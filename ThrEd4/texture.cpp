@@ -350,53 +350,53 @@ void txi::txrbak() noexcept {
 }
 
 auto texture::dutxtfil() -> bool {
-  if (!displayText::filmsgs(FMM_TXTR)) {
-	if (IniFile.textureHeight == 0.0F) {
-	  IniFile.textureHeight = ITXHI;
-	}
-	if (IniFile.textureWidth == 0.0F) {
-	  IniFile.textureWidth = ITXWID;
-	}
-	if (IniFile.textureSpacing == 0.0F) {
-	  IniFile.textureSpacing = ITXSPAC;
-	}
-	if (IniFile.textureEditorSize == 0U) {
-	  IniFile.textureEditorSize = ITXPIX;
-	}
-	StateMap->set(StateFlag::TXTRED);
-	StateMap->set(StateFlag::ZUMED);
-	StateMap->reset(StateFlag::WASPAT);
-	StateMap->reset(StateFlag::RUNPAT);
-	thred::movStch();
-	ShowWindow(VerticalScrollBar, SW_HIDE);
-	ShowWindow(HorizontalScrollBar, SW_HIDE);
-	SelectedTexturePointsList->clear();
-	StateMap->set(StateFlag::INIT);
-	SideWindowButton = nullptr;
-	if (StateMap->test(StateFlag::WASTXBAK)) {
-	  txi::redtbak();
-	  if (TextureScreen.areaHeight == 0.0F) {
-		TextureScreen.areaHeight = IniFile.textureHeight;
-	  }
-	  if (TextureScreen.spacing == 0.0F) {
-		TextureScreen.spacing = IniFile.underlaySpacing;
-	  }
-	  if (TextureScreen.width == 0.0F) {
-		TextureScreen.width = IniFile.textureWidth;
-	  }
-	  StateMap->set(StateFlag::LASTXBAK);
-	  StateMap->reset(StateFlag::TXBDIR);
-	}
-	else {
-	  TempTexturePoints->clear();
-	  TextureScreen.areaHeight = IniFile.textureHeight;
-	  TextureScreen.width      = IniFile.textureWidth;
-	  TextureScreen.spacing    = IniFile.textureSpacing;
-	}
-	StateMap->set(StateFlag::RESTCH);
-	return true;
+  if (displayText::filmsgs(FMM_TXTR)) {
+	return false;
   }
-  return false;
+  if (IniFile.textureHeight == 0.0F) {
+	IniFile.textureHeight = ITXHI;
+  }
+  if (IniFile.textureWidth == 0.0F) {
+	IniFile.textureWidth = ITXWID;
+  }
+  if (IniFile.textureSpacing == 0.0F) {
+	IniFile.textureSpacing = ITXSPAC;
+  }
+  if (IniFile.textureEditorSize == 0U) {
+	IniFile.textureEditorSize = ITXPIX;
+  }
+  StateMap->set(StateFlag::TXTRED);
+  StateMap->set(StateFlag::ZUMED);
+  StateMap->reset(StateFlag::WASPAT);
+  StateMap->reset(StateFlag::RUNPAT);
+  thred::movStch();
+  ShowWindow(VerticalScrollBar, SW_HIDE);
+  ShowWindow(HorizontalScrollBar, SW_HIDE);
+  SelectedTexturePointsList->clear();
+  StateMap->set(StateFlag::INIT);
+  SideWindowButton = nullptr;
+  if (StateMap->test(StateFlag::WASTXBAK)) {
+	txi::redtbak();
+	if (TextureScreen.areaHeight == 0.0F) {
+	  TextureScreen.areaHeight = IniFile.textureHeight;
+	}
+	if (TextureScreen.spacing == 0.0F) {
+	  TextureScreen.spacing = IniFile.underlaySpacing;
+	}
+	if (TextureScreen.width == 0.0F) {
+	  TextureScreen.width = IniFile.textureWidth;
+	}
+	StateMap->set(StateFlag::LASTXBAK);
+	StateMap->reset(StateFlag::TXBDIR);
+  }
+  else {
+	TempTexturePoints->clear();
+	TextureScreen.areaHeight = IniFile.textureHeight;
+	TextureScreen.width      = IniFile.textureWidth;
+	TextureScreen.spacing    = IniFile.textureSpacing;
+  }
+  StateMap->set(StateFlag::RESTCH);
+  return true;
 }
 
 void txi::txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept {
