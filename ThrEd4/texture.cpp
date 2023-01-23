@@ -657,29 +657,30 @@ void txi::ritxrct() {
 }
 
 void txi::dutxrct(TXTR_RECT& textureRect) {
-  if (!SelectedTexturePointsList->empty()) {
-	auto const* texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->front());
-	textureRect.left = textureRect.right = texturePoint->line;
-	textureRect.top = textureRect.bottom = texturePoint->y;
-	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(SelectedTexturePointsList->size()); ++iPoint) {
-	  texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
-	  if (texturePoint->y > textureRect.top) {
-		textureRect.top = texturePoint->y;
-	  }
-	  if (texturePoint->y < textureRect.bottom) {
-		textureRect.bottom = texturePoint->y;
-	  }
-	  if (texturePoint->line < textureRect.left) {
-		textureRect.left = texturePoint->line;
-	  }
-	  if (texturePoint->line > textureRect.right) {
-		textureRect.right = texturePoint->line;
-	  }
-	}
-  }
-  else {
+  if (SelectedTexturePointsList->empty()) {
 	textureRect.left = textureRect.right = 0U;
 	textureRect.top = textureRect.bottom = 0.0F;
+	return;
+  }
+  auto const& firstPoint = TempTexturePoints->operator[](SelectedTexturePointsList->front());
+  textureRect.left = textureRect.right = firstPoint.line;
+  textureRect.top = textureRect.bottom = firstPoint.y;
+  auto spList = std::ranges::subrange(std::next(SelectedTexturePointsList->begin()),
+                                      SelectedTexturePointsList->end());
+  for (auto const& iPoint : spList) {
+	auto const& texturePoint = TempTexturePoints->operator[](iPoint);
+	if (texturePoint.y > textureRect.top) {
+	  textureRect.top = texturePoint.y;
+	}
+	if (texturePoint.y < textureRect.bottom) {
+	  textureRect.bottom = texturePoint.y;
+	}
+	if (texturePoint.line < textureRect.left) {
+	  textureRect.left = texturePoint.line;
+	}
+	if (texturePoint.line > textureRect.right) {
+	  textureRect.right = texturePoint.line;
+	}
   }
 }
 
