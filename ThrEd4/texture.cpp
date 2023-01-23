@@ -971,14 +971,14 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	}
 	TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	txi::ritxfrm(textureForm);
+	return;
   }
-  else {
-	if (!SelectedTexturePointsList->empty()) {
-	  txi::ritxrct();
-	  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-	  txi::ritxrct();
-	}
+  if (SelectedTexturePointsList->empty()) {
+	return;
   }
+  txi::ritxrct();
+  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  txi::ritxrct();
 }
 
 void txi::txtlin() {
