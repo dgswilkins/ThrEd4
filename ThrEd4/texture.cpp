@@ -1560,6 +1560,7 @@ void texture::txsnap() {
 	  texturePoint.y   = yStep * IniFile.gridSize;
 	}
   }
+  txi::dutxrct(TextureRect);
   StateMap->set(StateFlag::RESTCH);
 }
 
