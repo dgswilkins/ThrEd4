@@ -610,23 +610,24 @@ void texture::txtrbut() {
 }
 
 auto txi::txtclos(uint32_t& closestTexturePoint) -> bool {
-  if (closestTexturePoint != 0U) {
-	auto minimumLength = BIGDBL;
-	auto reference     = POINT {};
-	auto point         = POINT {};
-	txi::deorg(reference);
-	closestTexturePoint = 0;
-	for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); ++iPoint) {
-	  txi::txt2pix(TempTexturePoints->operator[](iPoint), point);
-	  auto const length = hypot(point.x - reference.x, point.y - reference.y);
-	  if (length < minimumLength) {
-		minimumLength       = length;
-		closestTexturePoint = iPoint;
-	  }
+  if (closestTexturePoint == 0U) {
+	return false;
+  }
+  auto minimumLength = BIGDBL;
+  auto reference     = POINT {};
+  auto point         = POINT {};
+  txi::deorg(reference);
+  closestTexturePoint = 0;
+  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); ++iPoint) {
+	txi::txt2pix(TempTexturePoints->operator[](iPoint), point);
+	auto const length = hypot(point.x - reference.x, point.y - reference.y);
+	if (length < minimumLength) {
+	  minimumLength       = length;
+	  closestTexturePoint = iPoint;
 	}
-	if (minimumLength < CLOSENUF) {
-	  return true;
-	}
+  }
+  if (minimumLength < CLOSENUF) {
+	return true;
   }
   return false;
 }
