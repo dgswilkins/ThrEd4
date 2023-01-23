@@ -555,26 +555,22 @@ void texture::drwtxtr() {
 
 auto txi::px2txt(POINT const& offset) -> bool {
   auto editPoint = F_POINT {};
-  auto retval    = false;
   txi::px2ed(offset, editPoint);
-  auto line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
+  auto const line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
 
   if (line < OSCLAMP) {
-	line = 0.0F;
+	return false;
   }
   auto txPoint = TX_PNT {0.0F, wrap::round<uint16_t>(line)};
-  if ((txPoint.line <= TextureScreen.lines) && (txPoint.line >= 1)) {
-	if (offset.y > TextureScreen.top) {
-	  if ((offset.y <= TextureScreen.bottom)) {
-		txPoint.y = TextureScreen.areaHeight -
-		            (((wrap::toFloat(offset.y - TextureScreen.top)) /
-		             wrap::toFloat(TextureScreen.height)) * TextureScreen.areaHeight);
-		TempTexturePoints->push_back(txPoint);
-		retval = true;
-	  }
-	}
+  if ((txPoint.line > TextureScreen.lines) || (offset.y <= TextureScreen.top) ||
+      (offset.y > TextureScreen.bottom)) {
+	return false;
   }
-  return retval;
+  txPoint.y = TextureScreen.areaHeight -
+              (((wrap::toFloat(offset.y - TextureScreen.top)) / wrap::toFloat(TextureScreen.height)) *
+               TextureScreen.areaHeight);
+  TempTexturePoints->push_back(txPoint);
+  return true;
 }
 
 void txi::deorg(POINT& point) noexcept {
