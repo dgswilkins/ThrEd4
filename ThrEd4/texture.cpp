@@ -288,12 +288,11 @@ void texture::redtx() {
 }
 
 void txi::txrfor() noexcept {
-  if (TextureHistoryIndex < (TextureHistory->size() - 1U)) {
-	++TextureHistoryIndex;
-  }
-  else {
+  if (TextureHistoryIndex == (TextureHistory->size() - 1U)) {
 	TextureHistoryIndex = 0;
+	return;
   }
+  ++TextureHistoryIndex;
 }
 
 auto txi::chktxh(_In_ TX_HIST const& historyItem) -> bool {
