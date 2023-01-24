@@ -2312,40 +2312,47 @@ void xt::duauxnam(fs::path& auxName) {
 }
 
 void xi::rtrclpfn(FRM_HEAD const& form) {
-  if (OpenClipboard(ThrEdWindow) != 0) {
-	auto count = 0U;
-	if (auto clipRect = F_RECTANGLE {}; form.isEdgeClip()) {
-	  count = form.clipEntries;
-	  clip::oclp(clipRect, form.borderClipData, count);
-	}
-	else {
-	  if (form.isClip()) {
-		count = form.lengthOrCount.clipCount;
-		clip::oclp(clipRect, form.angleOrClipData.clip, count);
-	  }
-	}
-	if (count != 0U) {
-	  LowerLeftStitch.x = 0.0F;
-	  LowerLeftStitch.y = 0.0F;
-	  EmptyClipboard();
-	  Clip = RegisterClipboardFormat(PcdClipFormat);
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
-	  if (nullptr != clipHandle) {
-		auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-		if (nullptr != clipStitchData) {
-		  auto const spClipData = gsl::span(clipStitchData, count);
-		  thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
-		  for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-			thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
-		  }
-		}
-		GlobalUnlock(clipHandle);
-		SetClipboardData(Clip, clipHandle);
-	  }
-	}
-	CloseClipboard();
+  if (OpenClipboard(ThrEdWindow) == 0) {
+	return;
   }
+  auto count = 0U;
+  if (auto clipRect = F_RECTANGLE {}; form.isEdgeClip()) {
+	count = form.clipEntries;
+	clip::oclp(clipRect, form.borderClipData, count);
+  }
+  else {
+	if (form.isClip()) {
+	  count = form.lengthOrCount.clipCount;
+	  clip::oclp(clipRect, form.angleOrClipData.clip, count);
+	}
+  }
+  if (count == 0U) {
+	CloseClipboard();
+	return;
+  }
+  LowerLeftStitch.x = 0.0F;
+  LowerLeftStitch.y = 0.0F;
+  EmptyClipboard();
+  Clip = RegisterClipboardFormat(PcdClipFormat);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
+  if (nullptr == clipHandle) {
+	CloseClipboard();
+	return;
+  }
+  auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+  if (nullptr == clipStitchData) {
+	CloseClipboard();
+	return;
+  }
+  auto const spClipData = gsl::span(clipStitchData, count);
+  thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
+  for (auto iStitch = 1U; iStitch < count; ++iStitch) {
+	thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
+  }
+  GlobalUnlock(clipHandle);
+  SetClipboardData(Clip, clipHandle);
+  CloseClipboard();
 }
 
 void xt::rtrclp() {
