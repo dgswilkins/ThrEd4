@@ -176,8 +176,7 @@ void texture::txdun() {
   }
   WriteFile(handle, SIGNATURE.data(), wrap::toUnsigned(SIGNATURE.size()), &bytesWritten, nullptr);
   WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
-  auto bufferIter = textureHistoryBuffer.begin();
-  for (auto const& historyEntry : *TextureHistory) {
+  for (auto bufferIter = textureHistoryBuffer.begin(); auto const& historyEntry : *TextureHistory) {
 	bufferIter->count       = wrap::toUnsigned(historyEntry.texturePoints.size());
 	bufferIter->height      = historyEntry.height;
 	bufferIter->width       = historyEntry.width;
@@ -263,8 +262,7 @@ void texture::redtx() {
 	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
 	  break;
 	}
-	auto texture = TextureHistory->begin();
-	for (auto const& entry : textureHistoryBuffer) {
+	for (auto texture = TextureHistory->begin(); auto const& entry : textureHistoryBuffer) {
 	  texture->height  = entry.height;
 	  texture->width  = entry.width;
 	  texture->spacing = entry.spacing;
@@ -835,8 +833,7 @@ void texture::txtrup() {
 	std::swap(highestTexturePoint.y, lowestTexturePoint.y);
   }
   SelectedTexturePointsList->clear();
-  auto index = 0U;
-  for (auto const& iPoint :*TempTexturePoints) {
+  for (auto index = 0U; auto const& iPoint : *TempTexturePoints) {
 	if (iPoint.y < highestTexturePoint.y && iPoint.y > lowestTexturePoint.y &&
 	    iPoint.line <= highestTexturePoint.line && iPoint.line >= lowestTexturePoint.line) {
 	  SelectedTexturePointsList->push_back(index);
@@ -901,8 +898,7 @@ void txi::setxfrm() noexcept {
   txi::angrct(angleRect);
   auto const height = angleRect.top - angleRect.bottom;
   if (height > TextureScreen.areaHeight) {
-	auto const ratio = TextureScreen.areaHeight / height * 0.95F;
-	for (auto& vertex : angledFormVertices) {
+	for (auto const ratio = TextureScreen.areaHeight / height * 0.95F; auto& vertex : angledFormVertices) {
 	  vertex.x *= ratio;
 	  vertex.y *= ratio;
 	}
