@@ -109,7 +109,7 @@ void txhor(FRM_HEAD& form);
 auto txnam(std::wstring& name) -> bool;
 void txnudg(int32_t deltaX, float deltaY);
 void txpar(FRM_HEAD& form);
-void txrbak() noexcept;
+void txrbak();
 void txrct2rct(TXTR_RECT const& textureRect, RECT& rectangle) noexcept;
 void txrfor() noexcept;
 void txshrnk(FRM_HEAD const& textureForm);
@@ -218,7 +218,7 @@ void txi::redtbak() {
 void txi::rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
   auto dist = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
   if (dist == 0) {
-	TextureHistoryIndex = TextureHistory->size() - 1U;
+	TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
   }
   else {
 	TextureHistoryIndex = --dist;
@@ -234,7 +234,7 @@ void texture::redtx() {
   auto name                 = std::wstring {};
   auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(TextureHistory->size());
-  TextureHistoryIndex = TextureHistory->size() - 1U;
+  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
   do {
 	if (!txi::txnam(name)) {
 	  break;
@@ -255,13 +255,13 @@ void texture::redtx() {
 	  break;
 	}
 	if (!wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
-	  TextureHistoryIndex = TextureHistory->size() - 1U;
+	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
 	  break;
 	}
 	auto const bytesToRead = textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer);
 	auto       historyBytesRead = DWORD {};
 	if (!wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
-	  TextureHistoryIndex = TextureHistory->size() - 1U;
+	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
 	  break;
 	}
 	auto texture = TextureHistory->begin();
@@ -341,9 +341,9 @@ void texture::savtxt() {
       currentItem.texturePoints.end(), TempTexturePoints->begin(), TempTexturePoints->end());
 }
 
-void txi::txrbak() noexcept {
+void txi::txrbak() {
   if (TextureHistoryIndex == 0) {
-	TextureHistoryIndex = TextureHistory->size() - 1U;
+	TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
 	return;
   }
   --TextureHistoryIndex;
