@@ -2484,43 +2484,45 @@ void xt::nudsiz() {
 	  flag = 2;
 	}
   }
-  if (flag != 0) {
-	DesignSize.x = designSizeRect.right - designSizeRect.left;
-	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-	// clang-format off
-	// ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
+  if (flag == 0) {
+	return;
+  }
+  DesignSize.x = designSizeRect.right - designSizeRect.left;
+  DesignSize.y = designSizeRect.top - designSizeRect.bottom;
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-	auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	// ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
-	// clang-format on
-	if (nResult > 0) {
-	  flag = 0;
+  auto const nResult = DialogBox(
+      ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
 
-	  constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger
-	  if (DesignSize.x > IniFile.hoopSizeX) {
-		IniFile.hoopSizeX = DesignSize.x * HUPRATIO;
-		UnzoomedRect.cx   = std::lround(IniFile.hoopSizeX);
-		flag              = 1;
-	  }
-	  if (DesignSize.y > IniFile.hoopSizeY) {
-		IniFile.hoopSizeY = DesignSize.y * HUPRATIO;
-		UnzoomedRect.cy   = std::lround(IniFile.hoopSizeY);
-		flag              = 1;
-	  }
-	  xi::nudfn(designSizeRect);
-	  if (UserFlagMap->test(UserFlag::CHREF)) {
-		form::refilal();
-	  }
-	  if (flag != 0) {
-		thred::movStch();
-		thred::zumhom();
-		displayText::hsizmsg();
-	  }
-	  form::centir();
-	  for (auto& form : *FormList) {
-		form.outline();
-	  }
-	}
+  if (nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
+	return;
+  }
+  flag = 0;
+
+  constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger
+  if (DesignSize.x > IniFile.hoopSizeX) {
+	IniFile.hoopSizeX = DesignSize.x * HUPRATIO;
+	UnzoomedRect.cx   = std::lround(IniFile.hoopSizeX);
+	flag              = 1;
+  }
+  if (DesignSize.y > IniFile.hoopSizeY) {
+	IniFile.hoopSizeY = DesignSize.y * HUPRATIO;
+	UnzoomedRect.cy   = std::lround(IniFile.hoopSizeY);
+	flag              = 1;
+  }
+  xi::nudfn(designSizeRect);
+  if (UserFlagMap->test(UserFlag::CHREF)) {
+	form::refilal();
+  }
+  if (flag != 0) {
+	thred::movStch();
+	thred::zumhom();
+	displayText::hsizmsg();
+  }
+  form::centir();
+  for (auto& form : *FormList) {
+	form.outline();
   }
 }
 
