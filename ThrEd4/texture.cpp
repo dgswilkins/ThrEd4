@@ -188,7 +188,7 @@ void texture::txdun() {
                   wrap::toUnsigned(textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer)),
                   &bytesWritten,
                   nullptr);
-  for (auto& item : *TextureHistory) {
+  for (auto const& item : *TextureHistory) {
 	if (item.texturePoints.empty()) {
 	  continue;
 	}
@@ -1124,7 +1124,7 @@ void texture::deltx(uint32_t formIndex) {
   auto const& currentIndex = itForm->fillInfo.texture.index;
   // First check to see if the texture is shared between forms
   // check forms before current
-  for (auto const spForms = std::ranges::subrange(FormList->begin(), itForm); auto& current : spForms) {
+  for (auto const spForms = std::ranges::subrange(FormList->begin(), itForm); auto const& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
@@ -1133,7 +1133,7 @@ void texture::deltx(uint32_t formIndex) {
 	}
   }
   // check forms after current
-  for (auto const spForms = std::ranges::subrange(itNext, FormList->end()); auto& current : spForms) {
+  for (auto const spForms = std::ranges::subrange(itNext, FormList->end()); auto const& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
@@ -1178,7 +1178,7 @@ void txi::nutx(uint32_t formIndex) {
   }
   else {
 	for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
-	     auto& current : spForms | std::views::reverse) {
+	     auto const& current : spForms | std::views::reverse) {
 	  if (current.isTexture()) {
 		auto const& texture = current.fillInfo.texture;
 		index               = texture.index + texture.count;
@@ -1780,7 +1780,7 @@ void texture::setshft() {
   TempTexturePoints->clear();
   auto line = 1U;
   auto txIn = false;
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	if (txi::inrct(selectionRect, stitch)) {
 	  txIn = true;
 	  TempTexturePoints->push_back(TX_PNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
