@@ -2265,17 +2265,16 @@ void xt::dufhi(float length) {
 }
 
 void xt::setfilstrt() {
-  if (StateMap->test(StateFlag::FRMPSEL)) {
-	auto& form     = FormList->operator[](ClosestFormToCursor);
-	form.fillStart = gsl::narrow<uint16_t>(ClosestVertexToCursor);
-	form.extendedAttribute |= AT_STRT;
-	form::refil();
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (!StateMap->test(StateFlag::FRMPSEL)) {
 	displayText::shoseln(IDS_FORMP, IDS_FSTRT);
+	return;
   }
+  auto& form     = FormList->operator[](ClosestFormToCursor);
+  form.fillStart = gsl::narrow<uint16_t>(ClosestVertexToCursor);
+  form.extendedAttribute |= AT_STRT;
+  form::refil();
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void xt::setfilend() {
