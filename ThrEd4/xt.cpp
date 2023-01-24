@@ -2540,19 +2540,21 @@ void xt::mvshft() {
   if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) {
 	SetCapture(ThrEdWindow);
   }
-  if (StateMap->test(StateFlag::BZUMIN)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	if ((Msg.wParam & MK_LBUTTON) != 0U) {
-	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
-		SetCapture(ThrEdWindow);
-	  }
-	  thred::unbBox();
-	  ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
-	  ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
-	  StateMap->set(StateFlag::BZUM);
-	  thred::bBox();
-	}
+  if (!StateMap->test(StateFlag::BZUMIN)) {
+	return;
   }
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  if ((Msg.wParam & MK_LBUTTON) == 0U) {
+	return;
+  }
+  if (StateMap->testAndSet(StateFlag::VCAPT)) {
+	SetCapture(ThrEdWindow);
+  }
+  thred::unbBox();
+  ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
+  ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
+  StateMap->set(StateFlag::BZUM);
+  thred::bBox();
 }
 
 void xt::setclpspac() {
