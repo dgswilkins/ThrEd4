@@ -341,12 +341,11 @@ void texture::savtxt() {
 }
 
 void txi::txrbak() noexcept {
-  if (TextureHistoryIndex > 0) {
-	--TextureHistoryIndex;
-  }
-  else {
+  if (TextureHistoryIndex == 0) {
 	TextureHistoryIndex = ITXBUFSZ - 1U;
+	return;
   }
+  --TextureHistoryIndex;
 }
 
 auto texture::dutxtfil() -> bool {
