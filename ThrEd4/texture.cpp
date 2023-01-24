@@ -543,7 +543,7 @@ void texture::drwtxtr() {
 	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
-  for (auto const selectedPoint : *SelectedTexturePointsList) {
+  for (auto const& selectedPoint : *SelectedTexturePointsList) {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize * 2U);
   }
@@ -813,7 +813,7 @@ void texture::txtrup() {
 	if (xCoord > 0) {
 	  textureOffset.line -= xCoord;
 	}
-	for (auto const point : *SelectedTexturePointsList) {
+	for (auto const& point : *SelectedTexturePointsList) {
 	  auto& texturePoint = TempTexturePoints->operator[](point);
 	  texturePoint.line = gsl::narrow<uint16_t>(texturePoint.line + textureOffset.line);
 	  texturePoint.y += textureOffset.y;
@@ -876,7 +876,7 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
   auto const& angledFormVertices = *AngledFormVertices;
   auto const  maxVertex          = wrap::toUnsigned(angledFormVertices.size());
-  for (auto iVertex = 0U; iVertex < maxVertex; ++iVertex) {
+  for (auto iVertex = uint32_t {0U}; iVertex < maxVertex; ++iVertex) {
 	txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
 	formLines[iVertex].x += offset.x;
 	formLines[iVertex].y += offset.y;
@@ -1272,7 +1272,7 @@ void txi::dutxfn(uint32_t textureType) {
 	txfn(textureType, ClosestFormToCursor);
   }
   else {
-	for (auto const selectedForm : (*SelectedFormList)) {
+	for (auto const& selectedForm : *SelectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  txfn(textureType, selectedForm);
 	}
@@ -1510,18 +1510,18 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
   }
   if (deltaY != 0.0F) {
 	auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
-	for (auto const point : *SelectedTexturePointsList) {
+	for (auto const& point : *SelectedTexturePointsList) {
 	  auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
 	  if ((yCoord < 0.0F) || (yCoord > TextureScreen.areaHeight)) {
 		return;
 	  }
 	}
-	for (auto const point : *SelectedTexturePointsList) {
+	for (auto const& point : *SelectedTexturePointsList) {
 	  TempTexturePoints->operator[](point).y += screenDeltaY;
 	}
   }
   else {
-	for (auto const point : *SelectedTexturePointsList) {
+	for (auto const& point : *SelectedTexturePointsList) {
 	  auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
 	  if ((textureLine < 1) || (textureLine > TextureScreen.lines)) {
 		return;
