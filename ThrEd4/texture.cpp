@@ -158,7 +158,7 @@ auto txi::txnam(std::wstring& name) -> bool {
 void texture::txdun() {
   constexpr auto SIGNATURE            = std::array<char, 4> {"txh"};
   auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
-  textureHistoryBuffer.resize(ITXBUFSZ);
+  textureHistoryBuffer.resize(TextureHistory->size());
   if (TextureHistory->operator[](0).texturePoints.empty()) {
 	return;
   }
@@ -218,7 +218,7 @@ void txi::redtbak() {
 void txi::rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
   auto dist = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
   if (dist == 0) {
-	TextureHistoryIndex = ITXBUFSZ - 1U;
+	TextureHistoryIndex = TextureHistory->size() - 1U;
   }
   else {
 	TextureHistoryIndex = --dist;
@@ -233,8 +233,8 @@ void txi::rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
 void texture::redtx() {
   auto name                 = std::wstring {};
   auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
-  textureHistoryBuffer.resize(ITXBUFSZ);
-  TextureHistoryIndex = ITXBUFSZ - 1U;
+  textureHistoryBuffer.resize(TextureHistory->size());
+  TextureHistoryIndex = TextureHistory->size() - 1U;
   do {
 	if (!txi::txnam(name)) {
 	  break;
@@ -255,13 +255,13 @@ void texture::redtx() {
 	  break;
 	}
 	if (!wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
-	  TextureHistoryIndex = ITXBUFSZ - 1U;
+	  TextureHistoryIndex = TextureHistory->size() - 1U;
 	  break;
 	}
 	auto const bytesToRead = textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer);
 	auto       historyBytesRead = DWORD {};
 	if (!wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
-	  TextureHistoryIndex = ITXBUFSZ - 1U;
+	  TextureHistoryIndex = TextureHistory->size() - 1U;
 	  break;
 	}
 	auto texture = TextureHistory->begin();
@@ -288,7 +288,7 @@ void texture::redtx() {
 }
 
 void txi::txrfor() noexcept {
-  if (TextureHistoryIndex < (ITXBUFSZ - 1U)) {
+  if (TextureHistoryIndex < (TextureHistory->size() - 1U)) {
 	++TextureHistoryIndex;
   }
   else {
@@ -342,7 +342,7 @@ void texture::savtxt() {
 
 void txi::txrbak() noexcept {
   if (TextureHistoryIndex == 0) {
-	TextureHistoryIndex = ITXBUFSZ - 1U;
+	TextureHistoryIndex = TextureHistory->size() - 1U;
 	return;
   }
   --TextureHistoryIndex;
@@ -1402,7 +1402,7 @@ void txi::txbak() {
   }
   SelectedTexturePointsList->clear();
   auto flag = false;
-  for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
+  for (auto iHistory = 0U; iHistory < TextureHistory->size(); ++iHistory) {
 	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
 	  flag = true;
 	  break;
@@ -1420,7 +1420,7 @@ void txi::nxbak() {
 	return;
   }
   auto flag = false;
-  for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
+  for (auto iHistory = 0U; iHistory < TextureHistory->size(); ++iHistory) {
 	txi::txrfor();
 	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
 	  flag = true;

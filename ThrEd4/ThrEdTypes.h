@@ -80,7 +80,6 @@ constexpr float    ITXHI    = (9.0F * PFGRAN); // default texture editor height
 constexpr float    ITXWID   = (9.0F * PFGRAN); // default texture editor width
 constexpr float    ITXSPAC  = (0.4F * PFGRAN); // default texture editor spacing
 constexpr uint16_t ITXPIX   = 5U;              // default texture editor cross pixels
-constexpr uint32_t ITXBUFSZ = 16U;             // texture buffer depth
 constexpr uint32_t BTNCOUNT = 9U;              // Maximum number of buttons
 constexpr int32_t  FONTSIZE = 400;             // default font size
 constexpr uint32_t B1MASK   = 0x000000ffU;     // mask for the least significant byte

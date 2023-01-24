@@ -519,6 +519,7 @@ constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
 constexpr auto FLTPES   = COMDLG_FILTERSPEC {L"Brother", L"*.pes"};
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
+constexpr auto ITXBUFSZ = uint32_t {16U};         // texture buffer depth
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
 constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
