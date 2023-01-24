@@ -199,7 +199,6 @@ void texture::txdun() {
 }
 
 void txi::redtbak() {
-  // NOLINTNEXTLINE
   outDebugString(L"retrieving texture history {}\n", TextureHistoryIndex);
   auto const& textureHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
   TextureScreen.areaHeight       = textureHistoryItem.height;
@@ -659,7 +658,7 @@ void txi::dutxrct(TXTR_RECT& textureRect) {
   auto const& firstPoint = TempTexturePoints->operator[](SelectedTexturePointsList->front());
   textureRect.left = textureRect.right = firstPoint.line;
   textureRect.top = textureRect.bottom = firstPoint.y;
-  auto spList = std::ranges::subrange(std::next(SelectedTexturePointsList->begin()),
+  auto const spList = std::ranges::subrange(std::next(SelectedTexturePointsList->begin()),
                                       SelectedTexturePointsList->end());
   for (auto const& iPoint : spList) {
 	auto const& texturePoint = TempTexturePoints->operator[](iPoint);
