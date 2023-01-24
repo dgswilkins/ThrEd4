@@ -2349,13 +2349,14 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 }
 
 void xt::rtrclp() {
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	if (auto const& form = FormList->operator[](ClosestFormToCursor); form.isTexture()) {
-	  texture::rtrtx(form);
-	}
-	else {
-	  xi::rtrclpfn(form);
-	}
+  if (!StateMap->test(StateFlag::FORMSEL)) {
+	return;
+  }
+  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.isTexture()) {
+	texture::rtrtx(form);
+  }
+  else {
+	xi::rtrclpfn(form);
   }
 }
 
