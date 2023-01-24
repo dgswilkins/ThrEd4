@@ -322,22 +322,24 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) -> bool {
 }
 
 void texture::savtxt() {
-  if (!TempTexturePoints->empty()) {
-	auto const& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
-	if (txi::chktxh(currentHistoryItem)) {
-	  StateMap->set(StateFlag::WASTXBAK);
-	  StateMap->reset(StateFlag::TXBDIR);
-	  StateMap->reset(StateFlag::LASTXBAK);
-	  txi::txrfor();
-	  auto& currentItem   = TextureHistory->operator[](TextureHistoryIndex);
-	  currentItem.height  = TextureScreen.areaHeight;
-	  currentItem.width   = TextureScreen.width;
-	  currentItem.spacing = TextureScreen.spacing;
-	  currentItem.texturePoints.clear();
-	  currentItem.texturePoints.insert(
-	      currentItem.texturePoints.end(), TempTexturePoints->begin(), TempTexturePoints->end());
-	}
+  if (TempTexturePoints->empty()) {
+	return;
   }
+  auto const& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
+  if (!txi::chktxh(currentHistoryItem)) {
+	return;
+  }
+  StateMap->set(StateFlag::WASTXBAK);
+  StateMap->reset(StateFlag::TXBDIR);
+  StateMap->reset(StateFlag::LASTXBAK);
+  txi::txrfor();
+  auto& currentItem   = TextureHistory->operator[](TextureHistoryIndex);
+  currentItem.height  = TextureScreen.areaHeight;
+  currentItem.width   = TextureScreen.width;
+  currentItem.spacing = TextureScreen.spacing;
+  currentItem.texturePoints.clear();
+  currentItem.texturePoints.insert(
+      currentItem.texturePoints.end(), TempTexturePoints->begin(), TempTexturePoints->end());
 }
 
 void txi::txrbak() noexcept {
