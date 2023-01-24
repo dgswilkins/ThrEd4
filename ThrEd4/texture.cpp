@@ -622,10 +622,7 @@ auto txi::txtclos(uint32_t& closestTexturePoint) -> bool {
 	  closestTexturePoint = iPoint;
 	}
   }
-  if (minimumLength < CLOSENUF) {
-	return true;
-  }
-  return false;
+  return (minimumLength < CLOSENUF);
 }
 
 void txi::setxmov() {
