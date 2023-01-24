@@ -305,7 +305,8 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) -> bool {
   if (!util::closeEnough(historyItem.width, TextureScreen.width)) {
 	return true;
   }
-  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); ++iPoint) {
+  auto const end = wrap::toUnsigned(TextureHistory->size());
+  for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
 	if (TempTexturePoints->operator[](iPoint).line != historyItem.texturePoints[iPoint].line) {
 	  return true;
 	}
@@ -526,7 +527,8 @@ void texture::drwtxtr() {
   TextureCrossPen = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  for (auto index = 0U; index < wrap::toUnsigned(TempTexturePoints->size()); ++index) {
+  auto const end = wrap::toUnsigned(TextureHistory->size());
+  for (auto index = uint32_t {0U}; index < end; ++index) {
 	txi::dutxtx(index, IniFile.textureEditorSize);
   }
   if (!SelectedTexturePointsList->empty()) {
@@ -611,7 +613,8 @@ auto txi::txtclos(uint32_t& closestTexturePoint) -> bool {
   auto point         = POINT {};
   txi::deorg(reference);
   closestTexturePoint = 0;
-  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); ++iPoint) {
+  auto const end      = wrap::toUnsigned(TextureHistory->size());
+  for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
 	txi::txt2pix(TempTexturePoints->operator[](iPoint), point);
 	auto const length = hypot(point.x - reference.x, point.y - reference.y);
 	if (length < minimumLength) {
@@ -1395,7 +1398,8 @@ void txi::txbak() {
   }
   SelectedTexturePointsList->clear();
   auto flag = false;
-  for (auto iHistory = 0U; iHistory < TextureHistory->size(); ++iHistory) {
+  auto const end  = wrap::toUnsigned(TextureHistory->size());
+  for (auto iHistory = 0U; iHistory < end; ++iHistory) {
 	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
 	  flag = true;
 	  break;
@@ -1413,7 +1417,8 @@ void txi::nxbak() {
 	return;
   }
   auto flag = false;
-  for (auto iHistory = 0U; iHistory < TextureHistory->size(); ++iHistory) {
+  auto const end  = wrap::toUnsigned(TextureHistory->size());
+  for (auto iHistory = uint32_t {0U}; iHistory < end; ++iHistory) {
 	txi::txrfor();
 	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
 	  flag = true;
