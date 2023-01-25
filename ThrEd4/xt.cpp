@@ -572,7 +572,7 @@ void xt::fethrf() {
   form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
   form.fillInfo.feather.color     = (ActiveColor + 1U) & COLMSK;
   form.fillType                   = FTHF;
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void xt::fethr() {
@@ -1719,7 +1719,7 @@ void xi::setundfn(uint32_t code) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute |= code;
 	  if (savedAttribute != form.extendedAttribute) {
-		form::refilfn();
+		form::refilfn(ClosestFormToCursor);
 	  }
 	}
   }
@@ -1733,7 +1733,7 @@ void xi::setundfn(uint32_t code) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute |= code;
 	  if (savedAttribute != form.extendedAttribute) {
-		form::refilfn();
+		form::refilfn(selectedForm);
 	  }
 	}
   }
@@ -1761,7 +1761,7 @@ void xi::notundfn(uint32_t code) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute &= code;
 	  if (savedAttribute != form.extendedAttribute) {
-		form::refilfn();
+		form::refilfn(ClosestFormToCursor);
 	  }
 	}
   }
@@ -1775,7 +1775,7 @@ void xi::notundfn(uint32_t code) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute &= code;
 	  if (savedAttribute != form.extendedAttribute) {
-		form::refilfn();
+		form::refilfn(selectedForm);
 	  }
 	}
   }
@@ -1800,7 +1800,7 @@ void xi::ulenfn(uint32_t formNumber, float length) {
   if (auto& form = FormList->operator[](formNumber);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 	form.underlayStitchLen = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1829,7 +1829,7 @@ void xi::uspacfn(uint32_t formNumber, float spacing) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlaySpacing = spacing;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1851,7 +1851,7 @@ void xi::uangfn(uint32_t formNumber, float angle) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlayStitchAngle = angle;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1874,7 +1874,7 @@ void xi::flenfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !form.isClip()) {
 	form.lengthOrCount.stitchLength = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1901,7 +1901,7 @@ void xi::fspacfn(uint32_t formNumber, float spacing) {
 	  }
 	}
 	form.fillSpacing = spacing;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1924,7 +1924,7 @@ void xi::findfn(uint32_t formNumber, float indent) {
   auto& form          = FormList->operator[](formNumber);
   form.underlayIndent = indent;
   if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U) {
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1973,7 +1973,7 @@ void xi::fangfn(uint32_t formNumber, float angle) {
 		break;
 	  }
 	}
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -1997,7 +1997,7 @@ void xi::ucolfn(uint32_t formNumber, uint8_t color) {
   if (auto& form = FormList->operator[](formNumber);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 	form.underlayColor = color;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2023,7 +2023,7 @@ void xi::fcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	form.fillColor = color;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2052,7 +2052,7 @@ void xi::bcolfn(uint32_t formNumber, uint8_t color) {
 	return;
   }
   form.borderColor = color;
-  form::refilfn();
+  form::refilfn(formNumber);
 }
 
 void xt::dubcol(uint8_t color) {
@@ -2078,7 +2078,7 @@ void xi::blenfn(FRM_HEAD& form, float length) {
 	return;
   }
   form.lengthOrCount.stitchLength = length;
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void xt::dublen(float length) {
@@ -2101,7 +2101,7 @@ void xi::bspacfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.edgeSpacing = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2123,7 +2123,7 @@ void xi::bminfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.minBorderStitchLen = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2145,7 +2145,7 @@ void xi::bmaxfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.maxBorderStitchLen = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2167,7 +2167,7 @@ void xi::fminfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	form.minFillStitchLen = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2189,7 +2189,7 @@ void xi::fmaxfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	form.maxFillStitchLen = length;
-	form::refilfn();
+	form::refilfn(formNumber);
   }
 }
 
@@ -2220,7 +2220,7 @@ void xi::fwidfn(uint32_t formNumber, float length) {
 	++itVertex;
   }
   form.outline();
-  form::refilfn();
+  form::refilfn(formNumber);
 }
 
 void xt::dufwid(float length) {
@@ -2250,7 +2250,7 @@ void xi::fhifn(uint32_t formNumber, float length) {
 	++itVertex;
   }
   form.outline();
-  form::refilfn();
+  form::refilfn(formNumber);
 }
 
 void xt::dufhi(float length) {

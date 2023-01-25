@@ -1825,7 +1825,7 @@ void thi::chknum() {
 			form.underlayColor = colVal;
 			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmtStr.c_str());
-			form::refilfn();
+			form::refilfn(ClosestFormToCursor);
 			thred::coltab();
 		  }
 		  thred::unsid();
@@ -7948,7 +7948,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 		++itVertex;
 	  }
 	  form.outline();
-	  form::refilfn();
+	  form::refilfn(selectedForm);
 	}
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -9360,7 +9360,7 @@ void thi::filfrms() {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
-	  form::refilfn();
+	  form::refilfn(selectedForm);
 	}
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -11555,7 +11555,7 @@ auto thi::updateFillColor() -> bool {
 	}
 	if (StateMap->testAndReset(StateFlag::UNDCOL)) {
 	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLMSK;
-	  form::refilfn();
+	  form::refilfn(ClosestFormToCursor);
 	  thred::coltab();
 	  break;
 	}
@@ -12432,11 +12432,11 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  if (!SelectedFormList->empty()) {
 		for (auto selectedForm : (*SelectedFormList)) {
 		  ClosestFormToCursor = selectedForm;
-		  form::refilfn();
+		  form::refilfn(selectedForm);
 		}
 	  }
 	  else {
-		form::refilfn();
+		form::refilfn(ClosestFormToCursor);
 	  }
 	  thred::unmsg();
 	}
@@ -15834,11 +15834,11 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  if (!SelectedFormList->empty()) {
 			for (auto const selectedForm : (*SelectedFormList)) {
 			  ClosestFormToCursor = selectedForm;
-			  form::refilfn();
+			  form::refilfn(selectedForm);
 			}
 		  }
 		  else {
-			form::refilfn();
+			form::refilfn(ClosestFormToCursor);
 		  }
 		  thred::unmsg();
 		}

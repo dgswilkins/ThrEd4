@@ -675,7 +675,7 @@ void si::satsbrd(uint32_t formIndex) {
   currentForm.borderSize  = BorderWidth;
   currentForm.edgeSpacing = LineSpacing / 2;
   wrap::narrow(currentForm.borderColor, ActiveColor);
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void satin::satbrd() {
@@ -829,7 +829,7 @@ void satin::ribon() {
 		newForm.outline();
 		FormList->push_back(newForm);
 		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-		form::refilfn();
+		form::refilfn(ClosestFormToCursor);
 		ClosestFormToCursor = savedFormIndex;
 		StateMap->set(StateFlag::DELTO);
 		thred::frmdel();

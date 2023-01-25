@@ -121,7 +121,7 @@ void ratsr();
 void rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept;
 void refil();
 void refilal();
-void refilfn();
+void refilfn(uint32_t formIndex);
 void rinfrm();
 void ritfrct(uint32_t iForm, HDC hDC);
 void rotagain();

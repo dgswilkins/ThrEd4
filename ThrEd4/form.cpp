@@ -5139,12 +5139,12 @@ void fi::fmclp(FRM_HEAD& form) {
   LineSpacing          = savedSpacing;
 }
 
-void form::refilfn() {
+void form::refilfn(uint32_t formIndex) {
   auto const savedStitchLength   = UserStitchLength;
   auto       angledForm          = FRM_HEAD {};
   auto       workingFormVertices = std::vector<F_POINT> {};
   StateMap->reset(StateFlag::TXFIL);
-  auto& form = FormList->operator[](ClosestFormToCursor);
+  auto& form = FormList->operator[](formIndex);
   if (form.type == FRMLINE) {
 	form.underlayIndent = 0;
   }
@@ -5452,7 +5452,7 @@ void form::refil() {
 	  return;
 	}
   }
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::setfpnt() {
@@ -5495,7 +5495,7 @@ void fi::fsvrt() {
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
   form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::filvrt() {
@@ -5794,7 +5794,7 @@ void fi::filsfn() {
   form.fillType    = SATF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::filsat() {
@@ -6091,7 +6091,7 @@ void fi::sbord(uint32_t formIndex) {
   clip::deleclp(formIndex);
   form.edgeType = EDGELINE;
   form::bsizpar(form);
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::bord() {
@@ -6138,7 +6138,7 @@ void fi::fsclp(uint32_t formIndex) {
 	++itClipPoint;
   }
   clip::clpout(ClipRectSize.cy / 2);
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::fclp() {
@@ -6198,7 +6198,7 @@ void fi::sapliq(uint32_t formIndex) {
 	}
   }
   form.fillType = 0U;
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::apliq() {
@@ -6789,7 +6789,7 @@ void fi::sbold(uint32_t formIndex) {
   form.edgeType = EDGEBEAN;
   wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::dubold() {
@@ -7250,7 +7250,7 @@ void fi::prpsbrd(uint32_t formIndex) {
 	form.borderSize  = BorderWidth;
 	form.edgeSpacing = LineSpacing;
 	wrap::narrow(form.borderColor, ActiveColor);
-	form::refilfn();
+	form::refilfn(formIndex);
   }
 }
 
@@ -7384,7 +7384,7 @@ void fi::filsclp() {
 	*itClipPoints = clip;
 	++itClipPoints;
   }
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::clpfil() {
@@ -7882,7 +7882,7 @@ void form::refilal() {
   auto const savedFormIndex = ClosestFormToCursor;
   thred::savdo();
   for (ClosestFormToCursor = 0; ClosestFormToCursor < wrap::toUnsigned(FormList->size()); ++ClosestFormToCursor) {
-	form::refilfn();
+	form::refilfn(ClosestFormToCursor);
   }
   ClosestFormToCursor = savedFormIndex;
   thred::coltab();
@@ -8043,7 +8043,7 @@ void fi::bholbrd(uint32_t formIndex) {
   form.edgeSpacing = LineSpacing;
   wrap::narrow(form.borderColor, ActiveColor);
   form::savblen(ButtonholeCornerLength);
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::bhol() {
@@ -8140,7 +8140,7 @@ void fi::fspic(uint32_t formIndex) {
 	*itClipPoints = clip;
 	++itClipPoints;
   }
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::picot() {
@@ -8193,7 +8193,7 @@ auto fi::contsf(uint32_t formIndex) -> bool {
 	wrap::narrow(form.fillColor, ActiveColor);
 	form.fillSpacing = LineSpacing;
 	form::fsizpar(form);
-	form::refilfn();
+	form::refilfn(formIndex);
 	return true;
   }
   return false;
@@ -8726,9 +8726,9 @@ void form::stchadj() {
 	  stitch.attribute |= codedForm;
 	}
   }
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
   ++ClosestFormToCursor;
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
   StateMap->reset(StateFlag::FRMPSEL);
 }
 
@@ -8840,7 +8840,7 @@ void form::vrtsclp(uint32_t formIndex) {
   form.fillType = VCLPF;
   wrap::narrow(form.fillColor, ActiveColor);
   form.type = FRMFPOLY;
-  refilfn();
+  refilfn(formIndex);
 }
 
 void form::vrtclp() {
@@ -8905,7 +8905,7 @@ void form::horsclp() {
   form.fillType = HCLPF;
   wrap::narrow(form.fillColor, ActiveColor);
   form.type = FRMFPOLY;
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::horclp() {
@@ -8968,7 +8968,7 @@ void form::angsclp(FRM_HEAD& form) {
   form.fillType = ANGCLPF;
   wrap::narrow(form.fillColor, ActiveColor);
   form.type = FRMFPOLY;
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::angclp() {
@@ -9021,7 +9021,7 @@ void form::dubsfil(FRM_HEAD& form) {
   wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   fi::dubfn(form);
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::dubfil() {
@@ -9171,7 +9171,7 @@ void form::chan() {
   else {
 	currentForm.edgeType = EDGEOCHAIN;
   }
-  form::refilfn();
+  form::refilfn(ClosestFormToCursor);
 }
 
 void form::chain() {
@@ -9238,7 +9238,7 @@ void fi::fsclpx(uint32_t formIndex) {
 	++itClipPoint;
   }
   clip::duxclp(form);
-  form::refilfn();
+  form::refilfn(formIndex);
 }
 
 void form::filclpx() {
