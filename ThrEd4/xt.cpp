@@ -2047,10 +2047,12 @@ void xt::dufcol(uint8_t color) {
 
 void xi::bcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
-  if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
-	form.borderColor = color;
-	form::refilfn();
+  auto& form          = FormList->operator[](formNumber); 
+  if (form.edgeType == 0U) {
+	return;
   }
+  form.borderColor = color;
+  form::refilfn();
 }
 
 void xt::dubcol(uint8_t color) {
