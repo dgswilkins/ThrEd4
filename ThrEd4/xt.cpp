@@ -2072,7 +2072,7 @@ void xt::dubcol(uint8_t color) {
 }
 
 void xi::blenfn(FRM_HEAD& form, float length) {
-  if ((form.edgeType == 0U) || form.isEdgeClip()) {
+  if (form.isClip()) {
 	return;
   }
   form.lengthOrCount.stitchLength = length;
