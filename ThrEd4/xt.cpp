@@ -2072,10 +2072,11 @@ void xt::dubcol(uint8_t color) {
 }
 
 void xi::blenfn(FRM_HEAD& form, float length) {
-  if ((form.edgeType != 0U) && !form.isEdgeClip()) {
-	form.lengthOrCount.stitchLength = length;
-	form::refilfn();
+  if ((form.edgeType == 0U) || form.isEdgeClip()) {
+	return;
   }
+  form.lengthOrCount.stitchLength = length;
+  form::refilfn();
 }
 
 void xt::dublen(float length) {
