@@ -289,29 +289,28 @@ void ti::hideTraceWin() noexcept {
 }
 
 void trace::untrace() {
-  if (StateMap->testAndReset(StateFlag::WASTRAC)) {
-	bitmap::resetDC();
-	if (!TracedEdges->empty()) {
-	  TracedEdges->resize(0); // allocated in tracedg
-	}
-	if (!TracedMap->empty()) {
-	  TracedMap->resize(0); // allocated in trace
-	}
-	StateMap->reset(StateFlag::WASEDG);
-	ti::hideTraceWin();
-	ti::hidwnd(TraceStepWin);
-	thred::showColorWin();
-	for (auto const& iButton : *ButtonWin) {
-	  ti::shownd(iButton);
-	}
-  }
-  else {
+  if (!StateMap->testAndReset(StateFlag::WASTRAC)) {
 	if (StateMap->test(StateFlag::TRCUP)) {
 	  DownPixelColor = PENWHITE;
 	}
 	else {
 	  UpPixelColor = 0;
 	}
+	return;
+  }
+  bitmap::resetDC();
+  if (!TracedEdges->empty()) {
+	TracedEdges->resize(0); // allocated in tracedg
+  }
+  if (!TracedMap->empty()) {
+	TracedMap->resize(0); // allocated in trace
+  }
+  StateMap->reset(StateFlag::WASEDG);
+  ti::hideTraceWin();
+  ti::hidwnd(TraceStepWin);
+  thred::showColorWin();
+  for (auto const& iButton : *ButtonWin) {
+	ti::shownd(iButton);
   }
 }
 
