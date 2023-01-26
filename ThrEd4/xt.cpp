@@ -949,7 +949,7 @@ void xt::chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegment
 	xi::fnund(formIndex, textureSegments, angledFormVertices);
   }
   else {
-	xi::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
+	xi::delwlk((formIndex << FRMSHFT) | UNDMSK);
   }
 }
 
