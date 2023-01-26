@@ -398,13 +398,13 @@ void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& poin
 }
 
 void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
-  // clang-format off
-  auto        currentPoint = F_POINT {};
-  auto        nextPoint    = F_POINT {};
-  auto const& bCurrent     = BSequence->operator[](iSequence);
-  auto&       bNext        = BSequence->operator[](wrap::toSize(iSequence) + 1U);
-  auto const  length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
-  // clang-format on
+  auto currentPoint = F_POINT {};
+  auto nextPoint    = F_POINT {};
+
+  auto const& bCurrent = BSequence->operator[](iSequence);
+  auto& bNext          = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+
+  auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
   if (length < (2.0F * feather.minStitch)) {
 	feather.ratio = 0.5F;
