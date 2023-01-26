@@ -1325,7 +1325,8 @@ void formForms::wavfrm() {
 	  vShifted->y -= bottom;
 	  ++vShifted;
 	}
-	FormMoveDelta      = F_POINT {};
+	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	FormMoveDelta       = F_POINT {};
 	NewFormVertexCount = vertexCount + 1U;
 	form::setmfrm(ClosestFormToCursor);
 	form::mdufrm();
