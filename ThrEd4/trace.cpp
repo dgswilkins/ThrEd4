@@ -1060,24 +1060,23 @@ void trace::blak() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  if (!FormList->empty()) {
-	ti::tracwnd();
-	BlackPen = wrap::createPen(PS_SOLID, PENNWID, PENBLK);
-	SelectObject(bitmap::getBitmapDC(), BlackPen);
-	SelectObject(bitmap::getTraceDC(), BlackPen);
-	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  TraceDataSize = bitmap::getrmap();
-	}
-	for (auto& iForm : *FormList) {
-	  bitmap::bfrm(iForm);
-	}
-	DeleteObject(BlackPen);
-	StateMap->set(StateFlag::WASBLAK);
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (FormList->empty()) {
 	displayText::tabmsg(IDS_FRMNO, false);
+	return;
   }
+  ti::tracwnd();
+  BlackPen = wrap::createPen(PS_SOLID, PENNWID, PENBLK);
+  SelectObject(bitmap::getBitmapDC(), BlackPen);
+  SelectObject(bitmap::getTraceDC(), BlackPen);
+  if (!StateMap->test(StateFlag::WASTRAC)) {
+	TraceDataSize = bitmap::getrmap();
+  }
+  for (auto& iForm : *FormList) {
+	bitmap::bfrm(iForm);
+  }
+  DeleteObject(BlackPen);
+  StateMap->set(StateFlag::WASBLAK);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void trace::tracpar() {
