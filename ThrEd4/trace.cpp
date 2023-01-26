@@ -945,39 +945,38 @@ void trace::trinit() {
 }
 
 void trace::trcsel() {
-  if (bitmap::ismap()) {
-	StateMap->set(StateFlag::WASTRCOL);
-	StateMap->set(StateFlag::TRCRED);
-	StateMap->set(StateFlag::TRCBLU);
-	StateMap->set(StateFlag::TRCGRN);
-	DownPixelColor = PENWHITE;
-	UpPixelColor   = 0;
-	trace::trace();
-	StateMap->reset(StateFlag::HIDMAP);
-	StateMap->reset(StateFlag::TRSET);
-	auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
-	auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
-	for (auto& iPixel : spTBD) {
-	  auto colors                = ti::trcols(iPixel);
-	  auto maximumColorComponent = colors[0];
-	  auto iRGB                  = 2U;
-	  if (colors[1] > maximumColorComponent) {
-		maximumColorComponent = colors[1];
-		iRGB                  = 1;
-	  }
-	  if (colors[2] > maximumColorComponent) {
-		iRGB = 0;
-	  }
-	  iPixel &= TraceRGB[iRGB];
-	}
-	bitmap::bitbltBitmap();
-	StateMap->set(StateFlag::WASDSEL);
-	StateMap->set(StateFlag::RESTCH);
-	ti::tracwnd();
-  }
-  else {
+  if (!bitmap::ismap()) {
 	displayText::tabmsg(IDS_MAPLOD, false);
+	return;
   }
+  StateMap->set(StateFlag::WASTRCOL);
+  StateMap->set(StateFlag::TRCRED);
+  StateMap->set(StateFlag::TRCBLU);
+  StateMap->set(StateFlag::TRCGRN);
+  DownPixelColor = PENWHITE;
+  UpPixelColor   = 0;
+  trace::trace();
+  StateMap->reset(StateFlag::HIDMAP);
+  StateMap->reset(StateFlag::TRSET);
+  auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+  auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  for (auto& iPixel : spTBD) {
+	auto colors                = ti::trcols(iPixel);
+	auto maximumColorComponent = colors[0];
+	auto iRGB                  = 2U;
+	if (colors[1] > maximumColorComponent) {
+	  maximumColorComponent = colors[1];
+	  iRGB                  = 1;
+	}
+	if (colors[2] > maximumColorComponent) {
+	  iRGB = 0;
+	}
+	iPixel &= TraceRGB[iRGB];
+  }
+  bitmap::bitbltBitmap();
+  StateMap->set(StateFlag::WASDSEL);
+  StateMap->set(StateFlag::RESTCH);
+  ti::tracwnd();
 }
 
 void ti::ritrcol(COLORREF& colRef, uint32_t colNum) noexcept {
@@ -1152,7 +1151,7 @@ void trace::tracpar() {
 		  }
 		}
 		else {
-		  if (position < 20) {
+		  if (position < 20U) {
 			StateMap->set(StateFlag::NUMIN);
 			StateMap->set(StateFlag::TRNIN1);
 			thred::resetMsgBuffer();
