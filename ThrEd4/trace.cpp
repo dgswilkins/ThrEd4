@@ -731,139 +731,139 @@ void ti::decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
 }
 
 void ti::dutrac() {
-  if (thred::inStitchWin()) {
-	auto stitchPoint = thred::pxCor2stch(Msg.pt);
-	if (!StateMap->test(StateFlag::WASEDG)) {
-	  trace::tracedg();
-	  return;
-	}
-	thred::savdo();
-	if (StateMap->test(StateFlag::LANDSCAP)) {
-	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
-	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
-	}
-	auto const bmpSR = bitmap::getBmpStitchRatio();
-	CurrentTracePoint =
-	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
-	if (CurrentTracePoint.x > bitmap::getBitmapHeight()) {
-	  CurrentTracePoint.x = bitmap::getBitmapWidth();
-	}
-	if (CurrentTracePoint.y > bitmap::getBitmapHeight()) {
-	  CurrentTracePoint.y = bitmap::getBitmapHeight();
-	}
-	auto const savedPoint = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
-	auto       traceDirection = 0U;
-	if (!TracedEdges->test(wrap::toSize(savedPoint))) {
-	  auto point = savedPoint;
-	  auto limit = (CurrentTracePoint.y + 1) * bitmap::getBitmapWidth();
-	  while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
-		++point;
-	  }
-	  auto const right = (point < limit) ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
-	                                     : bitmap::getBitmapWidth();
-	  point            = savedPoint;
-	  limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
-	  while (point > limit && !TracedEdges->test(wrap::toSize(point))) {
-		--point;
-	  }
-	  auto const left = (point == limit) ? 0 : point - limit;
-	  point           = savedPoint;
-	  while (point > 0 && !TracedEdges->test(wrap::toSize(point))) {
-		if (point > bitmap::getBitmapWidth()) {
-		  point -= bitmap::getBitmapWidth();
-		}
-		else {
-		  point = 0;
-		}
-	  }
-	  auto const bottom = (point > 0) ? point / bitmap::getBitmapWidth() : 0;
-	  point             = savedPoint;
-	  limit             = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
-	  while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
-		point += bitmap::getBitmapWidth();
-	  }
-	  auto const top = (point < limit) ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
-	  auto flag                = 0U;
-	  auto minimumEdgeDistance = std::numeric_limits<int32_t>::max();
-	  if (left != 0) {
-		minimumEdgeDistance = CurrentTracePoint.x - left;
-		flag                = TRCL;
-	  }
-	  if (right < bitmap::getBitmapWidth()) {
-		auto const edgeDistance = right - CurrentTracePoint.x;
-		if (edgeDistance < minimumEdgeDistance) {
-		  minimumEdgeDistance = edgeDistance;
-		  flag                = TRCR;
-		}
-	  }
-	  if (bottom != 0) {
-		auto const edgeDistance = CurrentTracePoint.y - bottom;
-		if (edgeDistance < minimumEdgeDistance) {
-		  minimumEdgeDistance = edgeDistance;
-		  flag                = TRCD;
-		}
-	  }
-	  if (top < bitmap::getBitmapHeight()) {
-		auto const edgeDistance = top - CurrentTracePoint.y;
-		if (edgeDistance < minimumEdgeDistance) {
-		  flag = TRCU;
-		}
-	  }
-	  switch (flag) {
-		case TRCU: {
-		  CurrentTracePoint.y = top;
-		  traceDirection      = TRCR;
-		  break;
-		}
-		case TRCR: {
-		  CurrentTracePoint.x = right;
-		  traceDirection      = TRCD;
-		  break;
-		}
-		case TRCD: {
-		  CurrentTracePoint.y = bottom;
-		  traceDirection      = TRCL;
-		  break;
-		}
-		case TRCL: {
-		  CurrentTracePoint.x = left;
-		  traceDirection      = TRCU;
-		  break;
-		}
-		default:
-		  return;
-	  }
-	}
-	uint32_t const initialDirection = traceDirection;
-	auto           tracedPoints     = std::vector<TRACE_PNT> {};
-	tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
-	                                  gsl::narrow<int16_t>(CurrentTracePoint.y)});
-	while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
-	if (tracedPoints.size() >= POINTMAX) {
-	  displayText::tabmsg(IDS_FRM2L, false);
-	  return;
-	}
-#ifndef TESTTRC
-	auto decimatedLine = std::vector<TRACE_PNT> {};
-	decimatedLine.reserve(tracedPoints.size());
-	decSlope(tracedPoints, decimatedLine);
-	tracedPoints.clear();
-	tracedPoints.reserve(decimatedLine.size());
-	decLen(decimatedLine, tracedPoints);
-#endif
-	auto form        = FRM_HEAD {};
-	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
-	decForm(tracedPoints, *FormVertices);
-	form.vertexCount     = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
-	form.type            = FRMFPOLY;
-	form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
-	form.satinGuideCount = 0;
-	form.outline();
-	FormList->push_back(form);
-	StateMap->set(StateFlag::RESTCH);
-	StateMap->set(StateFlag::FRMOF);
-	form::tglfrm();
+  if (!thred::inStitchWin()) {
+	return;
   }
+  auto stitchPoint = thred::pxCor2stch(Msg.pt);
+  if (!StateMap->test(StateFlag::WASEDG)) {
+	trace::tracedg();
+	return;
+  }
+  thred::savdo();
+  if (StateMap->test(StateFlag::LANDSCAP)) {
+	auto const bmpSiS = bitmap::getBitmapSizeinStitches();
+	stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
+  }
+  auto const bmpSR = bitmap::getBmpStitchRatio();
+  CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
+  if (CurrentTracePoint.x > bitmap::getBitmapHeight()) {
+	CurrentTracePoint.x = bitmap::getBitmapWidth();
+  }
+  if (CurrentTracePoint.y > bitmap::getBitmapHeight()) {
+	CurrentTracePoint.y = bitmap::getBitmapHeight();
+  }
+  auto const savedPoint     = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
+  auto       traceDirection = 0U;
+  if (!TracedEdges->test(wrap::toSize(savedPoint))) {
+	auto point = savedPoint;
+	auto limit = (CurrentTracePoint.y + 1) * bitmap::getBitmapWidth();
+	while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
+	  ++point;
+	}
+	auto const right = (point < limit) ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
+	                                   : bitmap::getBitmapWidth();
+	point            = savedPoint;
+	limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
+	while (point > limit && !TracedEdges->test(wrap::toSize(point))) {
+	  --point;
+	}
+	auto const left = (point == limit) ? 0 : point - limit;
+	point           = savedPoint;
+	while (point > 0 && !TracedEdges->test(wrap::toSize(point))) {
+	  if (point > bitmap::getBitmapWidth()) {
+		point -= bitmap::getBitmapWidth();
+	  }
+	  else {
+		point = 0;
+	  }
+	}
+	auto const bottom = (point > 0) ? point / bitmap::getBitmapWidth() : 0;
+	point             = savedPoint;
+	limit             = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+	while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
+	  point += bitmap::getBitmapWidth();
+	}
+	auto const top = (point < limit) ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
+	auto       flag                = 0U;
+	auto       minimumEdgeDistance = std::numeric_limits<int32_t>::max();
+	if (left != 0) {
+	  minimumEdgeDistance = CurrentTracePoint.x - left;
+	  flag                = TRCL;
+	}
+	if (right < bitmap::getBitmapWidth()) {
+	  auto const edgeDistance = right - CurrentTracePoint.x;
+	  if (edgeDistance < minimumEdgeDistance) {
+		minimumEdgeDistance = edgeDistance;
+		flag                = TRCR;
+	  }
+	}
+	if (bottom != 0) {
+	  auto const edgeDistance = CurrentTracePoint.y - bottom;
+	  if (edgeDistance < minimumEdgeDistance) {
+		minimumEdgeDistance = edgeDistance;
+		flag                = TRCD;
+	  }
+	}
+	if (top < bitmap::getBitmapHeight()) {
+	  auto const edgeDistance = top - CurrentTracePoint.y;
+	  if (edgeDistance < minimumEdgeDistance) {
+		flag = TRCU;
+	  }
+	}
+	switch (flag) {
+	  case TRCU: {
+		CurrentTracePoint.y = top;
+		traceDirection      = TRCR;
+		break;
+	  }
+	  case TRCR: {
+		CurrentTracePoint.x = right;
+		traceDirection      = TRCD;
+		break;
+	  }
+	  case TRCD: {
+		CurrentTracePoint.y = bottom;
+		traceDirection      = TRCL;
+		break;
+	  }
+	  case TRCL: {
+		CurrentTracePoint.x = left;
+		traceDirection      = TRCU;
+		break;
+	  }
+	  default:
+		return;
+	}
+  }
+  uint32_t const initialDirection = traceDirection;
+  auto           tracedPoints     = std::vector<TRACE_PNT> {};
+  tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
+                                    gsl::narrow<int16_t>(CurrentTracePoint.y)});
+  while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
+  if (tracedPoints.size() >= POINTMAX) {
+	displayText::tabmsg(IDS_FRM2L, false);
+	return;
+  }
+#ifndef TESTTRC
+  auto decimatedLine = std::vector<TRACE_PNT> {};
+  decimatedLine.reserve(tracedPoints.size());
+  decSlope(tracedPoints, decimatedLine);
+  tracedPoints.clear();
+  tracedPoints.reserve(decimatedLine.size());
+  decLen(decimatedLine, tracedPoints);
+#endif
+  auto form        = FRM_HEAD {};
+  form.vertexIndex = wrap::toUnsigned(FormVertices->size());
+  decForm(tracedPoints, *FormVertices);
+  form.vertexCount     = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
+  form.type            = FRMFPOLY;
+  form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+  form.satinGuideCount = 0;
+  form.outline();
+  FormList->push_back(form);
+  StateMap->set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::FRMOF);
+  form::tglfrm();
 }
 
 void trace::trinit() {
