@@ -2190,12 +2190,11 @@ void xt::dufmax(float length) {
 }
 
 void xi::fwidfn(uint32_t formIndex, float length) {
-  // clang-format off
-  auto&       form      = FormList->operator[](formIndex);
-  auto const  reference = form.rectangle.left;
-  auto const  ratio     = length / (form.rectangle.right - reference);
-  auto        itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
-  // clang-format on
+  auto& form = FormList->operator[](formIndex);
+
+  auto const reference = form.rectangle.left;
+  auto const ratio     = length / (form.rectangle.right - reference);
+  auto       itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x = (itVertex->x - reference) * ratio + reference;
 	++itVertex;
