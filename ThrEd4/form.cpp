@@ -6127,7 +6127,7 @@ void fi::fsclp(uint32_t formIndex) {
   auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
   form.edgeType       = EDGECLIP;
   form.clipEntries    = clipSize;
-  form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
+  form.borderClipData = clip::nueclp(formIndex, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = ClipRectSize.cx;
   wrap::narrow(form.borderColor, ActiveColor);
@@ -6155,7 +6155,6 @@ void form::fclp() {
 	  if (ClipRectSize.cx > CLPMIN) {
 		if (!SelectedFormList->empty()) {
 		  for (auto const selectedForm : (*SelectedFormList)) {
-			ClosestFormToCursor = selectedForm;
 			fi::fsclp(selectedForm);
 		  }
 		  StateMap->set(StateFlag::INIT);
