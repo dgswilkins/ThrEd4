@@ -143,7 +143,7 @@ void setfpnt();
 void setfrm();
 void sethup() noexcept;
 void setins();
-void setmfrm();
+void setmfrm(uint32_t formIndex);
 void setrang();
 void setstrtch();
 auto sfCor2px(F_POINT const& stitchPoint) -> POINT;

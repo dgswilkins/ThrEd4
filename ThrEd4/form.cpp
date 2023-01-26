@@ -1200,8 +1200,8 @@ void fi::setzig() {
   displayText::numWnd();
 }
 
-void form::setmfrm() {
-  auto const& closeForm = FormList->operator[](ClosestFormToCursor);
+void form::setmfrm(uint32_t formIndex) {
+  auto const& closeForm = FormList->operator[](formIndex);
 
   auto itVertex = wrap::next(FormVertices->cbegin(), closeForm.vertexIndex);
   auto point    = form::sfCor2px(itVertex[0]);
@@ -1247,7 +1247,7 @@ void form::durpoli(uint32_t vertexCount) {
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
   StateMap->set(StateFlag::POLIMOV);
-  setmfrm();
+  setmfrm(ClosestFormToCursor);
   StateMap->set(StateFlag::SHOFRM);
   mdufrm();
 }
@@ -5665,7 +5665,7 @@ void form::rstfrm() {
       POINT {(Msg.pt.x + std::lround(FormMoveDelta.x)), (Msg.pt.y + std::lround(FormMoveDelta.y))};
 
   auto const attribute = ClosestFormToCursor << 4U;
-  form::setmfrm();
+  form::setmfrm(ClosestFormToCursor);
   StateMap->reset(StateFlag::FRMOV);
   auto const stitchPoint = thred::pxCor2stch(point);
   auto& currentForm      = FormList->operator[](ClosestFormToCursor);
@@ -6872,7 +6872,7 @@ void form::dustar(uint32_t starCount, float length) {
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
   StateMap->set(StateFlag::POLIMOV);
-  form::setmfrm();
+  form::setmfrm(ClosestFormToCursor);
   StateMap->set(StateFlag::SHOFRM);
   form::mdufrm();
 }
@@ -6929,7 +6929,7 @@ void form::duspir(uint32_t stepCount) {
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
   StateMap->set(StateFlag::POLIMOV);
-  form::setmfrm();
+  form::setmfrm(ClosestFormToCursor);
   StateMap->set(StateFlag::SHOFRM);
   form::mdufrm();
 }
@@ -7006,7 +7006,7 @@ void form::duhart(uint32_t sideCount) {
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   FormMoveDelta       = F_POINT {};
   StateMap->set(StateFlag::POLIMOV);
-  form::setmfrm();
+  form::setmfrm(ClosestFormToCursor);
   StateMap->set(StateFlag::SHOFRM);
   form::mdufrm();
 }
@@ -7063,7 +7063,7 @@ void form::dulens(uint32_t sides) {
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   FormMoveDelta       = F_POINT {};
   StateMap->set(StateFlag::POLIMOV);
-  form::setmfrm();
+  form::setmfrm(ClosestFormToCursor);
   StateMap->set(StateFlag::SHOFRM);
   form::mdufrm();
 }
@@ -7133,7 +7133,7 @@ void form::duzig(uint32_t vertices) {
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertices + 1U;
   StateMap->set(StateFlag::POLIMOV);
-  form::setmfrm();
+  form::setmfrm(ClosestFormToCursor);
   StateMap->set(StateFlag::SHOFRM);
   form::mdufrm();
 }

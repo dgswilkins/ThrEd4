@@ -10705,7 +10705,7 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::POLIMOV)) {
 	  form::munfrm();
-	  form::setmfrm();
+	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
@@ -10788,7 +10788,7 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::FUNCLP)) {
 	  form::unfrm();
-	  form::setmfrm();
+	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::dufrm();
 	  return true;
@@ -10803,7 +10803,7 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::FRMOV)) {
 	  form::munfrm();
-	  form::setmfrm();
+	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
@@ -13140,7 +13140,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  StateMap->set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
 		  form::unfrm();
-		  form::setmfrm();
+		  form::setmfrm(ClosestFormToCursor);
 		  StateMap->set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
@@ -13321,7 +13321,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  StateMap->set(StateFlag::INIT);
 		  form::unfrm();
 		  thred::duzrat();
-		  form::setmfrm();
+		  form::setmfrm(ClosestFormToCursor);
 		  StateMap->set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
