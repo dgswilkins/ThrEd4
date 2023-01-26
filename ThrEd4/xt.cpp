@@ -945,7 +945,7 @@ void xi::fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments
 }
 
 void xt::chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
-  if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
+  if (auto const& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	xi::fnund(formIndex, textureSegments, angledFormVertices);
   }
   else {
@@ -1348,7 +1348,7 @@ void xt::dmpat() {
 #endif
 
 void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap) {
-  auto& form = FormList->operator[](formIndex);
+  auto const& form = FormList->operator[](formIndex);
 
   auto iDestinationStitch = 0U;
   auto tmap               = 0U;
@@ -1770,7 +1770,7 @@ void xi::notundfn(uint32_t code) {
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& form          = FormList->operator[](selectedForm);
+	  auto& form = FormList->operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
 	  }
