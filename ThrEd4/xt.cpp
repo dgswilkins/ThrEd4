@@ -1346,12 +1346,14 @@ void xt::dmpat() {
 }
 #endif
 
-void xt::fdelstch(FRM_HEAD const& form, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap) {
+void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap) {
+  auto& form = FormList->operator[](formIndex);
+
   auto iDestinationStitch = 0U;
   auto tmap               = 0U;
   // ToDo - Still not sure what this function does?
   //        I suspect the fillStartsData members are not correctly named
-  auto const codedFormIndex = (ClosestFormToCursor << FRMSHFT);
+  auto const codedFormIndex = (formIndex << FRMSHFT);
   auto const bordercolor    = gsl::narrow_cast<uint32_t>(form.borderColor & COLMSK);
 
   auto const appliqueColor = gsl::narrow_cast<uint32_t>(form.borderColor >> FRMSHFT);

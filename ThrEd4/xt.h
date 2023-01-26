@@ -73,7 +73,7 @@ void dundcol(uint8_t color);
 void dushft();
 void duspac(float spacing);
 void dusulen(float length);
-void fdelstch(FRM_HEAD const& form, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap);
+void fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap);
 void fethr();
 void fethrf();
 void fsort();
