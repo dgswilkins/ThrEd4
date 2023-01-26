@@ -434,11 +434,10 @@ void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& fea
 }
 
 void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
-  // clang-format off
   auto const& bCurrent = BSequence->operator[](iSequence);
   auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
-  auto const  length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
-  // clang-format on
+
+  auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
   OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
   OSequence->push_back(F_POINT {bNext.x, bNext.y});
