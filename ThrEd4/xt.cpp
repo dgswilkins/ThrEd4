@@ -460,24 +460,26 @@ void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
 }
 
 void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) {
-  if (!OSequence->empty()) {
-	InterleaveSequenceIndices->emplace_back(
-	    INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
-	form::chkseq(false);
-	if (((form.extendedAttribute & AT_FTHBLND) != 0U) &&
-	    ~(form.extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
-	  InterleaveSequenceIndices->emplace_back(INS_REC {
-	      FTHMSK, form.fillInfo.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
-	  auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
-	  auto       iReverseSequence = sequenceMax - 1U;
-	  for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
-		OSequence->operator[](iSequence) = featherSequence[iReverseSequence];
-		--iReverseSequence;
-	  }
-	  OSequence->resize(sequenceMax);
-	  form::chkseq(false);
-	}
+  if (OSequence->empty()) {
+	return;
   }
+  InterleaveSequenceIndices->emplace_back(
+      INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
+  form::chkseq(false);
+  if (((form.extendedAttribute & AT_FTHBLND) == 0U) ||
+      ~(form.extendedAttribute & (AT_FTHUP | AT_FTHBTH)) == (AT_FTHUP | AT_FTHBTH)) {
+	return;
+  }
+  InterleaveSequenceIndices->emplace_back(
+      INS_REC {FTHMSK, form.fillInfo.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
+  auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
+  auto       iReverseSequence = sequenceMax - 1U;
+  for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
+	OSequence->operator[](iSequence) = featherSequence[iReverseSequence];
+	--iReverseSequence;
+  }
+  OSequence->resize(sequenceMax);
+  form::chkseq(false);
 }
 
 void xt::fthrfn(FRM_HEAD& form) {
