@@ -1587,12 +1587,13 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
   }
 }
 
-void xt::intlv(FRM_HEAD const& form, FILL_STARTS const& fillStartsData, uint32_t fillStartsMap) {
+void xt::intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t fillStartsMap) {
   auto ilData = INT_INFO {};
   StateMap->reset(StateFlag::ISEND);
+  auto const& form = FormList->operator[](formIndex);
   InterleaveSequenceIndices->emplace_back(INS_REC {0, 0, wrap::toUnsigned(InterleaveSequence->size()), 0});
   ilData.layerIndex = (gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1)) |
-                      (ClosestFormToCursor << FRMSHFT);
+                      (formIndex << FRMSHFT);
   StateMap->reset(StateFlag::DIDSTRT);
   if (!StitchBuffer->empty()) {
 	auto highStitchBuffer = std::vector<F_POINT_ATTR> {};

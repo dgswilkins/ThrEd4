@@ -5426,7 +5426,7 @@ void form::refilfn(uint32_t formIndex) {
 	}
   }
   UserStitchLength = savedStitchLength;
-  xt::intlv(form, fillStartsData, fillStartsMap);
+  xt::intlv(formIndex, fillStartsData, fillStartsMap);
   thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
   xt::setfchk();
 }

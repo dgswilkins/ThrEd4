@@ -79,7 +79,7 @@ void fethrf(uint32_t formIndex);
 void fsort();
 void fthrfn(FRM_HEAD& form);
 auto insid(FRM_HEAD const& form) -> std::vector<F_POINT>&;
-void intlv(FRM_HEAD const& form, FILL_STARTS const& fillStartsData, uint32_t fillStartsMap);
+void intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t fillStartsMap);
 void mvshft();
 void notcwlk();
 void notund();
