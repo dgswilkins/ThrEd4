@@ -17936,10 +17936,7 @@ void thi::sachk() {
 	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
-		  auto const bakclo   = ClosestFormToCursor;
-		  ClosestFormToCursor = iForm;
 		  satin::delsac(iForm);
-		  ClosestFormToCursor = bakclo;
 		}
 		++itGuide;
 	  }
