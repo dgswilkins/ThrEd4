@@ -441,21 +441,22 @@ void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
   nurat(feather);
   OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
   OSequence->push_back(F_POINT {bNext.x, bNext.y});
-  if (length > feather.minStitch) {
-	auto adjustedPoint = F_POINT {};
-	auto currentPoint  = F_POINT {};
-	auto nextPoint     = F_POINT {};
-	feather.ratioLocal = 0.5F;
-	duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
-	feather.ratioLocal       = feather.minStitch / length / 2;
-	auto const& sequence     = OSequence->operator[](iSequence);
-	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
-	xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
-	xratf(adjustedPoint, sequenceFwd1, nextPoint, feather.ratioLocal);
-	feather.ratioLocal = feather.ratio;
-	xratf(currentPoint, sequence, OSequence->operator[](iSequence), feather.ratioLocal);
-	xratf(nextPoint, sequenceFwd1, OSequence->operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
+  if (length <= feather.minStitch) {
+	return;
   }
+  auto adjustedPoint = F_POINT {};
+  auto currentPoint  = F_POINT {};
+  auto nextPoint     = F_POINT {};
+  feather.ratioLocal = 0.5F;
+  duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
+  feather.ratioLocal       = feather.minStitch / length / 2;
+  auto const& sequence     = OSequence->operator[](iSequence);
+  auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+  xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
+  xratf(adjustedPoint, sequenceFwd1, nextPoint, feather.ratioLocal);
+  feather.ratioLocal = feather.ratio;
+  xratf(currentPoint, sequence, OSequence->operator[](iSequence), feather.ratioLocal);
+  xratf(nextPoint, sequenceFwd1, OSequence->operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
 }
 
 void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) {
