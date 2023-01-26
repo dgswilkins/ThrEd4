@@ -324,49 +324,50 @@ void trace::trdif() {
   StateMap->reset(StateFlag::HIDMAP);
   trace::untrace();
   auto const bitmapSize = bitmap::getBitmapHeight() * bitmap::getBitmapWidth();
-  if (bitmapSize != 0U) {
-	auto differenceBitmap = std::vector<uint32_t> {};
-	differenceBitmap.resize(wrap::toSize(bitmapSize));
-	auto colorSumMaximum = 0U;
-	auto colorSumMinimum = std::numeric_limits<uint32_t>::max();
-	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  TraceDataSize = bitmap::getrmap();
-	}
-	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
-	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
-		auto iPoint = iHeight * bitmap::getBitmapWidth();
-		++iPoint;
-		for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
-		  ti::difbits(TraceShift[iRGB], std::next(spTBD.begin(), iPoint));
-		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
-
-		  auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
-		  if (colorSum > colorSumMaximum) {
-			colorSumMaximum = colorSum;
-		  }
-		  if (colorSum < colorSumMinimum) {
-			colorSumMinimum = colorSum;
-		  }
-		}
-	  }
-	  auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
-	  auto       pos   = size_t {0U};
-	  for (auto& iPixel : spTBD) {
-		iPixel &= TraceRGBMask[iRGB];
-		if (differenceBitmap[pos] != 0U) {
-		  auto const adjustedColorSum =
-		      wrap::round<uint32_t>(wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
-		  iPixel |= adjustedColorSum << TraceShift[iRGB];
-		}
-		++pos;
-	  }
-	}
-	bitmap::bitbltBitmap();
-	StateMap->set(StateFlag::WASDIF);
-	StateMap->set(StateFlag::RESTCH);
-	ti::tracwnd();
+  if (bitmapSize == 0U) {
+	return;
   }
+  auto differenceBitmap = std::vector<uint32_t> {};
+  differenceBitmap.resize(wrap::toSize(bitmapSize));
+  auto colorSumMaximum = 0U;
+  auto colorSumMinimum = std::numeric_limits<uint32_t>::max();
+  if (!StateMap->test(StateFlag::WASTRAC)) {
+	TraceDataSize = bitmap::getrmap();
+  }
+  auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+	for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
+	  auto iPoint = iHeight * bitmap::getBitmapWidth();
+	  ++iPoint;
+	  for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
+		ti::difbits(TraceShift[iRGB], std::next(spTBD.begin(), iPoint));
+		differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
+
+		auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
+		if (colorSum > colorSumMaximum) {
+		  colorSumMaximum = colorSum;
+		}
+		if (colorSum < colorSumMinimum) {
+		  colorSumMinimum = colorSum;
+		}
+	  }
+	}
+	auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
+	auto       pos   = size_t {0U};
+	for (auto& iPixel : spTBD) {
+	  iPixel &= TraceRGBMask[iRGB];
+	  if (differenceBitmap[pos] != 0U) {
+		auto const adjustedColorSum =
+		    wrap::round<uint32_t>(wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
+		iPixel |= adjustedColorSum << TraceShift[iRGB];
+	  }
+	  ++pos;
+	}
+  }
+  bitmap::bitbltBitmap();
+  StateMap->set(StateFlag::WASDIF);
+  StateMap->set(StateFlag::RESTCH);
+  ti::tracwnd();
 }
 
 #if TRCMTH == 0
