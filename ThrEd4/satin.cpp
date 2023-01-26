@@ -270,7 +270,7 @@ void si::satclos() {
 
 void satin::satknkt() {
   si::satclos();
-  form::refil();
+  form::refil(ClosestFormToCursor);
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -581,7 +581,7 @@ void satin::delcon(FRM_HEAD& form, uint32_t GuideIndex) {
   }
   --(form.satinGuideCount);
   if (form.fillType == SATF) {
-	form::refil();
+	form::refil(ClosestFormToCursor);
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
@@ -661,7 +661,7 @@ void satin::delspnt() {
       itVertex->y < ZoomRect.bottom || itVertex->y > ZoomRect.top) {
 	thred::shft(*itVertex);
   }
-  form::refil();
+  form::refil(ClosestFormToCursor);
 }
 
 void si::satsbrd(uint32_t formIndex) {

@@ -5431,9 +5431,9 @@ void form::refilfn(uint32_t formIndex) {
   xt::setfchk();
 }
 
-void form::refil() {
+void form::refil(uint32_t formIndex) {
   if (!UserFlagMap->test(UserFlag::WRNOF)) {
-	if (auto const codedForm = ClosestFormToCursor << FRMSHFT | USMSK;
+	if (auto const codedForm = formIndex << FRMSHFT | USMSK;
 	    std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
 	      return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
 	    })) {
@@ -5449,7 +5449,7 @@ void form::refil() {
 	  return;
 	}
   }
-  form::refilfn(ClosestFormToCursor);
+  form::refilfn(formIndex);
 }
 
 void form::setfpnt() {
@@ -5463,7 +5463,7 @@ void form::setfpnt() {
   fi::rats();
   *itVertex = fi::px2stchf(screenCoordinate);
   form.outline();
-  refil();
+  refil(ClosestFormToCursor);
   StateMap->set(StateFlag::WASFPNT);
   StateMap->reset(StateFlag::SELBOX);
   StateMap->set(StateFlag::FRMPSEL);
@@ -5533,7 +5533,7 @@ void fi::fshor(FRM_HEAD& form) {
   form::fsizpar(form);
   form.angleOrClipData.angle = PI_FHALF;
   form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
-  form::refil();
+  form::refil(ClosestFormToCursor);
 }
 
 void form::filhor() {
@@ -5573,7 +5573,7 @@ void fi::fsangl(FRM_HEAD& form) {
   form.fillSpacing           = LineSpacing;
   form::fsizpar(form);
   form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
-  form::refil();
+  form::refil(ClosestFormToCursor);
 }
 
 void form::filangl() {
@@ -5930,7 +5930,7 @@ void form::insat() { // insert a point in a form
 	  ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
 	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
 	}
-	form::refil();
+	form::refil(ClosestFormToCursor);
   }
   StateMap->set(StateFlag::RESTCH);
 }
@@ -6013,7 +6013,7 @@ void form::frm0() {
 	form::rotfrm(form, ClosestVertexToCursor);
 	ClosestVertexToCursor = 0;
 	satin::satadj(form);
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -6419,7 +6419,7 @@ void form::setstrtch() {
 	  }
 	  form.outline();
 	  thred::setpsel();
-	  refil();
+	  refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
@@ -6478,7 +6478,7 @@ void form::setstrtch() {
 	  }
 	  FormList->operator[](ClosestFormToCursor).outline();
 	  thred::setpsel();
-	  refil();
+	  refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
@@ -6529,11 +6529,11 @@ void form::setstrtch() {
 	for (auto selectedForm : (*SelectedFormList)) {
 	  FormList->operator[](selectedForm).outline();
 	  ClosestFormToCursor = selectedForm;
-	  refil();
+	  refil(ClosestFormToCursor);
 	}
   }
   else if (StateMap->test(StateFlag::FORMSEL)) {
-	refil();
+	refil(ClosestFormToCursor);
   }
   StateMap->set(StateFlag::RESTCH);
 }
@@ -6661,7 +6661,7 @@ void form::setexpand(float xyRatio) {
 	}
 	thred::setpsel();
 	FormList->operator[](ClosestFormToCursor).outline();
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
@@ -6697,7 +6697,7 @@ void form::setexpand(float xyRatio) {
 	  }
 	  form.outline();
 	  ClosestFormToCursor = selectedForm;
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	}
   }
   else {
@@ -6710,7 +6710,7 @@ void form::setexpand(float xyRatio) {
 		itVertex->y = (itVertex->y - reference.y) * ratio.y + reference.y;
 		++itVertex;
 	  }
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	}
 	else {
 	  auto itStitch = wrap::next(StitchBuffer->begin(), GroupStartStitch);
@@ -7308,7 +7308,7 @@ void fi::fnord() {
   auto const  itEndVertex   = wrap::next(itStartVertex, currentForm.vertexCount);
   // clang-format on
   std::reverse(itStartVertex, itEndVertex);
-  form::refil();
+  form::refil(ClosestFormToCursor);
 }
 
 void form::flpord() {
@@ -7327,7 +7327,7 @@ void form::flpord() {
 	  finish = form::pdir(form, finish);
 	  StateMap->flip(StateFlag::PSELDIR);
 	}
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -7678,7 +7678,7 @@ void form::duprot(float rotationAngle) {
   fi::adfrm(ClosestFormToCursor);
   auto const rotationCenter = form::rotpar();
   thred::rotfn(rotationAngle, rotationCenter);
-  form::refil();
+  form::refil(ClosestFormToCursor);
   StateMap->set(StateFlag::FORMSEL);
   StateMap->set(StateFlag::RESTCH);
 }
@@ -7862,7 +7862,7 @@ void form::join() {
 	std::ranges::copy(vertexList, dest);
 	toForm.vertexCount += wrap::toUnsigned(vertexList.size());
 	toForm.outline();
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -8273,7 +8273,7 @@ void fi::shrnks() {
 	++delta;
   }
   currentForm.outline();
-  form::refil();
+  form::refil(ClosestFormToCursor);
 }
 
 void form::shrnk() {

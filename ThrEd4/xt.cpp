@@ -883,7 +883,7 @@ void xt::dubit(FRM_HEAD& form, uint32_t bit) {
   else {
 	form.extendedAttribute |= bit;
   }
-  form::refil();
+  form::refil(ClosestFormToCursor);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
@@ -2257,7 +2257,7 @@ void xt::setfilstrt() {
   auto& form     = FormList->operator[](ClosestFormToCursor);
   form.fillStart = gsl::narrow<uint16_t>(ClosestVertexToCursor);
   form.extendedAttribute |= AT_STRT;
-  form::refil();
+  form::refil(ClosestFormToCursor);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
@@ -2270,7 +2270,7 @@ void xt::setfilend() {
   auto& form   = FormList->operator[](ClosestFormToCursor);
   form.fillEnd = gsl::narrow<uint16_t>(ClosestVertexToCursor);
   form.extendedAttribute |= AT_END;
-  form::refil();
+  form::refil(ClosestFormToCursor);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }

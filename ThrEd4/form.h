@@ -119,7 +119,7 @@ auto psg() noexcept -> uint32_t;
 void pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept;
 void ratsr();
 void rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept;
-void refil();
+void refil(uint32_t formIndex);
 void refilal();
 void refilfn(uint32_t formIndex);
 void rinfrm();

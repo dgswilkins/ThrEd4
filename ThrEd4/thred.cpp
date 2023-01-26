@@ -1459,7 +1459,7 @@ void thred::unsid() noexcept {
 
 void thi::insadj() {
   StateMap->reset(StateFlag::PRELIN);
-  form::refil();
+  form::refil(ClosestFormToCursor);
   thred::coltab();
   FormList->operator[](ClosestFormToCursor).outline();
 }
@@ -1851,7 +1851,7 @@ void thi::chknum() {
 		  form.edgeSpacing = value;
 		  thred::unsid();
 		  thi::setSideWinVal(LBRDPIC);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		case LFRMFAZ: {
@@ -1859,7 +1859,7 @@ void thi::chknum() {
 		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
 		  thred::unsid();
 		  thi::setSideWinVal(LFRMFAZ);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		case LBRDPOS: {
@@ -1867,7 +1867,7 @@ void thi::chknum() {
 		  form.edgeStitchLen = value * IPFGRAN;
 		  thred::unsid();
 		  thi::setSideWinVal(LBRDPOS);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		case LMAXFIL: {
@@ -1875,7 +1875,7 @@ void thi::chknum() {
 		  form.maxFillStitchLen = value;
 		  thred::unsid();
 		  thi::setSideWinVal(LMAXFIL);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		case LMINFIL: {
@@ -1883,7 +1883,7 @@ void thi::chknum() {
 		  form.minFillStitchLen = value;
 		  thred::unsid();
 		  thi::setSideWinVal(LMINFIL);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		case LMAXBRD: {
@@ -1891,7 +1891,7 @@ void thi::chknum() {
 		  form.maxBorderStitchLen = value;
 		  thred::unsid();
 		  thi::setSideWinVal(LMAXBRD);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		case LMINBRD: {
@@ -1899,7 +1899,7 @@ void thi::chknum() {
 		  form.minBorderStitchLen = value;
 		  thred::unsid();
 		  thi::setSideWinVal(LMINBRD);
-		  form::refil();
+		  form::refil(ClosestFormToCursor);
 		  return;
 		}
 		default: {
@@ -2014,7 +2014,7 @@ void thi::chknum() {
 		}
 	  }
 	  thred::unsid();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();
 	}
 	else {
@@ -6926,7 +6926,7 @@ void thi::delet() {
 	  }
 	  satin::satadj(form);
 	}
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	fndknt();
 	StateMap->set(StateFlag::RESTCH);
 	return;
@@ -7058,7 +7058,7 @@ void thi::delet() {
 		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 	  }
 	  form.outline();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -7917,7 +7917,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	}
 	form.outline();
 	thred::setpsel();
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
@@ -7959,7 +7959,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 		++itVertex;
 	  }
 	  form.outline();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
@@ -9363,7 +9363,7 @@ void thi::filfrms() {
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	}
   }
@@ -9632,7 +9632,7 @@ void thi::gsnap() {
 	  auto& formIter      = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	  formIter.outline();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	}
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -9642,7 +9642,7 @@ void thi::gsnap() {
 	  auto& formIter = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	  formIter.outline();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
@@ -10267,7 +10267,7 @@ void thi::fixpclp(uint32_t closestFormToCursor) {
 	++itVertex;
 	++itIntlvSeq;
   }
-  form::refil();
+  form::refil(ClosestFormToCursor);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
@@ -10951,7 +10951,7 @@ auto thi::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotati
 	  }
 	  thred::setpsel();
 	  form.outline();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
@@ -11626,7 +11626,7 @@ auto thi::handleSideWindowActive() -> bool {
 	if (iFeather != FTHRLIST.end()) {
 	  form.fillInfo.feather.fillType = iFeather->value;
 	  thred::unsid();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();
 	}
 	return true;
@@ -11834,7 +11834,7 @@ auto thi::handleSideWindowActive() -> bool {
 	  }
 	} while (false);
 	formForms::refrm();
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	thred::unmsg();
 	thred::unsid();
 	StateMap->set(StateFlag::RESTCH);
@@ -12023,7 +12023,7 @@ auto thi::handleSideWindowActive() -> bool {
   }
   else {
 	formForms::refrm();
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	thred::unmsg();
 	thred::unsid();
 	StateMap->set(StateFlag::RESTCH);
@@ -12089,14 +12089,14 @@ auto thi::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFTHBLND) || Msg.hwnd == LabelWindow->operator[](LFTHBLND)) {
 	  form.extendedAttribute ^= AT_FTHBLND;
 	  formForms::refrm();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  thred::unsid();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHUP) || Msg.hwnd == LabelWindow->operator[](LFTHUP)) {
 	  form.extendedAttribute ^= AT_FTHUP;
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  auto const choice = displayText::loadStr(((form.extendedAttribute & AT_FTHUP) == 0U) ? IDS_OFF : IDS_ON);
 	  SetWindowText(ValueWindow->operator[](LFTHUP), choice.c_str());
 	  StateMap->set(StateFlag::RESTCH);
@@ -12105,7 +12105,7 @@ auto thi::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFTHBTH) || Msg.hwnd == LabelWindow->operator[](LFTHBTH)) {
 	  form.extendedAttribute ^= AT_FTHBTH;
 	  formForms::refrm();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  thred::unsid();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
@@ -12222,7 +12222,7 @@ auto thi::handleFormDataSheet() -> bool {
 	  else {
 		form.attribute |= SBLNT;
 	  }
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
@@ -12237,7 +12237,7 @@ auto thi::handleFormDataSheet() -> bool {
 	  else {
 		form.attribute |= FBLNT;
 	  }
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
@@ -12254,7 +12254,7 @@ auto thi::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRDUND) || Msg.hwnd == LabelWindow->operator[](LBRDUND)) {
 	  form.edgeType ^= EGUND;
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	  auto const code    = form.edgeType & EGUND;
 	  auto const bUndStr = displayText::loadStr((code != 0U) ? IDS_ON : IDS_OFF);
 	  SetWindowText(ValueWindow->operator[](LBRDUND), bUndStr.c_str());
@@ -12463,7 +12463,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		++itVertex;
 	  }
 	  form.outline();
-	  form::refil();
+	  form::refil(ClosestFormToCursor);
 	}
 	StateMap->reset(StateFlag::FUNSCLP);
 	StateMap->set(StateFlag::RESTCH);
@@ -12692,7 +12692,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->test(StateFlag::FUNCLP)) {
 	StateMap->set(StateFlag::INIT);
 	form::rstfrm();
-	form::refil();
+	form::refil(ClosestFormToCursor);
 	StateMap->reset(StateFlag::FUNCLP);
 	if (StateMap->testAndReset(StateFlag::FPSEL)) {
 	  FormList->back().outline();
