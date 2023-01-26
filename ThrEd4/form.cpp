@@ -5277,7 +5277,7 @@ void form::refilfn(uint32_t formIndex) {
 	case FRMFPOLY: {
 	  xt::chkcwlk(form);
 	  xt::chkwlk(form);
-	  xt::chkund(form, textureSegments, *AngledFormVertices);
+	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
 	  if (form.fillType != 0U) {
 		auto const spacing      = LineSpacing;
@@ -5390,7 +5390,7 @@ void form::refilfn(uint32_t formIndex) {
 	case SAT: {
 	  xt::chkcwlk(form);
 	  xt::chkwlk(form);
-	  xt::chkund(form, textureSegments, *AngledFormVertices);
+	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
 	  switch (form.fillType) {
 		case SATF: {

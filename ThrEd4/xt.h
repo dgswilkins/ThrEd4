@@ -44,7 +44,7 @@ namespace xt {
 void chgchk(uint8_t code);
 void chgwrn();
 void chkcwlk(FRM_HEAD& form);
-void chkund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices);
+void chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices);
 void chkwlk(FRM_HEAD& form);
 void clrstch() noexcept;
 

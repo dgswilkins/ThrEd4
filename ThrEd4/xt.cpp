@@ -177,7 +177,7 @@ void flenfn(uint32_t formIndex, float length);
 void fmaxfn(uint32_t formIndex, float length);
 void fminfn(uint32_t formIndex, float length);
 void fncwlk(FRM_HEAD& form);
-void fnund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices);
+void fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices);
 void fnwlk(FRM_HEAD& form);
 void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence);
 void fspacfn(uint32_t formIndex, float spacing);
@@ -220,7 +220,7 @@ constexpr auto tim2int(FILETIME time) noexcept -> ULARGE_INTEGER;
 void uangfn(uint32_t formIndex, float angle);
 void ucolfn(uint32_t formIndex, uint8_t color);
 void ulenfn(uint32_t formIndex, float length);
-void undclp(FRM_HEAD const& form);
+void undclp(float& underlayStitchLen);
 void uspacfn(uint32_t formIndex, float spacing);
 void xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept;
 } // namespace xi
@@ -775,13 +775,13 @@ void xi::fnwlk(FRM_HEAD& form) {
   ritwlk(form, WLKMSK);
 }
 
-void xi::undclp(FRM_HEAD const& form) {
+void xi::undclp(float& underlayStitchLen) {
   // ToDo - Is it better to initialize individually?
   ClipBuffer->clear();
   ClipBuffer->reserve(2);
-  ClipRectSize = F_LSIZ {0, form.underlayStitchLen};
+  ClipRectSize = F_LSIZ {0, underlayStitchLen};
   ClipBuffer->emplace_back(0.0F, 00.0F, 0U);
-  ClipBuffer->emplace_back(0.0F, form.underlayStitchLen, 0U);
+  ClipBuffer->emplace_back(0.0F, underlayStitchLen, 0U);
 }
 
 void xi::fncwlk(FRM_HEAD& form) {
@@ -927,7 +927,9 @@ void xt::chkwlk(FRM_HEAD& form) {
   }
 }
 
-void xi::fnund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+void xi::fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+  auto& form = FormList->operator[](formIndex);
+
   auto const savedStitchSize = UserStitchLength;
   UserStitchLength           = std::numeric_limits<float>::max();
   if (form.underlaySpacing == 0.0F) {
@@ -936,16 +938,16 @@ void xi::fnund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, st
   if (form.underlayStitchLen == 0.0F) {
 	form.underlayStitchLen = IniFile.underlayStitchLen;
   }
-  undclp(form);
+  undclp(form.underlayStitchLen);
   StateMap->set(StateFlag::ISUND);
   form::angclpfn(form, textureSegments, angledFormVertices);
   ritwlk(form, UNDMSK);
   UserStitchLength = savedStitchSize;
 }
 
-void xt::chkund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
-  if ((form.extendedAttribute & AT_UND) != 0U) {
-	xi::fnund(form, textureSegments, angledFormVertices);
+void xt::chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+  if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
+	xi::fnund(formIndex, textureSegments, angledFormVertices);
   }
   else {
 	xi::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
