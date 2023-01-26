@@ -1725,7 +1725,6 @@ void xi::setundfn(uint32_t code) {
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
@@ -1767,7 +1766,6 @@ void xi::notundfn(uint32_t code) {
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
@@ -1796,7 +1794,6 @@ void xt::notcwlk() {
 }
 
 void xi::ulenfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 	form.underlayStitchLen = length;
@@ -1826,7 +1823,6 @@ void xt::setEdit(uint32_t code, StateFlag flag) {
 }
 
 void xi::uspacfn(uint32_t formIndex, float spacing) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlaySpacing = spacing;
 	form::refilfn(formIndex);
@@ -1848,7 +1844,6 @@ void xt::duspac(float spacing) {
 }
 
 void xi::uangfn(uint32_t formIndex, float angle) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlayStitchAngle = angle;
 	form::refilfn(formIndex);
@@ -1871,7 +1866,6 @@ void xt::dufang(float angle) {
 }
 
 void xi::flenfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); (form.fillType != 0U) && !form.isClip()) {
 	form.lengthOrCount.stitchLength = length;
 	form::refilfn(formIndex);
@@ -1893,7 +1887,6 @@ void xt::duflen(float length) {
 }
 
 void xi::fspacfn(uint32_t formIndex, float spacing) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	if (spacing < 0) {
 	  if (!form.isClip()) {
@@ -1920,7 +1913,6 @@ void xt::dufspac(float spacing) {
 }
 
 void xi::findfn(uint32_t formIndex, float indent) {
-  ClosestFormToCursor = formIndex;
   auto& form          = FormList->operator[](formIndex);
   form.underlayIndent = indent;
   if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U) {
@@ -1944,7 +1936,6 @@ void xt::dufind(float indent) {
 }
 
 void xi::fangfn(uint32_t formIndex, float angle) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.type == FRMFPOLY && (form.fillType != 0U)) {
 	switch (form.fillType) {
 	  case VRTF:
@@ -1993,7 +1984,6 @@ void xt::dufxang(float angle) {
 }
 
 void xi::ucolfn(uint32_t formIndex, uint8_t color) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 	form.underlayColor = color;
@@ -2020,7 +2010,6 @@ void xt::dundcol(uint8_t color) {
 }
 
 void xi::fcolfn(uint32_t formIndex, uint8_t color) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	form.fillColor = color;
 	form::refilfn(formIndex);
@@ -2046,7 +2035,6 @@ void xt::dufcol(uint8_t color) {
 }
 
 void xi::bcolfn(uint32_t formIndex, uint8_t color) {
-  ClosestFormToCursor = formIndex;
   auto& form          = FormList->operator[](formIndex); 
   if (form.edgeType == 0U) {
 	return;
@@ -2097,7 +2085,6 @@ void xt::dublen(float length) {
 }
 
 void xi::bspacfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.edgeType != 0U) {
 	form.edgeSpacing = length;
 	form::refilfn(formIndex);
@@ -2119,7 +2106,6 @@ void xt::dubspac(float length) {
 }
 
 void xi::bminfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.edgeType != 0U) {
 	form.minBorderStitchLen = length;
 	form::refilfn(formIndex);
@@ -2141,7 +2127,6 @@ void xt::dubmin(float length) {
 }
 
 void xi::bmaxfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.edgeType != 0U) {
 	form.maxBorderStitchLen = length;
 	form::refilfn(formIndex);
@@ -2163,7 +2148,6 @@ void xt::dubmax(float length) {
 }
 
 void xi::fminfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	form.minFillStitchLen = length;
 	form::refilfn(formIndex);
@@ -2185,7 +2169,6 @@ void xt::dufmin(float length) {
 }
 
 void xi::fmaxfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	form.maxFillStitchLen = length;
 	form::refilfn(formIndex);
@@ -2207,7 +2190,6 @@ void xt::dufmax(float length) {
 }
 
 void xi::fwidfn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   // clang-format off
   auto&       form      = FormList->operator[](formIndex);
   auto const  reference = form.rectangle.left;
@@ -2237,7 +2219,6 @@ void xt::dufwid(float length) {
 }
 
 void xi::fhifn(uint32_t formIndex, float length) {
-  ClosestFormToCursor = formIndex;
   // clang-format off
   auto&       form      = FormList->operator[](formIndex);
   auto const  reference = form.rectangle.bottom;

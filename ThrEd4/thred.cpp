@@ -6021,7 +6021,6 @@ void thi::duclip() {
 	  if (!SelectedFormList->empty()) {
 		auto length = 0U;
 		for (auto& selectedForm : (*SelectedFormList)) {
-		  ClosestFormToCursor = selectedForm;
 		  auto& currentForm   = FormList->operator[](selectedForm);
 		  length += sizfclp(currentForm);
 		}
@@ -6383,8 +6382,7 @@ void thi::delsfrms(wchar_t code) {
 	  formIndices.resize(FormList->size());
 	  auto formMap = boost::dynamic_bitset<>(FormList->size());
 	  for (auto const selectedForm : (*SelectedFormList)) {
-		ClosestFormToCursor = selectedForm;
-		formMap.set(ClosestFormToCursor);
+		formMap.set(selectedForm);
 		f1del(selectedForm);
 	  }
 	  auto       deletedFormCount = 0U;
@@ -7938,7 +7936,6 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
   }
   if (StateMap->testAndReset(StateFlag::FRMSROT)) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  // clang-format off
 	  auto& form     = FormList->operator[](selectedForm);
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
@@ -9359,7 +9356,6 @@ void thi::filfrms() {
   if (!SelectedFormList->empty()) {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  form::refilfn(selectedForm);
 	}
 	StateMap->set(StateFlag::RESTCH);
@@ -12431,7 +12427,6 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::savdo();
 	  if (!SelectedFormList->empty()) {
 		for (auto selectedForm : (*SelectedFormList)) {
-		  ClosestFormToCursor = selectedForm;
 		  form::refilfn(selectedForm);
 		}
 	  }
@@ -15833,7 +15828,6 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  thred::savdo();
 		  if (!SelectedFormList->empty()) {
 			for (auto const selectedForm : (*SelectedFormList)) {
-			  ClosestFormToCursor = selectedForm;
 			  form::refilfn(selectedForm);
 			}
 		  }

@@ -1328,9 +1328,8 @@ void form::flipv() {
 	form::pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.top + rectangle.bottom;
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
-	  auto& iForm         = FormList->operator[](ClosestFormToCursor);
-	  formMap.set(ClosestFormToCursor);
+	  auto& iForm         = FormList->operator[](selectedForm);
+	  formMap.set(selectedForm);
 	  auto itVertex = wrap::next(FormVertices->begin(), iForm.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < iForm.vertexCount; ++iVertex) {
 		itVertex->y = offset - itVertex->y;
@@ -5805,7 +5804,7 @@ void form::filsat() {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
-	  if (auto const& currentForm = FormList->operator[](ClosestFormToCursor); currentForm.type != FRMLINE) {
+	  if (auto const& currentForm = FormList->operator[](selectedForm); currentForm.type != FRMLINE) {
 		fi::filsfn();
 	  }
 	}
@@ -6100,7 +6099,6 @@ void form::bord() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
 	  wrap::narrow(form.borderColor, ActiveColor);
 	  fi::sbord(selectedForm);
@@ -6206,8 +6204,7 @@ void form::apliq() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
-	  if (auto& currentForm = FormList->operator[](ClosestFormToCursor); UserFlagMap->test(UserFlag::BLUNT)) {
+	  if (auto& currentForm = FormList->operator[](selectedForm); UserFlagMap->test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -6797,7 +6794,6 @@ void form::dubold() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  fi::sbold(selectedForm);
 	}
 	StateMap->set(StateFlag::INIT);
@@ -7183,7 +7179,6 @@ void form::fliph() {
 	form::pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.right + rectangle.left;
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  formMap.set(selectedForm);
 	  // clang-format off
 	  auto& formIter = FormList->operator[](selectedForm);
@@ -7261,8 +7256,7 @@ void form::prpbrd(float borderStitchSpacing) {
   LineSpacing = borderStitchSpacing;
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor    = selectedForm;
-	  auto& currentForm      = FormList->operator[](ClosestFormToCursor);
+	  auto& currentForm      = FormList->operator[](selectedForm);
 	  currentForm.borderSize = LineSpacing;
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
@@ -8053,7 +8047,6 @@ void form::bhol() {
   LineSpacing = savedSpacing;
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  fi::bholbrd(selectedForm);
 	}
 	StateMap->set(StateFlag::INIT);
@@ -8156,7 +8149,6 @@ void form::picot() {
 	  if (ClipRectSize.cx > CLPMIN) {
 		if (!SelectedFormList->empty()) {
 		  for (auto const selectedForm : (*SelectedFormList)) {
-			ClosestFormToCursor = selectedForm;
 			fi::fspic(selectedForm);
 		  }
 		  StateMap->set(StateFlag::INIT);
@@ -8855,9 +8847,8 @@ void form::vrtclp() {
 		if (!SelectedFormList->empty()) {
 		  StateMap->set(StateFlag::NOCLP);
 		  for (auto const selectedForm : (*SelectedFormList)) {
-			ClosestFormToCursor = selectedForm;
-			if (FormList->operator[](ClosestFormToCursor).type != FRMLINE) {
-			  vrtsclp(ClosestFormToCursor);
+			if (FormList->operator[](selectedForm).type != FRMLINE) {
+			  vrtsclp(selectedForm);
 			}
 		  }
 		  StateMap->reset(StateFlag::NOCLP);
@@ -9028,7 +9019,6 @@ void form::dubfil() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
 	  dubsfil(form);
 	}

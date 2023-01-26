@@ -684,7 +684,6 @@ void satin::satbrd() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow_cast<decltype(form.attribute)>(SBLNT | FBLNT);
