@@ -5274,7 +5274,7 @@ void form::refilfn(uint32_t formIndex) {
 	}
 	case FRMFPOLY: {
 	  xt::chkcwlk(formIndex);
-	  xt::chkwlk(form);
+	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
 	  if (form.fillType != 0U) {
@@ -5387,7 +5387,7 @@ void form::refilfn(uint32_t formIndex) {
 	}
 	case SAT: {
 	  xt::chkcwlk(formIndex);
-	  xt::chkwlk(form);
+	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
 	  switch (form.fillType) {

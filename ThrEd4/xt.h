@@ -45,7 +45,7 @@ void chgchk(uint8_t code);
 void chgwrn();
 void chkcwlk(uint32_t formIndex);
 void chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices);
-void chkwlk(FRM_HEAD& form);
+void chkwlk(uint32_t formIndex);
 void clrstch() noexcept;
 
 #ifdef _DEBUG

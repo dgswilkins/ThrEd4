@@ -917,12 +917,12 @@ void xt::chkcwlk(uint32_t formIndex) {
   }
 }
 
-void xt::chkwlk(FRM_HEAD& form) {
-  if ((form.extendedAttribute & AT_WALK) != 0U) {
+void xt::chkwlk(uint32_t formIndex) {
+  if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_WALK) != 0U) {
 	xi::fnwlk(form);
   }
   else {
-	xi::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
+	xi::delwlk((formIndex << FRMSHFT) | WLKMSK);
   }
 }
 
