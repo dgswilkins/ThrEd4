@@ -75,7 +75,7 @@ void duspac(float spacing);
 void dusulen(float length);
 void fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap);
 void fethr();
-void fethrf();
+void fethrf(uint32_t formIndex);
 void fsort();
 void fthrfn(FRM_HEAD& form);
 auto insid(FRM_HEAD const& form) -> std::vector<F_POINT>&;

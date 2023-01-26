@@ -11974,7 +11974,7 @@ auto thi::handleSideWindowActive() -> bool {
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
 	  }
-	  xt::fethrf();
+	  xt::fethrf(ClosestFormToCursor);
 	  StateMap->set(StateFlag::INIT);
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);

@@ -551,13 +551,13 @@ void xt::fthrfn(FRM_HEAD& form) {
   xi::fritfil(form, featherSequence);
 }
 
-void xt::fethrf() {
+void xt::fethrf(uint32_t formIndex) {
   if (displayText::filmsgs(FMM_FTH)) {
 	return;
   }
-  auto& form = FormList->operator[](ClosestFormToCursor);
-  clip::delmclp(ClosestFormToCursor);
-  texture::deltx(ClosestFormToCursor);
+  auto& form = FormList->operator[](formIndex);
+  clip::delmclp(formIndex);
+  texture::deltx(formIndex);
   form.type                           = SAT;
   form.fillInfo.feather.ratio         = IniFile.featherRatio;
   form.fillInfo.feather.upCount       = IniFile.featherUpCount;
@@ -572,7 +572,7 @@ void xt::fethrf() {
   form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
   form.fillInfo.feather.color     = (ActiveColor + 1U) & COLMSK;
   form.fillType                   = FTHF;
-  form::refilfn(ClosestFormToCursor);
+  form::refilfn(formIndex);
 }
 
 void xt::fethr() {
@@ -581,13 +581,12 @@ void xt::fethr() {
   }
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	xt::fethrf();
+	xt::fethrf(ClosestFormToCursor);
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  if (FormList->operator[](selectedForm).vertexCount > 2U) {
-		ClosestFormToCursor = selectedForm;
-		xt::fethrf();
+		xt::fethrf(selectedForm);
 	  }
 	}
   }
