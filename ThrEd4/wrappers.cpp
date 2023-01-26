@@ -167,10 +167,11 @@ auto wrap::toSize(uintmax_t invar) -> size_t {
 
 void wrap::setCursor(HCURSOR hCursor) noexcept {
   static HCURSOR saveCursor = nullptr;
-  if (saveCursor != hCursor) {
-	SetCursor(hCursor);
-	saveCursor = hCursor;
+  if (saveCursor == hCursor) {
+	return;
   }
+  SetCursor(hCursor);
+  saveCursor = hCursor;
 }
 
 auto wrap::createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN {
