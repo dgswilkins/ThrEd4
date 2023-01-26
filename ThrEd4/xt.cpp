@@ -2219,12 +2219,11 @@ void xt::dufwid(float length) {
 }
 
 void xi::fhifn(uint32_t formIndex, float length) {
-  // clang-format off
-  auto&       form      = FormList->operator[](formIndex);
-  auto const  reference = form.rectangle.bottom;
-  auto const  ratio     = length / (form.rectangle.top - reference);
-  auto        itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
-  // clang-format on
+  auto& form = FormList->operator[](formIndex);
+
+  auto const reference = form.rectangle.bottom;
+  auto const ratio     = length / (form.rectangle.top - reference);
+  auto       itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->y = (itVertex->y - reference) * ratio + reference;
 	++itVertex;
