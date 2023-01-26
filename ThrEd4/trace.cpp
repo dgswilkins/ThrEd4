@@ -392,97 +392,96 @@ unsigned ti::icolsum(COLORREF col) {
 #endif
 
 void trace::trace() {
-  if (bitmap::ismap()) {
-	trace::untrace();
-	ti::tracwnd();
-	TraceDataSize    = bitmap::getrmap();
-	auto const spTBD = gsl::span<uint32_t>(
-	    TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
-	if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
-	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
-	  if (StateMap->test(StateFlag::LANDSCAP)) {
-		auto const bmpSiS = bitmap::getBitmapSizeinStitches();
-		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
-	  }
-	  auto const bmpSR = bitmap::getBmpStitchRatio();
-	  auto const bitmapPoint =
-	      POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y - 1.0F)};
+  if (!bitmap::ismap()) {
+	displayText::tabmsg(IDS_MAPLOD, false);
+	return;
+  }
+  trace::untrace();
+  ti::tracwnd();
+  TraceDataSize    = bitmap::getrmap();
+  auto const spTBD = gsl::span<uint32_t>(
+      TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
+  if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
+	auto stitchPoint = thred::pxCor2stch(Msg.pt);
+	if (StateMap->test(StateFlag::LANDSCAP)) {
+	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
+	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
+	}
+	auto const bmpSR = bitmap::getBmpStitchRatio();
+	auto const bitmapPoint =
+	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y - 1.0F)};
 
-	  auto const color = spTBD[wrap::toSize(bitmapPoint.y) * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
-	  if (StateMap->test(StateFlag::TRCUP)) {
-		UpPixelColor   = color;
-		DownPixelColor = PENWHITE;
-	  }
-	  else {
-		DownPixelColor = color;
-		UpPixelColor   = 0;
-	  }
-	  StateMap->set(StateFlag::TRCRED);
-	  StateMap->set(StateFlag::TRCGRN);
-	  StateMap->set(StateFlag::TRCBLU);
+	auto const color = spTBD[wrap::toSize(bitmapPoint.y) * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
+	if (StateMap->test(StateFlag::TRCUP)) {
+	  UpPixelColor   = color;
+	  DownPixelColor = PENWHITE;
 	}
-	auto traceColorMask = COLMASK;
-	if (!StateMap->test(StateFlag::TRCRED)) {
-	  traceColorMask &= REDMSK;
+	else {
+	  DownPixelColor = color;
+	  UpPixelColor   = 0;
 	}
-	if (!StateMap->test(StateFlag::TRCGRN)) {
-	  traceColorMask &= GRNMSK;
+	StateMap->set(StateFlag::TRCRED);
+	StateMap->set(StateFlag::TRCGRN);
+	StateMap->set(StateFlag::TRCBLU);
+  }
+  auto traceColorMask = COLMASK;
+  if (!StateMap->test(StateFlag::TRCRED)) {
+	traceColorMask &= REDMSK;
+  }
+  if (!StateMap->test(StateFlag::TRCGRN)) {
+	traceColorMask &= GRNMSK;
+  }
+  if (!StateMap->test(StateFlag::TRCBLU)) {
+	traceColorMask &= BLUMSK;
+  }
+  if (traceColorMask != COLMASK) {
+	for (auto& iPixel : spTBD) {
+	  iPixel &= traceColorMask;
 	}
-	if (!StateMap->test(StateFlag::TRCBLU)) {
-	  traceColorMask &= BLUMSK;
-	}
-	if (traceColorMask != COLMASK) {
-	  for (auto& iPixel : spTBD) {
-		iPixel &= traceColorMask;
-	  }
-	}
+  }
 
 #if TRCMTH == 0
-	auto upBrightness   = ti::icolsum(UpPixelColor);
-	auto downBrightness = ti::icolsum(DownPixelColor);
-	if (TracedMap->empty()) {
-	  TracedMap->resize(TraceDataSize, false);
-	}
-	for (auto index = 0U; index < BitmapWidth * BitmapHeight; ++index) {
-	  auto pointBrightness = ti::colsum(TraceBitmapData[index]);
-	  if (upBrightness > pointBrightness && downBrightness < pointBrightness)
-		TracedMap->set(index);
-	  else
-		TraceBitmapData[index] = 0;
-	}
+  auto upBrightness   = ti::icolsum(UpPixelColor);
+  auto downBrightness = ti::icolsum(DownPixelColor);
+  if (TracedMap->empty()) {
+	TracedMap->resize(TraceDataSize, false);
+  }
+  for (auto index = 0U; index < BitmapWidth * BitmapHeight; ++index) {
+	auto pointBrightness = ti::colsum(TraceBitmapData[index]);
+	if (upBrightness > pointBrightness && downBrightness < pointBrightness)
+	  TracedMap->set(index);
+	else
+	  TraceBitmapData[index] = 0;
+  }
 #endif
 
 #if TRCMTH == 1
-	InvertUpColor   = UpPixelColor ^ COLMASK;
-	InvertDownColor = DownPixelColor ^ COLMASK;
-	auto colors     = ti::trcols(InvertUpColor);
-	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  HighColors[iRGB] = colors[iRGB];
+  InvertUpColor   = UpPixelColor ^ COLMASK;
+  InvertDownColor = DownPixelColor ^ COLMASK;
+  auto colors     = ti::trcols(InvertUpColor);
+  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+	HighColors[iRGB] = colors[iRGB];
+  }
+  colors = ti::trcols(InvertDownColor);
+  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+	LowColors[iRGB] = colors[iRGB];
+  }
+  if (TracedMap->empty()) {
+	TracedMap->resize(TraceDataSize, false);
+  }
+  auto pos = size_t {0U};
+  for (auto& iPixel : spTBD) {
+	if (ti::trcin(iPixel)) {
+	  TracedMap->set(pos);
 	}
-	colors = ti::trcols(InvertDownColor);
-	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  LowColors[iRGB] = colors[iRGB];
+	else {
+	  iPixel = 0;
 	}
-	if (TracedMap->empty()) {
-	  TracedMap->resize(TraceDataSize, false);
-	}
-	auto pos = size_t {0U};
-	for (auto& iPixel : spTBD) {
-	  if (ti::trcin(iPixel)) {
-		TracedMap->set(pos);
-	  }
-	  else {
-		iPixel = 0;
-	  }
-	  ++pos;
-	}
+	++pos;
+  }
 #endif
-	StateMap->set(StateFlag::TRSET);
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
-	displayText::tabmsg(IDS_MAPLOD, false);
-  }
+  StateMap->set(StateFlag::TRSET);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void trace::tracedg() {
