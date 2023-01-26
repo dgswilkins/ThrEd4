@@ -173,35 +173,35 @@ void ti::trcratnum() {
 }
 
 auto ti::trcin(COLORREF color) -> bool {
-  if (color != 0U) {
-	auto const colors = ti::trcols(color);
-	if (StateMap->test(StateFlag::TRCRED)) {
-	  if (colors[0] > HighColors[0]) {
-		return false;
-	  }
-	  if (colors[0] < LowColors[0]) {
-		return false;
-	  }
-	}
-	if (StateMap->test(StateFlag::TRCGRN)) {
-	  if (colors[1] > HighColors[1]) {
-		return false;
-	  }
-	  if (colors[1] < LowColors[1]) {
-		return false;
-	  }
-	}
-	if (StateMap->test(StateFlag::TRCBLU)) {
-	  if (colors[2] > HighColors[2]) {
-		return false;
-	  }
-	  if (colors[2] < LowColors[2]) {
-		return false;
-	  }
-	}
-	return true;
+  if (color == 0U) {
+	return false;
   }
-  return false;
+  auto const colors = ti::trcols(color);
+  if (StateMap->test(StateFlag::TRCRED)) {
+	if (colors[0] > HighColors[0]) {
+	  return false;
+	}
+	if (colors[0] < LowColors[0]) {
+	  return false;
+	}
+  }
+  if (StateMap->test(StateFlag::TRCGRN)) {
+	if (colors[1] > HighColors[1]) {
+	  return false;
+	}
+	if (colors[1] < LowColors[1]) {
+	  return false;
+	}
+  }
+  if (StateMap->test(StateFlag::TRCBLU)) {
+	if (colors[2] > HighColors[2]) {
+	  return false;
+	}
+	if (colors[2] < LowColors[2]) {
+	  return false;
+	}
+  }
+  return true;
 }
 
 void ti::shownd(HWND hwnd) noexcept {
