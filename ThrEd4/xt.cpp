@@ -908,12 +908,12 @@ void xt::setulen() {
   displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen * IPFGRAN);
 }
 
-void xt::chkcwlk(FRM_HEAD& form) {
-  if ((form.extendedAttribute & AT_CWLK) != 0U) {
+void xt::chkcwlk(uint32_t formIndex) {
+  if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_CWLK) != 0U) {
 	xi::fncwlk(form);
   }
   else {
-	xi::delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
+	xi::delwlk((formIndex << FRMSHFT) | CWLKMSK);
   }
 }
 
