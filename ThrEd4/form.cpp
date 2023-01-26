@@ -1201,15 +1201,13 @@ void fi::setzig() {
 }
 
 void form::setmfrm() {
-  // clang-format off
   auto const& closeForm = FormList->operator[](ClosestFormToCursor);
-  auto        itVertex  = wrap::next(FormVertices->cbegin(), closeForm.vertexIndex);
-  auto        point     = form::sfCor2px(itVertex[0]);
-  auto const  offset    =
-      POINT {Msg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
-             Msg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
-  auto&       formLines = *FormLines;
-  // clang-format on
+
+  auto itVertex = wrap::next(FormVertices->cbegin(), closeForm.vertexIndex);
+  auto point    = form::sfCor2px(itVertex[0]);
+  auto const offset = POINT {Msg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
+                             Msg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
+  auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
 	point              = form::sfCor2px(*itVertex);
