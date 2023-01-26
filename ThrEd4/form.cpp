@@ -8184,10 +8184,9 @@ void form::picot() {
 }
 
 auto fi::contsf(uint32_t formIndex) -> bool {
-  ClosestFormToCursor = formIndex;
-  if (auto& form = FormList->operator[](ClosestFormToCursor); form.vertexCount > 4) {
-	clip::delclps(ClosestFormToCursor);
-	texture::deltx(ClosestFormToCursor);
+  if (auto& form = FormList->operator[](formIndex); form.vertexCount > 4) {
+	clip::delclps(formIndex);
+	texture::deltx(formIndex);
 	form::chkcont();
 	form.attribute |= gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
 	wrap::narrow(form.fillColor, ActiveColor);
