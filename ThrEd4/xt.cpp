@@ -2073,24 +2073,23 @@ void xt::dubcol(uint8_t color) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::blenfn(FRM_HEAD& form, float length) {
+void xi::blenfn(uint32_t formIndex, float length) {
+  auto& form = FormList->operator[](formIndex);
   if (form.isClip()) {
 	return;
   }
   form.lengthOrCount.stitchLength = length;
-  form::refilfn(ClosestFormToCursor);
+  form::refilfn(formIndex);
 }
 
 void xt::dublen(float length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
-	xi::blenfn(form, length);
+	xi::blenfn(ClosestFormToCursor, length);
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& form = FormList->operator[](selectedForm);
-	  xi::blenfn(form, length);
+	  xi::blenfn(selectedForm, length);
 	}
   }
   thred::coltab();
