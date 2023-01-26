@@ -384,8 +384,9 @@ void xi::fthfn(uint32_t iSequence, FEATHER& feather) {
 
 void xi::ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept {
   auto const& bPoint = BSequence->operator[](iPoint);
-  point.x            = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
-  point.y            = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
+
+  point.x = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
+  point.y = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
 }
 
 auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
