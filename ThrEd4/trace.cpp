@@ -872,72 +872,75 @@ void trace::trinit() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  if (!StateMap->test(StateFlag::TRSET)) {
-	StateMap->set(StateFlag::TRCRED);
-	StateMap->set(StateFlag::TRCGRN);
-	StateMap->set(StateFlag::TRCBLU);
-	auto componentPeak = std::array<uint32_t, CHANLCNT> {};
-	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  TraceDataSize = bitmap::getrmap();
-	}
-	if (StateMap->test(StateFlag::MONOMAP)) {
-	  auto const spTBD =
-	      gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
-	  auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
-	  auto       highColor = color;
-	  auto const pixel     = std::find_if(
-          spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool { return data != color; });
-	  if (pixel != spTBD.end()) {
-		highColor = *pixel;
-	  }
-	  auto colors = ti::trcols(highColor);
-	  std::ranges::copy(colors, HighColors.begin());
-	  colors = ti::trcols(color);
-	  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-		if (colors[iRGB] > HighColors[iRGB]) {
-		  std::swap(colors[iRGB], HighColors[iRGB]);
-		}
-		componentPeak[iRGB] = ((HighColors[iRGB] - colors[iRGB]) / 2) + colors[iRGB];
-	  }
-	}
-	else {
-	  auto const spTBD =
-	      gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
-	  for (auto const pixel : spTBD) {
-		auto colors  = ti::trcols(pixel);
-		auto iColors = colors.begin();
-		for (auto& iHistogramData : histogramData) {
-		  auto const itHD = wrap::next(iHistogramData.begin(), *(iColors++));
-		  ++(*itHD);
-		}
-	  }
-	  auto componentPeakCount  = std::array<uint32_t, CHANLCNT> {};
-	  auto iComponentPeakCount = componentPeakCount.begin();
-	  auto iComponentPeak      = componentPeak.begin();
-	  for (auto& channelData : histogramData) {
-		auto iLevel = 0U;
-		for (auto const& channel : channelData) {
-		  if (channel > *iComponentPeakCount) {
-			*iComponentPeakCount = channel;
-			*iComponentPeak      = iLevel;
-		  }
-		  ++iLevel;
-		}
-		++iComponentPeakCount;
-		++iComponentPeak;
-	  }
-	}
-	InvertDownColor = 0U;
-	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  if (componentPeak[iRGB] != 0U) {
-		--(componentPeak[iRGB]);
-	  }
-	  InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
-	}
-	DownPixelColor = InvertDownColor ^ COLMASK;
-	InvertUpColor  = PENWHITE;
-	UpPixelColor   = 0U;
+  if (StateMap->test(StateFlag::TRSET)) {
+	StateMap->set(StateFlag::WASTRCOL);
+	trace::trace();
+	return;
   }
+  StateMap->set(StateFlag::TRCRED);
+  StateMap->set(StateFlag::TRCGRN);
+  StateMap->set(StateFlag::TRCBLU);
+  auto componentPeak = std::array<uint32_t, CHANLCNT> {};
+  if (!StateMap->test(StateFlag::WASTRAC)) {
+	TraceDataSize = bitmap::getrmap();
+  }
+  if (StateMap->test(StateFlag::MONOMAP)) {
+	auto const spTBD =
+	    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+	auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
+	auto       highColor = color;
+	auto const pixel     = std::find_if(
+        spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool { return data != color; });
+	if (pixel != spTBD.end()) {
+	  highColor = *pixel;
+	}
+	auto colors = ti::trcols(highColor);
+	std::ranges::copy(colors, HighColors.begin());
+	colors = ti::trcols(color);
+	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+	  if (colors[iRGB] > HighColors[iRGB]) {
+		std::swap(colors[iRGB], HighColors[iRGB]);
+	  }
+	  componentPeak[iRGB] = ((HighColors[iRGB] - colors[iRGB]) / 2) + colors[iRGB];
+	}
+  }
+  else {
+	auto const spTBD =
+	    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+	for (auto const pixel : spTBD) {
+	  auto colors  = ti::trcols(pixel);
+	  auto iColors = colors.begin();
+	  for (auto& iHistogramData : histogramData) {
+		auto const itHD = wrap::next(iHistogramData.begin(), *(iColors++));
+		++(*itHD);
+	  }
+	}
+	auto componentPeakCount  = std::array<uint32_t, CHANLCNT> {};
+	auto iComponentPeakCount = componentPeakCount.begin();
+	auto iComponentPeak      = componentPeak.begin();
+	for (auto& channelData : histogramData) {
+	  auto iLevel = 0U;
+	  for (auto const& channel : channelData) {
+		if (channel > *iComponentPeakCount) {
+		  *iComponentPeakCount = channel;
+		  *iComponentPeak      = iLevel;
+		}
+		++iLevel;
+	  }
+	  ++iComponentPeakCount;
+	  ++iComponentPeak;
+	}
+  }
+  InvertDownColor = 0U;
+  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+	if (componentPeak[iRGB] != 0U) {
+	  --(componentPeak[iRGB]);
+	}
+	InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
+  }
+  DownPixelColor = InvertDownColor ^ COLMASK;
+  InvertUpColor  = PENWHITE;
+  UpPixelColor   = 0U;
   StateMap->set(StateFlag::WASTRCOL);
   trace::trace();
 }
