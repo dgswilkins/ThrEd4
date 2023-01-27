@@ -305,7 +305,7 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) -> bool {
   if (!util::closeEnough(historyItem.width, TextureScreen.width)) {
 	return true;
   }
-  auto const end = wrap::toUnsigned(TextureHistory->size());
+  auto const end = wrap::toUnsigned(TempTexturePoints->size());
   for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
 	if (TempTexturePoints->operator[](iPoint).line != historyItem.texturePoints[iPoint].line) {
 	  return true;
