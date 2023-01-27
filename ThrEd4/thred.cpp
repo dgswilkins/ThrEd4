@@ -17269,184 +17269,185 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  if (thrEdFile != INVALID_HANDLE_VALUE) {
-	auto bytesRead    = DWORD {};
-	auto stitchHeader = THR_HEAD {};
-	if (!wrap::readFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &bytesRead, L"ReadFile for stitchHeader in ritbak")) {
-	  return;
-	}
-	if (bytesRead == sizeof(stitchHeader)) {
-	  auto       stitchSourceSize = F_POINT {1.0F, 1.0F};
-	  auto const fileTypeVersion  = (stitchHeader.headerType & FTYPMASK) >> TBYTSHFT;
-	  if ((stitchHeader.headerType & SIGMASK) == THREDSIG) {
-		switch (fileTypeVersion) {
-		  case 0: {
-			if (stitchHeader.hoopType == SMALHUP) {
-			  stitchSourceSize.x = IniFile.hoopSizeX = SHUPX;
-			  stitchSourceSize.y = IniFile.hoopSizeY = SHUPY;
-			}
-			else {
-			  stitchSourceSize.x = IniFile.hoopSizeX = LHUPX;
-			  stitchSourceSize.y = IniFile.hoopSizeY = LHUPY;
-			}
-			break;
-		  }
-		  case 1:
-		  case 2: {
-			auto extendedHeader = THR_HEAD_EX {};
-			if (!wrap::readFile(thrEdFile, &extendedHeader, sizeof(extendedHeader), &bytesRead, L"ReadFile for extendedHeader in ritbak")) {
-			  return;
-			}
-			if (bytesRead != sizeof(extendedHeader)) {
-			  return;
-			}
-			stitchSourceSize.x = extendedHeader.hoopSizeX;
-			stitchSourceSize.y = extendedHeader.hoopSizeY;
-			break;
-		  }
-		  default: {
-			return;
-		  }
-		}
-	  }
-	  auto const drawingDestinationSize = SIZE {(drawItem.rcItem.right - drawItem.rcItem.left),
-	                                            (drawItem.rcItem.bottom - drawItem.rcItem.top)};
-	  auto const xRatio = wrap::toFloat(drawingDestinationSize.cx) / stitchSourceSize.x;
-	  auto const yRatio = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
-	  auto const ratio  = (xRatio < yRatio) ? xRatio : yRatio;
-	  if (stitchHeader.stitchCount != 0U) {
-		auto stitchesToDraw = std::vector<F_POINT_ATTR> {};
-		stitchesToDraw.resize(stitchHeader.stitchCount);
-		auto lines = std::vector<POINT> {};
-		lines.resize(stitchHeader.stitchCount);
-		auto const bytesToRead =
-		    stitchHeader.stitchCount * wrap::sizeofType(StitchBuffer);
-		if (!wrap::readFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &bytesRead, L"ReadFile for stitchesToDraw in ritbak")) {
-		  return;
-		}
-		if (bytesToRead == bytesRead) {
-		  SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);
-		  auto brushColor = COLORREF {};
-		  if (!wrap::readFile(thrEdFile, &brushColor, sizeof(brushColor), &bytesRead, L"ReadFile for brushColor in ritbak")) {
-			return;
-		  }
-		  auto colors = std::vector<COLORREF> {};
-		  colors.resize(COLORCNT);
-		  if (!wrap::readFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, L"ReadFile for colors in ritbak")) {
-			return;
-		  }
-		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto brush = CreateSolidBrush(brushColor);
-		  SelectObject(drawItem.hDC, brush);
-		  FillRect(drawItem.hDC, &drawItem.rcItem, brush);
-		  auto iColor = stitchesToDraw[0].attribute & COLMSK;
-		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto pen   = wrap::createPen(PS_SOLID, PENNWID, colors[iColor]);
-		  auto iLine = 0U;
-		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
-			if ((stitchesToDraw[iStitch].attribute & COLMSK) == iColor) {
-			  lines[iLine++] = {std::lround(stitchesToDraw[iStitch].x * ratio),
-			                    std::lround(wrap::toFloat(drawingDestinationSize.cy) -
-			                                stitchesToDraw[iStitch].y * ratio)};
-			}
-			else {
-			  thred::nuPen(pen, 1, colors[iColor]);
-			  SelectObject(drawItem.hDC, pen);
-			  wrap::polyline(drawItem.hDC, lines.data(), iLine);
-			  iLine  = 0;
-			  iColor = stitchesToDraw[iStitch].attribute & COLMSK;
-			}
-		  }
-		  if (iLine != 0U) {
-			thred::nuPen(pen, 1, colors[iColor]);
-			SelectObject(drawItem.hDC, pen);
-			wrap::polyline(drawItem.hDC, lines.data(), iLine);
-		  }
-		  DeleteObject(brush);
-		  DeleteObject(pen);
+  if (thrEdFile == INVALID_HANDLE_VALUE) {
+	return;
+  }
+  auto bytesRead    = DWORD {};
+  auto stitchHeader = THR_HEAD {};
+  if (!wrap::readFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &bytesRead, L"ReadFile for stitchHeader in ritbak")) {
+	return;
+  }
+  if (bytesRead != sizeof(stitchHeader)) {
+	CloseHandle(thrEdFile);
+	return;
+  }
+  auto       stitchSourceSize = F_POINT {1.0F, 1.0F};
+  auto const fileTypeVersion  = (stitchHeader.headerType & FTYPMASK) >> TBYTSHFT;
+  if ((stitchHeader.headerType & SIGMASK) == THREDSIG) {
+	switch (fileTypeVersion) {
+	  case 0: {
+		if (stitchHeader.hoopType == SMALHUP) {
+		  stitchSourceSize.x = IniFile.hoopSizeX = SHUPX;
+		  stitchSourceSize.y = IniFile.hoopSizeY = SHUPY;
 		}
 		else {
-		  CloseHandle(thrEdFile);
+		  stitchSourceSize.x = IniFile.hoopSizeX = LHUPX;
+		  stitchSourceSize.y = IniFile.hoopSizeY = LHUPY;
+		}
+		break;
+	  }
+	  case 1:
+	  case 2: {
+		auto extendedHeader = THR_HEAD_EX {};
+		if (!wrap::readFile(thrEdFile, &extendedHeader, sizeof(extendedHeader), &bytesRead, L"ReadFile for extendedHeader in ritbak")) {
 		  return;
 		}
+		if (bytesRead != sizeof(extendedHeader)) {
+		  return;
+		}
+		stitchSourceSize.x = extendedHeader.hoopSizeX;
+		stitchSourceSize.y = extendedHeader.hoopSizeY;
+		break;
 	  }
-	  else {
-		SetFilePointer(thrEdFile, 84, nullptr, FILE_CURRENT);
-	  }
-	  if (stitchHeader.formCount != 0U) {
-		do {
-		  SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
-		  auto formList = std::vector<FRM_HEAD> {};
-		  formList.resize(stitchHeader.formCount);
-		  auto vertexList = std::vector<F_POINT> {};
-		  vertexList.resize(stitchHeader.vertexCount);
-		  if (fileTypeVersion < 2) {
-			auto formListOriginal = std::vector<FRM_HEAD_O> {};
-			formListOriginal.resize(stitchHeader.formCount);
-			auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(formListOriginal);
-			if (!wrap::readFile(thrEdFile, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in ritbak")) {
-			  return;
-			}
-			if (bytesRead != bytesToRead) {
-			  break;
-			}
-			std::ranges::copy(formListOriginal, formList.begin());
-		  }
-		  else {
-			auto inFormList = std::vector<FRM_HEAD_OUT> {};
-			inFormList.resize(stitchHeader.formCount);
-			auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
-			if (!wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in ritbak")) {
-			  return;
-			}
-			if (bytesRead != bytesToRead) {
-			  break;
-			}
-			std::ranges::copy(inFormList, formList.begin());
-		  }
-		  auto const bytesToRead = stitchHeader.vertexCount * wrap::sizeofType(vertexList);
-		  if (!wrap::readFile(thrEdFile, vertexList.data(), bytesToRead, &bytesRead, L"ReadFile for vertexList in ritbak")) {
-			return;
-		  }
-		  if (bytesRead != bytesToRead) {
-			break;
-		  }
-		  auto lines    = std::vector<POINT> {};
-		  auto maxLines = 0U;
-		  for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
-			if (formList[iForm].vertexCount > maxLines) {
-			  maxLines = formList[iForm].vertexCount;
-			}
-		  }
-		  lines.resize(wrap::toSize(maxLines) + 1U);
-		  auto iVertex = 0U;
-		  for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
-			auto const iLine = iVertex;
-			for (auto iVertexInForm = 0U;
-			     (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
-			     ++iVertexInForm) {
-			  lines[iVertexInForm] = {std::lround(vertexList[iVertex].x * ratio),
-			                          std::lround(wrap::toFloat(drawingDestinationSize.cy) -
-			                                      vertexList[iVertex++].y * ratio)};
-			}
-			lines[formList[iForm].vertexCount] = {
-			    std::lround(vertexList[iLine].x * ratio),
-			    std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iLine].y * ratio)};
-			SelectObject(drawItem.hDC, FormPen);
-			SetROP2(drawItem.hDC, R2_XORPEN);
-			if (formList[iForm].type == FRMLINE) {
-			  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount);
-			}
-			else {
-			  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount + 1U);
-			}
-			SetROP2(StitchWindowMemDC, R2_COPYPEN);
-		  }
-		} while (false);
+	  default: {
+		return;
 	  }
 	}
-	CloseHandle(thrEdFile);
   }
+  auto const drawingDestinationSize = SIZE {(drawItem.rcItem.right - drawItem.rcItem.left),
+                                            (drawItem.rcItem.bottom - drawItem.rcItem.top)};
+  auto const xRatio                 = wrap::toFloat(drawingDestinationSize.cx) / stitchSourceSize.x;
+  auto const yRatio                 = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
+  auto const ratio                  = (xRatio < yRatio) ? xRatio : yRatio;
+  if (stitchHeader.stitchCount != 0U) {
+	auto stitchesToDraw = std::vector<F_POINT_ATTR> {};
+	stitchesToDraw.resize(stitchHeader.stitchCount);
+	auto lines = std::vector<POINT> {};
+	lines.resize(stitchHeader.stitchCount);
+	auto const bytesToRead = stitchHeader.stitchCount * wrap::sizeofType(StitchBuffer);
+	if (!wrap::readFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &bytesRead, L"ReadFile for stitchesToDraw in ritbak")) {
+	  return;
+	}
+	if (bytesToRead != bytesRead) {
+	  CloseHandle(thrEdFile);
+	  return;
+	}
+	SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);
+	auto brushColor = COLORREF {};
+	if (!wrap::readFile(thrEdFile, &brushColor, sizeof(brushColor), &bytesRead, L"ReadFile for brushColor in ritbak")) {
+	  return;
+	}
+	auto colors = std::vector<COLORREF> {};
+	colors.resize(COLORCNT);
+	if (!wrap::readFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, L"ReadFile for colors in ritbak")) {
+	  return;
+	}
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto brush = CreateSolidBrush(brushColor);
+	SelectObject(drawItem.hDC, brush);
+	FillRect(drawItem.hDC, &drawItem.rcItem, brush);
+	auto iColor = stitchesToDraw[0].attribute & COLMSK;
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto pen   = wrap::createPen(PS_SOLID, PENNWID, colors[iColor]);
+	auto iLine = 0U;
+	for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
+	  if ((stitchesToDraw[iStitch].attribute & COLMSK) != iColor) {
+		thred::nuPen(pen, 1, colors[iColor]);
+		SelectObject(drawItem.hDC, pen);
+		wrap::polyline(drawItem.hDC, lines.data(), iLine);
+		iLine  = 0;
+		iColor = stitchesToDraw[iStitch].attribute & COLMSK;
+		continue;
+	  }
+	  lines[iLine++] = {
+	      std::lround(stitchesToDraw[iStitch].x * ratio),
+	      std::lround(wrap::toFloat(drawingDestinationSize.cy) - stitchesToDraw[iStitch].y * ratio)};
+	}
+	if (iLine != 0U) {
+	  thred::nuPen(pen, 1, colors[iColor]);
+	  SelectObject(drawItem.hDC, pen);
+	  wrap::polyline(drawItem.hDC, lines.data(), iLine);
+	}
+	DeleteObject(brush);
+	DeleteObject(pen);
+  }
+  else {
+	SetFilePointer(thrEdFile, 84, nullptr, FILE_CURRENT);
+  }
+  if (stitchHeader.formCount == 0U) {
+	CloseHandle(thrEdFile);
+	return;
+  }
+  do {
+	SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
+	auto formList = std::vector<FRM_HEAD> {};
+	formList.resize(stitchHeader.formCount);
+	auto vertexList = std::vector<F_POINT> {};
+	vertexList.resize(stitchHeader.vertexCount);
+	if (fileTypeVersion < 2) {
+	  auto formListOriginal = std::vector<FRM_HEAD_O> {};
+	  formListOriginal.resize(stitchHeader.formCount);
+	  auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(formListOriginal);
+	  if (!wrap::readFile(thrEdFile, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in ritbak")) {
+		return;
+	  }
+	  if (bytesRead != bytesToRead) {
+		break;
+	  }
+	  std::ranges::copy(formListOriginal, formList.begin());
+	}
+	else {
+	  auto inFormList = std::vector<FRM_HEAD_OUT> {};
+	  inFormList.resize(stitchHeader.formCount);
+	  auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
+	  if (!wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in ritbak")) {
+		return;
+	  }
+	  if (bytesRead != bytesToRead) {
+		break;
+	  }
+	  std::ranges::copy(inFormList, formList.begin());
+	}
+	auto const bytesToRead = stitchHeader.vertexCount * wrap::sizeofType(vertexList);
+	if (!wrap::readFile(thrEdFile, vertexList.data(), bytesToRead, &bytesRead, L"ReadFile for vertexList in ritbak")) {
+	  return;
+	}
+	if (bytesRead != bytesToRead) {
+	  break;
+	}
+	auto lines    = std::vector<POINT> {};
+	auto maxLines = 0U;
+	for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
+	  if (formList[iForm].vertexCount > maxLines) {
+		maxLines = formList[iForm].vertexCount;
+	  }
+	}
+	lines.resize(wrap::toSize(maxLines) + 1U);
+	auto iVertex = 0U;
+	for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
+	  auto const iLine = iVertex;
+	  for (auto iVertexInForm = 0U;
+	       (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
+	       ++iVertexInForm) {
+		lines[iVertexInForm] = {
+		    std::lround(vertexList[iVertex].x * ratio),
+		    std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iVertex++].y * ratio)};
+	  }
+	  lines[formList[iForm].vertexCount] = {
+	      std::lround(vertexList[iLine].x * ratio),
+	      std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iLine].y * ratio)};
+	  SelectObject(drawItem.hDC, FormPen);
+	  SetROP2(drawItem.hDC, R2_XORPEN);
+	  if (formList[iForm].type == FRMLINE) {
+		wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount);
+	  }
+	  else {
+		wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount + 1U);
+	  }
+	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
+	}
+  } while (false);
+  CloseHandle(thrEdFile);
 }
 
 struct createParams {
