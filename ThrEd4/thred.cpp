@@ -17244,25 +17244,26 @@ void thi::dubar() {
 	FillRect(DrawItem->hDC, &colorBarRect, *ucb);
 	colorBarRect.top = colorBarRect.bottom;
   }
-  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL)) {
-	auto selectedIndicator = wrap::toFloat(ClosestPointIndex) / buffSize;
-	indicatorLine[0].y     = indicatorLine[1].y =
+  if (!StateMap->test(StateFlag::SELBOX) && !StateMap->test(StateFlag::GRPSEL)) {
+	return;
+  }
+  auto selectedIndicator = wrap::toFloat(ClosestPointIndex) / buffSize;
+  indicatorLine[0].y     = indicatorLine[1].y =
+      wrap::ceil<decltype(indicatorLine[0].y)>(wrap::toFloat(colorBarRect.bottom) * selectedIndicator);
+  indicatorLine[0].x = colorBarRect.left;
+  indicatorLine[1].x = colorBarRect.right;
+  SelectObject(DrawItem->hDC, CrossPen);
+  SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
+  wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	selectedIndicator  = wrap::toFloat(GroupStitchIndex) / buffSize;
+	indicatorLine[0].y = indicatorLine[1].y =
 	    wrap::ceil<decltype(indicatorLine[0].y)>(wrap::toFloat(colorBarRect.bottom) * selectedIndicator);
 	indicatorLine[0].x = colorBarRect.left;
 	indicatorLine[1].x = colorBarRect.right;
-	SelectObject(DrawItem->hDC, CrossPen);
-	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  selectedIndicator  = wrap::toFloat(GroupStitchIndex) / buffSize;
-	  indicatorLine[0].y = indicatorLine[1].y =
-	      wrap::ceil<decltype(indicatorLine[0].y)>(wrap::toFloat(colorBarRect.bottom) * selectedIndicator);
-	  indicatorLine[0].x = colorBarRect.left;
-	  indicatorLine[1].x = colorBarRect.right;
-	  wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
-	}
-	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
+  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
 void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
