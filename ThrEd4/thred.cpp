@@ -16916,11 +16916,12 @@ void thi::doDrwInit(unsigned int stitchCount, std::vector<POINT>& linePoints) {
 		if (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
 		  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 		                ColorChangeTable->operator[](iColor).stitchIndex;
-		  auto const                      stitchIt =
-		      wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
-		  for (auto iStitch = ptrdiff_t {}; iStitch < gsl::narrow<ptrdiff_t>(stitchCount); ++iStitch) {
-			if (stitchIt[iStitch].x >= ZoomRect.left && stitchIt[iStitch].x <= ZoomRect.right &&
-			    stitchIt[iStitch].y >= ZoomRect.bottom && stitchIt[iStitch].y <= ZoomRect.top) {
+		  auto sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
+		  auto sEnd   = wrap::next(sStart, stitchCount);
+		  auto sRange = std::ranges::subrange(sStart, sEnd);
+		  for (auto const& iStitch : sRange) {
+			if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
+			    iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
 			  DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
 			  break;
 			}
