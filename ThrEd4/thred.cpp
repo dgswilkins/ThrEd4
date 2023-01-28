@@ -16900,24 +16900,11 @@ void thi::doDrwInit(unsigned int stitchCount, std::vector<POINT>& linePoints) {
       std::lround(dub6 * TSIZ30), std::lround(dub6 * TSIZ40), std::lround(dub6 * TSIZ60)}; // thread sizes in pixels
   auto tsi = ThreadSizeIndex.begin();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (StateMap->test(StateFlag::THRDS)) {
-	  auto itThreadWidth = wrap::next(threadWidth.begin(), *tsi);
-	  nuStchSiz(iColor, *itThreadWidth);
+	auto width = int32_t {1};
+	if (StateMap->test(StateFlag::THRDS) || ((iColor == ActiveColor) && StateMap->test(StateFlag::COL))) {
+	  width = *(wrap::next(threadWidth.begin(), *tsi));
 	}
-	else {
-	  if (StateMap->test(StateFlag::COL)) {
-		if (iColor == ActiveColor) {
-		  auto itThreadWidth = wrap::next(threadWidth.begin(), *tsi);
-		  nuStchSiz(iColor, *itThreadWidth);
-		}
-		else {
-		  nuStchSiz(iColor, 1);
-		}
-	  }
-	  else {
-		nuStchSiz(iColor, 1);
-	  }
-	}
+	nuStchSiz(iColor, width);
 	++tsi;
   }
   DisplayedColorBitmap.reset();
