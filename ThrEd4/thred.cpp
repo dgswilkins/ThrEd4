@@ -16912,22 +16912,20 @@ void thi::doDrwInit(unsigned int stitchCount, std::vector<POINT>& linePoints) {
 	StateMap->reset(StateFlag::LINED);
 	StateMap->reset(StateFlag::LININ);
 	for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	  if (StateMap->test(StateFlag::HID)) {
-		if (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
-		  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
-		                ColorChangeTable->operator[](iColor).stitchIndex;
-		  auto sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
-		  auto sEnd   = wrap::next(sStart, stitchCount);
-		  auto sRange = std::ranges::subrange(sStart, sEnd);
-		  for (auto const& iStitch : sRange) {
-			if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
-			    iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
-			  DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
-			  break;
-			}
+	  if (StateMap->test(StateFlag::HID) && (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor)) {
+		stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+		              ColorChangeTable->operator[](iColor).stitchIndex;
+		auto sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
+		auto sEnd   = wrap::next(sStart, stitchCount);
+		auto sRange = std::ranges::subrange(sStart, sEnd);
+		for (auto const& iStitch : sRange) {
+		  if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
+		      iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
+			DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
+			break;
 		  }
-		  continue;
 		}
+		continue;
 	  }
 	  auto wascol = 0U;
 	  SelectObject(StitchWindowMemDC, UserPen->operator[](ColorChangeTable->operator[](iColor).colorIndex));
