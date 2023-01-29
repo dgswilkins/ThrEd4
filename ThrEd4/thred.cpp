@@ -175,7 +175,7 @@ void desiz();
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-void doDrwInit(unsigned int stitchCount, std::vector<POINT>& linePoints);
+void doDrwInit();
 auto doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool;
 void doStretch(uint32_t start, uint32_t end);
 void drawBackground();
@@ -16871,7 +16871,17 @@ void thi::drawBackground() {
   dugrid();
 }
 
-void thi::doDrwInit(unsigned int stitchCount, std::vector<POINT>& linePoints) {
+void thi::doDrwInit() {
+  auto stitchCount = 0U;
+  for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
+	auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+	                                              ColorChangeTable->operator[](iColor).stitchIndex);
+	if (deltaCount > stitchCount) {
+	  stitchCount = deltaCount;
+	}
+  }
+  auto linePoints = std::vector<POINT> {};
+  linePoints.reserve(wrap::toSize(stitchCount) + 2U);
   if (StateMap->test(StateFlag::ZUMED)) {
 	auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
 	scrollInfo.cbSize = sizeof(scrollInfo);
@@ -17169,19 +17179,9 @@ void thi::drwStch() {
   StateMap->reset(StateFlag::ILIN);
   uncros();
   StateMap->reset(StateFlag::SHOFRM);
-  auto stitchCount = 0U;
-  for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
-	                                              ColorChangeTable->operator[](iColor).stitchIndex);
-	if (deltaCount > stitchCount) {
-	  stitchCount = deltaCount;
-	}
-  }
-  auto linePoints = std::vector<POINT> {};
-  linePoints.reserve(wrap::toSize(stitchCount) + 2U);
   thi::drawBackground();
   if (StateMap->test(StateFlag::INIT)) {
-	thi::doDrwInit(stitchCount, linePoints);
+	thi::doDrwInit();
   }
   if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	form::drwfrm();
