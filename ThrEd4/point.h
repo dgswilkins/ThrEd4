@@ -98,6 +98,7 @@ class F_POINT_ATTR
   constexpr F_POINT_ATTR() noexcept = default;
   inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
   inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
+  inline constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
   // F_POINT_ATTR(F_POINT_ATTR const&) = default;
   // F_POINT_ATTR(F_POINT_ATTR&&) = default;
   // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
@@ -200,6 +201,10 @@ inline F_POINT_ATTR::F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcep
 
 inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)), attribute(rhsA) {
+}
+
+inline constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {
+  return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y) && attribute==rhs.attribute;
 }
 
 inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
