@@ -16921,6 +16921,8 @@ void thi::doDrwInit() {
   if (StateMap->test(StateFlag::ZUMED)) {
 	StateMap->reset(StateFlag::LINED);
 	StateMap->reset(StateFlag::LININ);
+	// intentional copy of first stitch to initialize previous stitch
+	auto prevStitch = StitchBuffer->front(); 
 	for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	  if (StateMap->test(StateFlag::HID) && (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor)) {
 		stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
@@ -16942,59 +16944,55 @@ void thi::doDrwInit() {
 	  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	                ColorChangeTable->operator[](iColor).stitchIndex;
 	  if (!StitchBuffer->empty()) {
-		auto const stitchIt =
-		    wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
+		auto const stIndex = ColorChangeTable->operator[](iColor).stitchIndex;
+
+		auto const stStart   = wrap::next(StitchBuffer->begin(), stIndex);
 		stitchCount          = chkup(stitchCount, iColor);
+		auto const stitches  = std::ranges::subrange(stStart, wrap::next(stStart, stitchCount));
 		auto const maxYcoord = wrap::toFloat(DrawItem->rcItem.bottom);
-		for (auto iStitch = ptrdiff_t {}; iStitch < gsl::narrow<ptrdiff_t>(stitchCount); ++iStitch) {
-		  auto const layer = (stitchIt[iStitch].attribute & LAYMSK) >> LAYSHFT;
+		for (auto& iStitch : stitches) {
+		  auto const layer = (iStitch.attribute & LAYMSK) >> LAYSHFT;
 		  if ((ActiveLayer != 0U) && (layer != 0U) && (layer != ActiveLayer)) {
 			continue;
 		  }
-		  if (stitchIt[iStitch].x >= ZoomRect.left && stitchIt[iStitch].x <= ZoomRect.right &&
-		      stitchIt[iStitch].y >= ZoomRect.bottom && stitchIt[iStitch].y <= ZoomRect.top) {
+		  if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
+		      iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
 			wascol = 1;
 			if (StateMap->testAndSet(StateFlag::LINED)) {
 			  if (StateMap->testAndSet(StateFlag::LININ)) {
 				linePoints.push_back(
-				    {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-				     wrap::ceil<int32_t>(maxYcoord -
-				                         (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)});
+				    {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+				     wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 			  }
 			  else {
-				if (iStitch == 0) {
+				if (iStitch == prevStitch) {
 				  linePoints.push_back(
-				      {wrap::ceil<int32_t>((stitchIt->x - ZoomRect.left) * ZoomRatio.x),
-				       wrap::ceil<int32_t>(maxYcoord - (stitchIt->y - ZoomRect.bottom) * ZoomRatio.y)});
+				      {wrap::ceil<int32_t>((stStart->x - ZoomRect.left) * ZoomRatio.x),
+				       wrap::ceil<int32_t>(maxYcoord - (stStart->y - ZoomRect.bottom) * ZoomRatio.y)});
 				}
 				else {
 				  linePoints.push_back(
-				      {wrap::ceil<int32_t>((stitchIt[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x),
-				       wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch - 1].y - ZoomRect.bottom) *
-				                                           ZoomRatio.y)});
+				      {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+				       wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 				  linePoints.push_back(
-				      {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-				       wrap::ceil<int32_t>(maxYcoord -
-				                           (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)});
+				      {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+				       wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 				}
 			  }
 			}
 			else {
-			  if (iStitch == 0) {
+			  if (iStitch == prevStitch) {
 				linePoints.push_back(
-				    {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-				     wrap::ceil<int32_t>(maxYcoord -
-				                         (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)});
+				    {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+				     wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 			  }
 			  else {
 				linePoints.push_back(
-				    {wrap::ceil<int32_t>((stitchIt[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x),
-				     wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch - 1].y - ZoomRect.bottom) *
-				                                         ZoomRatio.y)});
+				    {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+				     wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 				linePoints.push_back(
-				    {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-				     wrap::ceil<int32_t>(maxYcoord -
-				                         (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)});
+				    {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+				     wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 			  }
 			  StateMap->set(StateFlag::LININ);
 			}
@@ -17002,34 +17000,31 @@ void thi::doDrwInit() {
 		  else {
 			if (StateMap->testAndReset(StateFlag::LININ)) {
 			  linePoints.push_back(
-			      {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-			       wrap::ceil<int32_t>(maxYcoord -
-			                           (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)});
+			      {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+			       wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)});
 			  wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
 			  linePoints.clear();
 			}
 			else {
-			  if (iStitch == 0U) {
+			  if (iStitch == prevStitch) {
 				continue;
 			  }
 			  // write an equation for this line
-			  auto const xDelta     = stitchIt[iStitch].x - stitchIt[iStitch - 1].x;
-			  auto const yDelta     = stitchIt[iStitch - 1].y - stitchIt[iStitch].y;
+			  auto const xDelta     = iStitch.x - prevStitch.x;
+			  auto const yDelta     = prevStitch.y - iStitch.y;
 			  auto const slope      = xDelta / yDelta;
-			  auto const offset     = stitchIt[iStitch].x + slope * stitchIt[iStitch].y;
+			  auto const offset     = iStitch.x + slope * iStitch.y;
 			  auto       stitchLine = std::array<POINT, LNPNTS> {};
 			  do {
 				// does the line intersect with the top of the screen?
 				auto gapToEdge = offset - slope * ZoomRect.top;
 				if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 				  stitchLine[0] = POINT {
-				      wrap::ceil<int32_t>((stitchIt[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x),
-				      wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch - 1].y - ZoomRect.bottom) *
-				                                          ZoomRatio.x)};
-				  stitchLine[1] =
-				      POINT {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-				             wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
-				                                                 ZoomRatio.x)};
+				      wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+				      wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.x)};
+				  stitchLine[1] = POINT {
+				      wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+				      wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.x)};
 				  wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 				  break;
 				}
@@ -17037,13 +17032,11 @@ void thi::doDrwInit() {
 				gapToEdge = offset - slope * ZoomRect.bottom;
 				if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 				  stitchLine[0] = POINT {
-				      wrap::ceil<int32_t>((stitchIt[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x),
-				      wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch - 1].y - ZoomRect.bottom) *
-				                                          ZoomRatio.y)};
-				  stitchLine[1] =
-				      POINT {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-				             wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
-				                                                 ZoomRatio.y)};
+				      wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+				      wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
+				  stitchLine[1] = POINT {
+				      wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+				      wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
 				  wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 				  break;
 				}
@@ -17052,19 +17045,18 @@ void thi::doDrwInit() {
 				  gapToEdge = (offset - ZoomRect.left) / slope;
 				  if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
 					stitchLine[0] = POINT {
-					    wrap::ceil<int32_t>((stitchIt[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x),
-					    wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch - 1].y - ZoomRect.bottom) *
-					                                        ZoomRatio.y)};
-					stitchLine[1] =
-					    POINT {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
-					           wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
-					                                               ZoomRatio.y)};
+					    wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+					    wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
+					stitchLine[1] = POINT {
+					    wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+					    wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
 					wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 				  }
 				}
 			  } while (false);
 			}
 		  }
+		  prevStitch = iStitch;
 		}
 	  }
 	  if (!linePoints.empty()) {
