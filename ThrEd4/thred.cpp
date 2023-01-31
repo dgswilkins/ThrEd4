@@ -16830,32 +16830,33 @@ void thi::drwknot() {
 }
 
 void thi::dugrid() {
-  if (ZoomFactor < ShowStitchThreshold || (ShowStitchThreshold == 0.0F)) {
-	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	SelectObject(StitchWindowMemDC, GridPen);
-	auto const gridRect = RECT {wrap::ceil<int32_t>(ZoomRect.left / IniFile.gridSize),
-	                            wrap::floor<int32_t>(ZoomRect.top / IniFile.gridSize),
-	                            wrap::floor<int32_t>(ZoomRect.right / IniFile.gridSize),
-	                            wrap::ceil<int32_t>(ZoomRect.bottom / IniFile.gridSize)};
-
-	auto gridLine = std::array<POINT, 2> {};
-	gridLine[0].x = 0;
-	gridLine[1].x = StitchWindowClientRect.right;
-	for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; ++iGrid) {
-	  gridLine[0].y = gridLine[1].y = wrap::ceil<int32_t>(
-	      wrap::toFloat(StitchWindowClientRect.bottom) -
-	      (wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y);
-	  wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
-	}
-	gridLine[0].y = 0;
-	gridLine[1].y = StitchWindowClientRect.bottom;
-	for (auto iGrid = gridRect.left; iGrid <= gridRect.right; ++iGrid) {
-	  gridLine[0].x = gridLine[1].x =
-	      wrap::ceil<int32_t>((wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x);
-	  wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
-	}
-	SetROP2(StitchWindowMemDC, R2_COPYPEN);
+  if (ZoomFactor >= ShowStitchThreshold && (ShowStitchThreshold != 0.0F)) {
+	return;
   }
+  SetROP2(StitchWindowMemDC, R2_XORPEN);
+  SelectObject(StitchWindowMemDC, GridPen);
+  auto const gridRect = RECT {wrap::ceil<int32_t>(ZoomRect.left / IniFile.gridSize),
+                              wrap::floor<int32_t>(ZoomRect.top / IniFile.gridSize),
+                              wrap::floor<int32_t>(ZoomRect.right / IniFile.gridSize),
+                              wrap::ceil<int32_t>(ZoomRect.bottom / IniFile.gridSize)};
+
+  auto gridLine = std::array<POINT, 2> {};
+  gridLine[0].x = 0;
+  gridLine[1].x = StitchWindowClientRect.right;
+  for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; ++iGrid) {
+	gridLine[0].y = gridLine[1].y =
+	    wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+	                        (wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y);
+	wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
+  }
+  gridLine[0].y = 0;
+  gridLine[1].y = StitchWindowClientRect.bottom;
+  for (auto iGrid = gridRect.left; iGrid <= gridRect.right; ++iGrid) {
+	gridLine[0].x = gridLine[1].x =
+	    wrap::ceil<int32_t>((wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x);
+	wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
+  }
+  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
 auto thi::setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize)
