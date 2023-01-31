@@ -16803,29 +16803,30 @@ void thi::stCor2px(F_POINT_ATTR const& stitch, POINT& point) {
 }
 
 void thi::drwknot() {
-  if (!UserFlagMap->test(UserFlag::KNOTOF) && (!Knots->empty()) && (!StitchBuffer->empty())) {
-	constexpr auto KBOFFSET = 5; // offset of the knot box sides;
-	auto const     kOffset  = MulDiv(KBOFFSET, *ScreenDPI, STDDPI);
-	constexpr auto KLINELEN = 10; // length of the knot line;
-	auto const     kLine    = MulDiv(KLINELEN, *ScreenDPI, STDDPI);
-	auto           point    = POINT {};
-	auto           kOutline = std::array<POINT, SQPNTS> {};
-	auto           tLine    = std::array<POINT, LNPNTS> {};
-	for (auto const knot : *Knots) {
-	  stCor2px(StitchBuffer->operator[](knot), point);
-	  SelectObject(StitchWindowMemDC, KnotPen);
-	  SetROP2(StitchWindowMemDC, R2_XORPEN);
-	  kOutline[0].x = kOutline[3].x = kOutline[4].x = point.x - kOffset;
-	  kOutline[1].x = kOutline[2].x = point.x + kOffset;
-	  kOutline[0].y = kOutline[1].y = kOutline[4].y = point.y + kOffset;
-	  kOutline[2].y = kOutline[3].y = point.y - kOffset;
-	  wrap::polyline(StitchWindowMemDC, kOutline.data(), wrap::toUnsigned(kOutline.size()));
-	  tLine[0].x = point.x - kLine;
-	  tLine[1].x = point.x + kLine;
-	  tLine[0].y = tLine[1].y = point.y;
-	  wrap::polyline(StitchWindowMemDC, tLine.data(), wrap::toUnsigned(tLine.size()));
-	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
-	}
+  if (UserFlagMap->test(UserFlag::KNOTOF) || Knots->empty() || StitchBuffer->empty()) {
+	return;
+  }
+  constexpr auto KBOFFSET = 5; // offset of the knot box sides;
+  auto const     kOffset  = MulDiv(KBOFFSET, *ScreenDPI, STDDPI);
+  constexpr auto KLINELEN = 10; // length of the knot line;
+  auto const     kLine    = MulDiv(KLINELEN, *ScreenDPI, STDDPI);
+  auto           point    = POINT {};
+  auto           kOutline = std::array<POINT, SQPNTS> {};
+  auto           tLine    = std::array<POINT, LNPNTS> {};
+  for (auto const knot : *Knots) {
+	stCor2px(StitchBuffer->operator[](knot), point);
+	SelectObject(StitchWindowMemDC, KnotPen);
+	SetROP2(StitchWindowMemDC, R2_XORPEN);
+	kOutline[0].x = kOutline[3].x = kOutline[4].x = point.x - kOffset;
+	kOutline[1].x = kOutline[2].x = point.x + kOffset;
+	kOutline[0].y = kOutline[1].y = kOutline[4].y = point.y + kOffset;
+	kOutline[2].y = kOutline[3].y = point.y - kOffset;
+	wrap::polyline(StitchWindowMemDC, kOutline.data(), wrap::toUnsigned(kOutline.size()));
+	tLine[0].x = point.x - kLine;
+	tLine[1].x = point.x + kLine;
+	tLine[0].y = tLine[1].y = point.y;
+	wrap::polyline(StitchWindowMemDC, tLine.data(), wrap::toUnsigned(tLine.size()));
+	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
 }
 
