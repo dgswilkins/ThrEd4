@@ -17149,15 +17149,16 @@ void thi::doDrwInit() {
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	if (StateMap->test(StateFlag::HID)) {
 	  for (auto iColor = 0U; iColor < thred::maxColor(); ++iColor) {
-		if (ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
-		  for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
-		       iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
-		       ++iStitch) {
-			auto const& stitch = StitchBuffer->operator[](iStitch);
-			if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
-			    stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
-			  stchbox(iStitch, StitchWindowMemDC);
-			}
+		if (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
+		  continue;
+		}
+		for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
+		     iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
+		     ++iStitch) {
+		  auto const& stitch = StitchBuffer->operator[](iStitch);
+		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
+		      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
+			stchbox(iStitch, StitchWindowMemDC);
 		  }
 		}
 	  }
