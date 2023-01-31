@@ -16788,7 +16788,7 @@ auto thi::chkup(uint32_t count, size_t iStitch) -> uint32_t {
 	  }
 	  return ClosestPointIndex - ColorChangeTable->operator[](iStitch).stitchIndex + 1U;
 	}
-	return 0;
+	return 0U;
   }
   return count;
 }
