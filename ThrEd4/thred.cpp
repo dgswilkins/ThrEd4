@@ -16756,31 +16756,32 @@ void thi::relin() {
 
 void thi::dumov() {
   auto const sCurr = wrap::next(StitchBuffer->begin(), MoveAnchor);
-  auto const sNext = std::next(sCurr);
-  RotateAngle      = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
-  if (sCurr->x >= ZoomRect.left && sCurr->x <= ZoomRect.right && sCurr->y >= ZoomRect.bottom &&
-      sCurr->y <= ZoomRect.top) {
-	constexpr auto ABPOINTS       = 7U; // Number of arrow box points
-	auto           arrowBox       = std::array<POINT, ABPOINTS> {};
-	auto const     abCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
-	arrowBox[0]                   = abCenterPixels;
-	arrowBox[6]                   = abCenterPixels;
-	auto offsetFromCenter         = POINT {abCenterPixels.x + 12, abCenterPixels.y + 2};
-	rotpix(offsetFromCenter, arrowBox[1], abCenterPixels);
-	offsetFromCenter.y = abCenterPixels.y - 2;
-	rotpix(offsetFromCenter, arrowBox[5], abCenterPixels);
-	offsetFromCenter.y = abCenterPixels.y + 6;
-	rotpix(offsetFromCenter, arrowBox[2], abCenterPixels);
-	offsetFromCenter.y = abCenterPixels.y - 6;
-	rotpix(offsetFromCenter, arrowBox[4], abCenterPixels);
-	offsetFromCenter.x = abCenterPixels.x + 20;
-	offsetFromCenter.y = abCenterPixels.y;
-	rotpix(offsetFromCenter, arrowBox[3], abCenterPixels);
-	SelectObject(StitchWindowMemDC, FormPen);
-	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	wrap::polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
-	SetROP2(StitchWindowMemDC, R2_COPYPEN);
+  if (sCurr->x < ZoomRect.left   || sCurr->x > ZoomRect.right || 
+	  sCurr->y < ZoomRect.bottom || sCurr->y > ZoomRect.top) {
+	return;
   }
+  auto const sNext              = std::next(sCurr);
+  RotateAngle                   = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
+  constexpr auto ABPOINTS       = 7U; // Number of arrow box points
+  auto           arrowBox       = std::array<POINT, ABPOINTS> {};
+  auto const     abCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
+  arrowBox[0]                   = abCenterPixels;
+  arrowBox[6]                   = abCenterPixels;
+  auto offsetFromCenter         = POINT {abCenterPixels.x + 12, abCenterPixels.y + 2};
+  rotpix(offsetFromCenter, arrowBox[1], abCenterPixels);
+  offsetFromCenter.y = abCenterPixels.y - 2;
+  rotpix(offsetFromCenter, arrowBox[5], abCenterPixels);
+  offsetFromCenter.y = abCenterPixels.y + 6;
+  rotpix(offsetFromCenter, arrowBox[2], abCenterPixels);
+  offsetFromCenter.y = abCenterPixels.y - 6;
+  rotpix(offsetFromCenter, arrowBox[4], abCenterPixels);
+  offsetFromCenter.x = abCenterPixels.x + 20;
+  offsetFromCenter.y = abCenterPixels.y;
+  rotpix(offsetFromCenter, arrowBox[3], abCenterPixels);
+  SelectObject(StitchWindowMemDC, FormPen);
+  SetROP2(StitchWindowMemDC, R2_XORPEN);
+  wrap::polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
+  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
 auto thi::chkup(uint32_t count, size_t iStitch) -> uint32_t {
