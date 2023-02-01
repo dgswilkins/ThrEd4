@@ -161,7 +161,6 @@
 #define IDS_NUFIL                       139
 #define IDS_SIZ                         140
 #define IDS_LAY04                       141
-#define IDS_EMB                         142
 #define IDS_ON                          143
 #define IDS_OFF                         144
 #define IDS_FMEN                        145

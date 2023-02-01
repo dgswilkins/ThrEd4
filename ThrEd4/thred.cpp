@@ -16214,53 +16214,55 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 }
 
 void thi::ducmd() {
-  if (ArgCount > 1) {
-	auto const spArgList = gsl::span(ArgList, ArgCount);
-	auto const arg1      = std::wstring {spArgList[1]};
-	if (arg1.compare(0, 4, L"/F1:") == 0) {
-	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto balaradFile =
-	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	  if (balaradFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(balaradFile);
-		*BalaradName0 = balaradFileName;
-		if (ArgCount > 2) {
-		  auto const arg2 = std::wstring {spArgList[2]};
-		  if (arg2.compare(0, 4, L"/F2:") == 0) {
-			balaradFileName = *HomeDirectory / arg2.substr(4);
-			balaradFile     = CreateFile(
-                balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-			if (balaradFile != INVALID_HANDLE_VALUE) {
-			  auto readBuffer = std::vector<char> {};
-			  readBuffer.resize(_MAX_PATH + 1);
-			  *BalaradName1  = balaradFileName;
-			  auto bytesRead = DWORD {};
-
-			  if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
-				return;
-			  }
-			  if (bytesRead != 0U) {
-				readBuffer.resize(bytesRead);
-				BalaradName2->assign(readBuffer.data());
-				redbal();
-			  }
-			  CloseHandle(balaradFile);
-			}
-		  }
-		}
-		SetWindowText(ThrEdWindow, displayText::loadStr(IDS_EMB).c_str());
-	  }
-	  fs::remove(*BalaradName1);
-	}
-	else {
-	  WorkingFileName->assign(arg1);
-	  StateMap->set(StateFlag::REDOLD);
-	  nuFil(FileIndices::THR);
-	}
+  if (ArgCount <= 1) {
+	return;
   }
+  auto const spArgList = gsl::span(ArgList, ArgCount);
+  auto const arg1      = std::wstring {spArgList[1]};
+  if (arg1.compare(0, 4, L"/F1:") != 0) {
+	WorkingFileName->assign(arg1);
+	StateMap->set(StateFlag::REDOLD);
+	nuFil(FileIndices::THR);
+	return;
+  }
+  auto balaradFileName = *HomeDirectory / arg1.substr(4);
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto balaradFile =
+      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  if (balaradFile == INVALID_HANDLE_VALUE) {
+	return;
+  }
+  CloseHandle(balaradFile);
+  *BalaradName0 = balaradFileName;
+  if (ArgCount <= 2) {
+	return;
+  }
+  auto const arg2 = std::wstring {spArgList[2]};
+  if (arg2.compare(0, 4, L"/F2:") != 0) {
+	return;
+  }
+  balaradFileName = *HomeDirectory / arg2.substr(4);
+  balaradFile =
+      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  if (balaradFile == INVALID_HANDLE_VALUE) {
+	return;
+  }
+  auto readBuffer = std::vector<char> {};
+  readBuffer.resize(_MAX_PATH + 1);
+  *BalaradName1  = balaradFileName;
+  auto bytesRead = DWORD {};
+  if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
+	return;
+  }
+  if (bytesRead != 0U) {
+	readBuffer.resize(bytesRead);
+	BalaradName2->assign(readBuffer.data());
+	redbal();
+  }
+  CloseHandle(balaradFile);
+  fs::remove(*BalaradName1);
 }
 
 void thi::setPrefs() {
@@ -16905,8 +16907,8 @@ void thi::doInitZoomed() {
 	if (StateMap->test(StateFlag::HID) && (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor)) {
 		stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	                ColorChangeTable->operator[](iColor).stitchIndex;
-	  auto sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
-	  auto sEnd   = wrap::next(sStart, stitchCount);
+	  auto const sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
+	  auto const sEnd   = wrap::next(sStart, stitchCount);
 	  auto sRange = std::ranges::subrange(sStart, sEnd);
 	  for (auto const& iStitch : sRange) {
 		if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
@@ -17056,7 +17058,7 @@ void thi::doInitUnzoomed() {
   auto const pwid = StateMap->test(StateFlag::HID);
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
-	auto stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+	auto stitchCount = wrap::toUnsigned(ColorChangeTable->operator[](iColor + 1U).stitchIndex) -
 	                   ColorChangeTable->operator[](iColor).stitchIndex;
 	stitchCount = chkup(stitchCount, iColor);
 	if (!pwid || ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
