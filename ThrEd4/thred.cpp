@@ -4649,12 +4649,16 @@ void thi::resetState() {
 }
 
 void thi::nuFil(FileIndices fileIndex) {
+  // Todo - check filename for validity before using it
   auto newFileName = *WorkingFileName;
   if (StateMap->testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, FileStyles::ALL_FILES, fileIndex)) {
 	WorkingFileName->assign(newFileName);
 	defNam(newFileName);
 	resetState();
 	auto const fileExt        = newFileName.extension().wstring();
+	if (fileExt.empty()) {
+	  return;
+	}
 	auto const firstCharacter = tolower(fileExt[1]);
 	if (firstCharacter == 't') {
 	  {
