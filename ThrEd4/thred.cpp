@@ -16784,14 +16784,14 @@ void thi::dumov() {
 }
 
 auto thi::chkup(uint32_t count, size_t iStitch) -> uint32_t {
-  if (StateMap->test(StateFlag::UPTO) && (ClosestPointIndex != 0U)) {
-	if (ColorChangeTable->operator[](iStitch).stitchIndex < ClosestPointIndex) {
-	  if (ColorChangeTable->operator[](iStitch + 1U).stitchIndex < ClosestPointIndex) {
-		return count;
-	  }
-	  return ClosestPointIndex - ColorChangeTable->operator[](iStitch).stitchIndex + 1U;
-	}
+  if (!StateMap->test(StateFlag::UPTO) || (ClosestPointIndex == 0U)) {
+	return count;
+  }
+  if (ColorChangeTable->operator[](iStitch).stitchIndex >= ClosestPointIndex) {
 	return 0U;
+  }
+  if (ColorChangeTable->operator[](iStitch + 1U).stitchIndex >= ClosestPointIndex) {
+	return ClosestPointIndex - ColorChangeTable->operator[](iStitch).stitchIndex + 1U;
   }
   return count;
 }
