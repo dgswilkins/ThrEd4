@@ -16166,23 +16166,24 @@ void thi::ritloc() {
   auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
   auto const hResult  = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-  if (SUCCEEDED(hResult)) {
-	lockFilePath.assign(ppszPath); // make a local copy of the path
-	lockFilePath /= L"ThrEd";
-	fs::create_directory(lockFilePath);
-	lockFilePath /= L"thredloc.txt";
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const lockFile =
-	    CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (lockFile != INVALID_HANDLE_VALUE) {
-	  auto       bytesWritten = DWORD {};
-	  auto const value        = utf::utf16ToUtf8(*HomeDirectory);
-	  wrap::writeFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
-	  CloseHandle(lockFile);
-	}
+  if (!SUCCEEDED(hResult)) {
+	CoTaskMemFree(ppszPath); // free up the path memory block
+	return;
   }
-  CoTaskMemFree(ppszPath); // free up the path memory block
+  lockFilePath.assign(ppszPath); // make a local copy of the path
+  CoTaskMemFree(ppszPath);       // free up the path memory block
+  lockFilePath /= L"ThrEd";
+  fs::create_directory(lockFilePath);
+  lockFilePath /= L"thredloc.txt";
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  if (lockFile != INVALID_HANDLE_VALUE) {
+	auto       bytesWritten = DWORD {};
+	auto const value        = utf::utf16ToUtf8(*HomeDirectory);
+	wrap::writeFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
+	CloseHandle(lockFile);
+  }
 }
 
 #pragma warning(push)
