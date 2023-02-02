@@ -10441,33 +10441,31 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_
   if (StitchBuffer->empty() || length == 0) {
 	return;
   }
-  auto activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
-  if ((gsl::narrow_cast<size_t>(currentStitch) + length) > StitchBuffer->size()) {
-	throw std::runtime_error("drwLin parameters faulty");
-  }
   if (ActiveLayer != 0U) {
 	linePoints.clear();
   }
-  for (auto iOffset = 0U; iOffset < length; ++iOffset) {
-	auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
-	if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
-	  linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
-	                        std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                    (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
+  auto const firstStitch = std::next(StitchBuffer->cbegin(), currentStitch);
+  auto const lastStitch  = std::next(firstStitch, length);
+  auto const rStitches   = std::ranges::subrange(firstStitch, lastStitch);
+  for (auto const& stitch : rStitches) {
+	auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
+	if ((ActiveLayer != 0U) && (layer != 0U) && (layer != ActiveLayer)) {
+	  continue;
 	}
-	++activeStitch;
+	linePoints.push_back({std::lround((stitch.x - ZoomRect.left) * ZoomRatio.x),
+	                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	                                  (stitch.y - ZoomRect.bottom) * ZoomRatio.y)});
   }
-  --activeStitch;
   SelectObject(StitchWindowMemDC, hPen);
   wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
   linePoints.clear();
-  auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
+  auto const layer = (firstStitch->attribute & LAYMSK) >> LAYSHFT;
   if ((ActiveLayer != 0U) && (layer != 0U) && layer != ActiveLayer) {
 	return;
   }
-  linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
+  linePoints.push_back({std::lround((firstStitch->x - ZoomRect.left) * ZoomRatio.x),
                         std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-                                    (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
+                                    (firstStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
 }
 
 auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
