@@ -10448,8 +10448,7 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_
   if (ActiveLayer != 0U) {
 	linePoints.clear();
   }
-  auto iOffset = 0U;
-  for (; iOffset < length; ++iOffset) {
+  for (auto iOffset = 0U; iOffset < length; ++iOffset) {
 	auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
 	if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
 	  linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
@@ -10465,14 +10464,6 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_
   auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
   if ((ActiveLayer != 0U) && (layer != 0U) && layer != ActiveLayer) {
 	return;
-  }
-  if (iOffset == 0U) {
-	activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
-	linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
-	                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                  (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
-	// Todo - I am not sure how we could ever reach here. Leave throw to test
-	throw std::runtime_error("iOffset was zero");
   }
   linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
                         std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
