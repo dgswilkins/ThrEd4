@@ -10281,17 +10281,18 @@ void thi::fixpclp(uint32_t closestFormToCursor) {
 }
 
 auto thi::sidclp() -> bool {
-  if (OpenClipboard(ThrEdWindow) != 0) {
-	Clip       = RegisterClipboardFormat(PcdClipFormat);
-	ClipMemory = GetClipboardData(Clip);
-	if (ClipMemory != nullptr) {
-	  thred::redclp();
-	  CloseClipboard();
-	  return true;
-	}
+  if (OpenClipboard(ThrEdWindow) == 0) {
+	return false;
   }
+  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  ClipMemory = GetClipboardData(Clip);
+  if (ClipMemory == nullptr) {
+	CloseClipboard();
+	return false;
+  }
+  thred::redclp();
   CloseClipboard();
-  return false;
+  return true;
 }
 
 void thi::selfpnt() {
