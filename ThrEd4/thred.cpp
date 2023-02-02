@@ -483,7 +483,7 @@ auto unselectAll() -> bool;
 void unstrtch(std::vector<POINT> const& stretchBoxLine);
 auto unthrsh(wchar_t level) noexcept -> float;
 void unthum();
-auto updateHoopSize() -> bool;
+auto updateHoopSize();
 auto updateFillColor() -> bool;
 auto updatePreferences() -> bool;
 auto usedcol(uint8_t VerticalIndex) -> bool;
@@ -4175,7 +4175,7 @@ void thi::stchWnd() {
   }
 }
 
-// check if a click occurred in A vertical set of 16 windows
+// check if a click occurred in a vertical set of 16 windows
 // and calculate which window had the click
 auto thi::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
   auto flag       = false;
@@ -11489,53 +11489,53 @@ auto thi::handleRightButtonDown() -> bool {
   return true;
 }
 
-auto thi::updateHoopSize() -> bool {
-  for (auto iHoop = 0; iHoop < HUPS; ++iHoop) {
-	if (Msg.hwnd == SideWindow->operator[](wrap::toSize(iHoop))) {
-	  switch (iHoop + 1) {
-		case SETCUST: {
-		  IniFile.customHoopX = IniFile.hoopSizeX;
-		  IniFile.customHoopY = IniFile.hoopSizeY;
-		  break;
-		}
-		case SMALHUP: {
-		  IniFile.hoopSizeX = SHUPX;
-		  IniFile.hoopSizeY = SHUPY;
-		  IniFile.hoopType  = SMALHUP;
-		  break;
-		}
-		case LARGHUP: {
-		  IniFile.hoopSizeX = LHUPX;
-		  IniFile.hoopSizeY = LHUPY;
-		  IniFile.hoopType  = LARGHUP;
-		  break;
-		}
-		case HUP100: {
-		  IniFile.hoopSizeX = HUP100XY;
-		  IniFile.hoopSizeY = HUP100XY;
-		  IniFile.hoopType  = HUP100;
-		  break;
-		}
-		case CUSTHUP: {
-		  IniFile.hoopSizeX = IniFile.customHoopX;
-		  IniFile.hoopSizeY = IniFile.customHoopY;
-		  IniFile.hoopType  = CUSTHUP;
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in updateHoopSize: iHoop [{}]\n", iHoop);
-		  break;
-		}
-	  }
-	  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-	  form::sethup();
-	  thred::chkhup();
+auto thi::updateHoopSize() {
+  auto it = std::ranges::find(*SideWindow, Msg.hwnd);
+  if (it == SideWindow->end()) {
+	return;
+  }
+  auto const option = std::distance(SideWindow->begin(), it) + 1U;
+  switch (option) {
+	case SETCUST: {
+	  IniFile.customHoopX = IniFile.hoopSizeX;
+	  IniFile.customHoopY = IniFile.hoopSizeY;
+	  break;
+	}
+	case SMALHUP: {
+	  IniFile.hoopSizeX = SHUPX;
+	  IniFile.hoopSizeY = SHUPY;
+	  IniFile.hoopType  = SMALHUP;
+	  break;
+	}
+	case LARGHUP: {
+	  IniFile.hoopSizeX = LHUPX;
+	  IniFile.hoopSizeY = LHUPY;
+	  IniFile.hoopType  = LARGHUP;
+	  break;
+	}
+	case HUP100: {
+	  IniFile.hoopSizeX = HUP100XY;
+	  IniFile.hoopSizeY = HUP100XY;
+	  IniFile.hoopType  = HUP100;
+	  break;
+	}
+	case CUSTHUP: {
+	  IniFile.hoopSizeX = IniFile.customHoopX;
+	  IniFile.hoopSizeY = IniFile.customHoopY;
+	  IniFile.hoopType  = CUSTHUP;
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in updateHoopSize: option [{}]\n", option);
 	  break;
 	}
   }
+  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  form::sethup();
+  thred::chkhup();
   thred::unsid();
   formForms::prfmsg();
-  return true;
+  return;
 }
 
 auto thi::updateFillColor() -> bool {
@@ -12400,7 +12400,8 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (StateMap->testAndReset(StateFlag::HUPMSG)) {
-	return thi::updateHoopSize();
+	thi::updateHoopSize();
+	return true;
   }
   if (StateMap->testAndReset(StateFlag::INSFIL)) {
 	duinsfil();
