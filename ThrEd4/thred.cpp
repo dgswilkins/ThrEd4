@@ -10156,7 +10156,7 @@ void thi::delcol() {
   }
   for (auto& stitch : *StitchBuffer) {
 	auto const color = stitch.attribute & COLMSK;
-	if (color <= VerticalIndex || (color == 0U)) {
+	if (color <= VerticalIndex) {
 	  continue;
 	}
 	stitch.attribute &= NCOLMSK;
