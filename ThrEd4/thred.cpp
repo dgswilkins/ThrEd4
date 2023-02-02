@@ -10186,27 +10186,26 @@ void thi::delcol() {
 }
 
 void thi::set1knot() {
-  if ((!StitchBuffer->empty()) && StateMap->test(StateFlag::SELBOX)) {
-	thred::savdo();
-	auto buffer = std::vector<F_POINT_ATTR> {};
-	buffer.reserve(StitchBuffer->size() + 5U);
-	buffer.insert(buffer.begin(), StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U));
-	if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	  StateMap->set(StateFlag::FILDIR);
-	  endknt(buffer, ClosestPointIndex);
-	}
-	else {
-	  strtknt(buffer, ClosestPointIndex);
-	}
-	buffer.insert(
-	    buffer.end(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U), StitchBuffer->end());
-	*StitchBuffer = std::move(buffer);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  if (StitchBuffer->empty() || (!StateMap->test(StateFlag::SELBOX))) {
+	displayText::tabmsg(IDS_NOSTCHSEL, false);
+	return;
+  }
+  thred::savdo();
+  auto buffer = std::vector<F_POINT_ATTR> {};
+  buffer.reserve(StitchBuffer->size() + 5U);
+  buffer.insert(buffer.begin(), StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U));
+  if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	StateMap->set(StateFlag::FILDIR);
+	endknt(buffer, ClosestPointIndex);
   }
   else {
-	displayText::tabmsg(IDS_NOSTCHSEL, false);
+	strtknt(buffer, ClosestPointIndex);
   }
+  buffer.insert(
+      buffer.end(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U), StitchBuffer->end());
+  *StitchBuffer = std::move(buffer);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::selfrm0() {
