@@ -10152,37 +10152,37 @@ auto thi::usedcol(uint8_t index) -> bool {
 void thi::delcol() {
   if (usedcol(VerticalIndex)) {
 	displayText::tabmsg(IDS_COLU, false);
+	return;
   }
-  else {
-	for (auto& stitch : *StitchBuffer) {
-	  auto const color = stitch.attribute & COLMSK;
-	  if (color > VerticalIndex && (color != 0U)) {
-		stitch.attribute &= NCOLMSK;
-		stitch.attribute |= color - 1U;
-	  }
+  for (auto& stitch : *StitchBuffer) {
+	auto const color = stitch.attribute & COLMSK;
+	if (color <= VerticalIndex || (color == 0U)) {
+	  continue;
 	}
-	for (auto& formIter : *FormList) {
-	  if (formIter.fillType != 0U) {
-		if (formIter.fillColor > VerticalIndex) {
-		  --(formIter.fillColor);
-		}
-		if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
-		  --(formIter.fillInfo.feather.color);
-		}
-	  }
-	  if (formIter.edgeType != 0U) {
-		if (formIter.borderColor > VerticalIndex) {
-		  --(formIter.borderColor);
-		}
-	  }
-	}
-	for (auto iColor = VerticalIndex; iColor < COLORMAX; ++iColor) {
-	  UserColor[iColor] = UserColor[wrap::toSize(iColor) + 1U];
-	  nuscol(iColor);
-	}
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+	stitch.attribute &= NCOLMSK;
+	stitch.attribute |= color - 1U;
   }
+  for (auto& formIter : *FormList) {
+	if (formIter.fillType != 0U) {
+	  if (formIter.fillColor > VerticalIndex) {
+		--(formIter.fillColor);
+	  }
+	  if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
+		--(formIter.fillInfo.feather.color);
+	  }
+	}
+	if (formIter.edgeType != 0U) {
+	  if (formIter.borderColor > VerticalIndex) {
+		--(formIter.borderColor);
+	  }
+	}
+  }
+  for (auto iColor = VerticalIndex; iColor < COLORMAX; ++iColor) {
+	UserColor[iColor] = UserColor[wrap::toSize(iColor) + 1U];
+	nuscol(iColor);
+  }
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::set1knot() {
