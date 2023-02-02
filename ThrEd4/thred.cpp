@@ -10438,45 +10438,45 @@ void thi::qcode() {
 }
 
 void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen) {
-  if (!StitchBuffer->empty() && length != 0) {
-	auto activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
-	if ((gsl::narrow_cast<size_t>(currentStitch) + length) > StitchBuffer->size()) {
-	  throw std::runtime_error("drwLin parameters faulty");
-	}
-	if (ActiveLayer != 0U) {
-	  linePoints.clear();
-	}
-	auto iOffset = 0U;
-	for (; iOffset < length; ++iOffset) {
-	  auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
-	  if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
-		linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
-		                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-		                                  (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
-	  }
-	  ++activeStitch;
-	}
-	--activeStitch;
-	SelectObject(StitchWindowMemDC, hPen);
-	wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
-	linePoints.clear();
-	auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
-	if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-	  if (iOffset != 0U) {
-		linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
-		                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-		                                  (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
-	  }
-	  else {
-		activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
-		linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
-		                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-		                                  (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
-		// Todo - I am not sure how we could ever reach here. Leave throw to test
-		throw std::runtime_error("iOffset was zero");
-	  }
-	}
+  if (StitchBuffer->empty() || length == 0) {
+	return;
   }
+  auto activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
+  if ((gsl::narrow_cast<size_t>(currentStitch) + length) > StitchBuffer->size()) {
+	throw std::runtime_error("drwLin parameters faulty");
+  }
+  if (ActiveLayer != 0U) {
+	linePoints.clear();
+  }
+  auto iOffset = 0U;
+  for (; iOffset < length; ++iOffset) {
+	auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
+	if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
+	  linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
+	                        std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	                                    (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
+	}
+	++activeStitch;
+  }
+  --activeStitch;
+  SelectObject(StitchWindowMemDC, hPen);
+  wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
+  linePoints.clear();
+  auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
+  if ((ActiveLayer != 0U) && (layer != 0U) && layer != ActiveLayer) {
+	return;
+  }
+  if (iOffset == 0U) {
+	activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
+	linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
+	                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	                                  (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
+	// Todo - I am not sure how we could ever reach here. Leave throw to test
+	throw std::runtime_error("iOffset was zero");
+  }
+  linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
+                        std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                    (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
 }
 
 auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
