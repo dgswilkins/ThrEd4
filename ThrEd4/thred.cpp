@@ -10027,72 +10027,73 @@ void thi::movchk() {
 		StateMap->set(StateFlag::WASCOL);
 	  }
 	}
+	return;
   }
-  else {
-	if (StateMap->testAndReset(StateFlag::WASMOV) && StateMap->testAndReset(StateFlag::WASCOL)) {
-	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back()) && draggedColor != VerticalIndex) {
-		thred::savdo();
-		auto const key          = wrap::pressed(VK_SHIFT);
-		auto const switchColors = wrap::pressed(VK_CONTROL);
-		for (auto& stitch : *StitchBuffer) {
-		  auto const color = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK);
-		  if (color == VerticalIndex) {
-			stitch.attribute &= NCOLMSK;
-			stitch.attribute |= draggedColor;
-		  }
-		  else {
-			if (!key && color == draggedColor) {
-			  stitch.attribute &= NCOLMSK;
-			  stitch.attribute |= VerticalIndex;
-			}
-		  }
-		}
-		for (auto& formIter : *FormList) {
-		  if (formIter.fillType != 0U) {
-			if (formIter.fillColor == VerticalIndex) {
-			  formIter.fillColor = draggedColor;
-			}
-			else {
-			  if (!key && formIter.fillColor == draggedColor) {
-				formIter.fillColor = VerticalIndex;
-			  }
-			}
-			if (formIter.fillType == FTHF) {
-			  if (formIter.fillInfo.feather.color == VerticalIndex) {
-				formIter.fillInfo.feather.color = draggedColor;
-			  }
-			  else {
-				if (!key && formIter.fillInfo.feather.color == draggedColor) {
-				  formIter.fillInfo.feather.color = VerticalIndex;
-				}
-			  }
-			}
-		  }
-		  if (formIter.edgeType != 0U) {
-			if (formIter.borderColor == VerticalIndex) {
-			  formIter.borderColor = draggedColor;
-			}
-			else {
-			  if (!key && formIter.borderColor == draggedColor) {
-				formIter.borderColor = VerticalIndex;
-			  }
-			}
-		  }
-		}
-		if (!switchColors) {
-		  auto const swapColor                   = UserColor[wrap::toSize(VerticalIndex)];
-		  UserColor[wrap::toSize(VerticalIndex)] = UserColor[wrap::toSize(draggedColor)];
-		  if (!key) {
-			UserColor[wrap::toSize(draggedColor)] = swapColor;
-			nuscol(draggedColor);
-		  }
-		  nuscol(VerticalIndex);
-		}
-		thred::coltab();
-		StateMap->set(StateFlag::RESTCH);
+  if (!StateMap->testAndReset(StateFlag::WASMOV) || !StateMap->testAndReset(StateFlag::WASCOL)) {
+	return;
+  }
+  if (!thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back()) || draggedColor == VerticalIndex) {
+	return;
+  }
+  thred::savdo();
+  auto const key          = wrap::pressed(VK_SHIFT);
+  auto const switchColors = wrap::pressed(VK_CONTROL);
+  for (auto& stitch : *StitchBuffer) {
+	auto const color = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK);
+	if (color == VerticalIndex) {
+	  stitch.attribute &= NCOLMSK;
+	  stitch.attribute |= draggedColor;
+	}
+	else {
+	  if (!key && color == draggedColor) {
+		stitch.attribute &= NCOLMSK;
+		stitch.attribute |= VerticalIndex;
 	  }
 	}
   }
+  for (auto& formIter : *FormList) {
+	if (formIter.fillType != 0U) {
+	  if (formIter.fillColor == VerticalIndex) {
+		formIter.fillColor = draggedColor;
+	  }
+	  else {
+		if (!key && formIter.fillColor == draggedColor) {
+		  formIter.fillColor = VerticalIndex;
+		}
+	  }
+	}
+	if (formIter.fillType == FTHF) {
+	  if (formIter.fillInfo.feather.color == VerticalIndex) {
+		formIter.fillInfo.feather.color = draggedColor;
+	  }
+	  else {
+		if (!key && formIter.fillInfo.feather.color == draggedColor) {
+		  formIter.fillInfo.feather.color = VerticalIndex;
+		}
+	  }
+	}
+	if (formIter.edgeType != 0U) {
+	  if (formIter.borderColor == VerticalIndex) {
+		formIter.borderColor = draggedColor;
+	  }
+	  else {
+		if (!key && formIter.borderColor == draggedColor) {
+		  formIter.borderColor = VerticalIndex;
+		}
+	  }
+	}
+  }
+  if (!switchColors) {
+	auto const swapColor                   = UserColor[wrap::toSize(VerticalIndex)];
+	UserColor[wrap::toSize(VerticalIndex)] = UserColor[wrap::toSize(draggedColor)];
+	if (!key) {
+	  UserColor[wrap::toSize(draggedColor)] = swapColor;
+	  nuscol(draggedColor);
+	}
+	nuscol(VerticalIndex);
+  }
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::inscol() {
