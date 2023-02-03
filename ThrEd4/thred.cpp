@@ -10163,13 +10163,11 @@ void thi::delcol() {
 	stitch.attribute |= color - 1U;
   }
   for (auto& formIter : *FormList) {
-	if (formIter.fillType != 0U) {
-	  if (formIter.fillColor > VerticalIndex) {
+	if ((formIter.fillType != 0U) && (formIter.fillColor > VerticalIndex)) {
 		--(formIter.fillColor);
-	  }
-	  if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
-		--(formIter.fillInfo.feather.color);
-	  }
+	}
+	if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
+	  --(formIter.fillInfo.feather.color);
 	}
 	if (formIter.edgeType != 0U) {
 	  if (formIter.borderColor > VerticalIndex) {
