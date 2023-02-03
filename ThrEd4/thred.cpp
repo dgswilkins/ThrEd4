@@ -9550,23 +9550,22 @@ auto thi::chkminus(wchar_t code) noexcept -> bool {
 }
 
 void thi::retrac() {
-  if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::savdo();
-	thred::rngadj();
-	if (GroupStartStitch == 0U) {
-	  ++GroupStartStitch;
-	}
-	auto const count       = GroupEndStitch - GroupStartStitch;
-	auto const insertPoint = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
-	auto const startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
-	auto const endPoint = wrap::next(startPoint, count);
-	StitchBuffer->insert(insertPoint, startPoint, endPoint);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (!StateMap->test(StateFlag::GRPSEL)) {
 	displayText::shoseln(IDS_GRPMSG, IDS_RETRAC);
+	return;
   }
+  thred::savdo();
+  thred::rngadj();
+  if (GroupStartStitch == 0U) {
+	++GroupStartStitch;
+  }
+  auto const count       = GroupEndStitch - GroupStartStitch;
+  auto const insertPoint = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
+  auto const startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
+  auto const endPoint   = wrap::next(startPoint, count);
+  StitchBuffer->insert(insertPoint, startPoint, endPoint);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::setgrd(COLORREF color) {
