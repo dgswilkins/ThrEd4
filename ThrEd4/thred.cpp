@@ -9268,11 +9268,10 @@ auto thi::nuang(float originalAngle, float xDelta, float yDelta) noexcept -> flo
 void thi::angdif(float& lowestAngle, float& highestAngle, float angle) noexcept {
   if (angle > highestAngle) {
 	highestAngle = angle;
+	return;
   }
-  else {
-	if (angle < lowestAngle) {
-	  lowestAngle = angle;
-	}
+  if (angle < lowestAngle) {
+	lowestAngle = angle;
   }
 }
 
