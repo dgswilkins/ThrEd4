@@ -10169,10 +10169,8 @@ void thi::delcol() {
 	if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
 	  --(formIter.fillInfo.feather.color);
 	}
-	if (formIter.edgeType != 0U) {
-	  if (formIter.borderColor > VerticalIndex) {
-		--(formIter.borderColor);
-	  }
+	if ((formIter.edgeType != 0U) && (formIter.borderColor > VerticalIndex)) {
+	  --(formIter.borderColor);
 	}
   }
   for (auto iColor = VerticalIndex; iColor < COLORMAX; ++iColor) {
