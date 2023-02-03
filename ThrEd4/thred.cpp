@@ -9343,21 +9343,18 @@ void thi::rotseg() {
 }
 
 void thi::pntmrk() {
-  do {
-	if (StateMap->test(StateFlag::SELBOX)) {
-	  dumrk(StitchBuffer->operator[](ClosestPointIndex).x,
-	        StitchBuffer->operator[](ClosestPointIndex).y);
-	  break;
-	}
-	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto const itVertex =
-	      wrap::next(FormVertices->cbegin(),
-	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-	  dumrk(itVertex->x, itVertex->y);
-	  break;
-	}
-	displayText::shoseln(IDS_STCH_FRM, IDS_SETMRK);
-  } while (false);
+  if (StateMap->test(StateFlag::SELBOX)) {
+	dumrk(StitchBuffer->operator[](ClosestPointIndex).x, StitchBuffer->operator[](ClosestPointIndex).y);
+	return;
+  }
+  if (StateMap->test(StateFlag::FRMPSEL)) {
+	auto const itVertex =
+	    wrap::next(FormVertices->cbegin(),
+	               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	dumrk(itVertex->x, itVertex->y);
+	return;
+  }
+  displayText::shoseln(IDS_STCH_FRM, IDS_SETMRK);
 }
 
 void thi::filfrms() {
