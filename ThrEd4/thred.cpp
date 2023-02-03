@@ -9380,23 +9380,21 @@ void thi::filfrms() {
 void thi::nuslst(uint32_t find) {
   gselrng();
   // ToDo - Check this code. Does it do what is intended?
-  do {
-	if (find < SelectedFormsRange.start) {
-	  for (auto form = find; form < SelectedFormsRange.finish; ++form) {
-		SelectedFormList->push_back(form);
-	  }
-	  break;
+  if (find < SelectedFormsRange.start) {
+	for (auto form = find; form < SelectedFormsRange.finish; ++form) {
+	  SelectedFormList->push_back(form);
 	}
-	if (find > SelectedFormsRange.finish) {
-	  for (auto form = SelectedFormsRange.start; form <= find; ++form) {
-		SelectedFormList->push_back(form);
-	  }
-	  break;
-	}
+	return;
+  }
+  if (find > SelectedFormsRange.finish) {
 	for (auto form = SelectedFormsRange.start; form <= find; ++form) {
 	  SelectedFormList->push_back(form);
 	}
-  } while (false);
+	return;
+  }
+  for (auto form = SelectedFormsRange.start; form <= find; ++form) {
+	SelectedFormList->push_back(form);
+  }
 }
 
 void thi::srchk() {
