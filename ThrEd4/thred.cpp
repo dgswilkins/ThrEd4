@@ -9534,19 +9534,19 @@ void thi::respac(FRM_HEAD& form) noexcept {
 }
 
 auto thi::chkminus(wchar_t code) noexcept -> bool {
-  if (code == VK_OEM_MINUS || code == VK_SUBTRACT) { // '-' key pressed
-	if (PreferenceIndex == PRFCLPPHS) {              // Clipboard Offset in preferences
-	  return true;
-	}
-	if (auto const& form = FormList->operator[](ClosestFormToCursor);
-	    FormMenuChoice == LFRMSPAC && form.isFanClip()) { // Fill Spacing for fan clip fill
-	  return true;
-	}
-	if (FormMenuChoice == LWLKIND) { // Indent
-	  return true;
-	}
+  if (code != VK_OEM_MINUS && code != VK_SUBTRACT) { // is '-' key pressed?
+	return false;
   }
-  return false;
+  if (PreferenceIndex == PRFCLPPHS) { // Clipboard Offset in preferences
+	return true;
+  }
+  if (auto const& form = FormList->operator[](ClosestFormToCursor);
+      FormMenuChoice == LFRMSPAC && form.isFanClip()) { // Fill Spacing for fan clip fill
+	return true;
+  }
+  if (FormMenuChoice == LWLKIND) { // Indent
+	return true;
+  }
 }
 
 void thi::retrac() {
