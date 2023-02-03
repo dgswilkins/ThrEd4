@@ -9847,11 +9847,10 @@ void thi::closfn() {
 void thi::filclos() {
   if (savcmp()) {
 	closfn();
+	return;
   }
-  else {
-	StateMap->set(StateFlag::FCLOS);
-	displayText::savdisc();
-  }
+  StateMap->set(StateFlag::FCLOS);
+  displayText::savdisc();
 }
 
 void thi::frmpos(FRM_HEAD& form, float deltaX, float deltaY) {
@@ -9938,20 +9937,10 @@ void thi::nudgfn(float deltaX, float deltaY) {
   }
   auto pixel = POINT {};
   if (deltaX != 0.0F) {
-	if (deltaX > 0) {
-	  pixel.x = IniFile.nudgePixels;
-	}
-	else {
-	  pixel.x = -IniFile.nudgePixels;
-	}
+	pixel.x = (deltaX > 0) ? IniFile.nudgePixels : -IniFile.nudgePixels;
   }
   if (deltaY != 0.0F) {
-	if (deltaY > 0) {
-	  pixel.y = -IniFile.nudgePixels;
-	}
-	else {
-	  pixel.y = +IniFile.nudgePixels;
-	}
+	pixel.y = (deltaY > 0) ? -IniFile.nudgePixels : IniFile.nudgePixels;
   }
   auto input       = INPUT {};
   input.type       = INPUT_MOUSE;
