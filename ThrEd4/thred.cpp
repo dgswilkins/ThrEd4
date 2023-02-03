@@ -9527,10 +9527,11 @@ void thi::tglhid() {
 }
 
 void thi::respac(FRM_HEAD& form) noexcept {
-  if (form.isClip()) {
-	form.fillSpacing = LineSpacing;
-	form::fsizpar(form);
+  if (!form.isClip()) {
+	return;
   }
+  form.fillSpacing = LineSpacing;
+  form::fsizpar(form);
 }
 
 auto thi::chkminus(wchar_t code) noexcept -> bool {
