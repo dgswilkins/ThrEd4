@@ -10103,44 +10103,41 @@ void thi::inscol() {
   }
   if (colorMap.all()) {
 	displayText::tabmsg(IDS_COLAL, false);
+	return;
   }
-  else {
-	auto nextColor = COLORMAX;
-	while (colorMap.test(nextColor)) {
-	  --nextColor;
-	}
-	for (auto& stitch : *StitchBuffer) {
-	  auto const color = gsl::narrow<uint8_t>(stitch.attribute & COLMSK);
-	  if (color >= VerticalIndex && color < nextColor) {
-		stitch.attribute &= NCOLMSK;
-		stitch.attribute |= color + 1U;
-	  }
-	}
-	for (auto& formIter : *FormList) {
-	  if (formIter.fillType != 0U) {
-		if (formIter.fillColor >= VerticalIndex && formIter.fillColor < nextColor) {
-		  ++(formIter.fillColor);
-		}
-		if (formIter.fillType == FTHF && formIter.fillInfo.feather.color >= VerticalIndex &&
-		    formIter.fillInfo.feather.color < nextColor) {
-		  ++(formIter.fillInfo.feather.color);
-		}
-	  }
-	  if (formIter.edgeType != 0U) {
-		if (formIter.borderColor >= VerticalIndex && formIter.borderColor < nextColor) {
-		  ++(formIter.borderColor);
-		}
-	  }
-	}
-	for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
-	  if (iColor != 0U) {
-		UserColor[iColor] = UserColor[iColor - 1U];
-	  }
-	  nuscol(iColor);
-	}
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  auto nextColor = COLORMAX;
+  while (colorMap.test(nextColor)) {
+	--nextColor;
   }
+  for (auto& stitch : *StitchBuffer) {
+	auto const color = gsl::narrow<uint8_t>(stitch.attribute & COLMSK);
+	if (color < VerticalIndex || color >= nextColor) {
+	  continue;
+	}
+	stitch.attribute &= NCOLMSK;
+	stitch.attribute |= color + 1U;
+  }
+  for (auto& formIter : *FormList) {
+	if ((formIter.fillType != 0U) && (formIter.fillColor >= VerticalIndex) && (formIter.fillColor < nextColor)) {
+	  ++(formIter.fillColor);
+	}
+	if ((formIter.fillType == FTHF) && (formIter.fillInfo.feather.color >= VerticalIndex) &&
+	    (formIter.fillInfo.feather.color < nextColor)) {
+	  ++(formIter.fillInfo.feather.color);
+	}
+	if ((formIter.edgeType != 0U) && (formIter.borderColor >= VerticalIndex) &&
+	    (formIter.borderColor < nextColor)) {
+	  ++(formIter.borderColor);
+	}
+  }
+  for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
+	if (iColor != 0U) {
+	  UserColor[iColor] = UserColor[iColor - 1U];
+	}
+	nuscol(iColor);
+  }
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 auto thi::usedcol(uint8_t index) -> bool {
