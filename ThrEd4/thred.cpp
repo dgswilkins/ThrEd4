@@ -9434,53 +9434,53 @@ constexpr auto thi::byteSwap(uint32_t data) noexcept -> uint32_t {
 void thi::ritcur() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const currentCursor = GetCursor();
-  if (currentCursor != nullptr) {
-	auto iconInfo = ICONINFO {FALSE, 0U, 0U, nullptr, nullptr};
-	GetIconInfo(currentCursor, &iconInfo);
-	auto cursorPosition = POINT {};
-	GetCursorPos(&cursorPosition);
-	cursorPosition.x -= (StitchWindowOrigin.x + gsl::narrow_cast<LONG>(iconInfo.xHotspot));
-	cursorPosition.y -= (StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot));
-	// ToDo - replace with GetDIBits
-	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
+  if (currentCursor == nullptr) {
+	return;
+  }
+  auto iconInfo = ICONINFO {FALSE, 0U, 0U, nullptr, nullptr};
+  GetIconInfo(currentCursor, &iconInfo);
+  auto cursorPosition = POINT {};
+  GetCursorPos(&cursorPosition);
+  cursorPosition.x -= (StitchWindowOrigin.x + gsl::narrow_cast<LONG>(iconInfo.xHotspot));
+  cursorPosition.y -= (StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot));
+  // ToDo - replace with GetDIBits
+  constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
-	auto bitmapBits = std::array<uint8_t, ICONSIZE> {};
-	auto iBMB       = bitmapBits.begin();
-	auto iIBMB      = std::next(bitmapBits.begin(), 32);
-	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
-	if (currentCursor == ArrowCursor) {
-	  constexpr auto ICONROWS = 32; // rows in the icon
-	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-		auto const     mask          = byteSwap(*(iBMB++));
-		auto const     bitmapInverse = byteSwap(*(iIBMB++));
-		auto           bitMask       = uint32_t {1U} << HBSHFT;
-		constexpr auto BPINT         = 32; // bits in an uint32_t
-		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
-		  if ((bitMask & mask) == 0U) {
-			auto const pixelColor = ((bitMask & bitmapInverse) != 0U) ? PENWHITE : PENBLK;
-			SetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow, pixelColor);
-		  }
-		  bitMask >>= 1U;
+  auto bitmapBits = std::array<uint8_t, ICONSIZE> {};
+  auto iBMB       = bitmapBits.begin();
+  auto iIBMB      = std::next(bitmapBits.begin(), 32);
+  GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
+  if (currentCursor != ArrowCursor) {
+	constexpr auto ICONROWS = 32; // rows in the icon
+	for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
+	  auto const     bitmapInverse = byteSwap(*(iIBMB++));
+	  auto           bitMask       = uint32_t {1U} << HBSHFT;
+	  constexpr auto BPINT         = 32; // bits in an uint32_t
+	  for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
+		if ((bitMask & bitmapInverse) != 0U) {
+		  constexpr auto ICOLMASK = 0xffffffU;
+		  SetPixel(StitchWindowDC,
+		           cursorPosition.x + iPixel,
+		           cursorPosition.y + iRow,
+		           GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ ICOLMASK);
 		}
+		bitMask >>= 1U;
 	  }
 	}
-	else {
-	  constexpr auto ICONROWS = 32; // rows in the icon
-	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-		auto const     bitmapInverse = byteSwap(*(iIBMB++));
-		auto           bitMask       = uint32_t {1U} << HBSHFT;
-		constexpr auto BPINT         = 32; // bits in an uint32_t
-		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
-		  if ((bitMask & bitmapInverse) != 0U) {
-			constexpr auto ICOLMASK = 0xffffffU;
-			SetPixel(StitchWindowDC,
-			         cursorPosition.x + iPixel,
-			         cursorPosition.y + iRow,
-			         GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ ICOLMASK);
-		  }
-		  bitMask >>= 1U;
-		}
+	return;
+  }
+  constexpr auto ICONROWS = 32; // rows in the icon
+  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
+	auto const     mask          = byteSwap(*(iBMB++));
+	auto const     bitmapInverse = byteSwap(*(iIBMB++));
+	auto           bitMask       = uint32_t {1U} << HBSHFT;
+	constexpr auto BPINT         = 32; // bits in an uint32_t
+	for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
+	  if ((bitMask & mask) == 0U) {
+		auto const pixelColor = ((bitMask & bitmapInverse) != 0U) ? PENWHITE : PENBLK;
+		SetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow, pixelColor);
 	  }
+	  bitMask >>= 1U;
 	}
   }
 }
