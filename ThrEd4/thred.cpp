@@ -9990,21 +9990,20 @@ void thi::getfrmbox() {
 }
 
 void thi::bakmrk() {
-  if (StateMap->test(StateFlag::WASMRK)) {
-	if (ZoomMarkPoint.x > IniFile.hoopSizeX) {
-	  ZoomMarkPoint.x = IniFile.hoopSizeY / 2;
-	}
-	if (ZoomMarkPoint.y > IniFile.hoopSizeY) {
-	  ZoomMarkPoint.y = IniFile.hoopSizeY / 2;
-	}
-	dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
-	F_POINT const point(ZoomMarkPoint);
-	thred::shft(point);
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (!StateMap->test(StateFlag::WASMRK)) {
 	displayText::tabmsg(IDS_MRK, false);
+	return;
   }
+  if (ZoomMarkPoint.x > IniFile.hoopSizeX) {
+	ZoomMarkPoint.x = IniFile.hoopSizeY / 2;
+  }
+  if (ZoomMarkPoint.y > IniFile.hoopSizeY) {
+	ZoomMarkPoint.y = IniFile.hoopSizeY / 2;
+  }
+  dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
+  F_POINT const point(ZoomMarkPoint);
+  thred::shft(point);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::nuscol(size_t iColor) {
