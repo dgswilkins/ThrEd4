@@ -9361,20 +9361,20 @@ void thi::pntmrk() {
 }
 
 void thi::filfrms() {
-  if (!SelectedFormList->empty()) {
+  if (SelectedFormList->empty()) {
+	if (!StateMap->test(StateFlag::FORMSEL)) {
+	  return;
+	}
 	thred::savdo();
-	for (auto const selectedForm : (*SelectedFormList)) {
-	  form::refilfn(selectedForm);
-	}
+	form::refil(ClosestFormToCursor);
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  form::refil(ClosestFormToCursor);
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  thred::savdo();
+  for (auto const selectedForm : (*SelectedFormList)) {
+	form::refilfn(selectedForm);
   }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::nuslst(uint32_t find) {
