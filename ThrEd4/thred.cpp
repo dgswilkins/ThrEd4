@@ -9633,38 +9633,35 @@ void thi::gsnap() {
 	texture::txsnap();
 	return;
   }
-  if (!SelectedFormList->empty()) {
-	thred::savdo();
-	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
-	  auto& formIter      = FormList->operator[](ClosestFormToCursor);
-	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
-	  formIter.outline();
-	  form::refil(ClosestFormToCursor);
-	}
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  auto& formIter = FormList->operator[](ClosestFormToCursor);
-	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
-	  formIter.outline();
-	  form::refil(ClosestFormToCursor);
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::savdo();
-		thred::rngadj();
-		stchsnap(GroupStartStitch, GroupEndStitch + 1U);
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	  else {
+  if (SelectedFormList->empty()) {
+	if (!StateMap->test(StateFlag::FORMSEL)) {
+	  if (!StateMap->test(StateFlag::GRPSEL)) {
 		displayText::shoseln(IDS_FGRPF, IDS_SNAP2GRD);
+		return;
 	  }
+	  thred::savdo();
+	  thred::rngadj();
+	  stchsnap(GroupStartStitch, GroupEndStitch + 1U);
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
 	}
+	thred::savdo();
+	auto& formIter = FormList->operator[](ClosestFormToCursor);
+	frmsnap(formIter.vertexIndex, formIter.vertexCount);
+	formIter.outline();
+	form::refil(ClosestFormToCursor);
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
+  thred::savdo();
+  for (auto const selectedForm : (*SelectedFormList)) {
+	ClosestFormToCursor = selectedForm;
+	auto& formIter      = FormList->operator[](ClosestFormToCursor);
+	frmsnap(formIter.vertexIndex, formIter.vertexCount);
+	formIter.outline();
+	form::refil(ClosestFormToCursor);
+  }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::ritlock(gsl::span<WIN32_FIND_DATA const> fileInfo, HWND hwndlg) noexcept {
