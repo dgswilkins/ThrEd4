@@ -9071,40 +9071,39 @@ void thi::clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noe
 }
 
 void thi::clpadj() {
-  if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rngadj();
-	auto iStitch          = GroupStartStitch;
-	auto clipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
-	                                     StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
-	                                     StitchBuffer->operator[](iStitch).x,
-	                                     StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
-	++iStitch;
-	while (iStitch < GroupEndStitch) {
-	  clpradj(clipRectAdjusted, StitchBuffer->operator[](iStitch++));
-	}
-	if (StitchBuffer->operator[](iStitch).x < clipRectAdjusted.left) {
-	  clipRectAdjusted.left = StitchBuffer->operator[](iStitch).x;
-	}
-	if (StitchBuffer->operator[](iStitch).x > clipRectAdjusted.right) {
-	  clipRectAdjusted.right = StitchBuffer->operator[](iStitch).x;
-	}
-	auto const clipMiddle = wrap::midl(clipRectAdjusted.right, clipRectAdjusted.left);
-	StitchBuffer->operator[](GroupStartStitch).y = wrap::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
-	StitchBuffer->operator[](GroupEndStitch).y = StitchBuffer->operator[](GroupStartStitch).y;
-	if (StitchBuffer->operator[](GroupStartStitch).x < clipMiddle) {
-	  StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.left;
-	  StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.right;
-	}
-	else {
-	  StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.left;
-	  StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.right;
-	}
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  if (!StateMap->test(StateFlag::GRPSEL)) {
+	displayText::shoseln(IDS_GRPMSG, IDS_RNGEND);
+	return;
+  }
+  thred::rngadj();
+  auto iStitch          = GroupStartStitch;
+  auto clipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
+                                       StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
+                                       StitchBuffer->operator[](iStitch).x,
+                                       StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
+  ++iStitch;
+  while (iStitch < GroupEndStitch) {
+	clpradj(clipRectAdjusted, StitchBuffer->operator[](iStitch++));
+  }
+  if (StitchBuffer->operator[](iStitch).x < clipRectAdjusted.left) {
+	clipRectAdjusted.left = StitchBuffer->operator[](iStitch).x;
+  }
+  if (StitchBuffer->operator[](iStitch).x > clipRectAdjusted.right) {
+	clipRectAdjusted.right = StitchBuffer->operator[](iStitch).x;
+  }
+  auto const clipMiddle = wrap::midl(clipRectAdjusted.right, clipRectAdjusted.left);
+  StitchBuffer->operator[](GroupStartStitch).y = wrap::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
+  StitchBuffer->operator[](GroupEndStitch).y = StitchBuffer->operator[](GroupStartStitch).y;
+  if (StitchBuffer->operator[](GroupStartStitch).x < clipMiddle) {
+	StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.left;
+	StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.right;
   }
   else {
-	displayText::shoseln(IDS_GRPMSG, IDS_RNGEND);
+	StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.left;
+	StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.right;
   }
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::shftflt(F_POINT const& point) noexcept {
