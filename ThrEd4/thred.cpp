@@ -9321,8 +9321,7 @@ void thi::rotmrk() {
   auto const segments   = std::round(PI_F2 / tAngle);
   IniFile.rotationAngle = PI_F2 / segments;
   auto const fmtStr =
-      fmt::format(fmt::runtime(displayText::loadStr(IDS_ROTMARK)), IniFile.fillAngle * RADDEGF, segments);
-  // ToDo - should this be IniFile.rotationAngle?
+      fmt::format(fmt::runtime(displayText::loadStr(IDS_ROTMARK)), IniFile.rotationAngle * RADDEGF, segments);
   displayText::shoMsg(fmtStr, false);
 }
 
