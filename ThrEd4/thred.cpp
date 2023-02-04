@@ -9540,6 +9540,7 @@ auto thi::chkminus(wchar_t code) noexcept -> bool {
   if (FormMenuChoice == LWLKIND) { // Indent
 	return true;
   }
+  return false;
 }
 
 void thi::retrac() {
