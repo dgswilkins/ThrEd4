@@ -8901,22 +8901,23 @@ auto thi::dunum(wchar_t code) noexcept -> bool {
 }
 
 void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
-  if (!StitchBuffer->empty()) {
-	rectangle.bottom = rectangle.left = BIGFLOAT;
-	rectangle.top = rectangle.right = 0;
-	for (auto const& stitch : *StitchBuffer) {
-	  if (stitch.x < rectangle.left) {
-		rectangle.left = stitch.x;
-	  }
-	  if (stitch.x > rectangle.right) {
-		rectangle.right = stitch.x;
-	  }
-	  if (stitch.y < rectangle.bottom) {
-		rectangle.bottom = stitch.y;
-	  }
-	  if (stitch.y > rectangle.top) {
-		rectangle.top = stitch.y;
-	  }
+  if (StitchBuffer->empty()) {
+	return;
+  }
+  rectangle.bottom = rectangle.left = BIGFLOAT;
+  rectangle.top = rectangle.right = 0;
+  for (auto const& stitch : *StitchBuffer) {
+	if (stitch.x < rectangle.left) {
+	  rectangle.left = stitch.x;
+	}
+	if (stitch.x > rectangle.right) {
+	  rectangle.right = stitch.x;
+	}
+	if (stitch.y < rectangle.bottom) {
+	  rectangle.bottom = stitch.y;
+	}
+	if (stitch.y > rectangle.top) {
+	  rectangle.top = stitch.y;
 	}
   }
 }
