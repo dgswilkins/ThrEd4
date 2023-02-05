@@ -11496,7 +11496,6 @@ auto thi::updateHoopSize() {
   thred::chkhup();
   thred::unsid();
   formForms::prfmsg();
-  return;
 }
 
 auto thi::updateFillColor() -> bool {
