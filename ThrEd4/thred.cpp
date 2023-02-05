@@ -11451,11 +11451,11 @@ auto thi::handleRightButtonDown() -> bool {
 }
 
 auto thi::updateHoopSize() {
-  auto it = std::ranges::find(*SideWindow, Msg.hwnd);
-  if (it == SideWindow->end()) {
+  auto itHwnd = std::ranges::find(*SideWindow, Msg.hwnd);
+  if (itHwnd == SideWindow->end()) {
 	return;
   }
-  auto const option = std::distance(SideWindow->begin(), it) + 1U;
+  auto const option = std::distance(SideWindow->begin(), itHwnd) + 1U;
   switch (option) {
 	case SETCUST: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
