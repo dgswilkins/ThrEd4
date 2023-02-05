@@ -73,11 +73,22 @@ template <class T> auto sizeofVector(std::vector<T> const* vec) noexcept -> uint
 #endif // _win64
 
 template <class outType, class inType> auto ceil(inType invar) -> outType {
+  static_assert(!std::is_same_v<outType, float>, "no need to use wrap::ceil here.");
   if constexpr (std::is_same_v<inType, float>) {
-	return gsl::narrow<outType>(std::ceilf(invar));
+	if constexpr (std::is_same_v<outType, float>) {
+	  return std::ceilf(invar);
+	}
+	else {
+	  return gsl::narrow<outType>(std::ceilf(invar));
+	}
   }
   else {
-	return gsl::narrow<outType>(std::ceil(invar));
+	if constexpr (std::is_same_v<outType, float>) {
+	  return std::ceilf(gsl::narrow<float>(invar));
+	}
+	else {
+	  return gsl::narrow<outType>(std::ceilf(gsl::narrow<float>(invar)));
+	}
   }
 }
 
