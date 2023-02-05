@@ -84,7 +84,24 @@ template <class outType, class inType> auto ceil(inType invar) -> outType {
 auto createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
 
 template <class outType, class inType> auto floor(inType invar) -> outType {
-  return gsl::narrow<outType>(std::floor(invar));
+  //static_assert(!std::is_same_v<outType, float>, "no need to use wrap::floor here.");
+  //static_assert(std::is_same_v<inType, float>, "cannot use wrap::floor here.");
+  if constexpr (std::is_same_v<inType, float>) {
+	if constexpr (std::is_same_v<outType, float>) {
+	  return std::floorf(invar);
+	}
+	else {
+	  return gsl::narrow<outType>(std::floorf(invar));
+	}
+  }
+  else {
+	if constexpr (std::is_same_v<outType, float>) {
+	  return std::floorf(gsl::narrow<float>(invar));
+	}
+	else {
+	  return gsl::narrow<outType>(std::floorf(gsl::narrow<float>(invar)));
+	}
+  }
 }
 
 void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSize) noexcept;
