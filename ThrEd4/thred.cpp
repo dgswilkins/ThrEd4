@@ -11455,8 +11455,7 @@ auto thi::updateHoopSize() {
   if (itHwnd == SideWindow->end()) {
 	return;
   }
-  auto const option = std::distance(SideWindow->begin(), itHwnd) + 1U;
-  switch (option) {
+  switch (auto const option = std::distance(SideWindow->begin(), itHwnd) + 1U; option) {
 	case SETCUST: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
 	  IniFile.customHoopY = IniFile.hoopSizeY;
