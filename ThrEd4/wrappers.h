@@ -102,8 +102,14 @@ template <class inType> auto midl(inType high, inType low) noexcept -> float {
   }
 }
 
-template <class outType, class inIt> auto distance(inIt start, inIt end) -> outType {
+template <class outType, class inType> auto distance(inType start, inType end) -> outType {
+  //static_assert(!std::is_same_v<outType, ptrdiff_t>, "no need to use wrap::distance here.");
+  if constexpr (std::is_same_v<outType, ptrdiff_t>) {
+	return std::distance(start, end);
+  }
+  else {
   return gsl::narrow<outType>(std::distance(start, end));
+}
 }
 
 template <class itType, class inType> auto next(itType iterator, inType index) -> itType {
