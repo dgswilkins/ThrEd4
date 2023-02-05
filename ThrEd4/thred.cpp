@@ -11451,7 +11451,7 @@ auto thi::handleRightButtonDown() -> bool {
 }
 
 auto thi::updateHoopSize() {
-  auto itHwnd = std::ranges::find(*SideWindow, Msg.hwnd);
+  auto const itHwnd = std::ranges::find(*SideWindow, Msg.hwnd);
   if (itHwnd == SideWindow->end()) {
 	return;
   }
