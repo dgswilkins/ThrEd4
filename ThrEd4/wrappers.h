@@ -162,7 +162,13 @@ template <class outType, class inType> void narrow(outType& outvar, inType invar
 
 template <class outType, class inType>
 void narrow_cast(outType& outvar, inType invar) noexcept { // NOLINT(readability-identifier-naming)
-  outvar = gsl::narrow_cast<outType>(invar);
+  //static_assert(!std::is_same_v<inType, outType>, "no need to use wrap::narrow_cast here.");
+  if constexpr (std::is_same_v<inType, outType>) {
+	outvar = invar;
+  }
+  else {
+	outvar = gsl::narrow_cast<outType>(invar);
+  }
 }
 
 void polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
