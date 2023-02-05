@@ -8868,16 +8868,16 @@ void thi::nucols() {
 	formMap.set(selectedForm);
 	auto& form = FormList->operator[](selectedForm);
 	if (form.fillType != 0U) {
-	  wrap::narrow(form.fillColor, ActiveColor);
+	  form.fillColor = ActiveColor;
 	  if (form.fillType == FTHF) {
-		wrap::narrow(form.fillInfo.feather.color, ActiveColor);
+		form.fillInfo.feather.color = ActiveColor;
 	  }
 	}
 	if (form.edgeType != 0U) {
-	  wrap::narrow(form.borderColor, ActiveColor);
+	  form.borderColor = ActiveColor;
 	}
 	if ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
-	  wrap::narrow(form.underlayColor, ActiveColor);
+	  form.underlayColor = ActiveColor;
 	}
   }
   for (auto& stitch : *StitchBuffer) {
@@ -12960,9 +12960,9 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		      ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
 			thred::savdo();
 			if (form.fillType != 0U) {
-			  wrap::narrow(form.fillColor, ActiveColor);
+			  form.fillColor = ActiveColor;
 			  if (form.fillType == FTHF) {
-				wrap::narrow(form.fillInfo.feather.color, ActiveColor);
+				form.fillInfo.feather.color = ActiveColor;
 			  }
 			}
 			if (form.edgeType != 0U) {
@@ -12971,11 +12971,11 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				form.borderColor |= ActiveColor;
 			  }
 			  else {
-				wrap::narrow(form.borderColor, ActiveColor);
+				form.borderColor = ActiveColor;
 			  }
 			}
 			if ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
-			  wrap::narrow(form.underlayColor, ActiveColor);
+			  form.underlayColor = ActiveColor;
 			}
 			auto const formCode = ClosestFormToCursor << FRMSHFT;
 			for (auto& stitch : *StitchBuffer) {

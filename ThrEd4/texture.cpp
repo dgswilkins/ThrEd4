@@ -1073,7 +1073,7 @@ void txi::txpar(FRM_HEAD& form) {
   form.lengthOrCount.stitchLength = IniFile.userStitchLength;
   form.maxFillStitchLen           = IniFile.maxStitchLength;
   form.minFillStitchLen           = IniFile.minStitchLength;
-  wrap::narrow(form.fillColor, ActiveColor);
+  form.fillColor = ActiveColor;
   form::refilfn(ClosestFormToCursor);
 }
 

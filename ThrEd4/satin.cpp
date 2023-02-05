@@ -674,7 +674,7 @@ void si::satsbrd(uint32_t formIndex) {
   form::bsizpar(currentForm);
   currentForm.borderSize  = BorderWidth;
   currentForm.edgeSpacing = LineSpacing / 2;
-  wrap::narrow(currentForm.borderColor, ActiveColor);
+  currentForm.borderColor = ActiveColor;
   form::refilfn(formIndex);
 }
 
@@ -795,7 +795,7 @@ void satin::ribon() {
 		}
 		auto const iNewVertex = wrap::distance<uint32_t>(startVertex, itVertex);
 		newForm.type          = SAT;
-		wrap::narrow(newForm.fillColor, ActiveColor);
+		newForm.fillColor = ActiveColor;
 		newForm.fillSpacing                = LineSpacing;
 		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 		newForm.vertexCount                = iNewVertex;

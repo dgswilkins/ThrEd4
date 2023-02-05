@@ -104,7 +104,13 @@ template <class inIt, class inIn> auto next(inIt iterator, inIn index) -> inIt {
 }
 
 template <class outType, class inType> void narrow(outType& outvar, inType invar) {
+  //static_assert(!std::is_same_v<inType, outType>, "no need to use wrap::narrow here.");
+  if constexpr (std::is_same_v<inType, outType>) {
+	outvar = invar;
+  }
+  else {
   outvar = gsl::narrow<outType>(invar);
+}
 }
 
 template <class outType, class inType>
