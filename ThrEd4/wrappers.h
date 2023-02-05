@@ -99,8 +99,14 @@ template <class outType, class inIt> auto distance(inIt start, inIt end) -> outT
   return gsl::narrow<outType>(std::distance(start, end));
 }
 
-template <class inIt, class inIn> auto next(inIt iterator, inIn index) -> inIt {
+template <class itType, class inType> auto next(itType iterator, inType index) -> itType {
+  //static_assert(!std::is_same_v<inType, ptrdiff_t>, "no need to use wrap::next here.");
+  if constexpr (std::is_same_v<inType, ptrdiff_t>) {
+	return std::next(iterator, index);
+  }
+  else {
   return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
+}
 }
 
 template <class outType, class inType> void narrow(outType& outvar, inType invar) {
