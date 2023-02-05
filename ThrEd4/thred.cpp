@@ -16126,7 +16126,7 @@ void thi::ritloc() {
   auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
   auto const hResult  = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-  if (!SUCCEEDED(hResult)) {
+  if (FAILED(hResult)) {
 	CoTaskMemFree(ppszPath); // free up the path memory block
 	return;
   }
