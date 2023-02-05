@@ -108,8 +108,8 @@ template <class outType, class inType> auto distance(inType start, inType end) -
 	return std::distance(start, end);
   }
   else {
-  return gsl::narrow<outType>(std::distance(start, end));
-}
+	return gsl::narrow<outType>(std::distance(start, end));
+  }
 }
 
 template <class itType, class inType> auto next(itType iterator, inType index) -> itType {
@@ -118,8 +118,8 @@ template <class itType, class inType> auto next(itType iterator, inType index) -
 	return std::next(iterator, index);
   }
   else {
-  return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
-}
+	return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
+  }
 }
 
 template <class outType, class inType> void narrow(outType& outvar, inType invar) {
@@ -128,8 +128,8 @@ template <class outType, class inType> void narrow(outType& outvar, inType invar
 	outvar = invar;
   }
   else {
-  outvar = gsl::narrow<outType>(invar);
-}
+	outvar = gsl::narrow<outType>(invar);
+  }
 }
 
 template <class outType, class inType>
