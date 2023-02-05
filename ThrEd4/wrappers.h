@@ -92,7 +92,14 @@ void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSiz
 auto getFormVertices() noexcept -> std::vector<F_POINT>*;
 
 template <class inType> auto midl(inType high, inType low) noexcept -> float {
-  return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
+  //static_assert(!std::is_same_v<inType, float>, "no need to use wrap::midl here.");
+  if constexpr (std::is_same_v<inType, float>) {
+	return (high - low) / 2.0F + low;
+  }
+  else {
+	return (gsl::narrow<float>(high) - gsl::narrow<float>(low)) / 2.0F +
+	       gsl::narrow<float>(low);
+  }
 }
 
 template <class outType, class inIt> auto distance(inIt start, inIt end) -> outType {
