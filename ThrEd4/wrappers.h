@@ -27,50 +27,46 @@
 
 namespace wrap {
 
-#ifdef _WIN64
 template <class T>
 constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) -> uint32_t {
-  return gsl::narrow<uint32_t>(sizeof(T));
+  if constexpr (std::is_same_v<uint32_t, size_t>) {
+	return sizeof(T);
+  }
+  else {
+	return gsl::narrow<uint32_t>(sizeof(T));
+  }
 }
 
 template <class T>
 constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) -> uint32_t {
-  return gsl::narrow<uint32_t>(sizeof(T));
+  if constexpr (std::is_same_v<uint32_t, size_t>) {
+	return sizeof(T);
+  }
+  else {
+	return gsl::narrow<uint32_t>(sizeof(T));
+  }
 }
 
 template <class T> auto sizeofVector(std::vector<T> const& vec) -> uint32_t {
-  return gsl::narrow<uint32_t>(sizeof(T) * vec.size());
+  if constexpr (std::is_same_v<uint32_t, size_t>) {
+	return sizeof(T) * vec.size();
+  }
+  else {
+	return gsl::narrow<uint32_t>(sizeof(T) * vec.size());
+  }
 }
 
 template <class T> auto sizeofVector(std::vector<T> const* vec) -> uint32_t {
   if (nullptr != vec) {
-	return gsl::narrow<uint32_t>(sizeof(T) * vec->size());
+	if constexpr (std::is_same_v<uint32_t, size_t>) {
+	  return sizeof(T) * vec->size();
+	}
+	else {
+	  return gsl::narrow<uint32_t>(sizeof(T) * vec->size());
+	}
   }
   return 0;
 }
-#else
-template <class T>
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) -> uint32_t {
-  return sizeof(T);
-}
-
-#pragma warning(suppress : 4100)
-template <class T>
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) -> uint32_t {
-  return sizeof(T);
-}
-
-template <class T> auto sizeofVector(std::vector<T> const& vec) noexcept -> uint32_t {
-  return sizeof(T) * vec.size();
-}
-
-template <class T> auto sizeofVector(std::vector<T> const* vec) noexcept -> uint32_t {
-  if (nullptr != vec) {
-	return sizeof(T) * vec->size();
-  }
-  return 0;
-}
-#endif // _win64
 
 template <class outType, class inType> auto ceil(inType invar) -> outType {
   static_assert(!std::is_same_v<outType, float>, "no need to use wrap::ceil here.");
