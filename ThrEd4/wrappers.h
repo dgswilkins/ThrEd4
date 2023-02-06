@@ -231,16 +231,37 @@ template <class inType> auto toDouble(inType invar) noexcept -> double {
   return gsl::narrow_cast<double>(invar);
 }
 
-auto toFloat(double invar) -> float;
-auto toFloat(int32_t invar) noexcept -> float;
-auto toFloat(LONG invar) noexcept -> float;
-// NOLINTNEXTLINE(google-runtime-int)
-auto toFloat(unsigned long invar) noexcept -> float;
-auto toFloat(uint32_t invar) noexcept -> float;
-#ifdef _WIN64
-auto toFloat(size_t invar) noexcept -> float;
-#endif
-auto toFloat(int16_t invar) noexcept -> float;
+template <class inType>
+auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, float> ||
+                                      (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>)))
+    -> float {
+  if constexpr (std::is_same_v<inType, float>) {
+	try {
+	  return gsl::narrow<float>(invar);
+	}
+	catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
+	  UNREFERENCED_PARAMETER(e);
+	  auto const var  = gsl::narrow_cast<float>(invar);
+	  auto const diff = abs(invar - gsl::narrow_cast<double>(var));
+	  if (diff > 4e-5) {
+		throw std::runtime_error("conversion error above limit");
+	  }
+	  return var;
+	}
+	catch (...) { // otherwise throw
+	  throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
+	}
+  }
+  else {
+	if constexpr (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>) {
+	  return gsl::narrow<float>(invar);
+	}
+	else {
+	  return gsl::narrow_cast<float>(invar);
+	}
+  }
+}
+
 auto toSize(int32_t invar) -> size_t;
 // NOLINTNEXTLINE(google-runtime-int)
 auto toSize(long invar) -> size_t;

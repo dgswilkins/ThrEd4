@@ -34,54 +34,8 @@ void wrap::textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, 
   TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int32_t>(cchString));
 }
 
-auto wrap::toFloat(double invar) -> float {
-  try {
-	return gsl::narrow<float>(invar);
-  }
-  catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
-	UNREFERENCED_PARAMETER(e);
-	auto const var  = gsl::narrow_cast<float>(invar);
-	auto const diff = abs(invar - gsl::narrow_cast<double>(var));
-	if (diff > 4e-5) {
-	  throw std::runtime_error("conversion error above limit");
-	}
-	return var;
-  }
-  catch (...) { // otherwise throw
-	throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
-  }
-}
-
-auto wrap::toFloat(int16_t invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
-}
-
-auto wrap::toFloat(int32_t invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
-}
-
-auto wrap::toFloat(LONG invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
-}
-
-auto wrap::toFloat(uint32_t invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
-}
-
-// this is used in 64bit mode only. In 32 bit, size_t is an int
-#ifdef _WIN64
-auto wrap::toFloat(size_t invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
-}
-#endif
-
 auto wrap::toUnsigned(int invar) -> uint32_t {
   return gsl::narrow<uint32_t>(invar);
-}
-
-// NOLINTNEXTLINE(google-runtime-int)
-auto wrap::toFloat(unsigned long invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
 }
 
 auto wrap::toUnsigned(float invar) -> uint32_t {
