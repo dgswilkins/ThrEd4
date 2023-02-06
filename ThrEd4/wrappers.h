@@ -198,11 +198,23 @@ auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD by
 }
 
 template <class outType, class inType> auto round(inType invar) -> outType {
+  //static_assert(!std::is_same_v<outType, float>, "no need to use wrap::round here.");
+  //static_assert(std::is_same_v<inType, float>, "cannot use wrap::round here.");
   if constexpr (std::is_same_v<inType, float>) {
-	return gsl::narrow<outType>(std::lroundf(invar));
+	if constexpr (std::is_same_v<outType, float>) {
+	  return std::roundf(invar);
+	}
+	else {
+	  return gsl::narrow<outType>(std::roundf(invar));
+	}
   }
   else {
-	return gsl::narrow<outType>(std::lround(invar));
+	if constexpr (std::is_same_v<outType, float>) {
+	  return std::roundf(gsl::narrow<float>(invar));
+	}
+	else {
+	  return gsl::narrow<outType>(std::roundf(gsl::narrow<float>(invar)));
+	}
   }
 }
 
