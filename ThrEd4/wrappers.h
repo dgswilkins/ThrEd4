@@ -228,6 +228,9 @@ auto round(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same
   }
 }
 
+void setCursor(HCURSOR hCursor) noexcept;
+void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
+
 template <class inType>
 auto to_ptrdiff(inType invar) noexcept(std::is_same_v<inType, ptrdiff_t>) -> ptrdiff_t {
   static_assert(std::is_same_v<inType, uint32_t>, "to_ptrdiff cannot be used here.");
@@ -238,9 +241,6 @@ auto to_ptrdiff(inType invar) noexcept(std::is_same_v<inType, ptrdiff_t>) -> ptr
 	return gsl::narrow_cast<ptrdiff_t>(invar);
   }
 }
-
-void setCursor(HCURSOR hCursor) noexcept;
-void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 
 template <class inType> auto toDouble(inType invar) noexcept -> double {
   return gsl::narrow_cast<double>(invar);
