@@ -312,12 +312,26 @@ auto toUnsigned(ptrdiff_t invar) -> uint32_t;
 #endif
 auto wcsToFloat(wchar_t const* buffer) -> float;
 
-template <class outType> void wcsToULong(outType& outvar, wchar_t const* invar) {
-  outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
+template <class outType>
+void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<outType, unsigned long>) {
+  //static_assert(!std::is_same_v<outType, unsigned long>, "no need to use wrap::wcstoULong here.");
+  if constexpr (std::is_same_v<outType, unsigned long>) {
+	outvar = std::wcstoul(invar, nullptr, 10);
+  }
+  else {
+	outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
+  }
 }
 
-template <class outType> auto wcsToLong(wchar_t const* buffer) -> outType {
-  return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
+template <class outType>
+auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType {
+  //static_assert(!std::is_same_v<outType, long>, "no need to use wrap::wcstoLong here.");
+  if constexpr (std::is_same_v<outType, long>) {
+	return std::wcstol(buffer, nullptr, 10);
+  }
+  else {
+	return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
+  }
 }
 
 void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
