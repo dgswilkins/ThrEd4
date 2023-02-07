@@ -280,6 +280,10 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, float> ||
 template <class inType>
 auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || (std::is_same_v<inType, uint64_t> && std::is_same_v<size_t, uint32_t>)))
     -> size_t {
+  static_assert((std::is_signed_v<inType> || std::is_same_v<inType, unsigned long long> ||
+                 std::is_same_v<inType, uint8_t> || std::is_same_v<inType, uint16_t> ||
+                 std::is_same_v<inType, uint32_t> || std::is_same_v<inType, DWORD>),
+                "cannot use wrap::toSize here.");
   if constexpr (std::is_signed_v<inType>) {
 	return gsl::narrow<size_t>(invar);
   }
