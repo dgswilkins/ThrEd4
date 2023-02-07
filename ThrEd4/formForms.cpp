@@ -257,7 +257,8 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   ffi::nxtlin(formMenuEntryCount);
   if (form.fillType != 0U) {
 	labelWindow[LFRMCOL] = ffi::txtwin(displayText::loadStr(IDS_TXT3), LabelWindowCoords);
-	valueWindow[LFRMCOL] = ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillColor + 1U)), ValueWindowCoords);
+	valueWindow[LFRMCOL] =
+	    ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillColor + 1U)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (form.fillType == FTHF) {
 	  labelWindow[LFTHCOL] = ffi::txtwin(displayText::loadStr(IDS_FTHCOL), LabelWindowCoords);
@@ -1159,7 +1160,8 @@ void formForms::setear() {
 }
 
 void ffi::wavinit(HWND hwndlg) {
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format(FMT_COMPILE(L"{d}"), IniFile.wavePoints).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS),
+                fmt::format(FMT_COMPILE(L"{d}"), IniFile.wavePoints).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format(FMT_COMPILE(L"{d}"), IniFile.waveStart).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(FMT_COMPILE(L"{d}"), IniFile.waveEnd).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(FMT_COMPILE(L"{d}"), IniFile.waveLobes).c_str());
@@ -1327,7 +1329,7 @@ void formForms::wavfrm() {
 	}
 	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 	FormMoveDelta       = F_POINT {};
-	NewFormVertexCount = vertexCount + 1U;
+	NewFormVertexCount  = vertexCount + 1U;
 	form::setmfrm(ClosestFormToCursor);
 	form::mdufrm();
   }

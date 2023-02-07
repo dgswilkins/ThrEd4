@@ -1732,7 +1732,7 @@ void xi::setundfn(uint32_t code) {
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& form          = FormList->operator[](selectedForm);
+	  auto& form = FormList->operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
 	  }
@@ -2042,7 +2042,7 @@ void xt::dufcol(uint8_t color) {
 }
 
 void xi::bcolfn(uint32_t formIndex, uint8_t color) {
-  auto& form          = FormList->operator[](formIndex); 
+  auto& form = FormList->operator[](formIndex);
   if (form.edgeType == 0U) {
 	return;
   }
@@ -2354,7 +2354,8 @@ void xt::rtrclp() {
 }
 
 void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
-  SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(FMT_COMPILE(L"{:.2f}"), (value * IPFGRAN)).c_str());
+  SetWindowText(GetDlgItem(dialog, stringIndex),
+                fmt::format(FMT_COMPILE(L"{:.2f}"), (value * IPFGRAN)).c_str());
 }
 
 auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {

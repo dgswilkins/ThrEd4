@@ -1326,7 +1326,7 @@ void form::flipv() {
 	form::pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.top + rectangle.bottom;
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& iForm         = FormList->operator[](selectedForm);
+	  auto& iForm = FormList->operator[](selectedForm);
 	  formMap.set(selectedForm);
 	  auto itVertex = wrap::next(FormVertices->begin(), iForm.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < iForm.vertexCount; ++iVertex) {
@@ -1590,7 +1590,7 @@ void form::chkseq(bool border) {
   auto userStitchLen =
       border ? (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN : form.edgeStitchLen
       : (form.isClip()) ? MaxStitchLen
-                       : form.lengthOrCount.stitchLength;
+                        : form.lengthOrCount.stitchLength;
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {
 	if (form.maxBorderStitchLen == 0.0F) {
@@ -5486,8 +5486,8 @@ void fi::fsvrt() {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type = FRMFPOLY;
-  form.fillColor = ActiveColor;
+  form.type        = FRMFPOLY;
+  form.fillColor   = ActiveColor;
   form.fillType    = VRTF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
@@ -5526,8 +5526,8 @@ void fi::fshor(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type = FRMFPOLY;
-  form.fillColor = ActiveColor;
+  form.type        = FRMFPOLY;
+  form.fillColor   = ActiveColor;
   form.fillType    = HORF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
@@ -5566,8 +5566,8 @@ void fi::fsangl(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type = FRMFPOLY;
-  form.fillColor = ActiveColor;
+  form.type                  = FRMFPOLY;
+  form.fillColor             = ActiveColor;
   form.fillType              = ANGF;
   form.angleOrClipData.angle = IniFile.fillAngle;
   form.fillSpacing           = LineSpacing;
@@ -5786,8 +5786,8 @@ void fi::filsfn() {
   auto& form = FormList->operator[](ClosestFormToCursor);
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  form.type = SAT;
-  form.fillColor = ActiveColor;
+  form.type        = SAT;
+  form.fillColor   = ActiveColor;
   form.fillType    = SATF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
@@ -6097,7 +6097,7 @@ void form::bord() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& form          = FormList->operator[](selectedForm);
+	  auto& form       = FormList->operator[](selectedForm);
 	  form.borderColor = ActiveColor;
 	  fi::sbord(selectedForm);
 	}
@@ -6107,7 +6107,7 @@ void form::bord() {
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto& form = FormList->operator[](ClosestFormToCursor);
+	  auto& form       = FormList->operator[](ClosestFormToCursor);
 	  form.borderColor = ActiveColor;
 	  fi::sbord(ClosestFormToCursor);
 	  thred::coltab();
@@ -6126,7 +6126,7 @@ void fi::fsclp(uint32_t formIndex) {
   form.borderClipData = clip::nueclp(formIndex, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = ClipRectSize.cx;
-  form.borderColor = ActiveColor;
+  form.borderColor    = ActiveColor;
   form::bsizpar(form);
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.borderClipData);
   for (auto const& clip : *ClipBuffer) {
@@ -6780,7 +6780,7 @@ void form::nulapcol(uint8_t color) {
 void fi::sbold(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::deleclp(formIndex);
-  form.edgeType = EDGEBEAN;
+  form.edgeType    = EDGEBEAN;
   form.borderColor = ActiveColor;
   form::bsizpar(form);
   form::refilfn(formIndex);
@@ -8122,7 +8122,7 @@ void fi::fspic(uint32_t formIndex) {
   form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = PicotSpacing;
-  form.borderColor = ActiveColor;
+  form.borderColor    = ActiveColor;
   form::bsizpar(form);
   form::savplen(ButtonholeCornerLength);
   auto itClipPoints = wrap::next(ClipPoints->begin(), form.borderClipData);
@@ -8178,7 +8178,7 @@ auto fi::contsf(uint32_t formIndex) -> bool {
 	texture::deltx(formIndex);
 	form::chkcont();
 	form.attribute |= gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
-	form.fillColor = ActiveColor;
+	form.fillColor   = ActiveColor;
 	form.fillSpacing = LineSpacing;
 	form::fsizpar(form);
 	form::refilfn(formIndex);
@@ -8825,9 +8825,9 @@ void form::vrtsclp(uint32_t formIndex) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
-  form.fillType = VCLPF;
+  form.fillType  = VCLPF;
   form.fillColor = ActiveColor;
-  form.type = FRMFPOLY;
+  form.type      = FRMFPOLY;
   refilfn(formIndex);
 }
 
@@ -8889,9 +8889,9 @@ void form::horsclp() {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
-  form.fillType = HCLPF;
+  form.fillType  = HCLPF;
   form.fillColor = ActiveColor;
-  form.type = FRMFPOLY;
+  form.type      = FRMFPOLY;
   form::refilfn(ClosestFormToCursor);
 }
 
@@ -8952,9 +8952,9 @@ void form::angsclp(FRM_HEAD& form) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
-  form.fillType = ANGCLPF;
+  form.fillType  = ANGCLPF;
   form.fillColor = ActiveColor;
-  form.type = FRMFPOLY;
+  form.type      = FRMFPOLY;
   form::refilfn(ClosestFormToCursor);
 }
 
@@ -9004,7 +9004,7 @@ void form::angclp() {
 
 void form::dubsfil(FRM_HEAD& form) {
   clip::deleclp(ClosestFormToCursor);
-  form.edgeType = EDGEDOUBLE;
+  form.edgeType    = EDGEDOUBLE;
   form.borderColor = ActiveColor;
   form::bsizpar(form);
   fi::dubfn(form);
@@ -9017,7 +9017,7 @@ void form::dubfil() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& form          = FormList->operator[](selectedForm);
+	  auto& form = FormList->operator[](selectedForm);
 	  dubsfil(form);
 	}
 	StateMap->set(StateFlag::INIT);
@@ -9144,8 +9144,8 @@ void form::col2frm() {
 }
 
 void form::chan() {
-  auto& currentForm = FormList->operator[](ClosestFormToCursor);
-  currentForm.borderColor = ActiveColor;
+  auto& currentForm              = FormList->operator[](ClosestFormToCursor);
+  currentForm.borderColor        = ActiveColor;
   currentForm.edgeSpacing        = IniFile.chainSpace;
   currentForm.borderSize         = BorderWidth;
   currentForm.edgeStitchLen      = IniFile.chainRatio;
@@ -9216,7 +9216,7 @@ void fi::fsclpx(uint32_t formIndex) {
   form.borderClipData = clip::nueclp(formIndex, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = ClipRectSize.cx;
-  form.borderColor = ActiveColor;
+  form.borderColor    = ActiveColor;
   form::bsizpar(form);
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.borderClipData);
   for (auto const& clip : *ClipBuffer) {

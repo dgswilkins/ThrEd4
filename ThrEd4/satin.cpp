@@ -684,7 +684,7 @@ void satin::satbrd() {
   }
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  auto& form          = FormList->operator[](selectedForm);
+	  auto& form = FormList->operator[](selectedForm);
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow_cast<decltype(form.attribute)>(SBLNT | FBLNT);
 	  }
@@ -793,9 +793,9 @@ void satin::ribon() {
 			*(itVertex++) = OutsidePoints->operator[](iVertex);
 		  }
 		}
-		auto const iNewVertex = wrap::distance<uint32_t>(startVertex, itVertex);
-		newForm.type          = SAT;
-		newForm.fillColor = ActiveColor;
+		auto const iNewVertex              = wrap::distance<uint32_t>(startVertex, itVertex);
+		newForm.type                       = SAT;
+		newForm.fillColor                  = ActiveColor;
 		newForm.fillSpacing                = LineSpacing;
 		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 		newForm.vertexCount                = iNewVertex;

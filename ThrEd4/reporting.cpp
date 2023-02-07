@@ -29,8 +29,8 @@ void rpt::reportError(const wchar_t* prompt, DWORD& errorCode) {
 	auto info = std::wstring {};
 	info      = fmt::format(
         fmt::runtime(L"{} failed with error [{}], {}\n"), prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
-	//displayText::shoMsg(info, false);
+	// displayText::shoMsg(info, false);
 #endif
-    LocalFree(lpMsgBuf);
+	LocalFree(lpMsgBuf);
   }
 }

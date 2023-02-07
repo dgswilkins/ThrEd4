@@ -18,4 +18,4 @@
 namespace rpt {
 
 void reportError(const wchar_t* prompt, DWORD& errorCode);
-} // namespace xt
+} // namespace rpt

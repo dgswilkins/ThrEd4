@@ -129,7 +129,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	  colors.resize(colorFileSize.u.LowPart / wrap::sizeofType(colors));
 	  if (!wrap::readFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, L"ReadFile for colors in dstran")) {
 		return;
-      }
+	  }
 	  CloseHandle(colorFile);
 	  if (bytesRead > (wrap::sizeofType(colors) * 2)) {
 		if (colors[0] == COLVER) {
@@ -265,7 +265,7 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
 	auto const count = (absoluteLengths.cx > absoluteLengths.cy) ? absoluteLengths.cx / DSTMAX + 1
-	                                                              : absoluteLengths.cy / DSTMAX + 1;
+	                                                             : absoluteLengths.cy / DSTMAX + 1;
 	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
 
 	auto difference = SIZE {};
@@ -981,7 +981,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 		  ++itChar;
 		}
 	  }
-// clang-format off
+	  // clang-format off
       // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
       #pragma warning(push)
       #pragma warning(disable : 26481)

@@ -706,7 +706,7 @@ void ci::xclpfn(std::vector<F_POINT> const& tempClipPoints,
                 F_POINT const&              rotationCenter) {
   auto const chainStartPoint = std::next(chainEndPoints.begin(), start);
   auto const chainNextPoint  = std::next(chainStartPoint);
-  auto const  delta =
+  auto const delta =
       F_POINT {(chainNextPoint->x - chainStartPoint->x), (chainNextPoint->y - chainStartPoint->y)};
   auto const rotationAngle = atan2(delta.y, delta.x);
   for (auto const& clip : tempClipPoints) {

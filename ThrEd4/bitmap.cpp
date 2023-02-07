@@ -125,7 +125,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	auto errorCode = GetLastError();
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
-	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil",errorCode);
+	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil", errorCode);
 	return;
   }
   if (bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {

@@ -1,7 +1,7 @@
 #pragma once
 
 // We disable 26446 as operator[] is bounds checked for vectors in the debug version
-#pragma warning(disable : 26446)    // bounds.4     Prefer to use gsl::at() instead of unchecked subscript operator
+#pragma warning(disable : 26446) // bounds.4     Prefer to use gsl::at() instead of unchecked subscript operator
 
 // Local Headers
 #include "clipStitch.h"

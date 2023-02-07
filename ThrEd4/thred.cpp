@@ -930,7 +930,7 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
 }
 
 void thred::resetSideBuffer() {
-  SideWinMsgIdx = 0;
+  SideWinMsgIdx           = 0;
   constexpr auto FILLCHAR = gsl::narrow_cast<wchar_t>(0U);
   std::ranges::fill(*SideWindowEntryBuffer, FILLCHAR);
 }
@@ -1831,7 +1831,7 @@ void thi::chknum() {
 			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form.underlayColor = colVal;
-			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
+			auto const fmtStr  = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmtStr.c_str());
 			form::refilfn(ClosestFormToCursor);
 			thred::coltab();
@@ -2034,45 +2034,45 @@ void thi::chknum() {
 		switch (PreferenceIndex - 1) {
 		  case PRFEGGRAT: {
 			IniFile.eggRatio = value;
-			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-			hWnd   = ValueWindow->operator[](PRFEGGRAT);
+			fmtStr           = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+			hWnd             = ValueWindow->operator[](PRFEGGRAT);
 			break;
 		  }
 		  case PRFNUGSTP: {
 			IniFile.cursorNudgeStep = value;
 			IniFile.nudgePixels     = pxchk(value);
-			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-			hWnd   = ValueWindow->operator[](PRFNUGSTP);
+			fmtStr                  = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+			hWnd                    = ValueWindow->operator[](PRFNUGSTP);
 			break;
 		  }
 		  case PRFPCTSPC: {
 			PicotSpacing = value * PFGRAN;
-			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-			hWnd   = ValueWindow->operator[](PRFPCTSPC);
+			fmtStr       = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+			hWnd         = ValueWindow->operator[](PRFPCTSPC);
 			break;
 		  }
 		  case PRFCLPOFF: {
 			IniFile.clipOffset = value * PFGRAN;
-			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f} mm"), value);
-			hWnd   = ValueWindow->operator[](PRFCLPOFF);
+			fmtStr             = fmt::format(FMT_COMPILE(L"{:.2f} mm"), value);
+			hWnd               = ValueWindow->operator[](PRFCLPOFF);
 			break;
 		  }
 		  case PRFCLPPHS: {
 			IniFile.fillPhase = wrap::floor<uint32_t>(value);
-			fmtStr = fmt::format(FMT_COMPILE(L"{}"), IniFile.fillPhase);
-			hWnd   = ValueWindow->operator[](PRFCLPPHS);
+			fmtStr            = fmt::format(FMT_COMPILE(L"{}"), IniFile.fillPhase);
+			hWnd              = ValueWindow->operator[](PRFCLPPHS);
 			break;
 		  }
 		  case PRFCHFPOS: {
 			IniFile.chainRatio = value;
-			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-			hWnd   = ValueWindow->operator[](PRFCHFPOS);
+			fmtStr             = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+			hWnd               = ValueWindow->operator[](PRFCHFPOS);
 			break;
 		  }
 		  case PRFSTCMIN: {
 			MinStitchLength = value * PFGRAN;
-			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-			hWnd   = ValueWindow->operator[](PRFSTCMIN);
+			fmtStr          = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+			hWnd            = ValueWindow->operator[](PRFSTCMIN);
 			break;
 		  }
 		  default: {
@@ -2112,8 +2112,8 @@ void thi::chknum() {
 				}
 				case PRFAPPCOL: {
 				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-				  fmtStr = fmt::format(FMT_COMPILE(L"{}"), (AppliqueColor + 1U));
-				  hWnd   = ValueWindow->operator[](PRFAPPCOL);
+				  fmtStr        = fmt::format(FMT_COMPILE(L"{}"), (AppliqueColor + 1U));
+				  hWnd          = ValueWindow->operator[](PRFAPPCOL);
 				  break;
 				}
 				case PRFAPSLEN: {
@@ -2173,14 +2173,14 @@ void thi::chknum() {
 				}
 				case PRFBCNLEN: {
 				  ButtonholeCornerLength = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-				  hWnd   = ValueWindow->operator[](PRFBCNLEN);
+				  fmtStr                 = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+				  hWnd                   = ValueWindow->operator[](PRFBCNLEN);
 				  break;
 				}
 				case PRFHUPWID: {
 				  IniFile.hoopSizeX = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.0f} mm"), value);
-				  hWnd   = ValueWindow->operator[](PRFHUPWID);
+				  fmtStr            = fmt::format(FMT_COMPILE(L"{:.0f} mm"), value);
+				  hWnd              = ValueWindow->operator[](PRFHUPWID);
 				  form::sethup();
 				  formForms::prfmsg();
 				  thred::chkhup();
@@ -2188,8 +2188,8 @@ void thi::chknum() {
 				}
 				case PRFHUPHGT: {
 				  IniFile.hoopSizeY = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.0f} mm"), value);
-				  hWnd   = ValueWindow->operator[](PRFHUPHGT);
+				  fmtStr            = fmt::format(FMT_COMPILE(L"{:.0f} mm"), value);
+				  hWnd              = ValueWindow->operator[](PRFHUPHGT);
 				  form::sethup();
 				  formForms::prfmsg();
 				  thred::chkhup();
@@ -2197,14 +2197,14 @@ void thi::chknum() {
 				}
 				case PRFGRDSIZ: {
 				  IniFile.gridSize = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f} mm"), value);
-				  hWnd   = ValueWindow->operator[](PRFGRDSIZ);
+				  fmtStr           = fmt::format(FMT_COMPILE(L"{:.2f} mm"), value);
+				  hWnd             = ValueWindow->operator[](PRFGRDSIZ);
 				  break;
 				}
 				case PRFCHFLEN: {
 				  IniFile.chainSpace = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
-				  hWnd   = ValueWindow->operator[](PRFCHFLEN);
+				  fmtStr             = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
+				  hWnd               = ValueWindow->operator[](PRFCHFLEN);
 				  break;
 				}
 				default: {
@@ -4659,7 +4659,7 @@ void thi::nuFil(FileIndices fileIndex) {
 	WorkingFileName->assign(newFileName);
 	defNam(newFileName);
 	resetState();
-	auto const fileExt        = newFileName.extension().wstring();
+	auto const fileExt = newFileName.extension().wstring();
 	if (fileExt.empty()) {
 	  return;
 	}
@@ -5917,8 +5917,7 @@ void thred::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_
   destination.tag  = 0x14;
 }
 
-auto thi::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>)
-    -> uint32_t {
+auto thi::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   if (form.type == SAT) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
@@ -6006,7 +6005,7 @@ void thi::duclip() {
 		clipHeader->clipType    = CLP_FRMPS;
 		clipHeader->vertexCount = SelectedFormVertices.vertexCount;
 		clipHeader->direction   = StateMap->test(StateFlag::PSELDIR);
-// skip past the header
+		// skip past the header
 		auto* ptrVertices = convertFromPtr<F_POINT*>(std::next(clipHeader));
 		auto vertices = gsl::span(ptrVertices, wrap::toSize(SelectedFormVertices.vertexCount) + 1U);
 		auto const& form = FormList->operator[](ClosestFormToCursor);
@@ -6034,7 +6033,7 @@ void thi::duclip() {
 	  if (!SelectedFormList->empty()) {
 		auto length = 0U;
 		for (auto& selectedForm : (*SelectedFormList)) {
-		  auto& currentForm   = FormList->operator[](selectedForm);
+		  auto& currentForm = FormList->operator[](selectedForm);
 		  length += sizfclp(currentForm);
 		}
 		// NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
@@ -6043,7 +6042,7 @@ void thi::duclip() {
 		  auto* clipFormsHeader     = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
 		  clipFormsHeader->clipType = CLP_FRMS;
 		  wrap::narrow(clipFormsHeader->formCount, SelectedFormList->size());
-// Skip past the header
+		  // Skip past the header
 		  auto*      ptrForms = convertFromPtr<FRM_HEAD*>(std::next(clipFormsHeader));
 		  auto const forms    = gsl::span(ptrForms, SelectedFormList->size());
 		  auto       iForm    = 0U;
@@ -6051,7 +6050,7 @@ void thi::duclip() {
 			auto& currentForm = FormList->operator[](selectedForm);
 			forms[iForm++]    = currentForm;
 		  }
-// skip past the forms
+		  // skip past the forms
 		  auto* ptrFormVertices = convertFromPtr<F_POINT*>(std::next(ptrForms, iForm));
 		  auto  verticesSize    = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
@@ -6078,7 +6077,7 @@ void thi::duclip() {
 			  guidesSize += form.satinGuideCount;
 			}
 		  }
-		  auto       guideCount = 0U;
+		  auto guideCount = 0U;
 		  if (guidesSize != 0U) {
 			auto const guides = gsl::span(ptrGuides, guidesSize);
 			for (auto& selectedForm : (*SelectedFormList)) {
@@ -6104,7 +6103,7 @@ void thi::duclip() {
 			  pointsSize += form.clipEntries;
 			}
 		  }
-		  auto       pointCount = 0;
+		  auto pointCount = 0;
 		  if (pointsSize != 0U) {
 			auto const points = gsl::span(ptrPoints, pointsSize);
 			for (auto& selectedForm : (*SelectedFormList)) {
@@ -6206,14 +6205,14 @@ void thi::duclip() {
 			auto* clipFormHeader     = gsl::narrow_cast<FORM_CLIP*>(GlobalLock(clipHandle));
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
-			auto* ptrFormVertices = convertFromPtr<F_POINT*>(std::next(clipFormHeader));
-			auto  startVertex     = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-			auto  endVertex       = wrap::next(startVertex, form.vertexCount);
+			auto* ptrFormVertices    = convertFromPtr<F_POINT*>(std::next(clipFormHeader));
+			auto  startVertex        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+			auto  endVertex          = wrap::next(startVertex, form.vertexCount);
 
 			auto const vertices = gsl::span(ptrFormVertices, form.vertexCount);
 			std::copy(startVertex, endVertex, vertices.begin());
-			auto* ptrGuides = convertFromPtr<SAT_CON*>(std::next(ptrFormVertices,form.vertexCount));
-			auto  iGuide    = 0U;
+			auto* ptrGuides = convertFromPtr<SAT_CON*>(std::next(ptrFormVertices, form.vertexCount));
+			auto iGuide = 0U;
 			if (form.type == SAT) {
 			  iGuide          = form.satinGuideCount;
 			  auto startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
@@ -9774,7 +9773,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			break;
 		  }
 		  case IDOK: {
-			auto       fileError  = 0U;
+			auto fileError = 0U;
 			for (auto& iFile : spFileInfo) {
 			  auto& cFileName = iFile.cFileName;
 			  auto  fileName  = *DefaultDirectory / std::begin(cFileName);
@@ -10145,7 +10144,7 @@ void thi::delcol() {
   }
   for (auto& formIter : *FormList) {
 	if ((formIter.fillType != 0U) && (formIter.fillColor > VerticalIndex)) {
-		--(formIter.fillColor);
+	  --(formIter.fillColor);
 	}
 	if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
 	  --(formIter.fillInfo.feather.color);
@@ -10281,7 +10280,7 @@ void thi::selfpnt() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-auto thi::unselectAll() -> bool{
+auto thi::unselectAll() -> bool {
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::FRMPSEL);
   StateMap->reset(StateFlag::FPSEL);
@@ -13101,10 +13100,10 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		else {
 		  FormMoveDelta = F_POINT {};
 		  StateMap->set(StateFlag::FUNCLP);
-		  auto formIter        = FRM_HEAD {};
-		  formIter.type        = FRMLINE;
-		  formIter.vertexCount = ptrFormVertexData->vertexCount + 1U;
-		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
+		  auto formIter          = FRM_HEAD {};
+		  formIter.type          = FRMLINE;
+		  formIter.vertexCount   = ptrFormVertexData->vertexCount + 1U;
+		  formIter.vertexIndex   = wrap::toUnsigned(FormVertices->size());
 		  auto*      ptrVertices = convertFromPtr<F_POINT*>(std::next(ptrFormVertexData));
 		  auto const vertices    = gsl::span {ptrVertices, formIter.vertexCount};
 		  FormVertices->insert(FormVertices->end(), vertices.begin(), vertices.end());
@@ -13122,8 +13121,8 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 	  // ToDo - Add more information to the clipboard so that memory can be allocated
 	  auto* ptrFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(clipPointer);
 	  if (ptrFormsHeader->clipType == CLP_FRMS) {
-		auto iForm     = 0U;
-		ClipFormsCount = ptrFormsHeader->formCount;
+		auto iForm            = 0U;
+		ClipFormsCount        = ptrFormsHeader->formCount;
 		auto*      ptrForms   = convertFromPtr<FRM_HEAD*>(std::next(ptrFormsHeader));
 		auto const forms      = gsl::span {ptrForms, ClipFormsCount};
 		auto const formOffset = wrap::toUnsigned(FormList->size());
@@ -13253,7 +13252,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto formIter = ptrClipFormHeader->form;
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
-		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
+		  formIter.vertexIndex   = wrap::toUnsigned(FormVertices->size());
 		  auto*      ptrVertices = convertFromPtr<F_POINT*>(std::next(ptrClipFormHeader));
 		  auto const vertices    = gsl::span {ptrVertices, formIter.vertexCount};
 		  FormVertices->insert(FormVertices->end(), vertices.begin(), vertices.end());
@@ -13264,7 +13263,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			SatinGuides->insert(SatinGuides->end(), guides.begin(), guides.end());
 		  }
 		  auto* ptrClipData = convertFromPtr<F_POINT*>(std::next(ptrGuides, formIter.satinGuideCount));
-		  auto  clipCount   = 0U;
+		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span {ptrClipData, formIter.lengthOrCount.clipCount};
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
@@ -16728,8 +16727,8 @@ void thi::relin() {
 
 void thi::dumov() {
   auto const sCurr = wrap::next(StitchBuffer->begin(), MoveAnchor);
-  if (sCurr->x < ZoomRect.left   || sCurr->x > ZoomRect.right || 
-	  sCurr->y < ZoomRect.bottom || sCurr->y > ZoomRect.top) {
+  if (sCurr->x < ZoomRect.left || sCurr->x > ZoomRect.right || sCurr->y < ZoomRect.bottom ||
+      sCurr->y > ZoomRect.top) {
 	return;
   }
   auto const sNext              = std::next(sCurr);
@@ -16863,7 +16862,7 @@ auto thi::getMaxCount() -> uint32_t {
 
 void thi::doInitZoomed() {
   auto stitchCount = getMaxCount();
-  auto linePoints = std::vector<POINT> {};
+  auto linePoints  = std::vector<POINT> {};
   linePoints.reserve(wrap::toSize(stitchCount) + 2U);
   StateMap->reset(StateFlag::LINED);
   StateMap->reset(StateFlag::LININ);
@@ -16871,11 +16870,11 @@ void thi::doInitZoomed() {
   auto prevStitch = StitchBuffer->front();
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	if (StateMap->test(StateFlag::HID) && (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor)) {
-		stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+	  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	                ColorChangeTable->operator[](iColor).stitchIndex;
 	  auto const sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 	  auto const sEnd   = wrap::next(sStart, stitchCount);
-	  auto sRange = std::ranges::subrange(sStart, sEnd);
+	  auto       sRange = std::ranges::subrange(sStart, sEnd);
 	  for (auto const& iStitch : sRange) {
 		if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
 		    iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
@@ -16887,14 +16886,14 @@ void thi::doInitZoomed() {
 	}
 	auto wascol = 0U;
 	SelectObject(StitchWindowMemDC, UserPen->operator[](ColorChangeTable->operator[](iColor).colorIndex));
-	  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+	stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	              ColorChangeTable->operator[](iColor).stitchIndex;
 	if (!StitchBuffer->empty()) {
 	  auto const stIndex = ColorChangeTable->operator[](iColor).stitchIndex;
 
 	  auto const stStart   = wrap::next(StitchBuffer->begin(), stIndex);
 	  stitchCount          = chkup(stitchCount, iColor);
-		auto const stitches  = std::ranges::subrange(stStart, wrap::next(stStart, stitchCount));
+	  auto const stitches  = std::ranges::subrange(stStart, wrap::next(stStart, stitchCount));
 	  auto const maxYcoord = wrap::toFloat(DrawItem->rcItem.bottom);
 	  for (auto& iStitch : stitches) {
 		auto const layer = (iStitch.attribute & LAYMSK) >> LAYSHFT;

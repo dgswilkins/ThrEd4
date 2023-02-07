@@ -204,7 +204,7 @@ inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexc
 }
 
 inline constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {
-  return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y) && attribute==rhs.attribute;
+  return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y) && attribute == rhs.attribute;
 }
 
 inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :

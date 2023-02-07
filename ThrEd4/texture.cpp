@@ -16,7 +16,7 @@
 class TX_HIST_BUFF
 {
   public:
-  uint32_t  count {};
+  uint32_t count {};
 
   float height {};
   float width {};
@@ -177,10 +177,10 @@ void texture::txdun() {
   WriteFile(handle, SIGNATURE.data(), wrap::toUnsigned(SIGNATURE.size()), &bytesWritten, nullptr);
   WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
   for (auto bufferIter = textureHistoryBuffer.begin(); auto const& historyEntry : *TextureHistory) {
-	bufferIter->count       = wrap::toUnsigned(historyEntry.texturePoints.size());
-	bufferIter->height      = historyEntry.height;
-	bufferIter->width       = historyEntry.width;
-	bufferIter->spacing     = historyEntry.spacing;
+	bufferIter->count   = wrap::toUnsigned(historyEntry.texturePoints.size());
+	bufferIter->height  = historyEntry.height;
+	bufferIter->width   = historyEntry.width;
+	bufferIter->spacing = historyEntry.spacing;
 	++bufferIter;
   }
   wrap::writeFile(handle,
@@ -264,7 +264,7 @@ void texture::redtx() {
 	}
 	for (auto texture = TextureHistory->begin(); auto const& entry : textureHistoryBuffer) {
 	  texture->height  = entry.height;
-	  texture->width  = entry.width;
+	  texture->width   = entry.width;
 	  texture->spacing = entry.spacing;
 	  if (entry.count == 0U) {
 		++texture;
@@ -660,7 +660,7 @@ void txi::dutxrct(TXTR_RECT& textureRect) {
   textureRect.left = textureRect.right = firstPoint.line;
   textureRect.top = textureRect.bottom = firstPoint.y;
   auto const spList = std::ranges::subrange(std::next(SelectedTexturePointsList->begin()),
-                                      SelectedTexturePointsList->end());
+                                            SelectedTexturePointsList->end());
   for (auto const& iPoint : spList) {
 	auto const& texturePoint = TempTexturePoints->operator[](iPoint);
 	if (texturePoint.y > textureRect.top) {
@@ -776,9 +776,9 @@ void txi::ed2txp(POINT const& offset, TX_PNT& textureRecord) {
 	val = 0.0F;
   }
   textureRecord.line = wrap::round<uint16_t>(val);
-  textureRecord.y =
-      TextureScreen.areaHeight - (((wrap::toFloat(offset.y - TextureScreen.top)) /
-                                  wrap::toFloat(TextureScreen.height)) * TextureScreen.areaHeight);
+  textureRecord.y    = TextureScreen.areaHeight -
+                    (((wrap::toFloat(offset.y - TextureScreen.top)) / wrap::toFloat(TextureScreen.height)) *
+                     TextureScreen.areaHeight);
 }
 
 void texture::txtrup() {
@@ -815,7 +815,7 @@ void texture::txtrup() {
 	}
 	for (auto const& point : *SelectedTexturePointsList) {
 	  auto& texturePoint = TempTexturePoints->operator[](point);
-	  texturePoint.line = gsl::narrow<uint16_t>(texturePoint.line + textureOffset.line);
+	  texturePoint.line  = gsl::narrow<uint16_t>(texturePoint.line + textureOffset.line);
 	  texturePoint.y += textureOffset.y;
 	}
 	txi::dutxrct(TextureRect);
@@ -913,16 +913,16 @@ void txi::setxfrm() noexcept {
 }
 
 void txi::txtclp(FRM_HEAD& textureForm) {
-  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat); 
+  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
   if (0U == thrEdClip) {
 	return;
   }
-  auto const clipData = GetClipboardData(thrEdClip);   // NOLINT(readability-qualified-auto)
+  auto const clipData = GetClipboardData(thrEdClip); // NOLINT(readability-qualified-auto)
   if (nullptr == clipData) {
 	return;
   }
   auto const clipMemory = GlobalLock(clipData); // NOLINT(readability-qualified-auto)
-  if ( nullptr == clipMemory) {
+  if (nullptr == clipMemory) {
 	return;
   }
   auto* clipForm = thred::getClipForm(clipMemory);
@@ -1073,7 +1073,7 @@ void txi::txpar(FRM_HEAD& form) {
   form.lengthOrCount.stitchLength = IniFile.userStitchLength;
   form.maxFillStitchLen           = IniFile.maxStitchLength;
   form.minFillStitchLen           = IniFile.minStitchLength;
-  form.fillColor = ActiveColor;
+  form.fillColor                  = ActiveColor;
   form::refilfn(ClosestFormToCursor);
 }
 
@@ -1396,7 +1396,7 @@ void txi::txbak() {
 	return;
   }
   SelectedTexturePointsList->clear();
-  auto flag = false;
+  auto       flag = false;
   auto const end  = wrap::toUnsigned(TextureHistory->size());
   for (auto iHistory = 0U; iHistory < end; ++iHistory) {
 	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
@@ -1415,7 +1415,7 @@ void txi::nxbak() {
   if (!StateMap->test(StateFlag::WASTXBAK)) {
 	return;
   }
-  auto flag = false;
+  auto       flag = false;
   auto const end  = wrap::toUnsigned(TextureHistory->size());
   for (auto iHistory = uint32_t {0U}; iHistory < end; ++iHistory) {
 	txi::txrfor();
@@ -1544,8 +1544,8 @@ void texture::txsnap() {
   if (!SelectedTexturePointsList->empty()) {
 	for (auto const& iPoint : *SelectedTexturePointsList) {
 	  auto& texturePoint = TempTexturePoints->operator[](iPoint);
-	  auto const yStep = std::floor((texturePoint.y + halfGrid) / IniFile.gridSize);
-	  texturePoint.y   = yStep * IniFile.gridSize;
+	  auto const yStep   = std::floor((texturePoint.y + halfGrid) / IniFile.gridSize);
+	  texturePoint.y     = yStep * IniFile.gridSize;
 	}
   }
   else {
