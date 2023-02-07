@@ -552,7 +552,7 @@ void bitmap::resetDC() noexcept {
   DeleteObject(TraceDC);
 }
 
-auto bitmap::getBmpNameLength() -> uint32_t {
+auto bitmap::getBmpNameLength() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   return wrap::toUnsigned(UTF8BMPname.size() - 1); // -1 to account for zero termination
 }
 

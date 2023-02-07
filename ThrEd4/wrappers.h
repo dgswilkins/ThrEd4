@@ -303,14 +303,24 @@ auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || std::is_same_v<
   }
 }
 
-auto toUnsigned(float invar) -> uint32_t;
-auto toUnsigned(size_t invar) -> uint32_t;
-auto toUnsigned(int invar) -> uint32_t;
-// NOLINTNEXTLINE(google-runtime-int)
-auto toUnsigned(long invar) -> uint32_t;
-#ifdef _WIN64
-auto toUnsigned(ptrdiff_t invar) -> uint32_t;
-#endif
+template <class inType>
+auto toUnsigned(inType invar) noexcept(std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint16_t>)
+    -> uint32_t {
+  static_assert((std::is_signed_v<inType> || std::is_same_v<inType, ptrdiff_t> || std::is_same_v<inType, uint16_t> ||
+                 std::is_same_v<inType, uint32_t> || std::is_same_v<inType, size_t>),
+                "cannot use wrap::toUnsigned here.");
+  if constexpr (std::is_same_v<inType, uint16_t>) {
+	return gsl::narrow_cast<uint32_t>(invar);
+  }
+  else {
+	if constexpr (std::is_same_v<inType, uint32_t>) {
+	  return invar;
+	}
+	else {
+	  return gsl::narrow<uint32_t>(invar);
+	}
+  }
+}
 
 auto wcsToFloat(wchar_t const* buffer) -> float;
 

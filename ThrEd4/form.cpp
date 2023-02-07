@@ -335,7 +335,7 @@ void frmpnts(uint32_t type);
 void frmpoly(gsl::span<POINT> const& source) noexcept;
 void frmsqr(uint32_t vertexIndex, uint32_t iVertex);
 void frmsqr0(POINT const& controlPoint);
-void frmx(POINT const& controlPoint, HDC hDC);
+void frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, uint32_t>);
 void fsangl(FRM_HEAD& form);
 void fsclp(uint32_t formIndex);
 void fsclpx(uint32_t formIndex);
@@ -426,7 +426,7 @@ void pfn(std::vector<V_RECT_2> const& underlayVerticalRect,
          uint32_t                     startVertex,
          std::vector<V_RECT_2> const& vrct,
          float                        width);
-void plbak(uint32_t backPoint);
+void plbak(uint32_t backPoint) noexcept(std::is_same_v<size_t, uint32_t>);
 void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
 void plfn(FRM_HEAD const&              form,
           std::vector<V_RECT_2> const& underlayVerticalRect,
@@ -829,7 +829,7 @@ void fi::frmsqr0(POINT const& controlPoint) {
   }
 }
 
-void fi::frmx(POINT const& controlPoint, HDC hDC) {
+void fi::frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto       line   = std::array<POINT, LNPNTS> {};
   auto const offset = MulDiv(8, *ScreenDPI, STDDPI);
   SelectObject(hDC, FormSelectedPen);
@@ -2736,7 +2736,7 @@ void fi::plfn(FRM_HEAD const&              form,
          stitchPoint);
 }
 
-void fi::plbak(uint32_t backPoint) {
+void fi::plbak(uint32_t backPoint) noexcept(std::is_same_v<size_t, uint32_t>) {
   if ((!OSequence->empty()) && (backPoint < (OSequence->size() - 1U))) {
 	auto iSequence = wrap::toUnsigned(OSequence->size() - 1U);
 	while (iSequence > backPoint) {

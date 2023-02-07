@@ -103,7 +103,7 @@ auto const DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZHART,
 };
 
-void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) {
+void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto labelSize = SIZE {};
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
   textSize.cy = labelSize.cy;

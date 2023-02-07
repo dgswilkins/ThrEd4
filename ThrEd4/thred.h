@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 namespace thred {
 auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
-void bBox();
+void bBox() noexcept(std::is_same_v<size_t, uint32_t>);
 void chkhup();
 void chkrng(F_POINT& range);
 void addColor(uint32_t stitch, uint32_t color);
@@ -55,7 +55,7 @@ void resetColorChanges() noexcept;
 void ritfcor(F_POINT const& point);
 void ritmov(uint32_t formIndex) noexcept;
 void ritot(uint32_t number);
-void rngadj();
+void rngadj() noexcept(std::is_same_v<size_t, uint32_t>);
 auto rotang1(F_POINT_ATTR const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept
     -> F_POINT;
 auto rotangf(F_POINT const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept -> F_POINT;
@@ -72,8 +72,8 @@ void showColorWin() noexcept;
 void sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept;
 auto stch2pxr(F_POINT const& stitchCoordinate) -> POINT;
 void stchrct(F_RECTANGLE& rectangle) noexcept;
-void strtchbox(std::vector<POINT> const& stretchBoxLine);
-auto txtWid(wchar_t const* string) -> SIZE;
+void strtchbox(std::vector<POINT> const& stretchBoxLine) noexcept(std::is_same_v<size_t, uint32_t>);
+auto txtWid(wchar_t const* string) noexcept(std::is_same_v<size_t, uint32_t>) -> SIZE;
 void tst();
 void unbBox();
 void unbsho();

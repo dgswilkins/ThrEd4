@@ -152,7 +152,7 @@ void clpadj();
 void clpbox();
 void clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept;
 auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
-void colchk();
+void colchk() noexcept(std::is_same_v<size_t, uint32_t>);
 void contract();
 void cros(uint32_t iStitch);
 void crtcurs() noexcept;
@@ -190,12 +190,12 @@ void dstcurs() noexcept;
 void duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest);
 void duIns();
 void duSelbox() noexcept;
-void duar(POINT const& stitchCoordsInPixels);
+void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uint32_t>);
 void dubar();
 void dubox(POINT const& stitchCoordsInPixels);
 void dubuf(std::vector<char>& buffer);
 void duclip();
-void duclp();
+void duclp() noexcept(std::is_same_v<size_t, uint32_t>);
 void ducmd();
 void ducros(HDC hDC);
 void dufdef() noexcept;
@@ -208,11 +208,11 @@ void dumov();
 void dumrk(float xCoord, float yCoord);
 void dun();
 auto dunum(wchar_t code) noexcept -> bool;
-void dupclp();
+void dupclp() noexcept(std::is_same_v<size_t, uint32_t>);
 void duprct(FRM_HEAD const& form);
 void durit(std::vector<char>& destination, const void* source, uint32_t count);
-void durot();
-void durotu();
+void durot() noexcept(std::is_same_v<size_t, uint32_t>);
+void durotu() noexcept(std::is_same_v<size_t, uint32_t>);
 void dusel(HDC hDC);
 void duselrng(RANGE& selectedRange);
 void dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize);
@@ -443,8 +443,12 @@ void shownd(HWND hwnd) noexcept;
 auto sidclp() -> bool;
 void sidhup();
 void sidmsg(FRM_HEAD const& form, HWND window);
-void sizclp(FRM_HEAD const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
-auto sizfclp(FRM_HEAD const& form) -> uint32_t;
+void sizclp(FRM_HEAD const& form,
+            uint32_t&       formFirstStitchIndex,
+            uint32_t&       formStitchCount,
+            uint32_t&       length,
+            uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>);
+auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t;
 void srchk();
 auto srchknot(uint32_t source) -> uint32_t;
 void stCor2px(F_POINT_ATTR const& stitch, POINT& point);
@@ -1274,7 +1278,7 @@ void thi::nunams() {
   menu::redfils(LRUPtr, PreviousNames);
 }
 
-void thred::rngadj() {
+void thred::rngadj() noexcept(std::is_same_v<size_t, uint32_t>) {
   auto lastStitch = wrap::toUnsigned(StitchBuffer->size());
   if (lastStitch != 0U) {
 	--lastStitch;
@@ -3174,7 +3178,7 @@ void thi::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& 
                   std::lround(wrap::toFloat(rotationCenterPixels.y) + distanceToCenter * sin(newAngle))};
 }
 
-void thi::duar(POINT const& stitchCoordsInPixels) {
+void thi::duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto const offset = MulDiv(10, *ScreenDPI, STDDPI);
   auto arrowCenter  = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
   StitchArrow[1]    = stitchCoordsInPixels;
@@ -5576,7 +5580,7 @@ void thi::newFil() {
   thred::zumhom();
 }
 
-void thred::bBox() {
+void thred::bBox() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
   wrap::polyline(StitchWindowDC, ZoomBoxLine.data(), wrap::toUnsigned(ZoomBoxLine.size()));
@@ -5622,7 +5626,7 @@ void thred::delstchm() {
   StitchBuffer->erase(start, end);
 }
 
-void thi::duclp() {
+void thi::duclp() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
   wrap::polyline(StitchWindowDC, ClipInsertBoxLine.data(), wrap::toUnsigned(ClipInsertBoxLine.size()));
@@ -5764,7 +5768,7 @@ auto thi::sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT {
                                     (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y)};
 }
 
-void thi::durot() {
+void thi::durot() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
   wrap::polyline(StitchWindowDC, RotateBoxOutline.data(), wrap::toUnsigned(RotateBoxOutline.size()));
@@ -5781,7 +5785,7 @@ void thi::unrot() {
   }
 }
 
-void thi::durotu() {
+void thi::durotu() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
   wrap::polyline(
@@ -5913,7 +5917,8 @@ void thred::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_
   destination.tag  = 0x14;
 }
 
-auto thi::sizfclp(FRM_HEAD const& form) -> uint32_t {
+auto thi::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>)
+    -> uint32_t {
   auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   if (form.type == SAT) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
@@ -5966,7 +5971,7 @@ void thi::sizclp(FRM_HEAD const& form,
                  uint32_t&       formFirstStitchIndex,
                  uint32_t&       formStitchCount,
                  uint32_t&       length,
-                 uint32_t&       fileSize) {
+                 uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>) {
   fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   length = fileSize;
   if (form.type == SAT) {
@@ -8027,7 +8032,7 @@ auto thi::iselpnt() noexcept -> bool {
   return false;
 }
 
-void thred::strtchbox(std::vector<POINT> const& stretchBoxLine) {
+void thred::strtchbox(std::vector<POINT> const& stretchBoxLine) noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::polyline(StitchWindowDC, stretchBoxLine.data(), wrap::toUnsigned(stretchBoxLine.size()));
@@ -8297,7 +8302,7 @@ void thi::movmrk() {
   }
 }
 
-void thi::colchk() {
+void thi::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
   if (!StitchBuffer->empty()) {
 	auto color       = StitchBuffer->front().attribute & COLMSK;
 	auto startStitch = 0U;
@@ -10216,7 +10221,7 @@ void thi::setpclp() {
   FormVerticesAsLine->push_back(point);
 }
 
-void thi::dupclp() {
+void thi::dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
@@ -16060,7 +16065,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 }
 
 // return the width of a text item
-auto thred::txtWid(wchar_t const* string) -> SIZE {
+auto thred::txtWid(wchar_t const* string) noexcept(std::is_same_v<size_t, uint32_t>) -> SIZE {
   auto textSize = SIZE {};
   wrap::getTextExtentPoint32(ThredDC, string, wrap::toUnsigned(wcslen(string)), &textSize);
   return textSize;

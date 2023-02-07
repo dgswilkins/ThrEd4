@@ -79,7 +79,7 @@ void dutxlin(F_POINT const& point0in, F_POINT const& point1in);
 void dutxmir();
 void dutxrct(TXTR_RECT& textureRect);
 void dutxtlin() noexcept;
-void dutxtx(uint32_t index, uint16_t offsetPixels);
+void dutxtx(uint32_t index, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>);
 void ed2px(F_POINT const& editPoint, POINT& point) noexcept;
 auto ed2stch(F_POINT const& point) noexcept -> F_POINT;
 void ed2txp(POINT const& offset, TX_PNT& textureRecord);
@@ -90,7 +90,7 @@ void px2ed(POINT const& point, F_POINT& editPoint) noexcept;
 auto px2txt(POINT const& offset) -> bool;
 void redtbak();
 void ritxfrm(FRM_HEAD const& textureForm);
-void ritxrct();
+void ritxrct() noexcept(std::is_same_v<size_t, uint32_t>);
 void rollbackTexture(std::vector<TX_HIST>::iterator const& texture);
 void setxclp(FRM_HEAD const& form);
 void setxfrm() noexcept;
@@ -109,17 +109,17 @@ void txhor(FRM_HEAD& form);
 auto txnam(std::wstring& name) -> bool;
 void txnudg(int32_t deltaX, float deltaY);
 void txpar(FRM_HEAD& form);
-void txrbak();
+void txrbak() noexcept(std::is_same_v<size_t, uint32_t>);
 void txrct2rct(TXTR_RECT const& textureRect, RECT& rectangle) noexcept;
 void txrfor() noexcept;
 void txshrnk(FRM_HEAD const& textureForm);
 void txsiz(float ratio, FRM_HEAD const& textureForm);
 void txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept;
-auto txtclos(uint32_t& closestTexturePoint) -> bool;
+auto txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t, uint32_t>) -> bool;
 void txtclp(FRM_HEAD& textureForm);
 void txtdel();
 void txtlin();
-void txtxfn(POINT const& reference, uint16_t offsetPixels);
+void txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>);
 void txvrt(FRM_HEAD& form);
 } // namespace txi
 
@@ -339,7 +339,7 @@ void texture::savtxt() {
       currentItem.texturePoints.end(), TempTexturePoints->begin(), TempTexturePoints->end());
 }
 
-void txi::txrbak() {
+void txi::txrbak() noexcept(std::is_same_v<size_t, uint32_t>) {
   if (TextureHistoryIndex == 0) {
 	TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
 	return;
@@ -407,7 +407,7 @@ void txi::txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept {
                   wrap::toFloat(TextureScreen.top));
 }
 
-void txi::txtxfn(POINT const& reference, uint16_t offsetPixels) {
+void txi::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto line = std::array<POINT, 2> {};
   line[0]   = POINT {reference.x, reference.y - offsetPixels};
   line[1]   = POINT {reference.x, reference.y + offsetPixels};
@@ -417,7 +417,7 @@ void txi::txtxfn(POINT const& reference, uint16_t offsetPixels) {
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
-void txi::dutxtx(uint32_t index, uint16_t offsetPixels) {
+void txi::dutxtx(uint32_t index, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto ref = POINT {};
   txi::txt2pix(TempTexturePoints->operator[](index), ref);
   txi::txtxfn(ref, offsetPixels);
@@ -604,7 +604,7 @@ void texture::txtrbut() {
   }
 }
 
-auto txi::txtclos(uint32_t& closestTexturePoint) -> bool {
+auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t, uint32_t>) -> bool {
   if (closestTexturePoint == 0U) {
 	return false;
   }
@@ -632,7 +632,7 @@ void txi::setxmov() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
 }
 
-void txi::ritxrct() {
+void txi::ritxrct() noexcept(std::is_same_v<size_t, uint32_t>) {
   auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                              (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 

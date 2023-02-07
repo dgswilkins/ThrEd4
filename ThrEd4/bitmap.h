@@ -37,7 +37,7 @@ auto getBitmapWidth() noexcept -> int;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
 auto getBmpColor() noexcept -> COLORREF;
 auto getBmpNameData() noexcept -> char*;
-auto getBmpNameLength() -> uint32_t;
+auto getBmpNameLength() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t;
 auto getBmpStitchRatio() noexcept -> F_POINT;
 auto getTraceDC() noexcept -> HDC;
 auto getrmap() -> uint32_t;
