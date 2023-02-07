@@ -262,24 +262,32 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, float> ||
   }
 }
 
-auto toSize(int32_t invar) -> size_t;
-// NOLINTNEXTLINE(google-runtime-int)
-auto toSize(long invar) -> size_t;
-#ifdef _WIN64
-auto toSize(ptrdiff_t invar) noexcept -> size_t;
-#endif
-auto toSize(uint16_t invar) noexcept -> size_t;
-auto toSize(uint32_t invar) noexcept -> size_t;
-#ifdef _WIN64
-auto toSize(DWORD invar) noexcept -> size_t;
-#else
-auto toSize(DWORD invar) -> size_t;
-#endif
-#ifdef _WIN64
-auto toSize(uintmax_t invar) noexcept -> size_t;
-#else
-auto toSize(uintmax_t invar) -> size_t;
-#endif
+template <class inType>
+auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || std::is_same_v<inType, unsigned long long>))
+    -> size_t {
+  if constexpr (std::is_signed_v<inType>) {
+	return gsl::narrow<size_t>(invar);
+  }
+  else {
+	if constexpr (std::is_same_v<inType, size_t>) {
+	  return invar;
+	}
+	else {
+	  if constexpr (std::is_same_v<size_t, unsigned long long>) {
+		return gsl::narrow_cast<size_t>(invar);
+	  }
+	  else {
+		if constexpr (std::is_same_v<inType, unsigned long long>) {
+		  return gsl::narrow<size_t>(invar);
+		}
+		else {
+		  return gsl::narrow_cast<size_t>(invar);
+		}
+	  }
+	}
+  }
+}
+
 auto toUnsigned(float invar) -> uint32_t;
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
