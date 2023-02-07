@@ -252,7 +252,7 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
   static_assert((std::is_same_v<inType, double> || std::is_same_v<inType, char> ||
                  std::is_same_v<inType, int16_t> || std::is_same_v<inType, int32_t> ||
                  std::is_same_v<inType, LONG> || std::is_same_v<inType, uint8_t> ||
-                 std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint32_t>),
+                 std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint64_t>),
                 "cannot use wrap::toFloat here.");
   if constexpr (std::is_same_v<inType, double>) {
 	try {
