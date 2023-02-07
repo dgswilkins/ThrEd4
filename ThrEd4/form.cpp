@@ -6972,7 +6972,7 @@ void form::duhart(uint32_t sideCount) {
   stepAngle /= HARTSTEP;
   auto       lastVertex    = iVertex;
   auto const itFirstVertex = wrap::next(FormVertices->begin(), savedVertexIndex);
-  while (point.x > itFirstVertex->x && iVertex < wrap::ptrdiff(2U * HSIDEMAX)) {
+  while (point.x > itFirstVertex->x && iVertex < wrap::to_ptrdiff(2U * HSIDEMAX)) {
 	FormVertices->push_back(F_POINT {point.x, point.y});
 	++iVertex;
 	point.x += length * cos(angle);
