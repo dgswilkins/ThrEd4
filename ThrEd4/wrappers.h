@@ -288,16 +288,11 @@ auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || (std::is_same_v
 	  return invar;
 	}
 	else {
-	  if constexpr (std::is_same_v<size_t, unsigned long long>) {
-		return gsl::narrow_cast<size_t>(invar);
+	  if constexpr (std::is_same_v<inType, unsigned long long> && std::is_same_v<size_t, uint32_t>) {
+		return gsl::narrow<size_t>(invar);
 	  }
 	  else {
-		if constexpr (std::is_same_v<inType, unsigned long long>) {
-		  return gsl::narrow<size_t>(invar);
-		}
-		else {
-		  return gsl::narrow_cast<size_t>(invar);
-		}
+		return gsl::narrow_cast<size_t>(invar);
 	  }
 	}
   }
