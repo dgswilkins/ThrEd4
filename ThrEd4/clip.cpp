@@ -31,7 +31,7 @@ void duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t
 void dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints);
 void dulast(std::vector<F_POINT>& chainEndPoints);
 void durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept;
-auto findclp(uint32_t formIndex) noexcept -> uint32_t;
+auto findclp(uint32_t formIndex) -> uint32_t;
 void fxlen(FRM_HEAD const&           form,
            std::vector<F_POINT>&     chainEndPoints,
            std::vector<float> const& listSINEs,
@@ -97,7 +97,7 @@ void xclpfn(std::vector<F_POINT> const& tempClipPoints,
 
 static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 
-auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
+auto ci::findclp(uint32_t formIndex) -> uint32_t {
   for (auto spForms = std::ranges::subrange(FormList->begin(), wrap::next(FormList->begin(), formIndex));
        auto& form : spForms | std::views::reverse) {
 	if (form.isEdgeClip()) {
