@@ -27,6 +27,42 @@
 
 namespace wrap {
 
+  template <class inType>
+auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
+                                      (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>)))
+    -> float {
+  static_assert((std::is_same_v<inType, double> || std::is_same_v<inType, char> || std::is_same_v<inType, int16_t> ||
+                 std::is_same_v<inType, int32_t> || std::is_same_v<inType, LONG> ||
+                 std::is_same_v<inType, uint8_t> || std::is_same_v<inType, uint16_t> ||
+                 std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint64_t>),
+                "cannot use wrap::toFloat here.");
+  if constexpr (std::is_same_v<inType, double>) {
+	try {
+	  return gsl::narrow<float>(invar);
+	}
+	catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
+	  UNREFERENCED_PARAMETER(e);
+	  auto const var  = gsl::narrow_cast<float>(invar);
+	  auto const diff = abs(invar - gsl::narrow_cast<double>(var));
+	  if (diff > 4e-5) {
+		throw std::runtime_error("conversion error above limit");
+	  }
+	  return var;
+	}
+	catch (...) { // otherwise throw
+	  throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
+	}
+  }
+  else {
+	if constexpr (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>) {
+	  return gsl::narrow<float>(invar);
+	}
+	else {
+	  return gsl::narrow_cast<float>(invar);
+	}
+  }
+}
+
 template <class T>
 constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>)
     -> uint32_t {
@@ -219,10 +255,10 @@ auto round(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same
   }
   else {
 	if constexpr (std::is_same_v<outType, float>) {
-	  return std::roundf(gsl::narrow<float>(invar));
+	  return std::roundf(wrap::toFloat(invar));
 	}
 	else {
-	  return gsl::narrow<outType>(std::roundf(gsl::narrow<float>(invar)));
+	  return gsl::narrow<outType>(std::roundf(wrap::toFloat(invar)));
 	}
   }
 }
@@ -243,42 +279,6 @@ auto to_ptrdiff(inType invar) noexcept(std::is_same_v<inType, ptrdiff_t>) -> ptr
 
 template <class inType> auto toDouble(inType invar) noexcept -> double {
   return gsl::narrow_cast<double>(invar);
-}
-
-template <class inType>
-auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
-                                      (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>)))
-    -> float {
-  static_assert((std::is_same_v<inType, double> || std::is_same_v<inType, char> ||
-                 std::is_same_v<inType, int16_t> || std::is_same_v<inType, int32_t> ||
-                 std::is_same_v<inType, LONG> || std::is_same_v<inType, uint8_t> ||
-                 std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint64_t>),
-                "cannot use wrap::toFloat here.");
-  if constexpr (std::is_same_v<inType, double>) {
-	try {
-	  return gsl::narrow<float>(invar);
-	}
-	catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
-	  UNREFERENCED_PARAMETER(e);
-	  auto const var  = gsl::narrow_cast<float>(invar);
-	  auto const diff = abs(invar - gsl::narrow_cast<double>(var));
-	  if (diff > 4e-5) {
-		throw std::runtime_error("conversion error above limit");
-	  }
-	  return var;
-	}
-	catch (...) { // otherwise throw
-	  throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
-	}
-  }
-  else {
-	if constexpr (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>) {
-	  return gsl::narrow<float>(invar);
-	}
-	else {
-	  return gsl::narrow_cast<float>(invar);
-	}
-  }
 }
 
 template <class inType>
