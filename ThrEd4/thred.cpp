@@ -8518,12 +8518,12 @@ void thi::setsrch(uint32_t stitch) {
 }
 
 auto thi::inrng(uint32_t iStitch) noexcept -> bool {
-  if (iStitch < StitchBuffer->size()) {
-	auto const& stitch = StitchBuffer->operator[](iStitch);
-	return stitch.x >= StitchRangeRect.left && stitch.x <= StitchRangeRect.right &&
-	       stitch.y >= StitchRangeRect.bottom && stitch.y <= StitchRangeRect.top;
+  if (iStitch >= StitchBuffer->size()) {
+	return false;
   }
-  return false;
+  auto const& stitch = StitchBuffer->operator[](iStitch);
+  return stitch.x >= StitchRangeRect.left && stitch.x <= StitchRangeRect.right &&
+         stitch.y >= StitchRangeRect.bottom && stitch.y <= StitchRangeRect.top;
 }
 
 auto thi::finrng(uint32_t find) noexcept -> bool {
