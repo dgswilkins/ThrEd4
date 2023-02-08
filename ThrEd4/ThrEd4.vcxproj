@@ -160,21 +160,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
-    <IncludePath>$(VcpkgRoot)\installed\x86-windows-static\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <CAExcludePath>$(VcpkgRoot)\installed\x86-windows-static\include;$(CAExcludePath)</CAExcludePath>
+    <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x86-windows-static\x86-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(VcpkgManifestRoot)\vcpkg_installed\x64-windows-static\x64-windows-static\include</IncludePath>
     <CAExcludePath>$(VcpkgRoot)\installed\x64-windows-static\include;$(CAExcludePath)</CAExcludePath>
+    <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x64-windows-static\x64-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x86-windows-static\x86-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x64-windows-static\x64-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
