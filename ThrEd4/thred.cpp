@@ -8282,21 +8282,21 @@ auto thi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
 }
 
 void thi::movmrk() {
-  if (StateMap->test(StateFlag::MOVSET)) {
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  thred::rngadj();
-	  if (movstchs(MoveAnchor, GroupStartStitch, GroupEndStitch)) {
-		thred::coltab();
-		StateMap->set(StateFlag::RESTCH);
-	  }
+  if (!StateMap->test(StateFlag::MOVSET)) {
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::rngadj();
+	if (movstchs(MoveAnchor, GroupStartStitch, GroupEndStitch)) {
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
 	}
-	else {
-	  if (StateMap->test(StateFlag::SELBOX)) {
-		if (movstchs(MoveAnchor, ClosestPointIndex, ClosestPointIndex + 1U)) {
-		  StateMap->set(StateFlag::RESTCH);
-		  thred::coltab();
-		}
-	  }
+	return;
+  }
+  if (StateMap->test(StateFlag::SELBOX)) {
+	if (movstchs(MoveAnchor, ClosestPointIndex, ClosestPointIndex + 1U)) {
+	  StateMap->set(StateFlag::RESTCH);
+	  thred::coltab();
 	}
   }
 }
