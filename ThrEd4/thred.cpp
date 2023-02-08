@@ -8578,27 +8578,25 @@ void thi::ungrphi() {
 	ClosestPointIndex = GroupEndStitch;
 	StateMap->set(StateFlag::SELBOX);
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto flag = true;
-	  for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; --iStitch) {
-		if (((StitchBuffer->operator[](iStitch - 1U).attribute & NOTFRM) == 0U) &&
-		    ((StitchBuffer->operator[](iStitch - 1U).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-		  ClosestPointIndex = iStitch - 1U;
-		  StateMap->set(StateFlag::SELBOX);
-		  StateMap->set(StateFlag::RESTCH);
-		  flag = false;
-		  break;
-		}
-	  }
-	  if (flag) {
-		displayText::grpmsg1();
-	  }
+  if (!StateMap->test(StateFlag::FORMSEL)) {
+	displayText::grpmsg();
+	return;
+  }
+  auto flag = true;
+  for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; --iStitch) {
+	if (((StitchBuffer->operator[](iStitch - 1U).attribute & NOTFRM) == 0U) &&
+	    ((StitchBuffer->operator[](iStitch - 1U).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+	  ClosestPointIndex = iStitch - 1U;
+	  StateMap->set(StateFlag::SELBOX);
+	  StateMap->set(StateFlag::RESTCH);
+	  flag = false;
+	  break;
 	}
-	else {
-	  displayText::grpmsg();
-	}
+  }
+  if (flag) {
+	displayText::grpmsg1();
   }
 }
 
