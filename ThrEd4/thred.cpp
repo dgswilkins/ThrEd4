@@ -7828,21 +7828,20 @@ void thred::chkrng(F_POINT& range) {
 	}
 	StitchBuffer->resize(wrap::toSize(std::distance(StitchBuffer->begin(), iDestination)));
 	thred::coltab();
+	return;
   }
-  else {
-	for (auto& stitch : *StitchBuffer) {
-	  if (stitch.x > range.x) {
-		stitch.x = range.x - 1.0F;
-	  }
-	  if (stitch.x < 0) {
-		stitch.x = 0;
-	  }
-	  if (stitch.y > range.y) {
-		stitch.y = range.y - 1.0F;
-	  }
-	  if (stitch.y < 0) {
-		stitch.y = 0;
-	  }
+  for (auto& stitch : *StitchBuffer) {
+	if (stitch.x > range.x) {
+	  stitch.x = range.x - 1.0F;
+	}
+	if (stitch.x < 0) {
+	  stitch.x = 0;
+	}
+	if (stitch.y > range.y) {
+	  stitch.y = range.y - 1.0F;
+	}
+	if (stitch.y < 0) {
+	  stitch.y = 0;
 	}
   }
 }
