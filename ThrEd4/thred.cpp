@@ -7586,23 +7586,22 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 }
 
 void thi::getbak() {
-  if (StateMap->test(StateFlag::THUMSHO)) {
-	*WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
-	if (StateMap->test(StateFlag::RBUT)) {
-	  unthum();
-	  StateMap->set(StateFlag::FRMOF);
-	  insfil(*WorkingFileName);
-	  if (wrap::pressed(VK_SHIFT)) {
-		StateMap->reset(StateFlag::INSFIL);
-		StateMap->reset(StateFlag::FRMOF);
-		StateMap->set(StateFlag::INIT);
-		thred::coltab();
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	}
-	else {
-	  StateMap->set(StateFlag::REDOLD);
-	  nuFil(FileIndices::THR);
+  if (!StateMap->test(StateFlag::THUMSHO)) {
+	StateMap->set(StateFlag::REDOLD);
+	nuFil(FileIndices::THR);
+	return;
+  }
+  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
+  if (StateMap->test(StateFlag::RBUT)) {
+	unthum();
+	StateMap->set(StateFlag::FRMOF);
+	insfil(*WorkingFileName);
+	if (wrap::pressed(VK_SHIFT)) {
+	  StateMap->reset(StateFlag::INSFIL);
+	  StateMap->reset(StateFlag::FRMOF);
+	  StateMap->set(StateFlag::INIT);
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
