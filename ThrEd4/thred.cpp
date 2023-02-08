@@ -8603,16 +8603,15 @@ void thi::ungrphi() {
 }
 
 void thi::barnam(HWND window, uint32_t iThumbnail) {
-  if (iThumbnail < ThumbnailDisplayCount) {
-	auto const thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
-	constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
-
-	auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
-	SetWindowText(window, name.c_str());
-  }
-  else {
+  if (iThumbnail >= ThumbnailDisplayCount) {
 	SetWindowText(window, static_cast<LPCWSTR>(L""));
+	return;
   }
+  auto const thumbPath    = fs::path(Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
+  constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
+
+  auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
+  SetWindowText(window, name.c_str());
 }
 
 void thi::rthumnam(uint32_t iThumbnail) {
