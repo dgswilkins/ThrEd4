@@ -8823,47 +8823,49 @@ void thi::gotbox() {
 }
 
 void thi::rngal() {
-  if (!StateMap->testAndReset(StateFlag::WASFPNT)) {
-	StateMap->reset(StateFlag::GRPSEL);
-	auto prng = std::vector<RANGE> {};
-	StateMap->reset(StateFlag::GRPSEL);
-	auto iStitch     = 0U;
-	auto flagInRange = false;
-	for (; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	  if (inrng(iStitch)) {
-		if (!flagInRange) {
-		  prng.push_back(RANGE {iStitch, 0U});
-		  flagInRange = true;
-		}
-	  }
-	  else {
-		if (flagInRange) {
-		  prng.back().finish = iStitch - 1U;
-		  flagInRange        = false;
-		}
+  if (StateMap->testAndReset(StateFlag::WASFPNT)) {
+	return;
+  }
+  StateMap->reset(StateFlag::GRPSEL);
+  auto prng = std::vector<RANGE> {};
+  StateMap->reset(StateFlag::GRPSEL);
+  auto iStitch     = 0U;
+  auto flagInRange = false;
+  for (; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
+	if (inrng(iStitch)) {
+	  if (!flagInRange) {
+		prng.push_back(RANGE {iStitch, 0U});
+		flagInRange = true;
 	  }
 	}
-	if (flagInRange) {
-	  prng.back().finish = iStitch - 1U;
-	}
-	if (!prng.empty()) {
-	  auto maximumLength = 0U;
-	  auto largestRange  = 0U;
-	  for (auto index = 0U; index < prng.size(); ++index) {
-		auto const length = prng[index].finish - prng[index].start;
-		if (length > maximumLength) {
-		  maximumLength = length;
-		  largestRange  = index;
-		}
+	else {
+	  if (flagInRange) {
+		prng.back().finish = iStitch - 1U;
+		flagInRange        = false;
 	  }
-	  if (maximumLength != 0U) {
-		ClosestPointIndex = prng[largestRange].start;
-		GroupStitchIndex  = prng[largestRange].finish;
-		StateMap->set(StateFlag::GRPSEL);
-	  }
-	  gotbox();
 	}
   }
+  if (flagInRange) {
+	prng.back().finish = iStitch - 1U;
+  }
+  if (prng.empty()) {
+	return;
+  }
+  auto maximumLength = 0U;
+  auto largestRange  = 0U;
+  for (auto index = 0U; index < prng.size(); ++index) {
+	auto const length = prng[index].finish - prng[index].start;
+	if (length > maximumLength) {
+	  maximumLength = length;
+	  largestRange  = index;
+	}
+  }
+  if (maximumLength != 0U) {
+	ClosestPointIndex = prng[largestRange].start;
+	GroupStitchIndex  = prng[largestRange].finish;
+	StateMap->set(StateFlag::GRPSEL);
+  }
+  gotbox();
 }
 
 void thi::nucols() {
