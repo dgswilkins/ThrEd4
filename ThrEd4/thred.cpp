@@ -8547,28 +8547,26 @@ void thi::ungrplo() {
 	ClosestPointIndex = GroupStartStitch;
 	StateMap->set(StateFlag::SELBOX);
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto flag    = true;
-	  auto iStitch = 0U;
-	  for (auto const& stitch : *StitchBuffer) {
-		if (((stitch.attribute & NOTFRM) == 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-		  ClosestPointIndex = iStitch;
-		  StateMap->set(StateFlag::SELBOX);
-		  StateMap->set(StateFlag::RESTCH);
-		  flag = false;
-		  break;
-		}
-		++iStitch;
-	  }
-	  if (flag) {
-		displayText::grpmsg1();
-	  }
+  if (!StateMap->test(StateFlag::FORMSEL)) {
+	displayText::grpmsg();
+	return;
+  }
+  auto flag    = true;
+  auto iStitch = 0U;
+  for (auto const& stitch : *StitchBuffer) {
+	if (((stitch.attribute & NOTFRM) == 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+	  ClosestPointIndex = iStitch;
+	  StateMap->set(StateFlag::SELBOX);
+	  StateMap->set(StateFlag::RESTCH);
+	  flag = false;
+	  break;
 	}
-	else {
-	  displayText::grpmsg();
-	}
+	++iStitch;
+  }
+  if (flag) {
+	displayText::grpmsg1();
   }
 }
 
