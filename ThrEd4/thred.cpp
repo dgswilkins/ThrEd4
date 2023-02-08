@@ -8528,17 +8528,16 @@ auto thi::inrng(uint32_t iStitch) noexcept -> bool {
 
 auto thi::finrng(uint32_t find) noexcept -> bool {
   auto const& rectFind = FormList->operator[](find).rectangle;
-  if (rectFind.left >= StitchRangeRect.left && rectFind.right <= StitchRangeRect.right &&
-      rectFind.bottom >= StitchRangeRect.bottom && rectFind.top <= StitchRangeRect.top) {
-	if (ActiveLayer == 0U) {
-	  return true;
-	}
-	auto const cod = gsl::narrow_cast<uint8_t>(
-	    gsl::narrow_cast<uint8_t>(FormList->operator[](find).attribute & FRMLMSK) >> 1U);
-	return (cod == 0U) || ActiveLayer == cod;
+  if (rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
+      rectFind.bottom < StitchRangeRect.bottom || rectFind.top > StitchRangeRect.top) {
+	return false;
   }
-
-  return false;
+  if (ActiveLayer == 0U) {
+	return true;
+  }
+  auto const cod = gsl::narrow_cast<uint8_t>(
+      gsl::narrow_cast<uint8_t>(FormList->operator[](find).attribute & FRMLMSK) >> 1U);
+  return (cod == 0U) || (ActiveLayer == cod);
 }
 
 void thi::ungrplo() {
