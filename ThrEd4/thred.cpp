@@ -8656,35 +8656,34 @@ void thi::thumnail() {
 	    fmt::format(fmt::runtime(displayText::loadStr(IDS_FFINDERR)), searchName.wstring(), dwError);
 	displayText::shoMsg(fmtStr, true);
 	unthum();
+	return;
   }
-  else {
-	Thumbnails->clear();
-	auto& fileName = fileData.cFileName;
+  Thumbnails->clear();
+  auto& fileName = fileData.cFileName;
+  Thumbnails->push_back(std::wstring(std::begin(fileName)));
+  while (FindNextFile(file, &fileData)) {
 	Thumbnails->push_back(std::wstring(std::begin(fileName)));
-	while (FindNextFile(file, &fileData)) {
-	  Thumbnails->push_back(std::wstring(std::begin(fileName)));
-	}
-	FindClose(file);
-	std::ranges::sort(*Thumbnails);
-	auto       iThumbnail = 0U;
-	auto const thumbSize  = Thumbnails->size();
-	while (iThumbnail < 4 && iThumbnail < thumbSize) {
-	  ThumbnailsSelected[iThumbnail] = iThumbnail;
-	  ++iThumbnail;
-	}
-	ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
-	while (iThumbnail < 4 && iThumbnail < thumbSize) {
-	  rthumnam(iThumbnail++);
-	}
-	StateMap->set(StateFlag::THUMSHO);
-	ThumbnailSearchString->clear();
-	ThumbnailSearchString->push_back(0);
-	SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
-	auto const blank = std::wstring {};
-	displayText::butxt(HBOXSEL, blank);
-	vubak();
-	StateMap->set(StateFlag::RESTCH);
   }
+  FindClose(file);
+  std::ranges::sort(*Thumbnails);
+  auto       iThumbnail = 0U;
+  auto const thumbSize  = Thumbnails->size();
+  while (iThumbnail < 4 && iThumbnail < thumbSize) {
+	ThumbnailsSelected[iThumbnail] = iThumbnail;
+	++iThumbnail;
+  }
+  ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
+  while (iThumbnail < 4 && iThumbnail < thumbSize) {
+	rthumnam(iThumbnail++);
+  }
+  StateMap->set(StateFlag::THUMSHO);
+  ThumbnailSearchString->clear();
+  ThumbnailSearchString->push_back(0);
+  SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
+  auto const blank = std::wstring {};
+  displayText::butxt(HBOXSEL, blank);
+  vubak();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::nuthsel() {
