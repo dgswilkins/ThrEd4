@@ -98,7 +98,7 @@ void xclpfn(std::vector<F_POINT> const& tempClipPoints,
 static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 
 auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
-  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+  for (auto spForms = std::ranges::subrange(FormList->begin(), wrap::next(FormList->begin(), formIndex));
        auto& form : spForms | std::views::reverse) {
 	if (form.isEdgeClip()) {
 	  return form.borderClipData + form.clipEntries;
@@ -169,7 +169,7 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, count, VAL);
-  auto itStart = std::next(FormList->begin(), currentForm);
+  auto itStart = wrap::next(FormList->begin(), currentForm);
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += count;
   }
@@ -191,7 +191,7 @@ auto clip::numclp(uint32_t formIndex) -> uint32_t {
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, clipSize, VAL);
-  auto itStart                  = std::next(FormList->begin(), formIndex);
+  auto itStart                  = wrap::next(FormList->begin(), formIndex);
   itStart->angleOrClipData.clip = find;
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += clipSize;
@@ -673,12 +673,12 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 	}
 	if (minimumIndex != 0U) {
 	  if (minimumIndex < wrap::toUnsigned(chainEndPoints.size() - 1U)) {
-		auto const spPoints1 = std::ranges::subrange(std::next(chainEndPoints.begin(), minimumIndex),
+		auto const spPoints1 = std::ranges::subrange(wrap::next(chainEndPoints.begin(), minimumIndex),
 		                                             std::prev(chainEndPoints.end(), 2));
 		tempClipPoints.insert(tempClipPoints.end(), spPoints1.begin(), spPoints1.end());
 	  }
 	  auto const spPoints2 =
-	      std::ranges::subrange(chainEndPoints.begin(), std::next(chainEndPoints.begin(), minimumIndex));
+	      std::ranges::subrange(chainEndPoints.begin(), wrap::next(chainEndPoints.begin(), minimumIndex));
 	  tempClipPoints.insert(tempClipPoints.end(), spPoints2.begin(), spPoints2.end());
 	  chainEndPoints = tempClipPoints;
 	}
@@ -704,7 +704,7 @@ void ci::xclpfn(std::vector<F_POINT> const& tempClipPoints,
                 std::vector<F_POINT> const& chainEndPoints,
                 uint32_t                    start,
                 F_POINT const&              rotationCenter) {
-  auto const chainStartPoint = std::next(chainEndPoints.begin(), start);
+  auto const chainStartPoint = wrap::next(chainEndPoints.begin(), start);
   auto const chainNextPoint  = std::next(chainStartPoint);
   auto const delta =
       F_POINT {(chainNextPoint->x - chainStartPoint->x), (chainNextPoint->y - chainStartPoint->y)};

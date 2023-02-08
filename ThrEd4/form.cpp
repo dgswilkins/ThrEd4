@@ -3920,7 +3920,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
                 uint32_t                       group1,
                 uint32_t                       line1,
                 float                          gapToClosestRegion) noexcept -> bool {
-  auto const lineEndPoint0 = std::next(lineEndpoints.begin(), groupIndexSequence[group0]);
+  auto const lineEndPoint0 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group0]);
   if (group1 > groupIndexSequence.size() - 2U) {
 	return false;
   }
@@ -3934,7 +3934,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 	index0 += 2;
   }
   if (count0 != 0U) {
-	auto const lineEndPoint1 = std::next(lineEndpoints.begin(), groupIndexSequence[group1]);
+	auto const lineEndPoint1 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group1]);
 	auto       index1        = 0U;
 	auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
 	while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {

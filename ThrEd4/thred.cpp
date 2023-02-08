@@ -6051,7 +6051,7 @@ void thi::duclip() {
 			forms[iForm++]    = currentForm;
 		  }
 		  // skip past the forms
-		  auto* ptrFormVertices = convertFromPtr<F_POINT*>(std::next(ptrForms, iForm));
+		  auto* ptrFormVertices = convertFromPtr<F_POINT*>(wrap::next(ptrForms, iForm));
 		  auto  verticesSize    = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			verticesSize += FormList->operator[](selectedForm).vertexCount;
@@ -6069,7 +6069,7 @@ void thi::duclip() {
 			}
 		  }
 		  // skip past the vertex list
-		  auto* ptrGuides  = convertFromPtr<SAT_CON*>(std::next(ptrFormVertices, iVertex));
+		  auto* ptrGuides  = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, iVertex));
 		  auto  guidesSize = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6092,7 +6092,7 @@ void thi::duclip() {
 			}
 		  }
 		  // skip past the guides
-		  auto* ptrPoints  = convertFromPtr<F_POINT*>(std::next(ptrGuides, guideCount));
+		  auto* ptrPoints  = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, guideCount));
 		  auto  pointsSize = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6211,7 +6211,7 @@ void thi::duclip() {
 
 			auto const vertices = gsl::span(ptrFormVertices, form.vertexCount);
 			std::copy(startVertex, endVertex, vertices.begin());
-			auto* ptrGuides = convertFromPtr<SAT_CON*>(std::next(ptrFormVertices, form.vertexCount));
+			auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, form.vertexCount));
 			auto iGuide = 0U;
 			if (form.type == SAT) {
 			  iGuide          = form.satinGuideCount;
@@ -6221,7 +6221,7 @@ void thi::duclip() {
 			  auto const guides = gsl::span(ptrGuides, iGuide);
 			  std::copy(startGuide, endGuide, guides.begin());
 			}
-			auto* ptrMclp = convertFromPtr<F_POINT*>(std::next(ptrGuides, iGuide));
+			auto* ptrMclp = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, iGuide));
 			auto  iClip   = 0U;
 			if (form.isClipX()) {
 			  iClip          = form.lengthOrCount.clipCount;
@@ -6231,7 +6231,7 @@ void thi::duclip() {
 			  auto const mclps = gsl::span(ptrMclp, iClip);
 			  std::copy(startMclp, endMclp, mclps.begin());
 			}
-			auto* ptrPoints = convertFromPtr<F_POINT*>(std::next(ptrMclp, iClip));
+			auto* ptrPoints = convertFromPtr<F_POINT*>(wrap::next(ptrMclp, iClip));
 			iClip           = 0U;
 			if (form.isEdgeClipX()) {
 			  iClip          = form.clipEntries;
@@ -6241,7 +6241,7 @@ void thi::duclip() {
 			  auto const points = gsl::span(ptrPoints, iClip);
 			  std::copy(startClip, endClip, points.begin());
 			}
-			auto* textures = convertFromPtr<TX_PNT*>(std::next(ptrPoints, iClip));
+			auto* textures = convertFromPtr<TX_PNT*>(wrap::next(ptrPoints, iClip));
 			if (form.isTexture()) {
 			  auto startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto endTexture = wrap::next(startTexture, form.fillInfo.texture.count);
@@ -10420,8 +10420,8 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_
   if (ActiveLayer != 0U) {
 	linePoints.clear();
   }
-  auto const firstStitch = std::next(StitchBuffer->cbegin(), currentStitch);
-  auto const lastStitch  = std::next(firstStitch, length);
+  auto const firstStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
+  auto const lastStitch  = wrap::next(firstStitch, length);
   auto const rStitches   = std::ranges::subrange(firstStitch, lastStitch);
   for (auto const& stitch : rStitches) {
 	auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
@@ -13131,7 +13131,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  FormList->back().attribute = (gsl::narrow_cast<decltype(form.attribute)>(form.attribute & NFRMLMSK) |
 		                                gsl::narrow_cast<decltype(form.attribute)>(ActiveLayer << 1U));
 		}
-		auto* ptrFormVertices = convertFromPtr<F_POINT*>(std::next(ptrForms, ClipFormsCount));
+		auto* ptrFormVertices = convertFromPtr<F_POINT*>(wrap::next(ptrForms, ClipFormsCount));
 		auto  currentVertex   = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
@@ -13143,7 +13143,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		      FormVertices->end(), wrap::next(formVertices.begin(), currentVertex), formVertices.end());
 		  currentVertex += form.vertexCount;
 		}
-		auto* ptrGuides  = convertFromPtr<SAT_CON*>(std::next(ptrFormVertices, currentVertex));
+		auto* ptrGuides  = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, currentVertex));
 		auto  guideCount = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
@@ -13166,7 +13166,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			}
 		  }
 		}
-		auto* ptrClipData = convertFromPtr<F_POINT*>(std::next(ptrGuides, currentGuide));
+		auto* ptrClipData = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, currentGuide));
 		auto  clipCount   = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  // clang-format off
@@ -13204,10 +13204,10 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			}
 		  }
 		}
-		auto* ptrTextureSource = convertFromPtr<TX_PNT*>(std::next(ptrClipData, currentClip));
+		auto* ptrTextureSource = convertFromPtr<TX_PNT*>(wrap::next(ptrClipData, currentClip));
 		auto  textureCount     = size_t {};
-		for (auto  spForms = std::ranges::subrange(std::next(FormList->begin(), formOffset),
-                                                  std::next(std::next(FormList->begin(), formOffset), ClipFormsCount));
+		for (auto  spForms = std::ranges::subrange(wrap::next(FormList->begin(), formOffset),
+                                                  wrap::next(wrap::next(FormList->begin(), formOffset), ClipFormsCount));
 		     auto& form : spForms) {
 		  if (form.isTexture()) {
 			textureCount += form.fillInfo.texture.count;
@@ -13256,13 +13256,13 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto*      ptrVertices = convertFromPtr<F_POINT*>(std::next(ptrClipFormHeader));
 		  auto const vertices    = gsl::span {ptrVertices, formIter.vertexCount};
 		  FormVertices->insert(FormVertices->end(), vertices.begin(), vertices.end());
-		  auto* ptrGuides = convertFromPtr<SAT_CON*>(std::next(ptrVertices, formIter.vertexCount));
+		  auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrVertices, formIter.vertexCount));
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
 			auto const guides           = gsl::span {ptrGuides, formIter.satinGuideCount};
 			formIter.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 			SatinGuides->insert(SatinGuides->end(), guides.begin(), guides.end());
 		  }
-		  auto* ptrClipData = convertFromPtr<F_POINT*>(std::next(ptrGuides, formIter.satinGuideCount));
+		  auto* ptrClipData = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, formIter.satinGuideCount));
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span {ptrClipData, formIter.lengthOrCount.clipCount};
@@ -13271,14 +13271,14 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
 		  if (formIter.isEdgeClipX()) {
-			ptrClipData             = convertFromPtr<F_POINT*>(std::next(ptrClipData, clipCount));
+			ptrClipData             = convertFromPtr<F_POINT*>(wrap::next(ptrClipData, clipCount));
 			auto const clipData     = gsl::span {ptrClipData, formIter.clipEntries};
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
 			clipCount += formIter.clipEntries;
 		  }
 		  if (formIter.isTexture()) {
-			auto* ptrTextureSource = convertFromPtr<TX_PNT*>(std::next(ptrClipData, clipCount));
+			auto* ptrTextureSource = convertFromPtr<TX_PNT*>(wrap::next(ptrClipData, clipCount));
 			auto const textureSource = gsl::span {ptrTextureSource, formIter.fillInfo.texture.count};
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(
