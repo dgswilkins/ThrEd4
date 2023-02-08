@@ -25,7 +25,7 @@ namespace displayText {
 void alrotmsg();
 void bfilmsg();
 void butxt(uint32_t iButton, std::wstring const& buttonText);
-void clrhbut(uint32_t startButton) noexcept;
+void clrhbut(uint32_t startButton);
 auto clpmsgs(uint32_t code) -> bool;
 void crmsg(fs::path const& fileName);
 void drwtxbut(TXTR_SCREEN const& textureScreen);

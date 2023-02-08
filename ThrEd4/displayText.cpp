@@ -164,7 +164,7 @@ void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
   }
 }
 
-void displayText::clrhbut(uint32_t startButton) noexcept {
+void displayText::clrhbut(uint32_t startButton) {
   for (auto const spButtons =
            std::ranges::subrange(wrap::next(ButtonWin->begin(), startButton), ButtonWin->end());
        auto const iButton : spButtons) { // NOLINT(readability-qualified-auto)
