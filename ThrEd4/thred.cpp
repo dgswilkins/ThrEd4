@@ -8766,15 +8766,16 @@ void thi::nuthum(wchar_t character) {
 }
 
 void thi::bakthum() {
-  if (ThumbnailSearchString->size() > 1) {
-	StateMap->set(StateFlag::RESTCH);
-	ThumbnailSearchString->pop_back();
-	ThumbnailSearchString->back() = 0;
-	ThumbnailIndex                = 0;
-	auto const txt                = std::wstring(ThumbnailSearchString->data());
-	displayText::butxt(HBOXSEL, txt);
-	nuthsel();
+  if (ThumbnailSearchString->size() <= 1) {
+	return;
   }
+  StateMap->set(StateFlag::RESTCH);
+  ThumbnailSearchString->pop_back();
+  ThumbnailSearchString->back() = 0;
+  ThumbnailIndex                = 0;
+  auto const txt                = std::wstring(ThumbnailSearchString->data());
+  displayText::butxt(HBOXSEL, txt);
+  nuthsel();
 }
 
 void thi::selalstch() {
