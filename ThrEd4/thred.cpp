@@ -7704,27 +7704,26 @@ void thi::mv2f() {
 	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
-	  thred::savdo();
-	  std::vector<F_POINT_ATTR> tempStitchBuffer {};
-	  auto const                grpSize = GroupEndStitch + 1U - GroupStartStitch;
-	  tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
-	  thred::rngadj();
-	  std::copy(StitchBuffer->begin(),
-	            wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	            tempStitchBuffer.begin());
-	  std::copy(wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
-	            StitchBuffer->end(),
-	            wrap::next(tempStitchBuffer.begin(), GroupStartStitch));
-	  std::copy(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	            wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
-	            StitchBuffer->begin());
-	  std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), grpSize));
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
+	thred::savdo();
+	std::vector<F_POINT_ATTR> tempStitchBuffer {};
+	auto const                grpSize = GroupEndStitch + 1U - GroupStartStitch;
+	tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
+	thred::rngadj();
+	std::copy(StitchBuffer->begin(),
+	          wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	          tempStitchBuffer.begin());
+	std::copy(wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
+	          StitchBuffer->end(),
+	          wrap::next(tempStitchBuffer.begin(), GroupStartStitch));
+	std::copy(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	          wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
+	          StitchBuffer->begin());
+	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), grpSize));
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
