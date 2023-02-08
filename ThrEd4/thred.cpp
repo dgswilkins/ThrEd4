@@ -7960,29 +7960,27 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	  form::refilfn(selectedForm);
 	}
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->testAndReset(StateFlag::FRMROT)) {
-	  auto& form = FormList->operator[](ClosestFormToCursor);
+  if (StateMap->testAndReset(StateFlag::FRMROT)) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
 
-	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
-		++itVertex;
-	  }
-	  form.outline();
-	  form::refil(ClosestFormToCursor);
-	  StateMap->set(StateFlag::RESTCH);
+	auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	  thred::rotflt(*itVertex, rotationAngle, rotationCenter);
+	  ++itVertex;
 	}
-	else {
-	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-		thi::rotstch(StitchBuffer->operator[](iStitch), rotationAngle, rotationCenter);
-	  }
-	  thred::rngadj();
-	  thi::selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
-	  StateMap->set(StateFlag::RESTCH);
-	}
+	form.outline();
+	form::refil(ClosestFormToCursor);
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
+  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+	thi::rotstch(StitchBuffer->operator[](iStitch), rotationAngle, rotationCenter);
+  }
+  thred::rngadj();
+  thi::selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::rotfns(float rotationAngle) {
