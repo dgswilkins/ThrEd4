@@ -8302,21 +8302,23 @@ void thi::movmrk() {
 }
 
 void thi::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
-  if (!StitchBuffer->empty()) {
-	auto color       = StitchBuffer->front().attribute & COLMSK;
-	auto startStitch = 0U;
-	// ToDo - Can this loop become a ranged for?
-	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	  auto const& stitch = StitchBuffer->operator[](iStitch);
-	  if (color != (stitch.attribute & COLMSK)) {
-		if ((iStitch - startStitch == 1) && ((startStitch) != 0U)) {
-		  auto& prevStitch     = StitchBuffer->operator[](iStitch - 1U);
-		  prevStitch.attribute = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
-		}
-		color       = stitch.attribute & COLMSK;
-		startStitch = iStitch;
-	  }
+  if (StitchBuffer->empty()) {
+	return;
+  }
+  auto color       = StitchBuffer->front().attribute & COLMSK;
+  auto startStitch = 0U;
+  // ToDo - Can this loop become a ranged for?
+  for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
+	auto const& stitch = StitchBuffer->operator[](iStitch);
+	if (color == (stitch.attribute & COLMSK)) {
+	  continue;
 	}
+	if ((iStitch - startStitch == 1) && ((startStitch) != 0U)) {
+	  auto& prevStitch     = StitchBuffer->operator[](iStitch - 1U);
+	  prevStitch.attribute = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
+	}
+	color       = stitch.attribute & COLMSK;
+	startStitch = iStitch;
   }
 }
 
