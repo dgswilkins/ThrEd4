@@ -267,7 +267,7 @@ void setCursor(HCURSOR hCursor) noexcept;
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 
 template <class inType>
-auto to_ptrdiff(inType invar) noexcept(std::is_same_v<inType, ptrdiff_t>) -> ptrdiff_t {
+auto to_ptrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int>) -> ptrdiff_t {
   static_assert(std::is_same_v<inType, uint32_t>, "to_ptrdiff cannot be used here.");
   if constexpr (std::is_same_v<ptrdiff_t, int>) {
 	return gsl::narrow<ptrdiff_t>(invar);
