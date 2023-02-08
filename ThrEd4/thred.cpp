@@ -7994,20 +7994,21 @@ void thi::rotfns(float rotationAngle) {
 void thi::nulayr(uint8_t play) {
   ActiveLayer = play;
   menu::ladj();
-  if (ActiveLayer != 0U) {
-	if (StateMap->test(StateFlag::FORMSEL) &&
-	    ((gsl::narrow_cast<decltype(ActiveLayer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >>
-	      1U) != ActiveLayer)) {
-	  StateMap->reset(StateFlag::FORMSEL);
-	}
-	StateMap->reset(StateFlag::GRPSEL);
-	if (StateMap->test(StateFlag::SELBOX)) {
-	  if (ActiveLayer != ((StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U) {
-		StateMap->reset(StateFlag::SELBOX);
-	  }
-	}
-	SelectedFormList->clear();
+  if (ActiveLayer == 0U) {
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
+  if (StateMap->test(StateFlag::FORMSEL) &&
+      ((gsl::narrow_cast<decltype(ActiveLayer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >>
+        1U) != ActiveLayer)) {
+	StateMap->reset(StateFlag::FORMSEL);
+  }
+  StateMap->reset(StateFlag::GRPSEL);
+  if (StateMap->test(StateFlag::SELBOX) &&
+      (ActiveLayer != ((StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U)) {
+	StateMap->reset(StateFlag::SELBOX);
+  }
+  SelectedFormList->clear();
   StateMap->set(StateFlag::RESTCH);
 }
 
