@@ -8371,49 +8371,49 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 }
 
 void thi::rembig() {
-  if (!StitchBuffer->empty()) {
-	if (UserStitchLength < IniFile.maxStitchLength) {
-	  thred::savdo();
-	  do {
-		if (!SelectedFormList->empty()) {
-		  auto range = RANGE {};
-		  for (auto const selectedForm : (*SelectedFormList)) {
-			if (form::frmrng(selectedForm, range)) {
-			  thi::makbig(range.start, range.finish);
-			}
-		  }
-		  break;
-		}
-		if (StateMap->test(StateFlag::FORMSEL)) {
-		  auto range = RANGE {};
-		  if (form::frmrng(ClosestFormToCursor, range)) {
-			thi::makbig(range.start, range.finish);
-		  }
-		  break;
-		}
-		if (StateMap->test(StateFlag::GRPSEL)) {
-		  thred::rngadj();
-		  if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
-			++GroupEndStitch;
-		  }
-		  if (ClosestPointIndex < GroupStitchIndex) {
-			GroupStitchIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
-		  }
-		  else {
-			ClosestPointIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
-		  }
-		  thred::grpAdj();
-		  break;
-		}
-		thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
-	  } while (false);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  displayText::tabmsg(IDS_REM1, false);
-	}
+  if (StitchBuffer->empty()) {
+	return;
   }
+  if (UserStitchLength >= IniFile.maxStitchLength) {
+	displayText::tabmsg(IDS_REM1, false);
+	return;
+  }
+  thred::savdo();
+  do {
+	if (!SelectedFormList->empty()) {
+	  auto range = RANGE {};
+	  for (auto const selectedForm : (*SelectedFormList)) {
+		if (form::frmrng(selectedForm, range)) {
+		  thi::makbig(range.start, range.finish);
+		}
+	  }
+	  break;
+	}
+	if (StateMap->test(StateFlag::FORMSEL)) {
+	  auto range = RANGE {};
+	  if (form::frmrng(ClosestFormToCursor, range)) {
+		thi::makbig(range.start, range.finish);
+	  }
+	  break;
+	}
+	if (StateMap->test(StateFlag::GRPSEL)) {
+	  thred::rngadj();
+	  if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
+		++GroupEndStitch;
+	  }
+	  if (ClosestPointIndex < GroupStitchIndex) {
+		GroupStitchIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
+	  }
+	  else {
+		ClosestPointIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
+	  }
+	  thred::grpAdj();
+	  break;
+	}
+	thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
+  } while (false);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::duselrng(RANGE& selectedRange) {
