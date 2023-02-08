@@ -8728,30 +8728,31 @@ void thi::nuthsel() {
 }
 
 void thi::nuthbak(uint32_t count) {
-  if (ThumbnailIndex != 0U) {
-	constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
-	auto const     length   = wcslen(ThumbnailSearchString->data());
-	if (length != 0U) {
-	  while ((count != 0U) && ThumbnailIndex < MAXFORMS) {
-		if (ThumbnailIndex != 0U) {
-		  --ThumbnailIndex;
-		  if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
-			--count;
-		  }
-		}
-		else {
-		  break;
+  if (ThumbnailIndex == 0U) {
+	return;
+  }
+  constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
+  auto const     length   = wcslen(ThumbnailSearchString->data());
+  if (length != 0U) {
+	while ((count != 0U) && ThumbnailIndex < MAXFORMS) {
+	  if (ThumbnailIndex != 0U) {
+		--ThumbnailIndex;
+		if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		  --count;
 		}
 	  }
+	  else {
+		break;
+	  }
 	}
-	else {
-	  ThumbnailIndex -= count;
-	}
-	if (ThumbnailIndex > MAXFORMS) {
-	  ThumbnailIndex = 0;
-	}
-	nuthsel();
   }
+  else {
+	ThumbnailIndex -= count;
+  }
+  if (ThumbnailIndex > MAXFORMS) {
+	ThumbnailIndex = 0;
+  }
+  nuthsel();
 }
 
 void thi::nuthum(wchar_t character) {
