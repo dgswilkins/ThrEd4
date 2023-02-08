@@ -8688,42 +8688,43 @@ void thi::thumnail() {
 }
 
 void thi::nuthsel() {
-  if (ThumbnailIndex < Thumbnails->size()) {
-	auto const savedIndex = ThumbnailIndex;
-	auto       iThumbnail = uint32_t {};
-	auto const length     = wcslen(ThumbnailSearchString->data());
-	StateMap->set(StateFlag::RESTCH);
-	if (length != 0U) {
-	  auto itHWndBV = BackupViewer.begin();
-	  while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
-		if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
-		  ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
-		  thred::redraw(*itHWndBV);
-		  ++itHWndBV;
-		  ++iThumbnail;
-		}
-		++ThumbnailIndex;
-	  }
-	}
-	else {
-	  auto itHWndBV = BackupViewer.begin();
-	  while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
+  if (ThumbnailIndex >= Thumbnails->size()) {
+	return;
+  }
+  auto const savedIndex = ThumbnailIndex;
+  auto       iThumbnail = uint32_t {};
+  auto const length     = wcslen(ThumbnailSearchString->data());
+  StateMap->set(StateFlag::RESTCH);
+  if (length != 0U) {
+	auto itHWndBV = BackupViewer.begin();
+	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
+	  if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 		thred::redraw(*itHWndBV);
 		++itHWndBV;
 		++iThumbnail;
-		++ThumbnailIndex;
 	  }
+	  ++ThumbnailIndex;
 	}
-	if (iThumbnail != 0U) {
-	  ThumbnailDisplayCount = iThumbnail;
-	  while (iThumbnail < OLDVER) {
-		rthumnam(iThumbnail++);
-	  }
+  }
+  else {
+	auto itHWndBV = BackupViewer.begin();
+	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
+	  ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
+	  thred::redraw(*itHWndBV);
+	  ++itHWndBV;
+	  ++iThumbnail;
+	  ++ThumbnailIndex;
 	}
-	else {
-	  ThumbnailIndex = savedIndex;
+  }
+  if (iThumbnail != 0U) {
+	ThumbnailDisplayCount = iThumbnail;
+	while (iThumbnail < OLDVER) {
+	  rthumnam(iThumbnail++);
 	}
+  }
+  else {
+	ThumbnailIndex = savedIndex;
   }
 }
 
