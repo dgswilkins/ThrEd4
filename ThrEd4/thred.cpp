@@ -7637,14 +7637,15 @@ void thi::thumbak() {
 }
 
 void thi::purg() {
-  if (!ThrName->empty()) {
-	auto fileName = *ThrName;
-	auto ext      = ThrName->extension().wstring();
-	for (auto iLast = wchar_t {}; iLast < OLDVER; ++iLast) {
-	  ext.back() = iLast + 's';
-	  fileName.replace_extension(ext);
-	  fs::remove(fileName);
-	}
+  if (ThrName->empty()) {
+	return;
+  }
+  auto fileName = *ThrName;
+  auto ext      = ThrName->extension().wstring();
+  for (auto iLast = wchar_t {}; iLast < OLDVER; ++iLast) {
+	ext.back() = iLast + 's';
+	fileName.replace_extension(ext);
+	fs::remove(fileName);
   }
 }
 
