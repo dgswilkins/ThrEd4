@@ -390,7 +390,7 @@ auto lnclos(std::vector<uint32_t> const&   groupIndexSequence,
             uint32_t                       line0,
             uint32_t                       group1,
             uint32_t                       line1,
-            float                          gapToClosestRegion) noexcept -> bool;
+            float gapToClosestRegion) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool;
 void makpoli();
 void movseq(std::vector<SMAL_PNT_L> const& lineEndpoints, std::vector<uint32_t> const& sortedLineIndices, uint32_t ind);
 void mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) noexcept;
@@ -452,7 +452,7 @@ auto regclos(std::vector<uint32_t> const&   groupIndexSequence,
              uint32_t                       iRegion1,
              std::vector<REGION> const&     regionsList,
              float                          gapToClosestRegion,
-             uint32_t&                      nextGroup) noexcept -> bool;
+             uint32_t& nextGroup) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool;
 auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
             std::vector<uint32_t> const&         sortedLineIndices,
             uint32_t                             iRegion,
@@ -3919,7 +3919,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
                 uint32_t                       line0,
                 uint32_t                       group1,
                 uint32_t                       line1,
-                float                          gapToClosestRegion) noexcept -> bool {
+                float gapToClosestRegion) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
   auto const lineEndPoint0 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group0]);
   if (group1 > groupIndexSequence.size() - 2U) {
 	return false;
@@ -3955,7 +3955,7 @@ auto fi::regclos(std::vector<uint32_t> const&   groupIndexSequence,
                  uint32_t                       iRegion1,
                  std::vector<REGION> const&     regionsList,
                  float                          gapToClosestRegion,
-                 uint32_t&                      nextGroup) noexcept -> bool {
+                 uint32_t& nextGroup) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
   auto const  lineStart0Index    = sortedLineIndices[regionsList[iRegion0].start];
   auto const  lineStart1Index    = sortedLineIndices[regionsList[iRegion1].start];
   auto const& lineEndPoint0Start = lineEndpoints[lineStart0Index];
