@@ -4225,7 +4225,7 @@ void fi::duseq1(std::vector<SMAL_PNT_L> const& lineEndpoints,
 void fi::movseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
                 std::vector<uint32_t> const&   sortedLineIndices,
                 uint32_t                       ind) {
-  auto lineEndPoint = std::next(lineEndpoints.begin(), sortedLineIndices[ind]);
+  auto lineEndPoint = wrap::next(lineEndpoints.begin(), sortedLineIndices[ind]);
   BSequence->emplace_back(B_SEQ_PNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
   //             and not the next entry in sortedLines
