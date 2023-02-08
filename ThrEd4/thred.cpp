@@ -8421,11 +8421,10 @@ void thi::duselrng(RANGE& selectedRange) {
 	thred::rngadj();
 	selectedRange.start  = GroupStartStitch;
 	selectedRange.finish = GroupEndStitch;
+	return;
   }
-  else {
-	selectedRange.start  = 0U;
-	selectedRange.finish = wrap::toUnsigned(StitchBuffer->size());
-  }
+  selectedRange.start  = 0U;
+  selectedRange.finish = wrap::toUnsigned(StitchBuffer->size());
 }
 
 void thi::longer() {
