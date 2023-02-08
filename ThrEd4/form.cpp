@@ -3929,7 +3929,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
   }
   auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1U] - groupIndexSequence[group0]) / 2U;
   auto index0 = 0U;
-  while ((count0 != 0U) && lineEndPoint0[index0].line != line0) {
+  while ((count0 != 0U) && lineEndPoint0.operator[](wrap::to_ptrdiff(index0)).line != line0) {
 	--count0;
 	index0 += 2;
   }
@@ -3937,7 +3937,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 	auto const lineEndPoint1 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group1]);
 	auto       index1        = 0U;
 	auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
-	while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {
+	while ((count1 != 0U) && lineEndPoint1.operator[](wrap::to_ptrdiff(index1)).line != line1) {
 	  --count1;
 	  index1 += 2;
 	}
