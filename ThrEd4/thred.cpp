@@ -8778,17 +8778,18 @@ void thi::bakthum() {
 }
 
 void thi::selalstch() {
-  if (!StitchBuffer->empty()) {
-	ClosestPointIndex = 0;
-	GroupStitchIndex  = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	GroupStartStitch  = ClosestPointIndex;
-	GroupEndStitch    = GroupStitchIndex;
-	StateMap->set(StateFlag::GRPSEL);
-	StateMap->set(StateFlag::SCROS);
-	StateMap->set(StateFlag::ECROS);
-	thred::grpAdj();
-	StateMap->set(StateFlag::RESTCH);
+  if (StitchBuffer->empty()) {
+	return;
   }
+  ClosestPointIndex = 0;
+  GroupStitchIndex  = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  GroupStartStitch  = ClosestPointIndex;
+  GroupEndStitch    = GroupStitchIndex;
+  StateMap->set(StateFlag::GRPSEL);
+  StateMap->set(StateFlag::SCROS);
+  StateMap->set(StateFlag::ECROS);
+  thred::grpAdj();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::duinsfil() {
