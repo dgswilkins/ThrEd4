@@ -8161,33 +8161,31 @@ void thi::selup() {
 	  }
 	}
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::SELBOX)) {
-	  unbox();
-	  auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
-	  while (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
-	         (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
-		++ClosestPointIndex;
+  if (StateMap->test(StateFlag::SELBOX)) {
+	unbox();
+	auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
+	while (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
+	       (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
+	  ++ClosestPointIndex;
+	}
+	auto stitchCoordsInPixels = POINT {};
+	stch2px(ClosestPointIndex, stitchCoordsInPixels);
+	dubox(stitchCoordsInPixels);
+	return;
+  }
+  if (!FormList->empty()) {
+	if (StateMap->testAndSet(StateFlag::FORMSEL)) {
+	  if (ClosestFormToCursor < wrap::toUnsigned(FormList->size()) - 1U) {
+		++ClosestFormToCursor;
 	  }
-	  auto stitchCoordsInPixels = POINT {};
-	  stch2px(ClosestPointIndex, stitchCoordsInPixels);
-	  dubox(stitchCoordsInPixels);
 	}
 	else {
-	  if (!FormList->empty()) {
-		if (StateMap->testAndSet(StateFlag::FORMSEL)) {
-		  if (ClosestFormToCursor < wrap::toUnsigned(FormList->size()) - 1U) {
-			++ClosestFormToCursor;
-		  }
-		}
-		else {
-		  ClosestFormToCursor = 0;
-		}
-		displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
-		StateMap->set(StateFlag::RESTCH);
-	  }
+	  ClosestFormToCursor = 0;
 	}
+	displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
