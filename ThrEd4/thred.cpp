@@ -6806,10 +6806,9 @@ void thi::drwlstch(uint32_t finish) {
 void thi::stchout() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	drwlstch(GroupEndStitch);
+	return;
   }
-  else {
-	drwlstch(wrap::toUnsigned(StitchBuffer->size() - 1U));
-  }
+  drwlstch(wrap::toUnsigned(StitchBuffer->size() - 1U));
 }
 
 void thi::setsped() {
