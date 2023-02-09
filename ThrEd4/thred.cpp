@@ -7591,19 +7591,21 @@ void thi::getbak() {
 	nuFil(FileIndices::THR);
 	return;
   }
-  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
-  if (StateMap->test(StateFlag::RBUT)) {
-	unthum();
-	StateMap->set(StateFlag::FRMOF);
-	insfil(*WorkingFileName);
-	if (wrap::pressed(VK_SHIFT)) {
-	  StateMap->reset(StateFlag::INSFIL);
-	  StateMap->reset(StateFlag::FRMOF);
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (!StateMap->test(StateFlag::RBUT)) {
+	return;
   }
+  unthum();
+  StateMap->set(StateFlag::FRMOF);
+  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
+  insfil(*WorkingFileName);
+  if (!wrap::pressed(VK_SHIFT)) {
+	return;
+  }
+  StateMap->reset(StateFlag::INSFIL);
+  StateMap->reset(StateFlag::FRMOF);
+  StateMap->set(StateFlag::INIT);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::rebak() {
