@@ -7160,59 +7160,60 @@ void thi::movi() {
 void thred::redclp() {
   auto const codedLayer  = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
   auto*      clipPointer = GlobalLock(ClipMemory);
-  if (clipPointer != nullptr) {
-	const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(clipPointer);
-	auto const        clipSize         = clipStitchPtr->led;
-	auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
-	ClipBuffer->clear();
-	ClipBuffer->reserve(clipSize);
-	ClipBuffer->emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
-	                         wrap::toFloat(clipStitchPtr->y) + wrap::toFloat(clipStitchPtr->fy) / FRACFACT,
-	                         0U);
+  if (clipPointer == nullptr) {
+	return;
+  }
+  const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(clipPointer);
+  auto const        clipSize         = clipStitchPtr->led;
+  auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
+  ClipBuffer->clear();
+  ClipBuffer->reserve(clipSize);
+  ClipBuffer->emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
+                           wrap::toFloat(clipStitchPtr->y) + wrap::toFloat(clipStitchPtr->fy) / FRACFACT,
+                           0U);
 
 #if CLPBUG
-	OutputDebugString(fmt::format(FMT_COMPILE(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n"),
+  OutputDebugString(fmt::format(FMT_COMPILE(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n"),
+                                ClipBuffer->back().x,
+                                ClipBuffer->back().y)
+                        .c_str());
+#endif
+  auto clipRect = F_RECTANGLE {
+      ClipBuffer->front().x, ClipBuffer->front().y, ClipBuffer->front().x, ClipBuffer->front().y};
+  auto iCSD = std::next(spClipStitchData.begin());
+  for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
+	ClipBuffer->emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
+	                         wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
+	                         (iCSD->led & COLMSK) | codedLayer);
+
+#if CLPBUG
+	OutputDebugString(fmt::format(FMT_COMPILE(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n"),
+	                              iStitch,
 	                              ClipBuffer->back().x,
 	                              ClipBuffer->back().y)
 	                      .c_str());
 #endif
-	auto clipRect = F_RECTANGLE {
-	    ClipBuffer->front().x, ClipBuffer->front().y, ClipBuffer->front().x, ClipBuffer->front().y};
-	auto iCSD = std::next(spClipStitchData.begin());
-	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
-	  ClipBuffer->emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
-	                           wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
-	                           (iCSD->led & COLMSK) | codedLayer);
-
-#if CLPBUG
-	  OutputDebugString(fmt::format(FMT_COMPILE(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n"),
-	                                iStitch,
-	                                ClipBuffer->back().x,
-	                                ClipBuffer->back().y)
-	                        .c_str());
-#endif
-	  if (ClipBuffer->back().x < clipRect.left) {
-		clipRect.left = ClipBuffer->back().x;
-	  }
-	  if (ClipBuffer->back().x > clipRect.right) {
-		clipRect.right = ClipBuffer->back().x;
-	  }
-	  if (ClipBuffer->back().y < clipRect.bottom) {
-		clipRect.bottom = ClipBuffer->back().y;
-	  }
-	  if (ClipBuffer->back().y > clipRect.top) {
-		clipRect.top = ClipBuffer->back().y;
-	  }
-	  ++iCSD;
+	if (ClipBuffer->back().x < clipRect.left) {
+	  clipRect.left = ClipBuffer->back().x;
 	}
-	ClipBuffer->front().attribute = ActiveColor | codedLayer;
-	ClipRectSize = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
-	GlobalUnlock(ClipMemory);
-	if ((clipRect.left != 0.0F) || (clipRect.bottom != 0.0F)) {
-	  for (auto& clip : *ClipBuffer) {
-		clip.x -= clipRect.left;
-		clip.y -= clipRect.bottom;
-	  }
+	if (ClipBuffer->back().x > clipRect.right) {
+	  clipRect.right = ClipBuffer->back().x;
+	}
+	if (ClipBuffer->back().y < clipRect.bottom) {
+	  clipRect.bottom = ClipBuffer->back().y;
+	}
+	if (ClipBuffer->back().y > clipRect.top) {
+	  clipRect.top = ClipBuffer->back().y;
+	}
+	++iCSD;
+  }
+  ClipBuffer->front().attribute = ActiveColor | codedLayer;
+  ClipRectSize                  = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
+  GlobalUnlock(ClipMemory);
+  if ((clipRect.left != 0.0F) || (clipRect.bottom != 0.0F)) {
+	for (auto& clip : *ClipBuffer) {
+	  clip.x -= clipRect.left;
+	  clip.y -= clipRect.bottom;
 	}
   }
 }
