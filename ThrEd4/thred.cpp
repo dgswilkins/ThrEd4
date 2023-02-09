@@ -6591,15 +6591,16 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
 	length = hypot(delta.x, delta.y);
 	++finishIt;
   }
-  if (finishIt != StitchBuffer->end()) {
-	--finishIt;
-	delta                    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	auto const knotAttribute = startIt->attribute | KNOTMSK;
-	auto const knotStep      = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	static constexpr auto KNOT_AT_START_ORDER = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
-	for (char const iKnot : KNOT_AT_START_ORDER) {
-	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
-	}
+  if (finishIt == StitchBuffer->end()) {
+	return;
+  }
+  --finishIt;
+  delta = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto const            knotAttribute = startIt->attribute | KNOTMSK;
+  auto const            knotStep      = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+  static constexpr auto KNOT_AT_START_ORDER = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
+  for (char const iKnot : KNOT_AT_START_ORDER) {
+	ofstch(buffer, start, iKnot, knotStep, knotAttribute);
   }
 }
 
