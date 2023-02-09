@@ -6729,76 +6729,75 @@ void thi::drwlstch(uint32_t finish) {
   auto           movieLine = std::vector<POINT> {}; // line for movie stitch draw
   constexpr auto LNMAXPTS  = 100U;                  // maximum number of points in a line
   movieLine.reserve(LNMAXPTS);
-  if (finish != 0) {
-	if (StateMap->test(StateFlag::HID)) {
-	  while (RunPoint < (finish - 1) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
-		++RunPoint;
-	  }
-	}
-	if (StateMap->test(StateFlag::ZUMED)) {
-	  constexpr auto STITCH_COORDS_IN_PIXELS = POINT {};
-	  movieLine.push_back(STITCH_COORDS_IN_PIXELS);
-	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
-		++RunPoint;
-	  }
-	}
-	auto const color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
-	if (StateMap->test(StateFlag::ZUMED)) {
-	  auto       stitchCoordsInPixels = POINT {};
-	  auto const origin               = RunPoint - 1U;
-	  auto       flag                 = true;
-	  while (wrap::toUnsigned(movieLine.size()) < (StitchesPerFrame + 1U) && RunPoint < (finish - 2U) &&
-	         (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		if (stch2px(RunPoint, stitchCoordsInPixels)) {
-		  movieLine.push_back(stitchCoordsInPixels);
-		  if (flag) {
-			flag = false;
-			if ((RunPoint != 0U) && stch2px(RunPoint - 1, stitchCoordsInPixels)) {
-			  movieLine.front() = movieLine.back();
-			}
-			else {
-			  movieLine.front() = stitchCoordsInPixels;
-			}
-		  }
-		}
-		++RunPoint;
-	  }
-	  if (RunPoint == origin) {
-		++RunPoint;
-	  }
-	  if (!stch2px(RunPoint, stitchCoordsInPixels)) {
-		if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		  movieLine.push_back(stitchCoordsInPixels);
-		  ++RunPoint;
-		}
-	  }
-	  SelectObject(StitchWindowDC, UserPen->operator[](color));
-	  wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
-	  if (!flag) {
-		--RunPoint;
-	  }
-	}
-	else {
-	  auto iMovieFrame = 0U;
-
-	  SelectObject(StitchWindowDC, UserPen->operator[](color));
-	  while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
-	         ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
-		movieLine.push_back(stch2px1(RunPoint++));
-		++iMovieFrame;
-	  }
-	  --RunPoint;
-	  wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
-	}
-	if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & COLMSK) != color) {
+  if (finish == 0) {
+	patdun();
+	return;
+  }
+  if (StateMap->test(StateFlag::HID)) {
+	while (RunPoint < (finish - 1) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
 	  ++RunPoint;
 	}
-	displayText::ritnum(IDS_NUMSEL, RunPoint);
-	if (RunPoint + 3U > finish - 1U) {
-	  patdun();
+  }
+  if (StateMap->test(StateFlag::ZUMED)) {
+	constexpr auto STITCH_COORDS_IN_PIXELS = POINT {};
+	movieLine.push_back(STITCH_COORDS_IN_PIXELS);
+	while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
+	  ++RunPoint;
+	}
+  }
+  auto const color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
+  if (StateMap->test(StateFlag::ZUMED)) {
+	auto       stitchCoordsInPixels = POINT {};
+	auto const origin               = RunPoint - 1U;
+	auto       flag                 = true;
+	while (wrap::toUnsigned(movieLine.size()) < (StitchesPerFrame + 1U) && RunPoint < (finish - 2U) &&
+	       (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+	  if (stch2px(RunPoint, stitchCoordsInPixels)) {
+		movieLine.push_back(stitchCoordsInPixels);
+		if (flag) {
+		  flag = false;
+		  if ((RunPoint != 0U) && stch2px(RunPoint - 1, stitchCoordsInPixels)) {
+			movieLine.front() = movieLine.back();
+		  }
+		  else {
+			movieLine.front() = stitchCoordsInPixels;
+		  }
+		}
+	  }
+	  ++RunPoint;
+	}
+	if (RunPoint == origin) {
+	  ++RunPoint;
+	}
+	if (!stch2px(RunPoint, stitchCoordsInPixels)) {
+	  if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+		movieLine.push_back(stitchCoordsInPixels);
+		++RunPoint;
+	  }
+	}
+	SelectObject(StitchWindowDC, UserPen->operator[](color));
+	wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
+	if (!flag) {
+	  --RunPoint;
 	}
   }
   else {
+	auto iMovieFrame = 0U;
+
+	SelectObject(StitchWindowDC, UserPen->operator[](color));
+	while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
+	       ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
+	  movieLine.push_back(stch2px1(RunPoint++));
+	  ++iMovieFrame;
+	}
+	--RunPoint;
+	wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
+  }
+  if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & COLMSK) != color) {
+	++RunPoint;
+  }
+  displayText::ritnum(IDS_NUMSEL, RunPoint);
+  if (RunPoint + 3U > finish - 1U) {
 	patdun();
   }
 }
