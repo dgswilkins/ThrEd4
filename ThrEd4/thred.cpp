@@ -7313,24 +7313,24 @@ void thi::insfil(fs::path& insertedFile) {
 	  successFlag         = true;
 	}
   }
-  if (successFlag) {
-	InsertCenter = F_POINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
-	                        wrap::midl(insertedRectangle.top, insertedRectangle.bottom)};
-
-	auto const insertedSize = F_POINT {insertedRectangle.right - insertedRectangle.left,
-	                                   insertedRectangle.top - insertedRectangle.bottom};
-	form::ratsr();
-	InsertSize.cx = std::lround(insertedSize.x * HorizontalRatio);
-	// ToDo - Should this be vertical ratio?
-	InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
-	auto const initialInsertPoint =
-	    POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
-	thred::insflin(initialInsertPoint);
-	NewFormVertexCount = 5U;
-	StateMap->set(StateFlag::SHOFRM);
-	StateMap->set(StateFlag::INSFIL);
-	form::dufrm();
+  if (!successFlag) {
+	return;
   }
+  InsertCenter = F_POINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
+                          wrap::midl(insertedRectangle.top, insertedRectangle.bottom)};
+
+  auto const insertedSize = F_POINT {insertedRectangle.right - insertedRectangle.left,
+                                     insertedRectangle.top - insertedRectangle.bottom};
+  form::ratsr();
+  InsertSize.cx = std::lround(insertedSize.x * HorizontalRatio);
+  // ToDo - Should this be vertical ratio?
+  InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
+  auto const initialInsertPoint = POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
+  thred::insflin(initialInsertPoint);
+  NewFormVertexCount = 5U;
+  StateMap->set(StateFlag::SHOFRM);
+  StateMap->set(StateFlag::INSFIL);
+  form::dufrm();
 }
 
 auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
