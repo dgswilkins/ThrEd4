@@ -6614,18 +6614,19 @@ void thi::delknot() {
   auto const firstStitch = std::ranges::find_if(*StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
 	return ((stitch.attribute & KNOTMSK) != 0U);
   });
-  if (firstStitch != StitchBuffer->end()) {
-	thred::savdo();
-	// delete the knot stitches
-	StitchBuffer->erase(std::remove_if(firstStitch,
-	                                   StitchBuffer->end(),
-	                                   [](F_POINT_ATTR const& stitch) -> bool {
-	                                     return (stitch.attribute & KNOTMSK) != 0U;
-	                                   }),
-	                    StitchBuffer->end());
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  if (firstStitch == StitchBuffer->end()) {
+	return;
   }
+  thred::savdo();
+  // delete the knot stitches
+  StitchBuffer->erase(std::remove_if(firstStitch,
+                                     StitchBuffer->end(),
+                                     [](F_POINT_ATTR const& stitch) -> bool {
+	                                   return (stitch.attribute & KNOTMSK) != 0U;
+                                     }),
+                      StitchBuffer->end());
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 constexpr auto KNOTLEN = int32_t {54}; // set knots for stitches longer than this
