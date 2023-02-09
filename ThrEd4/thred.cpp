@@ -6945,152 +6945,152 @@ void thi::delet() {
   }
   if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_SHIFT)) {
 	deltot();
+	fndknt();
+	return;
   }
-  else {
-	thred::savdo();
-	auto satinFlag = false;
-	if (!SelectedFormList->empty()) {
-	  if (frmstch()) {
-		StateMap->set(StateFlag::DELSFRMS);
-		displayText::tabmsg(IDS_DELFRM, false);
-		displayText::okcan();
-		displayText::tomsg();
-	  }
-	  else {
-		delsfrms(1);
-	  }
-	  return;
+  thred::savdo();
+  auto satinFlag = false;
+  if (!SelectedFormList->empty()) {
+	if (frmstch()) {
+	  StateMap->set(StateFlag::DELSFRMS);
+	  displayText::tabmsg(IDS_DELFRM, false);
+	  displayText::okcan();
+	  displayText::tomsg();
 	}
-	if (StateMap->test(StateFlag::FORMSEL) && !FormList->empty()) {
-	  if (wastch(ClosestFormToCursor)) {
-		StateMap->set(StateFlag::DELFRM);
-		displayText::tabmsg(IDS_FDEL, false);
-		displayText::okcan();
-		displayText::tomsg();
-	  }
-	  else {
-		StateMap->reset(StateFlag::DELTO);
-		thred::frmdel();
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	  fndknt();
-	  return;
+	else {
+	  delsfrms(1);
 	}
-	if (StateMap->test(StateFlag::SELBOX)) {
-	  if (StitchBuffer->size() > 2U) {
-		delstch1(ClosestPointIndex);
-		if (!stch2px2(ClosestPointIndex)) {
-		  movbox();
+	return;
+  }
+  if (StateMap->test(StateFlag::FORMSEL) && !FormList->empty()) {
+	if (wastch(ClosestFormToCursor)) {
+	  StateMap->set(StateFlag::DELFRM);
+	  displayText::tabmsg(IDS_FDEL, false);
+	  displayText::okcan();
+	  displayText::tomsg();
+	}
+	else {
+	  StateMap->reset(StateFlag::DELTO);
+	  thred::frmdel();
+	  StateMap->set(StateFlag::RESTCH);
+	}
+	fndknt();
+	return;
+  }
+  if (StateMap->test(StateFlag::SELBOX)) {
+	if (StitchBuffer->size() > 2U) {
+	  delstch1(ClosestPointIndex);
+	  if (!stch2px2(ClosestPointIndex)) {
+		movbox();
+	  }
+	}
+	else {
+	  StitchBuffer->clear();
+	  StateMap->reset(StateFlag::SELBOX);
+	}
+	thred::coltab();
+	xt::setfchk();
+	fndknt();
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::delstchm();
+	thred::coltab();
+	rstAll();
+	xt::setfchk();
+	fndknt();
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::FRMPSEL) || form::closfrm()) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	switch (form.type) {
+	  case FRMLINE: {
+		if (form.fillType == CONTF) {
+		  if (ClosestVertexToCursor == form.angleOrClipData.guide.start ||
+		      ClosestVertexToCursor == form.angleOrClipData.guide.finish) {
+			form::delmfil(ClosestFormToCursor);
+			form.fillType = 0;
+			thred::coltab();
+			StateMap->set(StateFlag::RESTCH);
+			return;
+		  }
+		  if (form.angleOrClipData.guide.start > ClosestVertexToCursor) {
+			--(form.angleOrClipData.guide.start);
+		  }
+		  if (form.angleOrClipData.guide.finish > ClosestVertexToCursor) {
+			--(form.angleOrClipData.guide.finish);
+		  }
 		}
+		break;
 	  }
-	  else {
-		StitchBuffer->clear();
-		StateMap->reset(StateFlag::SELBOX);
-	  }
-	  thred::coltab();
-	  xt::setfchk();
-	  fndknt();
-	  StateMap->set(StateFlag::RESTCH);
-	  return;
-	}
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  thred::delstchm();
-	  thred::coltab();
-	  rstAll();
-	  xt::setfchk();
-	  fndknt();
-	  StateMap->set(StateFlag::RESTCH);
-	  return;
-	}
-	if (StateMap->test(StateFlag::FRMPSEL) || form::closfrm()) {
-	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  switch (form.type) {
-		case FRMLINE: {
-		  if (form.fillType == CONTF) {
-			if (ClosestVertexToCursor == form.angleOrClipData.guide.start ||
-			    ClosestVertexToCursor == form.angleOrClipData.guide.finish) {
-			  form::delmfil(ClosestFormToCursor);
-			  form.fillType = 0;
-			  thred::coltab();
-			  StateMap->set(StateFlag::RESTCH);
-			  return;
-			}
-			if (form.angleOrClipData.guide.start > ClosestVertexToCursor) {
-			  --(form.angleOrClipData.guide.start);
-			}
-			if (form.angleOrClipData.guide.finish > ClosestVertexToCursor) {
-			  --(form.angleOrClipData.guide.finish);
+	  case SAT: {
+		do {
+		  if (ClosestVertexToCursor <= 1) {
+			if ((form.attribute & FRMEND) != 0U) {
+			  if (form.wordParam != 0U) {
+				form.wordParam = 0;
+			  }
+			  else {
+				form.attribute &= NFRMEND;
+			  }
+			  satinFlag = true;
+			  break;
 			}
 		  }
-		  break;
-		}
-		case SAT: {
-		  do {
-			if (ClosestVertexToCursor <= 1) {
-			  if ((form.attribute & FRMEND) != 0U) {
-				if (form.wordParam != 0U) {
-				  form.wordParam = 0;
-				}
-				else {
-				  form.attribute &= NFRMEND;
-				}
-				satinFlag = true;
-				break;
-			  }
+		  auto const& endGuide = form.wordParam;
+		  if (endGuide != 0U) {
+			if (ClosestVertexToCursor == endGuide || ClosestVertexToCursor == endGuide + 1U) {
+			  form.wordParam = 0;
+			  satinFlag      = true;
+			  break;
 			}
-			auto const& endGuide = form.wordParam;
-			if (endGuide != 0U) {
-			  if (ClosestVertexToCursor == endGuide || ClosestVertexToCursor == endGuide + 1U) {
-				form.wordParam = 0;
-				satinFlag      = true;
-				break;
-			  }
+		  }
+		  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+		  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+			if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
+			  satin::delcon(form, iGuide);
+			  satinFlag = true;
+			  break;
 			}
-			auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-			  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
-				satin::delcon(form, iGuide);
-				satinFlag = true;
-				break;
-			  }
-			  ++itGuide;
-			}
-		  } while (false);
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in delet: type [{}]\n", form.type);
-		  break;
-		}
+			++itGuide;
+		  }
+		} while (false);
+		break;
 	  }
-	  if (!satinFlag) {
-		satin::delspnt();
+	  default: {
+		outDebugString(L"default hit in delet: type [{}]\n", form.type);
+		break;
 	  }
-	  if (ClosestFormToCursor > FormList->size() - 1U) {
-		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-	  }
-	  form.outline();
-	  form::refil(ClosestFormToCursor);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
 	}
-	if (!satinFlag && closPnt1(ClosestPointIndex)) {
-	  if (StitchBuffer->size() > 2U) {
-		delstch1(ClosestPointIndex);
-		if (!stch2px2(ClosestPointIndex)) {
-		  movbox();
-		}
-	  }
-	  else {
-		StitchBuffer->clear();
-		StateMap->reset(StateFlag::SELBOX);
-	  }
-	  thred::coltab();
-	  xt::setfchk();
-	  fndknt();
-	  StateMap->set(StateFlag::RESTCH);
-	  return;
+	if (!satinFlag) {
+	  satin::delspnt();
 	}
+	if (ClosestFormToCursor > FormList->size() - 1U) {
+	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	}
+	form.outline();
+	form::refil(ClosestFormToCursor);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+  }
+  if (!satinFlag && closPnt1(ClosestPointIndex)) {
+	if (StitchBuffer->size() > 2U) {
+	  delstch1(ClosestPointIndex);
+	  if (!stch2px2(ClosestPointIndex)) {
+		movbox();
+	  }
+	}
+	else {
+	  StitchBuffer->clear();
+	  StateMap->reset(StateFlag::SELBOX);
+	}
+	thred::coltab();
+	xt::setfchk();
+	fndknt();
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
   fndknt();
 }
