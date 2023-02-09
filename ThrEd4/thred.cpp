@@ -7238,34 +7238,35 @@ void thi::drwmrk(HDC hDC) {
 }
 
 void thi::vubak() {
-  if (!WorkingFileName->empty() || StateMap->test(StateFlag::THUMSHO)) {
-	StateMap->set(StateFlag::ZUMED);
-	thred::movStch();
-	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	auto const deltaX   = StitchWindowClientRect.right / 2;
-	auto const deltaY   = StitchWindowClientRect.bottom / 2;
-	auto       itHWndBV = BackupViewer.begin();
-	for (auto iPosition = uint32_t {}; iPosition < QUADRT; ++iPosition) { // there are 4 quadrants
-	  auto verticalLocation = 0L;
-	  if ((iPosition & 2U) != 0U) {
-		verticalLocation = deltaY;
-	  }
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  *itHWndBV = CreateWindow(L"STATIC",
-	                           L"",
-	                           SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                           deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U) + ButtonWidthX3,
-	                           verticalLocation,
-	                           deltaX,
-	                           deltaY,
-	                           ThrEdWindow,
-	                           nullptr,
-	                           ThrEdInstance,
-	                           nullptr);
-	  ++itHWndBV;
-	}
-	StateMap->set(StateFlag::BAKSHO);
+  if (WorkingFileName->empty() && !StateMap->test(StateFlag::THUMSHO)) {
+	return;
   }
+  StateMap->set(StateFlag::ZUMED);
+  thred::movStch();
+  FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
+  auto const deltaX   = StitchWindowClientRect.right / 2;
+  auto const deltaY   = StitchWindowClientRect.bottom / 2;
+  auto       itHWndBV = BackupViewer.begin();
+  for (auto iPosition = uint32_t {}; iPosition < QUADRT; ++iPosition) { // there are 4 quadrants
+	auto verticalLocation = 0L;
+	if ((iPosition & 2U) != 0U) {
+	  verticalLocation = deltaY;
+	}
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	*itHWndBV = CreateWindow(L"STATIC",
+	                         L"",
+	                         SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                         deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U) + ButtonWidthX3,
+	                         verticalLocation,
+	                         deltaX,
+	                         deltaY,
+	                         ThrEdWindow,
+	                         nullptr,
+	                         ThrEdInstance,
+	                         nullptr);
+	++itHWndBV;
+  }
+  StateMap->set(StateFlag::BAKSHO);
 }
 
 void thred::insflin(POINT insertPoint) {
