@@ -6662,22 +6662,21 @@ void thi::setknt() {
 
 auto thi::srchknot(uint32_t source) -> uint32_t {
   auto upper = std::ranges::find(*Knots, source);
-  if (upper != Knots->end()) {
-	--upper;
-	if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
-	  ++upper;
-	  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
-		return 0;
-	  }
-	  return 2;
-	}
-
+  if (upper == Knots->end()) {
+	return 3;
+  }
+  --upper;
+  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
 	++upper;
 	if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
-	  return 1;
+	  return 0;
 	}
+	return 2;
   }
-  return 3;
+  ++upper;
+  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
+	return 1;
+  }
 }
 
 void thi::chkncol() {
