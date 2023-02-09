@@ -6708,16 +6708,17 @@ void thi::chkncol() {
 }
 
 void thi::setknots() {
-  if (!StitchBuffer->empty()) {
-	thred::savdo();
-	delknt();
-	setknt();
-	fndknt();
-	chkncol();
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+  if (StitchBuffer->empty()) {
+	return;
   }
+  thred::savdo();
+  delknt();
+  setknt();
+  fndknt();
+  chkncol();
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
+  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 }
 
 void thred::hidbit() {
