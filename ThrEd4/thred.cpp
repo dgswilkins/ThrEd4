@@ -7103,58 +7103,59 @@ void thi::movi() {
   else {
 	rstAll();
   }
-  if (!StitchBuffer->empty()) {
-	if (MsgWindow != nullptr) {
-	  DestroyWindow(MsgWindow);
-	  MsgWindow = nullptr;
-	}
-	StateMap->set(StateFlag::RUNPAT);
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  thred::rngadj();
-	  RunPoint = GroupStartStitch;
-	}
-	else {
-	  RunPoint = 0;
-	}
-	thred::movStch();
-	if (!StateMap->test(StateFlag::WASPAT)) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  SpeedScrollBar = CreateWindow(L"SCROLLBAR",
-	                                nullptr,
-	                                SBS_HORZ | WS_CHILD | WS_VISIBLE,
-	                                ButtonWidthX3,
-	                                0,
-	                                StitchWindowSize.cx,
-	                                *ScrollSize,
-	                                ThrEdWindow,
-	                                nullptr,
-	                                ThrEdInstance,
-	                                nullptr);
-	}
-	auto const stepCount = (StateMap->test(StateFlag::ZUMED))
-	                           ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
-	                           : gsl::narrow_cast<float>(StitchBuffer->size());
-	if (!StateMap->test(StateFlag::WASPAT)) {
-	  MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0F * MOVITIM / stepCount);
-	}
-	if (MovieTimeStep < MINDELAY) {
-	  MovieTimeStep = MINDELAY;
-	}
-	if (MovieTimeStep > MAXDELAY) {
-	  MovieTimeStep = MAXDELAY;
-	}
-	auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
-	scrollInfo.cbSize = sizeof(scrollInfo);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	scrollInfo.fMask = SIF_ALL;
-	scrollInfo.nMax  = MAXDELAY;
-	scrollInfo.nMin  = MINDELAY;
-	scrollInfo.nPage = 1;
-	scrollInfo.nPos  = MAXDELAY - MovieTimeStep;
-	SetScrollInfo(SpeedScrollBar, SB_CTL, &scrollInfo, TRUE);
-	FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
-	setsped();
+  if (StitchBuffer->empty()) {
+	return;
   }
+  if (MsgWindow != nullptr) {
+	DestroyWindow(MsgWindow);
+	MsgWindow = nullptr;
+  }
+  StateMap->set(StateFlag::RUNPAT);
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::rngadj();
+	RunPoint = GroupStartStitch;
+  }
+  else {
+	RunPoint = 0;
+  }
+  thred::movStch();
+  if (!StateMap->test(StateFlag::WASPAT)) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	SpeedScrollBar = CreateWindow(L"SCROLLBAR",
+	                              nullptr,
+	                              SBS_HORZ | WS_CHILD | WS_VISIBLE,
+	                              ButtonWidthX3,
+	                              0,
+	                              StitchWindowSize.cx,
+	                              *ScrollSize,
+	                              ThrEdWindow,
+	                              nullptr,
+	                              ThrEdInstance,
+	                              nullptr);
+  }
+  auto const stepCount = (StateMap->test(StateFlag::ZUMED))
+                             ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
+                             : gsl::narrow_cast<float>(StitchBuffer->size());
+  if (!StateMap->test(StateFlag::WASPAT)) {
+	MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0F * MOVITIM / stepCount);
+  }
+  if (MovieTimeStep < MINDELAY) {
+	MovieTimeStep = MINDELAY;
+  }
+  if (MovieTimeStep > MAXDELAY) {
+	MovieTimeStep = MAXDELAY;
+  }
+  auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
+  scrollInfo.cbSize = sizeof(scrollInfo);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  scrollInfo.fMask = SIF_ALL;
+  scrollInfo.nMax  = MAXDELAY;
+  scrollInfo.nMin  = MINDELAY;
+  scrollInfo.nPage = 1;
+  scrollInfo.nPos  = MAXDELAY - MovieTimeStep;
+  SetScrollInfo(SpeedScrollBar, SB_CTL, &scrollInfo, TRUE);
+  FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
+  setsped();
 }
 
 void thred::redclp() {
