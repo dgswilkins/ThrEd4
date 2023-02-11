@@ -6357,27 +6357,30 @@ void thred::frmdel() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   if (StateMap->testAndReset(StateFlag::DELTO)) {
 	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & NOTFRM) == 0U) {
-		auto const stitchForm = (stitch.attribute & FRMSK);
-		if (stitchForm > codedForm) {
-		  stitch.attribute &= NFRMSK;
-		  stitch.attribute |= (stitchForm - (1U << FRMSHFT));
-		}
+	  if ((stitch.attribute & NOTFRM) != 0U) {
+		continue;
+	  }
+	  auto const stitchForm = (stitch.attribute & FRMSK);
+	  if (stitchForm > codedForm) {
+		stitch.attribute &= NFRMSK;
+		stitch.attribute |= (stitchForm - (1U << FRMSHFT));
 	  }
 	}
   }
   else {
 	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & NOTFRM) == 0U) {
-		auto const stitchForm = (stitch.attribute & FRMSK);
-		if (stitchForm == codedForm) {
-		  stitch.attribute &= (NFRMSK & NTYPMSK);
-		  stitch.attribute |= NOTFRM;
-		}
-		if (stitchForm > codedForm) {
-		  stitch.attribute &= NFRMSK;
-		  stitch.attribute |= (stitchForm - (1U << FRMSHFT));
-		}
+	  if ((stitch.attribute & NOTFRM) != 0U) {
+		continue;
+	  }
+	  auto const stitchForm = (stitch.attribute & FRMSK);
+	  if (stitchForm == codedForm) {
+		stitch.attribute &= (NFRMSK & NTYPMSK);
+		stitch.attribute |= NOTFRM;
+		continue;
+	  }
+	  if (stitchForm > codedForm) {
+		stitch.attribute &= NFRMSK;
+		stitch.attribute |= (stitchForm - (1U << FRMSHFT));
 	  }
 	}
   }
