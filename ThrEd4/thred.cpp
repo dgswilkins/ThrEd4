@@ -166,7 +166,7 @@ void delet();
 void delfre();
 void delknot();
 void delknt();
-void delsfrms(wchar_t code);
+void delsfrms();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch();
 void delstch1(uint32_t iStitch);
@@ -6387,10 +6387,7 @@ void thred::frmdel() {
   }
 }
 
-void thi::delsfrms(wchar_t code) {
-  if (code == 0) {
-	return;
-  }
+void thi::delsfrms() {
   if (FormList->empty()) {
 	return;
   }
@@ -6452,7 +6449,7 @@ void thi::cut() {
   thi::duclip();
   if (!SelectedFormList->empty()) {
 	StateMap->set(StateFlag::DELTO);
-	delsfrms(L's');
+	delsfrms();
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
@@ -6961,7 +6958,7 @@ void thi::delet() {
 	  displayText::tomsg();
 	}
 	else {
-	  delsfrms(1);
+	  delsfrms();
 	}
 	return;
   }
@@ -12381,7 +12378,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		code = 1;
 	  }
 	}
-	delsfrms(code);
+	delsfrms();
 	thred::unmsg();
 	return true;
   }
@@ -15822,7 +15819,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  else {
 			StateMap->reset(StateFlag::DELTO);
 		  }
-		  delsfrms(code);
+		  delsfrms();
 		  thred::coltab();
 		  StateMap->set(StateFlag::RESTCH);
 		  thred::unmsg();
