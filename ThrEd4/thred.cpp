@@ -6524,10 +6524,9 @@ void thi::stretch() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	doStretch(GroupStartStitch, GroupEndStitch);
+	return;
   }
-  else {
-	doStretch(0, wrap::toUnsigned(StitchBuffer->size()));
-  }
+  doStretch(0, wrap::toUnsigned(StitchBuffer->size()));
 }
 
 void thi::contract() {
