@@ -6388,60 +6388,63 @@ void thred::frmdel() {
 }
 
 void thi::delsfrms(wchar_t code) {
-  if (code != 0) {
-	if (!FormList->empty()) {
-	  auto formIndices = std::vector<uint32_t> {};
-	  formIndices.resize(FormList->size());
-	  auto formMap = boost::dynamic_bitset<>(FormList->size());
-	  for (auto const selectedForm : (*SelectedFormList)) {
-		formMap.set(selectedForm);
-		f1del(selectedForm);
+  if (code == 0) {
+	return;
+  }
+  if (FormList->empty()) {
+	return;
+  }
+  auto formIndices = std::vector<uint32_t> {};
+  formIndices.resize(FormList->size());
+  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  for (auto const selectedForm : (*SelectedFormList)) {
+	formMap.set(selectedForm);
+	f1del(selectedForm);
+  }
+  auto       deletedFormCount = 0U;
+  auto       firstForm        = FormList->cbegin();
+  auto const formCount        = FormList->size();
+  for (auto iForm = 0U; iForm < formCount; ++iForm) {
+	if (formMap.test(iForm)) {
+	  FormList->erase(wrap::next(firstForm, (iForm - deletedFormCount)));
+	  firstForm = FormList->cbegin(); // the erase invalidates firstForm
+	  ++deletedFormCount;
+	  continue;
+	}
+	formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
+  }
+  if (StateMap->test(StateFlag::DELTO)) {
+	for (auto& stitch : *StitchBuffer) {
+	  if ((stitch.attribute & ALTYPMSK) == 0U) {
+		continue;
 	  }
-	  auto       deletedFormCount = 0U;
-	  auto       firstForm        = FormList->cbegin();
-	  auto const formCount        = FormList->size();
-	  for (auto iForm = 0U; iForm < formCount; ++iForm) {
-		if (!formMap.test(iForm)) {
-		  formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
-		}
-		else {
-		  FormList->erase(wrap::next(firstForm, (iForm - deletedFormCount)));
-		  firstForm = FormList->cbegin(); // the erase invalidates firstForm
-		  ++deletedFormCount;
-		}
+	  auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+	  if (!formMap.test(iForm)) {
+		stitch.attribute &= NFRMSK;
+		stitch.attribute |= formIndices[iForm];
 	  }
-	  if (StateMap->test(StateFlag::DELTO)) {
-		for (auto& stitch : *StitchBuffer) {
-		  if ((stitch.attribute & ALTYPMSK) != 0U) {
-			auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
-			if (!formMap.test(iForm)) {
-			  stitch.attribute &= NFRMSK;
-			  stitch.attribute |= formIndices[iForm];
-			}
-		  }
-		}
-	  }
-	  else {
-		for (auto& stitch : *StitchBuffer) {
-		  if ((stitch.attribute & NOTFRM) == 0U) {
-			auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
-			if (formMap.test(iForm)) {
-			  stitch.attribute &= (NFRMSK & NTYPMSK);
-			  stitch.attribute |= NOTFRM;
-			}
-			else {
-			  stitch.attribute &= NFRMSK;
-			  stitch.attribute |= formIndices[iForm];
-			}
-		  }
-		}
-	  }
-	  SelectedFormList->clear();
-	  StateMap->reset(StateFlag::FORMSEL);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
 	}
   }
+  else {
+	for (auto& stitch : *StitchBuffer) {
+	  if ((stitch.attribute & NOTFRM) != 0U) {
+		continue;
+	  }
+	  auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+	  if (formMap.test(iForm)) {
+		stitch.attribute &= (NFRMSK & NTYPMSK);
+		stitch.attribute |= NOTFRM;
+	  }
+	  else {
+		stitch.attribute &= NFRMSK;
+		stitch.attribute |= formIndices[iForm];
+	  }
+	}
+  }
+  SelectedFormList->clear();
+  StateMap->reset(StateFlag::FORMSEL);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::cut() {
