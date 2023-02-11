@@ -6535,12 +6535,13 @@ void thi::contract() {
 }
 
 void thi::unpat() {
-  if (StateMap->testAndReset(StateFlag::WASPAT)) {
-	ShowWindow(SpeedScrollBar, SW_HIDE);
-	DestroyWindow(SpeedScrollBar);
-	thred::movStch();
-	StateMap->set(StateFlag::RESTCH);
+  if (!StateMap->testAndReset(StateFlag::WASPAT)) {
+	return;
   }
+  ShowWindow(SpeedScrollBar, SW_HIDE);
+  DestroyWindow(SpeedScrollBar);
+  thred::movStch();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 auto thi::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
