@@ -10268,6 +10268,7 @@ void thi::selfpnt() {
       wrap::next(FormVertices->cbegin(),
                  FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*itVertex);
+  StateMap->set(StateFlag::FRMPSEL);
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -11258,11 +11259,9 @@ auto thi::handleRightButtonDown() -> bool {
 		thred::setpsel();
 		return true;
 	  }
-	  StateMap->reset(StateFlag::FPSEL);
-	  StateMap->set(StateFlag::FRMPSEL);
-	  SelectedFormVertices.start = ClosestVertexToCursor;
-	  SelectedFormVertices.form  = ClosestFormToCursor;
-	  selfpnt();
+	  if (!thi::unselectAll()) {
+		selfpnt();
+	  }
 	  return true;
 	}
   }
