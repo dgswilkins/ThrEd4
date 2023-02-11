@@ -10276,6 +10276,7 @@ auto thi::unselectAll() -> bool {
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::FRMPSEL);
   StateMap->reset(StateFlag::FPSEL);
+  StateMap->reset(StateFlag::GRPSEL);
   StateMap->reset(StateFlag::SELBOX);
   StateMap->set(StateFlag::RESTCH);
   thred::unmsg();
