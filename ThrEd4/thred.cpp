@@ -5350,90 +5350,93 @@ auto thi::closlin() -> uint32_t {
 	  --stitchCount;
 	}
 	auto const stitches = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iChange).stitchIndex);
-	if (thi::chkhid(iChange)) {
-	  for (auto iStitch = ptrdiff_t {}; iStitch < stitchCount; ++iStitch) {
-		auto const layer = (stitches[iStitch].attribute & LAYMSK) >> LAYSHFT;
-		if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
-		  auto const xba = std::lround(stitches[iStitch + 1].x - stitches[iStitch].x);
-		  auto const yab = std::lround(stitches[iStitch].y - stitches[iStitch + 1].y);
-		  auto left = (xba > 0) ? stitches[iStitch].x - tolerance : stitches[iStitch + 1].x - tolerance;
-		  auto right = (xba > 0) ? stitches[iStitch + 1].x + tolerance : stitches[iStitch].x + tolerance;
-		  auto bottom = (yab < 0) ? stitches[iStitch].y - tolerance : stitches[iStitch + 1].y - tolerance;
-		  auto top = (yab < 0) ? stitches[iStitch + 1].y + tolerance : stitches[iStitch].y + tolerance;
-		  if (offsetX > left && offsetX < right && offsetY > bottom && offsetY < top) {
-			// ReSharper disable once CppInitializedValueIsAlwaysRewritten
-			auto tsum         = 0.0F;
-			auto intersection = F_POINT {};
-			auto deltaX       = 0.0F;
-			auto deltaY       = 0.0F;
-			do {
-			  if (yab == 0) {
-				// stitch is horizontal
-				intersection.x = offsetX;
-				intersection.y = stitches[iStitch].y;
-			  }
-			  else {
-				if (xba == 0) {
-				  // stitch is vertical
-				  deltaX = stitches[iStitch].x - offsetX;
-				  top -= tolerance;
-				  bottom += tolerance;
-				  if (offsetY > top) {
-					deltaY = offsetY - top;
-					tsum   = hypot(deltaX, deltaY);
-					break;
-				  }
-				  if (offsetY < bottom) {
-					deltaY = offsetY - bottom;
-					tsum   = hypot(deltaX, deltaY);
-					break;
-				  }
-				  tsum = fabs(deltaX);
-				  break;
-				}
-				auto const slope = wrap::toFloat(xba) / wrap::toFloat(yab);
-				offset           = stitches[iStitch].x + slope * stitches[iStitch].y;
-				auto const poff  = offsetX - offsetY / slope;
+	if (!thi::chkhid(iChange)) {
+	  continue;
+	}
+	for (auto iStitch = ptrdiff_t {}; iStitch < stitchCount; ++iStitch) {
+	  auto const layer = (stitches[iStitch].attribute & LAYMSK) >> LAYSHFT;
+	  if ((ActiveLayer != 0U) && (layer != 0U) && (layer != ActiveLayer)) {
+		continue;
+	  }
+	  auto const xba = std::lround(stitches[iStitch + 1].x - stitches[iStitch].x);
+	  auto const yab = std::lround(stitches[iStitch].y - stitches[iStitch + 1].y);
+	  auto left = (xba > 0) ? stitches[iStitch].x - tolerance : stitches[iStitch + 1].x - tolerance;
+	  auto right = (xba > 0) ? stitches[iStitch + 1].x + tolerance : stitches[iStitch].x + tolerance;
+	  auto bottom = (yab < 0) ? stitches[iStitch].y - tolerance : stitches[iStitch + 1].y - tolerance;
+	  auto top = (yab < 0) ? stitches[iStitch + 1].y + tolerance : stitches[iStitch].y + tolerance;
+	  if (offsetX <= left || offsetX >= right || offsetY <= bottom || offsetY >= top) {
+		continue;
+	  }
+	  // ReSharper disable once CppInitializedValueIsAlwaysRewritten
+	  auto tsum         = 0.0F;
+	  auto intersection = F_POINT {};
+	  auto deltaX       = 0.0F;
+	  auto deltaY       = 0.0F;
+	  do {
+		if (yab == 0) {
+		  // stitch is horizontal
+		  intersection.x = offsetX;
+		  intersection.y = stitches[iStitch].y;
+		}
+		else {
+		  if (xba == 0) {
+			// stitch is vertical
+			deltaX = stitches[iStitch].x - offsetX;
+			top -= tolerance;
+			bottom += tolerance;
+			if (offsetY > top) {
+			  deltaY = offsetY - top;
+			  tsum   = hypot(deltaX, deltaY);
+			  break;
+			}
+			if (offsetY < bottom) {
+			  deltaY = offsetY - bottom;
+			  tsum   = hypot(deltaX, deltaY);
+			  break;
+			}
+			tsum = fabs(deltaX);
+			break;
+		  }
+		  auto const slope = wrap::toFloat(xba) / wrap::toFloat(yab);
+		  offset           = stitches[iStitch].x + slope * stitches[iStitch].y;
+		  auto const poff  = offsetX - offsetY / slope;
 
-				intersection = F_POINT {offset - slope * intersection.y,
-				                        slope * (offset - poff) / (slope * slope + 1.0F)};
-				deltaX       = intersection.x - offsetX;
-				deltaY       = intersection.y - offsetY;
-			  }
-			  top -= tolerance;
-			  bottom += tolerance;
-			  left += tolerance;
-			  right -= tolerance;
-			  if (intersection.x < left) {
-				if (intersection.y < bottom) {
-				  deltaX = offsetX - left;
-				  deltaY = offsetY - bottom;
-				}
-				else {
-				  deltaX = offsetX - left;
-				  deltaY = offsetY - top;
-				}
-			  }
-			  else {
-				if (intersection.x > right) {
-				  if (intersection.y < bottom) {
-					deltaX = offsetX - right;
-					deltaY = offsetY - bottom;
-				  }
-				  else {
-					deltaX = offsetX - right;
-					deltaY = offsetY - top;
-				  }
-				}
-			  }
-			  tsum = sqrt(deltaX * deltaX + deltaY * deltaY);
-			} while (false);
-			if (tsum < sum) {
-			  sum = tsum;
-			  closestPoint = wrap::toUnsigned(iStitch) + ColorChangeTable->operator[](iChange).stitchIndex;
+		  intersection =
+		      F_POINT {offset - slope * intersection.y, slope * (offset - poff) / (slope * slope + 1.0F)};
+		  deltaX = intersection.x - offsetX;
+		  deltaY = intersection.y - offsetY;
+		}
+		top -= tolerance;
+		bottom += tolerance;
+		left += tolerance;
+		right -= tolerance;
+		if (intersection.x < left) {
+		  if (intersection.y < bottom) {
+			deltaX = offsetX - left;
+			deltaY = offsetY - bottom;
+		  }
+		  else {
+			deltaX = offsetX - left;
+			deltaY = offsetY - top;
+		  }
+		}
+		else {
+		  if (intersection.x > right) {
+			if (intersection.y < bottom) {
+			  deltaX = offsetX - right;
+			  deltaY = offsetY - bottom;
+			}
+			else {
+			  deltaX = offsetX - right;
+			  deltaY = offsetY - top;
 			}
 		  }
 		}
+		tsum = sqrt(deltaX * deltaX + deltaY * deltaY);
+	  } while (false);
+	  if (tsum < sum) {
+		sum = tsum;
+		closestPoint = wrap::toUnsigned(iStitch) + ColorChangeTable->operator[](iChange).stitchIndex;
 	  }
 	}
   }
