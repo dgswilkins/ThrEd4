@@ -5495,40 +5495,41 @@ void thi::mark() {
 }
 
 void thi::selCol() {
-  if (!StitchBuffer->empty()) {
-	auto iStitch = (StateMap->test(StateFlag::SELBOX))   ? ClosestPointIndex
-	               : (StateMap->test(StateFlag::GRPSEL)) ? GroupStitchIndex
-	                                                     : 0;
-	if (iStitch > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	  iStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	}
-	GroupStitchIndex    = iStitch;
-	ClosestPointIndex   = iStitch;
-	auto const stitchIt = wrap::next(StitchBuffer->begin(), iStitch);
-	auto const color    = gsl::narrow_cast<uint8_t>(stitchIt->attribute & COLMSK);
-	while ((ClosestPointIndex != 0U) &&
-	       gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
-	  --ClosestPointIndex;
-	}
-	if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
-	  ++ClosestPointIndex;
-	}
-	while (GroupStitchIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
-	       (StitchBuffer->operator[](GroupStitchIndex).attribute & COLMSK) == color) {
-	  ++GroupStitchIndex;
-	}
-	if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
-	  --ClosestPointIndex;
-	}
-	if (GroupStitchIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	  GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	}
-	StateMap->set(StateFlag::GRPSEL);
-	unbox();
-	thred::grpAdj();
-	ActiveColor = color;
-	StateMap->set(StateFlag::RESTCH);
+  if (StitchBuffer->empty()) {
+	return;
   }
+  auto iStitch = (StateMap->test(StateFlag::SELBOX))   ? ClosestPointIndex
+                 : (StateMap->test(StateFlag::GRPSEL)) ? GroupStitchIndex
+                                                       : 0;
+  if (iStitch > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	iStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  }
+  GroupStitchIndex    = iStitch;
+  ClosestPointIndex   = iStitch;
+  auto const stitchIt = wrap::next(StitchBuffer->begin(), iStitch);
+  auto const color    = gsl::narrow_cast<uint8_t>(stitchIt->attribute & COLMSK);
+  while ((ClosestPointIndex != 0U) &&
+         gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
+	--ClosestPointIndex;
+  }
+  if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
+	++ClosestPointIndex;
+  }
+  while (GroupStitchIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
+         (StitchBuffer->operator[](GroupStitchIndex).attribute & COLMSK) == color) {
+	++GroupStitchIndex;
+  }
+  if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
+	--ClosestPointIndex;
+  }
+  if (GroupStitchIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  }
+  StateMap->set(StateFlag::GRPSEL);
+  unbox();
+  thred::grpAdj();
+  ActiveColor = color;
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::newFil() {
