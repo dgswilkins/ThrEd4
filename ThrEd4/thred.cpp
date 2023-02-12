@@ -5749,15 +5749,16 @@ void thi::stchbox(uint32_t iStitch, HDC hDC) {
   auto       line   = std::array<POINT, SQPNTS> {};
   auto const layer  = (StitchBuffer->operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
   auto const offset = MulDiv(IniFile.stitchSizePixels, *ScreenDPI, STDDPI);
-  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-	auto const stitchCoordsInPixels = stch2px1(iStitch);
-	line[0].x = line[3].x = line[4].x = stitchCoordsInPixels.x - offset;
-	line[0].y = line[1].y = stitchCoordsInPixels.y - offset;
-	line[1].x = line[2].x = stitchCoordsInPixels.x + offset;
-	line[2].y = line[3].y = stitchCoordsInPixels.y + offset;
-	line[4].y             = stitchCoordsInPixels.y - offset;
-	wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
+  if ((ActiveLayer != 0U) && (layer != 0U) && layer != ActiveLayer) {
+	return;
   }
+  auto const stitchCoordsInPixels = stch2px1(iStitch);
+  line[0].x = line[3].x = line[4].x = stitchCoordsInPixels.x - offset;
+  line[0].y = line[1].y = stitchCoordsInPixels.y - offset;
+  line[1].x = line[2].x = stitchCoordsInPixels.x + offset;
+  line[2].y = line[3].y = stitchCoordsInPixels.y + offset;
+  line[4].y             = stitchCoordsInPixels.y - offset;
+  wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void thred::sCor2px(F_POINT const& stitchCoordinate, POINT& pixelCoordinate) {
