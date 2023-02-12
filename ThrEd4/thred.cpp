@@ -4659,100 +4659,102 @@ void thi::resetState() {
 void thi::nuFil(FileIndices fileIndex) {
   // Todo - check filename for validity before using it
   auto newFileName = *WorkingFileName;
-  if (StateMap->testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, FileStyles::ALL_FILES, fileIndex)) {
-	WorkingFileName->assign(newFileName);
-	defNam(newFileName);
-	resetState();
-	auto const fileExt = newFileName.extension().wstring();
-	if (fileExt.empty()) {
-	  return;
-	}
-	auto const firstCharacter = tolower(fileExt[1]);
-	if (firstCharacter == 't') {
-	  {
-		if (!readTHRFile(newFileName)) {
-		  return;
-		}
-	  }
-	}
-	else {
-	  StateMap->set(StateFlag::NOTHRFIL);
-	  if (firstCharacter == 'p') {
-		if (tolower(fileExt[2]) == 'c') {
-		  if (!PCS::readPCSFile(newFileName)) {
-			return;
-		  }
-		}
-#if PESACT
-		else {
-		  if (!PES::readPESFile(newFileName)) {
-			return;
-		  }
-		}
-#endif
-	  }
-	  else {
-		if (!DST::readDSTFile(newFileName)) {
-		  return;
-		}
-	  }
-	}
-	if (bitmap::ismap()) {
-	  bitmap::assignUBFilename(*DefaultDirectory);
-	}
-	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
-	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-	thred::movStch();
-	thred::coltab();
-	StateMap->reset(StateFlag::ZUMED);
-	auto buffer       = std::array<wchar_t, 3> {};
-	buffer[1]         = L'0';
-	auto itUserPen    = UserPen->begin();
-	auto ucb          = UserColorBrush.begin();
-	auto itThreadSize = ThreadSize.begin();
-	auto tsw          = ThreadSizeWin->begin();
-	for (auto const& color : UserColor) {
-	  thred::nuPen(*itUserPen, 1, color);
-	  ++itUserPen;
-	  thi::nuBrush(*ucb, color);
-	  ++ucb;
-	  buffer[0] = *(itThreadSize++);
-	  SetWindowText(*(tsw++), buffer.data());
-	}
-	for (auto const& iColor : *UserColorWin) {
-	  thred::redraw(iColor);
-	}
-	thred::redraw(ColorBar);
-	if (!StitchBuffer->empty()) {
-	  StateMap->set(StateFlag::INIT);
-	}
-	nuAct(0);
-	StateMap->set(StateFlag::RESTCH);
-	nunams();
-	ritini();
-	auto const blank = std::wstring {};
-	displayText::butxt(HNUM, blank);
-	if (!StitchBuffer->empty()) {
-	  nuAct(StitchBuffer->front().attribute & COLMSK);
-	}
-	else {
-	  nuAct(0);
-	}
-	menu::auxmen();
-	lenCalc();
-	auto const fmtStr =
-	    fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), newFileName.wstring(), *DesignerName);
-	SetWindowText(ThrEdWindow, fmtStr.c_str());
-	StateMap->set(StateFlag::INIT);
-	StateMap->reset(StateFlag::TRSET);
-	if (StateMap->test(StateFlag::NOTHRFIL)) {
-	  for (auto& stitch : *StitchBuffer) {
-		stitch.attribute |= NOTFRM;
-	  }
-	}
-	repair::lodchk();
+  if (!StateMap->testAndReset(StateFlag::REDOLD) &&
+      !getNewFileName(newFileName, FileStyles::ALL_FILES, fileIndex)) {
+	return;
   }
+  WorkingFileName->assign(newFileName);
+  defNam(newFileName);
+  resetState();
+  auto const fileExt = newFileName.extension().wstring();
+  if (fileExt.empty()) {
+	return;
+  }
+  auto const firstCharacter = tolower(fileExt[1]);
+  if (firstCharacter == 't') {
+	{
+	  if (!readTHRFile(newFileName)) {
+		return;
+	  }
+	}
+  }
+  else {
+	StateMap->set(StateFlag::NOTHRFIL);
+	if (firstCharacter == 'p') {
+	  if (tolower(fileExt[2]) == 'c') {
+		if (!PCS::readPCSFile(newFileName)) {
+		  return;
+		}
+	  }
+#if PESACT
+	  else {
+		if (!PES::readPESFile(newFileName)) {
+		  return;
+		}
+	  }
+#endif
+	}
+	else {
+	  if (!DST::readDSTFile(newFileName)) {
+		return;
+	  }
+	}
+  }
+  if (bitmap::ismap()) {
+	bitmap::assignUBFilename(*DefaultDirectory);
+  }
+  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+  ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
+  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  thred::movStch();
+  thred::coltab();
+  StateMap->reset(StateFlag::ZUMED);
+  auto buffer       = std::array<wchar_t, 3> {};
+  buffer[1]         = L'0';
+  auto itUserPen    = UserPen->begin();
+  auto ucb          = UserColorBrush.begin();
+  auto itThreadSize = ThreadSize.begin();
+  auto tsw          = ThreadSizeWin->begin();
+  for (auto const& color : UserColor) {
+	thred::nuPen(*itUserPen, 1, color);
+	++itUserPen;
+	thi::nuBrush(*ucb, color);
+	++ucb;
+	buffer[0] = *(itThreadSize++);
+	SetWindowText(*(tsw++), buffer.data());
+  }
+  for (auto const& iColor : *UserColorWin) {
+	thred::redraw(iColor);
+  }
+  thred::redraw(ColorBar);
+  if (!StitchBuffer->empty()) {
+	StateMap->set(StateFlag::INIT);
+  }
+  nuAct(0);
+  StateMap->set(StateFlag::RESTCH);
+  nunams();
+  ritini();
+  auto const blank = std::wstring {};
+  displayText::butxt(HNUM, blank);
+  if (!StitchBuffer->empty()) {
+	nuAct(StitchBuffer->front().attribute & COLMSK);
+  }
+  else {
+	nuAct(0);
+  }
+  menu::auxmen();
+  lenCalc();
+  auto const fmtStr =
+      fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), newFileName.wstring(), *DesignerName);
+  SetWindowText(ThrEdWindow, fmtStr.c_str());
+  StateMap->set(StateFlag::INIT);
+  StateMap->reset(StateFlag::TRSET);
+  if (StateMap->test(StateFlag::NOTHRFIL)) {
+	for (auto& stitch : *StitchBuffer) {
+	  stitch.attribute |= NOTFRM;
+	}
+  }
+  repair::lodchk();
 }
 
 auto thi::nuCol(COLORREF init) noexcept -> BOOL {
