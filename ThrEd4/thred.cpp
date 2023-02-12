@@ -6155,12 +6155,13 @@ void thi::clipSelectedForms() {
 	auto const guides = gsl::span(ptrGuides, guidesSize);
 	for (auto& selectedForm : (*SelectedFormList)) {
 	  auto& form = FormList->operator[](selectedForm);
-	  if (form.type == SAT) {
-		auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-		  guides[guideCount++] = *itGuide;
-		  ++itGuide;
-		}
+	  if (form.type != SAT) {
+		continue;
+	  }
+	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+		guides[guideCount++] = *itGuide;
+		++itGuide;
 	  }
 	}
   }
@@ -6188,12 +6189,13 @@ void thi::clipSelectedForms() {
 		  ++offsetStart;
 		}
 	  }
-	  if (form.isEdgeClip()) {
-		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-		for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
-		  points[pointCount++] = *offsetStart;
-		  ++offsetStart;
-		}
+	  if (!form.isEdgeClip()) {
+		continue;
+	  }
+	  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	  for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
+		points[pointCount++] = *offsetStart;
+		++offsetStart;
 	  }
 	}
   }
@@ -6203,14 +6205,15 @@ void thi::clipSelectedForms() {
   iForm              = 0;
   for (auto& selectedForm : (*SelectedFormList)) {
 	auto& form = FormList->operator[](selectedForm);
-	if (form.isTexture()) {
-	  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-	  auto endPoint   = wrap::next(startPoint, form.fillInfo.texture.count);
-	  auto const spDest = gsl::span {std::next(textures, textureCount), form.fillInfo.texture.count};
-	  std::copy(startPoint, endPoint, spDest.begin());
-	  forms[iForm++].fillInfo.texture.index = textureCount;
-	  textureCount += form.fillInfo.texture.count;
+	if (!form.isTexture()) {
+	  continue;
 	}
+	auto       startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
+	auto       endPoint   = wrap::next(startPoint, form.fillInfo.texture.count);
+	auto const spDest = gsl::span {std::next(textures, textureCount), form.fillInfo.texture.count};
+	std::copy(startPoint, endPoint, spDest.begin());
+	forms[iForm++].fillInfo.texture.index = textureCount;
+	textureCount += form.fillInfo.texture.count;
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(thrEdClip, clipHandle);
@@ -6225,38 +6228,43 @@ void thi::clipSelectedForms() {
   astch.reserve(StitchBuffer->size() / RESRATIO);
   LowerLeftStitch.x = LowerLeftStitch.y = BIGFLOAT;
   for (auto& stitch : *StitchBuffer) {
-	if (((stitch.attribute & NOTFRM) == 0U) && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
-	  if (stitch.x < LowerLeftStitch.x) {
-		LowerLeftStitch.x = stitch.x;
-	  }
-	  if (stitch.y < LowerLeftStitch.y) {
-		LowerLeftStitch.y = stitch.y;
-	  }
-	  astch.push_back(stitch);
+	if (((stitch.attribute & NOTFRM) != 0U) || !formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+	  continue;
 	}
+	if (stitch.x < LowerLeftStitch.x) {
+	  LowerLeftStitch.x = stitch.x;
+	}
+	if (stitch.y < LowerLeftStitch.y) {
+	  LowerLeftStitch.y = stitch.y;
+	}
+	astch.push_back(stitch);
   }
   auto const stitchCount = wrap::toUnsigned(astch.size());
-  if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
-	Clip = RegisterClipboardFormat(PcdClipFormat);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
-	if (clipHandle != nullptr) {
-	  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-	  auto const spData         = gsl::span(clipStitchData, stitchCount);
-	  auto       iStitch        = 0U;
-	  auto       iDestination   = 0U;
-	  thred::savclp(spData[0], astch[0], stitchCount);
-	  ++iStitch;
-	  ++iDestination;
-	  while (iStitch < stitchCount) {
-		thred::savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
-		++iStitch;
-		++iDestination;
-	  }
-	  GlobalUnlock(clipHandle);
-	  SetClipboardData(Clip, clipHandle);
-	}
+  if (StitchBuffer->empty() || (stitchCount == 0)) {
+	CloseClipboard();
+	return;
   }
+  Clip = RegisterClipboardFormat(PcdClipFormat);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
+  if (clipHandle == nullptr) {
+	CloseClipboard();
+	return;
+  }
+  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+  auto const spData         = gsl::span(clipStitchData, stitchCount);
+  auto       iStitch        = 0U;
+  auto       iDestination   = 0U;
+  thred::savclp(spData[0], astch[0], stitchCount);
+  ++iStitch;
+  ++iDestination;
+  while (iStitch < stitchCount) {
+	thred::savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
+	++iStitch;
+	++iDestination;
+  }
+  GlobalUnlock(clipHandle);
+  SetClipboardData(Clip, clipHandle);
   CloseClipboard();
 }
 
