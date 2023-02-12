@@ -5226,33 +5226,34 @@ void thi::unlin() {
 }
 
 void thi::movbox() {
-  if (!StitchBuffer->empty()) {
-	auto stitchCoordsInPixels = POINT {};
-	if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
-	  unbox();
+  if (StitchBuffer->empty()) {
+	return;
+  }
+  auto stitchCoordsInPixels = POINT {};
+  if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+	unbox();
 #ifdef _DEBUG
-	  auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
-	  outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
-	                 ClosestPointIndex,
-	                 ((stitch.attribute & FRMSK) >> FRMSHFT),
-	                 ((stitch.attribute & TYPMSK) >> TYPSHFT),
-	                 stitch.x,
-	                 stitch.y);
+	auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
+	outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
+	               ClosestPointIndex,
+	               ((stitch.attribute & FRMSK) >> FRMSHFT),
+	               ((stitch.attribute & TYPMSK) >> TYPSHFT),
+	               stitch.x,
+	               stitch.y);
 #endif
-	  dubox(stitchCoordsInPixels);
-	  if (StateMap->test(StateFlag::UPTO)) {
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	}
-	else {
-	  shft2box();
-	  StateMap->set(StateFlag::SELBOX);
-	  StateMap->reset(StateFlag::FRMPSEL);
+	dubox(stitchCoordsInPixels);
+	if (StateMap->test(StateFlag::UPTO)) {
 	  StateMap->set(StateFlag::RESTCH);
 	}
-	nuAct(ClosestPointIndex);
-	ritcor(StitchBuffer->operator[](ClosestPointIndex));
   }
+  else {
+	shft2box();
+	StateMap->set(StateFlag::SELBOX);
+	StateMap->reset(StateFlag::FRMPSEL);
+	StateMap->set(StateFlag::RESTCH);
+  }
+  nuAct(ClosestPointIndex);
+  ritcor(StitchBuffer->operator[](ClosestPointIndex));
 }
 
 auto thi::chkhid(size_t colorToCheck) -> bool {
