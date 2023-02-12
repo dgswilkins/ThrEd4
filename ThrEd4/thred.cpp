@@ -4356,242 +4356,241 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for thredHeader in readTHRFile")) {
 	return false;
   }
-  if ((thredHeader.headerType & SIGMASK) == THREDSIG) {
-	if (bytesRead != sizeof(thredHeader)) {
-	  prtred(fileHandle, IDS_SHRTF);
-	  return false;
-	}
-	auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
-	auto const spIDN   = gsl::span {IniFile.designerName};
-	DesignerName->assign(utf::utf8ToUtf16(std::string(spIDN.data())));
-	switch (version) {
-	  case 0: {
-		if (thredHeader.hoopType == SMALHUP) {
-		  IniFile.hoopSizeX = SHUPX;
-		  IniFile.hoopSizeY = SHUPY;
-		  UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
-		}
-		else {
-		  IniFile.hoopSizeX = LHUPX;
-		  IniFile.hoopSizeY = LHUPY;
-		  UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
-		}
-		ritfnam(*DesignerName);
-		auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
-		std::copy(
-		    spIDN.begin(), wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U), spModifierName.begin());
-		break;
-	  }
-	  case 1:
-	  case 2: {
-		if (!wrap::readFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &bytesRead, L"ReadFile for ExtendedHeader in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != sizeof(*ExtendedHeader)) {
-		  prtred(fileHandle, IDS_SHRTF);
-		  return false;
-		}
-		IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
-		IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
-
-		UnzoomedRect = {std::lround(ExtendedHeader->hoopSizeX), std::lround(ExtendedHeader->hoopSizeY)};
-		redfnam(*DesignerName);
-		break;
-	  }
-	  default: {
-		prtred(fileHandle, IDS_NOTVER);
-		return false;
-	  }
-	}
-	ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
-	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-	StitchBuffer->resize(thredHeader.stitchCount);
-	if (thredHeader.stitchCount != 0U) {
-	  auto const bytesToRead = thredHeader.stitchCount * wrap::sizeofType(StitchBuffer);
-	  if (!wrap::readFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for StitchBuffer in readTHRFile")) {
-		return false;
-	  }
-	  if (bytesRead != bytesToRead) {
-		prtred(fileHandle, IDS_PRT);
-		return false;
-	  }
-	}
-	StitchBuffer->shrink_to_fit();
-	auto bytesToRead = bitmap::getBmpNameLength();
-	if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, L"ReadFile for getBmpNameData in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  bitmap::resetBmpFile(true);
-	  prtred(fileHandle, IDS_PRT);
-	  return false;
-	}
-	bytesToRead = sizeof(BackgroundColor);
-	if (!wrap::readFile(fileHandle, &BackgroundColor, bytesToRead, &bytesRead, L"ReadFile for BackgroundColor in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  BackgroundColor = IniFile.backgroundColor;
-	  prtred(fileHandle, IDS_PRT);
-	  return false;
-	}
-	BackgroundBrush = CreateSolidBrush(BackgroundColor);
-	bytesToRead     = sizeof(UserColor);
-	if (!wrap::readFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, L"ReadFile for UserColor in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  UserColor = DEFAULT_COLORS;
-	  prtred(fileHandle, IDS_PRT);
-	  return false;
-	}
-	bytesToRead = sizeof(CustomColor);
-	if (!wrap::readFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, L"ReadFile for CustomColor in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  CustomColor = DEFAULT_COLORS;
-	  prtred(fileHandle, IDS_PRT);
-	  return false;
-	}
-	auto msgBuffer = std::array<char, TSSIZE> {};
-	if (!wrap::readFile(fileHandle, msgBuffer.data(), sizeof(msgBuffer), &bytesRead, L"ReadFile for msgBuffer in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != TSSIZE) {
-	  prtred(fileHandle, IDS_PRT);
-	  return false;
-	}
-	auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
-	auto       threadSizeBufW = utf::utf8ToUtf16(threadSizebuf);
-	std::ranges::generate(ThreadSize, [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
-	  return *(tsBuffer++);
-	});
-	if (thredHeader.formCount != 0) {
-	  StateMap->reset(StateFlag::BADFIL);
-	  if (version < 2) {
-		auto formListOriginal = std::vector<FRM_HEAD_O> {};
-		formListOriginal.resize(thredHeader.formCount);
-		bytesToRead = thredHeader.formCount * wrap::sizeofType(formListOriginal);
-		if (!wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != bytesToRead) {
-		  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(formListOriginal));
-		  formListOriginal.resize(thredHeader.formCount);
-		  StateMap->set(StateFlag::BADFIL);
-		}
-		FormList->reserve(formListOriginal.size());
-		FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
-	  }
-	  else {
-		auto inFormList = std::vector<FRM_HEAD_OUT> {};
-		inFormList.resize(thredHeader.formCount);
-		bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
-		if (!wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != bytesToRead) {
-		  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(inFormList));
-		  inFormList.resize(thredHeader.formCount);
-		  StateMap->set(StateFlag::BADFIL);
-		}
-		FormList->reserve(inFormList.size());
-		FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
-	  }
-	  FormList->shrink_to_fit();
-	  if (thredHeader.vertexCount != 0U) {
-		FormVertices->resize(thredHeader.vertexCount);
-		bytesToRead = thredHeader.vertexCount * wrap::sizeofType(FormVertices);
-		if (!wrap::readFile(fileHandle, FormVertices->data(), bytesToRead, &bytesRead, L"ReadFile for FormVertices in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != bytesToRead) {
-		  FormVertices->resize(bytesRead / wrap::sizeofType(FormVertices));
-		  StateMap->set(StateFlag::BADFIL);
-		}
-	  }
-	  else {
-		// We have forms but no vertices - blow up the read
-		prtred(fileHandle, IDS_PRT);
-		return false;
-	  }
-	  FormVertices->shrink_to_fit();
-	  if (thredHeader.dlineCount != 0U) {
-		auto inGuideList = std::vector<SAT_CON_OUT>(thredHeader.dlineCount);
-		bytesToRead      = thredHeader.dlineCount * wrap::sizeofType(inGuideList);
-		if (!wrap::readFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, L"ReadFile for inGuideList in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != bytesToRead) {
-		  inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
-		  StateMap->set(StateFlag::BADFIL);
-		}
-		SatinGuides->reserve(inGuideList.size());
-		SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
-	  }
-	  SatinGuides->shrink_to_fit();
-	  if (thredHeader.clipDataCount != 0U) {
-		ClipPoints->resize(thredHeader.clipDataCount);
-		bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(ClipPoints);
-		if (!wrap::readFile(fileHandle, ClipPoints->data(), bytesToRead, &bytesRead, L"ReadFile for ClipPoints in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != bytesToRead) {
-		  ClipPoints->resize(bytesRead / wrap::sizeofType(ClipPoints));
-		  StateMap->set(StateFlag::BADFIL);
-		}
-	  }
-	  ClipPoints->shrink_to_fit();
-	  if (ExtendedHeader->texturePointCount != 0U) {
-		TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
-		bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(TexturePointsBuffer);
-		if (!wrap::readFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for TexturePointsBuffer in readTHRFile")) {
-		  return false;
-		}
-		if (bytesRead != bytesToRead) {
-		  TexturePointsBuffer->resize(bytesRead / wrap::sizeofType(TexturePointsBuffer));
-		  StateMap->set(StateFlag::BADFIL);
-		}
-	  }
-	  else {
-		TexturePointsBuffer->clear();
-	  }
-	  TexturePointsBuffer->shrink_to_fit();
-	  if (StateMap->testAndReset(StateFlag::BADFIL)) {
-		displayText::bfilmsg();
-	  }
-	  // now re-create all the pointers/indexes in the form data
-	  auto clipOffset   = 0U;
-	  auto vertexOffset = 0U;
-	  auto guideOffset  = 0U;
-	  for (auto& form : *FormList) {
-		form.vertexIndex = vertexOffset;
-		vertexOffset += form.vertexCount;
-		if (form.type == SAT) {
-		  if (form.satinGuideCount != 0U) {
-			form.satinOrAngle.guide = guideOffset;
-			guideOffset += form.satinGuideCount;
-		  }
-		}
-		// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
-		// where we could not store the pointer in v2)
-		if (form.isClip()) {
-		  form.angleOrClipData.clip = clipOffset;
-		  clipOffset += form.lengthOrCount.clipCount;
-		}
-		if (form.isEdgeClipX()) {
-		  form.borderClipData = clipOffset;
-		  clipOffset += form.clipEntries;
-		}
-	  }
-	  xt::setfchk();
-	}
-  }
-  else {
+  if ((thredHeader.headerType & SIGMASK) != THREDSIG) {
 	prtred(fileHandle, IDS_NOTHR);
 	return false;
   }
+  if (bytesRead != sizeof(thredHeader)) {
+	prtred(fileHandle, IDS_SHRTF);
+	return false;
+  }
+  auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
+  auto const spIDN   = gsl::span {IniFile.designerName};
+  DesignerName->assign(utf::utf8ToUtf16(std::string(spIDN.data())));
+  switch (version) {
+	case 0: {
+	  if (thredHeader.hoopType == SMALHUP) {
+		IniFile.hoopSizeX = SHUPX;
+		IniFile.hoopSizeY = SHUPY;
+		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
+	  }
+	  else {
+		IniFile.hoopSizeX = LHUPX;
+		IniFile.hoopSizeY = LHUPY;
+		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
+	  }
+	  ritfnam(*DesignerName);
+	  auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
+	  std::copy(spIDN.begin(), wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U), spModifierName.begin());
+	  break;
+	}
+	case 1:
+	case 2: {
+	  if (!wrap::readFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &bytesRead, L"ReadFile for ExtendedHeader in readTHRFile")) {
+		return false;
+	  }
+	  if (bytesRead != sizeof(*ExtendedHeader)) {
+		prtred(fileHandle, IDS_SHRTF);
+		return false;
+	  }
+	  IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
+	  IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
+
+	  UnzoomedRect = {std::lround(ExtendedHeader->hoopSizeX), std::lround(ExtendedHeader->hoopSizeY)};
+	  redfnam(*DesignerName);
+	  break;
+	}
+	default: {
+	  prtred(fileHandle, IDS_NOTVER);
+	  return false;
+	}
+  }
+  ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
+  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  StitchBuffer->resize(thredHeader.stitchCount);
+  if (thredHeader.stitchCount != 0U) {
+	auto const bytesToRead = thredHeader.stitchCount * wrap::sizeofType(StitchBuffer);
+	if (!wrap::readFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for StitchBuffer in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  prtred(fileHandle, IDS_PRT);
+	  return false;
+	}
+  }
+  StitchBuffer->shrink_to_fit();
+  auto bytesToRead = bitmap::getBmpNameLength();
+  if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, L"ReadFile for getBmpNameData in readTHRFile")) {
+	return false;
+  }
+  if (bytesRead != bytesToRead) {
+	bitmap::resetBmpFile(true);
+	prtred(fileHandle, IDS_PRT);
+	return false;
+  }
+  bytesToRead = sizeof(BackgroundColor);
+  if (!wrap::readFile(fileHandle, &BackgroundColor, bytesToRead, &bytesRead, L"ReadFile for BackgroundColor in readTHRFile")) {
+	return false;
+  }
+  if (bytesRead != bytesToRead) {
+	BackgroundColor = IniFile.backgroundColor;
+	prtred(fileHandle, IDS_PRT);
+	return false;
+  }
+  BackgroundBrush = CreateSolidBrush(BackgroundColor);
+  bytesToRead     = sizeof(UserColor);
+  if (!wrap::readFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, L"ReadFile for UserColor in readTHRFile")) {
+	return false;
+  }
+  if (bytesRead != bytesToRead) {
+	UserColor = DEFAULT_COLORS;
+	prtred(fileHandle, IDS_PRT);
+	return false;
+  }
+  bytesToRead = sizeof(CustomColor);
+  if (!wrap::readFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, L"ReadFile for CustomColor in readTHRFile")) {
+	return false;
+  }
+  if (bytesRead != bytesToRead) {
+	CustomColor = DEFAULT_COLORS;
+	prtred(fileHandle, IDS_PRT);
+	return false;
+  }
+  auto msgBuffer = std::array<char, TSSIZE> {};
+  if (!wrap::readFile(fileHandle, msgBuffer.data(), sizeof(msgBuffer), &bytesRead, L"ReadFile for msgBuffer in readTHRFile")) {
+	return false;
+  }
+  if (bytesRead != TSSIZE) {
+	prtred(fileHandle, IDS_PRT);
+	return false;
+  }
+  auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
+  auto       threadSizeBufW = utf::utf8ToUtf16(threadSizebuf);
+  std::ranges::generate(ThreadSize, [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
+	return *(tsBuffer++);
+  });
+  if (thredHeader.formCount == 0) {
+	CloseHandle(fileHandle);
+	return true;
+  }
+  StateMap->reset(StateFlag::BADFIL);
+  if (version < 2) {
+	auto formListOriginal = std::vector<FRM_HEAD_O> {};
+	formListOriginal.resize(thredHeader.formCount);
+	bytesToRead = thredHeader.formCount * wrap::sizeofType(formListOriginal);
+	if (!wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(formListOriginal));
+	  formListOriginal.resize(thredHeader.formCount);
+	  StateMap->set(StateFlag::BADFIL);
+	}
+	FormList->reserve(formListOriginal.size());
+	FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
+  }
+  else {
+	auto inFormList = std::vector<FRM_HEAD_OUT> {};
+	inFormList.resize(thredHeader.formCount);
+	bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
+	if (!wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(inFormList));
+	  inFormList.resize(thredHeader.formCount);
+	  StateMap->set(StateFlag::BADFIL);
+	}
+	FormList->reserve(inFormList.size());
+	FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+  }
+  FormList->shrink_to_fit();
+  if (thredHeader.vertexCount != 0U) {
+	FormVertices->resize(thredHeader.vertexCount);
+	bytesToRead = thredHeader.vertexCount * wrap::sizeofType(FormVertices);
+	if (!wrap::readFile(fileHandle, FormVertices->data(), bytesToRead, &bytesRead, L"ReadFile for FormVertices in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  FormVertices->resize(bytesRead / wrap::sizeofType(FormVertices));
+	  StateMap->set(StateFlag::BADFIL);
+	}
+  }
+  else {
+	// We have forms but no vertices - blow up the read
+	prtred(fileHandle, IDS_PRT);
+	return false;
+  }
+  FormVertices->shrink_to_fit();
+  if (thredHeader.dlineCount != 0U) {
+	auto inGuideList = std::vector<SAT_CON_OUT>(thredHeader.dlineCount);
+	bytesToRead      = thredHeader.dlineCount * wrap::sizeofType(inGuideList);
+	if (!wrap::readFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, L"ReadFile for inGuideList in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
+	  StateMap->set(StateFlag::BADFIL);
+	}
+	SatinGuides->reserve(inGuideList.size());
+	SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
+  }
+  SatinGuides->shrink_to_fit();
+  if (thredHeader.clipDataCount != 0U) {
+	ClipPoints->resize(thredHeader.clipDataCount);
+	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(ClipPoints);
+	if (!wrap::readFile(fileHandle, ClipPoints->data(), bytesToRead, &bytesRead, L"ReadFile for ClipPoints in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  ClipPoints->resize(bytesRead / wrap::sizeofType(ClipPoints));
+	  StateMap->set(StateFlag::BADFIL);
+	}
+  }
+  ClipPoints->shrink_to_fit();
+  if (ExtendedHeader->texturePointCount != 0U) {
+	TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
+	bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(TexturePointsBuffer);
+	if (!wrap::readFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for TexturePointsBuffer in readTHRFile")) {
+	  return false;
+	}
+	if (bytesRead != bytesToRead) {
+	  TexturePointsBuffer->resize(bytesRead / wrap::sizeofType(TexturePointsBuffer));
+	  StateMap->set(StateFlag::BADFIL);
+	}
+  }
+  else {
+	TexturePointsBuffer->clear();
+  }
+  TexturePointsBuffer->shrink_to_fit();
+  if (StateMap->testAndReset(StateFlag::BADFIL)) {
+	displayText::bfilmsg();
+  }
+  // now re-create all the pointers/indexes in the form data
+  auto clipOffset   = 0U;
+  auto vertexOffset = 0U;
+  auto guideOffset  = 0U;
+  for (auto& form : *FormList) {
+	form.vertexIndex = vertexOffset;
+	vertexOffset += form.vertexCount;
+	if (form.type == SAT) {
+	  if (form.satinGuideCount != 0U) {
+		form.satinOrAngle.guide = guideOffset;
+		guideOffset += form.satinGuideCount;
+	  }
+	}
+	// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
+	// where we could not store the pointer in v2)
+	if (form.isClip()) {
+	  form.angleOrClipData.clip = clipOffset;
+	  clipOffset += form.lengthOrCount.clipCount;
+	}
+	if (form.isEdgeClipX()) {
+	  form.borderClipData = clipOffset;
+	  clipOffset += form.clipEntries;
+	}
+  }
+  xt::setfchk();
   CloseHandle(fileHandle);
   return true;
 }
@@ -4672,10 +4671,8 @@ void thi::nuFil(FileIndices fileIndex) {
   }
   auto const firstCharacter = tolower(fileExt[1]);
   if (firstCharacter == 't') {
-	{
-	  if (!readTHRFile(newFileName)) {
-		return;
-	  }
+	if (!readTHRFile(newFileName)) {
+	  return;
 	}
   }
   else {
