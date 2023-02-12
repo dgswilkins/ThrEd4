@@ -5599,28 +5599,29 @@ void thred::unbBox() {
 
 void thi::rebox() {
   unbox();
-  if (closPnt1(ClosestPointIndex)) {
-	nuAct(ClosestPointIndex);
-	auto stitchCoordsInPixels = POINT {};
-	if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
-	  dubox(stitchCoordsInPixels);
-	  outDebugString(L"rebox:Stitch [{}] form [{}] type [{}]\n",
-	                 ClosestPointIndex,
-	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
-	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT));
-	}
-	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
-	  StateMap->reset(StateFlag::SCROS);
-	  StateMap->reset(StateFlag::ECROS);
-	  SearchLine->clear();
-	  SearchLine->shrink_to_fit();
-	  StateMap->set(StateFlag::RESTCH);
-	  for (auto const& window : *UserColorWin) {
-		thred::redraw(window);
-	  }
-	}
-	ritcor(StitchBuffer->operator[](ClosestPointIndex));
+  if (!closPnt1(ClosestPointIndex)) {
+	return;
   }
+  nuAct(ClosestPointIndex);
+  auto stitchCoordsInPixels = POINT {};
+  if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+	dubox(stitchCoordsInPixels);
+	outDebugString(L"rebox:Stitch [{}] form [{}] type [{}]\n",
+	               ClosestPointIndex,
+	               ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
+	               ((StitchBuffer->operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT));
+  }
+  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
+	StateMap->reset(StateFlag::SCROS);
+	StateMap->reset(StateFlag::ECROS);
+	SearchLine->clear();
+	SearchLine->shrink_to_fit();
+	StateMap->set(StateFlag::RESTCH);
+	for (auto const& window : *UserColorWin) {
+	  thred::redraw(window);
+	}
+  }
+  ritcor(StitchBuffer->operator[](ClosestPointIndex));
 }
 
 void thred::delstchm() {
