@@ -4923,67 +4923,68 @@ void thi::zumshft() {
 void thi::zumout() {
   unboxs();
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
-  if (StateMap->test(StateFlag::ZUMED)) {
-	do {
-	  if (StateMap->test(StateFlag::GMRK)) {
-		stitchPoint = ZoomMarkPoint;
-		break;
-	  }
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
-
-		stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
-		                       wrap::midl(boundingRect.top, boundingRect.bottom)};
-		break;
-	  }
-	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto const itVertex =
-		    wrap::next(FormVertices->cbegin(),
-		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-		stitchPoint = *itVertex;
-		break;
-	  }
-	  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT)) {
-		stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
-		break;
-	  }
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		auto groupBoundingRect = F_RECTANGLE {};
-		thred::selRct(groupBoundingRect);
-		stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
-		                       wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
-		break;
-	  }
-	  if (StateMap->test(StateFlag::SELBOX)) {
-		shft2box();
-		break;
-	  }
-	  if (!thred::inStitchWin()) {
-		stitchPoint = centr();
-	  }
-	} while (false);
-	ZoomFactor /= ZUMFCT;
-	constexpr auto ZMCLAMP = 0.98F; // clamp the zoom factor
-	if (ZoomFactor > ZMCLAMP) {
-	  ZoomFactor = 1;
-	  StateMap->reset(StateFlag::ZUMED);
-	  ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
-	  thred::movStch();
-	  NearestCount = 0;
-	}
-	else {
-	  auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
-	  ZoomRect = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
-	  thred::shft(stitchPoint);
-	}
-	if (StateMap->test(StateFlag::RUNPAT)) {
-	  FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	  RunPoint = 0;
-	}
-	StateMap->set(StateFlag::RESTCH);
-	thred::duzrat();
-	movins();
+  if (!StateMap->test(StateFlag::ZUMED)) {
+	return;
   }
+  do {
+	if (StateMap->test(StateFlag::GMRK)) {
+	  stitchPoint = ZoomMarkPoint;
+	  break;
+	}
+	if (StateMap->test(StateFlag::FORMSEL)) {
+	  auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
+
+	  stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
+	                         wrap::midl(boundingRect.top, boundingRect.bottom)};
+	  break;
+	}
+	if (StateMap->test(StateFlag::FRMPSEL)) {
+	  auto const itVertex =
+	      wrap::next(FormVertices->cbegin(),
+	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	  stitchPoint = *itVertex;
+	  break;
+	}
+	if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT)) {
+	  stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
+	  break;
+	}
+	if (StateMap->test(StateFlag::GRPSEL)) {
+	  auto groupBoundingRect = F_RECTANGLE {};
+	  thred::selRct(groupBoundingRect);
+	  stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
+	                         wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
+	  break;
+	}
+	if (StateMap->test(StateFlag::SELBOX)) {
+	  shft2box();
+	  break;
+	}
+	if (!thred::inStitchWin()) {
+	  stitchPoint = centr();
+	}
+  } while (false);
+  ZoomFactor /= ZUMFCT;
+  constexpr auto ZMCLAMP = 0.98F; // clamp the zoom factor
+  if (ZoomFactor > ZMCLAMP) {
+	ZoomFactor = 1;
+	StateMap->reset(StateFlag::ZUMED);
+	ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
+	thred::movStch();
+	NearestCount = 0;
+  }
+  else {
+	auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
+	ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
+	thred::shft(stitchPoint);
+  }
+  if (StateMap->test(StateFlag::RUNPAT)) {
+	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
+	RunPoint = 0;
+  }
+  StateMap->set(StateFlag::RESTCH);
+  thred::duzrat();
+  movins();
 }
 
 void thi::duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest) {
