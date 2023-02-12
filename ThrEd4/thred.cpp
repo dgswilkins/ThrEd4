@@ -6064,32 +6064,36 @@ void thi::clipSelectedForm() {
   GlobalUnlock(clipHandle);
   SetClipboardData(thrEdClip, clipHandle);
   StateMap->reset(StateFlag::WASPCDCLP);
-  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
-	Clip = RegisterClipboardFormat(PcdClipFormat);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
-	if (clipHandle != nullptr) {
-	  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-	  auto const spData         = gsl::span(clipStitchData, stitchCount);
-	  auto       iTexture       = firstStitch;
-	  thred::savclp(spData[0], StitchBuffer->operator[](iTexture), length);
-	  ++iTexture;
-	  auto       iDestination   = 1U;
-	  auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
-	  while (iTexture < StitchBuffer->size()) {
-		if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
-		    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
-		  thred::savclp(spData[iDestination++],
-		                StitchBuffer->operator[](iTexture),
-		                (StitchBuffer->operator[](iTexture).attribute & COLMSK));
-		}
-		++iTexture;
-	  }
-	  GlobalUnlock(clipHandle);
-	  SetClipboardData(Clip, clipHandle);
-	  StateMap->set(StateFlag::WASPCDCLP);
-	}
+  if (((form.fillType == 0U) && (form.edgeType == 0U))) {
+	CloseClipboard();
+	return;
   }
+  Clip = RegisterClipboardFormat(PcdClipFormat);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
+  if (clipHandle == nullptr) {
+	CloseClipboard();
+	return;
+  }
+  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+  auto const spData         = gsl::span(clipStitchData, stitchCount);
+  auto       iTexture       = firstStitch;
+  thred::savclp(spData[0], StitchBuffer->operator[](iTexture), length);
+  ++iTexture;
+  auto       iDestination   = 1U;
+  auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
+  while (iTexture < StitchBuffer->size()) {
+	if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
+	    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
+	  thred::savclp(spData[iDestination++],
+	                StitchBuffer->operator[](iTexture),
+	                (StitchBuffer->operator[](iTexture).attribute & COLMSK));
+	}
+	++iTexture;
+  }
+  GlobalUnlock(clipHandle);
+  SetClipboardData(Clip, clipHandle);
+  StateMap->set(StateFlag::WASPCDCLP);
   CloseClipboard();
 }
 
