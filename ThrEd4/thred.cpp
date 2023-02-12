@@ -5161,26 +5161,26 @@ auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch
 void thi::toglup() {
   if (StateMap->testAndFlip(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
+	thred::rngadj();
+	ClosestPointIndex = GroupStartStitch;
+	StateMap->set(StateFlag::SELBOX);
+	StateMap->reset(StateFlag::FRMPSEL);
   }
   else {
-	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
-	  thred::rngadj();
-	  ClosestPointIndex = GroupStartStitch;
-	  StateMap->set(StateFlag::SELBOX);
-	  StateMap->reset(StateFlag::FRMPSEL);
-	}
-	else {
-	  if (!StateMap->test(StateFlag::SELBOX)) {
-		ClosestPointIndex = 0;
-		if (StateMap->testAndReset(StateFlag::FORMSEL)) {
-		  ClosestPointIndex = thred::findFirstStitch(ClosestFormToCursor);
-		  StateMap->set(StateFlag::SELBOX);
-		  StateMap->reset(StateFlag::FRMPSEL);
-		}
+	if (!StateMap->test(StateFlag::SELBOX)) {
+	  ClosestPointIndex = 0;
+	  if (StateMap->testAndReset(StateFlag::FORMSEL)) {
+		ClosestPointIndex = thred::findFirstStitch(ClosestFormToCursor);
+		StateMap->set(StateFlag::SELBOX);
+		StateMap->reset(StateFlag::FRMPSEL);
 	  }
 	}
-	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
+  displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   StateMap->set(StateFlag::RESTCH);
 }
 
