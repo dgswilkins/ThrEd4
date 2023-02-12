@@ -5481,17 +5481,18 @@ void thi::istch() {
 }
 
 void thi::mark() {
-  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT) || closPnt1(ClosestPointIndex)) {
-	unbox();
-	xlin();
-	StateMap->reset(StateFlag::CAPT);
-	StateMap->reset(StateFlag::SELBOX);
-	StateMap->reset(StateFlag::INSRT);
-	StateMap->reset(StateFlag::SCROS);
-	StateMap->reset(StateFlag::ECROS);
-	GroupStitchIndex = ClosestPointIndex;
-	StateMap->set(StateFlag::GRPSEL);
+  if (!closPnt1(ClosestPointIndex) && !StateMap->test(StateFlag::SELBOX) && !StateMap->test(StateFlag::INSRT)) {
+	return;
   }
+  unbox();
+  xlin();
+  StateMap->reset(StateFlag::CAPT);
+  StateMap->reset(StateFlag::SELBOX);
+  StateMap->reset(StateFlag::INSRT);
+  StateMap->reset(StateFlag::SCROS);
+  StateMap->reset(StateFlag::ECROS);
+  GroupStitchIndex = ClosestPointIndex;
+  StateMap->set(StateFlag::GRPSEL);
 }
 
 void thi::selCol() {
