@@ -4205,11 +4205,12 @@ auto thi::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
 }
 
 void thi::delstch1(uint32_t iStitch) {
-  if (!StitchBuffer->empty()) {
-	StitchBuffer->erase(wrap::next(StitchBuffer->begin(), iStitch));
-	if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size()) - 1U) {
-	  ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size()) - 1U;
-	}
+  if (StitchBuffer->empty()) {
+	return;
+  }
+  StitchBuffer->erase(wrap::next(StitchBuffer->begin(), iStitch));
+  if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size()) - 1U) {
+	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size()) - 1U;
   }
 }
 
