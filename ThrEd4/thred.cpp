@@ -4839,12 +4839,7 @@ void thi::zumin() {
 	  }
 	  if (StateMap->test(StateFlag::INSRT)) {
 		if (StateMap->test(StateFlag::LIN1)) {
-		  if (StateMap->test(StateFlag::BAKEND)) {
-			stitchPoint = StitchBuffer->back();
-		  }
-		  else {
-			stitchPoint = StitchBuffer->front();
-		  }
+		  stitchPoint = StateMap->test(StateFlag::BAKEND) ? StitchBuffer->back() : StitchBuffer->front();
 		}
 		else {
 		  stitchPoint =
