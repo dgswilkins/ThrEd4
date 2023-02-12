@@ -5072,20 +5072,23 @@ auto thi::closPnt1(uint32_t& closestStitch) -> bool {
   if (StateMap->test(StateFlag::HID)) {
 	auto const maxIt = wrap::next(ColorChangeTable->end(), -1);
 	for (auto colorIt = ColorChangeTable->begin(); colorIt != maxIt; ++colorIt) {
-	  if (colorIt->colorIndex == ActiveColor) {
-		auto       stitch   = std::next(StitchBuffer->begin(), colorIt->stitchIndex);
-		auto const maxColor = std::next(colorIt)->stitchIndex;
-		for (auto iStitch = colorIt->stitchIndex; iStitch < maxColor; ++iStitch) {
-		  if (stitch->x >= ZoomRect.left && stitch->x <= ZoomRect.right &&
-		      stitch->y >= ZoomRect.bottom && stitch->y <= ZoomRect.top) {
-			auto const distance = hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
-			if (distance < distanceToClick) {
-			  distanceToClick = distance;
-			  closestIndex    = iStitch;
-			}
-		  }
+	  if (colorIt->colorIndex != ActiveColor) {
+		continue;
+	  }
+	  auto       stitch   = std::next(StitchBuffer->begin(), colorIt->stitchIndex);
+	  auto const maxColor = std::next(colorIt)->stitchIndex;
+	  for (auto iStitch = colorIt->stitchIndex; iStitch < maxColor; ++iStitch) {
+		if (stitch->x < ZoomRect.left || stitch->x > ZoomRect.right ||
+		    stitch->y < ZoomRect.bottom || stitch->y > ZoomRect.top) {
 		  ++stitch;
+		  continue;
 		}
+		auto const distance = hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
+		if (distance < distanceToClick) {
+		  distanceToClick = distance;
+		  closestIndex    = iStitch;
+		}
+		++stitch;
 	  }
 	}
   }
@@ -5093,15 +5096,19 @@ auto thi::closPnt1(uint32_t& closestStitch) -> bool {
 	auto currentStitch = 0U;
 	for (auto const& stitch : *StitchBuffer) {
 	  auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
-	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
-		    stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
-		  auto const distance = hypot(stitch.x - stitchPoint.x, stitch.y - stitchPoint.y);
-		  if (distance < distanceToClick) {
-			distanceToClick = distance;
-			closestIndex    = currentStitch;
-		  }
-		}
+	  if ((ActiveLayer != 0U) && (layer != 0U) && (layer != ActiveLayer)) {
+		++currentStitch;
+		continue;
+	  }
+	  if (stitch.x < ZoomRect.left || stitch.x > ZoomRect.right || stitch.y < ZoomRect.bottom ||
+	      stitch.y > ZoomRect.top) {
+		++currentStitch;
+		continue;
+	  }
+	  auto const distance = hypot(stitch.x - stitchPoint.x, stitch.y - stitchPoint.y);
+	  if (distance < distanceToClick) {
+		distanceToClick = distance;
+		closestIndex    = currentStitch;
 	  }
 	  ++currentStitch;
 	}
