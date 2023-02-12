@@ -5880,26 +5880,12 @@ void thi::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
 }
 
 void thi::rot(F_POINT& rotationCenter) {
-  do {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  break;
-	}
-	if (!SelectedFormList->empty()) {
-	  break;
-	}
-	if (StateMap->test(StateFlag::BIGBOX)) {
-	  break;
-	}
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  break;
-	}
-	if (StateMap->test(StateFlag::FPSEL)) {
-	  break;
-	}
+  if (!StateMap->test(StateFlag::FORMSEL) || SelectedFormList->empty() || !StateMap->test(StateFlag::BIGBOX) ||
+      !StateMap->test(StateFlag::GRPSEL) || !StateMap->test(StateFlag::FPSEL)) {
 	// no rotatable selections found
 	displayText::shoseln(IDS_FGRPF, IDS_ROT);
 	return;
-  } while (false);
+  }
   StateMap->set(StateFlag::ROTAT);
   rotationCenter = form::rotpar();
   ritrot(0, rotationCenter);
