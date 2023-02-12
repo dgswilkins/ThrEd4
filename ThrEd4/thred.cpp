@@ -5997,13 +5997,11 @@ void thi::sizclp(FRM_HEAD const& form,
 }
 
 void thi::clipSelectedForm() {
-  // clang-format off
-		  auto  firstStitch = 0U; // points to the first stitch in a form
-		  auto  stitchCount = 0U;
-		  auto& form        = FormList->operator[](ClosestFormToCursor);
-		  auto  length      = 0U;
-  // clang-format on
-  auto clipSize = 0U;
+  auto  firstStitch = 0U; // points to the first stitch in a form
+  auto  stitchCount = 0U;
+  auto  length      = 0U;
+  auto  clipSize    = 0U;
+  auto& form        = FormList->operator[](ClosestFormToCursor);
   sizclp(form, firstStitch, stitchCount, length, clipSize);
   clipSize += sizeof(FORM_CLIP);
   // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
@@ -6131,10 +6129,9 @@ void thi::clipSelectedForms() {
   auto const formVertices = gsl::span(ptrFormVertices, verticesSize);
   auto       iVertex      = 0U;
   for (auto& selectedForm : (*SelectedFormList)) {
-	// clang-format off
-			  auto& form     = FormList->operator[](selectedForm);
-			  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	// clang-format on
+	auto& form = FormList->operator[](selectedForm);
+
+	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iSide = 0U; iSide < form.vertexCount; ++iSide) {
 	  formVertices[iVertex++] = *itVertex;
 	  ++itVertex;
