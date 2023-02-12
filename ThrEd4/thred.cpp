@@ -4252,52 +4252,55 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
   auto hResult = CoCreateInstance(
       CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-  if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
-	auto dwOptions = DWORD {};
-	hResult        = pFileOpen->GetOptions(&dwOptions);
+  if (FAILED(hResult) || (nullptr == pFileOpen)) {
+	return false;
+  }
+  auto dwOptions = DWORD {};
+  hResult        = pFileOpen->GetOptions(&dwOptions);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-	if (SUCCEEDED(hResult)) {
-	  hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
-	  switch (fileTypes) {
-		case FileStyles::ALL_FILES: {
+  if (FAILED(hResult)) {
+	return false;
+  }
+  hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
+  switch (fileTypes) {
+	case FileStyles::ALL_FILES: {
 #if PESACT
-		  static constexpr auto ALL_FILE_TYPES =
-		      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
+	  static constexpr auto ALL_FILE_TYPES =
+	      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
 #else
-		  static constexpr auto ALL_FILE_TYPES =
-		      std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
+	  static constexpr auto ALL_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
-		  hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(ALL_FILE_TYPES.size()), ALL_FILE_TYPES.data());
-		  break;
-		}
-		case FileStyles::INS_FILES: {
-		  static constexpr auto INSERT_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
-		  hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()),
-		                                     INSERT_FILE_TYPES.data());
-		  break;
-		}
-	  }
-	  switch (fileIndex) {
-		case FileIndices::THR: {
-		  hResult += pFileOpen->SetFileTypeIndex(1);
-		  break;
-		}
-		case FileIndices::PCS: {
-		  hResult += pFileOpen->SetFileTypeIndex(2);
-		  break;
-		}
-		case FileIndices::DST: {
-		  hResult += pFileOpen->SetFileTypeIndex(3);
-		  break;
-		}
+	  hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(ALL_FILE_TYPES.size()), ALL_FILE_TYPES.data());
+	  break;
+	}
+	case FileStyles::INS_FILES: {
+	  static constexpr auto INSERT_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
+	  hResult +=
+	      pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()), INSERT_FILE_TYPES.data());
+	  break;
+	}
+  }
+  switch (fileIndex) {
+	case FileIndices::THR: {
+	  hResult += pFileOpen->SetFileTypeIndex(1);
+	  break;
+	}
+	case FileIndices::PCS: {
+	  hResult += pFileOpen->SetFileTypeIndex(2);
+	  break;
+	}
+	case FileIndices::DST: {
+	  hResult += pFileOpen->SetFileTypeIndex(3);
+	  break;
+	}
 #if PESACT
-		case FileIndices::PES: {
-		  hResult += pFileOpen->SetFileTypeIndex(4);
-		  break;
-		}
+	case FileIndices::PES: {
+	  hResult += pFileOpen->SetFileTypeIndex(4);
+	  break;
+	}
 #endif
-	  }
-	  hResult += pFileOpen->SetTitle(L"Open Thred File");
+  }
+  hResult += pFileOpen->SetTitle(L"Open Thred File");
 #if 0
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
 		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
@@ -4308,29 +4311,30 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 		}
 #endif
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-	  if (SUCCEEDED(hResult)) {
-		hResult = pFileOpen->Show(nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-		if (SUCCEEDED(hResult)) {
-		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		  hResult     = pFileOpen->GetResult(&pItem);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-		  if (SUCCEEDED(hResult) && (nullptr != pItem)) {
-			// NOLINTNEXTLINE(readability-qualified-auto)
-			auto pszFilePath = PWSTR {nullptr};
-			hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-			if (SUCCEEDED(hResult)) {
-			  newFileName.assign(pszFilePath);
-			  CoTaskMemFree(pszFilePath);
-			  return true;
-			}
-		  }
-		}
-	  }
-	}
+  if (FAILED(hResult)) {
+	return false;
   }
-  return false;
+  hResult = pFileOpen->Show(nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (FAILED(hResult)) {
+	return false;
+  }
+  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+  hResult     = pFileOpen->GetResult(&pItem);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (FAILED(hResult) || (nullptr == pItem)) {
+	return false;
+  }
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto pszFilePath = PWSTR {nullptr};
+  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (FAILED(hResult)) {
+	return false;
+  }
+  newFileName.assign(pszFilePath);
+  CoTaskMemFree(pszFilePath);
+  return true;
 }
 
 auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
