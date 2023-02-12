@@ -4223,21 +4223,22 @@ void thi::prtred(HANDLE fileHandle, uint32_t code) {
 }
 
 void thi::unthum() {
-  if (StateMap->testAndReset(StateFlag::THUMSHO)) {
-	for (auto const& iBackup : BackupViewer) {
-	  DestroyWindow(iBackup);
-	}
-	if (StateMap->test(StateFlag::UPTO)) {
-	  displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
-	}
-	else {
-	  displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
-	}
-	auto const blank = std::wstring {};
-	displayText::butxt(HNUM, blank);
-	thred::redraw(ButtonWin->operator[](HHID));
-	displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
+  if (!StateMap->testAndReset(StateFlag::THUMSHO)) {
+	return;
   }
+  for (auto const& iBackup : BackupViewer) {
+	DestroyWindow(iBackup);
+  }
+  if (StateMap->test(StateFlag::UPTO)) {
+	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
+  }
+  else {
+	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
+  }
+  auto const blank = std::wstring {};
+  displayText::butxt(HNUM, blank);
+  thred::redraw(ButtonWin->operator[](HHID));
+  displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
 }
 
 void thi::rstdu() {
