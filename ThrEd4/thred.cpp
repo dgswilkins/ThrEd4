@@ -4152,35 +4152,36 @@ void thi::stchWnd() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont = displayText::getThrEdFont(FONTSIZE);
   SelectObject(GetDC(MainStitchWin), hFont);
-  if (MainStitchWin != nullptr) {
-	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	VerticalScrollBar = CreateWindow(L"SCROLLBAR",
-	                                 nullptr,
-	                                 SBS_VERT | WS_CHILD | WS_VISIBLE,
-	                                 StitchWindowSize.cx + ButtonWidthX3,
-	                                 0,
-	                                 *ScrollSize,
-	                                 StitchWindowSize.cy,
-	                                 ThrEdWindow,
-	                                 nullptr,
-	                                 ThrEdInstance,
-	                                 nullptr);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	HorizontalScrollBar = CreateWindow(L"SCROLLBAR",
-	                                   nullptr,
-	                                   SBS_HORZ | WS_CHILD | WS_VISIBLE,
-	                                   ButtonWidthX3,
-	                                   StitchWindowSize.cy,
-	                                   StitchWindowSize.cx,
-	                                   *ScrollSize,
-	                                   ThrEdWindow,
-	                                   nullptr,
-	                                   ThrEdInstance,
-	                                   nullptr);
-	ShowWindow(VerticalScrollBar, SW_HIDE);
-	ShowWindow(HorizontalScrollBar, SW_HIDE);
+  if (MainStitchWin == nullptr) {
+	return;
   }
+  GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  VerticalScrollBar = CreateWindow(L"SCROLLBAR",
+                                   nullptr,
+                                   SBS_VERT | WS_CHILD | WS_VISIBLE,
+                                   StitchWindowSize.cx + ButtonWidthX3,
+                                   0,
+                                   *ScrollSize,
+                                   StitchWindowSize.cy,
+                                   ThrEdWindow,
+                                   nullptr,
+                                   ThrEdInstance,
+                                   nullptr);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  HorizontalScrollBar = CreateWindow(L"SCROLLBAR",
+                                     nullptr,
+                                     SBS_HORZ | WS_CHILD | WS_VISIBLE,
+                                     ButtonWidthX3,
+                                     StitchWindowSize.cy,
+                                     StitchWindowSize.cx,
+                                     *ScrollSize,
+                                     ThrEdWindow,
+                                     nullptr,
+                                     ThrEdInstance,
+                                     nullptr);
+  ShowWindow(VerticalScrollBar, SW_HIDE);
+  ShowWindow(HorizontalScrollBar, SW_HIDE);
 }
 
 // check if a click occurred in a vertical set of 16 windows
