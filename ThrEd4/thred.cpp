@@ -3959,20 +3959,18 @@ void thi::dun() {
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
   if (savcmp() || (!BalaradName0->empty())) {
 	reldun();
+	return;
   }
-  else {
-	if (StitchWindowClientRect.right != 0) {
-	  displayText::savdisc();
-	  StateMap->set(StateFlag::SAVEX);
-	}
-	else {
-	  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SAVFIL)), ThrName->wstring());
-	  if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
-		thred::save();
-	  }
-	  reldun();
-	}
+  if (StitchWindowClientRect.right != 0) {
+	displayText::savdisc();
+	StateMap->set(StateFlag::SAVEX);
+	return;
   }
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SAVFIL)), ThrName->wstring());
+  if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
+	thred::save();
+  }
+  reldun();
 }
 
 void thi::dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize) {
