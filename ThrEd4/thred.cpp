@@ -4186,22 +4186,21 @@ void thi::stchWnd() {
 // check if a click occurred in a vertical set of 16 windows
 // and calculate which window had the click
 auto thi::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
-  auto flag       = false;
   auto topRect    = RECT {};
   auto bottomRect = RECT {};
   GetWindowRect(topWindow, &topRect);
   GetWindowRect(bottomWindow, &bottomRect);
-  if (clickCoord.x > topRect.left && clickCoord.x < bottomRect.right &&
-      clickCoord.y > topRect.top && clickCoord.y < bottomRect.bottom) {
-	VerticalIndex = COLORMAX - gsl::narrow<uint8_t>((bottomRect.bottom - clickCoord.y) / ButtonHeight);
-	if (VerticalIndex > COLORMAX) { // Something has broken so do something reasonable
-	  VerticalIndex &= COLMSK;
-	}
-	else { // we have a valid Index
-	  flag = true;
-	}
+  if (clickCoord.x <= topRect.left || clickCoord.x >= bottomRect.right ||
+      clickCoord.y <= topRect.top || clickCoord.y >= bottomRect.bottom) {
+	return false;
   }
-  return flag;
+  VerticalIndex = COLORMAX - gsl::narrow<uint8_t>((bottomRect.bottom - clickCoord.y) / ButtonHeight);
+  if (VerticalIndex > COLORMAX) { // Something has broken so do something reasonable
+	VerticalIndex &= COLMSK;
+	return false;
+  }
+  // we have a valid Index
+  return true;
 }
 
 void thi::delstch1(uint32_t iStitch) {
