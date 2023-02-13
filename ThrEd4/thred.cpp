@@ -3761,15 +3761,15 @@ void thi::chk1col() {
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
 	auto const ccTableIt     = wrap::next(ColorChangeTable->begin(), iColorChange);
 	auto const ccTableNextIt = std::next(ccTableIt);
-	if (ccTableNextIt->stitchIndex - ccTableIt->stitchIndex == 1) {
-	  auto const iStitch = ccTableIt->stitchIndex;
-	  auto       stitchIt =
-          (iStitch != 0U) ? wrap::next(StitchBuffer->begin(), iStitch - 1U) : StitchBuffer->begin();
-	  auto const color = stitchIt->attribute & COLMSK;
-	  ++stitchIt;
-	  stitchIt->attribute &= NCOLMSK;
-	  stitchIt->attribute |= color;
+	if (ccTableNextIt->stitchIndex - ccTableIt->stitchIndex != 1) {
+	  continue;
 	}
+	auto const iStitch = ccTableIt->stitchIndex;
+	auto stitchIt = (iStitch != 0U) ? wrap::next(StitchBuffer->begin(), iStitch - 1U) : StitchBuffer->begin();
+	auto const color = stitchIt->attribute & COLMSK;
+	++stitchIt;
+	stitchIt->attribute &= NCOLMSK;
+	stitchIt->attribute |= color;
   }
 }
 
