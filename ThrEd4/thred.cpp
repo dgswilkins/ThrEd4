@@ -3935,14 +3935,13 @@ void thi::savAs() {
 void thred::save() {
   if (WorkingFileName->empty()) {
 	thi::savAs();
+	return;
   }
-  else {
-	if (WorkingFileName->extension().empty()) {
-	  *WorkingFileName /= L".thr";
-	}
-	thi::thrsav();
-	thi::sav();
+  if (WorkingFileName->extension().empty()) {
+	*WorkingFileName /= L".thr";
   }
+  thi::thrsav();
+  thi::sav();
 }
 
 void thi::dun() {
