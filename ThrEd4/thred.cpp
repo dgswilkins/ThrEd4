@@ -3893,43 +3893,45 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
 }
 
 void thi::savAs() {
-  if (!StitchBuffer->empty() || !FormList->empty() || bitmap::ismap()) {
-	auto index = FileIndices {};
-	if (getSaveName(*WorkingFileName, index)) {
-	  *DefaultDirectory = WorkingFileName->parent_path();
-	  switch (index) {
-		case FileIndices::THR: {
-		  WorkingFileName->replace_extension(L".thr");
-		  break;
-		}
-		case FileIndices::PCS: {
-		  WorkingFileName->replace_extension(L".pcs");
-		  thi::setpcs();
-		  break;
-		}
+  if (StitchBuffer->empty() && FormList->empty() && bitmap::ismap()) {
+	return;
+  }
+  auto index = FileIndices {};
+  if (!getSaveName(*WorkingFileName, index)) {
+	return;
+  }
+  *DefaultDirectory = WorkingFileName->parent_path();
+  switch (index) {
+	case FileIndices::THR: {
+	  WorkingFileName->replace_extension(L".thr");
+	  break;
+	}
+	case FileIndices::PCS: {
+	  WorkingFileName->replace_extension(L".pcs");
+	  thi::setpcs();
+	  break;
+	}
 #if PESACT
-		case FileIndices::PES: {
-		  WorkingFileName->replace_extension(L".pes");
-		  thi::setpes();
-		  break;
-		}
+	case FileIndices::PES: {
+	  WorkingFileName->replace_extension(L".pes");
+	  thi::setpes();
+	  break;
+	}
 #endif
-		case FileIndices::DST: {
-		  WorkingFileName->replace_extension(L".dst");
-		  thi::setdst();
-		  break;
-		}
-	  }
-	  StateMap->set(StateFlag::SAVAS);
-	  nunams();
-	  ritini();
-	  StateMap->reset(StateFlag::SAVAS);
-	  StateMap->reset(StateFlag::CMPDO);
-	  thrsav();
-	  sav();
-	  SetWindowText(ThrEdWindow, ThrName->wstring().c_str());
+	case FileIndices::DST: {
+	  WorkingFileName->replace_extension(L".dst");
+	  thi::setdst();
+	  break;
 	}
   }
+  StateMap->set(StateFlag::SAVAS);
+  nunams();
+  ritini();
+  StateMap->reset(StateFlag::SAVAS);
+  StateMap->reset(StateFlag::CMPDO);
+  thrsav();
+  sav();
+  SetWindowText(ThrEdWindow, ThrName->wstring().c_str());
 }
 
 void thred::save() {
