@@ -3719,7 +3719,7 @@ void thi::thrsav() {
 	  fs::remove(VersionNames->back());
 	  for (auto iBackup = VersionNames->size() - 1U; iBackup > 0; --iBackup) {
 		if (!VersionNames->operator[](iBackup - 1U).empty()) {
-		  auto newFileName = VersionNames->operator[](iBackup - 1U);
+		  auto newFileName = VersionNames->operator[](iBackup - 1U); // copy intended
 
 		  auto ext   = newFileName.extension().wstring();
 		  ext.back() = gsl::narrow<wchar_t>(iBackup - 1) + 's';
@@ -3742,17 +3742,16 @@ void thi::thrsav() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(*ThrName);
+	return;
   }
-  else {
-	auto output = std::vector<char> {};
-	dubuf(output);
-	auto bytesWritten = DWORD {};
-	WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
-	if (bytesWritten != output.size()) {
-	  displayText::showMessage(IDS_FWERR, ThrName->wstring());
-	}
-	CloseHandle(fileHandle);
+  auto output = std::vector<char> {};
+  dubuf(output);
+  auto bytesWritten = DWORD {};
+  WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
+  if (bytesWritten != output.size()) {
+	displayText::showMessage(IDS_FWERR, ThrName->wstring());
   }
+  CloseHandle(fileHandle);
 }
 
 void thi::chk1col() {
