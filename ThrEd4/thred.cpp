@@ -3635,61 +3635,62 @@ void thi::dubuf(std::vector<char>& buffer) {
 	*(iBuffer++) = gsl::narrow<char>(iThread);
   }
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
-  if (!FormList->empty()) {
-	auto outForms = std::vector<FRM_HEAD_OUT> {};
-	outForms.reserve(FormList->size());
-	auto vertices = std::vector<F_POINT> {};
-	vertices.reserve(vertexCount);
-	auto guides = std::vector<SAT_CON_OUT> {};
-	guides.reserve(guideCount);
-	auto points = std::vector<F_POINT> {};
-	points.reserve(clipDataCount);
-	for (auto& srcForm : (*FormList)) {
-	  outForms.emplace_back(srcForm);
-	  auto itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
-	  for (auto iVertex = 0U; iVertex < srcForm.vertexCount; ++iVertex) {
-		vertices.push_back(*itVertex);
-		++itVertex;
-	  }
-	  if (srcForm.type == SAT) {
-		wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
-		auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
-		for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
-		  guides.emplace_back(*itGuide);
-		  ++itGuide;
-		}
-	  }
-	  if (srcForm.isClip()) {
-		auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
-		for (auto iClip = 0U; iClip < srcForm.lengthOrCount.clipCount; ++iClip) {
-		  points.push_back(*offsetStart);
-		  ++offsetStart;
-		}
-	  }
-	  if (srcForm.isEdgeClipX()) {
-		auto       offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
-		auto const clipCount   = srcForm.clipEntries;
-		for (auto iClip = 0U; iClip < clipCount; ++iClip) {
-		  points.push_back(*offsetStart);
-		  ++offsetStart;
-		}
+  if (FormList->empty()) {
+	return;
+  }
+  auto outForms = std::vector<FRM_HEAD_OUT> {};
+  outForms.reserve(FormList->size());
+  auto vertices = std::vector<F_POINT> {};
+  vertices.reserve(vertexCount);
+  auto guides = std::vector<SAT_CON_OUT> {};
+  guides.reserve(guideCount);
+  auto points = std::vector<F_POINT> {};
+  points.reserve(clipDataCount);
+  for (auto& srcForm : (*FormList)) {
+	outForms.emplace_back(srcForm);
+	auto itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
+	for (auto iVertex = 0U; iVertex < srcForm.vertexCount; ++iVertex) {
+	  vertices.push_back(*itVertex);
+	  ++itVertex;
+	}
+	if (srcForm.type == SAT) {
+	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
+	  auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
+	  for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
+		guides.emplace_back(*itGuide);
+		++itGuide;
 	  }
 	}
-	if (!outForms.empty()) {
-	  durit(buffer, outForms.data(), wrap::sizeofVector(outForms));
+	if (srcForm.isClip()) {
+	  auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
+	  for (auto iClip = 0U; iClip < srcForm.lengthOrCount.clipCount; ++iClip) {
+		points.push_back(*offsetStart);
+		++offsetStart;
+	  }
 	}
-	if (!vertices.empty()) {
-	  durit(buffer, vertices.data(), wrap::sizeofVector(vertices));
+	if (srcForm.isEdgeClipX()) {
+	  auto       offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
+	  auto const clipCount   = srcForm.clipEntries;
+	  for (auto iClip = 0U; iClip < clipCount; ++iClip) {
+		points.push_back(*offsetStart);
+		++offsetStart;
+	  }
 	}
-	if (!guides.empty()) {
-	  durit(buffer, guides.data(), wrap::sizeofVector(guides));
-	}
-	if (!points.empty()) {
-	  durit(buffer, points.data(), wrap::sizeofVector(points));
-	}
-	if (!TexturePointsBuffer->empty()) {
-	  durit(buffer, TexturePointsBuffer->data(), wrap::sizeofVector(TexturePointsBuffer));
-	}
+  }
+  if (!outForms.empty()) {
+	durit(buffer, outForms.data(), wrap::sizeofVector(outForms));
+  }
+  if (!vertices.empty()) {
+	durit(buffer, vertices.data(), wrap::sizeofVector(vertices));
+  }
+  if (!guides.empty()) {
+	durit(buffer, guides.data(), wrap::sizeofVector(guides));
+  }
+  if (!points.empty()) {
+	durit(buffer, points.data(), wrap::sizeofVector(points));
+  }
+  if (!TexturePointsBuffer->empty()) {
+	durit(buffer, TexturePointsBuffer->data(), wrap::sizeofVector(TexturePointsBuffer));
   }
 }
 
