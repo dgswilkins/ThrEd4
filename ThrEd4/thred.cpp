@@ -4040,89 +4040,89 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 		}
 	  }
 	}
+	StateMap->set(StateFlag::SIDACT);
+	return;
   }
-  else {
-	auto entryCount = (FormMenuChoice == LLAYR)     ? gsl::narrow<int32_t>(LAYRLIST.size())
-	                  : (FormMenuChoice == LFTHTYP) ? gsl::narrow<int32_t>(FTHRLIST.size() - 1U)
-	                                                : gsl::narrow<int32_t>(FILLLIST.size());
-	switch (FormMenuChoice) {
-	  case LLAYR: {
-		auto const zero = displayText::loadStr(IDS_LAY03);
-		formForms::maxtsiz(zero, sideWindowSize);
-		break;
-	  }
-	  case LFTHTYP: {
-		auto const fthrWid = displayText::loadStr(IDS_FTH3);
-		formForms::maxtsiz(fthrWid, sideWindowSize);
-		break;
-	  }
-	  case LFRMFIL: {
-		for (auto const& iEntry : FILLLIST) {
-		  if (iEntry.value == form.fillType) {
+  auto entryCount = (FormMenuChoice == LLAYR)     ? gsl::narrow<int32_t>(LAYRLIST.size())
+                    : (FormMenuChoice == LFTHTYP) ? gsl::narrow<int32_t>(FTHRLIST.size() - 1U)
+                                                  : gsl::narrow<int32_t>(FILLLIST.size());
+  switch (FormMenuChoice) {
+	case LLAYR: {
+	  auto const zero = displayText::loadStr(IDS_LAY03);
+	  formForms::maxtsiz(zero, sideWindowSize);
+	  break;
+	}
+	case LFTHTYP: {
+	  auto const fthrWid = displayText::loadStr(IDS_FTH3);
+	  formForms::maxtsiz(fthrWid, sideWindowSize);
+	  break;
+	}
+	case LFRMFIL: {
+	  for (auto const& iEntry : FILLLIST) {
+		if (iEntry.value == form.fillType) {
+		  --entryCount;
+		}
+		else {
+		  if ((((1U << iEntry.value) & CLIPTYPEMAP) != 0U) && (!StateMap->test(StateFlag::WASPCDCLP))) {
 			--entryCount;
 		  }
 		  else {
-			if ((((1U << iEntry.value) & CLIPTYPEMAP) != 0U) && (!StateMap->test(StateFlag::WASPCDCLP))) {
-			  --entryCount;
-			}
-			else {
-			  formForms::maxtsiz(displayText::loadStr(iEntry.stringID), sideWindowSize);
-			}
+			formForms::maxtsiz(displayText::loadStr(iEntry.stringID), sideWindowSize);
 		  }
 		}
-		break;
 	  }
-	  default: {
-		outDebugString(L"default hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
-		break;
-	  }
+	  break;
 	}
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	SideMessageWindow = CreateWindow(L"STATIC",
-	                                 nullptr,
-	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
-	                                 parentListRect.right - ThredWindowOrigin.x + 3,
-	                                 childListRect.top - ThredWindowOrigin.y - 3,
-	                                 sideWindowSize.cx + 12,
-	                                 sideWindowSize.cy * entryCount + 12,
-	                                 ThrEdWindow,
-	                                 nullptr,
-	                                 ThrEdInstance,
-	                                 nullptr);
-	switch (FormMenuChoice) {
-	  case LLAYR: {
-		for (auto const& iEntry : LAYRLIST) {
+	default: {
+	  outDebugString(L"default hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
+	  break;
+	}
+  }
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideMessageWindow = CreateWindow(L"STATIC",
+                                   nullptr,
+                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
+                                   parentListRect.right - ThredWindowOrigin.x + 3,
+                                   childListRect.top - ThredWindowOrigin.y - 3,
+                                   sideWindowSize.cx + 12,
+                                   sideWindowSize.cy * entryCount + 12,
+                                   ThrEdWindow,
+                                   nullptr,
+                                   ThrEdInstance,
+                                   nullptr);
+  switch (FormMenuChoice) {
+	case LLAYR: {
+	  for (auto const& iEntry : LAYRLIST) {
+		dusid(iEntry, sideWindowLocation, sideWindowSize);
+	  }
+	  break;
+	}
+	case LFTHTYP: {
+	  for (auto const& iEntry : FTHRLIST) {
+		if (iEntry.value != form.fillInfo.feather.fillType) {
 		  dusid(iEntry, sideWindowLocation, sideWindowSize);
 		}
-		break;
 	  }
-	  case LFTHTYP: {
-		for (auto const& iEntry : FTHRLIST) {
-		  if (iEntry.value != form.fillInfo.feather.fillType) {
-			dusid(iEntry, sideWindowLocation, sideWindowSize);
-		  }
+	  break;
+	}
+	case LFRMFIL: {
+	  for (auto const& iEntry : FILLLIST) {
+		if (iEntry.value == form.fillType) {
+		  continue;
 		}
-		break;
-	  }
-	  case LFRMFIL: {
-		for (auto const& iEntry : FILLLIST) {
-		  if (iEntry.value != form.fillType) {
-			if (((1U << iEntry.value) & CLIPTYPEMAP) != 0U) {
-			  if (StateMap->test(StateFlag::WASPCDCLP)) {
-				dusid(iEntry, sideWindowLocation, sideWindowSize);
-			  }
-			}
-			else {
-			  dusid(iEntry, sideWindowLocation, sideWindowSize);
-			}
-		  }
+		if (((1U << iEntry.value) & CLIPTYPEMAP) == 0U) {
+		  dusid(iEntry, sideWindowLocation, sideWindowSize);
+		  continue;
 		}
-		break;
+		if (StateMap->test(StateFlag::WASPCDCLP)) {
+		  dusid(iEntry, sideWindowLocation, sideWindowSize);
+		}
 	  }
-	  default: {
-		outDebugString(L"default 2 hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
-		break;
-	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"default 2 hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
+	  break;
 	}
   }
   StateMap->set(StateFlag::SIDACT);
