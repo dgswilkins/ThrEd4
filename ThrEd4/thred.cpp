@@ -3538,17 +3538,16 @@ auto thi::chkattr(fs::path const& filename) -> bool {
   }
   StateMap->reset(StateFlag::NOTFREE);
   auto const writePerms = fs::status(filename).permissions() & WRBITS;
-  if (writePerms == fs::perms::none) {
-	auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_OVRLOK)), filename.wstring());
-	auto const buttonPressed =
-	    MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_OVRIT).c_str(), MB_YESNO);
-	if (buttonPressed == IDYES) {
-	  fs::permissions(filename, WRBITS, fs::perm_options::add);
-	}
-	else {
-	  return true;
-	}
+  if (writePerms != fs::perms::none) {
+	return false;
   }
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_OVRLOK)), filename.wstring());
+  auto const buttonPressed =
+      MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_OVRIT).c_str(), MB_YESNO);
+  if (buttonPressed != IDYES) {
+	return true;
+  }
+  fs::permissions(filename, WRBITS, fs::perm_options::add);
   return false;
 }
 
