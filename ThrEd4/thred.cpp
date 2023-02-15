@@ -3360,83 +3360,86 @@ void thi::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8
 
 void thi::redbal() {
   auto fileSize = uintmax_t {};
-  if (thred::getFileSize(*BalaradName2, fileSize)) {
-	auto balaradHeader = BAL_HEAD {};
-	StitchBuffer->clear();
-	FormList->clear();
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const balaradFile =
-	    CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  if (!thred::getFileSize(*BalaradName2, fileSize)) {
+	return;
+  }
+  auto balaradHeader = BAL_HEAD {};
+  StitchBuffer->clear();
+  FormList->clear();
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const balaradFile =
+      CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (balaradFile != INVALID_HANDLE_VALUE) {
-	  auto bytesRead = DWORD {};
-	  if (!wrap::readFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, L"ReadFile for balaradHeader in redbal")) {
-		return;
+  if (balaradFile == INVALID_HANDLE_VALUE) {
+	return;
+  }
+  auto bytesRead = DWORD {};
+  if (!wrap::readFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, L"ReadFile for balaradHeader in redbal")) {
+	return;
+  }
+  if (bytesRead != sizeof(balaradHeader)) {
+	CloseHandle(balaradFile);
+	return;
+  }
+  auto       balaradStitch = std::vector<BAL_STITCH> {};
+  auto const newSize       = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
+  balaradStitch.resize(gsl::narrow<size_t>(newSize));
+  if (!wrap::readFile(balaradFile, balaradStitch.data(), (fileSize - sizeof(balaradHeader)), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
+	return;
+  }
+  auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
+  BackgroundColor         = balaradHeader.backgroundColor;
+  IniFile.backgroundColor = balaradHeader.backgroundColor;
+  thred::nuPen(BackgroundPen, 1, BackgroundColor);
+  BackgroundPenWidth = 1;
+  DeleteObject(BackgroundBrush);
+  BackgroundBrush        = CreateSolidBrush(BackgroundColor);
+  constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
+  IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
+  IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
+  UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  BalaradOffset.x        = IniFile.hoopSizeX * 0.5F;
+  BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
+  IniFile.hoopType       = CUSTHUP;
+  UserColor.fill(0);
+  auto const spBHC = gsl::span {balaradHeader.color};
+  auto       iBHC  = spBHC.begin();
+  UserColor[0]     = *iBHC;
+  auto color       = 0U;
+  thred::addColor(0, color);
+  for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
+	switch (balaradStitch[iStitch].code) {
+	  case BALNORM: {
+		StitchBuffer->push_back(F_POINT_ATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
+		                                      balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
+		                                      color});
+		break;
 	  }
-	  if (bytesRead == sizeof(balaradHeader)) {
-		auto       balaradStitch = std::vector<BAL_STITCH> {};
-		auto const newSize = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
-		balaradStitch.resize(gsl::narrow<size_t>(newSize));
-		if (!wrap::readFile(balaradFile, balaradStitch.data(), (fileSize - sizeof(balaradHeader)), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
-		  return;
-		}
-		auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
-		BackgroundColor         = balaradHeader.backgroundColor;
-		IniFile.backgroundColor = balaradHeader.backgroundColor;
-		thred::nuPen(BackgroundPen, 1, BackgroundColor);
-		BackgroundPenWidth = 1;
-		DeleteObject(BackgroundBrush);
-		BackgroundBrush        = CreateSolidBrush(BackgroundColor);
-		constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
-		IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
-		IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
-		UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-		BalaradOffset.x        = IniFile.hoopSizeX * 0.5F;
-		BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
-		IniFile.hoopType       = CUSTHUP;
-		UserColor.fill(0);
-		auto const spBHC = gsl::span {balaradHeader.color};
-		auto       iBHC  = spBHC.begin();
-		UserColor[0]     = *iBHC;
-		auto color       = 0U;
-		thred::addColor(0, color);
-		for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
-		  switch (balaradStitch[iStitch].code) {
-			case BALNORM: {
-			  StitchBuffer->push_back(
-			      F_POINT_ATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
-			                    balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
-			                    color});
-			  break;
-			}
-			case BALSTOP: {
-			  color = DST::colmatch(*(iBHC++));
+	  case BALSTOP: {
+		color = DST::colmatch(*(iBHC++));
 
-			  auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-			  thred::addColor(currentStitch, color);
-			  break;
-			}
-			default: {
-			  outDebugString(L"default hit in redbal: code [{}]\n", balaradStitch[iStitch].code);
-			  break;
-			}
-		  }
-		}
-		auto itUserPen = UserPen->begin();
-		auto ucb       = UserColorBrush.begin();
-		for (auto const& ucolor : UserColor) {
-		  *(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
-		  thi::nuBrush(*ucb, ucolor);
-		  ++ucb;
-		}
-		thred::coltab();
-		thred::redraw(ColorBar);
-		StateMap->set(StateFlag::INIT);
-		StateMap->set(StateFlag::RESTCH);
+		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+		thred::addColor(currentStitch, color);
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in redbal: code [{}]\n", balaradStitch[iStitch].code);
+		break;
 	  }
 	}
-	CloseHandle(balaradFile);
   }
+  auto itUserPen = UserPen->begin();
+  auto ucb       = UserColorBrush.begin();
+  for (auto const& ucolor : UserColor) {
+	*(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
+	thi::nuBrush(*ucb, ucolor);
+	++ucb;
+  }
+  thred::coltab();
+  thred::redraw(ColorBar);
+  StateMap->set(StateFlag::INIT);
+  StateMap->set(StateFlag::RESTCH);
+  CloseHandle(balaradFile);
 }
 
 void thi::ritbal() {
