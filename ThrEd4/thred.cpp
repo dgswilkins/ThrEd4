@@ -3381,8 +3381,9 @@ void thi::redbal() {
 	CloseHandle(balaradFile);
 	return;
   }
-  auto       balaradStitch = std::vector<BAL_STITCH> {};
-  auto const newSize       = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
+  auto balaradStitch = std::vector<BAL_STITCH> {};
+
+  auto const newSize = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
   balaradStitch.resize(gsl::narrow<size_t>(newSize));
   if (!wrap::readFile(balaradFile, balaradStitch.data(), (fileSize - sizeof(balaradHeader)), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
 	return;
