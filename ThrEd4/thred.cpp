@@ -1146,19 +1146,18 @@ void thi::ritcor(F_POINT_ATTR const& pointAttribute) {
 
 void thi::fndknt() {
   auto endStitch = wrap::toUnsigned(StitchBuffer->size());
-  if (endStitch > 4U) {
-	endStitch -= 4U;
+  if (endStitch <= 4U) {
 	Knots->clear();
-	auto iterStitch = StitchBuffer->begin();
-	for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-	  if ((iterStitch->attribute & KNOTMSK) != 0U) {
-		Knots->push_back(iStitch);
-	  }
-	  ++iterStitch;
-	}
+	return;
   }
-  else {
-	Knots->clear();
+  endStitch -= 4U;
+  Knots->clear();
+  auto iterStitch = StitchBuffer->begin();
+  for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
+	if ((iterStitch->attribute & KNOTMSK) != 0U) {
+	  Knots->push_back(iStitch);
+	}
+	++iterStitch;
   }
 }
 
