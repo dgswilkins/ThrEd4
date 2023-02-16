@@ -3052,48 +3052,50 @@ void thred::grpAdj() {
   thi::ducros(StitchWindowDC);
   thi::lenCalc();
   thred::selRct(StitchRangeRect);
-  if (StateMap->test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
-	if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1 ||
-	    StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
-	  auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
-	                          std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
-	  if (newSize.x < MINZUM) {
-		if (newSize.x < 1.0F) {
-		  newSize.x = 1.0F;
-		}
-		auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
-		newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+  if (!StateMap->test(StateFlag::ZUMED) || GroupEndStitch == GroupStartStitch) {
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StitchRangeRect.top <= ZoomRect.top - 1 && StitchRangeRect.bottom >= ZoomRect.bottom - 1 &&
+      StitchRangeRect.left >= ZoomRect.left + 1 && StitchRangeRect.right <= ZoomRect.right - 1) {
+	auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
+	                        std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
+	if (newSize.x < MINZUM) {
+	  if (newSize.x < 1.0F) {
+		newSize.x = 1.0F;
 	  }
-	  constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
-	  if (newSize.x > newSize.y) {
-		auto coordinate = newSize.x * ZMARGIN;
-		newSize.x += std::round(coordinate);
-		coordinate = newSize.x / StitchWindowAspectRatio;
-		newSize.y  = std::round(coordinate);
-	  }
-	  else {
-		auto coordinate = newSize.y * ZMARGIN;
-		newSize.y       = std::round(coordinate);
-		coordinate      = newSize.y * StitchWindowAspectRatio;
-		newSize.x       = std::round(coordinate);
-	  }
-	  if (newSize.x > wrap::toFloat(UnzoomedRect.cx) || newSize.y > wrap::toFloat(UnzoomedRect.cy)) {
-		ZoomRect.left = ZoomRect.bottom = 0.0F;
-		ZoomRect.right                  = wrap::toFloat(UnzoomedRect.cx);
-		ZoomRect.top                    = wrap::toFloat(UnzoomedRect.cy);
-		StateMap->reset(StateFlag::ZUMED);
-		ZoomFactor = 1.0;
-		thred::movStch();
-	  }
-	  else {
-		ZoomRect.right = ZoomRect.left + newSize.x;
-		ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.cx);
-		ZoomRect.top   = ZoomRect.bottom + newSize.y;
-		auto const stitchPoint =
-		    F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
-		             ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
-		thred::shft(stitchPoint);
-	  }
+	  auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
+	  newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+	}
+	constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
+	if (newSize.x > newSize.y) {
+	  auto coordinate = newSize.x * ZMARGIN;
+	  newSize.x += std::round(coordinate);
+	  coordinate = newSize.x / StitchWindowAspectRatio;
+	  newSize.y  = std::round(coordinate);
+	}
+	else {
+	  auto coordinate = newSize.y * ZMARGIN;
+	  newSize.y       = std::round(coordinate);
+	  coordinate      = newSize.y * StitchWindowAspectRatio;
+	  newSize.x       = std::round(coordinate);
+	}
+	if (newSize.x > wrap::toFloat(UnzoomedRect.cx) || newSize.y > wrap::toFloat(UnzoomedRect.cy)) {
+	  ZoomRect.left = ZoomRect.bottom = 0.0F;
+	  ZoomRect.right                  = wrap::toFloat(UnzoomedRect.cx);
+	  ZoomRect.top                    = wrap::toFloat(UnzoomedRect.cy);
+	  StateMap->reset(StateFlag::ZUMED);
+	  ZoomFactor = 1.0;
+	  thred::movStch();
+	}
+	else {
+	  ZoomRect.right = ZoomRect.left + newSize.x;
+	  ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.cx);
+	  ZoomRect.top   = ZoomRect.bottom + newSize.y;
+	  auto const stitchPoint =
+	      F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
+	               ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
+	  thred::shft(stitchPoint);
 	}
   }
   StateMap->set(StateFlag::RESTCH);
