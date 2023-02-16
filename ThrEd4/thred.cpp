@@ -1498,26 +1498,25 @@ auto thi::pxchk(float pixelSize) -> uint16_t {
 }
 
 void thred::sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept {
-  if (!stitches.empty()) {
-	rectangle.bottom = rectangle.top = stitches[0].y;
-	rectangle.left = rectangle.right = stitches[0].x;
-	for (auto const& stitch : stitches) {
-	  if (stitch.x < rectangle.left) {
-		rectangle.left = stitch.x;
-	  }
-	  if (stitch.x > rectangle.right) {
-		rectangle.right = stitch.x;
-	  }
-	  if (stitch.y < rectangle.bottom) {
-		rectangle.bottom = stitch.y;
-	  }
-	  if (stitch.y > rectangle.top) {
-		rectangle.top = stitch.y;
-	  }
-	}
-  }
-  else {
+  if (stitches.empty()) {
 	rectangle = {};
+	return;
+  }
+  rectangle.bottom = rectangle.top = stitches[0].y;
+  rectangle.left = rectangle.right = stitches[0].x;
+  for (auto const& stitch : stitches) {
+	if (stitch.x < rectangle.left) {
+	  rectangle.left = stitch.x;
+	}
+	if (stitch.x > rectangle.right) {
+	  rectangle.right = stitch.x;
+	}
+	if (stitch.y < rectangle.bottom) {
+	  rectangle.bottom = stitch.y;
+	}
+	if (stitch.y > rectangle.top) {
+	  rectangle.top = stitch.y;
+	}
   }
 }
 
