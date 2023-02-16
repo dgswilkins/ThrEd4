@@ -1463,10 +1463,11 @@ void thred::unbsho() {
 
 void thred::unsid() noexcept {
   FormMenuChoice = 0;
-  if (SideMessageWindow != nullptr) {
-	DestroyWindow(SideMessageWindow);
-	SideMessageWindow = nullptr;
+  if (SideMessageWindow == nullptr) {
+	return;
   }
+  DestroyWindow(SideMessageWindow);
+  SideMessageWindow = nullptr;
 }
 
 void thi::insadj() {
