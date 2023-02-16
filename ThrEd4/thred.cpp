@@ -1163,10 +1163,10 @@ void thi::fndknt() {
 }
 
 auto thred::maxColor() noexcept -> size_t {
-  if (!ColorChangeTable->empty()) {
-	return ColorChangeTable->size() - 1U;
+  if (ColorChangeTable->empty()) {
+	return 0U;
   }
-  return 0U;
+  return ColorChangeTable->size() - 1U;
 }
 
 void thred::resetColorChanges() noexcept {
