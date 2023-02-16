@@ -1106,15 +1106,13 @@ auto thred::adclp(uint32_t count) -> uint32_t {
 
 auto thred::duthrsh(float threshold) noexcept -> uint32_t {
   auto iZoomLevel = 0U;
-  if (threshold > 0.0F) {
-	auto zoom = 1.0F;
-	while (zoom > threshold) {
-	  zoom *= ZUMFCT;
-	  ++iZoomLevel;
-	}
-  }
-  else {
+  if (threshold <= 0.0F) {
 	return 0;
+  }
+  auto zoom = 1.0F;
+  while (zoom > threshold) {
+	zoom *= ZUMFCT;
+	++iZoomLevel;
   }
   return iZoomLevel + 1U;
 }
