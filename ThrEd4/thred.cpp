@@ -1576,12 +1576,13 @@ void thi::shft2box() {
 }
 
 void thi::unbox() {
-  if (StateMap->testAndReset(StateFlag::SELBOX)) {
-	SelectObject(StitchWindowDC, BoxPen[0]);
-	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	wrap::polyline(StitchWindowDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
-	SetROP2(StitchWindowDC, R2_COPYPEN);
+  if (!StateMap->testAndReset(StateFlag::SELBOX)) {
+	return;
   }
+  SelectObject(StitchWindowDC, BoxPen[0]);
+  SetROP2(StitchWindowDC, R2_NOTXORPEN);
+  wrap::polyline(StitchWindowDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
+  SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
 void thi::ilin() noexcept {
