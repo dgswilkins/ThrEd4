@@ -1639,14 +1639,15 @@ void thi::duIns() {
 }
 
 void thi::movins() {
-  if (StateMap->test(StateFlag::INSRT)) {
-	if (StateMap->test(StateFlag::LIN1)) {
-	  (StateMap->test(StateFlag::BAKEND)) ? endpnt(stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U)))
-	                                      : endpnt(stch2px1(0U));
-	}
-	else {
-	  duIns();
-	}
+  if (!StateMap->test(StateFlag::INSRT)) {
+	return;
+  }
+  if (StateMap->test(StateFlag::LIN1)) {
+	(StateMap->test(StateFlag::BAKEND)) ? endpnt(stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U)))
+	                                    : endpnt(stch2px1(0U));
+  }
+  else {
+	duIns();
   }
 }
 
