@@ -3258,10 +3258,9 @@ void thi::getDocsFolder(fs::path& directory) {
 void thi::defNam(fs::path const& fileName) {
   if (fileName.empty()) {
 	getDocsFolder(*DefaultDirectory);
+	return;
   }
-  else {
-	*DefaultDirectory = fileName.parent_path();
-  }
+  *DefaultDirectory = fileName.parent_path();
 }
 
 void thi::ritini() {
