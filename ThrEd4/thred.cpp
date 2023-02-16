@@ -2611,43 +2611,43 @@ void thred::ritot(uint32_t number) {
 
 void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   auto const& form = FormList->operator[](ClosestFormToCursor);
-  if ((form.fillType != 0U) || (form.edgeType != 0U)) {
-	auto const code      = ClosestFormToCursor << FRMSHFT;
-	auto const endStitch = StitchBuffer->size() - 1U;
-	auto       maxLength = 0.0F;
-	auto       minLength = BIGFLOAT;
-	if (!StitchBuffer->empty()) {
-	  for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-		auto const stitch     = wrap::next(StitchBuffer->begin(), iStitch);
-		auto const stitchFwd1 = std::next(stitch);
-		if ((stitch->attribute & FRMSK) == code && ((stitch->attribute & NOTFRM) == 0U) &&
-		    (stitchFwd1->attribute & FRMSK) == code && ((stitchFwd1->attribute & TYPMSK) != 0U)) {
-		  auto const length = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
-		  if (length > maxLength) {
-			maxLength          = length;
-			largestStitchIndex = iStitch;
-		  }
-		  if (length < minLength) {
-			minLength           = length;
-			smallestStitchIndex = iStitch;
-		  }
-		}
-	  }
-	}
-	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
-	if (fabs(maxLength) < DIGITLIM) {
-	  auto const strMax = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMAX)), (maxLength * IPFGRAN));
-	  displayText::butxt(HMAXLEN, strMax);
-	}
-	if (fabs(minLength) < DIGITLIM) {
-	  auto const strMin = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMIN)), (minLength * IPFGRAN));
-	  displayText::butxt(HMINLEN, strMin);
-	}
-  }
-  else {
+  if ((form.fillType == 0U) && (form.edgeType == 0U)) {
 	auto const blank = std::wstring {};
 	displayText::butxt(HMAXLEN, blank);
 	displayText::butxt(HMINLEN, blank);
+	return;
+  }
+  auto const code      = ClosestFormToCursor << FRMSHFT;
+  auto const endStitch = StitchBuffer->size() - 1U;
+  auto       maxLength = 0.0F;
+  auto       minLength = BIGFLOAT;
+  if (!StitchBuffer->empty()) {
+	for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
+	  auto const stitch     = wrap::next(StitchBuffer->begin(), iStitch);
+	  auto const stitchFwd1 = std::next(stitch);
+	  if ((stitch->attribute & FRMSK) != code || ((stitch->attribute & NOTFRM) != 0U) ||
+	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
+		continue;
+	  }
+	  auto const length = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
+	  if (length > maxLength) {
+		maxLength          = length;
+		largestStitchIndex = iStitch;
+	  }
+	  if (length < minLength) {
+		minLength           = length;
+		smallestStitchIndex = iStitch;
+	  }
+	}
+  }
+  constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
+  if (fabs(maxLength) < DIGITLIM) {
+	auto const strMax = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMAX)), (maxLength * IPFGRAN));
+	displayText::butxt(HMAXLEN, strMax);
+  }
+  if (fabs(minLength) < DIGITLIM) {
+	auto const strMin = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMIN)), (minLength * IPFGRAN));
+	displayText::butxt(HMINLEN, strMin);
   }
 }
 
