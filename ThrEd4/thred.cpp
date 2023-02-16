@@ -1033,15 +1033,14 @@ void thi::ritfnam(std::wstring const& designerName) {
 	if (designer[iName++] != 0) {
 	  auto iNE = wrap::next(NameEncoder.begin(), designer[iName]);
 	  iTmpName = *iNE;
+	  continue;
 	}
-	else {
-	  auto iND = wrap::next(NameDecoder.begin(), iTmpName);
-	  while (*iND != 0U) {
-		iTmpName = (form::psg() & BYTMASK);
-		iND      = wrap::next(NameDecoder.begin(), iTmpName);
-	  }
-	  break;
+	auto iND = wrap::next(NameDecoder.begin(), iTmpName);
+	while (*iND != 0U) {
+	  iTmpName = (form::psg() & BYTMASK);
+	  iND      = wrap::next(NameDecoder.begin(), iTmpName);
 	}
+	break;
   }
   if (iName == NAMELEN) {
 	auto const spNameDecoder = gsl::span {NameDecoder};
