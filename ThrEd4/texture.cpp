@@ -1783,12 +1783,11 @@ void texture::setshft() {
 	if (txi::inrct(selectionRect, stitch)) {
 	  txIn = true;
 	  TempTexturePoints->push_back(TX_PNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
+	  continue;
 	}
-	else {
-	  if (txIn) {
-		txIn = false;
-		++line;
-	  }
+	if (txIn) {
+	  txIn = false;
+	  ++line;
 	}
   }
   if (!TempTexturePoints->empty()) {
