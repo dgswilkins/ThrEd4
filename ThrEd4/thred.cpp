@@ -1260,24 +1260,28 @@ void thi::nunams() {
   auto flag = true;
   for (auto spNames = std::ranges::subrange(std::next(PreviousNames->begin()), PreviousNames->end());
        auto& previousName : spNames) {
-	if (previousName == *ThrName) {
-	  std::swap(PreviousNames->front(), previousName);
-	  flag = false;
-	  break;
+	if (previousName != *ThrName) {
+	  continue;
 	}
+	std::swap(PreviousNames->front(), previousName);
+	flag = false;
+	break;
+  }
+  if (flag == false) {
+	menu::redfils(LRUPtr, PreviousNames);
+	return;
+  }
+  for (auto& previousName : *PreviousNames) {
+	if (!previousName.empty()) {
+	  continue;
+	}
+	previousName.assign(*ThrName);
+	flag = false;
+	break;
   }
   if (flag) {
-	for (auto& previousName : *PreviousNames) {
-	  if (previousName.empty()) {
-		previousName.assign(*ThrName);
-		flag = false;
-		break;
-	  }
-	}
-	if (flag) {
-	  PreviousNames->insert(PreviousNames->begin(), *ThrName);
-	  PreviousNames->pop_back();
-	}
+	PreviousNames->insert(PreviousNames->begin(), *ThrName);
+	PreviousNames->pop_back();
   }
   menu::redfils(LRUPtr, PreviousNames);
 }
@@ -1338,13 +1342,11 @@ void thi::unboxs() {
 
 void thi::stchPars() {
   auto const aspectRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(UnzoomedRect.cy);
-  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-	StitchWindowSize.cx = std::lround(wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
-  }
-  else {
-	StitchWindowSize.cx = std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
-  }
-
+  StitchWindowSize.cx =
+      (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT))
+          ? std::lround(wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio)
+          : std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
+  
   if ((StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
 	StitchWindowSize.cy = (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT))
 	                          ? ThredWindowRect.bottom - (*ScrollSize * 2)
