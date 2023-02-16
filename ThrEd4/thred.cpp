@@ -2827,47 +2827,47 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 }
 
 void thi::duzero() {
-  if (!StitchBuffer->empty()) {
-	if (!SelectedFormList->empty()) {
-	  auto formMap = boost::dynamic_bitset<>(FormList->size());
-	  for (auto const selectedForm : (*SelectedFormList)) {
-		formMap.set(selectedForm);
+  if (StitchBuffer->empty()) {
+	return;
+  }
+  if (!SelectedFormList->empty()) {
+	auto formMap = boost::dynamic_bitset<>(FormList->size());
+	for (auto const selectedForm : (*SelectedFormList)) {
+	  formMap.set(selectedForm);
+	}
+	StateMap->reset(StateFlag::CONTIG);
+	auto iDestination  = StitchBuffer->begin();
+	auto currentStitch = StitchBuffer->front(); // intentional copy
+	for (auto const& iStitch : *StitchBuffer) {
+	  if (((iStitch.attribute & TYPMSK) == 0U) || !formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
+		(*iDestination) = iStitch;
+		++iDestination;
+		StateMap->reset(StateFlag::CONTIG);
+		continue;
 	  }
-	  StateMap->reset(StateFlag::CONTIG);
-	  auto iDestination  = StitchBuffer->begin();
-	  auto currentStitch = StitchBuffer->front();
-	  for (auto const& iStitch : *StitchBuffer) {
-		if (((iStitch.attribute & TYPMSK) != 0U) && formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
-		  if (StateMap->testAndSet(StateFlag::CONTIG)) {
-			auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
-			if (stitchLength > MinStitchLength) {
-			  currentStitch   = iStitch;
-			  (*iDestination) = iStitch;
-			  ++iDestination;
-			}
-		  }
-		  else {
-			currentStitch = iStitch;
-		  }
-		}
-		else {
-		  (*iDestination) = iStitch;
-		  ++iDestination;
-		  StateMap->reset(StateFlag::CONTIG);
-		}
+	  if (!StateMap->testAndSet(StateFlag::CONTIG)) {
+		currentStitch = iStitch;
+		continue;
 	  }
-	  StitchBuffer->erase(iDestination, StitchBuffer->end());
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	  return;
+	  auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
+	  if (stitchLength <= MinStitchLength) {
+		continue;
+	  }
+	  currentStitch   = iStitch;
+	  (*iDestination) = iStitch;
+	  ++iDestination;
 	}
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  thred::rngadj();
-	  delsmal(GroupStartStitch, GroupEndStitch);
-	}
-	else {
-	  delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
-	}
+	StitchBuffer->erase(iDestination, StitchBuffer->end());
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::rngadj();
+	delsmal(GroupStartStitch, GroupEndStitch);
+  }
+  else {
+	delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
   }
 }
 
@@ -3056,47 +3056,49 @@ void thred::grpAdj() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StitchRangeRect.top <= ZoomRect.top - 1 && StitchRangeRect.bottom >= ZoomRect.bottom - 1 &&
-      StitchRangeRect.left >= ZoomRect.left + 1 && StitchRangeRect.right <= ZoomRect.right - 1) {
-	auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
-	                        std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
-	if (newSize.x < MINZUM) {
-	  if (newSize.x < 1.0F) {
-		newSize.x = 1.0F;
-	  }
-	  auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
-	  newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+  if (StitchRangeRect.top <= (ZoomRect.top - 1) && StitchRangeRect.bottom >= (ZoomRect.bottom - 1) &&
+      StitchRangeRect.left >= (ZoomRect.left + 1) && StitchRangeRect.right <= (ZoomRect.right - 1)) {
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
+                          std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
+  if (newSize.x < MINZUM) {
+	if (newSize.x < 1.0F) {
+	  newSize.x = 1.0F;
 	}
-	constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
-	if (newSize.x > newSize.y) {
-	  auto coordinate = newSize.x * ZMARGIN;
-	  newSize.x += std::round(coordinate);
-	  coordinate = newSize.x / StitchWindowAspectRatio;
-	  newSize.y  = std::round(coordinate);
-	}
-	else {
-	  auto coordinate = newSize.y * ZMARGIN;
-	  newSize.y       = std::round(coordinate);
-	  coordinate      = newSize.y * StitchWindowAspectRatio;
-	  newSize.x       = std::round(coordinate);
-	}
-	if (newSize.x > wrap::toFloat(UnzoomedRect.cx) || newSize.y > wrap::toFloat(UnzoomedRect.cy)) {
-	  ZoomRect.left = ZoomRect.bottom = 0.0F;
-	  ZoomRect.right                  = wrap::toFloat(UnzoomedRect.cx);
-	  ZoomRect.top                    = wrap::toFloat(UnzoomedRect.cy);
-	  StateMap->reset(StateFlag::ZUMED);
-	  ZoomFactor = 1.0;
-	  thred::movStch();
-	}
-	else {
-	  ZoomRect.right = ZoomRect.left + newSize.x;
-	  ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.cx);
-	  ZoomRect.top   = ZoomRect.bottom + newSize.y;
-	  auto const stitchPoint =
-	      F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
-	               ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
-	  thred::shft(stitchPoint);
-	}
+	auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
+	newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+  }
+  constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
+  if (newSize.x > newSize.y) {
+	auto coordinate = newSize.x * ZMARGIN;
+	newSize.x += std::round(coordinate);
+	coordinate = newSize.x / StitchWindowAspectRatio;
+	newSize.y  = std::round(coordinate);
+  }
+  else {
+	auto coordinate = newSize.y * ZMARGIN;
+	newSize.y       = std::round(coordinate);
+	coordinate      = newSize.y * StitchWindowAspectRatio;
+	newSize.x       = std::round(coordinate);
+  }
+  if (newSize.x > wrap::toFloat(UnzoomedRect.cx) || newSize.y > wrap::toFloat(UnzoomedRect.cy)) {
+	ZoomRect.left = ZoomRect.bottom = 0.0F;
+	ZoomRect.right                  = wrap::toFloat(UnzoomedRect.cx);
+	ZoomRect.top                    = wrap::toFloat(UnzoomedRect.cy);
+	StateMap->reset(StateFlag::ZUMED);
+	ZoomFactor = 1.0;
+	thred::movStch();
+  }
+  else {
+	ZoomRect.right = ZoomRect.left + newSize.x;
+	ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.cx);
+	ZoomRect.top   = ZoomRect.bottom + newSize.y;
+	auto const stitchPoint =
+	    F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
+	             ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
+	thred::shft(stitchPoint);
   }
   StateMap->set(StateFlag::RESTCH);
 }
