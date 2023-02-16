@@ -1454,10 +1454,11 @@ void thred::movStch() {
 }
 
 void thred::unbsho() {
-  if (StateMap->testAndReset(StateFlag::BAKSHO)) {
-	for (auto const& iBackup : BackupViewer) {
-	  DestroyWindow(iBackup);
-	}
+  if (!StateMap->testAndReset(StateFlag::BAKSHO)) {
+	return;
+  }
+  for (auto const& iBackup : BackupViewer) {
+	DestroyWindow(iBackup);
   }
 }
 
