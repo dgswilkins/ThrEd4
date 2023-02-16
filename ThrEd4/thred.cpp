@@ -1238,15 +1238,16 @@ void thred::coltab() {
 void thred::savdo() {
   StateMap->set(StateFlag::WASDO);
   StateMap->set(StateFlag::CMPDO);
-  if (StateMap->testAndReset(StateFlag::SAVACT)) {
-	if (StateMap->testAndReset(StateFlag::BAKING)) {
-	  menu::disableRedo();
-	}
-	StateMap->set(StateFlag::BAKACT);
-	menu::enableUndo();
-	backup::dudat();
-	backup::updateWriteIndex();
+  if (!StateMap->testAndReset(StateFlag::SAVACT)) {
+	return;
   }
+  if (StateMap->testAndReset(StateFlag::BAKING)) {
+	menu::disableRedo();
+  }
+  StateMap->set(StateFlag::BAKACT);
+  menu::enableUndo();
+  backup::dudat();
+  backup::updateWriteIndex();
 }
 
 void thi::nunams() {
