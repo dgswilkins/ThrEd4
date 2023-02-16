@@ -1695,45 +1695,47 @@ void thred::hupfn() {
 	  }
 	}
   }
-  if (!StitchBuffer->empty() || !FormVertices->empty() || StateMap->test(StateFlag::HUPEX)) {
-	if (checkHoopRect.left < 0 || checkHoopRect.right > IniFile.hoopSizeX ||
-	    checkHoopRect.bottom < 0 || checkHoopRect.top > IniFile.hoopSizeY) {
-	  StateMap->set(StateFlag::HUPEX);
-	}
-	if (StateMap->test(StateFlag::HUPEX)) {
-	  auto const hoopSize =
-	      F_POINT {checkHoopRect.right - checkHoopRect.left, checkHoopRect.top - checkHoopRect.bottom};
-	  if (hoopSize.x > IniFile.hoopSizeX) {
-		IniFile.hoopSizeX = hoopSize.x;
-		StateMap->set(StateFlag::HUPCHNG);
-	  }
-	  if (hoopSize.y > IniFile.hoopSizeY) {
-		IniFile.hoopSizeY = hoopSize.y;
-		StateMap->set(StateFlag::HUPCHNG);
-	  }
-	  auto const designCenter =
-	      F_POINT {hoopSize.x * 0.5F + checkHoopRect.left, hoopSize.y * 0.5F + checkHoopRect.bottom};
-	  auto const hoopCenter = F_POINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
-	  auto const delta = F_POINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
-	  for (auto& stitch : *StitchBuffer) {
-		stitch.x += delta.x;
-		stitch.y += delta.y;
-	  }
-	  for (auto& formVertice : *FormVertices) {
-		formVertice.x += delta.x;
-		formVertice.y += delta.y;
-	  }
-	  for (auto& form : *FormList) {
-		form.rectangle.left += delta.x;
-		form.rectangle.right += delta.x;
-		form.rectangle.top += delta.y;
-		form.rectangle.bottom += delta.y;
-	  }
-	  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-	  ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.cx);
-	  thred::zumhom();
-	}
+  if (StitchBuffer->empty() && FormVertices->empty() && !StateMap->test(StateFlag::HUPEX)) {
+	return;
   }
+  if (checkHoopRect.left < 0 || checkHoopRect.right > IniFile.hoopSizeX ||
+      checkHoopRect.bottom < 0 || checkHoopRect.top > IniFile.hoopSizeY) {
+	StateMap->set(StateFlag::HUPEX);
+  }
+  if (!StateMap->test(StateFlag::HUPEX)) {
+	return;
+  }
+  auto const hoopSize =
+      F_POINT {checkHoopRect.right - checkHoopRect.left, checkHoopRect.top - checkHoopRect.bottom};
+  if (hoopSize.x > IniFile.hoopSizeX) {
+	IniFile.hoopSizeX = hoopSize.x;
+	StateMap->set(StateFlag::HUPCHNG);
+  }
+  if (hoopSize.y > IniFile.hoopSizeY) {
+	IniFile.hoopSizeY = hoopSize.y;
+	StateMap->set(StateFlag::HUPCHNG);
+  }
+  auto const designCenter =
+      F_POINT {hoopSize.x * 0.5F + checkHoopRect.left, hoopSize.y * 0.5F + checkHoopRect.bottom};
+  auto const hoopCenter = F_POINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
+  auto const delta      = F_POINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
+  for (auto& stitch : *StitchBuffer) {
+	stitch.x += delta.x;
+	stitch.y += delta.y;
+  }
+  for (auto& formVertice : *FormVertices) {
+	formVertice.x += delta.x;
+	formVertice.y += delta.y;
+  }
+  for (auto& form : *FormList) {
+	form.rectangle.left += delta.x;
+	form.rectangle.right += delta.x;
+	form.rectangle.top += delta.y;
+	form.rectangle.bottom += delta.y;
+  }
+  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.cx);
+  thred::zumhom();
 }
 
 void thred::chkhup() {
