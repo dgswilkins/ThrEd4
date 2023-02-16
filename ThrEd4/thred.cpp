@@ -1180,59 +1180,59 @@ void thred::addColor(uint32_t stitch, uint32_t color) {
 
 void thred::coltab() {
   thred::resetColorChanges();
-  if (StitchBuffer->size() > 1) {
-	if (!StitchBuffer->empty()) {
-	  auto const firstStitch = StitchBuffer->begin();
-	  firstStitch->attribute &= NCOLMSK;
-	  firstStitch->attribute |= (firstStitch + 1)->attribute & COLMSK;
-	  auto const lastStitch = StitchBuffer->rbegin();
-	  lastStitch->attribute &= NCOLMSK;
-	  lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
-	  auto currentColor = StitchBuffer->front().attribute & COLMSK;
-	  for (auto stitchIt = std::next(StitchBuffer->begin()); stitchIt < std::prev(StitchBuffer->end()); ++stitchIt) {
-		if ((stitchIt->attribute & COLMSK) != currentColor) {
-		  if ((std::next(stitchIt)->attribute & COLMSK) == currentColor) {
-			stitchIt->attribute &= NCOLMSK;
-			stitchIt->attribute |= currentColor;
-		  }
-		  currentColor = stitchIt->attribute & COLMSK;
-		}
-	  }
-	  auto iColor      = 0U;
-	  auto iStitch     = 0U;
-	  currentColor     = std::numeric_limits<decltype(currentColor)>::max();
-	  auto const range = F_RECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
-	                                  wrap::toFloat(UnzoomedRect.cy) * 2.0F,
-	                                  wrap::toFloat(UnzoomedRect.cx) * 2.0F,
-	                                  wrap::toFloat(UnzoomedRect.cy) * -1.0F};
-	  for (auto& stitch : *StitchBuffer) {
-		if (stitch.x < range.left) {
-		  stitch.x = range.left;
-		}
-		if (stitch.x > range.right) {
-		  stitch.x = range.right;
-		}
-		if (stitch.y > range.top) {
-		  stitch.y = range.top;
-		}
-		if (stitch.y < range.bottom) {
-		  stitch.y = range.bottom;
-		}
-		auto const nextColor = stitch.attribute & COLMSK;
-		if (currentColor != nextColor) {
-		  addColor(iStitch, nextColor);
-		  ++iColor;
-		  currentColor = nextColor;
-		}
-		++iStitch;
-	  }
-	  addColor(wrap::toUnsigned(StitchBuffer->size()), 0);
-	  if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-		ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	  }
-	  thi::fndknt();
-	}
+  if (StitchBuffer->size() <= 1 || StitchBuffer->empty()) {
+	return;
   }
+  auto const firstStitch = StitchBuffer->begin();
+  firstStitch->attribute &= NCOLMSK;
+  firstStitch->attribute |= (firstStitch + 1)->attribute & COLMSK;
+  auto const lastStitch = StitchBuffer->rbegin();
+  lastStitch->attribute &= NCOLMSK;
+  lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
+  auto currentColor = StitchBuffer->front().attribute & COLMSK;
+  for (auto stitchIt = std::next(StitchBuffer->begin()); stitchIt < std::prev(StitchBuffer->end()); ++stitchIt) {
+	if ((stitchIt->attribute & COLMSK) == currentColor) {
+	  continue;
+	}
+	if ((std::next(stitchIt)->attribute & COLMSK) == currentColor) {
+	  stitchIt->attribute &= NCOLMSK;
+	  stitchIt->attribute |= currentColor;
+	}
+	currentColor = stitchIt->attribute & COLMSK;
+  }
+  auto iColor      = 0U;
+  auto iStitch     = 0U;
+  currentColor     = std::numeric_limits<decltype(currentColor)>::max();
+  auto const range = F_RECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
+                                  wrap::toFloat(UnzoomedRect.cy) * 2.0F,
+                                  wrap::toFloat(UnzoomedRect.cx) * 2.0F,
+                                  wrap::toFloat(UnzoomedRect.cy) * -1.0F};
+  for (auto& stitch : *StitchBuffer) {
+	if (stitch.x < range.left) {
+	  stitch.x = range.left;
+	}
+	if (stitch.x > range.right) {
+	  stitch.x = range.right;
+	}
+	if (stitch.y > range.top) {
+	  stitch.y = range.top;
+	}
+	if (stitch.y < range.bottom) {
+	  stitch.y = range.bottom;
+	}
+	auto const nextColor = stitch.attribute & COLMSK;
+	if (currentColor != nextColor) {
+	  addColor(iStitch, nextColor);
+	  ++iColor;
+	  currentColor = nextColor;
+	}
+	++iStitch;
+  }
+  addColor(wrap::toUnsigned(StitchBuffer->size()), 0);
+  if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  }
+  thi::fndknt();
 }
 
 void thred::savdo() {
