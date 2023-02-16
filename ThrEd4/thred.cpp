@@ -1557,13 +1557,13 @@ void thred::shft(F_POINT const& delta) noexcept {
 }
 
 auto thi::stch2px1(uint32_t iStitch) -> POINT {
-  if (!StitchBuffer->empty()) {
-	auto const current = wrap::next(StitchBuffer->begin(), iStitch);
-	return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
-	              wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                  (current->y - ZoomRect.bottom) * ZoomRatio.y)};
+  if (StitchBuffer->empty()) {
+	return POINT {0L, StitchWindowClientRect.bottom};
   }
-  return POINT {0L, StitchWindowClientRect.bottom};
+  auto const current = wrap::next(StitchBuffer->begin(), iStitch);
+  return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
+                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                    (current->y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
 void thi::shft2box() {
