@@ -1346,12 +1346,9 @@ void thi::stchPars() {
   }
 
   if ((StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
-	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-	  StitchWindowSize.cy = ThredWindowRect.bottom - (*ScrollSize * 2);
-	}
-	else {
-	  StitchWindowSize.cy = ThredWindowRect.bottom - *ScrollSize;
-	}
+	StitchWindowSize.cy = (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT))
+	                          ? ThredWindowRect.bottom - (*ScrollSize * 2)
+	                          : ThredWindowRect.bottom - *ScrollSize;
   }
   else {
 	StitchWindowSize = {ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize,
