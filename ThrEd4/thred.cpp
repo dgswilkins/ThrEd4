@@ -1121,12 +1121,10 @@ auto thred::duthrsh(float threshold) noexcept -> uint32_t {
 
 auto thi::unthrsh(wchar_t level) noexcept -> float {
   auto zoom = 1.0F;
-  if (level != 0) {
-	--level;
-  }
-  else {
+  if (level == 0) {
 	return 0.0F;
   }
+  --level;
   while (level != 0) {
 	zoom *= ZUMFCT;
 	--level;
