@@ -844,12 +844,13 @@ static auto RotateBoxToCursorLine =
 static auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
 
 auto thred::getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
-  if (clipMemory != nullptr) {
-	auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipMemory);
-	if (clipFormHeader->clipType == CLP_FRM) {
-	  auto* clipForm = &clipFormHeader->form;
-	  return clipForm;
-	}
+  if (clipMemory == nullptr) {
+	return nullptr;
+  }
+  auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipMemory);
+  if (clipFormHeader->clipType == CLP_FRM) {
+	auto* clipForm = &clipFormHeader->form;
+	return clipForm;
   }
   return nullptr;
 }
