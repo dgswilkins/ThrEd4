@@ -3200,24 +3200,25 @@ void thi::duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t
 }
 
 void thi::dubox(POINT const& stitchCoordsInPixels) {
-  if (!StitchBuffer->empty()) {
-	auto const stitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
-	if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
-	  // if the selected point is not at the end then aim at the next point
-	  auto const stitchFwd1 = std::next(stitch);
-	  RotateAngle           = atan2f(stitchFwd1->y - stitch->y, stitchFwd1->x - stitch->x);
-	}
-	else { // otherwise aim in the same direction
-	  auto const stitchBck1 = std::next(stitch, -1);
-	  RotateAngle           = atan2f(stitch->y - stitchBck1->y, stitch->x - stitchBck1->x);
-	}
-	duar(stitchCoordsInPixels);
-	StateMap->reset(StateFlag::ELIN);
-	StateMap->set(StateFlag::SELBOX);
-	StateMap->reset(StateFlag::FRMPSEL);
-	thred::redraw(ColorBar);
-	displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
+  if (StitchBuffer->empty()) {
+	return;
   }
+  auto const stitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+  if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
+	// if the selected point is not at the end then aim at the next point
+	auto const stitchFwd1 = std::next(stitch);
+	RotateAngle           = atan2f(stitchFwd1->y - stitch->y, stitchFwd1->x - stitch->x);
+  }
+  else { // otherwise aim in the same direction
+	auto const stitchBck1 = std::next(stitch, -1);
+	RotateAngle           = atan2f(stitch->y - stitchBck1->y, stitch->x - stitchBck1->x);
+  }
+  duar(stitchCoordsInPixels);
+  StateMap->reset(StateFlag::ELIN);
+  StateMap->set(StateFlag::SELBOX);
+  StateMap->reset(StateFlag::FRMPSEL);
+  thred::redraw(ColorBar);
+  displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 }
 
 auto thi::stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool {
