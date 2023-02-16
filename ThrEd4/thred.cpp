@@ -2685,26 +2685,24 @@ void thi::lenCalc() {
 	auto const lenMax     = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), lenMax));
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
+	return;
+  }
+  if (StitchBuffer->size() <= 1U) {
+	displayText::butxt(HMAXLEN, blank);
+	displayText::butxt(HMINLEN, blank);
+	return;
+  }
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	frmcalc(LargestStitchIndex, SmallestStitchIndex);
+	displayText::butxt(HCOR, blank);
+	return;
+  }
+  thred::rngadj();
+  if (StateMap->test(StateFlag::GRPSEL) && GroupStartStitch != GroupEndStitch) {
+	lenfn(GroupStartStitch, GroupEndStitch - 1U, LargestStitchIndex, SmallestStitchIndex);
   }
   else {
-	if (StitchBuffer->size() > 1U) {
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		frmcalc(LargestStitchIndex, SmallestStitchIndex);
-		displayText::butxt(HCOR, blank);
-		return;
-	  }
-	  thred::rngadj();
-	  if (StateMap->test(StateFlag::GRPSEL) && GroupStartStitch != GroupEndStitch) {
-		lenfn(GroupStartStitch, GroupEndStitch - 1U, LargestStitchIndex, SmallestStitchIndex);
-	  }
-	  else {
-		lenfn(0, wrap::toUnsigned(StitchBuffer->size() - 2U), LargestStitchIndex, SmallestStitchIndex);
-	  }
-	}
-	else {
-	  displayText::butxt(HMAXLEN, blank);
-	  displayText::butxt(HMINLEN, blank);
-	}
+	lenfn(0, wrap::toUnsigned(StitchBuffer->size() - 2U), LargestStitchIndex, SmallestStitchIndex);
   }
 }
 
