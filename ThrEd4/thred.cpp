@@ -1369,14 +1369,15 @@ void thi::stchPars() {
 
 void thred::redraw(HWND window) noexcept {
   RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
-  if (window == MainStitchWin) {
-	for (auto const& iWindow : *DefaultColorWin) {
-	  if (iWindow != nullptr) {
-		RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
-	  }
-	}
-	RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
+  if (window != MainStitchWin) {
+	return;
   }
+  for (auto const& iWindow : *DefaultColorWin) {
+	if (iWindow != nullptr) {
+	  RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
+	}
+  }
+  RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
 }
 
 void thi::nuRct() noexcept {
