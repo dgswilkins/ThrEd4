@@ -37,17 +37,17 @@ static auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch 
 
 void satin::delsac(uint32_t formIndex) {
   auto& formList = *FormList;
-  if (!SatinGuides->empty()) {
-	if (formList[formIndex].type == SAT && (formList[formIndex].satinGuideCount != 0U)) {
-	  auto const startGuide = wrap::next(SatinGuides->cbegin(), formList[formIndex].satinOrAngle.guide);
-	  auto const endGuide = wrap::next(startGuide, formList[formIndex].satinGuideCount);
-	  SatinGuides->erase(startGuide, endGuide);
-	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U) &&
-		    (formList[iForm].satinOrAngle.guide >= formList[formIndex].satinGuideCount)) {
-		  formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
-		}
-	  }
+  if (SatinGuides->empty() || formList[formIndex].type != SAT || (formList[formIndex].satinGuideCount == 0U)) {
+	formList[formIndex].satinGuideCount = 0;
+	return;
+  }
+  auto const startGuide = wrap::next(SatinGuides->cbegin(), formList[formIndex].satinOrAngle.guide);
+  auto const endGuide   = wrap::next(startGuide, formList[formIndex].satinGuideCount);
+  SatinGuides->erase(startGuide, endGuide);
+  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U) &&
+	    (formList[iForm].satinOrAngle.guide >= formList[formIndex].satinGuideCount)) {
+	  formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
 	}
   }
   formList[formIndex].satinGuideCount = 0;
