@@ -749,106 +749,102 @@ void si::satends(FRM_HEAD const& form, uint32_t isBlunt, float width) {
 
 void satin::ribon() {
   displayText::frm1pnt();
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	if (FormList->operator[](ClosestFormToCursor).vertexCount > 2) {
-	  thred::savdo();
-	  auto const savedFormIndex = ClosestFormToCursor;
-	  satin::satout(FormList->operator[](ClosestFormToCursor), BorderWidth);
-	  if (!FormList->empty()) {
-		auto       newForm            = FRM_HEAD {};
-		auto const currentType        = FormList->operator[](ClosestFormToCursor).type;
-		auto const currentVertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-		newForm.maxFillStitchLen      = MAXSIZ * PFGRAN;
-		newForm.minFillStitchLen      = MinStitchLength;
-		MaxStitchLen                  = MAXSIZ * PFGRAN;
-		if (currentType == FRMLINE) {
-		  // Set blunt flags
-		  auto isBlunt = 0U;
-		  if (UserFlagMap->test(UserFlag::BLUNT)) {
-			isBlunt = SBLNT | FBLNT;
-		  }
-		  si::satends(FormList->operator[](ClosestFormToCursor), isBlunt, BorderWidth);
-		}
-		newForm.vertexIndex    = (currentType == FRMLINE) ? thred::adflt(currentVertexCount * 2U)
-		                                                  : thred::adflt((currentVertexCount * 2U) + 2U);
-		auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
-		auto       itVertex    = startVertex;
-		*(itVertex++)          = OutsidePoints->front();
-		if (currentType == FRMLINE) {
-		  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
-			*(itVertex++) = InsidePoints->operator[](iVertex);
-		  }
-		  for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
-			*(itVertex++) = OutsidePoints->operator[](iVertex);
-		  }
-		}
-		else {
-		  newForm.underlayIndent = IniFile.underlayIndent;
-		  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
-			*(itVertex++) = InsidePoints->operator[](iVertex);
-		  }
-		  *(itVertex++) = InsidePoints->front();
-		  *(itVertex++) = OutsidePoints->front();
-		  for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
-			*(itVertex++) = OutsidePoints->operator[](iVertex);
-		  }
-		}
-		auto const iNewVertex              = wrap::distance<uint32_t>(startVertex, itVertex);
-		newForm.type                       = SAT;
-		newForm.fillColor                  = ActiveColor;
-		newForm.fillSpacing                = LineSpacing;
-		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
-		newForm.vertexCount                = iNewVertex;
-		newForm.attribute                  = FormList->operator[](ClosestFormToCursor).attribute;
-		newForm.attribute &= FRMLMSK;
-		newForm.attribute |= FRMEND;
-		newForm.wordParam          = iNewVertex / 2;
-		newForm.satinGuideCount    = newForm.wordParam - 2U;
-		newForm.satinOrAngle.guide = adsatk(newForm.satinGuideCount);
-		if (StateMap->test(StateFlag::CNV2FTH)) {
-		  newForm.fillType                       = FTHF;
-		  newForm.fillInfo.feather.ratio         = IniFile.featherRatio;
-		  newForm.fillInfo.feather.upCount       = IniFile.featherUpCount;
-		  newForm.fillInfo.feather.downCount     = IniFile.featherDownCount;
-		  newForm.fillInfo.feather.fillType      = IniFile.featherFillType;
-		  newForm.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-		  newForm.extendedAttribute              = IniFile.featherType;
-		  newForm.fillInfo.feather.count         = IniFile.featherCount;
-		  newForm.fillInfo.feather.color         = (ActiveColor + 1U) & COLMSK;
-		}
-		else {
-		  newForm.fillType = SATF;
-		}
-		auto itGuide = wrap::next(SatinGuides->begin(), newForm.satinOrAngle.guide);
-		for (auto iGuide = 0U; iGuide < newForm.satinGuideCount; ++iGuide) {
-		  itGuide->start  = iGuide + 2U;
-		  itGuide->finish = newForm.vertexCount - iGuide - 1U;
-		  ++itGuide;
-		}
-		newForm.outline();
-		FormList->push_back(newForm);
-		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-		form::refilfn(ClosestFormToCursor);
-		ClosestFormToCursor = savedFormIndex;
-		StateMap->set(StateFlag::DELTO);
-		thred::frmdel();
-		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-		thred::coltab();
-		StateMap->set(StateFlag::FORMSEL);
-		StateMap->set(StateFlag::INIT);
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	  else {
-		throw std::runtime_error("FormList is empty");
-	  }
+  if (!StateMap->test(StateFlag::FORMSEL)) {
+	displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
+	return;
+  }
+  if (FormList->operator[](ClosestFormToCursor).vertexCount > 2) {
+	displayText::tabmsg(IDS_FRM2, false);
+	return;
+  }
+  thred::savdo();
+  auto const savedFormIndex = ClosestFormToCursor;
+  satin::satout(FormList->operator[](ClosestFormToCursor), BorderWidth);
+  if (FormList->empty()) {
+	throw std::runtime_error("FormList is empty");
+  }
+  auto       newForm            = FRM_HEAD {};
+  auto const currentType        = FormList->operator[](ClosestFormToCursor).type;
+  auto const currentVertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
+  newForm.maxFillStitchLen      = MAXSIZ * PFGRAN;
+  newForm.minFillStitchLen      = MinStitchLength;
+  MaxStitchLen                  = MAXSIZ * PFGRAN;
+  if (currentType == FRMLINE) {
+	// Set blunt flags
+	auto isBlunt = 0U;
+	if (UserFlagMap->test(UserFlag::BLUNT)) {
+	  isBlunt = SBLNT | FBLNT;
 	}
-	else {
-	  displayText::tabmsg(IDS_FRM2, false);
+	si::satends(FormList->operator[](ClosestFormToCursor), isBlunt, BorderWidth);
+  }
+  newForm.vertexIndex    = (currentType == FRMLINE) ? thred::adflt(currentVertexCount * 2U)
+                                                    : thred::adflt((currentVertexCount * 2U) + 2U);
+  auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
+  auto       itVertex    = startVertex;
+  *(itVertex++)          = OutsidePoints->front();
+  if (currentType == FRMLINE) {
+	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
+	  *(itVertex++) = InsidePoints->operator[](iVertex);
+	}
+	for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
+	  *(itVertex++) = OutsidePoints->operator[](iVertex);
 	}
   }
   else {
-	displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
+	newForm.underlayIndent = IniFile.underlayIndent;
+	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
+	  *(itVertex++) = InsidePoints->operator[](iVertex);
+	}
+	*(itVertex++) = InsidePoints->front();
+	*(itVertex++) = OutsidePoints->front();
+	for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
+	  *(itVertex++) = OutsidePoints->operator[](iVertex);
+	}
   }
+  auto const iNewVertex              = wrap::distance<uint32_t>(startVertex, itVertex);
+  newForm.type                       = SAT;
+  newForm.fillColor                  = ActiveColor;
+  newForm.fillSpacing                = LineSpacing;
+  newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
+  newForm.vertexCount                = iNewVertex;
+  newForm.attribute                  = FormList->operator[](ClosestFormToCursor).attribute;
+  newForm.attribute &= FRMLMSK;
+  newForm.attribute |= FRMEND;
+  newForm.wordParam          = iNewVertex / 2;
+  newForm.satinGuideCount    = newForm.wordParam - 2U;
+  newForm.satinOrAngle.guide = adsatk(newForm.satinGuideCount);
+  if (StateMap->test(StateFlag::CNV2FTH)) {
+	newForm.fillType                       = FTHF;
+	newForm.fillInfo.feather.ratio         = IniFile.featherRatio;
+	newForm.fillInfo.feather.upCount       = IniFile.featherUpCount;
+	newForm.fillInfo.feather.downCount     = IniFile.featherDownCount;
+	newForm.fillInfo.feather.fillType      = IniFile.featherFillType;
+	newForm.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+	newForm.extendedAttribute              = IniFile.featherType;
+	newForm.fillInfo.feather.count         = IniFile.featherCount;
+	newForm.fillInfo.feather.color         = (ActiveColor + 1U) & COLMSK;
+  }
+  else {
+	newForm.fillType = SATF;
+  }
+  auto itGuide = wrap::next(SatinGuides->begin(), newForm.satinOrAngle.guide);
+  for (auto iGuide = 0U; iGuide < newForm.satinGuideCount; ++iGuide) {
+	itGuide->start  = iGuide + 2U;
+	itGuide->finish = newForm.vertexCount - iGuide - 1U;
+	++itGuide;
+  }
+  newForm.outline();
+  FormList->push_back(newForm);
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+  form::refilfn(ClosestFormToCursor);
+  ClosestFormToCursor = savedFormIndex;
+  StateMap->set(StateFlag::DELTO);
+  thred::frmdel();
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+  thred::coltab();
+  StateMap->set(StateFlag::FORMSEL);
+  StateMap->set(StateFlag::INIT);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void satin::slbrd(FRM_HEAD const& form) {
