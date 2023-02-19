@@ -282,18 +282,19 @@ auto si::satselfn() -> bool {
 
 	auto const layerCode =
 	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
-	if ((ActiveLayer == 0U) || (layerCode == 0U) || layerCode == ActiveLayer) {
-	  auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		auto const deltaX = stitchPoint.x - itVertex->x;
-		auto const deltaY = stitchPoint.y - itVertex->y;
-		++itVertex;
-		auto const length = hypot(deltaX, deltaY);
-		if (length < minimumLength) {
-		  minimumLength         = length;
-		  ClosestFormToCursor   = iForm;
-		  ClosestVertexToCursor = iVertex;
-		}
+	if ((ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
+	  continue;
+	}
+	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	  auto const deltaX = stitchPoint.x - itVertex->x;
+	  auto const deltaY = stitchPoint.y - itVertex->y;
+	  ++itVertex;
+	  auto const length = hypot(deltaX, deltaY);
+	  if (length < minimumLength) {
+		minimumLength         = length;
+		ClosestFormToCursor   = iForm;
+		ClosestVertexToCursor = iVertex;
 	  }
 	}
   }
