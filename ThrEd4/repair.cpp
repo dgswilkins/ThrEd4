@@ -245,7 +245,7 @@ void ri::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BAD_COUNTS {};
   auto& formList     = *FormList;
-  for (auto form : *FormList) {
+  for (auto &form : *FormList) {
 	if (form.vertexCount != 0U) {
 	  formList[iDestination++] = form;
 	}
@@ -262,26 +262,24 @@ void ri::repflt(std::wstring& repairMessage) {
 	  form.vertexIndex = iVertex;
 	  iVertex += form.vertexCount;
 	  ri::bcup(form, badData);
+	  continue;
 	}
-	else {
-	  if (form.vertexIndex < FormVertices->size()) {
-		wrap::narrow(form.vertexCount, FormVertices->size() - form.vertexIndex);
-		satin::delsac(iForm);
-		auto startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-		auto endVertex   = wrap::next(startVertex, form.vertexCount);
-		vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
-		ri::bcup(form, badData);
-	  }
-	  else {
-		FormList->resize(iForm);
-		ClipPoints->resize(badData.clip);
-		SatinGuides->resize(badData.guideCount);
-		TexturePointsBuffer->resize(badData.tx);
-		ri::chkfstch();
-		ri::adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(FormList->size()));
-		break;
-	  }
+	if (form.vertexIndex < FormVertices->size()) {
+	  wrap::narrow(form.vertexCount, FormVertices->size() - form.vertexIndex);
+	  satin::delsac(iForm);
+	  auto startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto endVertex   = wrap::next(startVertex, form.vertexCount);
+	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
+	  ri::bcup(form, badData);
+	  continue;
 	}
+	FormList->resize(iForm);
+	ClipPoints->resize(badData.clip);
+	SatinGuides->resize(badData.guideCount);
+	TexturePointsBuffer->resize(badData.tx);
+	ri::chkfstch();
+	ri::adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(FormList->size()));
+	break;
   }
   *FormVertices = std::move(vertexPoint);
 }
