@@ -301,17 +301,18 @@ auto si::satselfn() -> bool {
 }
 
 void satin::satsel() {
-  if (si::satselfn()) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
-	thred::duzrat();
-	StartPoint = ClosestVertexToCursor;
-	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
-	FormLines->front() = form::sfCor2px(*itVertex);
-	StateMap->reset(StateFlag::SHOCON);
-	StateMap->set(StateFlag::SATCNKT);
-	if (form.type == FRMFPOLY) {
-	  form.type = SAT;
-	}
+  if (!si::satselfn()) {
+	return;
+  }
+  auto& form = FormList->operator[](ClosestFormToCursor);
+  thred::duzrat();
+  StartPoint = ClosestVertexToCursor;
+  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
+  FormLines->front() = form::sfCor2px(*itVertex);
+  StateMap->reset(StateFlag::SHOCON);
+  StateMap->set(StateFlag::SATCNKT);
+  if (form.type == FRMFPOLY) {
+	form.type = SAT;
   }
 }
 
@@ -351,7 +352,7 @@ void satin::satadj(FRM_HEAD& form) {
   // ensure all guide endpoints are on valid vertices
   auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
   {
-	auto itGuide = itFirstGuide;
+	auto itGuide = itFirstGuide; //copy is intended
 	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 	  auto const endCount = (form.vertexCount - 1);
 	  if (itGuide->finish > endCount) {
@@ -365,7 +366,7 @@ void satin::satadj(FRM_HEAD& form) {
   }
   // remove any guides of 0 length
   {
-	auto itGuide = itFirstGuide;
+	auto itGuide = itFirstGuide; // copy is intended
 	for (auto iSource = 0U; iSource < currentGuidesCount; ++iSource) {
 	  if (itGuide->start != itGuide->finish) {
 		interiorGuides.push_back(*itGuide);
