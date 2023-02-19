@@ -463,32 +463,33 @@ void ri::datmsg(uint32_t code) {
 }
 
 void repair::frmchkx() {
-  if (IniFile.dataCheck != 0U) {
-	auto const code = ri::frmchkfn();
-	switch (IniFile.dataCheck) {
-	  case 1: {
-		if (code != 0U) {
-		  ri::datmsg(code);
-		}
-		break;
+  if (IniFile.dataCheck == 0U) {
+	return;
+  }
+  auto const code = ri::frmchkfn();
+  switch (IniFile.dataCheck) {
+	case 1: {
+	  if (code != 0U) {
+		ri::datmsg(code);
 	  }
-	  case 2: {
-		if (code != 0U) {
-		  repair::repar();
-		}
-		break;
+	  break;
+	}
+	case 2: {
+	  if (code != 0U) {
+		repair::repar();
 	  }
-	  case 3: {
-		if (code != 0U) {
-		  repair::repar();
-		  displayText::tabmsg(IDS_DATREP, false);
-		}
-		break;
+	  break;
+	}
+	case 3: {
+	  if (code != 0U) {
+		repair::repar();
+		displayText::tabmsg(IDS_DATREP, false);
 	  }
-	  default: {
-		outDebugString(L"default hit in frmchkx: dataCheck [{}]\n", IniFile.dataCheck);
-		break;
-	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in frmchkx: dataCheck [{}]\n", IniFile.dataCheck);
+	  break;
 	}
   }
 }
