@@ -352,32 +352,31 @@ void ri::repsat() {
   auto badData    = BAD_COUNTS {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
-	if (form.type == SAT) {
-	  auto const guideDifference = form.satinOrAngle.guide;
-	  if (FormVertices->size() > wrap::toSize(guideDifference) + form.vertexCount) {
-		auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-		auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
-		auto const destination = wrap::next(SatinGuides->begin(), guideCount);
-		std::copy(startGuide, endGuide, destination);
-		form.satinOrAngle.guide = guideCount;
-		guideCount += form.satinGuideCount;
-		ri::bcup(form, badData);
-	  }
-	  else {
-		if (guideDifference < SatinGuides->size()) {
-		  wrap::narrow(form.satinGuideCount, SatinGuides->size() - guideDifference);
-		  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-		  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
-		  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
-		  std::copy(startGuide, endGuide, destination);
-		  ri::bcup(form, badData);
-		}
-		else {
-		  guideCount           = badData.guideCount;
-		  form.satinGuideCount = 0;
-		}
-	  }
+	if (form.type != SAT) {
+	  continue;
 	}
+	auto const guideDifference = form.satinOrAngle.guide;
+	if (FormVertices->size() > wrap::toSize(guideDifference) + form.vertexCount) {
+	  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
+	  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
+	  std::copy(startGuide, endGuide, destination);
+	  form.satinOrAngle.guide = guideCount;
+	  guideCount += form.satinGuideCount;
+	  ri::bcup(form, badData);
+	  continue;
+	}
+	if (guideDifference < SatinGuides->size()) {
+	  wrap::narrow(form.satinGuideCount, SatinGuides->size() - guideDifference);
+	  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
+	  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
+	  std::copy(startGuide, endGuide, destination);
+	  ri::bcup(form, badData);
+	  continue;
+	}
+	guideCount           = badData.guideCount;
+	form.satinGuideCount = 0;
   }
   SatinGuides->resize(guideCount);
 }
