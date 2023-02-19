@@ -1713,15 +1713,16 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
   StateMap->set(StateFlag::TXFIL);
   ClipRectSize.cx = form.fillSpacing;
   ClipRectSize.cy = form.fillInfo.texture.height;
-  if (currentCount != 0U) {
-	for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	  auto const&              currentPoint =
-	      TexturePointsBuffer->operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
-	  if (currentPoint.line != 0U) {
-		auto const iSegment            = currentPoint.line - 1U;
-		textureSegments[iSegment].line = iTexturePoint;
-		++(textureSegments[iSegment].stitchCount);
-	  }
+  if (currentCount == 0U) {
+	return;
+  }
+  for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
+	auto const&              currentPoint =
+	    TexturePointsBuffer->operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
+	if (currentPoint.line != 0U) {
+	  auto const iSegment            = currentPoint.line - 1U;
+	  textureSegments[iSegment].line = iTexturePoint;
+	  ++(textureSegments[iSegment].stitchCount);
 	}
   }
 }
