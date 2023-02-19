@@ -65,60 +65,61 @@ void ri::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
 
 void repair::lodchk() {
   thred::delinf();
-  if (!FormList->empty()) {
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto& form = FormList->operator[](iForm);
-	  if (form.type == 0U) {
-		form.type = FRMFPOLY;
+  if (FormList->empty()) {
+	return;
+  }
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	auto& form = FormList->operator[](iForm);
+	if (form.type == 0U) {
+	  form.type = FRMFPOLY;
+	}
+	else {
+	  if (form.type == FRMLINE) {
+		if (form.fillType != CONTF) {
+		  form.fillType                = 0;
+		  form.lengthOrCount.clipCount = 0;
+		}
+	  }
+	}
+	form.outline();
+	if (form.maxFillStitchLen == 0.0F) {
+	  form.maxFillStitchLen = IniFile.maxStitchLength;
+	}
+	if (form.maxBorderStitchLen == 0.0F) {
+	  form.maxBorderStitchLen = IniFile.maxStitchLength;
+	}
+  }
+  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  for (auto& stitch : *StitchBuffer) {
+	auto const attribute = stitch.attribute;
+	if ((attribute & TYPMSK) == TYPFRM) {
+	  auto const tform = (attribute & FRMSK) >> FRMSHFT;
+	  if (tform < formMap.size()) {
+		formMap.set(tform);
 	  }
 	  else {
-		if (form.type == FRMLINE) {
-		  if (form.fillType != CONTF) {
-			form.fillType                = 0;
-			form.lengthOrCount.clipCount = 0;
-		  }
-		}
-	  }
-	  form.outline();
-	  if (form.maxFillStitchLen == 0.0F) {
-		form.maxFillStitchLen = IniFile.maxStitchLength;
-	  }
-	  if (form.maxBorderStitchLen == 0.0F) {
-		form.maxBorderStitchLen = IniFile.maxStitchLength;
+		stitch.attribute &= (NFRMSK & NTYPMSK);
+		stitch.attribute |= NOTFRM;
 	  }
 	}
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
-	for (auto& stitch : *StitchBuffer) {
-	  auto const attribute = stitch.attribute;
-	  if ((attribute & TYPMSK) == TYPFRM) {
-		auto const tform = (attribute & FRMSK) >> FRMSHFT;
-		if (tform < formMap.size()) {
-		  formMap.set(tform);
-		}
-		else {
-		  stitch.attribute &= (NFRMSK & NTYPMSK);
-		  stitch.attribute |= NOTFRM;
-		}
-	  }
+  }
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	auto& form = FormList->operator[](iForm);
+	if (!formMap.test(iForm)) {
+	  form.fillType = 0;
 	}
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto& form = FormList->operator[](iForm);
-	  if (!formMap.test(iForm)) {
-		form.fillType = 0;
-	  }
+  }
+  formMap.reset();
+  for (auto const& stitch : *StitchBuffer) {
+	auto const attribute = stitch.attribute;
+	if ((attribute & TYPBRD) != 0U) {
+	  formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
-	formMap.reset();
-	for (auto const& stitch : *StitchBuffer) {
-	  auto const attribute = stitch.attribute;
-	  if ((attribute & TYPBRD) != 0U) {
-		formMap.set((attribute & FRMSK) >> FRMSHFT);
-	  }
-	}
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto& form = FormList->operator[](iForm);
-	  if (!formMap.test(iForm)) {
-		form.edgeType = 0;
-	  }
+  }
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	auto& form = FormList->operator[](iForm);
+	if (!formMap.test(iForm)) {
+	  form.edgeType = 0;
 	}
   }
 }
