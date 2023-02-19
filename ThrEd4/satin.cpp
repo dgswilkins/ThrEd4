@@ -1385,34 +1385,35 @@ void satin::satzum() {
 }
 
 void satin::satout(FRM_HEAD const& form, float satinWidth) {
-  if (form.vertexCount != 0U) {
-	form::duangs(form);
-	OutsidePointList->resize(form.vertexCount);
-	InsidePointList->resize(form.vertexCount);
-	OutsidePoints = OutsidePointList;
-	InsidePoints  = InsidePointList;
+  if (form.vertexCount == 0U) {
+	return;
+  }
+  form::duangs(form);
+  OutsidePointList->resize(form.vertexCount);
+  InsidePointList->resize(form.vertexCount);
+  OutsidePoints = OutsidePointList;
+  InsidePoints  = InsidePointList;
 
-	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	  constexpr auto DEFWIDTH = 0.1F; // default satin width
-	  si::outfn(form, iVertex, iVertex + 1, DEFWIDTH);
+  for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
+	constexpr auto DEFWIDTH = 0.1F; // default satin width
+	si::outfn(form, iVertex, iVertex + 1, DEFWIDTH);
+  }
+  auto count = 0U;
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	if (form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
+	  ++count;
 	}
-	auto count = 0U;
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  if (form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
-		++count;
-	  }
-	}
-	satinWidth /= 2.0F;
-	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	  si::outfn(form, iVertex, iVertex + 1, satinWidth);
-	}
-	si::outfn(form, form.vertexCount - 1U, 0, satinWidth);
-	StateMap->reset(StateFlag::INDIR);
-	if (count < (form.vertexCount / 2U)) {
-	  StateMap->set(StateFlag::INDIR);
-	  OutsidePoints = InsidePointList;
-	  InsidePoints  = OutsidePointList;
-	}
+  }
+  satinWidth /= 2.0F;
+  for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
+	si::outfn(form, iVertex, iVertex + 1, satinWidth);
+  }
+  si::outfn(form, form.vertexCount - 1U, 0, satinWidth);
+  StateMap->reset(StateFlag::INDIR);
+  if (count < (form.vertexCount / 2U)) {
+	StateMap->set(StateFlag::INDIR);
+	OutsidePoints = InsidePointList;
+	InsidePoints  = OutsidePointList;
   }
 }
 
