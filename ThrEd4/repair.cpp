@@ -32,6 +32,16 @@ class BAD_COUNTS
 namespace ri {
 void adbad(std::wstring& repairMessage, uint32_t code, uint32_t count);
 void bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
+void checkClip(const uint32_t&       clipDifference,
+               FRM_HEAD&             form,
+               std::vector<F_POINT>& clipPoint,
+               unsigned int&         clipCount,
+               unsigned int&         badClipCount);
+void checkEdgeClip(const uint32_t&       clipDifference,
+                   FRM_HEAD&             form,
+                   std::vector<F_POINT>& clipPoint,
+                   unsigned int&         clipCount,
+                   unsigned int&         badClipCount);
 void chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept;
 void chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept;
 void chkfstch() noexcept;
@@ -276,6 +286,66 @@ void ri::repflt(std::wstring& repairMessage) {
   *FormVertices = std::move(vertexPoint);
 }
 
+void ri::checkClip(const uint32_t&       clipDifference,
+                   FRM_HEAD&             form,
+                   std::vector<F_POINT>& clipPoint,
+                   unsigned int&         clipCount,
+                   unsigned int&         badClipCount) {
+  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
+	clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+	auto const endClip     = wrap::next(startClip, form.lengthOrCount.clipCount);
+	auto const destination = wrap::next(clipPoint.begin(), clipCount);
+	std::copy(startClip, endClip, destination);
+	form.angleOrClipData.clip = clipCount;
+	clipCount += form.lengthOrCount.clipCount;
+	return;
+  }
+  if (clipDifference < ClipPoints->size()) {
+	form.lengthOrCount.clipCount = wrap::toUnsigned(FormVertices->size() - clipDifference);
+	clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+	auto const endClip     = wrap::next(startClip, form.lengthOrCount.clipCount);
+	auto const destination = wrap::next(clipPoint.begin(), clipCount);
+	std::copy(startClip, endClip, destination);
+	form.angleOrClipData.clip = clipCount;
+	clipCount += form.lengthOrCount.clipCount;
+	return;
+  }
+  ++badClipCount;
+  form.fillType = 0;
+}
+
+void ri::checkEdgeClip(const uint32_t&       clipDifference,
+                       FRM_HEAD&             form,
+                       std::vector<F_POINT>& clipPoint,
+                       unsigned int&         clipCount,
+                       unsigned int&         badClipCount) {
+  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
+	clipPoint.resize(clipPoint.size() + form.clipEntries);
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	auto const endClip     = wrap::next(startClip, form.clipEntries);
+	auto const destination = wrap::next(clipPoint.begin(), clipCount);
+	std::copy(startClip, endClip, destination);
+	form.borderClipData = clipCount;
+	clipCount += form.clipEntries;
+	return;
+  }
+  if (clipDifference < ClipPoints->size()) {
+	wrap::narrow(form.clipEntries, FormVertices->size() - clipDifference);
+	clipPoint.resize(clipPoint.size() + form.clipEntries);
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	auto const endClip     = wrap::next(startClip, form.clipEntries);
+	auto const destination = wrap::next(clipPoint.begin(), clipCount);
+	std::copy(startClip, endClip, destination);
+	form.borderClipData = clipCount;
+	clipCount += form.clipEntries;
+	return;
+  }
+  ++badClipCount;
+  form.fillType = 0;
+}
+
 void ri::repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
@@ -287,58 +357,10 @@ void ri::repclp(std::wstring& repairMessage) {
 	                            : (form.isEdgeClip()) ? form.borderClipData
 	                                                  : 0U;
 	if (form.isClip()) {
-	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
-		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-		auto const endClip     = wrap::next(startClip, form.lengthOrCount.clipCount);
-		auto const destination = wrap::next(clipPoint.begin(), clipCount);
-		std::copy(startClip, endClip, destination);
-		form.angleOrClipData.clip = clipCount;
-		clipCount += form.lengthOrCount.clipCount;
-	  }
-	  else {
-		if (clipDifference < ClipPoints->size()) {
-		  form.lengthOrCount.clipCount = wrap::toUnsigned(FormVertices->size() - clipDifference);
-		  clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-		  auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-		  auto const endClip     = wrap::next(startClip, form.lengthOrCount.clipCount);
-		  auto const destination = wrap::next(clipPoint.begin(), clipCount);
-		  std::copy(startClip, endClip, destination);
-		  form.angleOrClipData.clip = clipCount;
-		  clipCount += form.lengthOrCount.clipCount;
-		}
-		else {
-		  ++badClipCount;
-		  form.fillType = 0;
-		}
-	  }
+	  checkClip(clipDifference, form, clipPoint, clipCount, badClipCount);
 	}
 	if (form.isEdgeClip()) {
-	  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
-		clipPoint.resize(clipPoint.size() + form.clipEntries);
-		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-		auto const endClip     = wrap::next(startClip, form.clipEntries);
-		auto const destination = wrap::next(clipPoint.begin(), clipCount);
-		std::copy(startClip, endClip, destination);
-		form.borderClipData = clipCount;
-		clipCount += form.clipEntries;
-	  }
-	  else {
-		if (clipDifference < ClipPoints->size()) {
-		  wrap::narrow(form.clipEntries, FormVertices->size() - clipDifference);
-		  clipPoint.resize(clipPoint.size() + form.clipEntries);
-		  auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-		  auto const endClip     = wrap::next(startClip, form.clipEntries);
-		  auto const destination = wrap::next(clipPoint.begin(), clipCount);
-		  std::copy(startClip, endClip, destination);
-		  form.borderClipData = clipCount;
-		  clipCount += form.clipEntries;
-		}
-		else {
-		  ++badClipCount;
-		  form.fillType = 0;
-		}
-	  }
+	  checkEdgeClip(clipDifference, form, clipPoint, clipCount, badClipCount);
 	}
   }
   std::ranges::copy(clipPoint, ClipPoints->begin());
