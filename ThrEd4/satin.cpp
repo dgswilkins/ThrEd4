@@ -222,50 +222,47 @@ void si::satclos() {
 	}
 	form.angleOrClipData.guide.start  = StartPoint;
 	form.angleOrClipData.guide.finish = closestVertex;
+	return;
   }
-  else {
-	auto closestVertex = StartPoint;
-	if (ClosestVertexToCursor < closestVertex) {
-	  std::swap(ClosestVertexToCursor, closestVertex);
-	}
-	if (closestVertex == 0 && ClosestVertexToCursor == form.vertexCount - 1) {
-	  closestVertex         = form.vertexCount - 1U;
-	  ClosestVertexToCursor = form.vertexCount;
-	}
-	if (closestVertex == 1 && ClosestVertexToCursor == form.vertexCount) {
-	  closestVertex         = 0;
-	  ClosestVertexToCursor = 1;
-	}
-	if (ClosestVertexToCursor - closestVertex == 1) {
-	  if ((form.attribute & FRMEND) != 0U) {
-		form.wordParam = closestVertex;
-	  }
-	  else {
-		if (closestVertex != 0U) {
-		  form::rotfrm(form, closestVertex);
-		}
-		form.attribute |= FRMEND;
-	  }
-	  satin::satadj(form);
+  auto closestVertex = StartPoint;
+  if (ClosestVertexToCursor < closestVertex) {
+	std::swap(ClosestVertexToCursor, closestVertex);
+  }
+  if (closestVertex == 0 && ClosestVertexToCursor == form.vertexCount - 1) {
+	closestVertex         = form.vertexCount - 1U;
+	ClosestVertexToCursor = form.vertexCount;
+  }
+  if (closestVertex == 1 && ClosestVertexToCursor == form.vertexCount) {
+	closestVertex         = 0;
+	ClosestVertexToCursor = 1;
+  }
+  if (ClosestVertexToCursor - closestVertex == 1) {
+	if ((form.attribute & FRMEND) != 0U) {
+	  form.wordParam = closestVertex;
 	}
 	else {
-	  if (form.satinGuideCount != 0U) {
-		si::sacspac(form.satinOrAngle.guide + form.satinGuideCount, 1);
-		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + form.satinGuideCount);
-		itGuide->start  = closestVertex;
-		itGuide->finish = ClosestVertexToCursor;
-		++form.satinGuideCount;
-		satin::satadj(form);
+	  if (closestVertex != 0U) {
+		form::rotfrm(form, closestVertex);
 	  }
-	  else {
-		form.satinOrAngle.guide = si::nusac(ClosestFormToCursor, 1);
-		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + initialGuideCount);
-		itGuide->start       = closestVertex;
-		itGuide->finish      = ClosestVertexToCursor;
-		form.satinGuideCount = 1;
-	  }
+	  form.attribute |= FRMEND;
 	}
+	satin::satadj(form);
+	return;
   }
+  if (form.satinGuideCount != 0U) {
+	si::sacspac(form.satinOrAngle.guide + form.satinGuideCount, 1);
+	auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + form.satinGuideCount);
+	itGuide->start  = closestVertex;
+	itGuide->finish = ClosestVertexToCursor;
+	++form.satinGuideCount;
+	satin::satadj(form);
+	return;
+  }
+  form.satinOrAngle.guide = si::nusac(ClosestFormToCursor, 1);
+  auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + initialGuideCount);
+  itGuide->start       = closestVertex;
+  itGuide->finish      = ClosestVertexToCursor;
+  form.satinGuideCount = 1;
 }
 
 void satin::satknkt() {
