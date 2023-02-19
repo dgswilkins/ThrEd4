@@ -214,16 +214,11 @@ void txi::redtbak() {
 }
 
 void txi::rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
-  auto dist = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
-  if (dist == 0) {
-	TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
-  }
-  else {
-	TextureHistoryIndex = --dist;
-  }
-  texture->height  = 0;
-  texture->width   = 0;
-  texture->spacing = 0;
+  auto dist           = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
+  TextureHistoryIndex = (dist == 0) ? wrap::toUnsigned(TextureHistory->size() - 1U) : --dist;
+  texture->height     = 0;
+  texture->width      = 0;
+  texture->spacing    = 0;
   texture->texturePoints.clear();
   texture->texturePoints.shrink_to_fit();
 }
