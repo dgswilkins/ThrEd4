@@ -886,99 +886,118 @@ void si::satfn(FRM_HEAD const&           form,
                uint32_t                  line1End,
                uint32_t                  line2Start,
                uint32_t                  line2End) {
-  if (line1Start != line1End && line2Start != line2End) {
-	auto itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-	if (!StateMap->testAndSet(StateFlag::SAT1)) {
-	  if (StateMap->test(StateFlag::FTHR)) {
+  if (line1Start != line1End && line2Start == line2End) {
+	return;
+  }
+  auto itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  if (!StateMap->testAndSet(StateFlag::SAT1)) {
+	if (StateMap->test(StateFlag::FTHR)) {
+	  if (form.vertexCount != 0U) {
+		auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
+		BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
+	  }
+	}
+	else {
+	  if (StateMap->test(StateFlag::BARSAT)) {
 		if (form.vertexCount != 0U) {
 		  auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
+		  BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
+		  itVertex = wrap::next(itFirstVertex, line2Start % form.vertexCount);
 		  BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
 		}
 	  }
 	  else {
-		if (StateMap->test(StateFlag::BARSAT)) {
-		  if (form.vertexCount != 0U) {
-			auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
-			BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
-			itVertex = wrap::next(itFirstVertex, line2Start % form.vertexCount);
-			BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
-		  }
-		}
-		else {
-		  auto itVertex = wrap::next(itFirstVertex, line1Start);
-		  OSequence->push_back(*itVertex);
-		}
+		auto itVertex = wrap::next(itFirstVertex, line1Start);
+		OSequence->push_back(*itVertex);
 	  }
 	}
-	auto line1Length = lengths[line1End] - lengths[line1Start];
-	auto line2Length = lengths[line2Start] - lengths[line2End];
-	auto stitchCount = 0U;
-	if (fabs(line1Length) > fabs(line2Length)) {
-	  stitchCount = wrap::round<uint32_t>(fabs(line2Length) / LineSpacing);
+  }
+  auto line1Length = lengths[line1End] - lengths[line1Start];
+  auto line2Length = lengths[line2Start] - lengths[line2End];
+  auto stitchCount = 0U;
+  if (fabs(line1Length) > fabs(line2Length)) {
+	stitchCount = wrap::round<uint32_t>(fabs(line2Length) / LineSpacing);
+  }
+  else {
+	stitchCount = wrap::round<uint32_t>(fabs(line1Length) / LineSpacing);
+  }
+  auto const line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
+  auto const line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
+  auto line1StitchCounts = std::vector<uint32_t> {};
+  line1StitchCounts.reserve(line1Segments);
+  auto line2StitchCounts = std::vector<uint32_t> {};
+  line2StitchCounts.reserve(line2Segments);
+  auto iVertex            = line1Start;
+  auto segmentStitchCount = 0U;
+  for (auto iSegment = 0U; iSegment < line1Segments - 1U; ++iSegment) {
+	auto const nextVertex = form::nxt(form, iVertex);
+	auto const val = wrap::ceil<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) *
+	                                      wrap::toFloat(stitchCount));
+	line1StitchCounts.push_back(val);
+	segmentStitchCount += val;
+	iVertex = form::nxt(form, iVertex);
+  }
+  line1StitchCounts.push_back(stitchCount - segmentStitchCount);
+  auto iNextVertex   = line2Start;
+  iVertex            = form::prv(form, iNextVertex);
+  segmentStitchCount = 0;
+  while (iVertex > line2End) {
+	auto const val = wrap::ceil<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) *
+	                                      wrap::toFloat(stitchCount));
+	line2StitchCounts.push_back(val);
+	segmentStitchCount += val;
+	iNextVertex = form::prv(form, iNextVertex);
+	iVertex     = form::prv(form, iNextVertex);
+  }
+  line2StitchCounts.push_back(stitchCount - segmentStitchCount);
+  auto line1Point    = *(wrap::next(itFirstVertex, line1Start));
+  auto line1Next     = wrap::next(itFirstVertex, form::nxt(form, line1Start));
+  auto line2Previous = wrap::next(itFirstVertex, form::prv(form, line2Start));
+  auto line1Count    = line1StitchCounts[0];
+  auto line2Count    = line2StitchCounts[0];
+  auto iLine1Vertex  = line1Start;
+  auto iLine2Vertex  = line2Start;
+
+  auto itLine1Vertex = wrap::next(itFirstVertex, iLine1Vertex);
+  auto line1Delta    = F_POINT {line1Next->x - itLine1Vertex->x, line1Next->y - itLine1Vertex->y};
+  auto line2Point    = (iLine2Vertex == form.vertexCount) ? *itFirstVertex
+                                                          : *(wrap::next(itFirstVertex, iLine2Vertex));
+  auto line2Delta    = F_POINT {line2Previous->x - line2Point.x, line2Previous->y - line2Point.y};
+  iLine1Vertex       = form::nxt(form, iLine1Vertex);
+  iLine2Vertex       = form::prv(form, iLine2Vertex);
+  auto line1Step =
+      F_POINT {line1Delta.x / wrap::toFloat(line1Count), line1Delta.y / wrap::toFloat(line1Count)};
+  auto line2Step =
+      F_POINT {line2Delta.x / wrap::toFloat(line2Count), line2Delta.y / wrap::toFloat(line2Count)};
+  bool flag        = false;
+  auto iLine1Count = 1U;
+  auto iLine2Count = 1U;
+  auto stitchPoint = *(wrap::next(itFirstVertex, line1Start));
+  auto loop        = 0U;
+
+  constexpr auto LOOPLIM = 20000U; // limit the iterations
+
+  do {
+	flag = false;
+	++loop;
+	if (StateMap->test(StateFlag::FTHR)) {
+	  while ((line1Count != 0U) && (line2Count != 0U)) {
+		line1Point.x += line1Step.x;
+		line1Point.y += line1Step.y;
+		line2Point.x += line2Step.x;
+		line2Point.y += line2Step.y;
+		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
+		  BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 0});
+		}
+		else {
+		  BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 1});
+		}
+		--line1Count;
+		--line2Count;
+	  }
 	}
 	else {
-	  stitchCount = wrap::round<uint32_t>(fabs(line1Length) / LineSpacing);
-	}
-	auto const line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
-	auto const line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
-	auto line1StitchCounts = std::vector<uint32_t> {};
-	line1StitchCounts.reserve(line1Segments);
-	auto line2StitchCounts = std::vector<uint32_t> {};
-	line2StitchCounts.reserve(line2Segments);
-	auto iVertex            = line1Start;
-	auto segmentStitchCount = 0U;
-	for (auto iSegment = 0U; iSegment < line1Segments - 1U; ++iSegment) {
-	  auto const nextVertex = form::nxt(form, iVertex);
-	  auto const val = wrap::ceil<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) *
-	                                        wrap::toFloat(stitchCount));
-	  line1StitchCounts.push_back(val);
-	  segmentStitchCount += val;
-	  iVertex = form::nxt(form, iVertex);
-	}
-	line1StitchCounts.push_back(stitchCount - segmentStitchCount);
-	auto iNextVertex   = line2Start;
-	iVertex            = form::prv(form, iNextVertex);
-	segmentStitchCount = 0;
-	while (iVertex > line2End) {
-	  auto const val = wrap::ceil<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) *
-	                                        wrap::toFloat(stitchCount));
-	  line2StitchCounts.push_back(val);
-	  segmentStitchCount += val;
-	  iNextVertex = form::prv(form, iNextVertex);
-	  iVertex     = form::prv(form, iNextVertex);
-	}
-	line2StitchCounts.push_back(stitchCount - segmentStitchCount);
-	auto line1Point    = *(wrap::next(itFirstVertex, line1Start));
-	auto line1Next     = wrap::next(itFirstVertex, form::nxt(form, line1Start));
-	auto line2Previous = wrap::next(itFirstVertex, form::prv(form, line2Start));
-	auto line1Count    = line1StitchCounts[0];
-	auto line2Count    = line2StitchCounts[0];
-	auto iLine1Vertex  = line1Start;
-	auto iLine2Vertex  = line2Start;
-
-	auto itLine1Vertex = wrap::next(itFirstVertex, iLine1Vertex);
-	auto line1Delta    = F_POINT {line1Next->x - itLine1Vertex->x, line1Next->y - itLine1Vertex->y};
-	auto line2Point    = (iLine2Vertex == form.vertexCount) ? *itFirstVertex
-	                                                        : *(wrap::next(itFirstVertex, iLine2Vertex));
-	auto line2Delta    = F_POINT {line2Previous->x - line2Point.x, line2Previous->y - line2Point.y};
-	iLine1Vertex       = form::nxt(form, iLine1Vertex);
-	iLine2Vertex       = form::prv(form, iLine2Vertex);
-	auto line1Step =
-	    F_POINT {line1Delta.x / wrap::toFloat(line1Count), line1Delta.y / wrap::toFloat(line1Count)};
-	auto line2Step =
-	    F_POINT {line2Delta.x / wrap::toFloat(line2Count), line2Delta.y / wrap::toFloat(line2Count)};
-	bool flag        = false;
-	auto iLine1Count = 1U;
-	auto iLine2Count = 1U;
-	auto stitchPoint = *(wrap::next(itFirstVertex, line1Start));
-	auto loop        = 0U;
-
-	constexpr auto LOOPLIM = 20000U; // limit the iterations
-
-	do {
-	  flag = false;
-	  ++loop;
-	  if (StateMap->test(StateFlag::FTHR)) {
+	  if (StateMap->test(StateFlag::BARSAT)) {
 		while ((line1Count != 0U) && (line2Count != 0U)) {
 		  line1Point.x += line1Step.x;
 		  line1Point.y += line1Step.y;
@@ -986,83 +1005,65 @@ void si::satfn(FRM_HEAD const&           form,
 		  line2Point.y += line2Step.y;
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 0});
+			BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 1});
 		  }
 		  else {
-			BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 1});
+			BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 2});
+			BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 3});
 		  }
 		  --line1Count;
 		  --line2Count;
 		}
 	  }
 	  else {
-		if (StateMap->test(StateFlag::BARSAT)) {
-		  while ((line1Count != 0U) && (line2Count != 0U)) {
-			line1Point.x += line1Step.x;
-			line1Point.y += line1Step.y;
-			line2Point.x += line2Step.x;
-			line2Point.y += line2Step.y;
-			if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			  BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 0});
-			  BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 1});
+		while ((line1Count != 0U) && (line2Count != 0U)) {
+		  line1Point.x += line1Step.x;
+		  line1Point.y += line1Step.y;
+		  line2Point.x += line2Step.x;
+		  line2Point.y += line2Step.y;
+		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
+			if (UserFlagMap->test(UserFlag::SQRFIL)) {
+			  stitchPoint = form::filinu(line2Point, stitchPoint);
 			}
-			else {
-			  BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 2});
-			  BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 3});
-			}
-			--line1Count;
-			--line2Count;
+			stitchPoint = form::filin(line1Point, stitchPoint);
 		  }
-		}
-		else {
-		  while ((line1Count != 0U) && (line2Count != 0U)) {
-			line1Point.x += line1Step.x;
-			line1Point.y += line1Step.y;
-			line2Point.x += line2Step.x;
-			line2Point.y += line2Step.y;
-			if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			  if (UserFlagMap->test(UserFlag::SQRFIL)) {
-				stitchPoint = form::filinu(line2Point, stitchPoint);
-			  }
-			  stitchPoint = form::filin(line1Point, stitchPoint);
+		  else {
+			if (UserFlagMap->test(UserFlag::SQRFIL)) {
+			  stitchPoint = form::filinu(line1Point, stitchPoint);
 			}
-			else {
-			  if (UserFlagMap->test(UserFlag::SQRFIL)) {
-				stitchPoint = form::filinu(line1Point, stitchPoint);
-			  }
-			  stitchPoint = form::filin(line2Point, stitchPoint);
-			}
-			--line1Count;
-			--line2Count;
+			stitchPoint = form::filin(line2Point, stitchPoint);
 		  }
+		  --line1Count;
+		  --line2Count;
 		}
 	  }
-	  if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
-		if ((line1Count == 0U) && iLine1Count < line1StitchCounts.size()) {
-		  line1Count           = line1StitchCounts[iLine1Count++];
-		  line1Next            = wrap::next(itFirstVertex, form::nxt(form, iLine1Vertex));
-		  auto itCurrentVertex = wrap::next(itFirstVertex, iLine1Vertex);
-		  line1Delta.x         = line1Next->x - itCurrentVertex->x;
-		  line1Delta.y         = line1Next->y - itCurrentVertex->y;
-		  iLine1Vertex         = form::nxt(form, iLine1Vertex);
-		  line1Step.x          = line1Delta.x / wrap::toFloat(line1Count);
-		  line1Step.y          = line1Delta.y / wrap::toFloat(line1Count);
-		}
-		if ((line2Count == 0U) && iLine2Count < line2StitchCounts.size()) {
-		  line2Count           = line2StitchCounts[iLine2Count++];
-		  line2Previous        = wrap::next(itFirstVertex, form::prv(form, iLine2Vertex));
-		  auto itCurrentVertex = wrap::next(itFirstVertex, iLine2Vertex);
-		  line2Delta.x         = line2Previous->x - itCurrentVertex->x;
-		  line2Delta.y         = line2Previous->y - itCurrentVertex->y;
-		  iLine2Vertex         = form::prv(form, iLine2Vertex);
-		  line2Step.x          = line2Delta.x / wrap::toFloat(line2Count);
-		  line2Step.y          = line2Delta.y / wrap::toFloat(line2Count);
-		}
-		if (((line1Count != 0U) || (line2Count != 0U)) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
-		  flag = true;
-		}
+	}
+	if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
+	  if ((line1Count == 0U) && iLine1Count < line1StitchCounts.size()) {
+		line1Count           = line1StitchCounts[iLine1Count++];
+		line1Next            = wrap::next(itFirstVertex, form::nxt(form, iLine1Vertex));
+		auto itCurrentVertex = wrap::next(itFirstVertex, iLine1Vertex);
+		line1Delta.x         = line1Next->x - itCurrentVertex->x;
+		line1Delta.y         = line1Next->y - itCurrentVertex->y;
+		iLine1Vertex         = form::nxt(form, iLine1Vertex);
+		line1Step.x          = line1Delta.x / wrap::toFloat(line1Count);
+		line1Step.y          = line1Delta.y / wrap::toFloat(line1Count);
 	  }
-	} while (flag && (loop < LOOPLIM));
-  }
+	  if ((line2Count == 0U) && iLine2Count < line2StitchCounts.size()) {
+		line2Count           = line2StitchCounts[iLine2Count++];
+		line2Previous        = wrap::next(itFirstVertex, form::prv(form, iLine2Vertex));
+		auto itCurrentVertex = wrap::next(itFirstVertex, iLine2Vertex);
+		line2Delta.x         = line2Previous->x - itCurrentVertex->x;
+		line2Delta.y         = line2Previous->y - itCurrentVertex->y;
+		iLine2Vertex         = form::prv(form, iLine2Vertex);
+		line2Step.x          = line2Delta.x / wrap::toFloat(line2Count);
+		line2Step.y          = line2Delta.y / wrap::toFloat(line2Count);
+	  }
+	  if (((line1Count != 0U) || (line2Count != 0U)) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
+		flag = true;
+	  }
+	}
+  } while (flag && (loop < LOOPLIM));
 }
 
 void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
