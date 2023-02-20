@@ -287,68 +287,67 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
+	CloseHandle(fileHandle);
+	return false;
   }
-  else {
-	auto pcsFileHeader = PCSHEADER {};
-	auto bytesRead     = DWORD {};
+  auto pcsFileHeader = PCSHEADER {};
+  auto bytesRead     = DWORD {};
 
-	if (!wrap::readFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, L"ReadFile for pcsFileHeader in insPCS")) {
-	  return retflag;
+  if (!wrap::readFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, L"ReadFile for pcsFileHeader in insPCS")) {
+	return false;
+  }
+  if (pcsFileHeader.leadIn != 0x32 || pcsFileHeader.colorCount != COLORCNT) {
+	CloseHandle(fileHandle);
+	return false;
+  }
+  auto fileSize = uintmax_t {};
+  thred::getFileSize(insertedFile, fileSize);
+  fileSize -= sizeof(pcsFileHeader) + 14;
+  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
+  auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
+  pcsStitchBuffer.resize(pcsStitchCount);
+  if (!wrap::readFile(fileHandle, pcsStitchBuffer.data(), fileSize, &bytesRead, L"ReadFile for pcsStitchBuffer in insPCS")) {
+	return false;
+  }
+  if (bytesRead == fileSize) {
+	StateMap->reset(StateFlag::INIT);
+	displayText::tabmsg(IDS_SHRTF, false);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+	CloseHandle(fileHandle);
+	return false;
+  }
+  thred::savdo();
+  auto insertIndex = StitchBuffer->size();
+  StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
+  auto newAttribute = 0U;
+  for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; ++iPCSStitch) {
+	if (pcsStitchBuffer[iPCSStitch].tag == 3) {
+	  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
+	  continue;
 	}
-	if (pcsFileHeader.leadIn == 0x32 && pcsFileHeader.colorCount == COLORCNT) {
-	  auto fileSize = uintmax_t {};
-	  thred::getFileSize(insertedFile, fileSize);
-	  fileSize -= sizeof(pcsFileHeader) + 14;
-	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
-	  auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
-	  pcsStitchBuffer.resize(pcsStitchCount);
-	  if (!wrap::readFile(fileHandle, pcsStitchBuffer.data(), fileSize, &bytesRead, L"ReadFile for pcsStitchBuffer in insPCS")) {
-		return retflag;
-	  }
-	  if (bytesRead == fileSize) {
-		thred::savdo();
-		auto insertIndex = StitchBuffer->size();
-		StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
-		auto newAttribute = 0U;
-		for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; ++iPCSStitch) {
-		  if (pcsStitchBuffer[iPCSStitch].tag == 3) {
-			newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
-		  }
-		  else {
-			(*StitchBuffer)
-			    .emplace_back(wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
-			                      wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
-			                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
-			                      wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,
-			                  newAttribute);
-		  }
-		}
-		auto const newStitchCount = StitchBuffer->size();
-		for (; insertIndex < newStitchCount; ++insertIndex) {
-		  auto const& stitch = StitchBuffer->operator[](insertIndex);
-		  if (stitch.x < insertedRectangle.left) {
-			insertedRectangle.left = stitch.x;
-		  }
-		  if (stitch.x > insertedRectangle.right) {
-			insertedRectangle.right = stitch.x;
-		  }
-		  if (stitch.y < insertedRectangle.bottom) {
-			insertedRectangle.bottom = stitch.y;
-		  }
-		  if (stitch.y > insertedRectangle.top) {
-			insertedRectangle.top = stitch.y;
-		  }
-		}
-		retflag = true;
-	  }
-	  else {
-		StateMap->reset(StateFlag::INIT);
-		displayText::tabmsg(IDS_SHRTF, false);
-		thred::coltab();
-		StateMap->set(StateFlag::RESTCH);
-	  }
+	auto xVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
+	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT;
+	auto yVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
+	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT;
+	(*StitchBuffer).emplace_back(xVal, yVal, newAttribute);
+  }
+  auto const newStitchCount = StitchBuffer->size();
+  for (; insertIndex < newStitchCount; ++insertIndex) {
+	auto const& stitch = StitchBuffer->operator[](insertIndex);
+	if (stitch.x < insertedRectangle.left) {
+	  insertedRectangle.left = stitch.x;
+	}
+	if (stitch.x > insertedRectangle.right) {
+	  insertedRectangle.right = stitch.x;
+	}
+	if (stitch.y < insertedRectangle.bottom) {
+	  insertedRectangle.bottom = stitch.y;
+	}
+	if (stitch.y > insertedRectangle.top) {
+	  insertedRectangle.top = stitch.y;
 	}
   }
   CloseHandle(fileHandle);
-  return retflag;
+  return true;
 }
