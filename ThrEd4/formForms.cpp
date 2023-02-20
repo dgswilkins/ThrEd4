@@ -1077,85 +1077,86 @@ void formForms::setear() {
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionType
   // clang-format on
-  if (nResult > 0) {
-	thred::savdo();
-	constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
+  if (nResult <= 0) {
+	return;
+  }
+  thred::savdo();
+  constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
 
-	auto twistStep = IniFile.tearTwistStep;
-	form::durpoli(IniFile.formSides);
-	auto&      form             = FormList->back();
-	auto const formVertexIndex  = form.vertexIndex;
-	auto const formVertexCount  = form.vertexCount;
-	auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
-	auto       nextVertex       = std::next(firstVertex);
-	auto const count            = wrap::toSize(formVertexCount) / 4U;
-	auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
-	auto       lastVertex       = wrap::next(firstVertex, count + 1U);
-	auto       verticalPosition = lastVertex->y;
-	--lastVertex;
-	auto step        = verticalPosition - lastVertex->y;
-	auto leftVertex  = wrap::next(firstVertex, wrap::toSize(formVertexCount) - count);
-	auto rightVertex = wrap::next(firstVertex, count + 1U);
-	for (auto iStep = 0U; iStep < count; ++iStep) {
-	  leftVertex->y  = verticalPosition;
-	  rightVertex->y = leftVertex->y;
-	  rightVertex->x += twistStep;
-	  leftVertex->x += twistStep;
-	  twistStep *= IniFile.tearTwistRatio;
-	  verticalPosition -= step;
-	  step *= IniFile.tearTailLength;
-	  --rightVertex;
-	  ++leftVertex;
-	}
-	firstVertex->y = nextVertex->y = verticalPosition;
-	firstVertex->x += twistStep;
-	nextVertex->x += twistStep;
-	verticalPosition -= step / 2.0F;
-	FormVertices->push_back(*firstVertex);
-	firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
-	nextVertex = std::next(firstVertex);
-	if (twistStep != 0.0F) {
-	  firstVertex->x = nextVertex->x + twistStep / TWSTFACT;
-	}
-	else {
-	  firstVertex->x = middle;
-	}
-	firstVertex->y = verticalPosition;
-	++(form.vertexCount);
-	++NewFormVertexCount;
-	StateMap->set(StateFlag::FORMSEL);
-	form::flipv();
-	StateMap->reset(StateFlag::FORMSEL);
-	auto const size =
-	    F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
-	if (horizontalRatio > 1.0F) {
-	  horizontalRatio = 1.0F;
-	}
-	auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / TWSTFACT / size.y;
-	if (verticalRatio < horizontalRatio) {
-	  horizontalRatio = verticalRatio;
-	}
-	if (horizontalRatio < 1.0F) {
-	  auto       scaledVertex = firstVertex;
-	  auto const vertexMax    = form.vertexCount;
-	  for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
-		scaledVertex->x = (scaledVertex->x - firstVertex->x) * horizontalRatio + firstVertex->x;
-		scaledVertex->y = (scaledVertex->y - firstVertex->y) * horizontalRatio + firstVertex->y;
-		++scaledVertex;
-	  }
-	}
-	form.outline();
-	// ToDo - is this copy of an iterator required?
-	auto       shiftedVertex = firstVertex;
-	auto const left          = form.rectangle.left;
-	auto const bottom        = form.rectangle.bottom;
-	auto const vertexMax     = form.vertexCount;
+  auto twistStep = IniFile.tearTwistStep;
+  form::durpoli(IniFile.formSides);
+  auto&      form             = FormList->back();
+  auto const formVertexIndex  = form.vertexIndex;
+  auto const formVertexCount  = form.vertexCount;
+  auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
+  auto       nextVertex       = std::next(firstVertex);
+  auto const count            = wrap::toSize(formVertexCount) / 4U;
+  auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
+  auto       lastVertex       = wrap::next(firstVertex, count + 1U);
+  auto       verticalPosition = lastVertex->y;
+  --lastVertex;
+  auto step        = verticalPosition - lastVertex->y;
+  auto leftVertex  = wrap::next(firstVertex, wrap::toSize(formVertexCount) - count);
+  auto rightVertex = wrap::next(firstVertex, count + 1U);
+  for (auto iStep = 0U; iStep < count; ++iStep) {
+	leftVertex->y  = verticalPosition;
+	rightVertex->y = leftVertex->y;
+	rightVertex->x += twistStep;
+	leftVertex->x += twistStep;
+	twistStep *= IniFile.tearTwistRatio;
+	verticalPosition -= step;
+	step *= IniFile.tearTailLength;
+	--rightVertex;
+	++leftVertex;
+  }
+  firstVertex->y = nextVertex->y = verticalPosition;
+  firstVertex->x += twistStep;
+  nextVertex->x += twistStep;
+  verticalPosition -= step / 2.0F;
+  FormVertices->push_back(*firstVertex);
+  firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
+  nextVertex = std::next(firstVertex);
+  if (twistStep != 0.0F) {
+	firstVertex->x = nextVertex->x + twistStep / TWSTFACT;
+  }
+  else {
+	firstVertex->x = middle;
+  }
+  firstVertex->y = verticalPosition;
+  ++(form.vertexCount);
+  ++NewFormVertexCount;
+  StateMap->set(StateFlag::FORMSEL);
+  form::flipv();
+  StateMap->reset(StateFlag::FORMSEL);
+  auto const size =
+      F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
+  auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
+  if (horizontalRatio > 1.0F) {
+	horizontalRatio = 1.0F;
+  }
+  auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / TWSTFACT / size.y;
+  if (verticalRatio < horizontalRatio) {
+	horizontalRatio = verticalRatio;
+  }
+  if (horizontalRatio < 1.0F) {
+	auto       scaledVertex = firstVertex;
+	auto const vertexMax    = form.vertexCount;
 	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
-	  shiftedVertex->x -= left;
-	  shiftedVertex->y -= bottom;
-	  ++shiftedVertex;
+	  scaledVertex->x = (scaledVertex->x - firstVertex->x) * horizontalRatio + firstVertex->x;
+	  scaledVertex->y = (scaledVertex->y - firstVertex->y) * horizontalRatio + firstVertex->y;
+	  ++scaledVertex;
 	}
+  }
+  form.outline();
+  // ToDo - is this copy of an iterator required?
+  auto       shiftedVertex = firstVertex;
+  auto const left          = form.rectangle.left;
+  auto const bottom        = form.rectangle.bottom;
+  auto const vertexMax     = form.vertexCount;
+  for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
+	shiftedVertex->x -= left;
+	shiftedVertex->y -= bottom;
+	++shiftedVertex;
   }
 }
 
