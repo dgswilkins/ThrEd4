@@ -286,7 +286,6 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
-	CloseHandle(fileHandle);
 	return false;
   }
   auto pcsFileHeader = PCSHEADER {};
@@ -296,6 +295,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	return false;
   }
   if (pcsFileHeader.leadIn != 0x32 || pcsFileHeader.colorCount != COLORCNT) {
+	// ToDo - Add error message
 	CloseHandle(fileHandle);
 	return false;
   }
