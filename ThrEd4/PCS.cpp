@@ -72,7 +72,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
   wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
   auto const spColors = gsl::span {PCSHeader.colors};
   std::ranges::copy(UserColor, spColors.begin());
-  if (pci::pcshup(saveStitches)) {
+  if (!pci::pcshup(saveStitches)) {
 	CloseHandle(fileHandle);
 	return false;
   }
@@ -240,7 +240,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
                                 boundingRect.top - boundingRect.bottom};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L, false);
-	return true;
+	return false;
   }
   auto const largeFlag =
       (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
@@ -266,7 +266,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 	  offsetStitch.y += delta.y;
 	}
   }
-  return false;
+  return true;
 }
 
 auto PCS::isPCS(fs::path const& path) -> bool {
