@@ -9037,110 +9037,109 @@ void form::dubfil() {
 
 void form::col2frm() {
   auto colorChangedCount = 0U;
-  if (!FormList->empty()) {
-	auto const formColorPermutations = FormList->size() << 4U; // total number of form and color combinations
-	auto fillColorHistogram = std::vector<uint32_t> {};
-	fillColorHistogram.resize(formColorPermutations);
-	auto borderColorHistogram = std::vector<uint32_t> {};
-	borderColorHistogram.resize(formColorPermutations);
-	auto featherColorHistogram = std::vector<uint32_t> {};
-	featherColorHistogram.resize(formColorPermutations);
-	auto underlayColorHistogram = std::vector<uint32_t> {};
-	underlayColorHistogram.resize(formColorPermutations);
-	for (auto const& stitch : *StitchBuffer) {
-	  if (auto const formColorCode = stitch.attribute & (COLMSK | FRMSK);
-	      (stitch.attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0U) {
-		++(underlayColorHistogram[formColorCode]);
+  if (FormList->empty()) {
+	displayText::showMessage(IDS_NCOLCHG, colorChangedCount);
+	return;
+  }
+  auto const formColorPermutations = FormList->size() << 4U; // total number of form and color combinations
+  auto fillColorHistogram = std::vector<uint32_t> {};
+  fillColorHistogram.resize(formColorPermutations);
+  auto borderColorHistogram = std::vector<uint32_t> {};
+  borderColorHistogram.resize(formColorPermutations);
+  auto featherColorHistogram = std::vector<uint32_t> {};
+  featherColorHistogram.resize(formColorPermutations);
+  auto underlayColorHistogram = std::vector<uint32_t> {};
+  underlayColorHistogram.resize(formColorPermutations);
+  for (auto const& stitch : *StitchBuffer) {
+	auto const formColorCode = stitch.attribute & (COLMSK | FRMSK);
+	if ((stitch.attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0U) {
+	  ++(underlayColorHistogram[formColorCode]);
+	  continue;
+	}
+	if ((stitch.attribute & FTHMSK) != 0U) {
+	  ++(featherColorHistogram[formColorCode]);
+	  continue;
+	}
+	switch (stitch.attribute & TYPMSK) {
+	  case FRMFIL: {
+		++(fillColorHistogram[formColorCode]);
+		break;
 	  }
-	  else {
-		if ((stitch.attribute & FTHMSK) != 0U) {
-		  ++(featherColorHistogram[formColorCode]);
-		}
-		else {
-		  switch (stitch.attribute & TYPMSK) {
-			case FRMFIL: {
-			  ++(fillColorHistogram[formColorCode]);
-			  break;
-			}
-			case FRMBFIL: {
-			  ++(borderColorHistogram[formColorCode]);
-			  break;
-			}
-			default: {
-			  outDebugString(L"default hit in col2frm: attribute [{}]\n", stitch.attribute & TYPMSK);
-			  break;
-			}
-		  }
-		}
+	  case FRMBFIL: {
+		++(borderColorHistogram[formColorCode]);
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in col2frm: attribute [{}]\n", stitch.attribute & TYPMSK);
+		break;
 	  }
 	}
-	auto startColorOffset = 0U;
-	auto endColorOffset   = COLORCNT;
-	for (auto& formIter : *FormList) {
-	  if (formIter.fillType != 0U) {
-		auto count         = 0U;
-		auto majorityColor = 0U;
+  }
+  auto startColorOffset = 0U;
+  auto endColorOffset   = COLORCNT;
+  for (auto& formIter : *FormList) {
+	if (formIter.fillType != 0U) {
+	  auto count         = 0U;
+	  auto majorityColor = 0U;
+	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
+		if (fillColorHistogram[iColor] > count) {
+		  count         = fillColorHistogram[iColor];
+		  majorityColor = iColor;
+		}
+	  }
+	  majorityColor &= COLMSK;
+	  if (formIter.fillColor != majorityColor) {
+		++colorChangedCount;
+		wrap::narrow(formIter.fillColor, majorityColor);
+	  }
+	  if (formIter.fillType == FTHF && ((formIter.extendedAttribute & AT_FTHBLND) != 0U)) {
+		count = majorityColor = 0;
 		for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
-		  if (fillColorHistogram[iColor] > count) {
+		  if (featherColorHistogram[iColor] > count) {
 			count         = fillColorHistogram[iColor];
 			majorityColor = iColor;
 		  }
 		}
 		majorityColor &= COLMSK;
-		if (formIter.fillColor != majorityColor) {
+		if (formIter.fillInfo.feather.color != majorityColor) {
 		  ++colorChangedCount;
-		  wrap::narrow(formIter.fillColor, majorityColor);
-		}
-		if (formIter.fillType == FTHF && ((formIter.extendedAttribute & AT_FTHBLND) != 0U)) {
-		  count = majorityColor = 0;
-		  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
-			if (featherColorHistogram[iColor] > count) {
-			  count         = fillColorHistogram[iColor];
-			  majorityColor = iColor;
-			}
-		  }
-		  majorityColor &= COLMSK;
-		  if (formIter.fillInfo.feather.color != majorityColor) {
-			++colorChangedCount;
-			wrap::narrow(formIter.fillInfo.feather.color, majorityColor);
-		  }
+		  wrap::narrow(formIter.fillInfo.feather.color, majorityColor);
 		}
 	  }
-	  if (formIter.edgeType != 0U) {
-		auto count         = 0U;
-		auto majorityColor = 0U;
-		for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
-		  if (borderColorHistogram[iColor] > count) {
-			count         = borderColorHistogram[iColor];
-			majorityColor = iColor;
-		  }
-		}
-		majorityColor &= COLMSK;
-		if (formIter.borderColor != majorityColor) {
-		  ++colorChangedCount;
-		  wrap::narrow(formIter.borderColor, majorityColor);
-		}
-	  }
-	  if ((formIter.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) {
-		auto count         = 0U;
-		auto majorityColor = 0U;
-		for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
-		  if (underlayColorHistogram[iColor] > count) {
-			count         = borderColorHistogram[iColor];
-			majorityColor = iColor;
-		  }
-		}
-		majorityColor &= COLMSK;
-		if (formIter.underlayColor != majorityColor) {
-		  ++colorChangedCount;
-		  wrap::narrow(formIter.underlayColor, majorityColor);
-		}
-	  }
-	  startColorOffset += COLORCNT;
-	  endColorOffset += COLORCNT;
 	}
+	if (formIter.edgeType != 0U) {
+	  auto count         = 0U;
+	  auto majorityColor = 0U;
+	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
+		if (borderColorHistogram[iColor] > count) {
+		  count         = borderColorHistogram[iColor];
+		  majorityColor = iColor;
+		}
+	  }
+	  majorityColor &= COLMSK;
+	  if (formIter.borderColor != majorityColor) {
+		++colorChangedCount;
+		wrap::narrow(formIter.borderColor, majorityColor);
+	  }
+	}
+	if ((formIter.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) {
+	  auto count         = 0U;
+	  auto majorityColor = 0U;
+	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
+		if (underlayColorHistogram[iColor] > count) {
+		  count         = borderColorHistogram[iColor];
+		  majorityColor = iColor;
+		}
+	  }
+	  majorityColor &= COLMSK;
+	  if (formIter.underlayColor != majorityColor) {
+		++colorChangedCount;
+		wrap::narrow(formIter.underlayColor, majorityColor);
+	  }
+	}
+	startColorOffset += COLORCNT;
+	endColorOffset += COLORCNT;
   }
-  displayText::showMessage(IDS_NCOLCHG, colorChangedCount);
 }
 
 void form::chan(uint32_t formIndex) {
