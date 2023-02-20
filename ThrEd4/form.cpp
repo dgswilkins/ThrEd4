@@ -9151,12 +9151,7 @@ void form::chan(uint32_t formIndex) {
   currentForm.edgeStitchLen      = IniFile.chainRatio;
   currentForm.maxBorderStitchLen = IniFile.maxStitchLength;
   currentForm.minBorderStitchLen = MinStitchLength;
-  if (StateMap->test(StateFlag::LINCHN)) {
-	currentForm.edgeType = EDGELCHAIN;
-  }
-  else {
-	currentForm.edgeType = EDGEOCHAIN;
-  }
+  currentForm.edgeType           = StateMap->test(StateFlag::LINCHN) ? EDGELCHAIN : EDGEOCHAIN;
   form::refilfn(formIndex);
 }
 
