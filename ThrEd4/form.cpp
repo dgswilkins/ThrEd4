@@ -8749,34 +8749,34 @@ auto fi::spltlin() -> bool {
 }
 
 void form::spltfrm() {
-  if (StateMap->test(StateFlag::FRMPSEL)) {
-	thred::savdo();
-	if (auto const& currentForm = FormList->operator[](ClosestFormToCursor); currentForm.type == SAT) {
-	  if (currentForm.satinGuideCount != 0U) {
-		auto itGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinOrAngle.guide);
-		for (auto guideIndex = 0U; guideIndex < currentForm.satinGuideCount; ++guideIndex) {
-		  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
-			satin::spltsat(guideIndex);
-			return;
-		  }
-		  ++itGuide;
-		}
-	  }
+  if (!StateMap->test(StateFlag::FRMPSEL)) {
+	displayText::spltmsg();
+	return;
+  }
+  thred::savdo();
+  auto const& currentForm = FormList->operator[](ClosestFormToCursor); 
+  if (currentForm.type == SAT) {
+	if (currentForm.satinGuideCount == 0U) {
+	  return;
 	}
-	else {
-	  if (currentForm.type == FRMLINE) {
-		if (fi::spltlin()) {
-		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
-		}
-		else {
-		  displayText::tabmsg(IDS_FRM3, false);
-		}
+	auto itGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinOrAngle.guide);
+	for (auto guideIndex = 0U; guideIndex < currentForm.satinGuideCount; ++guideIndex) {
+	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
+		satin::spltsat(guideIndex);
 		return;
 	  }
+	  ++itGuide;
 	}
+	return;
   }
-  displayText::spltmsg();
+  if (currentForm.type == FRMLINE) {
+	if (!fi::spltlin()) {
+	  displayText::tabmsg(IDS_FRM3, false);
+	  return;
+	}
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+  }
 }
 
 void form::stchs2frm() {
