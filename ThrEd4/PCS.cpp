@@ -154,7 +154,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   std::ranges::copy(PCSHeader.colors, UserColor.begin());
-  fileSize -= sizeof(PCSHeader) + 14;
+  fileSize -= uintmax_t {14U} + sizeof(PCSHeader);
   auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
   auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
   pcsDataBuffer.resize(pcsStitchCount);
@@ -166,25 +166,21 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   auto iStitch      = uint16_t {};
-  auto iColorChange = 0U;
   auto color        = 0U;
-  auto iPCSstitch   = 0U;
   StitchBuffer->clear();
   StitchBuffer->reserve(PCSHeader.stitchCount);
-  while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-	auto const& stitch = pcsDataBuffer[iPCSstitch];
+  for (auto const &stitch : pcsDataBuffer) {
 	if (stitch.tag == 3) {
 	  thred::addColor(iStitch, stitch.fx);
-	  ++iColorChange;
 	  color = NOTFRM | stitch.fx;
+	  continue;
 	}
-	else {
-	  StitchBuffer->push_back(F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
-	                                        wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
-	                                        color});
-	  ++iStitch;
+	StitchBuffer->push_back(F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+	                                      wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
+	                                      color});
+	if (iStitch++ >= PCSHeader.stitchCount) {
+	  break;
 	}
-	++iPCSstitch;
   }
   // Grab the bitmap filename
   if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, L"ReadFile for getBmpNameData in readPCSFile")) {
