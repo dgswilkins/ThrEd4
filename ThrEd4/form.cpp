@@ -8962,43 +8962,41 @@ void form::angclp() {
   if (!displayText::filmsgs(FMM_CLP)) {
 	return;
   }
-  if (OpenClipboard(ThrEdWindow) != 0) {
-	Clip       = RegisterClipboardFormat(PcdClipFormat);
-	ClipMemory = GetClipboardData(Clip);
-	if (ClipMemory != nullptr) {
-	  thred::redclp();
-	  CloseClipboard();
-	  if (ClipRectSize.cy > CLPMIN) {
-		if (!SelectedFormList->empty()) {
-		  StateMap->set(StateFlag::NOCLP);
-		  for (auto const selectedForm : (*SelectedFormList)) {
-			ClosestFormToCursor = selectedForm;
-			if (auto& form = FormList->operator[](selectedForm); form.type != FRMLINE) {
-			  angsclp(form);
-			}
-		  }
-		  StateMap->reset(StateFlag::NOCLP);
-		  StateMap->set(StateFlag::INIT);
-		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
-		}
-		else {
-		  if (StateMap->test(StateFlag::FORMSEL)) {
-			auto& form = FormList->operator[](ClosestFormToCursor);
-			angsclp(form);
-			StateMap->set(StateFlag::INIT);
-			thred::coltab();
-			StateMap->set(StateFlag::RESTCH);
-		  }
-		}
-	  }
-	  else {
-		displayText::tabmsg(IDS_CLP, false);
+  if (OpenClipboard(ThrEdWindow) == FALSE) {
+	return;
+  }
+  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  ClipMemory = GetClipboardData(Clip);
+  if (ClipMemory == nullptr) {
+	CloseClipboard();
+	return;
+  }
+  thred::redclp();
+  CloseClipboard();
+  if (ClipRectSize.cy <= CLPMIN) {
+	displayText::tabmsg(IDS_CLP, false);
+	return;
+  }
+  if (!SelectedFormList->empty()) {
+	StateMap->set(StateFlag::NOCLP);
+	for (auto const selectedForm : (*SelectedFormList)) {
+	  ClosestFormToCursor = selectedForm;
+	  if (auto& form = FormList->operator[](selectedForm); form.type != FRMLINE) {
+		angsclp(form);
 	  }
 	}
-	else {
-	  CloseClipboard();
-	}
+	StateMap->reset(StateFlag::NOCLP);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	angsclp(form);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
