@@ -1240,97 +1240,99 @@ void formForms::wavfrm() {
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionType
   // clang-format on
-  if (nResult > 0) {
-	thred::savdo();
-	auto points = std::vector<F_POINT> {};
-	points.reserve(IniFile.wavePoints);
-	// reuse regular polygon code to build the template for points
-	form::durpoli(IniFile.wavePoints);
-	auto&      form            = FormList->back();
-	auto const formVertexIndex = form.vertexIndex;
-	form::mdufrm();
-	auto iPoint      = 0U;
-	auto waveIndex   = IniFile.waveStart;
-	auto firstVertex = wrap::next(FormVertices->begin(), formVertexIndex);
-	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
-	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-	  auto const     nextVertex  = wrap::next(firstVertex, iNextVertex);
-	  auto const     waveVertex  = wrap::next(firstVertex, waveIndex);
-	  points.emplace_back(-nextVertex->x + waveVertex->x, -nextVertex->y + waveVertex->y);
-	  ++iPoint;
-	  waveIndex = iNextVertex;
-	}
-	auto const count            = iPoint;
-	auto       currentPosition  = F_POINT {};
-	auto const formVerticesSize = (IniFile.waveLobes * count) + 1 -
-	                              IniFile.wavePoints; // account for vertices already allocated by durpoli above
-	FormVertices->resize(FormVertices->size() + formVerticesSize);
-	firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // resize may invalidate iterator
-	auto itVertex = firstVertex;
-	for (auto iLobe = 0U; iLobe < IniFile.waveLobes; ++iLobe) {
-	  if ((iLobe & 1U) != 0U) {
-		for (auto index = 0U; index < count; ++index) {
-		  *itVertex = currentPosition;
-		  ++itVertex;
-		  currentPosition.x += points[index].x;
-		  currentPosition.y += points[index].y;
-		}
-	  }
-	  else {
-		for (auto index = count; index != 0; --index) {
-		  *itVertex = currentPosition;
-		  ++itVertex;
-		  currentPosition.x += points[index - 1U].x;
-		  currentPosition.y += points[index - 1U].y;
-		}
-	  }
-	}
-	*itVertex = currentPosition;
-
-	auto const vertexCount   = wrap::distance<uint32_t>(firstVertex, itVertex) + 1U;
-	auto const rotationAngle = -atan2(itVertex->y - firstVertex->y, itVertex->x - firstVertex->x);
-
-	auto rotatedVertex = firstVertex;
-	for (auto index = 0U; index < vertexCount; ++index) {
-	  thred::rotflt(*rotatedVertex, rotationAngle, F_POINT {});
-	  ++rotatedVertex;
-	}
-	form.type        = FRMLINE;
-	form.vertexCount = vertexCount;
-	form.outline();
-	StateMap->reset(StateFlag::FORMSEL);
-	auto const selectedSize =
-	    F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	constexpr auto WAVSIZE         = 4.0F; // wave size factor
-	auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
-	if (horizontalRatio > 1) {
-	  horizontalRatio = 1.0F;
-	}
-	auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
-	if (verticalRatio < horizontalRatio) {
-	  horizontalRatio = verticalRatio;
-	}
-	if (horizontalRatio < 1.0F) {
-	  auto vScaled = firstVertex;
-	  for (auto index = 0U; index < vertexCount; ++index) {
-		vScaled->x = (vScaled->x - firstVertex->x) * horizontalRatio + firstVertex->x;
-		vScaled->y = (vScaled->y - firstVertex->y) * horizontalRatio + firstVertex->y;
-		++vScaled;
-	  }
-	}
-	form.outline();
-	auto       vShifted = firstVertex;
-	auto const left     = FormList->back().rectangle.left;
-	auto const bottom   = FormList->back().rectangle.bottom;
-	for (auto index = 0U; index < vertexCount; ++index) {
-	  vShifted->x -= left;
-	  vShifted->y -= bottom;
-	  ++vShifted;
-	}
-	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-	FormMoveDelta       = F_POINT {};
-	NewFormVertexCount  = vertexCount + 1U;
-	form::setmfrm(ClosestFormToCursor);
-	form::mdufrm();
+  if (nResult <= 0) {
+	return;
   }
+  thred::savdo();
+  auto points = std::vector<F_POINT> {};
+  points.reserve(IniFile.wavePoints);
+  // reuse regular polygon code to build the template for points
+  form::durpoli(IniFile.wavePoints);
+  auto&      form            = FormList->back();
+  auto const formVertexIndex = form.vertexIndex;
+  form::mdufrm();
+  auto iPoint      = 0U;
+  auto waveIndex   = IniFile.waveStart;
+  auto firstVertex = wrap::next(FormVertices->begin(), formVertexIndex);
+  while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
+	uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
+	auto const     nextVertex  = wrap::next(firstVertex, iNextVertex);
+	auto const     waveVertex  = wrap::next(firstVertex, waveIndex);
+	points.emplace_back(-nextVertex->x + waveVertex->x, -nextVertex->y + waveVertex->y);
+	++iPoint;
+	waveIndex = iNextVertex;
+  }
+  auto const count            = iPoint;
+  auto       currentPosition  = F_POINT {};
+  auto const formVerticesSize = (IniFile.waveLobes * count) + 1 -
+                                IniFile.wavePoints; // account for vertices already allocated by durpoli above
+  FormVertices->resize(FormVertices->size() + formVerticesSize);
+  firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // resize may invalidate iterator
+
+  auto itVertex = firstVertex; // copy intended
+  for (auto iLobe = 0U; iLobe < IniFile.waveLobes; ++iLobe) {
+	if ((iLobe & 1U) != 0U) {
+	  for (auto index = 0U; index < count; ++index) {
+		*itVertex = currentPosition;
+		++itVertex;
+		currentPosition.x += points[index].x;
+		currentPosition.y += points[index].y;
+	  }
+	}
+	else {
+	  for (auto index = count; index != 0; --index) {
+		*itVertex = currentPosition;
+		++itVertex;
+		currentPosition.x += points[index - 1U].x;
+		currentPosition.y += points[index - 1U].y;
+	  }
+	}
+  }
+  *itVertex = currentPosition;
+
+  auto const vertexCount   = wrap::distance<uint32_t>(firstVertex, itVertex) + 1U;
+  auto const rotationAngle = -atan2(itVertex->y - firstVertex->y, itVertex->x - firstVertex->x);
+
+  auto rotatedVertex = firstVertex;
+  for (auto index = 0U; index < vertexCount; ++index) {
+	thred::rotflt(*rotatedVertex, rotationAngle, F_POINT {});
+	++rotatedVertex;
+  }
+  form.type        = FRMLINE;
+  form.vertexCount = vertexCount;
+  form.outline();
+  StateMap->reset(StateFlag::FORMSEL);
+  auto const selectedSize =
+      F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
+  constexpr auto WAVSIZE         = 4.0F; // wave size factor
+  auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
+  if (horizontalRatio > 1) {
+	horizontalRatio = 1.0F;
+  }
+  auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
+  if (verticalRatio < horizontalRatio) {
+	horizontalRatio = verticalRatio;
+  }
+  if (horizontalRatio < 1.0F) {
+	auto vScaled = firstVertex; // copy intended
+	for (auto index = 0U; index < vertexCount; ++index) {
+	  vScaled->x = (vScaled->x - firstVertex->x) * horizontalRatio + firstVertex->x;
+	  vScaled->y = (vScaled->y - firstVertex->y) * horizontalRatio + firstVertex->y;
+	  ++vScaled;
+	}
+  }
+  form.outline();
+  auto       vShifted = firstVertex; // copy intended
+  auto const left     = FormList->back().rectangle.left;
+  auto const bottom   = FormList->back().rectangle.bottom;
+  for (auto index = 0U; index < vertexCount; ++index) {
+	vShifted->x -= left;
+	vShifted->y -= bottom;
+	++vShifted;
+  }
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+  FormMoveDelta       = F_POINT {};
+  NewFormVertexCount  = vertexCount + 1U;
+  form::setmfrm(ClosestFormToCursor);
+  form::mdufrm();
 }
