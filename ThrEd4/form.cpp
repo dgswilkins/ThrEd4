@@ -9269,32 +9269,30 @@ void form::filclpx() {
 }
 
 void form::srtfrm() {
-  if (FormList->empty()) {
+  if (FormList->empty() || StitchBuffer->empty()) {
 	return;
   }
   auto histogram = std::vector<uint32_t> {};
   histogram.resize(FormList->size());
-  if (!StitchBuffer->empty()) {
-	thred::savdo();
-	for (auto const& stitch : *StitchBuffer) {
-	  auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
-	  ++(histogram[iForm]);
-	}
-	auto totalStitches = 0U;
-	for (auto& entry : histogram) {
-	  auto const formStitchCount = entry;
-	  entry                      = totalStitches;
-	  totalStitches += formStitchCount;
-	}
-	auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
-	highStitchBuffer.resize(StitchBuffer->size());
-	for (auto const& stitch : *StitchBuffer) {
-	  auto const iForm              = (stitch.attribute & FRMSK) >> FRMSHFT;
-	  auto const iHighStitch        = histogram[iForm]++;
-	  highStitchBuffer[iHighStitch] = stitch;
-	}
-	std::ranges::copy(highStitchBuffer, StitchBuffer->begin());
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  thred::savdo();
+  for (auto const& stitch : *StitchBuffer) {
+	auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+	++(histogram[iForm]);
   }
+  auto totalStitches = 0U;
+  for (auto& entry : histogram) {
+	auto const formStitchCount = entry;
+	entry                      = totalStitches;
+	totalStitches += formStitchCount;
+  }
+  auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
+  highStitchBuffer.resize(StitchBuffer->size());
+  for (auto const& stitch : *StitchBuffer) {
+	auto const iForm              = (stitch.attribute & FRMSK) >> FRMSHFT;
+	auto const iHighStitch        = histogram[iForm]++;
+	highStitchBuffer[iHighStitch] = stitch;
+  }
+  std::ranges::copy(highStitchBuffer, StitchBuffer->begin());
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
