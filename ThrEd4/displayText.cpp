@@ -197,9 +197,9 @@ auto displayText::clpmsgs(uint32_t code) -> bool {
   form::ispcdclp();
   if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS, false);
-	return true;
+	return false;
   }
-  return false;
+  return true;
 }
 
 void displayText::frm1pnt() {
@@ -219,22 +219,22 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 	  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.vertexCount == 2) {
 		if (code < FML_LIN) {
 		  displayText::tabmsg(IDS_FRM3X, false);
-		  return true;
+		  return false;
 		}
 
 		if (code == FML_PRPS) {
 		  displayText::tabmsg(IDS_ANGS, false);
-		  return true;
+		  return false;
 		}
 	  }
 	  return displayText::clpmsgs(code);
 	}
 
 	displayText::tabmsg(IDS_FILSEL, false);
-	return true;
+	return false;
   }
   displayText::tabmsg(IDS_FILCR, false);
-  return true;
+  return false;
 }
 
 void displayText::grpmsg() {

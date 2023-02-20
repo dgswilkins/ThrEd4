@@ -5496,7 +5496,7 @@ void fi::fsvrt() {
 }
 
 void form::filvrt() {
-  if (displayText::filmsgs(FMM_VRT)) {
+  if (!displayText::filmsgs(FMM_VRT)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -5537,7 +5537,7 @@ void fi::fshor(FRM_HEAD& form) {
 }
 
 void form::filhor() {
-  if (displayText::filmsgs(FMM_HOR)) {
+  if (!displayText::filmsgs(FMM_HOR)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -5577,7 +5577,7 @@ void fi::fsangl(FRM_HEAD& form) {
 }
 
 void form::filangl() {
-  if (displayText::filmsgs(FMM_ANG)) {
+  if (!displayText::filmsgs(FMM_ANG)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -5795,7 +5795,7 @@ void fi::filsfn() {
 }
 
 void form::filsat() {
-  if (displayText::filmsgs(FMM_FAN)) {
+  if (!displayText::filmsgs(FMM_FAN)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -5944,7 +5944,7 @@ auto form::chkdel(FRM_HEAD const& currentForm) noexcept -> bool {
 }
 
 void form::unfil() {
-  if (displayText::filmsgs(FMX_UNF)) {
+  if (!displayText::filmsgs(FMX_UNF)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -6092,7 +6092,7 @@ void fi::sbord(uint32_t formIndex) {
 }
 
 void form::bord() {
-  if (displayText::filmsgs(FML_LIN)) {
+  if (!displayText::filmsgs(FML_LIN)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -6138,7 +6138,7 @@ void fi::fsclp(uint32_t formIndex) {
 }
 
 void form::fclp() {
-  if (displayText::filmsgs(FML_CLP)) {
+  if (!displayText::filmsgs(FML_CLP)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
@@ -6197,7 +6197,7 @@ void fi::sapliq(uint32_t formIndex) {
 }
 
 void form::apliq() {
-  if (displayText::filmsgs(FML_APLQ)) {
+  if (!displayText::filmsgs(FML_APLQ)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -6787,7 +6787,7 @@ void fi::sbold(uint32_t formIndex) {
 }
 
 void form::dubold() {
-  if (displayText::filmsgs(FML_BLD)) {
+  if (!displayText::filmsgs(FML_BLD)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -7248,7 +7248,7 @@ void fi::prpsbrd(uint32_t formIndex) {
 
 void form::prpbrd(float borderStitchSpacing) {
   auto const savedSpacing = LineSpacing;
-  if (displayText::filmsgs(FML_PRPS)) {
+  if (!displayText::filmsgs(FML_PRPS)) {
 	return;
   }
   LineSpacing = borderStitchSpacing;
@@ -7379,7 +7379,7 @@ void fi::filsclp() {
 }
 
 void form::clpfil() {
-  if (displayText::filmsgs(FMM_CLP)) {
+  if (!displayText::filmsgs(FMM_CLP)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
@@ -8039,7 +8039,7 @@ void fi::bholbrd(uint32_t formIndex) {
 
 void form::bhol() {
   auto const savedSpacing = LineSpacing;
-  if (displayText::filmsgs(FML_BHOL)) {
+  if (!displayText::filmsgs(FML_BHOL)) {
 	return;
   }
   LineSpacing = savedSpacing;
@@ -8134,7 +8134,7 @@ void fi::fspic(uint32_t formIndex) {
 }
 
 void form::picot() {
-  if (displayText::filmsgs(FML_PIC)) {
+  if (!displayText::filmsgs(FML_PIC)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
@@ -8188,7 +8188,7 @@ auto fi::contsf(uint32_t formIndex) -> bool {
 }
 
 void form::contfil() {
-  if (displayText::filmsgs(FML_CONT)) {
+  if (!displayText::filmsgs(FML_CONT)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -8832,7 +8832,7 @@ void form::vrtsclp(uint32_t formIndex) {
 }
 
 void form::vrtclp() {
-  if (displayText::filmsgs(FMM_CLP)) {
+  if (!displayText::filmsgs(FMM_CLP)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
@@ -8896,7 +8896,7 @@ void form::horsclp() {
 }
 
 void form::horclp() {
-  if (displayText::filmsgs(FMM_CLP)) {
+  if (!displayText::filmsgs(FMM_CLP)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
@@ -8959,7 +8959,7 @@ void form::angsclp(FRM_HEAD& form) {
 }
 
 void form::angclp() {
-  if (displayText::filmsgs(FMM_CLP)) {
+  if (!displayText::filmsgs(FMM_CLP)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
@@ -9012,7 +9012,7 @@ void form::dubsfil(FRM_HEAD& form) {
 }
 
 void form::dubfil() {
-  if (displayText::filmsgs(FML_LIN)) {
+  if (!displayText::filmsgs(FML_LIN)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -9161,7 +9161,7 @@ void form::chan() {
 }
 
 void form::chain() {
-  if (displayText::filmsgs(FML_CHAIN)) {
+  if (!displayText::filmsgs(FML_CHAIN)) {
 	return;
   }
   thred::savdo();
@@ -9228,7 +9228,7 @@ void fi::fsclpx(uint32_t formIndex) {
 }
 
 void form::filclpx() {
-  if (displayText::filmsgs(FML_CLP)) {
+  if (!displayText::filmsgs(FML_CLP)) {
 	return;
   }
   if (OpenClipboard(ThrEdWindow) != 0) {
