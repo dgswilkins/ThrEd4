@@ -672,15 +672,14 @@ void formForms::prfmsg() {
 }
 
 void formForms::frmnum() {
-  if (!FormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
-	displayText::showMessage(IDS_FRML, FormList->size());
-	StateMap->set(StateFlag::NUMIN);
-	StateMap->set(StateFlag::ENTRFNUM);
-	displayText::numWnd();
-  }
-  else {
+  if (FormList->empty() || !StateMap->test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);
+	return;
   }
+  displayText::showMessage(IDS_FRML, FormList->size());
+  StateMap->set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::ENTRFNUM);
+  displayText::numWnd();
 }
 
 void ffi::chkdaz() {
