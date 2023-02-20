@@ -11835,13 +11835,13 @@ auto thi::handleSideWindowActive() -> bool {
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGELCHAIN)) {
 		StateMap->set(StateFlag::LINCHN);
-		form::chan();
+		form::chan(ClosestFormToCursor);
 		thred::coltab();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEOCHAIN)) {
 		StateMap->reset(StateFlag::LINCHN);
-		form::chan();
+		form::chan(ClosestFormToCursor);
 		thred::coltab();
 		break;
 	  }

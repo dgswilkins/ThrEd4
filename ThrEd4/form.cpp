@@ -9143,8 +9143,8 @@ void form::col2frm() {
   displayText::showMessage(IDS_NCOLCHG, colorChangedCount);
 }
 
-void form::chan() {
-  auto& currentForm              = FormList->operator[](ClosestFormToCursor);
+void form::chan(uint32_t formIndex) {
+  auto& currentForm              = FormList->operator[](formIndex);
   currentForm.borderColor        = ActiveColor;
   currentForm.edgeSpacing        = IniFile.chainSpace;
   currentForm.borderSize         = BorderWidth;
@@ -9157,7 +9157,7 @@ void form::chan() {
   else {
 	currentForm.edgeType = EDGEOCHAIN;
   }
-  form::refilfn(ClosestFormToCursor);
+  form::refilfn(formIndex);
 }
 
 void form::chain() {
@@ -9168,7 +9168,7 @@ void form::chain() {
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
-	  chan();
+	  chan(ClosestFormToCursor);
 	}
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
@@ -9177,6 +9177,7 @@ void form::chain() {
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  chan();
+	chan(selectedForm);
 	  StateMap->set(StateFlag::INIT);
 	  thred::coltab();
 	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
