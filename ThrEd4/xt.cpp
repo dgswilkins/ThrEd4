@@ -1216,6 +1216,9 @@ void xt::fsort() {
 #ifdef _DEBUG
 	xi::dmprec(pRecs, lastRegion);
 #endif
+	if (FormList->empty()) {
+	  return;
+	}
 	if (auto badForm = 0U; xi::srtchk(pFRecs, lastRegion, badForm)) {
 	  auto stitchRange = std::vector<RANGE> {};
 	  stitchRange.resize(lastRegion);
