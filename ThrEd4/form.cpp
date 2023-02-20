@@ -9269,6 +9269,9 @@ void form::filclpx() {
 }
 
 void form::srtfrm() {
+  if (FormList->empty()) {
+	return;
+  }
   auto histogram = std::vector<uint32_t> {};
   histogram.resize(FormList->size());
   if (!StitchBuffer->empty()) {
