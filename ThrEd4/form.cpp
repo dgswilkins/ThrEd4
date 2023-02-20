@@ -8780,35 +8780,34 @@ void form::spltfrm() {
 }
 
 void form::stchs2frm() {
-  if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::savdo();
-	thred::rngadj();
-	// ToDo - Is this still a valid restriction?
-	if (constexpr auto STITCHMX = 12000U; // maximum number of stitches in a group
-	    (GroupEndStitch - GroupStartStitch) > STITCHMX) {
-	  displayText::tabmsg(IDS_STMAX, false);
-	  return;
-	}
-	auto const vertexCount  = GroupEndStitch - GroupStartStitch + 1U;
-	auto       currentForm  = FRM_HEAD {};
-	currentForm.type        = FRMLINE;
-	currentForm.vertexCount = vertexCount;
-	currentForm.vertexIndex = thred::adflt(vertexCount);
-	auto itVertex           = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
-	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  *itVertex = StitchBuffer->operator[](iStitch);
-	  ++itVertex;
-	}
-	currentForm.outline();
-	FormList->push_back(currentForm);
-	thred::delstchm();
-	StateMap->reset(StateFlag::GRPSEL);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (!StateMap->test(StateFlag::GRPSEL)) {
 	displayText::shoseln(IDS_GRPMSG, IDS_STCH2FRM);
+	return;
   }
+  thred::savdo();
+  thred::rngadj();
+  // ToDo - Is this still a valid restriction?
+  if (constexpr auto STITCHMX = 12000U; // maximum number of stitches in a group
+      (GroupEndStitch - GroupStartStitch) > STITCHMX) {
+	displayText::tabmsg(IDS_STMAX, false);
+	return;
+  }
+  auto const vertexCount  = GroupEndStitch - GroupStartStitch + 1U;
+  auto       currentForm  = FRM_HEAD {};
+  currentForm.type        = FRMLINE;
+  currentForm.vertexCount = vertexCount;
+  currentForm.vertexIndex = thred::adflt(vertexCount);
+  auto itVertex           = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
+  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+	*itVertex = StitchBuffer->operator[](iStitch);
+	++itVertex;
+  }
+  currentForm.outline();
+  FormList->push_back(currentForm);
+  thred::delstchm();
+  StateMap->reset(StateFlag::GRPSEL);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::vrtsclp(uint32_t formIndex) {
