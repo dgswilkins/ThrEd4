@@ -9187,24 +9187,23 @@ void form::chain() {
 
 void form::crop() {
   displayText::frm1pnt();
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	thred::savdo();
-	// clang-format off
+  if (!StateMap->test(StateFlag::FORMSEL)) {
+	displayText::shoseln(IDS_FRM1MSG, IDS_CROP);
+	return;
+  }
+  thred::savdo();
+  // clang-format off
 	auto const& form         = FormList->operator[](ClosestFormToCursor);
 	auto        iDestination = StitchBuffer->begin();
-	// clang-format on
-	for (auto const& stitch : *StitchBuffer) {
-	  if (form::cisin(form, stitch.x, stitch.y)) {
-		*iDestination++ = stitch;
-	  }
+  // clang-format on
+  for (auto const& stitch : *StitchBuffer) {
+	if (form::cisin(form, stitch.x, stitch.y)) {
+	  *iDestination++ = stitch;
 	}
-	StitchBuffer->resize(wrap::distance<size_t>(StitchBuffer->begin(), iDestination));
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
   }
-  else {
-	displayText::shoseln(IDS_FRM1MSG, IDS_CROP);
-  }
+  StitchBuffer->resize(wrap::distance<size_t>(StitchBuffer->begin(), iDestination));
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void fi::fsclpx(uint32_t formIndex) {
