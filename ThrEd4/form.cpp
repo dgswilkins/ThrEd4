@@ -9165,25 +9165,22 @@ void form::chain() {
 	return;
   }
   thred::savdo();
-  if (!SelectedFormList->empty()) {
-	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
-	  chan(ClosestFormToCursor);
-	}
-	StateMap->set(StateFlag::INIT);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (SelectedFormList->empty()) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  chan();
-	chan(selectedForm);
+	  chan(ClosestFormToCursor);
 	  StateMap->set(StateFlag::INIT);
 	  thred::coltab();
 	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	  StateMap->set(StateFlag::RESTCH);
 	}
+	return;
   }
+  for (auto const selectedForm : (*SelectedFormList)) {
+	chan(selectedForm);
+  }
+  StateMap->set(StateFlag::INIT);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::crop() {
