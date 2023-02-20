@@ -8617,24 +8617,25 @@ auto fi::bean(uint32_t start, uint32_t finish) -> uint32_t {
 }
 
 void form::dubean() {
-  if (!StitchBuffer->empty()) {
-	thred::savdo();
-	if (StateMap->test(StateFlag::GRPSEL)) {
-	  thred::rngadj();
-	  if (auto const beanCount = fi::bean(GroupStartStitch, GroupEndStitch); ClosestPointIndex > GroupStitchIndex) {
-		ClosestPointIndex += beanCount;
-	  }
-	  else {
-		GroupStitchIndex += beanCount;
-	  }
-	  thred::grpAdj();
+  if (StitchBuffer->empty()) {
+	return;
+  }
+  thred::savdo();
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::rngadj();
+	if (auto const beanCount = fi::bean(GroupStartStitch, GroupEndStitch); ClosestPointIndex > GroupStitchIndex) {
+	  ClosestPointIndex += beanCount;
 	}
 	else {
-	  fi::bean(0, wrap::toUnsigned(StitchBuffer->size() - 1U));
+	  GroupStitchIndex += beanCount;
 	}
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+	thred::grpAdj();
   }
+  else {
+	fi::bean(0, wrap::toUnsigned(StitchBuffer->size() - 1U));
+  }
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void fi::unbean(uint32_t start, uint32_t& finish) {
