@@ -280,7 +280,6 @@ auto PCS::isPCS(fs::path const& path) -> bool {
 }
 
 auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
-  auto retflag = false;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
