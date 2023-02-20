@@ -8899,41 +8899,40 @@ void form::horclp() {
   if (!displayText::filmsgs(FMM_CLP)) {
 	return;
   }
-  if (OpenClipboard(ThrEdWindow) != 0) {
-	Clip       = RegisterClipboardFormat(PcdClipFormat);
-	ClipMemory = GetClipboardData(Clip);
-	if (ClipMemory != nullptr) {
-	  thred::redclp();
-	  CloseClipboard();
-	  if (ClipRectSize.cy > CLPMIN) {
-		if (!SelectedFormList->empty()) {
-		  StateMap->set(StateFlag::NOCLP);
-		  for (auto const selectedForm : (*SelectedFormList)) {
-			ClosestFormToCursor = selectedForm;
-			if (FormList->operator[](ClosestFormToCursor).type != FRMLINE) {
-			  horsclp();
-			}
-		  }
-		  StateMap->set(StateFlag::NOCLP);
-		  StateMap->set(StateFlag::INIT);
-		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
-		}
-		else {
-		  if (StateMap->test(StateFlag::FORMSEL)) {
-			horsclp();
-			StateMap->set(StateFlag::INIT);
-			thred::coltab();
-			StateMap->set(StateFlag::RESTCH);
-		  }
-		}
-	  }
-	  else {
-		displayText::tabmsg(IDS_CLP, false);
+  if (OpenClipboard(ThrEdWindow) == FALSE) {
+	return;
+  }
+  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  ClipMemory = GetClipboardData(Clip);
+  if (ClipMemory == nullptr) {
+	CloseClipboard();
+	return;
+  }
+  thred::redclp();
+  CloseClipboard();
+  if (ClipRectSize.cy > CLPMIN) {
+	displayText::tabmsg(IDS_CLP, false);
+	return;
+  }
+  if (!SelectedFormList->empty()) {
+	StateMap->set(StateFlag::NOCLP);
+	for (auto const selectedForm : (*SelectedFormList)) {
+	  ClosestFormToCursor = selectedForm;
+	  if (FormList->operator[](ClosestFormToCursor).type != FRMLINE) {
+		horsclp();
 	  }
 	}
-	else {
-	  CloseClipboard();
+	StateMap->set(StateFlag::NOCLP);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+  }
+  else {
+	if (StateMap->test(StateFlag::FORMSEL)) {
+	  horsclp();
+	  StateMap->set(StateFlag::INIT);
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
