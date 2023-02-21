@@ -8042,7 +8042,6 @@ void form::bhol() {
   if (!displayText::filmsgs(FML_BHOL)) {
 	return;
   }
-  LineSpacing = savedSpacing;
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  fi::bholbrd(selectedForm);
@@ -8050,17 +8049,17 @@ void form::bhol() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	LineSpacing = savedSpacing;
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  fi::bholbrd(ClosestFormToCursor);
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	fi::bholbrd(ClosestFormToCursor);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+	StateMap->set(StateFlag::RESTCH);
+	LineSpacing = savedSpacing;
   }
-  LineSpacing = savedSpacing;
 }
 
 void form::fcntr() {
