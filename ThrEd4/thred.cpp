@@ -11664,37 +11664,21 @@ auto thi::handleSideWindowActive() -> bool {
   }
   form.borderColor &= COLMSK;
   if (StateMap->testAndReset(StateFlag::BRDACT)) {
-	if (form.isEdgeClip()) {
-	  clip::deleclp(ClosestFormToCursor);
-	}
 	do {
 	  if (Msg.hwnd == SideWindow->operator[](0)) {
+		if (form.isEdgeClip()) {
+		  clip::deleclp(ClosestFormToCursor);
+		}
 		form.edgeType = 0;
 		thred::coltab();
 		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGELINE)) {
-		if (form.edgeType != 0U) {
-		  auto const code = form.edgeType & NEGUND;
-		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
-			form::bsizpar(form);
-		  }
-		  form.edgeType = EDGELINE;
-		  break;
-		}
 		form::bord();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEBEAN)) {
-		if (form.edgeType != 0U) {
-		  auto const code = form.edgeType & NEGUND;
-		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
-			form::bsizpar(form);
-		  }
-		  form.edgeType = EDGEBEAN;
-		  break;
-		}
 		form::dubold();
 		break;
 	  }
@@ -11703,145 +11687,41 @@ auto thi::handleSideWindowActive() -> bool {
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEANGSAT)) {
-		if (form.edgeType != 0U) {
-		  switch (form.edgeType) {
-			case EDGECLIP: {
-			  form::bsizpar(form);
-			  [[fallthrough]];
-			}
-			case EDGELINE: {
-			  [[fallthrough]];
-			}
-			case EDGEBEAN: {
-			  form.borderSize  = BorderWidth;
-			  form.edgeSpacing = LineSpacing;
-			  break;
-			}
-			case EDGEPROPSAT: {
-			  form.edgeSpacing /= 2;
-			  break;
-			}
-			default: {
-			  outDebugString(L"default hit in handleSideWindowActive 1: edgeType [{}]\n", form.edgeType);
-			  break;
-			}
-		  }
-		  form.edgeType = EDGEANGSAT;
-		  if (UserFlagMap->test(UserFlag::DUND)) {
-			form.edgeType |= EGUND;
-		  }
-		  break;
-		}
 		satin::satbrd();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEAPPL)) {
 		if (form.fillType != 0U) {
 		  form::delmfil(ClosestFormToCursor);
-		  form.fillType = 0;
-		}
-		if (form.edgeType != 0U) {
-		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
-			form.borderSize  = BorderWidth;
-			form.edgeSpacing = LineSpacing;
-			if (form.edgeType == EDGECLIP) {
-			  form::bsizpar(form);
-			}
-		  }
-		  form.edgeType = EDGEAPPL;
-		  if (UserFlagMap->test(UserFlag::DUND)) {
-			form.edgeType |= EGUND;
-		  }
-		  form.borderColor |= gsl::narrow_cast<uint8_t>(AppliqueColor << 4U);
-		  break;
 		}
 		form::apliq();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEPROPSAT)) {
-		if (form.edgeType != 0U) {
-		  switch (form.edgeType) {
-			case EDGECLIP: {
-			  form::bsizpar(form);
-			  [[fallthrough]];
-			}
-			case EDGELINE: {
-			  [[fallthrough]];
-			}
-			case EDGEBEAN: {
-			  form.borderSize  = BorderWidth;
-			  form.edgeSpacing = LineSpacing;
-			  break;
-			}
-			case EDGEANGSAT: {
-			  form.edgeSpacing *= 2;
-			  break;
-			}
-			default: {
-			  outDebugString(L"default hit in handleSideWindowActive 2: edgeType [{}]\n", form.edgeType);
-			  break;
-			}
-		  }
-		  form.edgeType = EDGEPROPSAT;
-		  if (UserFlagMap->test(UserFlag::DUND)) {
-			form.edgeType |= EGUND;
-		  }
-		  break;
-		}
 		form::prpbrd(LineSpacing);
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEBHOL)) {
-		if (form.edgeType != 0U) {
-		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
-			form.borderSize  = BorderWidth;
-			form.edgeSpacing = LineSpacing;
-			if (form.edgeType == EDGECLIP) {
-			  form::bsizpar(form);
-			}
-		  }
-		  form.edgeType = EDGEBHOL;
-		  break;
-		}
 		form::bhol();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEPICOT)) {
-		if (form.edgeType != 0U) {
-		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
-			form.borderSize  = BorderWidth;
-			form.edgeSpacing = LineSpacing;
-			if (form.edgeType == EDGECLIP) {
-			  form::bsizpar(form);
-			}
-		  }
-		  form::picot();
-		  break;
-		}
 		form::picot();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEDOUBLE)) {
-		if (form.edgeType != 0U) {
-		  auto const code = form.edgeType & NEGUND;
-		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
-			form::bsizpar(form);
-		  }
-		  form.edgeType = EDGEDOUBLE;
-		  break;
-		}
 		form::dubsfil(form);
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGELCHAIN)) {
 		StateMap->set(StateFlag::LINCHN);
-		form::chan(ClosestFormToCursor);
+		form::chain();
 		thred::coltab();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGEOCHAIN)) {
 		StateMap->reset(StateFlag::LINCHN);
-		form::chan(ClosestFormToCursor);
+		form::chain();
 		thred::coltab();
 		break;
 	  }
