@@ -8855,8 +8855,8 @@ void form::vrtclp() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  vrtsclp(ClosestFormToCursor);
 	  StateMap->set(StateFlag::INIT);
@@ -8864,7 +8864,6 @@ void form::vrtclp() {
 	  StateMap->set(StateFlag::RESTCH);
 	}
   }
-}
 
 void form::horsclp() {
   auto& form = FormList->operator[](ClosestFormToCursor);
