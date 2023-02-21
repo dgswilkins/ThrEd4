@@ -1162,10 +1162,10 @@ void formForms::setear() {
 
 void ffi::wavinit(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS),
-                fmt::format(FMT_COMPILE(L"{d}"), IniFile.wavePoints).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format(FMT_COMPILE(L"{d}"), IniFile.waveStart).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(FMT_COMPILE(L"{d}"), IniFile.waveEnd).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(FMT_COMPILE(L"{d}"), IniFile.waveLobes).c_str());
+                fmt::format(FMT_COMPILE(L"{:d}"), IniFile.wavePoints).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveStart).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveEnd).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveLobes).c_str());
 }
 
 auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
