@@ -2246,7 +2246,7 @@ void thi::chknum() {
 	}
 	if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
 	  if (wrap::round<uint32_t>(value) < FormList->size()) {
-		form::frmnumfn(wrap::round<uint32_t>(value));
+		form::frmnumfn(ClosestFormToCursor, wrap::round<uint32_t>(value));
 	  }
 	  else {
 		displayText::tabmsg(IDS_FRMN1, false);

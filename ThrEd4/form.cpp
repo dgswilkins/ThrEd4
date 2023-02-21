@@ -8329,9 +8329,9 @@ void fi::stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept {
   attribute |= formIndex << FRMSHFT;
 }
 
-void form::frmnumfn(uint32_t newFormIndex) {
+void form::frmnumfn(uint32_t& oldFormIndex, uint32_t newFormIndex) {
   thred::savdo();
-  if (newFormIndex != ClosestFormToCursor) {
+  if (newFormIndex != oldFormIndex) {
 	auto formRelocationIndex = 0U;
 	auto sourceForm          = 0U;
 	auto tempFormList        = std::vector<FRM_HEAD> {};
@@ -8345,10 +8345,10 @@ void form::frmnumfn(uint32_t newFormIndex) {
 	auto formSourceIndex = 0U;
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (iForm == newFormIndex) {
-		fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex, formSourceIndex);
+		fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, oldFormIndex, formRelocationIndex, formSourceIndex);
 	  }
 	  else {
-		if (sourceForm == ClosestFormToCursor) {
+		if (sourceForm == oldFormIndex) {
 		  ++sourceForm;
 		}
 		fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++, formRelocationIndex, formSourceIndex);
@@ -8362,17 +8362,17 @@ void form::frmnumfn(uint32_t newFormIndex) {
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & SRTYPMSK) != 0U) {
 		if (auto const decodedFormIndex = (stitch.attribute & FRMSK) >> FRMSHFT;
-		    decodedFormIndex == ClosestFormToCursor) {
+		    decodedFormIndex == oldFormIndex) {
 		  fi::stchfrm(newFormIndex, stitch.attribute);
 		}
 		else {
 		  auto start  = newFormIndex;
-		  auto finish = ClosestFormToCursor;
-		  if (ClosestFormToCursor < newFormIndex) {
+		  auto finish = oldFormIndex;
+		  if (oldFormIndex < newFormIndex) {
 			std::swap(start, finish);
 		  }
 		  if (decodedFormIndex >= start && decodedFormIndex <= finish) {
-			if (newFormIndex < ClosestFormToCursor) {
+			if (newFormIndex < oldFormIndex) {
 			  fi::stchfrm(decodedFormIndex + 1, stitch.attribute);
 			}
 			else {
@@ -8382,8 +8382,8 @@ void form::frmnumfn(uint32_t newFormIndex) {
 		}
 	  }
 	}
-	ClosestFormToCursor = newFormIndex;
-	displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
+	oldFormIndex = newFormIndex;
+	displayText::ritnum(IDS_NUMFORM, oldFormIndex);
   }
 }
 
