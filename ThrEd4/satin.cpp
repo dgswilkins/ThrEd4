@@ -678,7 +678,7 @@ void si::satsbrd(uint32_t formIndex) {
 }
 
 void satin::satbrd() {
-  if (displayText::filmsgs(FML_ANGS)) {
+  if (!displayText::filmsgs(FML_ANGS)) {
 	return;
   }
   if (!SelectedFormList->empty()) {
