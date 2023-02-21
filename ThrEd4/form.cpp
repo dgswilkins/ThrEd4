@@ -8453,9 +8453,7 @@ void form::cntrx() {
       StateMap->test(StateFlag::GMRK)
           ? ZoomMarkPoint
           : F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
-  bool flag = false;
   if (!SelectedFormList->empty()) {
-	flag = true;
 	thred::savdo();
 	auto selectedCenter = F_POINT {};
 	fi::dufcntr(selectedCenter);
@@ -8470,75 +8468,70 @@ void form::cntrx() {
 	  frmadj(selectedForm);
 	}
 	frmsadj();
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  flag = true;
-	  thred::savdo();
-	  // clang-format off
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	// clang-format off
 	  auto const& formRect       = FormList->operator[](ClosestFormToCursor).rectangle;
 	  auto const  selectedCenter = F_POINT {wrap::midl(formRect.right, formRect.left), 
 										    wrap::midl(formRect.top, formRect.bottom)};
-	  // clang-format on
-	  FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
-	  if (StateMap->test(StateFlag::CNTRV)) {
-		FormMoveDelta.y = 0.0F;
-	  }
-	  if (StateMap->test(StateFlag::CNTRH)) {
-		FormMoveDelta.x = 0.0F;
-	  }
-	  frmadj(ClosestFormToCursor);
-	  for (auto& stitch : *StitchBuffer) {
-		if (((stitch.attribute & ALTYPMSK) != 0U) && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-		  stitch.x += FormMoveDelta.x;
-		  stitch.y -= FormMoveDelta.y;
-		}
+	// clang-format on
+	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
+	if (StateMap->test(StateFlag::CNTRV)) {
+	  FormMoveDelta.y = 0.0F;
+	}
+	if (StateMap->test(StateFlag::CNTRH)) {
+	  FormMoveDelta.x = 0.0F;
+	}
+	frmadj(ClosestFormToCursor);
+	for (auto& stitch : *StitchBuffer) {
+	  if (((stitch.attribute & ALTYPMSK) != 0U) && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+		stitch.x += FormMoveDelta.x;
+		stitch.y -= FormMoveDelta.y;
 	  }
 	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		flag = true;
-		thred::savdo();
-		thred::rngadj();
-		auto const& startStitch = StitchBuffer->operator[](GroupStartStitch);
-		auto groupRect = F_RECTANGLE {startStitch.x, startStitch.y, startStitch.x, startStitch.y};
-		for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
-		  auto const& stitch = StitchBuffer->operator[](iStitch);
-		  if (stitch.x < groupRect.left) {
-			groupRect.left = stitch.x;
-		  }
-		  if (stitch.y > groupRect.top) {
-			groupRect.top = stitch.y;
-		  }
-		  if (stitch.x > groupRect.right) {
-			groupRect.right = stitch.x;
-		  }
-		  if (stitch.y < groupRect.bottom) {
-			groupRect.bottom = stitch.y;
-		  }
-		}
-		auto const selectedCenter = F_POINT {wrap::midl(groupRect.right, groupRect.left),
-		                                     wrap::midl(groupRect.top, groupRect.bottom)};
-		FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
-		if (StateMap->test(StateFlag::CNTRV)) {
-		  FormMoveDelta.y = 0.0F;
-		}
-		if (StateMap->test(StateFlag::CNTRH)) {
-		  FormMoveDelta.x = 0.0F;
-		}
-		for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-		  StitchBuffer->operator[](iStitch).x += FormMoveDelta.x;
-		  StitchBuffer->operator[](iStitch).y -= FormMoveDelta.y;
-		}
-	  }
-	  else {
-		displayText::shoseln(IDS_FGRPF, IDS_CENT);
-	  }
-	}
-  }
-  if (flag) {
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::savdo();
+	thred::rngadj();
+	auto const& startStitch = StitchBuffer->operator[](GroupStartStitch);
+	auto groupRect = F_RECTANGLE {startStitch.x, startStitch.y, startStitch.x, startStitch.y};
+	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
+	  auto const& stitch = StitchBuffer->operator[](iStitch);
+	  if (stitch.x < groupRect.left) {
+		groupRect.left = stitch.x;
+	  }
+	  if (stitch.y > groupRect.top) {
+		groupRect.top = stitch.y;
+	  }
+	  if (stitch.x > groupRect.right) {
+		groupRect.right = stitch.x;
+	  }
+	  if (stitch.y < groupRect.bottom) {
+		groupRect.bottom = stitch.y;
+	  }
+	}
+	auto const selectedCenter = F_POINT {wrap::midl(groupRect.right, groupRect.left),
+	                                     wrap::midl(groupRect.top, groupRect.bottom)};
+	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
+	if (StateMap->test(StateFlag::CNTRV)) {
+	  FormMoveDelta.y = 0.0F;
+	}
+	if (StateMap->test(StateFlag::CNTRH)) {
+	  FormMoveDelta.x = 0.0F;
+	}
+	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+	  StitchBuffer->operator[](iStitch).x += FormMoveDelta.x;
+	  StitchBuffer->operator[](iStitch).y -= FormMoveDelta.y;
+	}
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  displayText::shoseln(IDS_FGRPF, IDS_CENT);
 }
 
 void form::centir() {
