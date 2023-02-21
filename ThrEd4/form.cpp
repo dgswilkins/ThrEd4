@@ -8394,22 +8394,23 @@ constexpr auto fi::duat(uint32_t attribute) -> uint32_t {
 }
 
 void fi::srtf(std::vector<F_POINT_ATTR> const& tempStitchBuffer, uint32_t start, uint32_t finish) {
-  if (start != finish) {
-	auto stitchHistogram = std::vector<uint32_t> {};
-	stitchHistogram.resize(FormList->size() << 2U);
-	for (auto iStitch = start; iStitch < finish; ++iStitch) {
-	  ++(stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]);
-	}
-	auto stitchAccumulator = start;
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size() << 2U); ++iForm) {
-	  auto const value       = stitchHistogram[iForm];
-	  stitchHistogram[iForm] = stitchAccumulator;
-	  stitchAccumulator += value;
-	}
-	for (auto iStitch = start; iStitch < finish; ++iStitch) {
-	  StitchBuffer->operator[](stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++) =
-	      tempStitchBuffer[iStitch];
-	}
+  if (start == finish) {
+	return;
+  }
+  auto stitchHistogram = std::vector<uint32_t> {};
+  stitchHistogram.resize(FormList->size() << 2U);
+  for (auto iStitch = start; iStitch < finish; ++iStitch) {
+	++(stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]);
+  }
+  auto stitchAccumulator = start;
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size() << 2U); ++iForm) {
+	auto const value       = stitchHistogram[iForm];
+	stitchHistogram[iForm] = stitchAccumulator;
+	stitchAccumulator += value;
+  }
+  for (auto iStitch = start; iStitch < finish; ++iStitch) {
+	StitchBuffer->operator[](stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++) =
+	    tempStitchBuffer[iStitch];
   }
 }
 
