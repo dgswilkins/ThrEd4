@@ -8199,18 +8199,16 @@ void form::contfil() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	thred::savdo();
-	if (fi::contsf(ClosestFormToCursor)) {
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  displayText::tabmsg(IDS_CONT, false);
-	}
+  thred::savdo();
+  if (fi::contsf(ClosestFormToCursor)) {
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
+  displayText::tabmsg(IDS_CONT, false);
 }
 
 void form::dupfn(float rotationAngle) {
