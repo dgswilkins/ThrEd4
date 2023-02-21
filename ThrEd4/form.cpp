@@ -8065,41 +8065,38 @@ void form::bhol() {
 
 void form::fcntr() {
   if (!SelectedFormList->empty()) {
-	thred::savdo();
-	// clang-format off
-	auto const  firstForm     = SelectedFormList->front();
-	auto const& firstRect     = FormList->operator[](firstForm).rectangle;
-	auto const  initialCenter = F_POINT {wrap::midl(firstRect.right, firstRect.left), 
-										 wrap::midl(firstRect.top, firstRect.bottom)};
-	// clang-format on
-	for (auto const selectedForm : (*SelectedFormList)) {
-	  // clang-format off
-	  auto&       currentForm   = FormList->operator[](selectedForm);
-	  auto const& formRect      = currentForm.rectangle;
-	  auto const  currentCenter = F_POINT {wrap::midl(formRect.right, formRect.left), 
-		                                   wrap::midl(formRect.top, formRect.bottom)};
-	  auto const  delta         = F_POINT {initialCenter.x - currentCenter.x, initialCenter.y - currentCenter.y};
-	  auto        itVertex      = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
-	  // clang-format on
-	  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
-		itVertex->x += delta.x;
-		itVertex->y += delta.y;
-		++itVertex;
-	  }
-	  currentForm.outline();
-	  auto const codedForm = (selectedForm << FRMSHFT);
-	  for (auto& stitch : *StitchBuffer) {
-		if ((stitch.attribute & FRMSK) == codedForm && ((stitch.attribute & NOTFRM) == 0U)) {
-		  stitch.x += delta.x;
-		  stitch.y += delta.y;
-		}
+	displayText::tabmsg(IDS_SELC, false);
+	return;
+  }
+  thred::savdo();
+  auto const  firstForm = SelectedFormList->front();
+  auto const& firstRect = FormList->operator[](firstForm).rectangle;
+
+  auto const initialCenter =
+      F_POINT {wrap::midl(firstRect.right, firstRect.left), wrap::midl(firstRect.top, firstRect.bottom)};
+  for (auto const selectedForm : (*SelectedFormList)) {
+	auto& currentForm = FormList->operator[](selectedForm);
+
+	auto const& formRect = currentForm.rectangle;
+	auto const  currentCenter =
+	    F_POINT {wrap::midl(formRect.right, formRect.left), wrap::midl(formRect.top, formRect.bottom)};
+	auto const delta = F_POINT {initialCenter.x - currentCenter.x, initialCenter.y - currentCenter.y};
+	auto itVertex = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
+	for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
+	  itVertex->x += delta.x;
+	  itVertex->y += delta.y;
+	  ++itVertex;
+	}
+	currentForm.outline();
+	auto const codedForm = (selectedForm << FRMSHFT);
+	for (auto& stitch : *StitchBuffer) {
+	  if ((stitch.attribute & FRMSK) == codedForm && ((stitch.attribute & NOTFRM) == 0U)) {
+		stitch.x += delta.x;
+		stitch.y += delta.y;
 	  }
 	}
-	StateMap->set(StateFlag::RESTCH);
   }
-  else {
-	displayText::tabmsg(IDS_SELC, false);
-  }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::boxsel() {
