@@ -8277,16 +8277,15 @@ void fi::shrnks() {
 }
 
 void form::shrnk() {
-  if (StateMap->test(StateFlag::FORMSEL) && FormList->operator[](ClosestFormToCursor).edgeType == EDGECLIP) {
+  if (!StateMap->test(StateFlag::FORMSEL) || FormList->operator[](ClosestFormToCursor).edgeType != EDGECLIP) {
+	displayText::shoseln(IDS_FRMCLP, IDS_SHRNK);
+	return;
+  }
 	thred::savdo();
 	fi::shrnks();
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
-  else {
-	displayText::shoseln(IDS_FRMCLP, IDS_SHRNK);
-  }
-}
 
 void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
                 std::vector<SAT_CON>&  tempGuides,
