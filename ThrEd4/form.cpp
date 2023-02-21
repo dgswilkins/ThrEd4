@@ -8220,28 +8220,24 @@ void form::dupfn(float rotationAngle) {
 	usedAngle = PI_F2 - rotationAngle;
   }
   auto const rotationCenter = form::rotpar();
-  if (usedAngle != 0.0F) {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  form::duprot(usedAngle);
-	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		fi::duprots(usedAngle, rotationCenter);
-	  }
-	  else {
-		if (!SelectedFormList->empty()) {
-		  fi::duprotfs(usedAngle);
-		}
-		else {
-		  displayText::shord();
-		}
-	  }
-	}
-  }
-  else {
+  if (usedAngle == 0.0F) {
 	fi::rotentr(usedAngle);
 	StateMap->set(StateFlag::ENTRDUP);
+	return;
   }
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	form::duprot(usedAngle);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	fi::duprots(usedAngle, rotationCenter);
+	return;
+  }
+  if (!SelectedFormList->empty()) {
+	fi::duprotfs(usedAngle);
+	return;
+  }
+  displayText::shord();
 }
 
 void fi::shrnks() {
@@ -8281,11 +8277,11 @@ void form::shrnk() {
 	displayText::shoseln(IDS_FRMCLP, IDS_SHRNK);
 	return;
   }
-	thred::savdo();
-	fi::shrnks();
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
+  thred::savdo();
+  fi::shrnks();
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
+}
 
 void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
                 std::vector<SAT_CON>&  tempGuides,
