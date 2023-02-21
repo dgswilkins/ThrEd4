@@ -8331,60 +8331,60 @@ void fi::stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept {
 
 void form::frmnumfn(uint32_t& oldFormIndex, uint32_t newFormIndex) {
   thred::savdo();
-  if (newFormIndex != oldFormIndex) {
-	auto formRelocationIndex = 0U;
-	auto sourceForm          = 0U;
-	auto tempFormList        = std::vector<FRM_HEAD> {};
-	tempFormList.resize(FormList->size());
-	auto tempFormVertices = std::vector<F_POINT> {};
-	tempFormVertices.resize(FormVertices->size());
-	auto tempGuides = std::vector<SAT_CON> {};
-	tempGuides.reserve(SatinGuides->size());
-	auto tempClipPoints = std::vector<F_POINT> {};
-	tempClipPoints.reserve(ClipPoints->size());
-	auto formSourceIndex = 0U;
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  if (iForm == newFormIndex) {
-		fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, oldFormIndex, formRelocationIndex, formSourceIndex);
-	  }
-	  else {
-		if (sourceForm == oldFormIndex) {
-		  ++sourceForm;
-		}
-		fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++, formRelocationIndex, formSourceIndex);
-	  }
-	}
-	auto& formList = *FormList;
-	std::ranges::copy(tempFormList, formList.begin());
-	std::ranges::copy(tempFormVertices, FormVertices->begin());
-	std::ranges::copy(tempGuides, SatinGuides->begin());
-	std::ranges::copy(tempClipPoints, ClipPoints->begin());
-	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & SRTYPMSK) != 0U) {
-		if (auto const decodedFormIndex = (stitch.attribute & FRMSK) >> FRMSHFT;
-		    decodedFormIndex == oldFormIndex) {
-		  fi::stchfrm(newFormIndex, stitch.attribute);
-		}
-		else {
-		  auto start  = newFormIndex;
-		  auto finish = oldFormIndex;
-		  if (oldFormIndex < newFormIndex) {
-			std::swap(start, finish);
-		  }
-		  if (decodedFormIndex >= start && decodedFormIndex <= finish) {
-			if (newFormIndex < oldFormIndex) {
-			  fi::stchfrm(decodedFormIndex + 1, stitch.attribute);
-			}
-			else {
-			  fi::stchfrm(decodedFormIndex - 1, stitch.attribute);
-			}
-		  }
-		}
-	  }
-	}
-	oldFormIndex = newFormIndex;
-	displayText::ritnum(IDS_NUMFORM, oldFormIndex);
+  if (newFormIndex == oldFormIndex) {
+	return;
   }
+  auto formRelocationIndex = 0U;
+  auto sourceForm          = 0U;
+  auto tempFormList        = std::vector<FRM_HEAD> {};
+  tempFormList.resize(FormList->size());
+  auto tempFormVertices = std::vector<F_POINT> {};
+  tempFormVertices.resize(FormVertices->size());
+  auto tempGuides = std::vector<SAT_CON> {};
+  tempGuides.reserve(SatinGuides->size());
+  auto tempClipPoints = std::vector<F_POINT> {};
+  tempClipPoints.reserve(ClipPoints->size());
+  auto formSourceIndex = 0U;
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	if (iForm == newFormIndex) {
+	  fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, oldFormIndex, formRelocationIndex, formSourceIndex);
+	  continue;
+	}
+	if (sourceForm == oldFormIndex) {
+	  ++sourceForm;
+	}
+	fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, sourceForm++, formRelocationIndex, formSourceIndex);
+  }
+  auto& formList = *FormList;
+  std::ranges::copy(tempFormList, formList.begin());
+  std::ranges::copy(tempFormVertices, FormVertices->begin());
+  std::ranges::copy(tempGuides, SatinGuides->begin());
+  std::ranges::copy(tempClipPoints, ClipPoints->begin());
+  for (auto& stitch : *StitchBuffer) {
+	if ((stitch.attribute & SRTYPMSK) == 0U) {
+	  continue;
+	}
+	auto const decodedFormIndex = (stitch.attribute & FRMSK) >> FRMSHFT;
+	if (decodedFormIndex == oldFormIndex) {
+	  fi::stchfrm(newFormIndex, stitch.attribute);
+	  continue;
+	}
+	auto start  = newFormIndex;
+	auto finish = oldFormIndex;
+	if (oldFormIndex < newFormIndex) {
+	  std::swap(start, finish);
+	}
+	if (decodedFormIndex < start || decodedFormIndex > finish) {
+	  continue;
+	}
+	if (newFormIndex < oldFormIndex) {
+	  fi::stchfrm(decodedFormIndex + 1, stitch.attribute);
+	  continue;
+	}
+	fi::stchfrm(decodedFormIndex - 1, stitch.attribute);
+  }
+  oldFormIndex = newFormIndex;
+  displayText::ritnum(IDS_NUMFORM, oldFormIndex);
 }
 
 constexpr auto fi::duat(uint32_t attribute) -> uint32_t {
@@ -8857,13 +8857,13 @@ void form::vrtclp() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  vrtsclp(ClosestFormToCursor);
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	vrtsclp(ClosestFormToCursor);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
+}
 
 void form::horsclp() {
   auto& form = FormList->operator[](ClosestFormToCursor);
@@ -9014,14 +9014,14 @@ void form::dubfil() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  dubsfil(form);
-	  thred::coltab();
-	  StateMap->set(StateFlag::INIT);
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	dubsfil(form);
+	thred::coltab();
+	StateMap->set(StateFlag::INIT);
+	StateMap->set(StateFlag::RESTCH);
   }
+}
 
 void form::col2frm() {
   auto colorChangedCount = 0U;
