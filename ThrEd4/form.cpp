@@ -9013,8 +9013,8 @@ void form::dubfil() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 	  dubsfil(form);
@@ -9023,7 +9023,6 @@ void form::dubfil() {
 	  StateMap->set(StateFlag::RESTCH);
 	}
   }
-}
 
 void form::col2frm() {
   auto colorChangedCount = 0U;
