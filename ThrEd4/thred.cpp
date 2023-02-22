@@ -6738,6 +6738,7 @@ auto thi::srchknot(uint32_t source) -> uint32_t {
   if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
 	return 1;
   }
+  return 3;
 }
 
 void thi::chkncol() {
