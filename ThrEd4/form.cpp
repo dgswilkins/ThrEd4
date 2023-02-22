@@ -6739,14 +6739,16 @@ void form::nufilcol(uint8_t color) noexcept {
 }
 
 void form::nufthcol(uint8_t color) noexcept {
-  if (auto& formColor = FormList->operator[](ClosestFormToCursor).fillInfo.feather.color; formColor != color) {
-	formColor            = color;
-	auto const attribute = (ClosestFormToCursor << FRMSHFT) | FTHMSK;
-	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & (FRMSK | FTHMSK)) == attribute) {
-		stitch.attribute &= NCOLMSK;
-		stitch.attribute |= color;
-	  }
+  auto& formColor = FormList->operator[](ClosestFormToCursor).fillInfo.feather.color;
+  if (formColor == color) {
+	return;
+  }
+  formColor            = color;
+  auto const attribute = (ClosestFormToCursor << FRMSHFT) | FTHMSK;
+  for (auto& stitch : *StitchBuffer) {
+	if ((stitch.attribute & (FRMSK | FTHMSK)) == attribute) {
+	  stitch.attribute &= NCOLMSK;
+	  stitch.attribute |= color;
 	}
   }
 }
