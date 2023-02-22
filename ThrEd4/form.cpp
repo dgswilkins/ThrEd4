@@ -7921,33 +7921,32 @@ void form::frmsadj() {
 }
 
 void fi::frmpnts(uint32_t type) {
-  if (!StitchBuffer->empty()) {
-	auto       iStitch = 0U;
-	auto const trg     = ((ClosestFormToCursor << 4U) | type);
-	for (auto const& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & (ALTYPMSK | FRMSK)) == trg) {
-		break;
-	  }
-	  ++iStitch;
-	}
-	ClosestPointIndex = iStitch;
-	auto bFlag        = false;
-	for (auto itStitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
-	     itStitch != StitchBuffer->end();
-	     ++itStitch) {
-	  if (((*itStitch).attribute & (ALTYPMSK | FRMSK)) != trg) {
-		GroupStitchIndex = wrap::distance<uint32_t>(StitchBuffer->begin(), itStitch) - 1U;
-		bFlag            = true;
-		break;
-	  }
-	}
-	if (!bFlag) {
-	  GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	}
-  }
-  else {
+  if (StitchBuffer->empty()) {
 	ClosestPointIndex = 0;
 	GroupStitchIndex  = 0;
+	return;
+  }
+  auto       iStitch = 0U;
+  auto const trg     = ((ClosestFormToCursor << 4U) | type);
+  for (auto const& stitch : *StitchBuffer) {
+	if ((stitch.attribute & (ALTYPMSK | FRMSK)) == trg) {
+	  break;
+	}
+	++iStitch;
+  }
+  ClosestPointIndex = iStitch;
+  auto bFlag        = false;
+  for (auto itStitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+       itStitch != StitchBuffer->end();
+       ++itStitch) {
+	if (((*itStitch).attribute & (ALTYPMSK | FRMSK)) != trg) {
+	  GroupStitchIndex = wrap::distance<uint32_t>(StitchBuffer->begin(), itStitch) - 1U;
+	  bFlag            = true;
+	  break;
+	}
+  }
+  if (!bFlag) {
+	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
   }
 }
 
