@@ -6007,16 +6007,17 @@ void form::unfil() {
 }
 
 void form::frm0() {
-  if (StateMap->test(StateFlag::FRMPSEL)) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
-	thred::savdo();
-	form::rotfrm(form, ClosestVertexToCursor);
-	ClosestVertexToCursor = 0;
-	satin::satadj(form);
-	form::refil(ClosestFormToCursor);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  if (!StateMap->test(StateFlag::FRMPSEL)) {
+	return;
   }
+  auto& form = FormList->operator[](ClosestFormToCursor);
+  thred::savdo();
+  form::rotfrm(form, ClosestVertexToCursor);
+  ClosestVertexToCursor = 0;
+  satin::satadj(form);
+  form::refil(ClosestFormToCursor);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::rinfrm() {
