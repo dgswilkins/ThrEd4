@@ -7895,10 +7895,9 @@ void form::nufsel() {
 }
 
 void form::frmadj(uint32_t formIndex) {
-  // clang-format off
-  auto& form     = FormList->operator[](formIndex);
-  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-  // clang-format on
+  auto& form = FormList->operator[](formIndex);
+
+  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x += FormMoveDelta.x;
 	itVertex->y -= FormMoveDelta.y;
