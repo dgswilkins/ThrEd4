@@ -6725,15 +6725,17 @@ void form::setexpand(float xyRatio) {
 }
 
 void form::nufilcol(uint8_t color) noexcept {
-  if (auto& formColor = FormList->operator[](ClosestFormToCursor).fillColor; formColor != color) {
-	formColor = color;
+  auto& formColor = FormList->operator[](ClosestFormToCursor).fillColor;
+  if (formColor == color) {
+	return;
+  }
+  formColor = color;
 
-	auto const attribute = (ClosestFormToCursor << FRMSHFT) | FRMFIL;
-	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
-		stitch.attribute &= NCOLMSK;
-		stitch.attribute |= color;
-	  }
+  auto const attribute = (ClosestFormToCursor << FRMSHFT) | FRMFIL;
+  for (auto& stitch : *StitchBuffer) {
+	if ((stitch.attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
+	  stitch.attribute &= NCOLMSK;
+	  stitch.attribute |= color;
 	}
   }
 }
