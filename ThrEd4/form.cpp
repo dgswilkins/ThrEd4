@@ -8004,25 +8004,20 @@ void form::selalfil() {
 }
 
 auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
-  auto retval = false;
-  if (!StitchBuffer->empty()) {
-	range.start = 0;
-	// clang-format off
-	auto const& form      = FormList->operator[](iForm);
-	auto const  saveClose = ClosestFormToCursor;
-	// clang-format on
-	ClosestFormToCursor = iForm;
-	if ((form.fillType != 0U) || (form.edgeType != 0U)) {
-	  range.start  = thred::findFirstStitch(ClosestFormToCursor);
-	  range.finish = thred::findLastStitch(ClosestFormToCursor);
-	  retval       = range.finish > range.start;
-	}
-	else {
-	  range.finish = wrap::toUnsigned(StitchBuffer->size());
-	}
-	ClosestFormToCursor = saveClose;
+  if (StitchBuffer->empty()) {
+	return false;
   }
-  return retval;
+  range.start      = 0;
+  auto const& form = FormList->operator[](iForm);
+
+  ClosestFormToCursor  = iForm;
+  if ((form.fillType != 0U) || (form.edgeType != 0U)) {
+	range.start  = thred::findFirstStitch(iForm);
+	range.finish = thred::findLastStitch(iForm);
+	return range.finish > range.start;
+  }
+  range.finish = wrap::toUnsigned(StitchBuffer->size());
+  return false;
 }
 
 void fi::bholbrd(uint32_t formIndex) {
