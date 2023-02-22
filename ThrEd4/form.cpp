@@ -6213,20 +6213,19 @@ void form::apliq() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  if (auto& currentForm = FormList->operator[](ClosestFormToCursor); UserFlagMap->test(UserFlag::BLUNT)) {
-		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
-	  }
-	  else {
-		currentForm.attribute &= NOBLNT;
-	  }
-	  fi::sapliq(ClosestFormToCursor);
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	if (auto& currentForm = FormList->operator[](ClosestFormToCursor); UserFlagMap->test(UserFlag::BLUNT)) {
+	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	}
+	else {
+	  currentForm.attribute &= NOBLNT;
+	}
+	fi::sapliq(ClosestFormToCursor);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -6324,83 +6323,83 @@ void form::setstrtch() {
   switch (SelectedFormControlVertex) {
 	case 0: { // top control
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-		reference          = stitchRect.bottom;
+		reference = stitchRect.bottom;
+
 		auto const offsetY = Msg.pt.y - StitchWindowOrigin.y;
-		ratio              = wrap::toFloat(SelectedFormsRect.bottom - offsetY) /
+
+		ratio = wrap::toFloat(SelectedFormsRect.bottom - offsetY) /
 		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
+		break;
 	  }
-	  else {
-		if (StateMap->test(StateFlag::FORMSEL)) {
-		  reference          = form.rectangle.bottom;
-		  ratio              = (stitchPoint.y - reference) / (form.rectangle.top - reference);
-		  form.rectangle.top = stitchPoint.y;
-		}
-		else {
-		  reference = StitchRangeRect.bottom;
-		  ratio     = (stitchPoint.y - reference) / (StitchRangeRect.top - reference);
-		}
+	  if (StateMap->test(StateFlag::FORMSEL)) {
+		reference          = form.rectangle.bottom;
+		ratio              = (stitchPoint.y - reference) / (form.rectangle.top - reference);
+		form.rectangle.top = stitchPoint.y;
+		break;
 	  }
+	  reference = StitchRangeRect.bottom;
+	  ratio     = (stitchPoint.y - reference) / (StitchRangeRect.top - reference);
 	  break;
 	}
 	case 1: { // right control
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-		reference          = stitchRect.left;
+		reference = stitchRect.left;
+
 		auto const offsetX = Msg.pt.x - StitchWindowOrigin.x;
-		ratio              = wrap::toFloat(offsetX - SelectedFormsRect.left) /
+
+		ratio = wrap::toFloat(offsetX - SelectedFormsRect.left) /
 		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
+		break;
 	  }
-	  else {
-		if (StateMap->test(StateFlag::FORMSEL)) {
-		  auto& formRectangle = form.rectangle;
-		  reference           = formRectangle.left;
-		  ratio               = (stitchPoint.x - reference) / (formRectangle.right - reference);
-		  formRectangle.right = stitchPoint.x;
-		}
-		else {
-		  reference = StitchRangeRect.left;
-		  ratio     = (stitchPoint.x - reference) / (StitchRangeRect.right - reference);
-		}
+	  if (StateMap->test(StateFlag::FORMSEL)) {
+		auto& formRectangle = form.rectangle;
+		reference           = formRectangle.left;
+		ratio               = (stitchPoint.x - reference) / (formRectangle.right - reference);
+		formRectangle.right = stitchPoint.x;
+		break;
 	  }
+	  reference = StitchRangeRect.left;
+	  ratio     = (stitchPoint.x - reference) / (StitchRangeRect.right - reference);
 	  break;
 	}
 	case 2: { // bottom control
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-		reference          = stitchRect.top;
+		reference = stitchRect.top;
+
 		auto const offsetY = Msg.pt.y - StitchWindowOrigin.y;
-		ratio              = wrap::toFloat(offsetY - SelectedFormsRect.top) /
+
+		ratio = wrap::toFloat(offsetY - SelectedFormsRect.top) /
 		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
+		break;
 	  }
-	  else {
-		if (StateMap->test(StateFlag::FORMSEL)) {
-		  reference             = form.rectangle.top;
-		  ratio                 = (stitchPoint.y - reference) / (form.rectangle.bottom - reference);
-		  form.rectangle.bottom = stitchPoint.y;
-		}
-		else {
-		  reference = StitchRangeRect.top;
-		  ratio     = (stitchPoint.y - reference) / (StitchRangeRect.bottom - reference);
-		}
+	  if (StateMap->test(StateFlag::FORMSEL)) {
+		reference             = form.rectangle.top;
+		ratio                 = (stitchPoint.y - reference) / (form.rectangle.bottom - reference);
+		form.rectangle.bottom = stitchPoint.y;
+		break;
 	  }
+	  reference = StitchRangeRect.top;
+	  ratio     = (stitchPoint.y - reference) / (StitchRangeRect.bottom - reference);
 	  break;
 	}
 	case 3: { // left control
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-		reference          = stitchRect.right;
+		reference = stitchRect.right;
+
 		auto const offsetX = Msg.pt.x - StitchWindowOrigin.x;
-		ratio              = wrap::toFloat(SelectedFormsRect.right - offsetX) /
+
+		ratio = wrap::toFloat(SelectedFormsRect.right - offsetX) /
 		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
+		break;
 	  }
-	  else {
-		if (StateMap->test(StateFlag::FORMSEL)) {
-		  reference           = form.rectangle.right;
-		  ratio               = (stitchPoint.x - reference) / (form.rectangle.left - reference);
-		  form.rectangle.left = stitchPoint.x;
-		}
-		else {
-		  reference = StitchRangeRect.right;
-		  ratio     = (stitchPoint.x - reference) / (StitchRangeRect.left - reference);
-		}
+	  if (StateMap->test(StateFlag::FORMSEL)) {
+		reference           = form.rectangle.right;
+		ratio               = (stitchPoint.x - reference) / (form.rectangle.left - reference);
+		form.rectangle.left = stitchPoint.x;
+		break;
 	  }
+	  reference = StitchRangeRect.right;
+	  ratio     = (stitchPoint.x - reference) / (StitchRangeRect.left - reference);
 	  break;
 	}
 	default: {
@@ -6439,7 +6438,6 @@ void form::setstrtch() {
 	  selal();
 	  return;
 	}
-
 	if (!SelectedFormList->empty()) {
 	  for (auto selectedForm : (*SelectedFormList)) {
 		auto& formIter = FormList->operator[](selectedForm);
@@ -6449,21 +6447,25 @@ void form::setstrtch() {
 		  ++itVertex;
 		}
 	  }
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
 	}
-	else {
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-		for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		  itVertex->x = (itVertex->x - reference) * ratio + reference;
-		  ++itVertex;
-		}
+	if (StateMap->test(StateFlag::FORMSEL)) {
+	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+		itVertex->x = (itVertex->x - reference) * ratio + reference;
+		++itVertex;
 	  }
-	  else {
-		for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-		  StitchBuffer->operator[](iStitch).x =
-		      (StitchBuffer->operator[](iStitch).x - reference) * ratio + reference;
-		}
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
+	}
+	if (StateMap->test(StateFlag::GRPSEL)) {
+	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+		StitchBuffer->operator[](iStitch).x =
+		    (StitchBuffer->operator[](iStitch).x - reference) * ratio + reference;
 	  }
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
 	}
   }
   else {
@@ -6498,7 +6500,6 @@ void form::setstrtch() {
 	  selal();
 	  return;
 	}
-
 	if (!SelectedFormList->empty()) {
 	  for (auto selectedForm : (*SelectedFormList)) {
 		auto& formIter = FormList->operator[](selectedForm);
@@ -6508,37 +6509,34 @@ void form::setstrtch() {
 		  ++itVertex;
 		}
 	  }
-	}
-	else {
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-		for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		  itVertex->y = (itVertex->y - reference) * ratio + reference;
-		  ++itVertex;
-		}
+	  for (auto selectedForm : (*SelectedFormList)) {
+		FormList->operator[](selectedForm).outline();
+		ClosestFormToCursor = selectedForm;
+		refil(ClosestFormToCursor);
 	  }
-	  else {
-		for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-		  StitchBuffer->operator[](iStitch).y =
-		      (StitchBuffer->operator[](iStitch).y - reference) * ratio + reference;
-		}
-	  }
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
 	}
-  }
-  if (!SelectedFormList->empty()) {
-	for (auto selectedForm : (*SelectedFormList)) {
-	  FormList->operator[](selectedForm).outline();
-	  ClosestFormToCursor = selectedForm;
+	if (StateMap->test(StateFlag::FORMSEL)) {
+	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+		itVertex->y = (itVertex->y - reference) * ratio + reference;
+		++itVertex;
+	  }
 	  refil(ClosestFormToCursor);
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
+	}
+	if (StateMap->test(StateFlag::GRPSEL)) {
+	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+		StitchBuffer->operator[](iStitch).y =
+		    (StitchBuffer->operator[](iStitch).y - reference) * ratio + reference;
+	  }
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
-  else if (StateMap->test(StateFlag::FORMSEL)) {
-	refil(ClosestFormToCursor);
-  }
-  StateMap->set(StateFlag::RESTCH);
 }
 
-// ToDo - is this actually unused?
 void form::setexpand(float xyRatio) {
   auto size0     = F_POINT {};
   auto rectangle = F_RECTANGLE {};
