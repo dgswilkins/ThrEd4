@@ -7881,17 +7881,18 @@ void form::refilal() {
 }
 
 void form::nufsel() {
-  if (!FormList->empty()) {
-	StateMap->reset(StateFlag::FORMSEL);
-	if (StateMap->testAndReset(StateFlag::WASEL)) {
-	  SelectedFormList->push_back(PreviousFormIndex);
-	}
-	if (std::ranges::none_of(*SelectedFormList,
-	                         [](uint32_t intX) { return intX == ClosestFormToCursor; })) {
-	  SelectedFormList->push_back(ClosestFormToCursor);
-	}
-	StateMap->set(StateFlag::RESTCH);
+  if (FormList->empty()) {
+	return;
   }
+  StateMap->reset(StateFlag::FORMSEL);
+  if (StateMap->testAndReset(StateFlag::WASEL)) {
+	SelectedFormList->push_back(PreviousFormIndex);
+  }
+  if (std::ranges::none_of(*SelectedFormList,
+                           [](uint32_t intX) { return intX == ClosestFormToCursor; })) {
+	SelectedFormList->push_back(ClosestFormToCursor);
+  }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::frmadj(uint32_t formIndex) {
