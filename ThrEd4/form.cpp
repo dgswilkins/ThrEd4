@@ -7829,43 +7829,44 @@ void form::join() {
   auto const                        lastVertex =
       wrap::next(FormVertices->cbegin(), savedform.vertexIndex + savedform.vertexCount - 1U);
   StateMap->set(StateFlag::FRMSAM);
-  if (FormList->size() > 1 && StateMap->test(StateFlag::FORMSEL) && form::closfrm()) {
-	// clang-format off
-	auto const& form       = FormList->operator[](ClosestFormToCursor);
-	auto        vertexList = std::vector<F_POINT> {};
-	// clang-format on
-	vertexList.reserve(form.vertexCount);
-	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	if ((abs(lastVertex->x - itVertex->x) > TNYFLOAT) || (abs(lastVertex->y - itVertex->y) > TNYFLOAT)) {
-	  auto const itThisVertex = wrap::next(itVertex, ClosestVertexToCursor);
-	  vertexList.push_back(*itThisVertex);
-	}
-	ClosestVertexToCursor = form::nxt(form, ClosestVertexToCursor);
-	for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-	  auto itThisVertex = wrap::next(itVertex, ClosestVertexToCursor);
-	  vertexList.push_back(*itThisVertex);
-	  ClosestVertexToCursor = form::nxt(form, ClosestVertexToCursor);
-	}
-	StateMap->set(StateFlag::DELTO);
-	thred::frmdel();
-	if (savedFormIndex > ClosestFormToCursor) {
-	  ClosestFormToCursor = savedFormIndex - 1U;
-	}
-	else {
-	  ClosestFormToCursor = savedFormIndex;
-	}
-	auto& toForm = FormList->operator[](ClosestFormToCursor);
-
-	auto const insertionPoint = toForm.vertexIndex + toForm.vertexCount;
-	form::fltspac(toForm.vertexCount, wrap::toUnsigned(vertexList.size()));
-	auto const dest = wrap::next(FormVertices->begin(), insertionPoint);
-	std::ranges::copy(vertexList, dest);
-	toForm.vertexCount += wrap::toUnsigned(vertexList.size());
-	toForm.outline();
-	form::refil(ClosestFormToCursor);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  if (FormList->size() <= 1 || !StateMap->test(StateFlag::FORMSEL) || !form::closfrm()) {
+	StateMap->reset(StateFlag::FRMSAM);
+	return;
   }
+  auto const& form = FormList->operator[](ClosestFormToCursor);
+
+  auto vertexList = std::vector<F_POINT> {};
+  vertexList.reserve(form.vertexCount);
+  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  if ((abs(lastVertex->x - itVertex->x) > TNYFLOAT) || (abs(lastVertex->y - itVertex->y) > TNYFLOAT)) {
+	auto const itThisVertex = wrap::next(itVertex, ClosestVertexToCursor);
+	vertexList.push_back(*itThisVertex);
+  }
+  ClosestVertexToCursor = form::nxt(form, ClosestVertexToCursor);
+  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
+	auto itThisVertex = wrap::next(itVertex, ClosestVertexToCursor);
+	vertexList.push_back(*itThisVertex);
+	ClosestVertexToCursor = form::nxt(form, ClosestVertexToCursor);
+  }
+  StateMap->set(StateFlag::DELTO);
+  thred::frmdel();
+  if (savedFormIndex > ClosestFormToCursor) {
+	ClosestFormToCursor = savedFormIndex - 1U;
+  }
+  else {
+	ClosestFormToCursor = savedFormIndex;
+  }
+  auto& toForm = FormList->operator[](ClosestFormToCursor);
+
+  auto const insertionPoint = toForm.vertexIndex + toForm.vertexCount;
+  form::fltspac(toForm.vertexCount, wrap::toUnsigned(vertexList.size()));
+  auto const dest = wrap::next(FormVertices->begin(), insertionPoint);
+  std::ranges::copy(vertexList, dest);
+  toForm.vertexCount += wrap::toUnsigned(vertexList.size());
+  toForm.outline();
+  form::refil(ClosestFormToCursor);
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
   StateMap->reset(StateFlag::FRMSAM);
 }
 
