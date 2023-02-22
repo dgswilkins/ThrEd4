@@ -246,7 +246,7 @@ void ri::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BAD_COUNTS {};
   auto& formList     = *FormList;
-  for (auto &form : *FormList) {
+  for (auto const &form : *FormList) {
 	if (form.vertexCount != 0U) {
 	  formList[iDestination++] = form;
 	}
@@ -257,8 +257,8 @@ void ri::repflt(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = formList[iForm];
 	if (FormVertices->size() >= wrap::toSize(form.vertexIndex) + form.vertexCount) {
-	  auto startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto endVertex   = wrap::next(startVertex, form.vertexCount);
+	  auto const startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto const endVertex   = wrap::next(startVertex, form.vertexCount);
 	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
 	  form.vertexIndex = iVertex;
 	  iVertex += form.vertexCount;
@@ -268,8 +268,8 @@ void ri::repflt(std::wstring& repairMessage) {
 	if (form.vertexIndex < FormVertices->size()) {
 	  wrap::narrow(form.vertexCount, FormVertices->size() - form.vertexIndex);
 	  satin::delsac(iForm);
-	  auto startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto endVertex   = wrap::next(startVertex, form.vertexCount);
+	  auto const startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto const endVertex   = wrap::next(startVertex, form.vertexCount);
 	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
 	  ri::bcup(form, badData);
 	  continue;
