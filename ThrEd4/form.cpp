@@ -7232,18 +7232,20 @@ void form::fliph() {
 }
 
 void fi::prpsbrd(uint32_t formIndex) {
-  if (auto& form = FormList->operator[](formIndex); form.vertexCount > 2) {
-	clip::deleclp(formIndex);
-	form.edgeType = EDGEPROPSAT;
-	if (UserFlagMap->test(UserFlag::DUND)) {
-	  form.edgeType |= EGUND;
-	}
-	form::bsizpar(form);
-	form.borderSize  = BorderWidth;
-	form.edgeSpacing = LineSpacing;
-	form.borderColor = ActiveColor;
-	form::refilfn(formIndex);
+  auto& form = FormList->operator[](formIndex);
+  if (form.vertexCount <= 2) {
+	return;
   }
+  clip::deleclp(formIndex);
+  form.edgeType = EDGEPROPSAT;
+  if (UserFlagMap->test(UserFlag::DUND)) {
+	form.edgeType |= EGUND;
+  }
+  form::bsizpar(form);
+  form.borderSize  = BorderWidth;
+  form.edgeSpacing = LineSpacing;
+  form.borderColor = ActiveColor;
+  form::refilfn(formIndex);
 }
 
 void form::prpbrd(float borderStitchSpacing) {
