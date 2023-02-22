@@ -7613,14 +7613,13 @@ void form::rotcmd() {
 }
 
 void fi::fnagain(float rotationAngle) {
-  if (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::GRPSEL) ||
-      !SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-	auto const rotationCenter = form::rotpar();
-	thred::rotfn(rotationAngle, rotationCenter);
-  }
-  else {
+  if (!StateMap->test(StateFlag::FORMSEL) && !StateMap->test(StateFlag::GRPSEL) &&
+      SelectedFormList->empty() && !StateMap->test(StateFlag::BIGBOX) && !StateMap->test(StateFlag::FPSEL)) {
 	displayText::alrotmsg();
+	return;
   }
+  auto const rotationCenter = form::rotpar();
+  thred::rotfn(rotationAngle, rotationCenter);
 }
 
 void form::rotagain() {
