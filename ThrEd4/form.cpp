@@ -5904,34 +5904,36 @@ void fi::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT stitchPoint) {
 }
 
 void form::insat() { // insert a point in a form
-  if (auto inOutFlag = IntersectionStyles::POINT_IN_LINE; fi::closat(inOutFlag)) {
-	thred::savdo();
-	// clang-format off
+  auto inOutFlag = IntersectionStyles::POINT_IN_LINE; 
+  if (!fi::closat(inOutFlag)) {
+	return;
+  }
+  thred::savdo();
+  // clang-format off
 	auto&      selectedForm = FormList->operator[](ClosestFormToCursor);
 	auto const stitchPoint  = thred::pxCor2stch(Msg.pt);
 	auto const lastVertex   = selectedForm.vertexCount - 1U;
-	// clang-format on
-	if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
-	  if (ClosestVertexToCursor == 0 && selectedForm.type == FRMLINE) {
-		StateMap->set(StateFlag::PRELIN);
-	  }
-	  else {
-		if (ClosestVertexToCursor != lastVertex && selectedForm.type == FRMLINE) {
-		  ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
-		}
-	  }
-	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
-	  auto const itVertex = wrap::next(FormVertices->begin(), selectedForm.vertexIndex);
-	  if (StateMap->testAndReset(StateFlag::PRELIN)) {
-		std::swap(itVertex[0], itVertex[1]);
-	  }
+  // clang-format on
+  if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
+	if (ClosestVertexToCursor == 0 && selectedForm.type == FRMLINE) {
+	  StateMap->set(StateFlag::PRELIN);
 	}
 	else {
-	  ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
-	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+	  if (ClosestVertexToCursor != lastVertex && selectedForm.type == FRMLINE) {
+		ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
+	  }
 	}
-	form::refil(ClosestFormToCursor);
+	fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+	auto const itVertex = wrap::next(FormVertices->begin(), selectedForm.vertexIndex);
+	if (StateMap->testAndReset(StateFlag::PRELIN)) {
+	  std::swap(itVertex[0], itVertex[1]);
+	}
   }
+  else {
+	ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
+	fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+  }
+  form::refil(ClosestFormToCursor);
   StateMap->set(StateFlag::RESTCH);
 }
 
