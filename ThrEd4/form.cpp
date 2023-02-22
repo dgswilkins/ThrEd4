@@ -6035,26 +6035,28 @@ void form::rinfrm() {
 }
 
 void form::infrm() { // insert multiple points into a form
-  if (auto inOutFlag = IntersectionStyles::POINT_IN_LINE; fi::closat(inOutFlag)) {
-	FormForInsert = &(FormList->operator[](ClosestFormToCursor));
-	if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
-	  if ((ClosestVertexToCursor == 0U) && FormForInsert->type == FRMLINE) {
-		FormVertexPrev = 0;
-		StateMap->set(StateFlag::PRELIN);
-	  }
-	  else {
-		FormVertexPrev = form::prv(*FormForInsert, ClosestVertexToCursor);
-		FormVertexNext = ClosestVertexToCursor;
-	  }
+  auto inOutFlag = IntersectionStyles::POINT_IN_LINE; 
+  if (!fi::closat(inOutFlag)) {
+	return;
+  }
+  FormForInsert = &(FormList->operator[](ClosestFormToCursor));
+  if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
+	if ((ClosestVertexToCursor == 0U) && FormForInsert->type == FRMLINE) {
+	  FormVertexPrev = 0;
+	  StateMap->set(StateFlag::PRELIN);
 	}
 	else {
-	  FormVertexNext = ClosestVertexToCursor;
 	  FormVertexPrev = form::prv(*FormForInsert, ClosestVertexToCursor);
+	  FormVertexNext = ClosestVertexToCursor;
 	}
-	StateMap->set(StateFlag::INSFRM);
-	StateMap->set(StateFlag::INIT);
-	rinfrm();
   }
+  else {
+	FormVertexNext = ClosestVertexToCursor;
+	FormVertexPrev = form::prv(*FormForInsert, ClosestVertexToCursor);
+  }
+  StateMap->set(StateFlag::INSFRM);
+  StateMap->set(StateFlag::INIT);
+  rinfrm();
 }
 
 void form::setins() {
