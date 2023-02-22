@@ -6538,6 +6538,7 @@ void form::setstrtch() {
   StateMap->set(StateFlag::RESTCH);
 }
 
+// ToDo - is this actually unused?
 void form::setexpand(float xyRatio) {
   auto size0     = F_POINT {};
   auto rectangle = F_RECTANGLE {};
@@ -6555,12 +6556,8 @@ void form::setexpand(float xyRatio) {
   }
   else {
 	stitchPoint = thred::pxCor2stch(Msg.pt);
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  rectangle = FormList->operator[](ClosestFormToCursor).rectangle;
-	}
-	else {
-	  rectangle = StitchRangeRect;
-	}
+	rectangle = StateMap->test(StateFlag::FORMSEL) ? FormList->operator[](ClosestFormToCursor).rectangle
+	                                               : StitchRangeRect;
 	size0.y = rectangle.top - rectangle.bottom;
   }
   auto ratio     = F_POINT {1.0F, 1.0F};
@@ -6699,29 +6696,31 @@ void form::setexpand(float xyRatio) {
 	  ClosestFormToCursor = selectedForm;
 	  form::refil(ClosestFormToCursor);
 	}
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto& form = FormList->operator[](ClosestFormToCursor);
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
 
-	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		itVertex->x = (itVertex->x - reference.x) * ratio.x + reference.x;
-		itVertex->y = (itVertex->y - reference.y) * ratio.y + reference.y;
-		++itVertex;
-	  }
-	  form::refil(ClosestFormToCursor);
+	auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	  itVertex->x = (itVertex->x - reference.x) * ratio.x + reference.x;
+	  itVertex->y = (itVertex->y - reference.y) * ratio.y + reference.y;
+	  ++itVertex;
 	}
-	else {
-	  auto itStitch = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-		itStitch->x = (itStitch->x - reference.x) * ratio.x + reference.x;
-		itStitch->y = (itStitch->y - reference.y) * ratio.y + reference.y;
-		++itStitch;
-	  }
-	}
+	form::refil(ClosestFormToCursor);
+	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	auto itStitch = wrap::next(StitchBuffer->begin(), GroupStartStitch);
+	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+	  itStitch->x = (itStitch->x - reference.x) * ratio.x + reference.x;
+	  itStitch->y = (itStitch->y - reference.y) * ratio.y + reference.y;
+	  ++itStitch;
+	}
+	StateMap->set(StateFlag::RESTCH);
+  }
 }
 
 void form::nufilcol(uint8_t color) noexcept {
