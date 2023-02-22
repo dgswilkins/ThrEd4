@@ -7420,17 +7420,18 @@ void form::clpfil() {
 }
 
 void fi::snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept {
-  if (finish != start) {
-	for (auto current = start; current < end; ++current) {
-	  auto const reference = xPoints[current];
-	  for (auto iPoint = current + 1U; iPoint < finish; ++iPoint) {
-		auto const check = xPoints[iPoint];
-		if (auto const checkLength =
-		        hypot(StitchBuffer->operator[](check).x - StitchBuffer->operator[](reference).x,
-		              StitchBuffer->operator[](check).y - StitchBuffer->operator[](reference).y);
-		    checkLength < SnapLength) {
-		  StitchBuffer->operator[](check) = StitchBuffer->operator[](reference);
-		}
+  if (finish == start) {
+	return;
+  }
+  for (auto current = start; current < end; ++current) {
+	auto const reference = xPoints[current];
+	for (auto iPoint = current + 1U; iPoint < finish; ++iPoint) {
+	  auto const check = xPoints[iPoint];
+	  if (auto const checkLength =
+	          hypot(StitchBuffer->operator[](check).x - StitchBuffer->operator[](reference).x,
+	                StitchBuffer->operator[](check).y - StitchBuffer->operator[](reference).y);
+	      checkLength < SnapLength) {
+		StitchBuffer->operator[](check) = StitchBuffer->operator[](reference);
 	  }
 	}
   }
@@ -7558,6 +7559,9 @@ void fi::dufcntr(F_POINT& center) noexcept {
 }
 
 auto form::rotpar() -> F_POINT {
+  if (StateMap->test(StateFlag::GMRK)) {
+	return ZoomMarkPoint;
+  }
   do {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  RotationRect = FormList->operator[](ClosestFormToCursor).rectangle;
@@ -7583,9 +7587,6 @@ auto form::rotpar() -> F_POINT {
 	  break;
 	}
   } while (false);
-  if (StateMap->test(StateFlag::GMRK)) {
-	return ZoomMarkPoint;
-  }
   return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
                   wrap::midl(RotationRect.top, RotationRect.bottom)};
 }
