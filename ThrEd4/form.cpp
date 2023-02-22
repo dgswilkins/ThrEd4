@@ -7776,7 +7776,8 @@ void form::cpylayr(uint32_t layer) {
 }
 
 void form::movlayr(uint32_t layer) {
-  if (auto const codedStitchLayer = layer << LAYSHFT; !SelectedFormList->empty()) {
+  auto const codedStitchLayer = layer << LAYSHFT; 
+  if (!SelectedFormList->empty()) {
 	thred::savdo();
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto const selectedForm : (*SelectedFormList)) {
@@ -7794,31 +7795,29 @@ void form::movlayr(uint32_t layer) {
 	SelectedFormList->clear();
 	StateMap->reset(StateFlag::FORMSEL);
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  auto& formAttr = FormList->operator[](ClosestFormToCursor).attribute;
-	  wrap::narrow(formAttr, (layer << FLAYSHFT | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK)));
-	  StateMap->reset(StateFlag::FORMSEL);
-	  for (auto& stitch : *StitchBuffer) {
-		if (((stitch.attribute & ALTYPMSK) != 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-		  stitch.attribute = (stitch.attribute & NLAYMSK) | codedStitchLayer;
-		}
-	  }
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::savdo();
-		thred::rngadj();
-		for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; ++iStitch) {
-		  StitchBuffer->operator[](iStitch).attribute =
-		      (StitchBuffer->operator[](iStitch).attribute & NLAYMSK) | codedStitchLayer;
-		}
-		StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	auto& formAttr = FormList->operator[](ClosestFormToCursor).attribute;
+	wrap::narrow(formAttr, (layer << FLAYSHFT | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK)));
+	StateMap->reset(StateFlag::FORMSEL);
+	for (auto& stitch : *StitchBuffer) {
+	  if (((stitch.attribute & ALTYPMSK) != 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+		stitch.attribute = (stitch.attribute & NLAYMSK) | codedStitchLayer;
 	  }
 	}
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::savdo();
+	thred::rngadj();
+	for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; ++iStitch) {
+	  StitchBuffer->operator[](iStitch).attribute =
+	      (StitchBuffer->operator[](iStitch).attribute & NLAYMSK) | codedStitchLayer;
+	}
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
