@@ -7338,25 +7338,23 @@ void form::flpord() {
 	}
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  fi::fnord();
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::savdo();
-		thred::rngadj();
-		auto const start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-		auto const end   = wrap::next(StitchBuffer->begin(), GroupEndStitch);
-		std::reverse(start, end);
-		thred::coltab();
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	fi::fnord();
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::savdo();
+	thred::rngadj();
+	auto const start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
+	auto const end   = wrap::next(StitchBuffer->begin(), GroupEndStitch);
+	std::reverse(start, end);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
