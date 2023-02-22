@@ -7602,14 +7602,13 @@ void form::setrang() {
 }
 
 void form::rotcmd() {
-  if (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::GRPSEL) ||
-      !SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-	fi::rotentr(IniFile.rotationAngle);
-	StateMap->set(StateFlag::ENTROT);
-  }
-  else {
+  if (!StateMap->test(StateFlag::FORMSEL) && !StateMap->test(StateFlag::GRPSEL) &&
+      SelectedFormList->empty() && !StateMap->test(StateFlag::BIGBOX) && !StateMap->test(StateFlag::FPSEL)) {
 	displayText::shoseln(IDS_ALLX, IDS_ROTCMD);
+	return;
   }
+  fi::rotentr(IniFile.rotationAngle);
+  StateMap->set(StateFlag::ENTROT);
 }
 
 void fi::fnagain(float rotationAngle) {
