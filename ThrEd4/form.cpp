@@ -7746,32 +7746,30 @@ void form::cpylayr(uint32_t layer) {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  fi::cplayfn(selectedForm, layer);
 	}
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  fi::cplayfn(ClosestFormToCursor, layer);
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	fi::cplayfn(ClosestFormToCursor, layer);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::savdo();
+	thred::rngadj();
+	auto const oldSize = StitchBuffer->size();
+	StitchBuffer->reserve(oldSize + (wrap::toSize(GroupEndStitch) + 1U - GroupStartStitch));
+	StitchBuffer->insert(StitchBuffer->end(),
+	                     wrap::next(StitchBuffer->cbegin(), GroupStartStitch),
+	                     wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U));
+	auto const codedStitchLayer = layer << LAYSHFT;
+	for (auto currentStitch = wrap::next(StitchBuffer->begin(), oldSize);
+	     currentStitch != StitchBuffer->end();
+	     ++currentStitch) {
+	  currentStitch->attribute &= NLAYMSK;
+	  currentStitch->attribute |= codedStitchLayer;
 	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::savdo();
-		thred::rngadj();
-		auto const oldSize = StitchBuffer->size();
-		StitchBuffer->reserve(oldSize + (wrap::toSize(GroupEndStitch) + 1U - GroupStartStitch));
-		StitchBuffer->insert(StitchBuffer->end(),
-		                     wrap::next(StitchBuffer->cbegin(), GroupStartStitch),
-		                     wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U));
-		auto const codedStitchLayer = layer << LAYSHFT;
-		for (auto currentStitch = wrap::next(StitchBuffer->begin(), oldSize);
-		     currentStitch != StitchBuffer->end();
-		     ++currentStitch) {
-		  currentStitch->attribute &= NLAYMSK;
-		  currentStitch->attribute |= codedStitchLayer;
-		}
-		thred::coltab();
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	}
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
