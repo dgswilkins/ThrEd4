@@ -7195,39 +7195,36 @@ void form::fliph() {
 	  }
 	}
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  auto const& srcRect  = form.rectangle;
-	  auto const  offset   = srcRect.right + srcRect.left;
-	  auto        itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		itVertex->x = offset - itVertex->x;
-		++itVertex;
-	  }
-	  for (auto& stitch : *StitchBuffer) {
-		if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor &&
-		    ((stitch.attribute & NOTFRM) == 0U)) {
-		  stitch.x = offset - stitch.x;
-		}
-	  }
-	  form.outline();
-	  StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	auto const& srcRect  = form.rectangle;
+	auto const  offset   = srcRect.right + srcRect.left;
+	auto        itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	  itVertex->x = offset - itVertex->x;
+	  ++itVertex;
 	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::savdo();
-		thred::rngadj();
-		auto rectangle = F_RECTANGLE {};
-		thred::selRct(rectangle);
-		auto const offset = rectangle.right + rectangle.left;
-		for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-		  StitchBuffer->operator[](iStitch).x = offset - StitchBuffer->operator[](iStitch).x;
-		}
-		StateMap->set(StateFlag::RESTCH);
+	for (auto& stitch : *StitchBuffer) {
+	  if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor && ((stitch.attribute & NOTFRM) == 0U)) {
+		stitch.x = offset - stitch.x;
 	  }
 	}
+	form.outline();
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::savdo();
+	thred::rngadj();
+	auto rectangle = F_RECTANGLE {};
+	thred::selRct(rectangle);
+	auto const offset = rectangle.right + rectangle.left;
+	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+	  StitchBuffer->operator[](iStitch).x = offset - StitchBuffer->operator[](iStitch).x;
+	}
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
