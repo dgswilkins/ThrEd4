@@ -6002,7 +6002,7 @@ void form::unfil() {
 	  form.edgeType = 0;
 	  form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	}
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 

@@ -12025,7 +12025,6 @@ auto thi::handleFormDataSheet() -> bool {
 	  }
 	  thred::coltab();
 	  satin::delsac(ClosestFormToCursor);
-	  StateMap->set(StateFlag::RESTCH);
 	  formForms::refrm();
 	  break;
 	}
@@ -12496,7 +12495,6 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::savdo();
 	  form::unfil();
 	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
 	  thred::unmsg();
 	  return true;
 	}
@@ -15447,7 +15445,6 @@ auto thi::handleFillMenu(WORD const& wParameter) -> bool {
 	  thred::savdo();
 	  form::unfil();
 	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -15715,7 +15712,6 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  thred::savdo();
 		  form::unfil();
 		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
 		  thred::unmsg();
 		  return true;
 		}
