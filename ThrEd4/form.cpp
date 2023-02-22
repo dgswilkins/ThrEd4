@@ -7632,19 +7632,19 @@ void form::bakagain() {
 }
 
 void form::rotdup() {
-  if (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::GRPSEL) || !SelectedFormList->empty()) {
-	fi::rotentr(IniFile.rotationAngle);
-	StateMap->set(StateFlag::ENTRDUP);
-  }
-  else {
+  if (!StateMap->test(StateFlag::FORMSEL) && !StateMap->test(StateFlag::GRPSEL) && SelectedFormList->empty()) {
 	displayText::shord();
+	return;
   }
+  fi::rotentr(IniFile.rotationAngle);
+  StateMap->set(StateFlag::ENTRDUP);
 }
 
 void fi::adfrm(uint32_t iForm) {
-  auto currentForm                                 = FormList->operator[](iForm);
-  auto const                   originalVertexIndex = currentForm.vertexIndex;
-  currentForm.vertexIndex                          = wrap::toUnsigned(FormVertices->size());
+  auto currentForm = FormList->operator[](iForm); //intended copy
+
+  auto const originalVertexIndex = currentForm.vertexIndex;
+  currentForm.vertexIndex        = wrap::toUnsigned(FormVertices->size());
   auto const itVertex = wrap::next(FormVertices->cbegin(), originalVertexIndex);
   FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
@@ -7711,7 +7711,7 @@ void fi::duprots(float rotationAngle, F_POINT const& rotationCenter) {
 }
 
 void fi::cplayfn(uint32_t iForm, uint32_t layer) {
-  auto currentForm = FormList->operator[](iForm);
+  auto currentForm = FormList->operator[](iForm); //intended copy
 
   auto const originalVertexIndex = currentForm.vertexIndex;
   currentForm.vertexIndex        = thred::adflt(currentForm.vertexCount);
