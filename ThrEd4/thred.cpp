@@ -6282,7 +6282,7 @@ void thi::clipSelectedForms() {
 
 void thi::clipSelectedPoints() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
-  auto clipHandle = GlobalAlloc(
+  auto const clipHandle = GlobalAlloc(
       GHND, (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT) + sizeof(FORM_VERTEX_CLIP));
   if (clipHandle == nullptr) {
 	return;
@@ -6300,8 +6300,9 @@ void thi::clipSelectedPoints() {
   auto* ptrVertices = convertFromPtr<F_POINT*>(std::next(clipHeader));
   auto  vertices    = gsl::span(ptrVertices, wrap::toSize(SelectedFormVertices.vertexCount) + 1U);
   auto const& form  = FormList->operator[](ClosestFormToCursor);
-  auto                         itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-  auto                         iSource  = SelectedFormVertices.start;
+
+  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto       iSource  = SelectedFormVertices.start;
   for (auto& vertex : vertices) {
 	auto sourceIt = wrap::next(itVertex, iSource);
 	vertex        = *sourceIt;
