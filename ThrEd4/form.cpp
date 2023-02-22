@@ -6797,15 +6797,14 @@ void form::dubold() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  fi::sbold(ClosestFormToCursor);
-	  thred::coltab();
-	  StateMap->set(StateFlag::INIT);
-	  StateMap->set(StateFlag::RESTCH);
-	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	fi::sbold(ClosestFormToCursor);
+	thred::coltab();
+	StateMap->set(StateFlag::INIT);
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
