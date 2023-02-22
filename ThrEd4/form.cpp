@@ -6104,16 +6104,15 @@ void form::bord() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto& form       = FormList->operator[](ClosestFormToCursor);
-	  form.borderColor = ActiveColor;
-	  fi::sbord(ClosestFormToCursor);
-	  thred::coltab();
-	  StateMap->set(StateFlag::INIT);
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	auto& form       = FormList->operator[](ClosestFormToCursor);
+	form.borderColor = ActiveColor;
+	fi::sbord(ClosestFormToCursor);
+	thred::coltab();
+	StateMap->set(StateFlag::INIT);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
