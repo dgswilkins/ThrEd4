@@ -12300,11 +12300,9 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
-	auto code = wchar_t {};
 	if (chkok()) {
 	  thred::savdo();
 	  StateMap->reset(StateFlag::DELTO);
-	  code = 1;
 	}
 	else {
 	  auto windowRect = RECT {};
@@ -12313,7 +12311,6 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 		thred::savdo();
 		StateMap->set(StateFlag::DELTO);
-		code = 1;
 	  }
 	}
 	delsfrms();
