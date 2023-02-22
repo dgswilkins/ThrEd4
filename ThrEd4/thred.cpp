@@ -1263,7 +1263,7 @@ void thi::nunams() {
 	flag = false;
 	break;
   }
-  if (flag == false) {
+  if (!flag) {
 	menu::redfils(LRUPtr, PreviousNames);
 	return;
   }
