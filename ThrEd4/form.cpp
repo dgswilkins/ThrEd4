@@ -7980,27 +7980,25 @@ void form::selfil(uint32_t type) {
 
 void form::selalfil() {
   displayText::frm1pnt();
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	auto const savedIndex = ClosestPointIndex;
-	ClosestPointIndex     = thred::findFirstStitch(ClosestFormToCursor);
-	if (ClosestPointIndex != StitchBuffer->size()) {
-	  if (ClosestPointIndex != 0U) {
-		--ClosestPointIndex;
-	  }
-	  GroupStitchIndex = thred::findLastStitch(ClosestFormToCursor);
-	  StateMap->set(StateFlag::GRPSEL);
-	  StateMap->reset(StateFlag::FORMSEL);
-	  thred::rngadj();
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  ClosestPointIndex = savedIndex;
-	  displayText::tabmsg(IDS_FSELM, false);
-	}
-  }
-  else {
+  if (!StateMap->test(StateFlag::FORMSEL)) {
 	displayText::tabmsg(IDS_SEL1FRM, false);
+	return;
   }
+  auto const savedIndex = ClosestPointIndex;
+  ClosestPointIndex     = thred::findFirstStitch(ClosestFormToCursor);
+  if (ClosestPointIndex == StitchBuffer->size()) {
+	ClosestPointIndex = savedIndex;
+	displayText::tabmsg(IDS_FSELM, false);
+	return;
+  }
+  if (ClosestPointIndex != 0U) {
+	--ClosestPointIndex;
+  }
+  GroupStitchIndex = thred::findLastStitch(ClosestFormToCursor);
+  StateMap->set(StateFlag::GRPSEL);
+  StateMap->reset(StateFlag::FORMSEL);
+  thred::rngadj();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
