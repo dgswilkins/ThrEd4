@@ -5968,40 +5968,40 @@ void form::unfil() {
 	StitchBuffer->resize(wrap::distance<size_t>(StitchBuffer->begin(), iDestination));
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  if (!StateMap->testAndReset(StateFlag::IGNOR) && !UserFlagMap->test(UserFlag::WRNOF)) {
-		if (auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
-		    std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
-		      return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
-		    })) {
-		  displayText::tabmsg(IDS_UNFIL, true);
-		  StateMap->set(StateFlag::FILMSG);
-		  displayText::okcan();
-		  StateMap->set(StateFlag::IGNOR);
-		  return;
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	if (!StateMap->testAndReset(StateFlag::IGNOR) && !UserFlagMap->test(UserFlag::WRNOF)) {
+	  if (auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
+	      std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
+		    return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
+	      })) {
+		displayText::tabmsg(IDS_UNFIL, true);
+		StateMap->set(StateFlag::FILMSG);
+		displayText::okcan();
+		StateMap->set(StateFlag::IGNOR);
+		return;
+	  }
+	}
+	if (!StitchBuffer->empty()) {
+	  auto       iDestination = StitchBuffer->begin();
+	  auto       destCount    = 0U;
+	  auto const codedForm    = ClosestFormToCursor << FRMSHFT;
+	  for (auto const& stitch : *StitchBuffer) {
+		if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
+		  *iDestination++ = stitch;
+		  ++destCount;
 		}
 	  }
-	  if (!StitchBuffer->empty()) {
-		auto       iDestination = StitchBuffer->begin();
-		auto       destCount    = 0U;
-		auto const codedForm    = ClosestFormToCursor << FRMSHFT;
-		for (auto const& stitch : *StitchBuffer) {
-		  if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
-			*iDestination++ = stitch;
-			++destCount;
-		  }
-		}
-		StitchBuffer->resize(destCount);
-	  }
-	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  clip::delclps(ClosestFormToCursor);
-	  texture::deltx(ClosestFormToCursor);
-	  form.fillType = 0;
-	  form.edgeType = 0;
-	  form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
-	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+	  StitchBuffer->resize(destCount);
+	}
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	clip::delclps(ClosestFormToCursor);
+	texture::deltx(ClosestFormToCursor);
+	form.fillType = 0;
+	form.edgeType = 0;
+	form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	StateMap->set(StateFlag::RESTCH);
   }
 }
