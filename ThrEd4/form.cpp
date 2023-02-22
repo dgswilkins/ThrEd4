@@ -7953,29 +7953,28 @@ void fi::frmpnts(uint32_t type) {
 
 void form::selfil(uint32_t type) {
   displayText::frm1pnt();
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	auto const& currentForm = FormList->operator[](ClosestFormToCursor);
-	if (type == FRMFIL && (currentForm.fillType == 0U)) {
-	  displayText::tabmsg(IDS_FSELF, false);
-	  return;
-	}
-	if (type == FRMBFIL && (currentForm.edgeType == 0U)) {
-	  displayText::tabmsg(IDS_FSELB, false);
-	  return;
-	}
-	if (type == FRMAPFIL && (currentForm.edgeType & NEGUND) != EDGEAPPL) {
-	  displayText::tabmsg(IDS_FSELA, false);
-	  return;
-	}
-	fi::frmpnts(type);
-	StateMap->set(StateFlag::GRPSEL);
-	StateMap->reset(StateFlag::FORMSEL);
-	thred::rngadj();
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
+  if (!StateMap->test(StateFlag::FORMSEL)) {
 	displayText::tabmsg(IDS_SEL1FRM, false);
+	return;
   }
+  auto const& currentForm = FormList->operator[](ClosestFormToCursor);
+  if (type == FRMFIL && (currentForm.fillType == 0U)) {
+	displayText::tabmsg(IDS_FSELF, false);
+	return;
+  }
+  if (type == FRMBFIL && (currentForm.edgeType == 0U)) {
+	displayText::tabmsg(IDS_FSELB, false);
+	return;
+  }
+  if (type == FRMAPFIL && (currentForm.edgeType & NEGUND) != EDGEAPPL) {
+	displayText::tabmsg(IDS_FSELA, false);
+	return;
+  }
+  fi::frmpnts(type);
+  StateMap->set(StateFlag::GRPSEL);
+  StateMap->reset(StateFlag::FORMSEL);
+  thred::rngadj();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::selalfil() {
