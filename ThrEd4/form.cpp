@@ -6763,16 +6763,17 @@ void form::nubrdcol(uint8_t color) noexcept {
 }
 
 void form::nulapcol(uint8_t color) {
-  if (auto& currentForm = FormList->operator[](ClosestFormToCursor);
-      gsl::narrow<decltype(color)>(currentForm.borderColor >> FRMSHFT) != color) {
-	currentForm.borderColor &= COLMSK;
-	currentForm.borderColor |= gsl::narrow_cast<uint8_t>(color << FRMSHFT);
-	auto const attribute = (ClosestFormToCursor << FRMSHFT) | TYPMSK;
-	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & (TYPMSK | FRMSK)) == attribute) {
-		stitch.attribute &= NCOLMSK;
-		stitch.attribute |= color;
-	  }
+  auto& currentForm = FormList->operator[](ClosestFormToCursor);
+  if (gsl::narrow<decltype(color)>(currentForm.borderColor >> FRMSHFT) == color) {
+	return;
+  }
+  currentForm.borderColor &= COLMSK;
+  currentForm.borderColor |= gsl::narrow_cast<uint8_t>(color << FRMSHFT);
+  auto const attribute = (ClosestFormToCursor << FRMSHFT) | TYPMSK;
+  for (auto& stitch : *StitchBuffer) {
+	if ((stitch.attribute & (TYPMSK | FRMSK)) == attribute) {
+	  stitch.attribute &= NCOLMSK;
+	  stitch.attribute |= color;
 	}
   }
 }
