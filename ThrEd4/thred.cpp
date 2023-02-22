@@ -6328,7 +6328,7 @@ void thi::clipSelectedStitches() {
   auto const length  = GroupEndStitch - GroupStartStitch + 1U;
   auto       iSource = GroupStartStitch;
   // NOLINTNEXTLINE(hicpp-signed-bitwise,readability-qualified-auto)
-  auto clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
+  auto const clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
   if (clipHandle == nullptr) {
 	return;
   }
