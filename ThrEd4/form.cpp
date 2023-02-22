@@ -7247,11 +7247,11 @@ void fi::prpsbrd(uint32_t formIndex) {
 }
 
 void form::prpbrd(float borderStitchSpacing) {
-  auto const savedSpacing = LineSpacing;
   if (!displayText::filmsgs(FML_PRPS)) {
 	return;
   }
-  LineSpacing = borderStitchSpacing;
+  auto const savedSpacing = LineSpacing;
+  LineSpacing             = borderStitchSpacing;
   if (!SelectedFormList->empty()) {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  auto& currentForm      = FormList->operator[](selectedForm);
@@ -7266,24 +7266,24 @@ void form::prpbrd(float borderStitchSpacing) {
 	}
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
+	LineSpacing = savedSpacing;
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	if (auto& currentForm = FormList->operator[](ClosestFormToCursor); UserFlagMap->test(UserFlag::BLUNT)) {
+	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
+	}
+	else {
+	  currentForm.attribute &= NOBLNT;
+	}
+	fi::prpsbrd(ClosestFormToCursor);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+	LineSpacing = savedSpacing;
 	StateMap->set(StateFlag::RESTCH);
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  if (auto& currentForm = FormList->operator[](ClosestFormToCursor); UserFlagMap->test(UserFlag::BLUNT)) {
-		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
-	  }
-	  else {
-		currentForm.attribute &= NOBLNT;
-	  }
-	  fi::prpsbrd(ClosestFormToCursor);
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	  StateMap->set(StateFlag::RESTCH);
-	}
-  }
-  LineSpacing = savedSpacing;
 }
 
 void form::tglfrm() {
