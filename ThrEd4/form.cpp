@@ -5909,29 +5909,26 @@ void form::insat() { // insert a point in a form
 	return;
   }
   thred::savdo();
-  // clang-format off
-	auto&      selectedForm = FormList->operator[](ClosestFormToCursor);
-	auto const stitchPoint  = thred::pxCor2stch(Msg.pt);
-	auto const lastVertex   = selectedForm.vertexCount - 1U;
-  // clang-format on
-  if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
-	if (ClosestVertexToCursor == 0 && selectedForm.type == FRMLINE) {
-	  StateMap->set(StateFlag::PRELIN);
-	}
-	else {
-	  if (ClosestVertexToCursor != lastVertex && selectedForm.type == FRMLINE) {
-		ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
-	  }
-	}
-	fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
-	auto const itVertex = wrap::next(FormVertices->begin(), selectedForm.vertexIndex);
-	if (StateMap->testAndReset(StateFlag::PRELIN)) {
+  auto& selectedForm = FormList->operator[](ClosestFormToCursor);
+
+  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto const lastVertex  = selectedForm.vertexCount - 1U;
+  switch (inOutFlag) {
+	case IntersectionStyles::POINT_BEFORE_LINE: {
+	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+	  auto const itVertex = wrap::next(FormVertices->begin(), selectedForm.vertexIndex);
 	  std::swap(itVertex[0], itVertex[1]);
+	  break;
 	}
-  }
-  else {
-	ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
-	fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+	case IntersectionStyles::POINT_IN_LINE: {
+	  ClosestVertexToCursor = form::prv(selectedForm, ClosestVertexToCursor);
+	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+	  break;
+	}
+	case IntersectionStyles::POINT_AFTER_LINE: {
+	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
+	  break;
+	}
   }
   form::refil(ClosestFormToCursor);
   StateMap->set(StateFlag::RESTCH);
