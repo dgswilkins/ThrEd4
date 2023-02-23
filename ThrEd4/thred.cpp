@@ -3225,6 +3225,9 @@ void thi::dubox(POINT const& stitchCoordsInPixels) {
 }
 
 auto thi::stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool {
+  if (StitchBuffer->empty()) {
+	return false;
+  }
   stitchCoordsInPixels = {
       wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
       wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
