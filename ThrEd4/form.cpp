@@ -5473,10 +5473,8 @@ void form::setfpnt() {
 
 void fi::makpoli() {
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
-  if (currentForm.type == SAT) {
-	if (currentForm.satinGuideCount != 0U) {
-	  satin::delsac(ClosestFormToCursor);
-	}
+  if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
+	satin::delsac(ClosestFormToCursor);
   }
   currentForm.type = FRMFPOLY;
 }
