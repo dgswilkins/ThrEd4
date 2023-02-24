@@ -5591,16 +5591,15 @@ void form::filangl() {
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  fi::fsangl(form);
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	fi::fsangl(form);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
