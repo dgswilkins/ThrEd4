@@ -6039,18 +6039,21 @@ void form::infrm() { // insert multiple points into a form
 	return;
   }
   FormForInsert = &(FormList->operator[](ClosestFormToCursor));
-  if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
-	if ((ClosestVertexToCursor == 0U) && FormForInsert->type == FRMLINE) {
+  switch (inOutFlag) {
+	case IntersectionStyles::POINT_BEFORE_LINE: {
 	  FormVertexPrev = 0;
 	  StateMap->set(StateFlag::PRELIN);
+	  break;
 	}
-	else {
+	case IntersectionStyles::POINT_IN_LINE: {
+	  FormVertexPrev = form::prv(*FormForInsert, ClosestVertexToCursor);
+	  FormVertexNext = ClosestVertexToCursor;
+	  break;
+	}
+	case IntersectionStyles::POINT_AFTER_LINE: {
 	  FormVertexPrev = ClosestVertexToCursor;
+	  break;
 	}
-  }
-  else {
-	FormVertexNext = ClosestVertexToCursor;
-	FormVertexPrev = form::prv(*FormForInsert, ClosestVertexToCursor);
   }
   StateMap->set(StateFlag::INSFRM);
   StateMap->set(StateFlag::INIT);
