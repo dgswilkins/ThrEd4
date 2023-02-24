@@ -5432,24 +5432,27 @@ void form::refilfn(uint32_t formIndex) {
 }
 
 void form::refil(uint32_t formIndex) {
-  if (!UserFlagMap->test(UserFlag::WRNOF)) {
-	if (auto const codedForm = formIndex << FRMSHFT | USMSK;
-	    std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
-	      return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
-	    })) {
-	  if (FormDataSheet != nullptr) {
-		StateMap->set(StateFlag::WASFRMFRM);
-	  }
-	  thred::undat();
-	  if (nullptr == MsgWindow) {
-		displayText::tabmsg(IDS_REFIL, true);
-		displayText::okcan();
-	  }
-	  StateMap->set(StateFlag::MOVMSG);
-	  return;
-	}
+  if (UserFlagMap->test(UserFlag::WRNOF)) {
+	form::refilfn(formIndex);
+	return;
   }
-  form::refilfn(formIndex);
+  auto const codedForm = formIndex << FRMSHFT | USMSK;
+  if (!std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
+	    return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
+      })) {
+	form::refilfn(formIndex);
+	return;
+  }
+  if (FormDataSheet != nullptr) {
+	StateMap->set(StateFlag::WASFRMFRM);
+  }
+  thred::undat();
+  if (nullptr == MsgWindow) {
+	displayText::tabmsg(IDS_REFIL, true);
+	displayText::okcan();
+  }
+  StateMap->set(StateFlag::MOVMSG);
+  return;
 }
 
 void form::setfpnt() {
