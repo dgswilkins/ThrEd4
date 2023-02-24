@@ -5748,37 +5748,36 @@ void form::rotfrm(FRM_HEAD& form, uint32_t newStartVertex) {
 	++itVertex;
   }
   auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
-  auto       rotatedIt    = itStartGuide;
-  if (form.type == SAT) {
-	if (form.vertexCount != 0U) {
-	  if (form.wordParam != 0U) {
-		form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
-	  }
-	  auto itGuide = itStartGuide;
-	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-		if (itGuide->start != newStartVertex && itGuide->finish != newStartVertex) {
-		  rotatedIt->start = (itGuide->start + form.vertexCount - newStartVertex) % form.vertexCount;
-		  rotatedIt->finish = (itGuide->finish + form.vertexCount - newStartVertex) % form.vertexCount;
-		  if (rotatedIt->start > rotatedIt->finish) {
-			std::swap(rotatedIt->start, rotatedIt->finish);
-		  }
-		  ++rotatedIt;
+  auto       rotatedIt    = itStartGuide; //intended copy
+  if (form.type == SAT && form.vertexCount != 0U) {
+	if (form.wordParam != 0U) {
+	  form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
+	}
+	auto itGuide = itStartGuide; //intended copy
+	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+	  if (itGuide->start != newStartVertex && itGuide->finish != newStartVertex) {
+		rotatedIt->start = (itGuide->start + form.vertexCount - newStartVertex) % form.vertexCount;
+		rotatedIt->finish = (itGuide->finish + form.vertexCount - newStartVertex) % form.vertexCount;
+		if (rotatedIt->start > rotatedIt->finish) {
+		  std::swap(rotatedIt->start, rotatedIt->finish);
 		}
-		++itGuide;
+		++rotatedIt;
 	  }
+	  ++itGuide;
 	}
   }
   if (rotatedIt != itStartGuide) {
 	form.satinGuideCount = wrap::distance<uint32_t>(itStartGuide, rotatedIt);
 	std::sort(itStartGuide, rotatedIt, satin::scomp);
   }
-  if (form.vertexCount != 0U) {
-	if ((form.extendedAttribute & AT_STRT) != 0U) {
-	  form.fillStart = (form.fillStart + form.vertexCount - newStartVertex) % form.vertexCount;
-	}
-	if ((form.extendedAttribute & AT_END) != 0U) {
-	  form.fillEnd = (form.fillEnd + form.vertexCount - newStartVertex) % form.vertexCount;
-	}
+  if (form.vertexCount == 0U) {
+	return;
+  }
+  if ((form.extendedAttribute & AT_STRT) != 0U) {
+	form.fillStart = (form.fillStart + form.vertexCount - newStartVertex) % form.vertexCount;
+  }
+  if ((form.extendedAttribute & AT_END) != 0U) {
+	form.fillEnd = (form.fillEnd + form.vertexCount - newStartVertex) % form.vertexCount;
   }
 }
 
