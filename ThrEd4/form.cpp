@@ -309,7 +309,7 @@ void duspnd(float                        stitchLen,
             F_POINT&                     stitchPoint);
 void fillSB(const F_POINT& pivot, float angle, float const& radius, F_POINT& stitchPoint, float const& level);
 void filsclp();
-void filsfn();
+void filsfn(uint32_t formIndex);
 auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POINT const& point, float& distance) noexcept
     -> float;
 void fmclp(FRM_HEAD& form);
@@ -5782,16 +5782,16 @@ void form::rotfrm(FRM_HEAD& form, uint32_t newStartVertex) {
   }
 }
 
-void fi::filsfn() {
-  auto& form = FormList->operator[](ClosestFormToCursor);
-  clip::delmclp(ClosestFormToCursor);
-  texture::deltx(ClosestFormToCursor);
+void fi::filsfn(uint32_t formIndex) {
+  auto& form = FormList->operator[](formIndex);
+  clip::delmclp(formIndex);
+  texture::deltx(formIndex);
   form.type        = SAT;
   form.fillColor   = ActiveColor;
   form.fillType    = SATF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form::refilfn(ClosestFormToCursor);
+  form::refilfn(formIndex);
 }
 
 void form::filsat() {
@@ -5801,23 +5801,21 @@ void form::filsat() {
   if (!SelectedFormList->empty()) {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor = selectedForm;
 	  if (auto const& currentForm = FormList->operator[](selectedForm); currentForm.type != FRMLINE) {
-		fi::filsfn();
+		fi::filsfn(selectedForm);
 	  }
 	}
 	StateMap->set(StateFlag::INIT);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
+	return;
   }
-  else {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::savdo();
-	  fi::filsfn();
-	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
-	  StateMap->set(StateFlag::RESTCH);
-	}
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	thred::savdo();
+	fi::filsfn(ClosestFormToCursor);
+	StateMap->set(StateFlag::INIT);
+	thred::coltab();
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
