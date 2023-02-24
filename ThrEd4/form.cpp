@@ -5649,15 +5649,15 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
 	++formControlIndex;
   }
   SelectedFormControlVertex >>= 1U;
-  if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top &&
-      point.y <= rectangle.bottom) {
-	auto const itVertex   = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex);
-	auto const formOrigin = form::sfCor2px(*itVertex);
-	FormMoveDelta         = F_POINT {formOrigin.x - point.x, formOrigin.y - point.y};
-	StateMap->set(StateFlag::FRMOV);
-	return true;
+  if (point.x < rectangle.left || point.x > rectangle.right || point.y < rectangle.top ||
+      point.y > rectangle.bottom) {
+	return false;
   }
-  return false;
+  auto const itVertex   = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex);
+  auto const formOrigin = form::sfCor2px(*itVertex);
+  FormMoveDelta         = F_POINT {formOrigin.x - point.x, formOrigin.y - point.y};
+  StateMap->set(StateFlag::FRMOV);
+  return true;
 }
 
 void form::rstfrm() {
