@@ -6045,8 +6045,7 @@ void form::infrm() { // insert multiple points into a form
 	  StateMap->set(StateFlag::PRELIN);
 	}
 	else {
-	  FormVertexPrev = form::prv(*FormForInsert, ClosestVertexToCursor);
-	  FormVertexNext = ClosestVertexToCursor;
+	  FormVertexPrev = ClosestVertexToCursor;
 	}
   }
   else {
