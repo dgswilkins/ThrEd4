@@ -5825,47 +5825,46 @@ auto fi::closat(IntersectionStyles& inOutFlag) -> bool {
   auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (auto& formIter = FormList->operator[](iForm); formIter.vertexCount != 0U) {
-	  if (auto const layer =
-	          gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1U);
-	      (ActiveLayer == 0U) || layer == ActiveLayer || ((formIter.attribute & FRMLMSK) == 0U)) {
-		auto const lastVertex = (formIter.type == FRMLINE) ? formIter.vertexCount - 1U : formIter.vertexCount;
-		// Loop through for all line segments
-		auto       length   = 0.0F;
-		auto const itVertex = wrap::next(FormVertices->cbegin(), formIter.vertexIndex);
-		for (auto iVertex = 0U; iVertex < lastVertex; ++iVertex) {
-		  auto const itCurrentVertex = wrap::next(itVertex, iVertex);
-		  auto const itNextVertex    = wrap::next(itVertex, form::nxt(formIter, iVertex));
-		  auto const param = findDistanceToSide(*itCurrentVertex, *itNextVertex, stitchPoint, length);
-		  if ((length < minimumLength)) {
-			if ((param < 0.0F) && (iVertex == 0)) {
-			  // this should only happen if the Closest vertex is the start of a line (vertex 0)
-			  minimumLength         = length;
-			  ClosestFormToCursor   = iForm;
-			  ClosestVertexToCursor = iVertex;
-			  inOutFlag             = IntersectionStyles::POINT_BEFORE_LINE;
-			}
-			else {
-			  // return the vertex after the intersection
-			  if ((param > 1.0F) && (iVertex == lastVertex - 1)) {
-				minimumLength         = length;
-				ClosestFormToCursor   = iForm;
-				ClosestVertexToCursor = form::nxt(formIter, iVertex);
-				inOutFlag             = IntersectionStyles::POINT_AFTER_LINE;
-			  }
-			  else {
-				minimumLength         = length;
-				ClosestFormToCursor   = iForm;
-				ClosestVertexToCursor = form::nxt(formIter, iVertex);
-				inOutFlag             = IntersectionStyles::POINT_IN_LINE;
-			  }
-			}
-		  }
-		}
-	  }
-	}
-	else {
+	auto& formIter = FormList->operator[](iForm);
+	if (formIter.vertexCount == 0U) {
 	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", gsl::narrow_cast<int>(inOutFlag));
+	}
+	auto const layer =
+	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1U);
+	if ((ActiveLayer != 0U) && layer != ActiveLayer && ((formIter.attribute & FRMLMSK) != 0U)) {
+	  continue;
+	}
+	auto const lastVertex = (formIter.type == FRMLINE) ? formIter.vertexCount - 1U : formIter.vertexCount;
+	// Loop through for all line segments
+	auto       length   = 0.0F;
+	auto const itVertex = wrap::next(FormVertices->cbegin(), formIter.vertexIndex);
+	for (auto iVertex = 0U; iVertex < lastVertex; ++iVertex) {
+	  auto const itCurrentVertex = wrap::next(itVertex, iVertex);
+	  auto const itNextVertex    = wrap::next(itVertex, form::nxt(formIter, iVertex));
+	  auto const param = findDistanceToSide(*itCurrentVertex, *itNextVertex, stitchPoint, length);
+	  if ((length >= minimumLength)) {
+		continue;
+	  }
+	  if ((param < 0.0F) && (iVertex == 0)) {
+		// this should only happen if the Closest vertex is the start of a line (vertex 0)
+		minimumLength         = length;
+		ClosestFormToCursor   = iForm;
+		ClosestVertexToCursor = iVertex;
+		inOutFlag             = IntersectionStyles::POINT_BEFORE_LINE;
+		continue;
+	  }
+	  // return the vertex after the intersection
+	  if ((param > 1.0F) && (iVertex == lastVertex - 1)) {
+		minimumLength         = length;
+		ClosestFormToCursor   = iForm;
+		ClosestVertexToCursor = form::nxt(formIter, iVertex);
+		inOutFlag             = IntersectionStyles::POINT_AFTER_LINE;
+		continue;
+	  }
+	  minimumLength         = length;
+	  ClosestFormToCursor   = iForm;
+	  ClosestVertexToCursor = form::nxt(formIter, iVertex);
+	  inOutFlag             = IntersectionStyles::POINT_IN_LINE;
 	}
   }
   return !util::closeEnough(minimumLength, BIGFLOAT);
