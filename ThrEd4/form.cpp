@@ -5912,7 +5912,6 @@ void form::insat() { // insert a point in a form
   auto& selectedForm = FormList->operator[](ClosestFormToCursor);
 
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-  auto const lastVertex  = selectedForm.vertexCount - 1U;
   switch (inOutFlag) {
 	case IntersectionStyles::POINT_BEFORE_LINE: {
 	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
