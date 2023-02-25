@@ -522,7 +522,7 @@ void texture::drwtxtr() {
   TextureCrossPen = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  auto const end = wrap::toUnsigned(TextureHistory->size());
+  auto const end = wrap::toUnsigned(TempTexturePoints->size());
   for (auto index = uint32_t {0U}; index < end; ++index) {
 	txi::dutxtx(index, IniFile.textureEditorSize);
   }
