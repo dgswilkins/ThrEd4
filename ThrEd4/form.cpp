@@ -502,6 +502,7 @@ void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
 void spurfn(F_POINT const& innerPoint, F_POINT const& outerPoint, F_POINT& underlayInnerPoint, F_POINT& underlayOuterPoint) noexcept;
 void srtf(std::vector<F_POINT_ATTR> const& tempStitchBuffer, uint32_t start, uint32_t finish);
 void stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept;
+void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm);
 void trfrm(F_POINT const& bottomLeftPoint,
            F_POINT const& topLeftPoint,
            F_POINT const& bottomRightPoint,
@@ -5136,6 +5137,98 @@ void fi::fmclp(FRM_HEAD& form) {
   LineSpacing          = savedSpacing;
 }
 
+void fi::swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
+  switch (form.edgeType & NEGUND) {
+	case EDGELINE: {
+	  fi::brdfil(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEBEAN: {
+	  fi::bold(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGECLIP: {
+	  auto clipRect = F_RECTANGLE {};
+	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+	  clip::clpout(form.borderSize);
+	  clip::clpbrd(form, clipRect, 0);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEANGSAT: {
+	  StateMap->reset(StateFlag::SAT1);
+	  satin::slbrd(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEPROPSAT: {
+	  if (form.vertexCount > 2) {
+		StateMap->reset(StateFlag::SAT1);
+		fi::plbrd(form, angledForm, *AngledFormVertices);
+		fi::ritbrd(form);
+	  }
+	  break;
+	}
+	case EDGEAPPL: {
+	  fi::lapbrd(form);
+	  fi::ritapbrd();
+	  StateMap->reset(StateFlag::SAT1);
+	  satin::slbrd(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEBHOL: {
+	  auto const length      = ButtonholeCornerLength;
+	  ButtonholeCornerLength = form::getblen();
+	  satin::satout(form, BHWIDTH);
+	  fi::blbrd(form);
+	  ButtonholeCornerLength = length;
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEPICOT: {
+	  auto clipRect = F_RECTANGLE {};
+	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+	  auto const length      = ButtonholeCornerLength;
+	  ButtonholeCornerLength = form::getplen();
+	  clip::clpic(form, clipRect);
+	  ButtonholeCornerLength = length;
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEDOUBLE: {
+	  fi::dubfn(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGELCHAIN: {
+	  StateMap->set(StateFlag::LINCHN);
+	  clip::chnfn(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGEOCHAIN: {
+	  StateMap->reset(StateFlag::LINCHN);
+	  clip::chnfn(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	case EDGECLIPX: {
+	  auto clipRect = F_RECTANGLE {};
+	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+	  clip::duxclp(form);
+	  fi::ritbrd(form);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in refilfn 1: edgeType [{}]\n", form.edgeType & NEGUND);
+	  break;
+	}
+  }
+}
+
 void form::refilfn(uint32_t formIndex) {
   auto const savedStitchLength   = UserStitchLength;
   auto       angledForm          = FRM_HEAD {};
@@ -5177,95 +5270,7 @@ void form::refilfn(uint32_t formIndex) {
   textureSegments.resize(wrap::toSize(form.fillInfo.texture.lines));
   switch (form.type) {
 	case FRMLINE: {
-	  switch (form.edgeType & NEGUND) {
-		case EDGELINE: {
-		  fi::brdfil(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEBEAN: {
-		  fi::bold(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGECLIP: {
-		  auto clipRect = F_RECTANGLE {};
-		  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-		  clip::clpout(form.borderSize);
-		  clip::clpbrd(form, clipRect, 0);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEANGSAT: {
-		  StateMap->reset(StateFlag::SAT1);
-		  satin::slbrd(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEPROPSAT: {
-		  if (form.vertexCount > 2) {
-			StateMap->reset(StateFlag::SAT1);
-			fi::plbrd(form, angledForm, *AngledFormVertices);
-			fi::ritbrd(form);
-		  }
-		  break;
-		}
-		case EDGEAPPL: {
-		  fi::lapbrd(form);
-		  fi::ritapbrd();
-		  StateMap->reset(StateFlag::SAT1);
-		  satin::slbrd(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEBHOL: {
-		  auto const length      = ButtonholeCornerLength;
-		  ButtonholeCornerLength = form::getblen();
-		  satin::satout(form, BHWIDTH);
-		  fi::blbrd(form);
-		  ButtonholeCornerLength = length;
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEPICOT: {
-		  auto clipRect = F_RECTANGLE {};
-		  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-		  auto const length      = ButtonholeCornerLength;
-		  ButtonholeCornerLength = form::getplen();
-		  clip::clpic(form, clipRect);
-		  ButtonholeCornerLength = length;
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEDOUBLE: {
-		  fi::dubfn(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGELCHAIN: {
-		  StateMap->set(StateFlag::LINCHN);
-		  clip::chnfn(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGEOCHAIN: {
-		  StateMap->reset(StateFlag::LINCHN);
-		  clip::chnfn(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		case EDGECLIPX: {
-		  auto clipRect = F_RECTANGLE {};
-		  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-		  clip::duxclp(form);
-		  fi::ritbrd(form);
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in refilfn 1: edgeType [{}]\n", form.edgeType & NEGUND);
-		  break;
-		}
-	  }
+	  fi::swEdgeType(form, angledForm);
 	  if (form.fillType == CONTF && ((form.attribute & FRECONT) != 0)) {
 		fi::contf(form);
 		fi::ritfil();
