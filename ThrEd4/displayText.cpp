@@ -197,9 +197,9 @@ auto displayText::clpmsgs(uint32_t code) -> bool {
   form::ispcdclp();
   if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS, false);
-	return false;
+	return true;
   }
-  return true;
+  return false;
 }
 
 void displayText::frm1pnt() {
