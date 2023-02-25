@@ -5282,111 +5282,113 @@ void form::refilfn(uint32_t formIndex) {
 	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
-	  if (form.fillType != 0U) {
-		auto const spacing      = LineSpacing;
-		LineSpacing             = form.fillSpacing;
-		auto lineEndpoints      = std::vector<SMAL_PNT_L> {};
-		auto groupIndexSequence = std::vector<uint32_t> {};
-		auto rotationCenter     = F_POINT {};
-		auto doFill             = true;
-		auto rotationAngle      = 0.0F;
-		switch (form.fillType) {
-		  case VRTF: {
-			workingFormVertices.clear();
-			workingFormVertices.reserve(form.vertexCount);
-			auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-			auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
-			workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
-			fi::fnvrt(workingFormVertices, groupIndexSequence, lineEndpoints);
-			break;
-		  }
-		  case HORF: {
-			rotationAngle = PI_FHALF;
-			fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
-			workingFormVertices.clear();
-			workingFormVertices.reserve(angledForm.vertexCount);
-			auto itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
-			auto itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
-			workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
-			break;
-		  }
-		  case ANGF: {
-			rotationAngle = PI_FHALF - form.angleOrClipData.angle;
-			fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
-			workingFormVertices.clear();
-			workingFormVertices.reserve(angledForm.vertexCount);
-			auto itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
-			auto itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
-			workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
-			break;
-		  }
-		  case VCLPF: {
-			auto clipRect = F_RECTANGLE {};
-			clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
-			workingFormVertices.clear();
-			workingFormVertices.reserve(form.vertexCount);
-			auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-			auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
-			workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
-			fi::clpcon(form, textureSegments, workingFormVertices);
-			doFill = false;
-			break;
-		  }
-		  case HCLPF: {
-			auto clipRect = F_RECTANGLE {};
-			clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
-			fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
-			doFill = false;
-			break;
-		  }
-		  case ANGCLPF: {
-			auto clipRect = F_RECTANGLE {};
-			clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
-			StateMap->reset(StateFlag::ISUND);
-			form::angclpfn(form, textureSegments, *AngledFormVertices);
-			doFill = false;
-			break;
-		  }
-		  case TXVRTF: {
-			texture::setxt(form, textureSegments);
-			workingFormVertices.clear();
-			workingFormVertices.reserve(form.vertexCount);
-			auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-			auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
-			workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
-			fi::clpcon(form, textureSegments, workingFormVertices);
-			doFill = false;
-			break;
-		  }
-		  case TXHORF: {
-			texture::setxt(form, textureSegments);
-			fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
-			doFill = false;
-			break;
-		  }
-		  case TXANGF: {
-			texture::setxt(form, textureSegments);
-			StateMap->reset(StateFlag::ISUND);
-			form::angclpfn(form, textureSegments, *AngledFormVertices);
-			doFill = false;
-			break;
-		  }
-		  default: {
-			outDebugString(L"default hit in refilfn 2: fillType [{}]\n", form.fillType);
-			break;
-		  }
-		}
-		if (doFill) {
-		  fi::lcon(form, groupIndexSequence, lineEndpoints, workingFormVertices);
-		  fi::bakseq();
-		  if (form.fillType != VRTF && form.fillType != TXVRTF) {
-			rotationAngle = -rotationAngle;
-			fi::rotbak(rotationAngle, rotationCenter);
-		  }
-		}
-		fi::ritfil();
-		LineSpacing = spacing;
+	  if (form.fillType == 0U) {
+		fi::chkbrd(form);
+		break;
 	  }
+	  auto const spacing      = LineSpacing;
+	  LineSpacing             = form.fillSpacing;
+	  auto lineEndpoints      = std::vector<SMAL_PNT_L> {};
+	  auto groupIndexSequence = std::vector<uint32_t> {};
+	  auto rotationCenter     = F_POINT {};
+	  auto doFill             = true;
+	  auto rotationAngle      = 0.0F;
+	  switch (form.fillType) {
+		case VRTF: {
+		  workingFormVertices.clear();
+		  workingFormVertices.reserve(form.vertexCount);
+		  auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		  auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+		  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
+		  fi::fnvrt(workingFormVertices, groupIndexSequence, lineEndpoints);
+		  break;
+		}
+		case HORF: {
+		  rotationAngle = PI_FHALF;
+		  fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
+		  workingFormVertices.clear();
+		  workingFormVertices.reserve(angledForm.vertexCount);
+		  auto itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
+		  auto itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
+		  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
+		  break;
+		}
+		case ANGF: {
+		  rotationAngle = PI_FHALF - form.angleOrClipData.angle;
+		  fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
+		  workingFormVertices.clear();
+		  workingFormVertices.reserve(angledForm.vertexCount);
+		  auto itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
+		  auto itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
+		  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
+		  break;
+		}
+		case VCLPF: {
+		  auto clipRect = F_RECTANGLE {};
+		  clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
+		  workingFormVertices.clear();
+		  workingFormVertices.reserve(form.vertexCount);
+		  auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		  auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+		  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
+		  fi::clpcon(form, textureSegments, workingFormVertices);
+		  doFill = false;
+		  break;
+		}
+		case HCLPF: {
+		  auto clipRect = F_RECTANGLE {};
+		  clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
+		  fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
+		  doFill = false;
+		  break;
+		}
+		case ANGCLPF: {
+		  auto clipRect = F_RECTANGLE {};
+		  clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
+		  StateMap->reset(StateFlag::ISUND);
+		  form::angclpfn(form, textureSegments, *AngledFormVertices);
+		  doFill = false;
+		  break;
+		}
+		case TXVRTF: {
+		  texture::setxt(form, textureSegments);
+		  workingFormVertices.clear();
+		  workingFormVertices.reserve(form.vertexCount);
+		  auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		  auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+		  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
+		  fi::clpcon(form, textureSegments, workingFormVertices);
+		  doFill = false;
+		  break;
+		}
+		case TXHORF: {
+		  texture::setxt(form, textureSegments);
+		  fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
+		  doFill = false;
+		  break;
+		}
+		case TXANGF: {
+		  texture::setxt(form, textureSegments);
+		  StateMap->reset(StateFlag::ISUND);
+		  form::angclpfn(form, textureSegments, *AngledFormVertices);
+		  doFill = false;
+		  break;
+		}
+		default: {
+		  outDebugString(L"default hit in refilfn 2: fillType [{}]\n", form.fillType);
+		  break;
+		}
+	  }
+	  if (doFill) {
+		fi::lcon(form, groupIndexSequence, lineEndpoints, workingFormVertices);
+		fi::bakseq();
+		if (form.fillType != VRTF && form.fillType != TXVRTF) {
+		  rotationAngle = -rotationAngle;
+		  fi::rotbak(rotationAngle, rotationCenter);
+		}
+	  }
+	  fi::ritfil();
+	  LineSpacing = spacing;
 	  fi::chkbrd(form);
 	  break;
 	}
