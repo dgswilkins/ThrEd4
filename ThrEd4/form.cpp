@@ -4690,183 +4690,179 @@ void fi::lcon(FRM_HEAD const&              form,
   UNREFERENCED_PARAMETER(groupIndexSequence);
 #endif
 
-  if (!lineEndpoints.empty()) {
-	auto       sortedLineIndices = fi::getLineSortOrder(lineEndpoints);
-	auto const lineCount         = wrap::toUnsigned(sortedLineIndices.size());
-	auto       regions           = std::vector<REGION> {};
-	regions.emplace_back(0U, 0U, 0U, 0U);
-	auto breakLine = lineEndpoints[sortedLineIndices[0]].line;
-	for (auto iLine = 0U; iLine < lineCount; ++iLine) {
-	  if (breakLine != lineEndpoints[sortedLineIndices[iLine]].line) {
-		regions.back().end = iLine - 1U;
-		regions.emplace_back(iLine, 0U, 0U, 0U);
-		breakLine = lineEndpoints[sortedLineIndices[iLine]].line;
-	  }
+  if (lineEndpoints.empty()) {
+	return;
+  }
+  auto       sortedLineIndices = fi::getLineSortOrder(lineEndpoints);
+  auto const lineCount         = wrap::toUnsigned(sortedLineIndices.size());
+  auto       regions           = std::vector<REGION> {};
+  regions.emplace_back(0U, 0U, 0U, 0U);
+  auto breakLine = lineEndpoints[sortedLineIndices[0]].line;
+  for (auto iLine = 0U; iLine < lineCount; ++iLine) {
+	if (breakLine == lineEndpoints[sortedLineIndices[iLine]].line) {
+	  continue;
 	}
-	regions.back().end        = lineCount - 1U;
-	auto const regionCount    = wrap::toUnsigned(regions.size());
-	auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
-	for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
-	  auto count = 0U;
-	  if ((regions[iRegion].end - regions[iRegion].start) > 1) {
-		auto startGroup = lineEndpoints[sortedLineIndices[regions[iRegion].start]].group;
-		for (auto iLine = regions[iRegion].start + 1U; iLine <= regions[iRegion].end; ++iLine) {
-		  ++startGroup;
-		  if (lineEndpoints[sortedLineIndices[iLine]].group != startGroup) {
-			if (constexpr auto STLINE = 0U; count == 0U) {
-			  regions[iRegion].regionBreak = STLINE;
-			}
-			++count;
-			startGroup = lineEndpoints[sortedLineIndices[iLine]].group;
-		  }
-		}
-	  }
-	  regions[iRegion].breakCount = count;
+	regions.back().end = iLine - 1U;
+	regions.emplace_back(iLine, 0U, 0U, 0U);
+	breakLine = lineEndpoints[sortedLineIndices[iLine]].line;
+  }
+  regions.back().end        = lineCount - 1U;
+  auto const regionCount    = wrap::toUnsigned(regions.size());
+  auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
+  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
+	auto count = 0U;
+	if ((regions[iRegion].end - regions[iRegion].start) <= 1) {
+	  continue;
 	}
+	auto startGroup = lineEndpoints[sortedLineIndices[regions[iRegion].start]].group;
+	for (auto iLine = regions[iRegion].start + 1U; iLine <= regions[iRegion].end; ++iLine) {
+	  ++startGroup;
+	  if (lineEndpoints[sortedLineIndices[iLine]].group == startGroup) {
+		continue;
+	  }
+	  if (constexpr auto STLINE = 0U; count == 0U) {
+		regions[iRegion].regionBreak = STLINE;
+	  }
+	  ++count;
+	  startGroup = lineEndpoints[sortedLineIndices[iLine]].group;
+	}
+	regions[iRegion].breakCount = count;
+  }
 
 #if BUGSEQ
-	// Note - this debug code only works for vertical fill on a single form
-	auto bugColor = 0U;
-	for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
-	  for (auto iLine = regions[iRegion].start; iLine <= regions[iRegion].end; ++iLine) {
-		auto const* lineGroupPoint = &*sortedLines[iLine];
-		StitchBuffer->push_back(F_POINT_ATTR {lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor});
-		StitchBuffer->push_back(F_POINT_ATTR {lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor});
-	  }
-	  ++bugColor;
-	  bugColor &= 0xf;
+  // Note - this debug code only works for vertical fill on a single form
+  auto bugColor = 0U;
+  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
+	for (auto iLine = regions[iRegion].start; iLine <= regions[iRegion].end; ++iLine) {
+	  auto const* lineGroupPoint = &*sortedLines[iLine];
+	  StitchBuffer->push_back(F_POINT_ATTR {lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor});
+	  StitchBuffer->push_back(F_POINT_ATTR {lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor});
 	}
+	++bugColor;
+	bugColor &= 0xf;
+  }
 #else
-	BSequence->clear();
-	auto mapIndexSequence = std::vector<uint32_t> {};
-	mapIndexSequence.reserve(wrap::toSize(regionCount) + 1U);
-	auto pathMap = std::vector<R_CON> {};
-	if (auto sequencePath = std::vector<F_SEQ> {}; regionCount > 1) {
-	  auto pathMapIndex = 0U;
-	  // use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
-	  pathMap.reserve(wrap::toSize((regionCount * (regionCount - 1U)) / 2U) + 2U);
-	  for (auto iSequence = 0U; iSequence < regionCount; ++iSequence) {
-		mapIndexSequence.push_back(pathMapIndex);
-		auto count              = 0;
-		auto gapToClosestRegion = 0.0F;
-		for (auto iNode = 0U; iNode < regionCount; ++iNode) {
-		  if (iSequence != iNode) {
-			auto nextGroup = 0U;
-			if (auto const isConnected = regclos(
-			        groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
-			    isConnected) {
-			  pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
-			  ++pathMapIndex;
-			  ++count;
-			}
-		  }
-		}
-		while (count == 0) {
-		  gapToClosestRegion += LineSpacing;
-		  count = 0;
-		  for (auto iNode = 0U; iNode < regionCount; ++iNode) {
-			if (iSequence != iNode) {
-			  auto nextGroup = 0U;
-			  if (auto const isConnected = regclos(
-			          groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
-			      isConnected) {
-				pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
-				++pathMapIndex;
-				++count;
-			  }
-			}
-		  }
-		}
+  BSequence->clear();
+  auto mapIndexSequence = std::vector<uint32_t> {};
+  mapIndexSequence.reserve(wrap::toSize(regionCount) + 1U);
+  auto pathMap      = std::vector<R_CON> {};
+  auto sequencePath = std::vector<F_SEQ> {};
+  if (regionCount <= 1) {
+	constexpr auto SPATHIDX = 1U; // Sequence path index
+	sequencePath.resize(SPATHIDX);
+	auto lastGroup       = 0U;
+	sequencePath[0].node = 0;
+	wrap::narrow(sequencePath[0].nextGroup, lineEndpoints[sortedLineIndices[regions[0].end]].group);
+	sequencePath[0].skp = false;
+	durgn(form, sequencePath, visitedRegions, lineEndpoints, sortedLineIndices, 0, lineCount, regions, lastGroup, SPATHIDX, workingFormVertices);
+	return;
+  }
+  auto pathMapIndex = 0U;
+  // use the number of possible pairs of nodes n(n - 1)/2 and account for RegionCount possibly being odd
+  pathMap.reserve(wrap::toSize((regionCount * (regionCount - 1U)) / 2U) + 2U);
+  for (auto iSequence = 0U; iSequence < regionCount; ++iSequence) {
+	mapIndexSequence.push_back(pathMapIndex);
+	auto count              = 0;
+	auto gapToClosestRegion = 0.0F;
+	for (auto iNode = 0U; iNode < regionCount; ++iNode) {
+	  if (iSequence == iNode) {
+		continue;
 	  }
-	  mapIndexSequence.push_back(pathMapIndex);
-	  // find the leftmost region
-	  auto startGroup = std::numeric_limits<uint32_t>::max();
-	  auto leftRegion = 0U;
-	  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
-		if (auto const& lineGroupPoint = lineEndpoints[sortedLineIndices[regions[iRegion].start]];
-		    lineGroupPoint.group < startGroup) {
-		  startGroup = lineGroupPoint.group;
-		  leftRegion = iRegion;
-		}
+	  auto       nextGroup   = 0U;
+	  if (auto const isConnected = regclos(
+	          groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
+	      isConnected) {
+		pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
+		++pathMapIndex;
+		++count;
 	  }
-	  auto tempPath = std::vector<RG_SEQ> {};
-	  tempPath.resize(wrap::toSize((regionCount * (regionCount - 1U)) / 2U) + 1U);
-	  // find the leftmost region in pathMap
-	  auto sequencePathIndex = 1U;
-	  auto dontSkip          = true;
-	  auto inPath            = 0U;
-	  for (inPath = 0U; inPath < pathMapIndex; ++inPath) {
-		if (pathMap[inPath].node == leftRegion) {
-		  dontSkip = false;
-		  break;
+	}
+	while (count == 0) {
+	  gapToClosestRegion += LineSpacing;
+	  count = 0;
+	  for (auto iNode = 0U; iNode < regionCount; ++iNode) {
+		if (iSequence == iNode) {
+		  continue;
+		}
+		auto nextGroup = 0U;
+		if (auto const isConnected = regclos(
+		        groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
+		    isConnected) {
+		  pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
+		  ++pathMapIndex;
+		  ++count;
 		}
 	  }
-	  if (dontSkip) {
-		pathMap.push_back(R_CON {leftRegion, false, 0});
-		inPath = pathMapIndex;
-	  }
-	  // set the first entry in the temporary path to the leftmost region
-	  tempPath[0].pcon  = inPath;
-	  tempPath[0].count = 1;
-	  tempPath[0].skp   = false;
-	  visitedRegions.set(leftRegion);
-	  auto doneRegion   = leftRegion; // last region sequenced
-	  auto visitedIndex = 0;
-	  while (unvis(visitedRegions, visitedIndex)) {
-		nxtrgn(tempPath,
-		       pathMap,
-		       mapIndexSequence,
-		       visitedRegions,
-		       lineEndpoints,
-		       sortedLineIndices,
-		       regions,
-		       doneRegion,
-		       pathMapIndex,
-		       sequencePathIndex,
-		       visitedIndex);
-	  }
-	  auto count = std::numeric_limits<uint32_t>::max();
-	  sequencePath.reserve(sequencePathIndex);
-	  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
-		bool const tmpSkip = tempPath[iPath].skp;
-		uint16_t   tmpNode = 0U;
-		if (tempPath[iPath].pcon == std::numeric_limits<uint32_t>::max()) {
-		  wrap::narrow(tmpNode, tempPath[iPath].count);
-		  count = wrap::toUnsigned(tempPath[iPath].count);
-		}
-		else {
-		  if (tempPath[iPath].pcon != count) {
-			count = tempPath[iPath].pcon;
-			wrap::narrow(tmpNode, pathMap[tempPath[iPath].pcon].node);
-		  }
-		}
-		sequencePath.push_back(F_SEQ {tmpNode, 0, tmpSkip});
-	  }
-	  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
-		nxtseq(sequencePath, pathMap, mapIndexSequence, iPath);
-	  }
-	  visitedRegions.reset();
-	  auto lastGroup = 0U;
-	  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
-		outDebugString(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup);
-		if (!unvis(visitedRegions, visitedIndex)) {
-		  break;
-		}
-		durgn(form, sequencePath, visitedRegions, lineEndpoints, sortedLineIndices, iPath, lineCount, regions, lastGroup, sequencePathIndex, workingFormVertices);
-	  }
+	}
+  }
+  mapIndexSequence.push_back(pathMapIndex);
+  // find the leftmost region
+  auto startGroup = std::numeric_limits<uint32_t>::max();
+  auto leftRegion = 0U;
+  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
+	if (auto const& lineGroupPoint = lineEndpoints[sortedLineIndices[regions[iRegion].start]];
+	    lineGroupPoint.group < startGroup) {
+	  startGroup = lineGroupPoint.group;
+	  leftRegion = iRegion;
+	}
+  }
+  auto tempPath = std::vector<RG_SEQ> {};
+  tempPath.resize(wrap::toSize((regionCount * (regionCount - 1U)) / 2U) + 1U);
+  // find the leftmost region in pathMap
+  auto sequencePathIndex = 1U;
+  auto dontSkip          = true;
+  auto inPath            = 0U;
+  for (inPath = 0U; inPath < pathMapIndex; ++inPath) {
+	if (pathMap[inPath].node == leftRegion) {
+	  dontSkip = false;
+	  break;
+	}
+  }
+  if (dontSkip) {
+	pathMap.push_back(R_CON {leftRegion, false, 0});
+	inPath = pathMapIndex;
+  }
+  // set the first entry in the temporary path to the leftmost region
+  tempPath[0].pcon  = inPath;
+  tempPath[0].count = 1;
+  tempPath[0].skp   = false;
+  visitedRegions.set(leftRegion);
+  auto doneRegion   = leftRegion; // last region sequenced
+  auto visitedIndex = 0;
+  while (unvis(visitedRegions, visitedIndex)) {
+	nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, lineEndpoints, sortedLineIndices, regions, doneRegion, pathMapIndex, sequencePathIndex, visitedIndex);
+  }
+  auto count = std::numeric_limits<uint32_t>::max();
+  sequencePath.reserve(sequencePathIndex);
+  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
+	bool const tmpSkip = tempPath[iPath].skp;
+	uint16_t   tmpNode = 0U;
+	if (tempPath[iPath].pcon == std::numeric_limits<uint32_t>::max()) {
+	  wrap::narrow(tmpNode, tempPath[iPath].count);
+	  count = wrap::toUnsigned(tempPath[iPath].count);
 	}
 	else {
-	  constexpr auto SPATHIDX = 1U; // Sequence path index
-	  sequencePath.resize(SPATHIDX);
-	  auto lastGroup       = 0U;
-	  sequencePath[0].node = 0;
-	  wrap::narrow(sequencePath[0].nextGroup, lineEndpoints[sortedLineIndices[regions[0].end]].group);
-	  sequencePath[0].skp = false;
-	  durgn(form, sequencePath, visitedRegions, lineEndpoints, sortedLineIndices, 0, lineCount, regions, lastGroup, SPATHIDX, workingFormVertices);
+	  if (tempPath[iPath].pcon != count) {
+		count = tempPath[iPath].pcon;
+		wrap::narrow(tmpNode, pathMap[tempPath[iPath].pcon].node);
+	  }
 	}
+	sequencePath.push_back(F_SEQ {tmpNode, 0, tmpSkip});
+  }
+  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
+	nxtseq(sequencePath, pathMap, mapIndexSequence, iPath);
+  }
+  visitedRegions.reset();
+  auto lastGroup = 0U;
+  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
+	outDebugString(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup);
+	if (!unvis(visitedRegions, visitedIndex)) {
+	  break;
+	}
+	durgn(form, sequencePath, visitedRegions, lineEndpoints, sortedLineIndices, iPath, lineCount, regions, lastGroup, sequencePathIndex, workingFormVertices);
+  }
 
 #endif
-  }
 }
 
 void fi::bakseq() {
