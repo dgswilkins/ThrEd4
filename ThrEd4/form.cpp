@@ -4933,76 +4933,81 @@ void fi::bakseq() {
 			  yVal += UserStitchLength;
 			} while (true);
 			OSequence->back() = bCurrent;
+			break;
 		  }
-		  else {
-			OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
-			auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
-			            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
-			do {
-			  OSequence->push_back(F_POINT {0.0F, yVal});
-			  if (yVal < bPrevious.y) {
-				break;
-			  }
-			  OSequence->back().x = bCurrent.x;
-			  yVal -= UserStitchLength;
-			} while (true);
-			OSequence->back() = bPrevious;
-		  }
-		}
-		else {
-		  auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
-		              wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
-		  do {
-			OSequence->push_back(F_POINT {0.0F, yVal});
-			if (yVal > bCurrent.y) {
-			  break;
-			}
-			delta.y             = OSequence->back().y - bNext.y;
-			delta.x             = slope * delta.y;
-			OSequence->back().x = bNext.x + delta.x;
-			yVal += UserStitchLength;
-		  } while (true);
-		  OSequence->back() = bCurrent;
-		}
-		break;
-	  }
-	  case SEQBOT: {
-		if ((form.extendedAttribute & AT_SQR) == 0U) {
-		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
+		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
 		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
 		  do {
 			OSequence->push_back(F_POINT {0.0F, yVal});
-			if (yVal < bCurrent.y) {
+			if (yVal < bPrevious.y) {
 			  break;
 			}
-			delta.y             = OSequence->back().y - bNext.y;
-			delta.x             = slope * delta.y;
-			OSequence->back().x = bNext.x + delta.x;
+			OSequence->back().x = bCurrent.x;
 			yVal -= UserStitchLength;
 		  } while (true);
-		  OSequence->back() = bCurrent;
+		  OSequence->back() = bPrevious;
+		  break;
 		}
+		auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
+		            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
+		do {
+		  OSequence->push_back(F_POINT {0.0F, yVal});
+		  if (yVal > bCurrent.y) {
+			break;
+		  }
+		  delta.y             = OSequence->back().y - bNext.y;
+		  delta.x             = slope * delta.y;
+		  OSequence->back().x = bNext.x + delta.x;
+		  yVal += UserStitchLength;
+		} while (true);
+		OSequence->back() = bCurrent;
+		break;
+	  }
+	  case SEQBOT: {
+		if ((form.extendedAttribute & AT_SQR) != 0U) {
+		  break;
+		}
+		auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
+		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
+		do {
+		  OSequence->push_back(F_POINT {0.0F, yVal});
+		  if (yVal < bCurrent.y) {
+			break;
+		  }
+		  delta.y             = OSequence->back().y - bNext.y;
+		  delta.x             = slope * delta.y;
+		  OSequence->back().x = bNext.x + delta.x;
+		  yVal -= UserStitchLength;
+		} while (true);
+		OSequence->back() = bCurrent;
 		break;
 	  }
 	  case 0: {
 		delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 		StateMap->reset(StateFlag::FILDIR);
-		if (auto const length = hypot(delta.x, delta.y); length != 0.0F) {
-		  if (auto const userStitchLength2 = UserStitchLength * 2.0F; length > userStitchLength2) {
-			auto point = bNext;
-			auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
-			if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
-			  return;
-			}
-			auto const fCount = wrap::toFloat(count);
-			auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
-			while (count != 0U) {
-			  point.x += step.x;
-			  point.y += step.y;
-			  OSequence->push_back(F_POINT {point.x, point.y});
-			  --count;
-			}
-		  }
+		auto const length = hypot(delta.x, delta.y);
+		if (length == 0.0F) {
+		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+		  break;
+		}
+		auto const userStitchLength2 = UserStitchLength * 2.0F;
+		if (length <= userStitchLength2) {
+		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+		  break;
+		}
+		auto point = bNext; //intended copy
+		auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
+		if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
+		  return;
+		}
+		auto const fCount = wrap::toFloat(count);
+		auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
+		while (count != 0U) {
+		  point.x += step.x;
+		  point.y += step.y;
+		  OSequence->push_back(F_POINT {point.x, point.y});
+		  --count;
 		}
 		OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
 		break;
