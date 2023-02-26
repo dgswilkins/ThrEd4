@@ -5018,14 +5018,14 @@ void fi::bakseq() {
 #endif // BUGSEQ
 }
 
-auto form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) -> F_POINT {
+void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
   auto       point  = stitchPoint;
   auto const delta  = F_POINT {(inPoint.x - stitchPoint.x), (inPoint.y - stitchPoint.y)};
   auto const length = hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
 	OSequence->push_back(inPoint);
-	return inPoint;
+	return;
   }
 
   if (StateMap->test(StateFlag::FILDIR)) {
@@ -5039,17 +5039,16 @@ auto form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) -> F_POINT
 	OSequence->push_back(point);
 	--count;
   }
-  return inPoint;
 }
 
-auto form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) -> F_POINT {
+void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
   auto const delta  = F_POINT {(currentPoint.x - stitchPoint.x), (currentPoint.y - stitchPoint.y)};
   auto       point  = stitchPoint;
   auto const length = hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
 	OSequence->push_back(currentPoint);
-	return currentPoint;
+	return;
   }
   if (StateMap->test(StateFlag::FILDIR)) {
 	++count;
@@ -5062,7 +5061,6 @@ auto form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) -> F_P
 	OSequence->push_back(point);
 	--count;
   }
-  return currentPoint;
 }
 
 void fi::dudif(F_POINT const& start, F_POINT const& finish, F_POINT& delta) noexcept {

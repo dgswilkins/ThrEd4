@@ -1018,15 +1018,19 @@ void si::satfn(FRM_HEAD const&           form,
 		  line2Point.y += line2Step.y;
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			if (UserFlagMap->test(UserFlag::SQRFIL)) {
-			  stitchPoint = form::filinu(line2Point, stitchPoint);
+			  form::filinu(line2Point, stitchPoint);
+			  stitchPoint = line2Point;
 			}
-			stitchPoint = form::filin(line1Point, stitchPoint);
+			form::filin(line1Point, stitchPoint);
+			stitchPoint = line1Point;
 		  }
 		  else {
 			if (UserFlagMap->test(UserFlag::SQRFIL)) {
-			  stitchPoint = form::filinu(line1Point, stitchPoint);
+			  form::filinu(line1Point, stitchPoint);
+			  stitchPoint = line1Point;
 			}
-			stitchPoint = form::filin(line2Point, stitchPoint);
+			form::filin(line2Point, stitchPoint);
+			stitchPoint = line2Point;
 		  }
 		  --line1Count;
 		  --line2Count;
