@@ -5045,21 +5045,21 @@ auto form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) -> F_P
   auto const delta  = F_POINT {(currentPoint.x - stitchPoint.x), (currentPoint.y - stitchPoint.y)};
   auto       point  = stitchPoint;
   auto const length = hypot(delta.x, delta.y);
-  if (auto count = wrap::round<uint32_t>(length / UserStitchLength); count != 0U) {
-	if (StateMap->test(StateFlag::FILDIR)) {
-	  ++count;
-	}
-	auto const fCount = wrap::toFloat(count);
-	auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
-	while (count > 0) {
-	  point.x += step.x;
-	  point.y += step.y;
-	  OSequence->push_back(point);
-	  --count;
-	}
-  }
-  else {
+  auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
+  if (count == 0U) {
 	OSequence->push_back(currentPoint);
+	return currentPoint;
+  }
+  if (StateMap->test(StateFlag::FILDIR)) {
+	++count;
+  }
+  auto const fCount = wrap::toFloat(count);
+  auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
+  while (count > 0) {
+	point.x += step.x;
+	point.y += step.y;
+	OSequence->push_back(point);
+	--count;
   }
   return currentPoint;
 }
