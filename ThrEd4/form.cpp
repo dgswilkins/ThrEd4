@@ -2623,29 +2623,31 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 		++iPoint;
 	  }
 	}
-	if (iPoint > 1) {
-	  auto const evenPointCount = (iPoint & 0xfffffffe);
-	  groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
-	  std::ranges::sort(projectedPoints, fi::fplComp);
-	  iPoint                    = 0;
-	  auto const savedLineCount = lineEndpoints.size();
-	  while (iPoint < evenPointCount) {
-		if (lineEndpoints.size() < fillLineCount) {
-		  lineEndpoints.push_back(SMAL_PNT_L {projectedPoints[iPoint].line,
-		                                      lineGroupIndex,
-		                                      projectedPoints[iPoint].x,
-		                                      projectedPoints[iPoint].y});
-		  ++iPoint;
-		  lineEndpoints.push_back(SMAL_PNT_L {projectedPoints[iPoint].line,
-		                                      lineGroupIndex,
-		                                      projectedPoints[iPoint].x,
-		                                      projectedPoints[iPoint].y});
-		  ++iPoint;
-		}
+	if (iPoint <= 1) {
+	  continue;
+	}
+	auto const evenPointCount = (iPoint & 0xfffffffe);
+	groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
+	std::ranges::sort(projectedPoints, fi::fplComp);
+	iPoint                    = 0;
+	auto const savedLineCount = lineEndpoints.size();
+	while (iPoint < evenPointCount) {
+	  if (lineEndpoints.size() >= fillLineCount) {
+		continue;
 	  }
-	  if (lineEndpoints.size() != savedLineCount) {
-		++lineGroupIndex;
-	  }
+	  lineEndpoints.push_back(SMAL_PNT_L {projectedPoints[iPoint].line,
+	                                      lineGroupIndex,
+	                                      projectedPoints[iPoint].x,
+	                                      projectedPoints[iPoint].y});
+	  ++iPoint;
+	  lineEndpoints.push_back(SMAL_PNT_L {projectedPoints[iPoint].line,
+	                                      lineGroupIndex,
+	                                      projectedPoints[iPoint].x,
+	                                      projectedPoints[iPoint].y});
+	  ++iPoint;
+	}
+	if (lineEndpoints.size() != savedLineCount) {
+	  ++lineGroupIndex;
 	}
   }
   groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
