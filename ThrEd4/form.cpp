@@ -4574,69 +4574,63 @@ void fi::durgn(FRM_HEAD const&                form,
 	  }
 	}
   }
-  if (auto sequenceIndex = wrap::toUnsigned(lineEndpoints.size() + 1U); currentRegion.breakCount != 0U) {
+  auto sequenceIndex = wrap::toUnsigned(lineEndpoints.size() + 1U);
+  if (currentRegion.breakCount != 0U) {
 	if (dun) {
 	  brkdun(lineEndpoints, sortedLineIndices, seql, seqn, workingFormVertices);
+	  return;
 	}
-	else {
-	  if (lastGroup >= groupEnd) {
-		brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
-		if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-		  brkseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
-		}
+	if (lastGroup >= groupEnd) {
+	  brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
+	  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
+		brkseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
 	  }
-	  else {
-		if (groupStart <= nextGroup) {
-		  if (seql != sequenceStart) {
-			brkseq(lineEndpoints, sortedLineIndices, seql, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
-		  }
-		  brkseq(lineEndpoints, sortedLineIndices, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
-		  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-			brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceIndex);
-		  }
-		}
-		else {
-		  if (seql != sequenceEnd) {
-			brkseq(lineEndpoints, sortedLineIndices, seql, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
-		  }
-		  brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
-		  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
-			brkseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
-		  }
-		}
-	  }
+	  return;
 	}
+	if (groupStart <= nextGroup) {
+	  if (seql != sequenceStart) {
+		brkseq(lineEndpoints, sortedLineIndices, seql, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
+	  }
+	  brkseq(lineEndpoints, sortedLineIndices, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
+	  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
+		brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceIndex);
+	  }
+	  return;
+	}
+	if (seql != sequenceEnd) {
+	  brkseq(lineEndpoints, sortedLineIndices, seql, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
+	}
+	brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
+	if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
+	  brkseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
+	}
+	return;
   }
-  else {
-	if (dun) {
-	  dunseq(lineEndpoints, sortedLineIndices, seql, seqn, lastGroup);
+  if (dun) {
+	dunseq(lineEndpoints, sortedLineIndices, seql, seqn, lastGroup);
+	return;
+  }
+  if (lastGroup >= groupEnd) {
+	duseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
+	duseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
+	return;
+  }
+  if (groupStart <= nextGroup) {
+	if (seql != sequenceStart) {
+	  duseq(lineEndpoints, sortedLineIndices, seql, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
 	}
-	else {
-	  if (lastGroup >= groupEnd) {
-		duseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
-		duseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
-	  }
-	  else {
-		if (groupStart <= nextGroup) {
-		  if (seql != sequenceStart) {
-			duseq(lineEndpoints, sortedLineIndices, seql, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
-		  }
-		  duseq(lineEndpoints, sortedLineIndices, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
-		  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-			duseq(lineEndpoints, sortedLineIndices, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceIndex);
-		  }
-		}
-		else {
-		  if (seql != sequenceEnd) {
-			duseq(lineEndpoints, sortedLineIndices, seql, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
-		  }
-		  duseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
-		  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
-			duseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
-		  }
-		}
-	  }
+	duseq(lineEndpoints, sortedLineIndices, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
+	if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
+	  duseq(lineEndpoints, sortedLineIndices, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceIndex);
 	}
+	return;
+  }
+  if (seql != sequenceEnd) {
+	duseq(lineEndpoints, sortedLineIndices, seql, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
+  }
+  duseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
+  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
+	duseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
   }
 }
 
