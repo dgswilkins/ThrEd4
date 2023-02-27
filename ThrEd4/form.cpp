@@ -4144,22 +4144,25 @@ void fi::nxtrgn(std::vector<RG_SEQ>&           tempPath,
 	auto       minimumLength = BIGFLOAT;
 	auto const regionCount   = visitedRegions.size();
 	for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
-	  if (!visitedRegions[iRegion]) {
-		if (auto const length = reglen(lineEndpoints, sortedLineIndices, iRegion, lastRegionCorners, regionsList);
-		    length < minimumLength) {
-		  minimumLength = length;
-		  newRegion     = iRegion;
-		}
+	  if (visitedRegions[iRegion]) {
+		continue;
 	  }
+	  auto const length = reglen(lineEndpoints, sortedLineIndices, iRegion, lastRegionCorners, regionsList);
+	  if (length >= minimumLength) {
+		continue;
+	  }
+	  minimumLength = length;
+	  newRegion     = iRegion;
 	}
 	tempPath[sequencePathIndex].skp = true;
 	for (auto iPath = 0U; iPath < pathMapIndex; ++iPath) {
-	  if (pathMap[iPath].node == newRegion) {
-		tempPath[sequencePathIndex++].pcon = iPath;
-		visitedRegions.set(newRegion);
-		doneRegion = newRegion;
-		return;
+	  if (pathMap[iPath].node != newRegion) {
+		continue;
 	  }
+	  tempPath[sequencePathIndex++].pcon = iPath;
+	  visitedRegions.set(newRegion);
+	  doneRegion = newRegion;
+	  return;
 	}
 	tempPath[sequencePathIndex].count  = visitedIndex;
 	tempPath[sequencePathIndex++].pcon = MAXDWORD;
