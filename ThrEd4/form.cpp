@@ -3096,25 +3096,25 @@ auto fi::isin(FRM_HEAD const&             form,
   for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; ++iRegion) {
 	auto const iVertex       = regionCrossingData[iRegion].vertex;
 	auto const itStartVertex = wrap::next(currentFormVertices.cbegin(), iVertex);
-	if (auto const itEndVertex = wrap::next(currentFormVertices.cbegin(), form::nxt(form, iVertex));
-	    projv(xCoordinate, *itStartVertex, *itEndVertex, point)) {
-	  if (point.y > yCoordinate) {
-		if (!util::closeEnough(itStartVertex->x, xCoordinate) && !util::closeEnough(itEndVertex->x, xCoordinate)) {
-		  ++count;
-		}
-		else {
-		  if (itStartVertex->x < itEndVertex->x) {
-			if (!util::closeEnough(itEndVertex->x, xCoordinate)) {
-			  ++count;
-			}
-		  }
-		  else {
-			if (!util::closeEnough(itStartVertex->x, xCoordinate)) {
-			  ++count;
-			}
-		  }
-		}
+	auto const itEndVertex   = wrap::next(currentFormVertices.cbegin(), form::nxt(form, iVertex));
+	if (!projv(xCoordinate, *itStartVertex, *itEndVertex, point)) {
+	  continue;
+	}
+	if (point.y <= yCoordinate) {
+	  continue;
+	}
+	if (!util::closeEnough(itStartVertex->x, xCoordinate) && !util::closeEnough(itEndVertex->x, xCoordinate)) {
+	  ++count;
+	  continue;
+	}
+	if (itStartVertex->x < itEndVertex->x) {
+	  if (!util::closeEnough(itEndVertex->x, xCoordinate)) {
+		++count;
 	  }
+	  continue;
+	}
+	if (!util::closeEnough(itStartVertex->x, xCoordinate)) {
+	  ++count;
 	}
   }
   return (count & 1U) != 0U;
