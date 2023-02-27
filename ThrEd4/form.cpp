@@ -2852,169 +2852,169 @@ public:
 
   auto const start = form.angleOrClipData.guide.start;
   // ToDo - Find a better way to avoid crashing than clamping it if start is after finish
-  if (auto const finish = form.angleOrClipData.guide.finish; start < finish) {
-	auto       itFirstVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	auto const itSelectedVertex = wrap::next(itFirstVertex, start);
-	auto const lowVertexIndex   = start;
-	auto const highVertexIndex  = form.vertexCount - start - 1U;
-	auto       lowCounts        = std::vector<uint32_t> {};
-	lowCounts.resize(lowVertexIndex);
-	auto highCounts = std::vector<uint32_t> {};
-	highCounts.resize(highVertexIndex);
-	auto lowLengths = std::vector<float> {};
-	lowLengths.resize(lowVertexIndex);
-	auto highLengths = std::vector<float> {};
-	highLengths.resize(highVertexIndex);
-	auto lowDeltas = std::vector<F_POINT> {};
-	lowDeltas.resize(lowVertexIndex);
-	auto highDeltas = std::vector<F_POINT> {};
-	highDeltas.resize(highVertexIndex);
-	auto lowSteps = std::vector<F_POINT> {};
-	lowSteps.resize(lowVertexIndex);
-	auto highSteps = std::vector<F_POINT> {};
-	highSteps.resize(highVertexIndex);
-	auto lowVertices = std::vector<F_POINT> {};
-	lowVertices.resize(lowVertexIndex);
-	auto highVertices = std::vector<F_POINT> {};
-	highVertices.resize(highVertexIndex);
-	auto lowLength = 0.0F;
-	OSequence->clear();
-	auto lowIndex = 0U;
-	{
-	  auto itVertex = wrap::next(itFirstVertex, lowVertexIndex);
-	  for (auto iVertex = lowVertexIndex; iVertex != 0; --iVertex) {
-		lowVertices[lowIndex] = *itVertex;
-		auto itPreviousVertex = wrap::next(itVertex, -1);
-		lowDeltas[lowIndex] =
-		    F_POINT {itPreviousVertex->x - itVertex->x, itPreviousVertex->y - itVertex->y};
-		lowLengths[lowIndex] = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
-		lowLength += lowLengths[lowIndex];
-		++lowIndex;
-		--itVertex;
-	  }
+  auto const finish = form.angleOrClipData.guide.finish;
+  if (start >= finish) {
+	return;
+  }
+  auto       itFirstVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto const itSelectedVertex = wrap::next(itFirstVertex, start);
+  auto const lowVertexIndex   = start;
+  auto const highVertexIndex  = form.vertexCount - start - 1U;
+  auto       lowCounts        = std::vector<uint32_t> {};
+  lowCounts.resize(lowVertexIndex);
+  auto highCounts = std::vector<uint32_t> {};
+  highCounts.resize(highVertexIndex);
+  auto lowLengths = std::vector<float> {};
+  lowLengths.resize(lowVertexIndex);
+  auto highLengths = std::vector<float> {};
+  highLengths.resize(highVertexIndex);
+  auto lowDeltas = std::vector<F_POINT> {};
+  lowDeltas.resize(lowVertexIndex);
+  auto highDeltas = std::vector<F_POINT> {};
+  highDeltas.resize(highVertexIndex);
+  auto lowSteps = std::vector<F_POINT> {};
+  lowSteps.resize(lowVertexIndex);
+  auto highSteps = std::vector<F_POINT> {};
+  highSteps.resize(highVertexIndex);
+  auto lowVertices = std::vector<F_POINT> {};
+  lowVertices.resize(lowVertexIndex);
+  auto highVertices = std::vector<F_POINT> {};
+  highVertices.resize(highVertexIndex);
+  auto lowLength = 0.0F;
+  OSequence->clear();
+  auto lowIndex = 0U;
+  {
+	auto itVertex = wrap::next(itFirstVertex, lowVertexIndex);
+	for (auto iVertex = lowVertexIndex; iVertex != 0; --iVertex) {
+	  lowVertices[lowIndex] = *itVertex;
+	  auto itPreviousVertex = wrap::next(itVertex, -1);
+	  lowDeltas[lowIndex] =
+	      F_POINT {itPreviousVertex->x - itVertex->x, itPreviousVertex->y - itVertex->y};
+	  lowLengths[lowIndex] = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
+	  lowLength += lowLengths[lowIndex];
+	  ++lowIndex;
+	  --itVertex;
 	}
-	auto const selectedVertexCount = finish - start;
-	auto       polyLines           = std::vector<P_VEC> {};
-	polyLines.resize(selectedVertexCount);
-	{
-	  auto selind   = 0U;
-	  auto itVertex = wrap::next(itFirstVertex, start + 1);
-	  for (auto iVertex = start + 1U; iVertex <= finish; ++iVertex) {
-		auto const delta =
-		    F_POINT {itVertex->x - itSelectedVertex->x, itVertex->y - itSelectedVertex->y};
-		polyLines[selind] = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
-		++selind;
-		++itVertex;
-	  }
+  }
+  auto const selectedVertexCount = finish - start;
+  auto       polyLines           = std::vector<P_VEC> {};
+  polyLines.resize(selectedVertexCount);
+  {
+	auto selind   = 0U;
+	auto itVertex = wrap::next(itFirstVertex, start + 1);
+	for (auto iVertex = start + 1U; iVertex <= finish; ++iVertex) {
+	  auto const delta = F_POINT {itVertex->x - itSelectedVertex->x, itVertex->y - itSelectedVertex->y};
+	  polyLines[selind] = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
+	  ++selind;
+	  ++itVertex;
 	}
-	auto highIndex  = 0U;
-	auto highLength = 0.0F;
-	{
-	  auto itFinishVertex = wrap::next(itFirstVertex, finish);
-	  auto itNextVertex   = wrap::next(itFinishVertex, 1);
-	  for (auto iVertex = finish; iVertex < form.vertexCount - 1U; ++iVertex) {
-		highVertices[highIndex] = *itFinishVertex;
-		highDeltas[highIndex] =
-		    F_POINT {itNextVertex->x - itFinishVertex->x, itNextVertex->y - itFinishVertex->y};
-		highLengths[highIndex] = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
-		highLength += highLengths[highIndex];
-		++highIndex;
-		++itFinishVertex;
-		++itNextVertex;
-	  }
-	}
-	auto lowSpacing  = form.fillSpacing;
-	auto highSpacing = lowSpacing;
-	if (highLength < lowLength) {
-	  highSpacing = form.fillSpacing * highLength / lowLength;
-	}
-	else {
-	  lowSpacing = form.fillSpacing * lowLength / highLength;
-	}
-	for (auto iVertex = 0U; iVertex < lowVertexIndex; ++iVertex) {
-	  lowCounts[iVertex] = wrap::round<uint32_t>(lowLengths[iVertex] / lowSpacing);
-	  lowSteps[iVertex]  = F_POINT {lowDeltas[iVertex].x / wrap::toFloat(lowCounts[iVertex]),
-                                   lowDeltas[iVertex].y / wrap::toFloat(lowCounts[iVertex])};
-	}
-	for (auto iVertex = 0U; iVertex < highVertexIndex; ++iVertex) {
-	  highCounts[iVertex] = wrap::round<uint32_t>(highLengths[iVertex] / highSpacing);
-	  highSteps[iVertex]  = F_POINT {highDeltas[iVertex].x / wrap::toFloat(highCounts[iVertex]),
-                                    highDeltas[iVertex].y / wrap::toFloat(highCounts[iVertex])};
-	}
-	lowIndex = highIndex = 0;
-	StateMap->reset(StateFlag::FILDIR);
-	auto lowCount       = 0U;
-	auto highCount      = 0U;
+  }
+  auto highIndex  = 0U;
+  auto highLength = 0.0F;
+  {
 	auto itFinishVertex = wrap::next(itFirstVertex, finish);
-	auto itStartVertex  = wrap::next(itFirstVertex, start);
-	auto delta = F_POINT {itFinishVertex->x - itStartVertex->x, itFinishVertex->y - itStartVertex->y};
-	auto const reference = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
-	auto       lowStep   = F_POINT {};
-	auto       lowPoint  = F_POINT {};
-	auto       highStep  = F_POINT {};
-	auto       highPoint = F_POINT {};
-	while ((lowCount != 0U) || (lowIndex < lowVertexIndex && highIndex < highVertexIndex)) {
-	  if (lowCount != 0U) {
-		--lowCount;
-	  }
-	  else {
-		if (lowIndex < lowVertexIndex) {
-		  lowCount = lowCounts[lowIndex];
-		  lowStep  = lowSteps[lowIndex];
-		  lowPoint = lowVertices[lowIndex];
-		  ++lowIndex;
-		}
-	  }
-	  if (highCount != 0U) {
-		--highCount;
-	  }
-	  else {
-		if (highIndex < highVertexIndex) {
-		  highCount = highCounts[highIndex];
-		  highStep  = highSteps[highIndex];
-		  highPoint = highVertices[highIndex];
-		  ++highIndex;
-		}
-	  }
-	  delta = F_POINT {highPoint.x - lowPoint.x, highPoint.y - lowPoint.y};
-
-	  if (constexpr auto REFFACT = 0.9F; // reduction factor for the reference
-	      reference.length > REFFACT * LineSpacing) {
-		auto const polyLine = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
-		if (auto const polyDiff =
-		        P_VEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
-		    StateMap->testAndFlip(StateFlag::FILDIR)) {
-		  OSequence->push_back(F_POINT {lowPoint});
-		  for (auto iVertex = 0U; iVertex < (selectedVertexCount - 1); ++iVertex) {
-			auto const length = polyLines[iVertex].length * polyDiff.length;
-			auto const angle  = polyLines[iVertex].angle + polyDiff.angle;
-			OSequence->push_back(F_POINT {lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length});
-		  }
-		}
-		else {
-		  OSequence->push_back(F_POINT {highPoint});
-		  for (auto iVertex = selectedVertexCount - 1U; iVertex != 0; --iVertex) {
-			auto const length = polyLines[iVertex - 1U].length * polyDiff.length;
-			auto const angle  = polyLines[iVertex - 1U].angle + polyDiff.angle;
-			OSequence->push_back(F_POINT {lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length});
-		  }
-		}
-	  }
-	  lowPoint.x += lowStep.x;
-	  lowPoint.y += lowStep.y;
-	  highPoint.x += highStep.x;
-	  highPoint.y += highStep.y;
+	auto itNextVertex   = wrap::next(itFinishVertex, 1);
+	for (auto iVertex = finish; iVertex < form.vertexCount - 1U; ++iVertex) {
+	  highVertices[highIndex] = *itFinishVertex;
+	  highDeltas[highIndex] =
+	      F_POINT {itNextVertex->x - itFinishVertex->x, itNextVertex->y - itFinishVertex->y};
+	  highLengths[highIndex] = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
+	  highLength += highLengths[highIndex];
+	  ++highIndex;
+	  ++itFinishVertex;
+	  ++itNextVertex;
 	}
-	if (StateMap->test(StateFlag::FILDIR)) {
-	  OSequence->push_back(*itFirstVertex);
+  }
+  auto lowSpacing  = form.fillSpacing;
+  auto highSpacing = lowSpacing;
+  if (highLength < lowLength) {
+	highSpacing = form.fillSpacing * highLength / lowLength;
+  }
+  else {
+	lowSpacing = form.fillSpacing * lowLength / highLength;
+  }
+  for (auto iVertex = 0U; iVertex < lowVertexIndex; ++iVertex) {
+	lowCounts[iVertex] = wrap::round<uint32_t>(lowLengths[iVertex] / lowSpacing);
+	lowSteps[iVertex]  = F_POINT {lowDeltas[iVertex].x / wrap::toFloat(lowCounts[iVertex]),
+                                 lowDeltas[iVertex].y / wrap::toFloat(lowCounts[iVertex])};
+  }
+  for (auto iVertex = 0U; iVertex < highVertexIndex; ++iVertex) {
+	highCounts[iVertex] = wrap::round<uint32_t>(highLengths[iVertex] / highSpacing);
+	highSteps[iVertex]  = F_POINT {highDeltas[iVertex].x / wrap::toFloat(highCounts[iVertex]),
+                                  highDeltas[iVertex].y / wrap::toFloat(highCounts[iVertex])};
+  }
+  lowIndex = highIndex = 0;
+  StateMap->reset(StateFlag::FILDIR);
+  auto lowCount       = 0U;
+  auto highCount      = 0U;
+  auto itFinishVertex = wrap::next(itFirstVertex, finish);
+  auto itStartVertex  = wrap::next(itFirstVertex, start);
+  auto delta = F_POINT {itFinishVertex->x - itStartVertex->x, itFinishVertex->y - itStartVertex->y};
+  auto const reference = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
+  auto       lowStep   = F_POINT {};
+  auto       lowPoint  = F_POINT {};
+  auto       highStep  = F_POINT {};
+  auto       highPoint = F_POINT {};
+  while ((lowCount != 0U) || (lowIndex < lowVertexIndex && highIndex < highVertexIndex)) {
+	if (lowCount != 0U) {
+	  --lowCount;
 	}
 	else {
-	  auto itLastVertex = wrap::next(itFirstVertex, form.vertexCount - 1U);
-	  OSequence->push_back(*itLastVertex);
+	  if (lowIndex < lowVertexIndex) {
+		lowCount = lowCounts[lowIndex];
+		lowStep  = lowSteps[lowIndex];
+		lowPoint = lowVertices[lowIndex];
+		++lowIndex;
+	  }
 	}
-	if (form.lengthOrCount.stitchLength < MinStitchLength) {
-	  form.lengthOrCount.stitchLength = MinStitchLength;
+	if (highCount != 0U) {
+	  --highCount;
 	}
+	else {
+	  if (highIndex < highVertexIndex) {
+		highCount = highCounts[highIndex];
+		highStep  = highSteps[highIndex];
+		highPoint = highVertices[highIndex];
+		++highIndex;
+	  }
+	}
+	delta = F_POINT {highPoint.x - lowPoint.x, highPoint.y - lowPoint.y};
+
+	if (constexpr auto REFFACT = 0.9F; // reduction factor for the reference
+	    reference.length > REFFACT * LineSpacing) {
+	  auto const polyLine = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
+	  if (auto const polyDiff = P_VEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
+	      StateMap->testAndFlip(StateFlag::FILDIR)) {
+		OSequence->push_back(F_POINT {lowPoint});
+		for (auto iVertex = 0U; iVertex < (selectedVertexCount - 1); ++iVertex) {
+		  auto const length = polyLines[iVertex].length * polyDiff.length;
+		  auto const angle  = polyLines[iVertex].angle + polyDiff.angle;
+		  OSequence->push_back(F_POINT {lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length});
+		}
+	  }
+	  else {
+		OSequence->push_back(F_POINT {highPoint});
+		for (auto iVertex = selectedVertexCount - 1U; iVertex != 0; --iVertex) {
+		  auto const length = polyLines[iVertex - 1U].length * polyDiff.length;
+		  auto const angle  = polyLines[iVertex - 1U].angle + polyDiff.angle;
+		  OSequence->push_back(F_POINT {lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length});
+		}
+	  }
+	}
+	lowPoint.x += lowStep.x;
+	lowPoint.y += lowStep.y;
+	highPoint.x += highStep.x;
+	highPoint.y += highStep.y;
+  }
+  if (StateMap->test(StateFlag::FILDIR)) {
+	OSequence->push_back(*itFirstVertex);
+  }
+  else {
+	auto itLastVertex = wrap::next(itFirstVertex, form.vertexCount - 1U);
+	OSequence->push_back(*itLastVertex);
+  }
+  if (form.lengthOrCount.stitchLength < MinStitchLength) {
+	form.lengthOrCount.stitchLength = MinStitchLength;
   }
 }
 
