@@ -3800,27 +3800,28 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 }
 
 void fi::angout(FRM_HEAD& angledForm) {
-  if (angledForm.vertexCount != 0U) {
-	auto* rectangle = &angledForm.rectangle;
-	auto  itVertex  = wrap::next(FormVertices->cbegin(), angledForm.vertexIndex);
-	rectangle->left = rectangle->right = itVertex->x;
-	rectangle->bottom = rectangle->top = itVertex->y;
-	++itVertex;
-	for (auto iVertex = 1U; iVertex < angledForm.vertexCount; ++iVertex) {
-	  if (itVertex->x > rectangle->right) {
-		rectangle->right = itVertex->x;
-	  }
-	  if (itVertex->x < rectangle->left) {
-		rectangle->left = itVertex->x;
-	  }
-	  if (itVertex->y < rectangle->bottom) {
-		rectangle->bottom = itVertex->y;
-	  }
-	  if (itVertex->y > rectangle->top) {
-		rectangle->top = itVertex->y;
-	  }
-	  ++itVertex;
+  if (angledForm.vertexCount == 0U) {
+	return;
+  }
+  auto* rectangle = &angledForm.rectangle;
+  auto  itVertex  = wrap::next(FormVertices->cbegin(), angledForm.vertexIndex);
+  rectangle->left = rectangle->right = itVertex->x;
+  rectangle->bottom = rectangle->top = itVertex->y;
+  ++itVertex;
+  for (auto iVertex = 1U; iVertex < angledForm.vertexCount; ++iVertex) {
+	if (itVertex->x > rectangle->right) {
+	  rectangle->right = itVertex->x;
 	}
+	if (itVertex->x < rectangle->left) {
+	  rectangle->left = itVertex->x;
+	}
+	if (itVertex->y < rectangle->bottom) {
+	  rectangle->bottom = itVertex->y;
+	}
+	if (itVertex->y > rectangle->top) {
+	  rectangle->top = itVertex->y;
+	}
+	++itVertex;
   }
 }
 
