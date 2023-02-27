@@ -2740,13 +2740,14 @@ void fi::plfn(FRM_HEAD const&              form,
 }
 
 void fi::plbak(uint32_t backPoint) noexcept(std::is_same_v<size_t, uint32_t>) {
-  if ((!OSequence->empty()) && (backPoint < (OSequence->size() - 1U))) {
-	auto iSequence = wrap::toUnsigned(OSequence->size() - 1U);
-	while (iSequence > backPoint) {
-	  std::swap(OSequence->operator[](iSequence), OSequence->operator[](backPoint));
-	  --iSequence;
-	  ++backPoint;
-	}
+  if ((OSequence->empty()) || (backPoint >= (OSequence->size() - 1U))) {
+	return;
+  }
+  auto iSequence = wrap::toUnsigned(OSequence->size() - 1U);
+  while (iSequence > backPoint) {
+	std::swap(OSequence->operator[](iSequence), OSequence->operator[](backPoint));
+	--iSequence;
+	++backPoint;
   }
 }
 
