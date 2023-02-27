@@ -2503,77 +2503,78 @@ void fi::dubfn(FRM_HEAD const& currentForm) {
 }
 
 void fi::chkbrd(FRM_HEAD const& form) {
-  if (form.edgeType != 0U) {
-	switch (form.edgeType & NEGUND) {
-	  case EDGELINE: { // Line
-		brdfil(form);
-		break;
-	  }
-	  case EDGEBEAN: { // Bean
-		bold(form);
-		break;
-	  }
-	  case EDGECLIP: { // Clipboard
-		auto clipRect = F_RECTANGLE {};
-		clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-		clip::clpbrd(form, clipRect, form::getlast(form));
-		break;
-	  }
-	  case EDGECLIPX: { // Even Clipboard
-		auto clipRect = F_RECTANGLE {};
-		clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-		clip::duxclp(form);
-		break;
-	  }
-	  case EDGEANGSAT: { // Angle Satin
-		satin::sbrd(form);
-		break;
-	  }
-	  case EDGEPROPSAT: { // Proportional Satin
-		pbrd(form);
-		break;
-	  }
-	  case EDGEAPPL: { // Applique
-		apbrd(form);
-		ritapbrd();
-		satin::sbrd(form);
-		break;
-	  }
-	  case EDGEBHOL: { // BH Buttonhole
-		auto const length      = ButtonholeCornerLength;
-		ButtonholeCornerLength = form::getblen();
-		satin::satout(form, BHWIDTH);
-		bhbrd(form);
-		ButtonholeCornerLength = length;
-		break;
-	  }
-	  case EDGEPICOT: { // Picot
-		auto clipRect = F_RECTANGLE {};
-		clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-		clip::clpic(form, clipRect);
-		break;
-	  }
-	  case EDGEDOUBLE: { // Double
-		dubfn(form);
-		break;
-	  }
-	  case EDGELCHAIN: { // Lin Chain
-		StateMap->set(StateFlag::LINCHN);
-		clip::chnfn(form);
-		break;
-	  }
-	  case EDGEOCHAIN: { // Open Chain
-		StateMap->reset(StateFlag::LINCHN);
-		clip::chnfn(form);
-		break;
-	  }
-	  default: {
-		outDebugString(L"default hit in chkbrd: edgeType [{}]\n", form.edgeType & NEGUND);
-		break;
-	  }
-	}
-	ritbrd(form);
+  if (form.edgeType == 0U) {
+	return;
   }
+  switch (form.edgeType & NEGUND) {
+	case EDGELINE: { // Line
+	  brdfil(form);
+	  break;
+	}
+	case EDGEBEAN: { // Bean
+	  bold(form);
+	  break;
+	}
+	case EDGECLIP: { // Clipboard
+	  auto clipRect = F_RECTANGLE {};
+	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+	  clip::clpbrd(form, clipRect, form::getlast(form));
+	  break;
+	}
+	case EDGECLIPX: { // Even Clipboard
+	  auto clipRect = F_RECTANGLE {};
+	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+	  clip::duxclp(form);
+	  break;
+	}
+	case EDGEANGSAT: { // Angle Satin
+	  satin::sbrd(form);
+	  break;
+	}
+	case EDGEPROPSAT: { // Proportional Satin
+	  pbrd(form);
+	  break;
+	}
+	case EDGEAPPL: { // Applique
+	  apbrd(form);
+	  ritapbrd();
+	  satin::sbrd(form);
+	  break;
+	}
+	case EDGEBHOL: { // BH Buttonhole
+	  auto const length      = ButtonholeCornerLength;
+	  ButtonholeCornerLength = form::getblen();
+	  satin::satout(form, BHWIDTH);
+	  bhbrd(form);
+	  ButtonholeCornerLength = length;
+	  break;
+	}
+	case EDGEPICOT: { // Picot
+	  auto clipRect = F_RECTANGLE {};
+	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+	  clip::clpic(form, clipRect);
+	  break;
+	}
+	case EDGEDOUBLE: { // Double
+	  dubfn(form);
+	  break;
+	}
+	case EDGELCHAIN: { // Lin Chain
+	  StateMap->set(StateFlag::LINCHN);
+	  clip::chnfn(form);
+	  break;
+	}
+	case EDGEOCHAIN: { // Open Chain
+	  StateMap->reset(StateFlag::LINCHN);
+	  clip::chnfn(form);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in chkbrd: edgeType [{}]\n", form.edgeType & NEGUND);
+	  break;
+	}
+  }
+  ritbrd(form);
 }
 
 void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
