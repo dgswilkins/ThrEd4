@@ -3463,7 +3463,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	totalLength += clipSideLengths[vertex];
 	vertex = nextVertex;
   }
-  auto itVertex     = itFirstVertex;
+  auto itVertex     = itFirstVertex; // intentional copy
   auto boundingRect = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
   ++itVertex;
   for (auto iVertex = 1U; iVertex < currentVertexCount; ++iVertex) {
