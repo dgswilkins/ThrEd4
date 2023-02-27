@@ -4131,40 +4131,41 @@ void fi::nxtrgn(std::vector<RG_SEQ>&           tempPath,
 	  maxPathLength = DEPFACT;
 	}
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
-	if (pathLength > maxPathLength) {
-	  auto lineEndPoint        = sortedLineIndices[regionsList[doneRegion].start];
-	  lastRegionCorners[0]     = lineEndpoints[lineEndPoint];
-	  lastRegionCorners[1]     = lineEndpoints[++lineEndPoint];
-	  lineEndPoint             = sortedLineIndices[regionsList[doneRegion].end];
-	  lastRegionCorners[2]     = lineEndpoints[lineEndPoint];
-	  lastRegionCorners[3]     = lineEndpoints[++lineEndPoint];
-	  auto       newRegion     = 0U;
-	  auto       minimumLength = BIGFLOAT;
-	  auto const regionCount   = visitedRegions.size();
-	  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
-		if (!visitedRegions[iRegion]) {
-		  if (auto const length = reglen(lineEndpoints, sortedLineIndices, iRegion, lastRegionCorners, regionsList);
-		      length < minimumLength) {
-			minimumLength = length;
-			newRegion     = iRegion;
-		  }
-		}
-	  }
-	  tempPath[sequencePathIndex].skp = true;
-	  for (auto iPath = 0U; iPath < pathMapIndex; ++iPath) {
-		if (pathMap[iPath].node == newRegion) {
-		  tempPath[sequencePathIndex++].pcon = iPath;
-		  visitedRegions.set(newRegion);
-		  doneRegion = newRegion;
-		  return;
-		}
-	  }
-	  tempPath[sequencePathIndex].count  = visitedIndex;
-	  tempPath[sequencePathIndex++].pcon = MAXDWORD;
-	  visitedRegions.set(wrap::toSize(visitedIndex));
-	  doneRegion = wrap::toUnsigned(visitedIndex);
-	  return;
+	if (pathLength <= maxPathLength) {
+	  continue;
 	}
+	auto lineEndPoint        = sortedLineIndices[regionsList[doneRegion].start];
+	lastRegionCorners[0]     = lineEndpoints[lineEndPoint];
+	lastRegionCorners[1]     = lineEndpoints[++lineEndPoint];
+	lineEndPoint             = sortedLineIndices[regionsList[doneRegion].end];
+	lastRegionCorners[2]     = lineEndpoints[lineEndPoint];
+	lastRegionCorners[3]     = lineEndpoints[++lineEndPoint];
+	auto       newRegion     = 0U;
+	auto       minimumLength = BIGFLOAT;
+	auto const regionCount   = visitedRegions.size();
+	for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
+	  if (!visitedRegions[iRegion]) {
+		if (auto const length = reglen(lineEndpoints, sortedLineIndices, iRegion, lastRegionCorners, regionsList);
+		    length < minimumLength) {
+		  minimumLength = length;
+		  newRegion     = iRegion;
+		}
+	  }
+	}
+	tempPath[sequencePathIndex].skp = true;
+	for (auto iPath = 0U; iPath < pathMapIndex; ++iPath) {
+	  if (pathMap[iPath].node == newRegion) {
+		tempPath[sequencePathIndex++].pcon = iPath;
+		visitedRegions.set(newRegion);
+		doneRegion = newRegion;
+		return;
+	  }
+	}
+	tempPath[sequencePathIndex].count  = visitedIndex;
+	tempPath[sequencePathIndex++].pcon = MAXDWORD;
+	visitedRegions.set(wrap::toSize(visitedIndex));
+	doneRegion = wrap::toUnsigned(visitedIndex);
+	return;
   }
   auto itRegionPath = wrap::next(tempPath.cbegin(), sequencePathIndex);
   for (auto iPath = ptrdiff_t {}; iPath < pathLength; ++iPath) {
