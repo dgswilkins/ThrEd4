@@ -3507,7 +3507,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	clipGrid.bottom += negativeOffset;
 	clipGrid.top += negativeOffset;
 	auto const formNegativeOffset = ClipRectSize.cy * wrap::toFloat(negativeOffset);
-	auto       vertIt             = itFirstVertex;
+	auto       vertIt             = itFirstVertex; // intentional copy
 	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	  vertIt->y += formNegativeOffset;
 	  ++vertIt;
@@ -3518,7 +3518,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   auto regionCrossingData = std::vector<V_CLP_X> {}; // region crossing data for vertical clipboard fills
   // reserve a little more than we need. Determined empirically
   regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * 5U);
-  auto vCurr = itFirstVertex;
+  auto vCurr = itFirstVertex; //intentional copy
   for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	auto const itNextVertex = wrap::next(itFirstVertex, form::nxt(form, iVertex));
 	auto       start        = wrap::floor<uint32_t>(vCurr->x / clipWidth);
@@ -3662,13 +3662,11 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 		  break;
 		}
 	  }
-	  if (!breakFlag) {
-		if (!clipStitchPoints.empty()) {
-		  clipStitchPoints[clipStitchPoints.size() - 1U].flag = 2;
-		}
-	  }
-	  else {
+	  if (breakFlag) {
 		break;
+	  }
+	  if (!clipStitchPoints.empty()) {
+		clipStitchPoints[clipStitchPoints.size() - 1U].flag = 2;
 	  }
 	}
   }
@@ -3680,7 +3678,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	for (auto& clipStitchPoint : clipStitchPoints) {
 	  clipStitchPoint.y -= formNegativeOffset;
 	}
-	auto vOffset = itFirstVertex;
+	auto vOffset = itFirstVertex; // intentional copy
 	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	  vOffset->y -= formNegativeOffset;
 	  ++vOffset;
@@ -3724,79 +3722,79 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 
 #endif
 
-  if (!clipSegments.empty()) {
-	auto sortedLengths = std::vector<LEN_INFO> {};
-	sortedLengths.reserve(clipSegments.size() * 2);
-	for (auto iSegment = 0U; iSegment < wrap::toUnsigned(clipSegments.size()); ++iSegment) {
-	  sortedLengths.push_back(LEN_INFO {iSegment, false, clipSegments[iSegment].beginLength});
-	  sortedLengths.push_back(LEN_INFO {iSegment, true, clipSegments[iSegment].endLength});
+  if (clipSegments.empty()) {
+	return;
+  }
+  auto sortedLengths = std::vector<LEN_INFO> {};
+  sortedLengths.reserve(clipSegments.size() * 2);
+  for (auto iSegment = 0U; iSegment < wrap::toUnsigned(clipSegments.size()); ++iSegment) {
+	sortedLengths.push_back(LEN_INFO {iSegment, false, clipSegments[iSegment].beginLength});
+	sortedLengths.push_back(LEN_INFO {iSegment, true, clipSegments[iSegment].endLength});
+  }
+  std::ranges::sort(sortedLengths, fi::lenComp);
+  for (auto iSorted = 0U; iSorted < wrap::toUnsigned(sortedLengths.size()); ++iSorted) {
+	if (sortedLengths[iSorted].isEnd) {
+	  clipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
 	}
-	std::ranges::sort(sortedLengths, fi::lenComp);
-	for (auto iSorted = 0U; iSorted < wrap::toUnsigned(sortedLengths.size()); ++iSorted) {
-	  if (sortedLengths[iSorted].isEnd) {
-		clipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
-	  }
-	  else {
-		clipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
-	  }
+	else {
+	  clipSegments[sortedLengths[iSorted].index].beginIndex = iSorted;
 	}
+  }
 
 #if CLPVU == 1
 
-	for (uint32_t iStitch = 0; iStitch < ActivePointIndex; ++iStitch) {
-	  StitchBuffer->operator[](iStitch) =
-	      F_POINT_ATTR {ClipStitchPoints[iStitch].x, ClipStitchPoints[iStitch].y, 0};
-	}
-	PCSHeader.stitchCount = ActivePointIndex;
+  for (uint32_t iStitch = 0; iStitch < ActivePointIndex; ++iStitch) {
+	StitchBuffer->operator[](iStitch) =
+	    F_POINT_ATTR {ClipStitchPoints[iStitch].x, ClipStitchPoints[iStitch].y, 0};
+  }
+  PCSHeader.stitchCount = ActivePointIndex;
 #endif
 
 #if CLPVU == 2
 
-	auto iStitch = 0;
-	for (iSegment = 0; iSegment < ClipSegmentIndex; ++iSegment) {
-	  for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish;
-	       ++iStitchPoint) {
-		StitchBuffer->operator[](iStitch) =
-		    F_POINT_ATTR {ClipStitchPoints[iStitchPoint].x, ClipStitchPoints[iStitchPoint].y, iSegment & 0xf};
-	  }
+  auto iStitch = 0;
+  for (iSegment = 0; iSegment < ClipSegmentIndex; ++iSegment) {
+	for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; ++iStitchPoint) {
+	  StitchBuffer->operator[](iStitch) =
+	      F_POINT_ATTR {ClipStitchPoints[iStitchPoint].x, ClipStitchPoints[iStitchPoint].y, iSegment & 0xf};
 	}
-	PCSHeader.stitchCount = iStitch;
+  }
+  PCSHeader.stitchCount = iStitch;
 
 #endif
 
 #if CLPVU == 0
 
-	auto currentSegmentIndex = 0U;
-	StateMap->set(StateFlag::FILDIR);
-	OSequence->clear();
-	auto clipIntersectSide = clipSegments[0].asid;
+  auto currentSegmentIndex = 0U;
+  StateMap->set(StateFlag::FILDIR);
+  OSequence->clear();
+  auto clipIntersectSide = clipSegments[0].asid;
+  ritseg(form, clipStitchPoints, clipSegments, currentSegmentIndex, clipIntersectSide, currentFormVertices);
+  while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
 	ritseg(form, clipStitchPoints, clipSegments, currentSegmentIndex, clipIntersectSide, currentFormVertices);
-	while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
-	  ritseg(form, clipStitchPoints, clipSegments, currentSegmentIndex, clipIntersectSide, currentFormVertices);
-	}
-	chksid(form, 0, clipIntersectSide, currentFormVertices);
-	auto index = 0U;
-	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size()); ++iSequence) {
-	  if (vscmp(iSequence, index)) {
-		++index;
-		OSequence->operator[](index) = OSequence->operator[](iSequence);
-	  }
-	}
-	OSequence->resize(index);
-	if (StateMap->test(StateFlag::WASNEG)) {
-	  for (auto& iSequence : *OSequence) {
-		iSequence.x -= formOffset;
-	  }
-	  auto vOffset = itFirstVertex;
-	  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
-		vOffset->x -= formOffset;
-		++vOffset;
-	  }
-	  form.rectangle.left -= formOffset;
-	  form.rectangle.right -= formOffset;
-	}
-#endif
   }
+  chksid(form, 0, clipIntersectSide, currentFormVertices);
+  auto index = 0U;
+  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size()); ++iSequence) {
+	if (vscmp(iSequence, index)) {
+	  ++index;
+	  OSequence->operator[](index) = OSequence->operator[](iSequence);
+	}
+  }
+  OSequence->resize(index);
+  if (StateMap->test(StateFlag::WASNEG)) {
+	for (auto& iSequence : *OSequence) {
+	  iSequence.x -= formOffset;
+	}
+	auto vOffset = itFirstVertex; // intentional copy
+	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
+	  vOffset->x -= formOffset;
+	  ++vOffset;
+	}
+	form.rectangle.left -= formOffset;
+	form.rectangle.right -= formOffset;
+  }
+#endif
 }
 
 void fi::angout(FRM_HEAD& angledForm) {
