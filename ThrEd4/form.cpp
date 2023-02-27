@@ -4181,23 +4181,21 @@ void fi::nxtseq(std::vector<F_SEQ>&          sequencePath,
                 std::vector<R_CON> const&    pathMap,
                 std::vector<uint32_t> const& mapIndexSequence,
                 uint32_t                     pathIndex) {
-  if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {
-	unsigned const nextNode = sequencePath[wrap::toSize(pathIndex) + 1U].node;
-	unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
-	while (iPath < mapIndexSequence[wrap::toSize(sequencePath[pathIndex].node) + 1U] &&
-	       pathMap[iPath].node != nextNode) {
-	  ++iPath;
-	}
-	if (iPath < pathMap.size()) {
-	  sequencePath[pathIndex].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
-	}
-	else {
-	  sequencePath[pathIndex].nextGroup = 0;
-	}
-  }
-  else {
+  if ((wrap::toSize(pathIndex) + 1U) >= sequencePath.size()) {
 	sequencePath[pathIndex].nextGroup = 0;
+	return;
   }
+  unsigned const nextNode = sequencePath[wrap::toSize(pathIndex) + 1U].node;
+  unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
+  while (iPath < mapIndexSequence[wrap::toSize(sequencePath[pathIndex].node) + 1U] &&
+         pathMap[iPath].node != nextNode) {
+	++iPath;
+  }
+  if (iPath >= pathMap.size()) {
+	sequencePath[pathIndex].nextGroup = 0;
+	return;
+  }
+  sequencePath[pathIndex].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
 }
 
 void fi::brkdun(std::vector<SMAL_PNT_L> const& lineEndpoints,
