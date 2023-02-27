@@ -3936,17 +3936,18 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 	--count0;
 	index0 += 2;
   }
-  if (count0 != 0U) {
-	auto const lineEndPoint1 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group1]);
-	auto       index1        = 0U;
-	auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
-	while ((count1 != 0U) && lineEndPoint1.operator[](wrap::to_ptrdiff(index1)).line != line1) {
-	  --count1;
-	  index1 += 2;
-	}
-	if (count1 != 0U) {
-	  return isclos(lineEndpoints, groupIndexSequence[group0] + index0, groupIndexSequence[group1] + index1, gapToClosestRegion);
-	}
+  if (count0 == 0U) {
+	return false;
+  }
+  auto const lineEndPoint1 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group1]);
+  auto       index1        = 0U;
+  auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
+  while ((count1 != 0U) && lineEndPoint1.operator[](wrap::to_ptrdiff(index1)).line != line1) {
+	--count1;
+	index1 += 2;
+  }
+  if (count1 != 0U) {
+	return isclos(lineEndpoints, groupIndexSequence[group0] + index0, groupIndexSequence[group1] + index1, gapToClosestRegion);
   }
   return false;
 }
@@ -4049,37 +4050,36 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
   while (visitedRegions[pathMap[itRegionPath[previousLevel].pcon].node]) {
 	if (--itRegionPath[previousLevel].count > 0) {
 	  ++(itRegionPath[previousLevel].pcon);
+	  continue;
 	}
-	else {
-	  auto pivot = previousLevel;
-	  do {
-		if (pivot != 0U) {
-		  --pivot;
+	auto pivot = previousLevel;
+	do {
+	  if (pivot != 0U) {
+		--pivot;
+	  }
+	  else {
+		return true;
+	  }
+	  --(itRegionPath[pivot].count);
+	  ++(itRegionPath[pivot].pcon);
+	} while (itRegionPath[pivot].count == 0);
+	++pivot;
+	while (pivot <= previousLevel) {
+	  if (pivot != 0U) {
+		itRegionPath[pivot].pcon  = mapIndexSequence[pathMap[itRegionPath[pivot - 1].pcon].node];
+		itRegionPath[pivot].count = gsl::narrow<int32_t>(
+		    mapIndexSequence[wrap::toSize(pathMap[itRegionPath[pivot - 1].pcon].node) + 1U] -
+		    itRegionPath[pivot].pcon);
+	  }
+	  else {
+		if (--itRegionPath[0].count != 0) {
+		  ++(itRegionPath[0].pcon);
 		}
 		else {
 		  return true;
 		}
-		--(itRegionPath[pivot].count);
-		++(itRegionPath[pivot].pcon);
-	  } while (itRegionPath[pivot].count == 0);
-	  ++pivot;
-	  while (pivot <= previousLevel) {
-		if (pivot != 0U) {
-		  itRegionPath[pivot].pcon  = mapIndexSequence[pathMap[itRegionPath[pivot - 1].pcon].node];
-		  itRegionPath[pivot].count = gsl::narrow<int32_t>(
-		      mapIndexSequence[wrap::toSize(pathMap[itRegionPath[pivot - 1].pcon].node) + 1U] -
-		      itRegionPath[pivot].pcon);
-		}
-		else {
-		  if (--itRegionPath[0].count != 0) {
-			++(itRegionPath[0].pcon);
-		  }
-		  else {
-			return true;
-		  }
-		}
-		++pivot;
 	  }
+	  ++pivot;
 	}
   }
   return false;
