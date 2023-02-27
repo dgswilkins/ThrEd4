@@ -2442,24 +2442,25 @@ void fi::bhfn(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
   auto       innerPoint    = F_POINT {itStartVertex->x, itStartVertex->y};
   auto const rotationAngle = atan2(-delta.x, delta.y);
   auto const outerStep = F_POINT {form.borderSize * cos(rotationAngle), form.borderSize * sin(rotationAngle)};
-  if (count != 0U) {
-	for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
-	  auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
-	  auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
-	  OSequence->push_back(F_POINT {firstPoint});
-	  OSequence->push_back(F_POINT {innerPoint});
-	  OSequence->push_back(F_POINT {firstPoint});
-	  OSequence->push_back(F_POINT {outerPoint});
-	  OSequence->push_back(F_POINT {firstPoint});
-	  OSequence->push_back(F_POINT {outerPoint});
-	  OSequence->push_back(F_POINT {firstPoint});
-	  innerPoint.x += step.x;
-	  innerPoint.y += step.y;
-	}
+  if (count == 0U) {
+	return;
+  }
+  for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
 	auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
+	auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
 	OSequence->push_back(F_POINT {firstPoint});
 	OSequence->push_back(F_POINT {innerPoint});
+	OSequence->push_back(F_POINT {firstPoint});
+	OSequence->push_back(F_POINT {outerPoint});
+	OSequence->push_back(F_POINT {firstPoint});
+	OSequence->push_back(F_POINT {outerPoint});
+	OSequence->push_back(F_POINT {firstPoint});
+	innerPoint.x += step.x;
+	innerPoint.y += step.y;
   }
+  auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
+  OSequence->push_back(F_POINT {firstPoint});
+  OSequence->push_back(F_POINT {innerPoint});
 }
 
 void fi::bhcrnr(FRM_HEAD const& form, uint32_t vertex) {
