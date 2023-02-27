@@ -3301,26 +3301,26 @@ void fi::chksid(FRM_HEAD const&             form,
                 uint32_t                    vertexIndex,
                 uint32_t                    clipIntersectSide,
                 std::vector<F_POINT> const& currentFormVertices) {
-  if (clipIntersectSide != vertexIndex) {
-	auto const itVertex = currentFormVertices.cbegin();
-	if (auto const vertexCount = currentFormVertices.size();
-	    (vertexIndex - clipIntersectSide + vertexCount) % vertexCount < (vertexCount / 2)) {
-	  auto       iVertex = form::nxt(form, clipIntersectSide);
-	  auto const limit   = form::nxt(form, vertexIndex);
-	  while (iVertex != limit) {
-		auto const itThisVertex = wrap::next(itVertex, iVertex);
-		OSequence->push_back(*itThisVertex);
-		iVertex = form::nxt(form, iVertex);
-	  }
+  if (clipIntersectSide == vertexIndex) {
+	return;
+  }
+  auto const itVertex = currentFormVertices.cbegin();
+  if (auto const vertexCount = currentFormVertices.size();
+      (vertexIndex - clipIntersectSide + vertexCount) % vertexCount < (vertexCount / 2)) {
+	auto       iVertex = form::nxt(form, clipIntersectSide);
+	auto const limit   = form::nxt(form, vertexIndex);
+	while (iVertex != limit) {
+	  auto const itThisVertex = wrap::next(itVertex, iVertex);
+	  OSequence->push_back(*itThisVertex);
+	  iVertex = form::nxt(form, iVertex);
 	}
-	else {
-	  auto iVertex = clipIntersectSide;
-	  while (iVertex != vertexIndex) {
-		auto const itThisVertex = wrap::next(itVertex, iVertex);
-		OSequence->push_back(*itThisVertex);
-		iVertex = form::prv(form, iVertex);
-	  }
-	}
+	return;
+  }
+  auto iVertex = clipIntersectSide;
+  while (iVertex != vertexIndex) {
+	auto const itThisVertex = wrap::next(itVertex, iVertex);
+	OSequence->push_back(*itThisVertex);
+	iVertex = form::prv(form, iVertex);
   }
 }
 
@@ -3381,12 +3381,11 @@ auto fi::clpnxt(std::vector<CLIP_SEG> const& clipSegments,
 		return false;
 	  }
 	  ++index;
+	  continue;
 	}
-	else {
-	  outIndex = (sind + indexDoubled - index) % indexDoubled;
-	  if (clipSegments[sortedLengths[outIndex].index].dun == 0) {
-		return false;
-	  }
+	outIndex = (sind + indexDoubled - index) % indexDoubled;
+	if (clipSegments[sortedLengths[outIndex].index].dun == 0) {
+	  return false;
 	}
   }
   return true;
