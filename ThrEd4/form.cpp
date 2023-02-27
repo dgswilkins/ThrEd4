@@ -2464,22 +2464,23 @@ void fi::bhfn(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
 
 void fi::bhcrnr(FRM_HEAD const& form, uint32_t vertex) {
   auto const nextVertex = form::nxt(form, vertex);
-  auto const itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
-  if (auto const* ptr = (StateMap->test(StateFlag::INDIR)) ? OutsidePoints : InsidePoints; nullptr != ptr) {
-	auto delta = F_POINT {ptr->operator[](nextVertex).x - itVertex->x,
-	                      ptr->operator[](nextVertex).y - itVertex->y};
-
-	auto const length = hypot(delta.x, delta.y);
-	auto const ratio  = ButtonholeCornerLength / length;
-	delta.x *= ratio;
-	delta.y *= ratio;
-	auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
-	OSequence->push_back(*itVertex);
-	OSequence->push_back(F_POINT {point});
-	OSequence->push_back(*itVertex);
-	OSequence->push_back(F_POINT {point});
-	OSequence->push_back(*itVertex);
+  auto const  itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
+  auto const* ptr        = (StateMap->test(StateFlag::INDIR)) ? OutsidePoints : InsidePoints;
+  if (nullptr == ptr) {
+	return;
   }
+  auto delta =
+      F_POINT {ptr->operator[](nextVertex).x - itVertex->x, ptr->operator[](nextVertex).y - itVertex->y};
+  auto const length = hypot(delta.x, delta.y);
+  auto const ratio  = ButtonholeCornerLength / length;
+  delta.x *= ratio;
+  delta.y *= ratio;
+  auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
+  OSequence->push_back(*itVertex);
+  OSequence->push_back(F_POINT {point});
+  OSequence->push_back(*itVertex);
+  OSequence->push_back(F_POINT {point});
+  OSequence->push_back(*itVertex);
 }
 
 void fi::bhbrd(FRM_HEAD const& form) {
