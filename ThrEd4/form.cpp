@@ -3019,25 +3019,23 @@ public:
 }
 
 void fi::duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices) {
-  if (auto const leftEdge = (std::ranges::min_element(currentFormVertices,
-                                                      [](F_POINT const& first, F_POINT const& second) {
-	                                                    return first.x < second.x;
-                                                      }))
-                                ->x;
-      leftEdge < ClipRectSize.cx) {
-	StateMap->set(StateFlag::WASNEG);
-	constexpr auto SAFOFFST = 0.01F; // factor to ensure that formOffset is not 0
-	formOffset              = ClipRectSize.cx + fabs(leftEdge) + SAFOFFST;
-	for (auto& vertex : currentFormVertices) {
-	  vertex.x += formOffset;
-	}
-	auto& form = FormList->operator[](ClosestFormToCursor);
-	form.rectangle.left += formOffset;
-	form.rectangle.right += formOffset;
-  }
-  else {
+  auto const leftEdge =
+      (std::ranges::min_element(currentFormVertices, [](F_POINT const& first, F_POINT const& second) {
+	    return first.x < second.x;
+      }))->x;
+  if (leftEdge >= ClipRectSize.cx) {
 	StateMap->reset(StateFlag::WASNEG);
+	return;
   }
+  StateMap->set(StateFlag::WASNEG);
+  constexpr auto SAFOFFST = 0.01F; // factor to ensure that formOffset is not 0
+  formOffset              = ClipRectSize.cx + fabs(leftEdge) + SAFOFFST;
+  for (auto& vertex : currentFormVertices) {
+	vertex.x += formOffset;
+  }
+  auto& form = FormList->operator[](ClosestFormToCursor);
+  form.rectangle.left += formOffset;
+  form.rectangle.right += formOffset;
 }
 
 auto fi::leftsid(std::vector<F_POINT> const& currentFormVertices) noexcept -> uint32_t {
