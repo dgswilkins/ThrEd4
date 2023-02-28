@@ -2040,9 +2040,9 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
   auto const& ipStart      = InsidePoints->operator[](start);
   auto const& ipFinish     = InsidePoints->operator[](finish);
   auto const delta         = F_POINT {(opFinish.x - opStart.x), (opFinish.y - opStart.y)};
-  auto const itStartVertex = wrap::next(vertices.cbegin(), vertexIndex + start);
-  if (auto const itFinishVertex = wrap::next(vertices.cbegin(), vertexIndex + finish);
-      (delta.x != 0.0F) && (delta.y != 0.0F)) {
+  auto const itStartVertex  = wrap::next(vertices.cbegin(), vertexIndex + start);
+  auto const itFinishVertex = wrap::next(vertices.cbegin(), vertexIndex + finish);
+  if ((delta.x != 0.0F) && (delta.y != 0.0F)) {
 	auto const slope        = -delta.x / delta.y;
 	auto       point        = *itFinishVertex;
 	auto&      verticalRect = fillVerticalRect[start];
@@ -2069,54 +2069,52 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
 	  point              = opFinish;
 	  proj(point, slope, ipStart, ipFinish, verticalRect.cipnt);
 	}
+	return;
   }
-  else {
-	if (delta.x != 0.0F) {
-	  auto  pointX       = itFinishVertex->x;
-	  auto& verticalRect = fillVerticalRect[start];
-	  projv(pointX, opStart, opFinish, verticalRect.dopnt);
-	  projv(pointX, ipStart, ipFinish, verticalRect.dipnt);
-	  pointX = itStartVertex->x;
-	  projv(pointX, opStart, opFinish, verticalRect.aopnt);
-	  projv(pointX, ipStart, ipFinish, verticalRect.aipnt);
-	  if (projv(ipStart.x, opStart, opFinish, verticalRect.bopnt)) {
-		verticalRect.bipnt = ipStart;
-	  }
-	  else {
-		verticalRect.bopnt = opStart;
-		projv(opStart.x, ipStart, ipFinish, verticalRect.bipnt);
-	  }
-	  if (projv(ipFinish.x, opStart, opFinish, verticalRect.copnt)) {
-		verticalRect.cipnt = ipFinish;
-	  }
-	  else {
-		verticalRect.copnt = opFinish;
-		projv(opFinish.x, ipStart, ipFinish, verticalRect.cipnt);
-	  }
+  if (delta.x != 0.0F) {
+	auto  pointX       = itFinishVertex->x;
+	auto& verticalRect = fillVerticalRect[start];
+	projv(pointX, opStart, opFinish, verticalRect.dopnt);
+	projv(pointX, ipStart, ipFinish, verticalRect.dipnt);
+	pointX = itStartVertex->x;
+	projv(pointX, opStart, opFinish, verticalRect.aopnt);
+	projv(pointX, ipStart, ipFinish, verticalRect.aipnt);
+	if (projv(ipStart.x, opStart, opFinish, verticalRect.bopnt)) {
+	  verticalRect.bipnt = ipStart;
 	}
 	else {
-	  auto  pointY       = itFinishVertex->y;
-	  auto& verticalRect = fillVerticalRect[start];
-	  projh(pointY, opStart, opFinish, verticalRect.dopnt);
-	  projh(pointY, ipStart, ipFinish, verticalRect.dipnt);
-	  pointY = itStartVertex->y;
-	  projh(pointY, opStart, opFinish, verticalRect.aopnt);
-	  projh(pointY, ipStart, ipFinish, verticalRect.aipnt);
-	  if (projh(ipStart.y, opStart, opFinish, verticalRect.bopnt)) {
-		verticalRect.bipnt = ipStart;
-	  }
-	  else {
-		verticalRect.bopnt = opStart;
-		projh(opStart.y, ipStart, ipFinish, verticalRect.bipnt);
-	  }
-	  if (projh(ipFinish.y, opStart, opFinish, verticalRect.copnt)) {
-		verticalRect.cipnt = ipFinish;
-	  }
-	  else {
-		verticalRect.copnt = opFinish;
-		projh(opFinish.y, ipStart, ipFinish, verticalRect.cipnt);
-	  }
+	  verticalRect.bopnt = opStart;
+	  projv(opStart.x, ipStart, ipFinish, verticalRect.bipnt);
 	}
+	if (projv(ipFinish.x, opStart, opFinish, verticalRect.copnt)) {
+	  verticalRect.cipnt = ipFinish;
+	}
+	else {
+	  verticalRect.copnt = opFinish;
+	  projv(opFinish.x, ipStart, ipFinish, verticalRect.cipnt);
+	}
+	return;
+  }
+  auto  pointY       = itFinishVertex->y;
+  auto& verticalRect = fillVerticalRect[start];
+  projh(pointY, opStart, opFinish, verticalRect.dopnt);
+  projh(pointY, ipStart, ipFinish, verticalRect.dipnt);
+  pointY = itStartVertex->y;
+  projh(pointY, opStart, opFinish, verticalRect.aopnt);
+  projh(pointY, ipStart, ipFinish, verticalRect.aipnt);
+  if (projh(ipStart.y, opStart, opFinish, verticalRect.bopnt)) {
+	verticalRect.bipnt = ipStart;
+  }
+  else {
+	verticalRect.bopnt = opStart;
+	projh(opStart.y, ipStart, ipFinish, verticalRect.bipnt);
+  }
+  if (projh(ipFinish.y, opStart, opFinish, verticalRect.copnt)) {
+	verticalRect.cipnt = ipFinish;
+  }
+  else {
+	verticalRect.copnt = opFinish;
+	projh(opFinish.y, ipStart, ipFinish, verticalRect.cipnt);
   }
 }
 
