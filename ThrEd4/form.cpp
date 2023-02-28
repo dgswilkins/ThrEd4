@@ -1987,22 +1987,20 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
 
 auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) noexcept
     -> bool {
-  if (OutsidePoints != nullptr) {
-	auto const  delta = F_POINT {(OutsidePoints->operator[](start).x - points[start].x),
-                                (OutsidePoints->operator[](start).y - points[start].y)};
-	auto const& point = points[start];
-
-	if ((delta.x == 0.0F) && (delta.y == 0.0F)) {
-	  return false;
-	}
-	if (delta.x != 0.0F) {
-	  return fi::proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points[finish], intersection);
-	}
-
-	return fi::projv(point.x, points[finish], OutsidePoints->operator[](finish), intersection);
+  if (nullptr == OutsidePoints) {
+	return false;
   }
+  auto const  delta = F_POINT {(OutsidePoints->operator[](start).x - points[start].x),
+                              (OutsidePoints->operator[](start).y - points[start].y)};
+  auto const& point = points[start];
 
-  return false;
+  if ((delta.x == 0.0F) && (delta.y == 0.0F)) {
+	return false;
+  }
+  if (delta.x != 0.0F) {
+	return fi::proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points[finish], intersection);
+  }
+  return fi::projv(point.x, points[finish], OutsidePoints->operator[](finish), intersection);
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
