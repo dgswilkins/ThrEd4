@@ -1922,25 +1922,25 @@ auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> 
   }
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const itThisVertex = wrap::next(itVertex, iVertex);
-	if (auto const itNextVertex = wrap::next(itVertex, nxt(form, iVertex));
-	    fi::projv(xCoordinate, *itThisVertex, *itNextVertex, intersection)) {
-	  if (intersection.y >= yCoordinate) {
-		if (!util::closeEnough(itThisVertex->x, xCoordinate) && !util::closeEnough(itNextVertex->x, xCoordinate)) {
-		  ++count;
-		}
-		else {
-		  if (itThisVertex->x < itNextVertex->x) {
-			if (!util::closeEnough(itNextVertex->x, xCoordinate)) {
-			  ++count;
-			}
-		  }
-		  else {
-			if (!util::closeEnough(itThisVertex->x, xCoordinate)) {
-			  ++count;
-			}
-		  }
-		}
+	auto const itNextVertex = wrap::next(itVertex, nxt(form, iVertex));
+	if (!fi::projv(xCoordinate, *itThisVertex, *itNextVertex, intersection)) {
+	  continue;
+	}
+	if (intersection.y < yCoordinate) {
+	  continue;
+	}
+	if (!util::closeEnough(itThisVertex->x, xCoordinate) && !util::closeEnough(itNextVertex->x, xCoordinate)) {
+	  ++count;
+	  continue;
+	}
+	if (itThisVertex->x < itNextVertex->x) {
+	  if (!util::closeEnough(itNextVertex->x, xCoordinate)) {
+		++count;
 	  }
+	  continue;
+	}
+	if (!util::closeEnough(itThisVertex->x, xCoordinate)) {
+	  ++count;
 	}
   }
   return (count & 1U) != 0U;
