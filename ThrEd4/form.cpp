@@ -2297,45 +2297,42 @@ void fi::duspnd(float                        stitchLen,
                 uint32_t                     finish,
                 float                        width,
                 F_POINT&                     stitchPoint) {
-  if (StateMap->test(StateFlag::UND)) {
-	if (StateMap->test(StateFlag::UNDPHAS)) {
-	  form::filinsb(underlayVerticalRect[start].copnt, stitchPoint);
-	  form::filinsb(underlayVerticalRect[start].cipnt, stitchPoint);
-	  auto const delta =
-	      F_POINT {underlayVerticalRect[finish].bipnt.x - underlayVerticalRect[start].cipnt.x,
-	               underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y};
-	  if (auto const length = hypot(delta.x, delta.y); length > stitchLen) {
-		auto const angle =
-		    atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
-		          InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
-		auto const point = F_POINT {underlayVerticalRect[finish].bopnt.x + cos(angle) * width,
-		                            underlayVerticalRect[finish].bopnt.y + sin(angle) * width};
-		form::filinsb(point, stitchPoint);
-	  }
-	  form::filinsb(underlayVerticalRect[finish].bipnt, stitchPoint);
-	  form::filinsb(underlayVerticalRect[finish].bopnt, stitchPoint);
-	}
-	else {
-	  form::filinsb(underlayVerticalRect[start].cipnt, stitchPoint);
-	  form::filinsb(underlayVerticalRect[start].copnt, stitchPoint);
-	  auto const delta =
-	      F_POINT {underlayVerticalRect[finish].bopnt.x - underlayVerticalRect[start].copnt.x,
-	               underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y};
-	  if (auto const length = hypot(delta.x, delta.y); length > stitchLen) {
-		auto const angle =
-		    atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
-		          OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
-		auto const point = F_POINT {underlayVerticalRect[finish].bipnt.x + cos(angle) * width,
-		                            underlayVerticalRect[finish].bipnt.y + sin(angle) * width};
-		form::filinsb(point, stitchPoint);
-	  }
-	  form::filinsb(underlayVerticalRect[finish].bopnt, stitchPoint);
-	  form::filinsb(underlayVerticalRect[finish].bipnt, stitchPoint);
-	}
-  }
-  else {
+  if (!StateMap->test(StateFlag::UND)) {
 	spend(fillVerticalRect, start, finish, stitchPoint);
+	return;
   }
+  if (StateMap->test(StateFlag::UNDPHAS)) {
+	form::filinsb(underlayVerticalRect[start].copnt, stitchPoint);
+	form::filinsb(underlayVerticalRect[start].cipnt, stitchPoint);
+	auto const delta =
+	    F_POINT {underlayVerticalRect[finish].bipnt.x - underlayVerticalRect[start].cipnt.x,
+	             underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y};
+	if (auto const length = hypot(delta.x, delta.y); length > stitchLen) {
+	  auto const angle =
+	      atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
+	            InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
+	  auto const point = F_POINT {underlayVerticalRect[finish].bopnt.x + cos(angle) * width,
+	                              underlayVerticalRect[finish].bopnt.y + sin(angle) * width};
+	  form::filinsb(point, stitchPoint);
+	}
+	form::filinsb(underlayVerticalRect[finish].bipnt, stitchPoint);
+	form::filinsb(underlayVerticalRect[finish].bopnt, stitchPoint);
+	return;
+  }
+  form::filinsb(underlayVerticalRect[start].cipnt, stitchPoint);
+  form::filinsb(underlayVerticalRect[start].copnt, stitchPoint);
+  auto const delta =
+      F_POINT {underlayVerticalRect[finish].bopnt.x - underlayVerticalRect[start].copnt.x,
+               underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y};
+  if (auto const length = hypot(delta.x, delta.y); length > stitchLen) {
+	auto const angle = atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
+	                         OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
+	auto const point = F_POINT {underlayVerticalRect[finish].bipnt.x + cos(angle) * width,
+	                            underlayVerticalRect[finish].bipnt.y + sin(angle) * width};
+	form::filinsb(point, stitchPoint);
+  }
+  form::filinsb(underlayVerticalRect[finish].bopnt, stitchPoint);
+  form::filinsb(underlayVerticalRect[finish].bipnt, stitchPoint);
 }
 
 void fi::pfn(std::vector<V_RECT_2> const& underlayVerticalRect,
