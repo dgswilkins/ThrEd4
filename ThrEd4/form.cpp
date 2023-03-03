@@ -1679,21 +1679,21 @@ auto form::lastch() noexcept -> bool {
 }
 
 auto form::getlast(FRM_HEAD const& form) -> uint32_t {
-  if (form.fillType != 0U) {
-	form::lastch();
-	auto minimumLength = BIGFLOAT;
-	auto closestVertex = 0U;
-	auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  if (auto const length = hypot(LastPoint.x - itVertex->x, LastPoint.y - itVertex->y); length < minimumLength) {
-		minimumLength = length;
-		closestVertex = iVertex;
-	  }
-	  ++itVertex;
-	}
-	return closestVertex;
+  if (form.fillType == 0U) {
+	return 0;
   }
-  { return 0; }
+  form::lastch();
+  auto minimumLength = BIGFLOAT;
+  auto closestVertex = 0U;
+  auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	if (auto const length = hypot(LastPoint.x - itVertex->x, LastPoint.y - itVertex->y); length < minimumLength) {
+	  minimumLength = length;
+	  closestVertex = iVertex;
+	}
+	++itVertex;
+  }
+  return closestVertex;
 }
 
 void form::filinsb(F_POINT const& point, F_POINT& stitchPoint) {
