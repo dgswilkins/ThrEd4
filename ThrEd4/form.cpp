@@ -1641,13 +1641,14 @@ void form::chkseq(bool border) {
 }
 
 void fi::ritbrd(FRM_HEAD const& form) {
-  if (!OSequence->empty()) {
-	InterleaveSequenceIndices->emplace_back(INS_REC {TYPBRD,
-	                                                 gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
-	                                                 wrap::toUnsigned(InterleaveSequence->size()),
-	                                                 I_BRD});
-	form::chkseq(true);
+  if (OSequence->empty()) {
+	return;
   }
+  InterleaveSequenceIndices->emplace_back(INS_REC {TYPBRD,
+                                                   gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
+                                                   wrap::toUnsigned(InterleaveSequence->size()),
+                                                   I_BRD});
+  form::chkseq(true);
 }
 
 void fi::ritapbrd() {
