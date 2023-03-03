@@ -1886,18 +1886,18 @@ void form::duangs(FRM_HEAD const& form) {
 auto fi::projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoint, F_POINT& intersection) noexcept
     -> bool {
   auto const deltaX = upperPoint.x - lowerPoint.x;
-  intersection.x    = xCoordinate;
-  if (deltaX != 0.0F) {
-	auto const slope = (upperPoint.y - lowerPoint.y) / deltaX;
-	intersection.y   = (xCoordinate - lowerPoint.x) * slope + lowerPoint.y;
-	auto lower       = lowerPoint.x;
-	auto upper       = upperPoint.x;
-	if (lower > upper) {
-	  std::swap(lower, upper);
-	}
-	return xCoordinate >= lower && xCoordinate <= upper;
+  if (deltaX == 0.0F) {
+	return false;
   }
-  return false;
+  intersection.x   = xCoordinate;
+  auto const slope = (upperPoint.y - lowerPoint.y) / deltaX;
+  intersection.y   = (xCoordinate - lowerPoint.x) * slope + lowerPoint.y;
+  auto lower       = lowerPoint.x;
+  auto upper       = upperPoint.x;
+  if (lower > upper) {
+	std::swap(lower, upper);
+  }
+  return xCoordinate >= lower && xCoordinate <= upper;
 }
 
 auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool {
