@@ -1662,12 +1662,13 @@ void fi::ritapbrd() {
 }
 
 void fi::ritfil() {
-  if (!OSequence->empty()) {
-	auto const& form = FormList->operator[](ClosestFormToCursor);
-	InterleaveSequenceIndices->emplace_back(INS_REC {
-	    TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
-	form::chkseq(false);
+  if (OSequence->empty()) {
+	return;
   }
+  auto const& form = FormList->operator[](ClosestFormToCursor);
+  InterleaveSequenceIndices->emplace_back(INS_REC {
+      TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
+  form::chkseq(false);
 }
 
 auto form::lastch() noexcept -> bool {
