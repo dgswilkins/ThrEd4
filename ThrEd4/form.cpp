@@ -1671,11 +1671,11 @@ void fi::ritfil() {
 }
 
 auto form::lastch() noexcept -> bool {
-  if (!InterleaveSequence->empty()) {
-	LastPoint = InterleaveSequence->back();
-	return true;
+  if (InterleaveSequence->empty()) {
+	return false;
   }
-  { return false; }
+  LastPoint = InterleaveSequence->back();
+  return true;
 }
 
 auto form::getlast(FRM_HEAD const& form) -> uint32_t {
