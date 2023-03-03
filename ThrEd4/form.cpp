@@ -1816,27 +1816,27 @@ void fi::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float si
       size < ESCLAMP) {
 	size = ESCLAMP;
   }
-  if (auto count = wrap::round<uint32_t>(length / size); count != 0U) {
-	auto const step   = F_POINT {delta.x / wrap::toFloat(count), delta.y / wrap::toFloat(count)};
-	auto       point0 = *itStartVertex;
-	auto       point1 = F_POINT {point0.x + step.x, point0.y + step.y};
-	while (count != 0U) {
-	  OSequence->push_back(point1);
-	  OSequence->push_back(point0);
-	  OSequence->push_back(point1);
-	  point0.x += step.x;
-	  point0.y += step.y;
-	  point1.x += step.x;
-	  point1.y += step.y;
-	  --count;
-	}
-	OSequence->push_back(*itFinishVertex);
-  }
-  else {
+  auto count = wrap::round<uint32_t>(length / size);
+  if (count == 0U) {
 	OSequence->push_back(*itFinishVertex);
 	OSequence->push_back(*itStartVertex);
 	OSequence->push_back(*itFinishVertex);
+	return;
   }
+  auto const step   = F_POINT {delta.x / wrap::toFloat(count), delta.y / wrap::toFloat(count)};
+  auto       point0 = *itStartVertex;
+  auto       point1 = F_POINT {point0.x + step.x, point0.y + step.y};
+  while (count != 0U) {
+	OSequence->push_back(point1);
+	OSequence->push_back(point0);
+	OSequence->push_back(point1);
+	point0.x += step.x;
+	point0.y += step.y;
+	point1.x += step.x;
+	point1.y += step.y;
+	--count;
+  }
+  OSequence->push_back(*itFinishVertex);
 }
 
 void fi::bold(FRM_HEAD const& form) {
