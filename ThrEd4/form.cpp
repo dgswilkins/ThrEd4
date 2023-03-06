@@ -667,21 +667,22 @@ auto fi::px2stchf(POINT const& screen) noexcept -> F_POINT {
 }
 
 void form::frmlin(FRM_HEAD const& form) {
-  if (form.vertexCount != 0U) {
-	FormLines->clear();
-	FormLines->reserve(form.vertexCount);
-	auto const itFirstVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	auto       itCurrentVertex = itFirstVertex;
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  FormLines->push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
-	                              std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                          (itCurrentVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
-	  ++itCurrentVertex;
-	}
-	FormLines->push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
-	                            std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                        (itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
+  if (form.vertexCount == 0U) {
+	return;
   }
+  FormLines->clear();
+  FormLines->reserve(form.vertexCount);
+  auto const itFirstVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto       itCurrentVertex = itFirstVertex;
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	FormLines->push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
+	                            std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	                                        (itCurrentVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
+	++itCurrentVertex;
+  }
+  FormLines->push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
+                              std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                          (itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
 }
 
 void form::frmlin(std::vector<F_POINT> const& vertices) {
