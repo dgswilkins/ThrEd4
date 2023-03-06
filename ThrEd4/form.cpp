@@ -642,12 +642,13 @@ void form::chkcont() {
 
 void form::ispcdclp() {
   StateMap->reset(StateFlag::WASPCDCLP);
-  if (OpenClipboard(ThrEdWindow) != 0) {
-	Clip       = RegisterClipboardFormat(PcdClipFormat);
-	ClipMemory = GetClipboardData(Clip);
-	if (ClipMemory != nullptr) {
-	  StateMap->set(StateFlag::WASPCDCLP);
-	}
+  if (OpenClipboard(ThrEdWindow) == 0) {
+	return;
+  }
+  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  ClipMemory = GetClipboardData(Clip);
+  if (ClipMemory != nullptr) {
+	StateMap->set(StateFlag::WASPCDCLP);
   }
   CloseClipboard();
 }
