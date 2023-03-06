@@ -1013,91 +1013,92 @@ void form::drwfrm() {
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
 	auto const& form = FormList->operator[](iForm);
 	form::frmlin(form);
-	if (!FormLines->empty()) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  if (auto const layer = gsl::narrow_cast<uint8_t>((form.attribute & FRMLMSK) >> 1U);
-	      (ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-		auto line      = std::array<POINT, 2> {};
-		auto lastPoint = 0U;
-		if (form.type == SAT) {
-		  if ((form.attribute & FRMEND) != 0U) {
-			SelectObject(StitchWindowMemDC, FormPen3px);
-			wrap::polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
-			lastPoint = 1;
-		  }
-		  if (form.wordParam != 0U) {
-			SelectObject(StitchWindowMemDC, FormPen);
-			fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
-			SelectObject(StitchWindowMemDC, FormPen3px);
-			wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
-			SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
-			lastPoint = form.wordParam + 1U;
-		  }
-		  auto const maxGuide      = FormList->operator[](iForm).satinGuideCount;
-		  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-		  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-		  for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
-			auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
-			auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
-			line[0]                   = form::sfCor2px(*itStartVertex);
-			line[1]                   = form::sfCor2px(*itFinishVertex);
-			SelectObject(StitchWindowMemDC, FormPen);
-			wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-			++itGuide;
-		  }
-		}
+	if (FormLines->empty()) {
+	  continue;
+	}
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	auto const layer = gsl::narrow_cast<uint8_t>((form.attribute & FRMLMSK) >> 1U);
+	if ((ActiveLayer != 0U) && (layer != 0U) && layer != ActiveLayer) {
+	  continue;
+	}
+	auto line      = std::array<POINT, 2> {};
+	auto lastPoint = 0U;
+	if (form.type == SAT) {
+	  if ((form.attribute & FRMEND) != 0U) {
+		SelectObject(StitchWindowMemDC, FormPen3px);
+		wrap::polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
+		lastPoint = 1;
+	  }
+	  if (form.wordParam != 0U) {
+		SelectObject(StitchWindowMemDC, FormPen);
+		fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
+		SelectObject(StitchWindowMemDC, FormPen3px);
+		wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
 		SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
-		if (form.type == FRMLINE) {
-		  if (form.vertexCount > 0) {
-			fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
-			if (form.fillType == CONTF) {
-			  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-			  auto const itStartVertex = wrap::next(itFirstVertex, form.angleOrClipData.guide.start);
-			  auto const itFinishVertex = wrap::next(itFirstVertex, form.angleOrClipData.guide.finish);
-			  thred::sCor2px(*itStartVertex, line[0]);
-			  thred::sCor2px(*itFinishVertex, line[1]);
-			  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-			}
-		  }
-		}
-		else {
-		  if (form.vertexCount > lastPoint) {
-			fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](lastPoint)),
-			                             form.vertexCount - lastPoint));
-		  }
-		}
-		if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) {
-		  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-			if (iVertex == ClosestVertexToCursor) {
-			  fi::frmx(FormLines->operator[](iVertex), StitchWindowMemDC);
-			}
-			else {
-			  fi::frmsqr(form.vertexIndex, iVertex);
-			}
-		  }
-		  if (ClosestVertexToCursor != 0U) {
-			fi::frmsqr0(FormLines->front());
-		  }
-		  else {
-			fi::frmx(FormLines->front(), StitchWindowMemDC);
-		  }
-		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
-		}
-		else {
-		  auto& formLines = *FormLines;
-		  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-			fi::frmsqr(form.vertexIndex, iVertex);
-		  }
-		  SelectObject(StitchWindowMemDC, FormSelectedPen);
-		  fi::frmsqr0(formLines[0]);
-		}
-		if (StateMap->test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
-		  SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
-		  form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-		  StateMap->set(StateFlag::SHOPSEL);
-		  form::dupsel(StitchWindowMemDC);
+		lastPoint = form.wordParam + 1U;
+	  }
+	  auto const maxGuide      = FormList->operator[](iForm).satinGuideCount;
+	  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
+		auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
+		auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
+		line[0]                   = form::sfCor2px(*itStartVertex);
+		line[1]                   = form::sfCor2px(*itFinishVertex);
+		SelectObject(StitchWindowMemDC, FormPen);
+		wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+		++itGuide;
+	  }
+	}
+	SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
+	if (form.type == FRMLINE) {
+	  if (form.vertexCount > 0) {
+		fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
+		if (form.fillType == CONTF) {
+		  auto const itFirstVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		  auto const itStartVertex  = wrap::next(itFirstVertex, form.angleOrClipData.guide.start);
+		  auto const itFinishVertex = wrap::next(itFirstVertex, form.angleOrClipData.guide.finish);
+		  thred::sCor2px(*itStartVertex, line[0]);
+		  thred::sCor2px(*itFinishVertex, line[1]);
+		  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 		}
 	  }
+	}
+	else {
+	  if (form.vertexCount > lastPoint) {
+		fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](lastPoint)), form.vertexCount - lastPoint));
+	  }
+	}
+	if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) {
+	  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
+		if (iVertex == ClosestVertexToCursor) {
+		  fi::frmx(FormLines->operator[](iVertex), StitchWindowMemDC);
+		}
+		else {
+		  fi::frmsqr(form.vertexIndex, iVertex);
+		}
+	  }
+	  if (ClosestVertexToCursor != 0U) {
+		fi::frmsqr0(FormLines->front());
+	  }
+	  else {
+		fi::frmx(FormLines->front(), StitchWindowMemDC);
+	  }
+	  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
+	}
+	else {
+	  auto& formLines = *FormLines;
+	  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
+		fi::frmsqr(form.vertexIndex, iVertex);
+	  }
+	  SelectObject(StitchWindowMemDC, FormSelectedPen);
+	  fi::frmsqr0(formLines[0]);
+	}
+	if (StateMap->test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
+	  SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
+	  form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
+	  StateMap->set(StateFlag::SHOPSEL);
+	  form::dupsel(StitchWindowMemDC);
 	}
   }
   if (!SelectedFormList->empty()) {
