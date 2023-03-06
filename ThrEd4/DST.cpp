@@ -918,24 +918,24 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, L"ReadFile for dstHeader in readDSTFile")) {
 	return false;
   }
-  if (bytesRead == sizeof(dstHeader)) {
-	if (di::chkdst(&dstHeader)) {
-	  bitmap::resetBmpFile(true);
-	  fileSize -= sizeof(dstHeader);
-	  auto dstData = std::vector<DSTREC> {};
-	  dstData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
-	  if (!wrap::readFile(fileHandle, dstData.data(), fileSize, &bytesRead, L"ReadFile for dstData in readDSTFile")) {
-		return false;
-	  }
-	  di::dstran(dstData);
-	  IniFile.auxFileType = AUXDST;
-	}
-  }
-  else {
+  if (bytesRead != sizeof(dstHeader)) {
 	displayText::tabmsg(IDS_DST2S, false);
 	CloseHandle(fileHandle);
 	return false;
   }
+  if (!di::chkdst(&dstHeader)) {
+	CloseHandle(fileHandle);
+	return false;
+  }
+  bitmap::resetBmpFile(true);
+  fileSize -= sizeof(dstHeader);
+  auto dstData = std::vector<DSTREC> {};
+  dstData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
+  if (!wrap::readFile(fileHandle, dstData.data(), fileSize, &bytesRead, L"ReadFile for dstData in readDSTFile")) {
+	return false;
+  }
+  di::dstran(dstData);
+  IniFile.auxFileType = AUXDST;
   CloseHandle(fileHandle);
   return true;
 }
