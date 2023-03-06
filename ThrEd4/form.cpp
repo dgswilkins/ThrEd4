@@ -563,14 +563,16 @@ void form::fltspac(uint32_t vertexOffset, uint32_t count) {
 }
 
 void form::delflt(uint32_t formIndex) {
-  if (auto itForm = wrap::next(FormList->begin(), formIndex); itForm->vertexCount != 0U) {
-	auto const vertexCount   = itForm->vertexCount;
-	auto const itStartVertex = wrap::next(FormVertices->cbegin(), itForm->vertexIndex);
-	auto const itEndVertex   = wrap::next(itStartVertex, itForm->vertexCount);
-	FormVertices->erase(itStartVertex, itEndVertex);
-	for (++itForm; itForm < FormList->end(); ++itForm) {
-	  itForm->vertexIndex -= vertexCount;
-	}
+  auto itForm = wrap::next(FormList->begin(), formIndex);
+  if (itForm->vertexCount == 0U) {
+	return;
+  }
+  auto const vertexCount   = itForm->vertexCount;
+  auto const itStartVertex = wrap::next(FormVertices->cbegin(), itForm->vertexIndex);
+  auto const itEndVertex   = wrap::next(itStartVertex, itForm->vertexCount);
+  FormVertices->erase(itStartVertex, itEndVertex);
+  for (++itForm; itForm < FormList->end(); ++itForm) {
+	itForm->vertexIndex -= vertexCount;
   }
 }
 
