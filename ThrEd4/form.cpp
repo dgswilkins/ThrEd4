@@ -685,19 +685,21 @@ void form::frmlin(FRM_HEAD const& form) {
 }
 
 void form::frmlin(std::vector<F_POINT> const& vertices) {
-  if (auto const vertexMax = vertices.size(); vertexMax != 0U) {
-	auto& formLines = *FormLines;
-	formLines.clear();
-	formLines.reserve(vertexMax);
-	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
-	  formLines.push_back(POINT {std::lround((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
-	                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                         (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y)});
-	}
-	formLines.push_back(POINT {std::lround((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
-	                           std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                       (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y)});
+  auto const vertexMax = vertices.size();
+  if (vertexMax == 0U) {
+	return;
   }
+  auto& formLines = *FormLines;
+  formLines.clear();
+  formLines.reserve(vertexMax);
+  for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
+	formLines.push_back(POINT {std::lround((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
+	                           std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	                                       (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y)});
+  }
+  formLines.push_back(POINT {std::lround((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
+                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                         (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y)});
 }
 
 void form::dufrm() noexcept {
