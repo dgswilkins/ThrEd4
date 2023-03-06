@@ -334,13 +334,12 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
 auto di::colfil() -> bool {
   *ColorFileName = *WorkingFileName;
   *RGBFileName   = *WorkingFileName;
-  auto flag      = false;
-  if (WorkingFileName->has_extension()) {
-	ColorFileName->replace_extension(L"thw");
-	RGBFileName->replace_extension(L"rgb");
-	flag = true;
+  if (!WorkingFileName->has_extension()) {
+	return false;
   }
-  return flag;
+  ColorFileName->replace_extension(L"thw");
+  RGBFileName->replace_extension(L"rgb");
+  return true;
 }
 
 void DST::setColFilename(fs::path* directory) noexcept {
