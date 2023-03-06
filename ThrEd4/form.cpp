@@ -1455,59 +1455,62 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
 }
 
 auto form::closfrm() -> bool {
-  if (!FormList->empty()) {
-	auto const screenCoordinate =
-	    POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-	fi::rats();
-	auto       closestForm   = 0U;
-	auto       closestVertex = 0U;
-	auto       minimumLength = BIGFLOAT;
-	auto const point         = fi::px2stchf(screenCoordinate);
-	auto const layerCoded    = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
-	auto const maxForm       = wrap::toUnsigned(FormList->size());
-	for (auto iForm = 0U; iForm < maxForm; ++iForm) {
-	  if (StateMap->test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
+  if (FormList->empty()) {
+	return false;
+  }
+  auto const screenCoordinate =
+      POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  fi::rats();
+  auto       closestForm   = 0U;
+  auto       closestVertex = 0U;
+  auto       minimumLength = BIGFLOAT;
+  auto const point         = fi::px2stchf(screenCoordinate);
+  auto const layerCoded    = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
+  auto const maxForm       = wrap::toUnsigned(FormList->size());
+  for (auto iForm = 0U; iForm < maxForm; ++iForm) {
+	if (StateMap->test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
+	  continue;
+	}
+	auto& currentForm    = FormList->operator[](iForm);
+	auto const formLayer = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
+	if ((ActiveLayer != 0U) && (formLayer != 0U) && formLayer != layerCoded) {
+	  continue;
+	}
+	auto const itFirstVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex);
+	auto       itVertex      = itFirstVertex;
+	// find the closest line first and then find the closest vertex on that line
+	auto       length    = 0.0F;
+	auto const sideCount = currentForm.vertexCount;
+	for (auto iVertex = 0U; iVertex < sideCount; ++iVertex) {
+	  auto const itNextVertex = wrap::next(itFirstVertex, form::nxt(currentForm, iVertex));
+	  auto const param        = fi::findDistanceToSide(*itVertex, *itNextVertex, point, length);
+	  if ((length >= minimumLength) || (length < 0.0F)) {
+		++itVertex;
 		continue;
 	  }
-	  auto& currentForm = FormList->operator[](iForm);
-	  if (auto const formLayer = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
-	      (ActiveLayer == 0U) || (formLayer == 0U) || formLayer == layerCoded) {
-		auto const itFirstVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex);
-		auto       itVertex      = itFirstVertex;
-		// find the closest line first and then find the closest vertex on that line
-		auto       length    = 0.0F;
-		auto const sideCount = currentForm.vertexCount;
-		for (auto iVertex = 0U; iVertex < sideCount; ++iVertex) {
-		  auto const itNextVertex = wrap::next(itFirstVertex, form::nxt(currentForm, iVertex));
-		  auto const param        = fi::findDistanceToSide(*itVertex, *itNextVertex, point, length);
-		  if ((length < minimumLength) && (length >= 0.0F)) {
-			minimumLength = length;
-			closestForm   = iForm;
-			if (param < 0.5F) {
-			  closestVertex = iVertex;
-			}
-			else {
-			  closestVertex = form::nxt(currentForm, iVertex);
-			}
-		  }
-		  ++itVertex;
-		}
+	  minimumLength = length;
+	  closestForm   = iForm;
+	  if (param < 0.5F) {
+		closestVertex = iVertex;
 	  }
+	  else {
+		closestVertex = form::nxt(currentForm, iVertex);
+	  }
+	  ++itVertex;
 	}
+  }
 
-	auto const& vertex =
-	    FormVertices->operator[](wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex);
-	auto const stitchCoordsInPixels = thred::stch2pxr(vertex);
+  auto const& vertex =
+      FormVertices->operator[](wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex);
+  auto const stitchCoordsInPixels = thred::stch2pxr(vertex);
 
-	minimumLength = std::hypot(wrap::toFloat(stitchCoordsInPixels.x - screenCoordinate.x),
-	                           wrap::toFloat(stitchCoordsInPixels.y - screenCoordinate.y));
-	if (minimumLength < FCLOSNUF) {
-	  ClosestFormToCursor   = closestForm;
-	  ClosestVertexToCursor = closestVertex;
-	  StateMap->set(StateFlag::RELAYR);
-	  return true;
-	}
-	return false;
+  minimumLength = std::hypot(wrap::toFloat(stitchCoordsInPixels.x - screenCoordinate.x),
+                             wrap::toFloat(stitchCoordsInPixels.y - screenCoordinate.y));
+  if (minimumLength < FCLOSNUF) {
+	ClosestFormToCursor   = closestForm;
+	ClosestVertexToCursor = closestVertex;
+	StateMap->set(StateFlag::RELAYR);
+	return true;
   }
   return false;
 }
