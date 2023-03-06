@@ -743,35 +743,36 @@ void fi::rats() {
 }
 
 void form::setfrm() {
-  if (!FormList->empty()) {
-	fi::rats();
-	ClosestFormToCursor  = wrap::toUnsigned(FormList->size() - 1U);
-	auto const point     = fi::px2stchf(FormLines->front());
-	auto       itVertex  = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
-	auto const delta     = F_POINT {point.x - itVertex->x, point.y - itVertex->y};
-	auto&      rectangle = FormList->back().rectangle;
-	rectangle            = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
-	for (auto iVertex = 0U; iVertex < NewFormVertexCount - 1U; ++iVertex) {
-	  itVertex->x += delta.x;
-	  itVertex->y += delta.y;
-	  if (itVertex->x < rectangle.left) {
-		rectangle.left = itVertex->x;
-	  }
-	  if (itVertex->x > rectangle.right) {
-		rectangle.right = itVertex->x;
-	  }
-	  if (itVertex->y > rectangle.top) {
-		rectangle.top = itVertex->y;
-	  }
-	  if (itVertex->y < rectangle.bottom) {
-		rectangle.bottom = itVertex->y;
-	  }
-	  ++itVertex;
-	}
-	StateMap->reset(StateFlag::FORMIN);
-	StateMap->set(StateFlag::INIT);
-	StateMap->set(StateFlag::RESTCH);
+  if (FormList->empty()) {
+	return;
   }
+  fi::rats();
+  ClosestFormToCursor  = wrap::toUnsigned(FormList->size() - 1U);
+  auto const point     = fi::px2stchf(FormLines->front());
+  auto       itVertex  = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
+  auto const delta     = F_POINT {point.x - itVertex->x, point.y - itVertex->y};
+  auto&      rectangle = FormList->back().rectangle;
+  rectangle            = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
+  for (auto iVertex = 0U; iVertex < NewFormVertexCount - 1U; ++iVertex) {
+	itVertex->x += delta.x;
+	itVertex->y += delta.y;
+	if (itVertex->x < rectangle.left) {
+	  rectangle.left = itVertex->x;
+	}
+	if (itVertex->x > rectangle.right) {
+	  rectangle.right = itVertex->x;
+	}
+	if (itVertex->y > rectangle.top) {
+	  rectangle.top = itVertex->y;
+	}
+	if (itVertex->y < rectangle.bottom) {
+	  rectangle.bottom = itVertex->y;
+	}
+	++itVertex;
+  }
+  StateMap->reset(StateFlag::FORMIN);
+  StateMap->set(StateFlag::INIT);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void form::form() {
