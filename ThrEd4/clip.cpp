@@ -908,30 +908,30 @@ void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint
 
 void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   OSequence->clear();
-  if (auto chainLength = wrap::toUnsigned(chainEndPoints.size()); chainLength > 2U) {
-	--chainLength;
-	for (auto iPoint = 0U; iPoint < chainLength - 1U; ++iPoint) {
-	  ci::duchfn(chainEndPoints, iPoint, iPoint + 1U);
-	}
-	if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
-	  ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
-	  auto backupAt = 8U;
-	  if (StateMap->test(StateFlag::LINCHN)) {
-		--backupAt;
-	  }
-	  if ((OSequence->size() >= backupAt)) {
-		OSequence->operator[](OSequence->size() - backupAt) = chainEndPoints[chainLength];
-	  }
-	  OSequence->push_back(chainEndPoints[chainLength]);
-	}
-	else {
-	  ci::duchfn(chainEndPoints, chainLength - 1, 0);
-	  OSequence->push_back(chainEndPoints[chainLength]);
-	}
-  }
-  else {
+  auto chainLength = wrap::toUnsigned(chainEndPoints.size());
+  if (chainLength <= 2U) {
 	displayText::tabmsg(IDS_CHANSMAL, false);
+	return;
   }
+  --chainLength;
+  for (auto iPoint = 0U; iPoint < chainLength - 1U; ++iPoint) {
+	ci::duchfn(chainEndPoints, iPoint, iPoint + 1U);
+  }
+  auto const& form = FormList->operator[](ClosestFormToCursor);
+  if (form.type != FRMLINE) {
+	ci::duchfn(chainEndPoints, chainLength - 1, 0);
+	OSequence->push_back(chainEndPoints[chainLength]);
+	return;
+  }
+  ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
+  auto backupAt = 8U;
+  if (StateMap->test(StateFlag::LINCHN)) {
+	--backupAt;
+  }
+  if ((OSequence->size() >= backupAt)) {
+	OSequence->operator[](OSequence->size() - backupAt) = chainEndPoints[chainLength];
+  }
+  OSequence->push_back(chainEndPoints[chainLength]);
 }
 
 void clip::chnfn(FRM_HEAD const& form) {
