@@ -25,56 +25,57 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
 }
 
 void displayText::shoMsg(std::wstring const& message, bool top) {
-  if (!message.empty()) {
-	auto       strings              = std::vector<std::wstring> {};
-	auto       iString              = 0U;
-	auto       previousStringLength = 0U;
-	auto const sizeLim              = message.size();
-	while (iString < sizeLim) {
-	  if (constexpr auto NEWLINE = 10; message[iString] == NEWLINE) {
-		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
-		previousStringLength = iString;
-	  }
-	  else {
-		++iString;
-	  }
-	}
-	strings.push_back(message.substr(previousStringLength, (iString - previousStringLength)));
-	auto textSize    = SIZE {};
-	auto messageSize = SIZE {};
-	for (auto& string : strings) {
-	  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
-	  if (textSize.cx > messageSize.cx) {
-		messageSize.cx = textSize.cx;
-	  }
-	  if (textSize.cy > messageSize.cy) {
-		messageSize.cy = textSize.cy;
-	  }
-	}
-	messageSize.cy *= gsl::narrow<int32_t>(strings.size());
-	auto mainRect = RECT {};
-	GetWindowRect(MainStitchWin, &mainRect);
-	auto thredRect = RECT {};
-	GetWindowRect(ThrEdWindow, &thredRect);
-	auto const xOffset = mainRect.left - thredRect.left;
-	auto       yOffset = 3;
-	if (!top) {
-	  yOffset = (mainRect.bottom - mainRect.top) - 12 - messageSize.cy;
-	}
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	MsgWindow = CreateWindow(L"STATIC",
-	                         message.c_str(),
-	                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                         xOffset,
-	                         yOffset,
-	                         messageSize.cx + 20,
-	                         messageSize.cy + 6,
-	                         ThrEdWindow,
-	                         nullptr,
-	                         ThrEdInstance,
-	                         nullptr);
-	//		displayText::updateWinFont(MainStitchWin);
+  if (message.empty()) {
+	return;
   }
+  auto       strings              = std::vector<std::wstring> {};
+  auto       iString              = 0U;
+  auto       previousStringLength = 0U;
+  auto const sizeLim              = message.size();
+  while (iString < sizeLim) {
+	if (constexpr auto NEWLINE = 10; message[iString] == NEWLINE) {
+	  strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
+	  previousStringLength = iString;
+	}
+	else {
+	  ++iString;
+	}
+  }
+  strings.push_back(message.substr(previousStringLength, (iString - previousStringLength)));
+  auto textSize    = SIZE {};
+  auto messageSize = SIZE {};
+  for (auto& string : strings) {
+	wrap::getTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
+	if (textSize.cx > messageSize.cx) {
+	  messageSize.cx = textSize.cx;
+	}
+	if (textSize.cy > messageSize.cy) {
+	  messageSize.cy = textSize.cy;
+	}
+  }
+  messageSize.cy *= gsl::narrow<int32_t>(strings.size());
+  auto mainRect = RECT {};
+  GetWindowRect(MainStitchWin, &mainRect);
+  auto thredRect = RECT {};
+  GetWindowRect(ThrEdWindow, &thredRect);
+  auto const xOffset = mainRect.left - thredRect.left;
+  auto       yOffset = 3;
+  if (!top) {
+	yOffset = (mainRect.bottom - mainRect.top) - 12 - messageSize.cy;
+  }
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  MsgWindow = CreateWindow(L"STATIC",
+                           message.c_str(),
+                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                           xOffset,
+                           yOffset,
+                           messageSize.cx + 20,
+                           messageSize.cy + 6,
+                           ThrEdWindow,
+                           nullptr,
+                           ThrEdInstance,
+                           nullptr);
+  //		displayText::updateWinFont(MainStitchWin);
 }
 
 void displayText::tabmsg(uint32_t code, bool top) {
