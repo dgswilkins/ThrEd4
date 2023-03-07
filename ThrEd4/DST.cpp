@@ -159,34 +159,33 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 		color                    = DST::colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		thred::addColor(currentStitch, color);
+		continue;
 	  }
-	  else {
-		++color;
-		color &= COLMSK;
-	  }
+	  ++color;
+	  color &= COLMSK;
+	  continue;
 	}
-	else {
-	  auto dstStitch = POINT {};
-	  di::dstin(di::dtrn(&record), dstStitch);
-	  localStitch.x += wrap::toFloat(dstStitch.x);
-	  localStitch.y += wrap::toFloat(dstStitch.y);
-	  if (constexpr auto C0MASK = 0x80U;
-	      (record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
-		auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
-		StitchBuffer->push_back(stitch);
-		if (stitch.x > maximumCoordinate.x) {
-		  maximumCoordinate.x = stitch.x;
-		}
-		if (stitch.y > maximumCoordinate.y) {
-		  maximumCoordinate.y = stitch.y;
-		}
-		if (stitch.x < mimimumCoordinate.x) {
-		  mimimumCoordinate.x = stitch.x;
-		}
-		if (stitch.y < mimimumCoordinate.y) {
-		  mimimumCoordinate.y = stitch.y;
-		}
-	  }
+	auto dstStitch = POINT {};
+	di::dstin(di::dtrn(&record), dstStitch);
+	localStitch.x += wrap::toFloat(dstStitch.x);
+	localStitch.y += wrap::toFloat(dstStitch.y);
+	constexpr auto C0MASK = 0x80U;
+	if ((record.nd & C0MASK) != 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
+	  continue;
+	}
+	auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
+	StitchBuffer->push_back(stitch);
+	if (stitch.x > maximumCoordinate.x) {
+	  maximumCoordinate.x = stitch.x;
+	}
+	if (stitch.y > maximumCoordinate.y) {
+	  maximumCoordinate.y = stitch.y;
+	}
+	if (stitch.x < mimimumCoordinate.x) {
+	  mimimumCoordinate.x = stitch.x;
+	}
+	if (stitch.y < mimimumCoordinate.y) {
+	  mimimumCoordinate.y = stitch.y;
 	}
   }
   auto const dstSize =
