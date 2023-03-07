@@ -143,25 +143,22 @@ void displayText::crmsg(fs::path const& fileName) {
 }
 
 void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
-  if (StateMap->test(StateFlag::WASTRAC) && iButton > HNUM) {
-	if (iButton == HMINLEN) {
-	  if (StateMap->test(StateFlag::HIDMAP)) {
-		auto const bText = displayText::loadStr(IDS_TRC1H);
-		SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
-	  }
-	  else {
-		auto const bText = displayText::loadStr(IDS_TRC1S);
-		SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
-	  }
-	}
-	else {
-	  auto const bText = displayText::loadStr(iButton - 4U + IDS_TRC0);
-	  SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
-	}
-  }
-  else {
+  if (!StateMap->test(StateFlag::WASTRAC) || iButton <= HNUM) {
 	SetWindowText(ButtonWin->operator[](iButton), buttonText.c_str());
+	return;
   }
+  if (iButton != HMINLEN) {
+	auto const bText = displayText::loadStr(iButton - 4U + IDS_TRC0);
+	SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
+	return;
+  }
+  if (!StateMap->test(StateFlag::HIDMAP)) {
+	auto const bText = displayText::loadStr(IDS_TRC1S);
+	SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
+	return;
+  }
+  auto const bText = displayText::loadStr(IDS_TRC1H);
+  SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 }
 
 void displayText::clrhbut(uint32_t startButton) {
