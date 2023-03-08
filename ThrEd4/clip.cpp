@@ -674,11 +674,12 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 	if (minimumIndex != 0U) {
 	  if (minimumIndex < wrap::toUnsigned(chainEndPoints.size() - 1U)) {
 		auto const spPoints1 = std::ranges::subrange(wrap::next(chainEndPoints.begin(), minimumIndex),
-		                                             std::prev(chainEndPoints.end(), 2));
+		                                             std::prev(chainEndPoints.end(), 1));
 		tempClipPoints.insert(tempClipPoints.end(), spPoints1.begin(), spPoints1.end());
 	  }
+	  auto const spEnd = ptrdiff_t {minimumIndex} + 1U;
 	  auto const spPoints2 =
-	      std::ranges::subrange(chainEndPoints.begin(), wrap::next(chainEndPoints.begin(), minimumIndex));
+	      std::ranges::subrange(chainEndPoints.begin(), std::next(chainEndPoints.begin(), spEnd));
 	  tempClipPoints.insert(tempClipPoints.end(), spPoints2.begin(), spPoints2.end());
 	  chainEndPoints = tempClipPoints;
 	}
