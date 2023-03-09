@@ -543,7 +543,7 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto       flag          = true;
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const vNext         = std::next(itFirstVertex);
-  for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(vNext, form.vertexCount - 1U));
+  for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(itFirstVertex, form.vertexCount));
        auto const& iVertex : spVertices) {
 	auto const length = hypot(iVertex.x - itFirstVertex->x, iVertex.y - itFirstVertex->y);
 	if (length > form.edgeSpacing) {
