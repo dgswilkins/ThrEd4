@@ -163,7 +163,7 @@ auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> co
 constexpr auto durat(float start, float finish, float featherRatio) -> float;
 
 void durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather);
-void durec(O_REC& record);
+void durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto dutyp(uint32_t attribute) noexcept -> uint32_t;
 void duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept;
 
@@ -213,7 +213,9 @@ auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> B
 
 void setstxt(int32_t stringIndex, float value, HWND dialog);
 void setundfn(uint32_t code);
-auto srtchk(std::vector<O_REC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool;
+auto srtchk(std::vector<O_REC*> const& stitchRegion,
+            uint32_t                   count,
+            uint32_t&                  badForm) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool;
 
 constexpr auto tim2int(FILETIME time) noexcept -> ULARGE_INTEGER;
 
@@ -979,7 +981,7 @@ auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
   return 1U;
 }
 
-void xi::durec(O_REC& record) {
+void xi::durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const itStitch = wrap::next(StitchBuffer->begin(), record.start);
   record.type = gsl::narrow_cast<decltype(record.type)>(STITCH_TYPES[dutyp(itStitch->attribute)]);
   auto const attribute = itStitch->attribute & SRTMSK;
@@ -1138,7 +1140,9 @@ void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
 }
 #endif
 
-auto xi::srtchk(std::vector<O_REC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool {
+auto xi::srtchk(std::vector<O_REC*> const& stitchRegion,
+                uint32_t                   count,
+                uint32_t& badForm) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool {
   auto iStitchRegion = stitchRegion.begin();
   auto formIndex     = (*iStitchRegion)->form;
   auto color         = (*iStitchRegion)->color;

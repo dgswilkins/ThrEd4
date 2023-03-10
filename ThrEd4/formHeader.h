@@ -311,7 +311,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto isEdgeClipX() const noexcept -> bool;
   [[nodiscard]] inline auto isTexture() const noexcept -> bool;
   [[nodiscard]] inline auto isFanClip() const noexcept -> bool;
-  inline void               outline();
+  inline void               outline() noexcept(!(std::is_same_v<ptrdiff_t, int>));
   inline void               squareEnd(bool flag) noexcept;
 };
 
@@ -651,7 +651,7 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
   return false;
 }
 
-inline void FRM_HEAD::outline() {
+inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (vertexCount != 0U) {
 	const auto* formVertices = wrap::getFormVertices();
 	auto        itVertex     = wrap::next(formVertices->cbegin(), vertexIndex);

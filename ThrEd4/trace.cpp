@@ -1346,7 +1346,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
   thred::redraw(TraceNumberInput);
 }
 
-void trace::traceNumberReset() {
+void trace::traceNumberReset() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const itTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
   *itTraceInputBuffer           = 0;
   thred::redraw(TraceNumberInput);

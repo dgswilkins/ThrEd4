@@ -13,7 +13,10 @@ namespace si {
 auto chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool;
 void filinsbw(std::vector<F_POINT>& satinBackup, F_POINT const& point, uint32_t& satinBackupIndex, F_POINT& stitchPoint);
 auto nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t;
-void outfn(FRM_HEAD const& form, uint32_t start, uint32_t finish, float satinWidth);
+void outfn(FRM_HEAD const& form,
+           uint32_t        start,
+           uint32_t        finish,
+           float           satinWidth) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void sacspac(uint32_t startGuide, uint32_t guideCount);
 void satclos();
 void satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t size);
@@ -1460,7 +1463,10 @@ auto si::satOffset(const uint32_t& finish, const uint32_t& start, float satinWid
   return F_POINT {xVal, yVal};
 }
 
-void si::outfn(FRM_HEAD const& form, uint32_t start, uint32_t finish, float satinWidth) {
+void si::outfn(FRM_HEAD const& form,
+               uint32_t        start,
+               uint32_t        finish,
+               float           satinWidth) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const offset =
       (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT)
           ? F_POINT {0.0F, satinWidth}

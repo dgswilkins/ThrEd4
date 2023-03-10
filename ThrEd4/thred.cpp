@@ -191,7 +191,10 @@ void drwknot();
 void drwlstch(uint32_t finish);
 void drwmrk(HDC hDC);
 void dstcurs() noexcept;
-void duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest);
+void duClos(uint32_t            startStitch,
+            uint32_t            stitchCount,
+            F_POINT const&      stitchPoint,
+            std::vector<float>& gapToNearest) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void duIns();
 void duSelbox() noexcept;
 void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uint32_t>);
@@ -245,8 +248,8 @@ void formStretch(uint32_t form);
 void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
 auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
 void frmcursel(uint32_t cursorType);
-void frmpos(FRM_HEAD& form, float deltaX, float deltaY);
-void frmsnap(uint32_t start, uint32_t count);
+void frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!(std::is_same_v<ptrdiff_t, int>));
+void frmsnap(uint32_t start, uint32_t count) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto frmstch() -> bool;
 
 auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
@@ -339,7 +342,7 @@ auto nuCol(COLORREF init) noexcept -> BOOL;
 void resetState();
 void nuFil(FileIndices fileIndex);
 void nuRct() noexcept;
-void nuStchSiz(uint32_t iColor, int32_t width);
+void nuStchSiz(uint32_t iColor, int32_t width) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
 void nucols();
 void nudgfn(float deltaX, float deltaY);
@@ -463,7 +466,7 @@ void stchPars();
 void stchWnd();
 void stchbox(uint32_t iStitch, HDC hDC);
 void stchout();
-void stchsnap(uint32_t start, uint32_t finish);
+void stchsnap(uint32_t start, uint32_t finish) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto stlen(uint32_t iStitch) -> float;
 void stretch();
 void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
@@ -3162,7 +3165,7 @@ void thred::nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept {
   pen = wrap::createPen(PS_SOLID, width, color);
 }
 
-void thi::nuStchSiz(uint32_t iColor, int32_t width) {
+void thi::nuStchSiz(uint32_t iColor, int32_t width) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const tsp = wrap::next(ThreadSizePixels.begin(), iColor);
   if (width != *tsp) {
 	thred::nuPen(UserPen->operator[](iColor), width, UserColor[iColor]);
@@ -5000,7 +5003,10 @@ void thi::zumout() {
   movins();
 }
 
-void thi::duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest) {
+void thi::duClos(uint32_t            startStitch,
+                 uint32_t            stitchCount,
+                 F_POINT const&      stitchPoint,
+                 std::vector<float>& gapToNearest) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
 	auto const xCoord = std::abs(stitch->x - stitchPoint.x);
@@ -9658,7 +9664,7 @@ void thi::frmcursel(uint32_t cursorType) {
   menu::frmcurmen();
 }
 
-void thi::stchsnap(uint32_t start, uint32_t finish) {
+void thi::stchsnap(uint32_t start, uint32_t finish) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto pnt = wrap::next(StitchBuffer->begin(), start);
   for (auto i = 0U; i < finish - start; ++i) {
 	pnt->x = rintf(pnt->x / IniFile.gridSize) * IniFile.gridSize;
@@ -9667,7 +9673,7 @@ void thi::stchsnap(uint32_t start, uint32_t finish) {
   }
 }
 
-void thi::frmsnap(uint32_t start, uint32_t count) {
+void thi::frmsnap(uint32_t start, uint32_t count) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto itVertex = wrap::next(FormVertices->begin(), start);
   for (auto i = 0U; i < count; ++i) {
 	itVertex->x = rintf(itVertex->x / IniFile.gridSize) * IniFile.gridSize;
@@ -9898,7 +9904,7 @@ void thi::filclos() {
   displayText::savdisc();
 }
 
-void thi::frmpos(FRM_HEAD& form, float deltaX, float deltaY) {
+void thi::frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x += deltaX;
@@ -16380,7 +16386,7 @@ void thi::chkirct() noexcept {
   }
 }
 
-auto thred::getLayerPen(uint32_t layer) -> HPEN {
+auto thred::getLayerPen(uint32_t layer) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> HPEN {
   auto const itLayerPen = wrap::next(LayerPen.begin(), layer);
   return *itLayerPen;
 }

@@ -53,7 +53,7 @@ void fxlit(uint32_t                  vertexIndex,
            F_POINT&                  stitchPoint,
            uint32_t&                 adjCount,
            float                     adjustedSpace,
-           uint32_t                  nextStart);
+           uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto fxpnt(uint32_t                  vertexIndex,
            std::vector<float> const& listSINEs,
            std::vector<float> const& listCOSINEs,
@@ -61,7 +61,7 @@ auto fxpnt(uint32_t                  vertexIndex,
            uint32_t                  currentSide,
            F_POINT const&            stitchPoint,
            float                     adjustedSpace,
-           uint32_t                  nextStart) -> bool;
+           uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool;
 void lincrnr(uint32_t                    vertexIndex,
              std::vector<F_POINT> const& clipReversedData,
              std::vector<F_POINT>&       clipFillData,
@@ -88,7 +88,11 @@ void picfn(FRM_HEAD const&       form,
            float                 spacing,
            F_POINT const&        rotationCenter);
 auto ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool;
-void setvct(uint32_t vertexIndex, uint32_t start, uint32_t finish, float& clipAngle, F_POINT& vector0);
+void setvct(uint32_t vertexIndex,
+            uint32_t start,
+            uint32_t finish,
+            float&   clipAngle,
+            F_POINT& vector0) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void xclpfn(std::vector<F_POINT> const& tempClipPoints,
             std::vector<F_POINT> const& chainEndPoints,
             uint32_t                    start,
@@ -263,7 +267,11 @@ void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedDa
   }
 }
 
-void ci::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finish, float& clipAngle, F_POINT& vector0) {
+void ci::setvct(uint32_t vertexIndex,
+                uint32_t start,
+                uint32_t finish,
+                float&   clipAngle,
+                F_POINT& vector0) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const itVertex       = wrap::next(FormVertices->cbegin(), vertexIndex);
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);
@@ -467,7 +475,8 @@ auto ci::fxpnt(uint32_t                  vertexIndex,
                uint32_t                  currentSide,
                F_POINT const&            stitchPoint,
                float                     adjustedSpace,
-               uint32_t                  nextStart) -> bool {
+               uint32_t nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>))
+    -> bool {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
   moveToCoords        = *itVertex;
   if (auto length = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y); length > adjustedSpace) {
@@ -494,7 +503,7 @@ void ci::fxlit(uint32_t                  vertexIndex,
                F_POINT&                  stitchPoint,
                uint32_t&                 adjCount,
                float                     adjustedSpace,
-               uint32_t                  nextStart) {
+               uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (ci::fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
 	stitchPoint = moveToCoords;
 	++adjCount;

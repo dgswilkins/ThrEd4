@@ -182,13 +182,30 @@ auto distance(inType start, inType end) noexcept(std::is_same_v<outType, ptrdiff
 }
 
 template <class itType, class inType>
-auto next(itType iterator, inType index) noexcept(std::is_same_v<inType, ptrdiff_t>) -> itType {
+auto next(itType iterator,
+          inType index) noexcept(!(std::is_same_v<inType, size_t> ||
+                                   (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>)))
+    -> itType {
   // static_assert(!std::is_same_v<inType, ptrdiff_t>, "no need to use wrap::next here.");
+  static_assert((std::is_same_v<inType, size_t> || std::is_same_v<inType, uint32_t> ||
+                 std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint8_t> ||
+                 std::is_same_v<inType, int> || std::is_same_v<inType, char>),
+                "next cannot be used here.");
   if constexpr (std::is_same_v<inType, ptrdiff_t>) {
 	return std::next(iterator, index);
   }
   else {
-	return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
+	if constexpr (std::is_same_v<inType, size_t>) {
+	  return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
+	}
+	else {
+	  if constexpr (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>) {
+		return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
+	  }
+	  else {
+		return std::next(iterator, gsl::narrow_cast<ptrdiff_t>(index));
+	  }
+	}
   }
 }
 
@@ -267,13 +284,23 @@ void setCursor(HCURSOR hCursor) noexcept;
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 
 template <class inType>
-auto to_ptrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int>) -> ptrdiff_t {
-  static_assert(std::is_same_v<inType, uint32_t>, "to_ptrdiff cannot be used here.");
-  if constexpr (std::is_same_v<ptrdiff_t, int>) {
-	return gsl::narrow<ptrdiff_t>(invar);
+auto to_ptrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
+    -> ptrdiff_t {
+  static_assert(std::is_same_v<inType, ptrdiff_t> || std::is_same_v<inType, uint32_t> ||
+                    std::is_same_v<inType, int>,
+                "to_ptrdiff cannot be used here.");
+  if constexpr (std::is_same_v<inType, ptrdiff_t>) {
+	return invar;
   }
   else {
-	return gsl::narrow_cast<ptrdiff_t>(invar);
+	if constexpr (std::is_same_v<ptrdiff_t, int>) {
+	  if constexpr (std::is_same_v<inType, uint32_t>) {
+		return gsl::narrow<ptrdiff_t>(invar);
+	  }
+	}
+	else {
+	  return gsl::narrow_cast<ptrdiff_t>(invar);
+	}
   }
 }
 

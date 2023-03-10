@@ -209,7 +209,7 @@ constexpr auto SEQBOT   = int32_t {3};
 
 namespace fi {
 void adfrm(uint32_t iForm);
-void angout(FRM_HEAD& angledForm);
+void angout(FRM_HEAD& angledForm) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void apbrd(FRM_HEAD const& form);
 void bakseq();
 void bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float stitchSize);
@@ -347,7 +347,7 @@ auto getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR> con
 auto getlen(std::vector<CLIP_PNT>&      clipStitchPoints,
             std::vector<float> const&   lengths,
             uint32_t                    iPoint,
-            std::vector<F_POINT> const& currentFormVertices) -> float;
+            std::vector<F_POINT> const& currentFormVertices) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> float;
 auto getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uint32_t>;
 void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
 auto insect(FRM_HEAD const&             form,
@@ -495,7 +495,7 @@ void sprct(std::vector<F_POINT> const& vertices,
            uint32_t                    vertexIndex,
            std::vector<V_RECT_2>&      fillVerticalRect,
            uint32_t                    start,
-           uint32_t                    finish);
+           uint32_t                    finish) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
             uint32_t                     iRect) noexcept;
@@ -562,7 +562,7 @@ void form::fltspac(uint32_t vertexOffset, uint32_t count) {
   }
 }
 
-void form::delflt(uint32_t formIndex) {
+void form::delflt(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto itForm = wrap::next(FormList->begin(), formIndex);
   if (itForm->vertexCount == 0U) {
 	return;
@@ -1573,7 +1573,9 @@ auto fi::ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen
   return true;
 }
 
-auto form::closflt(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> uint32_t {
+auto form::closflt(FRM_HEAD const& form,
+                   float           xCoordinate,
+                   float yCoordinate) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t {
   auto closestVertex = 0U;
   auto minimumLength = BIGFLOAT;
   auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -1689,7 +1691,7 @@ auto form::lastch() noexcept -> bool {
   return true;
 }
 
-auto form::getlast(FRM_HEAD const& form) -> uint32_t {
+auto form::getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t {
   if (form.fillType == 0U) {
 	return 0;
   }
@@ -2043,7 +2045,7 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
                uint32_t                    vertexIndex,
                std::vector<V_RECT_2>&      fillVerticalRect,
                uint32_t                    start,
-               uint32_t                    finish) {
+               uint32_t                    finish) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const& opStart      = OutsidePoints->operator[](start);
   auto const& opFinish     = OutsidePoints->operator[](finish);
   auto const& ipStart      = InsidePoints->operator[](start);
@@ -3266,7 +3268,8 @@ auto fi::insect(FRM_HEAD const&             form,
 auto fi::getlen(std::vector<CLIP_PNT>&      clipStitchPoints,
                 std::vector<float> const&   lengths,
                 uint32_t                    iPoint,
-                std::vector<F_POINT> const& currentFormVertices) -> float {
+                std::vector<F_POINT> const& currentFormVertices) noexcept(!(std::is_same_v<ptrdiff_t, int>))
+    -> float {
   clipStitchPoints[iPoint].vertexIndex %= currentFormVertices.size();
   auto const itVertex = wrap::next(currentFormVertices.cbegin(), clipStitchPoints[iPoint].vertexIndex);
   return lengths[clipStitchPoints[iPoint].vertexIndex] +
@@ -3803,7 +3806,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 #endif
 }
 
-void fi::angout(FRM_HEAD& angledForm) {
+void fi::angout(FRM_HEAD& angledForm) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (angledForm.vertexCount == 0U) {
 	return;
   }
@@ -7897,7 +7900,7 @@ void form::nufsel() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void form::frmadj(uint32_t formIndex) {
+void form::frmadj(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto& form = FormList->operator[](formIndex);
 
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);

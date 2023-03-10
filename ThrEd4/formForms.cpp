@@ -1090,15 +1090,15 @@ void formForms::setear() {
   auto const formVertexCount  = form.vertexCount;
   auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
   auto       nextVertex       = std::next(firstVertex);
-  auto const count            = wrap::toSize(formVertexCount) / 4U;
+  auto const count            = wrap::to_ptrdiff(formVertexCount) / 4;
   auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
-  auto       lastVertex       = wrap::next(firstVertex, count + 1U);
+  auto       lastVertex       = std::next(firstVertex, count + 1);
   auto       verticalPosition = lastVertex->y;
   --lastVertex;
   auto step        = verticalPosition - lastVertex->y;
-  auto leftVertex  = wrap::next(firstVertex, wrap::toSize(formVertexCount) - count);
-  auto rightVertex = wrap::next(firstVertex, count + 1U);
-  for (auto iStep = 0U; iStep < count; ++iStep) {
+  auto leftVertex  = std::next(firstVertex, wrap::to_ptrdiff(formVertexCount) - count);
+  auto rightVertex = std::next(firstVertex, count + 1);
+  for (auto iStep = 0; iStep < count; ++iStep) {
 	leftVertex->y  = verticalPosition;
 	rightVertex->y = leftVertex->y;
 	rightVertex->x += twistStep;

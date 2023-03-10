@@ -29,7 +29,9 @@ auto chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints, std::vector<PO
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
 auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool;
-auto closflt(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> uint32_t;
+auto closflt(FRM_HEAD const& form,
+             float           xCoordinate,
+             float           yCoordinate) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;
 auto closfrm() -> bool;
 void clpfil();
 void clpspac(uint32_t insertPoint, uint32_t count);
@@ -40,7 +42,7 @@ void contfil();
 void cpylayr(uint32_t layer);
 void crop();
 void debean();
-void delflt(uint32_t formIndex);
+void delflt(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void delfrms();
 void delmfil(uint32_t formIndex);
 void drwcon();
@@ -80,7 +82,7 @@ void flpord();
 void fltspac(uint32_t vertexOffset, uint32_t count);
 void form();
 void frm0();
-void frmadj(uint32_t formIndex);
+void frmadj(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void frmlin(FRM_HEAD const& form);
 void frmlin(std::vector<F_POINT> const& vertices);
 void frmnumfn(uint32_t& oldFormIndex, uint32_t newFormIndex);
@@ -91,7 +93,7 @@ void frmsadj();
 void fselrct(uint32_t iForm);
 void fsizpar(FRM_HEAD& form) noexcept;
 auto getblen() noexcept -> float;
-auto getlast(FRM_HEAD const& form) -> uint32_t;
+auto getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;
 auto getplen() noexcept -> float;
 void horclp();
 void horsclp();
