@@ -1062,7 +1062,7 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  break;
 	}
 	default: {
-	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
+	  outDebugString(L"umsg [{}] not handled in tearprc\n", umsg);
 	  break;
 	}
   }
