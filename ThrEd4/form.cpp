@@ -5243,8 +5243,8 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	case VRTF: {
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(form.vertexCount);
-	  auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+	  auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  fi::fnvrt(workingFormVertices, groupIndexSequence, lineEndpoints);
 	  break;
@@ -5254,8 +5254,8 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(angledForm.vertexCount);
-	  auto itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
-	  auto itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
+	  auto const itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
+	  auto const itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
 	}
@@ -5264,8 +5264,8 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(angledForm.vertexCount);
-	  auto itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
-	  auto itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
+	  auto const itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
+	  auto const itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
 	}
@@ -5274,8 +5274,8 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(form.vertexCount);
-	  auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+	  auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  fi::clpcon(form, textureSegments, workingFormVertices);
 	  doFill = false;
@@ -5300,8 +5300,8 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  texture::setxt(form, textureSegments);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(form.vertexCount);
-	  auto itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+	  auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  fi::clpcon(form, textureSegments, workingFormVertices);
 	  doFill = false;
