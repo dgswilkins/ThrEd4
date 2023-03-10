@@ -5470,7 +5470,6 @@ void form::refil(uint32_t formIndex) {
 	displayText::okcan();
   }
   StateMap->set(StateFlag::MOVMSG);
-  return;
 }
 
 void form::setfpnt() {
