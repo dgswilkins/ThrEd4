@@ -343,7 +343,7 @@ void txi::txrbak() noexcept(std::is_same_v<size_t, uint32_t>) {
 }
 
 auto texture::dutxtfil() -> bool {
-  if (displayText::filmsgs(FMM_TXTR)) {
+  if (!displayText::filmsgs(FMM_TXTR)) {
 	return false;
   }
   if (IniFile.textureHeight == 0.0F) {
