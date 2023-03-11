@@ -798,43 +798,44 @@ void ci::picfn(FRM_HEAD const&       form,
   auto const count = wrap::round<uint32_t>(length / spacing);
   rotationAngle    = atan2(delta.y, delta.x);
   ClipReference    = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
-  if (count != 0U) {
-	auto step = F_POINT {};
-	if (count > 1) {
-	  auto const tdub =
-	      ((length - wrap::toFloat(count) * spacing) / (wrap::toFloat(count) - 1.0F) + spacing) / length;
-	  auto const val = F_POINT {delta.x * tdub, delta.y * tdub};
-	  step           = val;
+  if (count == 0U) {
+	return;
+  }
+  auto step = F_POINT {};
+  if (count > 1) {
+	auto const tdub =
+	    ((length - wrap::toFloat(count) * spacing) / (wrap::toFloat(count) - 1.0F) + spacing) / length;
+	auto const val = F_POINT {delta.x * tdub, delta.y * tdub};
+	step           = val;
+  }
+  auto iClip = clipFillData.begin();
+  for (auto& clip : *ClipBuffer) {
+	*iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
+	++iClip;
+  }
+  auto flag       = true;
+  auto innerPoint = F_POINT {itStartVertex->x, itStartVertex->y};
+  for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
+	auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
+	auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
+	OSequence->push_back(firstPoint);
+	OSequence->push_back(innerPoint);
+	OSequence->push_back(firstPoint);
+	OSequence->push_back(outerPoint);
+	OSequence->push_back(firstPoint);
+	OSequence->push_back(outerPoint);
+	if (ci::ritclp(clipFillData, outerPoint)) {
+	  flag = false;
+	  break;
 	}
-	auto iClip = clipFillData.begin();
-	for (auto& clip : *ClipBuffer) {
-	  *iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
-	  ++iClip;
-	}
-	auto flag       = true;
-	auto innerPoint = F_POINT {itStartVertex->x, itStartVertex->y};
-	for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
-	  auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
-	  auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
-	  OSequence->push_back(firstPoint);
-	  OSequence->push_back(innerPoint);
-	  OSequence->push_back(firstPoint);
-	  OSequence->push_back(outerPoint);
-	  OSequence->push_back(firstPoint);
-	  OSequence->push_back(outerPoint);
-	  if (ci::ritclp(clipFillData, outerPoint)) {
-		flag = false;
-		break;
-	  }
-	  OSequence->push_back(outerPoint);
-	  OSequence->push_back(firstPoint);
-	  innerPoint.x += step.x;
-	  innerPoint.y += step.y;
-	}
-	if (flag) {
-	  OSequence->push_back(*itFinishVertex);
-	  OSequence->push_back(innerPoint);
-	}
+	OSequence->push_back(outerPoint);
+	OSequence->push_back(firstPoint);
+	innerPoint.x += step.x;
+	innerPoint.y += step.y;
+  }
+  if (flag) {
+	OSequence->push_back(*itFinishVertex);
+	OSequence->push_back(innerPoint);
   }
 }
 
