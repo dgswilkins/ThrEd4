@@ -750,32 +750,34 @@ void ci::clpcrnr(FRM_HEAD const&       form,
                  uint32_t              vertex,
                  F_POINT const&        rotationCenter) {
   auto const nextVertex = form::nxt(form, vertex);
-  auto const itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
-  if (auto const* points = StateMap->test(StateFlag::INDIR) ? OutsidePoints : InsidePoints; points != nullptr) {
-	auto delta = F_POINT {points->operator[](nextVertex).x - itVertex->x,
-	                      points->operator[](nextVertex).y - itVertex->y};
+  auto const  itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
+  auto const* points     = StateMap->test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  if (nullptr == points) {
+	return;
+  }
+  auto delta = F_POINT {points->operator[](nextVertex).x - itVertex->x,
+                        points->operator[](nextVertex).y - itVertex->y};
 
-	auto const rotationAngle = atan2(delta.y, delta.x) + PI_FHALF;
-	auto const referencePoint = F_POINT_ATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
-	ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
-	auto iClip    = clipFillData.begin();
-	for (auto& clip : *ClipBuffer) {
-	  *iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
-	  ++iClip;
-	}
-	auto const length = hypot(delta.x, delta.y);
-	auto const ratio  = form::getplen() / length;
-	delta.x *= ratio;
-	delta.y *= ratio;
-	auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
-	OSequence->push_back(*itVertex);
+  auto const rotationAngle = atan2(delta.y, delta.x) + PI_FHALF;
+  auto const referencePoint = F_POINT_ATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
+  ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
+  auto iClip    = clipFillData.begin();
+  for (auto& clip : *ClipBuffer) {
+	*iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
+	++iClip;
+  }
+  auto const length = hypot(delta.x, delta.y);
+  auto const ratio  = form::getplen() / length;
+  delta.x *= ratio;
+  delta.y *= ratio;
+  auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
+  OSequence->push_back(*itVertex);
+  OSequence->push_back(point);
+  OSequence->push_back(*itVertex);
+  OSequence->push_back(point);
+  if (!ci::ritclp(clipFillData, point)) {
 	OSequence->push_back(point);
 	OSequence->push_back(*itVertex);
-	OSequence->push_back(point);
-	if (!ci::ritclp(clipFillData, point)) {
-	  OSequence->push_back(point);
-	  OSequence->push_back(*itVertex);
-	}
   }
 }
 
