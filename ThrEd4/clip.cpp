@@ -856,22 +856,21 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
 	  ci::clpcrnr(form, clipRect, clipFillData, iVertex, rotationCenter);
 	}
 	ci::picfn(form, clipRect, clipFillData, form.vertexCount - 2, form.vertexCount - 1, form.edgeSpacing, rotationCenter);
+	return;
   }
-  else {
-	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	if (form.fillType == 0U) {
-	  OSequence->push_back(*itVertex);
-	}
-	auto currentVertex = 0U;
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  auto const nextVertex = form::nxt(form, currentVertex);
-	  ci::picfn(form, clipRect, clipFillData, currentVertex, nextVertex, form.edgeSpacing, rotationCenter);
-	  ci::clpcrnr(form, clipRect, clipFillData, currentVertex, rotationCenter);
-	  currentVertex = nextVertex;
-	}
-	itVertex = wrap::next(itVertex, currentVertex);
+  auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  if (form.fillType == 0U) {
 	OSequence->push_back(*itVertex);
   }
+  auto currentVertex = 0U;
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	auto const nextVertex = form::nxt(form, currentVertex);
+	ci::picfn(form, clipRect, clipFillData, currentVertex, nextVertex, form.edgeSpacing, rotationCenter);
+	ci::clpcrnr(form, clipRect, clipFillData, currentVertex, rotationCenter);
+	currentVertex = nextVertex;
+  }
+  itVertex = wrap::next(itVertex, currentVertex);
+  OSequence->push_back(*itVertex);
 }
 
 void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
