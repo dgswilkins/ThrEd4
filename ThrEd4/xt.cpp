@@ -557,7 +557,7 @@ void xt::fthrfn(FRM_HEAD& form) {
 }
 
 void xt::fethrf(uint32_t formIndex) {
-  if (displayText::filmsgs(FMM_FTH)) {
+  if (!displayText::filmsgs(FMM_FTH)) {
 	return;
   }
   auto& form = FormList->operator[](formIndex);
@@ -581,7 +581,7 @@ void xt::fethrf(uint32_t formIndex) {
 }
 
 void xt::fethr() {
-  if (displayText::filmsgs(FMM_FTH)) {
+  if (!displayText::filmsgs(FMM_FTH)) {
 	return;
   }
   thred::savdo();
