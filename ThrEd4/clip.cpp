@@ -697,17 +697,17 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 
 void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   ci::dulast(chainEndPoints);
-  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
+  auto const& form = FormList->operator[](ClosestFormToCursor); 
+  if (form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
 	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
 	});
+	return;
   }
-  else {
-	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
-	  return F_POINT {clip.x, (-clip.y)};
-	});
-  }
+  std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
+	return F_POINT {clip.x, (-clip.y)};
+  });
 }
 
 void ci::xclpfn(std::vector<F_POINT> const& tempClipPoints,
