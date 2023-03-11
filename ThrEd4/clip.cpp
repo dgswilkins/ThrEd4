@@ -670,28 +670,29 @@ void ci::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
 void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   auto tempClipPoints = std::vector<F_POINT> {};
   tempClipPoints.reserve(chainEndPoints.size());
-  if (form::lastch()) {
-	auto minimumLength = BIGFLOAT;
-	auto minimumIndex  = 0U;
-	for (auto index = 0U; auto const& iPoint : chainEndPoints) {
-	  if (auto const length = hypot(LastPoint.x - iPoint.x, LastPoint.y - iPoint.y); length < minimumLength) {
-		minimumLength = length;
-		minimumIndex  = index;
-	  }
-	  ++index;
+  if (!form::lastch()) {
+	return;
+  }
+  auto minimumLength = BIGFLOAT;
+  auto minimumIndex  = 0U;
+  for (auto index = 0U; auto const& iPoint : chainEndPoints) {
+	if (auto const length = hypot(LastPoint.x - iPoint.x, LastPoint.y - iPoint.y); length < minimumLength) {
+	  minimumLength = length;
+	  minimumIndex  = index;
 	}
-	if (minimumIndex != 0U) {
-	  if (minimumIndex < wrap::toUnsigned(chainEndPoints.size() - 1U)) {
-		auto const spPoints1 = std::ranges::subrange(wrap::next(chainEndPoints.begin(), minimumIndex),
-		                                             std::prev(chainEndPoints.end(), 1));
-		tempClipPoints.insert(tempClipPoints.end(), spPoints1.begin(), spPoints1.end());
-	  }
-	  auto const spEnd = minimumIndex + 1U;
-	  auto const spPoints2 =
-	      std::ranges::subrange(chainEndPoints.begin(), wrap::next(chainEndPoints.begin(), spEnd));
-	  tempClipPoints.insert(tempClipPoints.end(), spPoints2.begin(), spPoints2.end());
-	  chainEndPoints = tempClipPoints;
+	++index;
+  }
+  if (minimumIndex != 0U) {
+	if (minimumIndex < wrap::toUnsigned(chainEndPoints.size() - 1U)) {
+	  auto const spPoints1 = std::ranges::subrange(wrap::next(chainEndPoints.begin(), minimumIndex),
+	                                               std::prev(chainEndPoints.end(), 1));
+	  tempClipPoints.insert(tempClipPoints.end(), spPoints1.begin(), spPoints1.end());
 	}
+	auto const spEnd = minimumIndex + 1U;
+	auto const spPoints2 =
+	    std::ranges::subrange(chainEndPoints.begin(), wrap::next(chainEndPoints.begin(), spEnd));
+	tempClipPoints.insert(tempClipPoints.end(), spPoints2.begin(), spPoints2.end());
+	chainEndPoints = tempClipPoints;
   }
 }
 
