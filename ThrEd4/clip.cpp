@@ -453,18 +453,17 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t st
 	  ci::lincrnr(form.vertexIndex, clipReversedData, clipFillData, clipAngle, rotationCenter, currentSide, stitchPoint, borderClipReference);
 	}
 	ci::linsid(form.vertexIndex, clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, sideCount, stitchPoint, borderClipReference);
+	return;
   }
-  else {
-	clpout(ClipRectSize.cx / 2);
-	auto reference     = startVertex;
-	auto currentVertex = startVertex;
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  auto const nextVertex = form::prv(form, currentVertex);
-	  if (ci::clpsid(form.vertexIndex, clipRect, clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
-		reference = nextVertex;
-	  }
-	  currentVertex = nextVertex;
+  clpout(ClipRectSize.cx / 2);
+  auto reference     = startVertex;
+  auto currentVertex = startVertex;
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	auto const nextVertex = form::prv(form, currentVertex);
+	if (ci::clpsid(form.vertexIndex, clipRect, clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
+	  reference = nextVertex;
 	}
+	currentVertex = nextVertex;
   }
 }
 
