@@ -397,29 +397,30 @@ auto ci::clpsid(uint32_t                    vertexIndex,
   if (ClipRectSize.cx == 0.0F) {
 	return false;
   }
-  if (auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx); clipCount != 0U) {
-	auto const remainder = (clipCount > 1U) ? ((length - wrap::toFloat(clipCount) * ClipRectSize.cx) /
-	                                               (wrap::toFloat(clipCount) - 1.0F) +
-	                                           ClipRectSize.cx) /
-	                                              length
-	                                        : (length - ClipRectSize.cx) / 2;
-	auto const step         = F_POINT {delta.x * remainder, delta.y * remainder};
-	auto       insertPoint  = *itStartVertex;
-	auto       reversedData = clipReversedData.begin();
-	for (auto& data : clipFillData) {
-	  data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
-	  ++reversedData;
-	}
-	for (auto stepCount = 0U; stepCount < clipCount; ++stepCount) {
-	  if (ci::ritclp(clipFillData, insertPoint)) {
-		break;
-	  }
-	  insertPoint.x += step.x;
-	  insertPoint.y += step.y;
-	}
-	return true;
+  auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
+  if (clipCount == 0U) {
+	return false;
   }
-  return false;
+  auto const fClipCount = wrap::toFloat(clipCount);
+  auto const remainder =
+      (clipCount > 1U)
+          ? ((length - fClipCount * ClipRectSize.cx) / (fClipCount - 1.0F) + ClipRectSize.cx) / length
+          : (length - ClipRectSize.cx) / 2;
+  auto const step         = F_POINT {delta.x * remainder, delta.y * remainder};
+  auto       insertPoint  = *itStartVertex; // copy intended
+  auto       reversedData = clipReversedData.begin();
+  for (auto& data : clipFillData) {
+	data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
+	++reversedData;
+  }
+  for (auto stepCount = 0U; stepCount < clipCount; ++stepCount) {
+	if (ci::ritclp(clipFillData, insertPoint)) {
+	  break;
+	}
+	insertPoint.x += step.x;
+	insertPoint.y += step.y;
+  }
+  return true;
 }
 
 void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t startVertex) {
