@@ -527,19 +527,20 @@ void ci::fxlin(uint32_t                  vertexIndex,
                F_POINT&                  stitchPoint,
                float                     adjustedSpace,
                uint32_t                  nextStart) {
-  if (ci::fxpnt(vertexIndex, ListSINEs, ListCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
-	stitchPoint = moveToCoords;
+  if (!ci::fxpnt(vertexIndex, ListSINEs, ListCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
+	return;
+  }
+  stitchPoint = moveToCoords;
+  chainEndPoints.push_back(stitchPoint);
+  auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
+  auto const length   = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
+  auto const count    = wrap::floor<uint32_t>(length / adjustedSpace);
+  auto const delta =
+      F_POINT {adjustedSpace * ListCOSINEs[currentSide], adjustedSpace * ListSINEs[currentSide]};
+  for (auto iChain = 0U; iChain < count; ++iChain) {
+	stitchPoint.x += delta.x;
+	stitchPoint.y += delta.y;
 	chainEndPoints.push_back(stitchPoint);
-	auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
-	auto const length   = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
-	auto const count    = wrap::floor<uint32_t>(length / adjustedSpace);
-	auto const delta =
-	    F_POINT {adjustedSpace * ListCOSINEs[currentSide], adjustedSpace * ListSINEs[currentSide]};
-	for (auto iChain = 0U; iChain < count; ++iChain) {
-	  stitchPoint.x += delta.x;
-	  stitchPoint.y += delta.y;
-	  chainEndPoints.push_back(stitchPoint);
-	}
   }
 }
 
