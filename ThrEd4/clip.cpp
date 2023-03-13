@@ -364,17 +364,17 @@ void ci::linsid(uint32_t                    vertexIndex,
 }
 
 void clip::clpout(float width) {
-  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
+  auto const& form = FormList->operator[](ClosestFormToCursor);
+  if ( form.type == FRMLINE) {
 	satin::satout(form, width);
+	return;
   }
-  else {
-	satin::satout(form, ClipRectSize.cy);
-	InsidePointList->clear();
-	auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
-	InsidePointList->insert(InsidePointList->end(), itStartVertex, itEndVertex);
-	InsidePoints = InsidePointList;
-  }
+  satin::satout(form, ClipRectSize.cy);
+  InsidePointList->clear();
+  auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
+  InsidePointList->insert(InsidePointList->end(), itStartVertex, itEndVertex);
+  InsidePoints = InsidePointList;
 }
 
 auto ci::clpsid(uint32_t                    vertexIndex,
