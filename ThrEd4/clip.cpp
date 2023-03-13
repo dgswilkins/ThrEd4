@@ -347,19 +347,21 @@ void ci::linsid(uint32_t                    vertexIndex,
                 F_POINT&                    stitchPoint,
                 F_POINT const&              borderClipReference) {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 1);
-  auto const length   = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
-  if (auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx); clipCount != 0U) {
-	ClipReference     = thred::rotangf(borderClipReference, clipAngle, rotationCenter);
-	auto reversedData = clipReversedData.begin();
-	for (auto& data : clipFillData) {
-	  data = thred::rotangf(*reversedData, clipAngle, rotationCenter);
-	  ++reversedData;
-	}
-	for (auto iClip = 0U; iClip < clipCount; ++iClip) {
-	  ci::ritclp(clipFillData, stitchPoint);
-	  stitchPoint.x += vector0.x;
-	  stitchPoint.y += vector0.y;
-	}
+  auto const length    = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
+  auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
+  if (clipCount == 0U) {
+	return;
+  }
+  ClipReference     = thred::rotangf(borderClipReference, clipAngle, rotationCenter);
+  auto reversedData = clipReversedData.begin();
+  for (auto& data : clipFillData) {
+	data = thred::rotangf(*reversedData, clipAngle, rotationCenter);
+	++reversedData;
+  }
+  for (auto iClip = 0U; iClip < clipCount; ++iClip) {
+	ci::ritclp(clipFillData, stitchPoint);
+	stitchPoint.x += vector0.x;
+	stitchPoint.y += vector0.y;
   }
 }
 
