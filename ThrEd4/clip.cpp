@@ -479,20 +479,21 @@ auto ci::fxpnt(uint32_t                  vertexIndex,
     -> bool {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
   moveToCoords        = *itVertex;
-  if (auto length = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y); length > adjustedSpace) {
-	constexpr auto ITLIMIT = 10U; // Iteration limit
-	for (auto iGuess = 0U; iGuess < ITLIMIT; ++iGuess) {
-	  length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
-	  auto const delta = adjustedSpace - length;
-	  moveToCoords.x += delta * listCOSINEs[currentSide];
-	  moveToCoords.y += delta * listSINEs[currentSide];
-	  if (constexpr auto DLTLIMIT = 0.01F; fabs(delta) < DLTLIMIT) {
-		break;
-	  }
-	}
-	return true;
+  auto length         = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
+  if (length <= adjustedSpace) {
+	return false;
   }
-  return false;
+  constexpr auto ITLIMIT = 10U; // Iteration limit
+  for (auto iGuess = 0U; iGuess < ITLIMIT; ++iGuess) {
+	length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
+	auto const delta = adjustedSpace - length;
+	moveToCoords.x += delta * listCOSINEs[currentSide];
+	moveToCoords.y += delta * listSINEs[currentSide];
+	if (constexpr auto DLTLIMIT = 0.01F; fabs(delta) < DLTLIMIT) {
+	  break;
+	}
+  }
+  return true;
 }
 
 void ci::fxlit(uint32_t                  vertexIndex,
@@ -504,18 +505,19 @@ void ci::fxlit(uint32_t                  vertexIndex,
                uint32_t&                 adjCount,
                float                     adjustedSpace,
                uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
-  if (ci::fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
-	stitchPoint = moveToCoords;
-	++adjCount;
-	auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
-	auto const length   = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
-	auto const count    = std::floor(length / adjustedSpace);
-	auto const delta =
-	    F_POINT {adjustedSpace * listCOSINEs[currentSide], adjustedSpace * listSINEs[currentSide]};
-	stitchPoint.x += delta.x * count;
-	stitchPoint.y += delta.y * count;
-	adjCount += gsl::narrow_cast<uint32_t>(count);
+  if (!ci::fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
+	return;
   }
+  stitchPoint = moveToCoords;
+  ++adjCount;
+  auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
+  auto const length   = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
+  auto const count    = std::floor(length / adjustedSpace);
+  auto const delta =
+      F_POINT {adjustedSpace * listCOSINEs[currentSide], adjustedSpace * listSINEs[currentSide]};
+  stitchPoint.x += delta.x * count;
+  stitchPoint.y += delta.y * count;
+  adjCount += gsl::narrow_cast<uint32_t>(count);
 }
 
 void ci::fxlin(uint32_t                  vertexIndex,
