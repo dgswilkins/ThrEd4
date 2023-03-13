@@ -322,19 +322,21 @@ void ci::lincrnr(uint32_t                    vertexIndex,
                  uint32_t                    currentSide,
                  F_POINT&                    stitchPoint,
                  F_POINT const&              borderClipReference) {
-  auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 2);
-  if (auto moveToCoords = *itVertex; ci::nupnt(clipAngle, moveToCoords, stitchPoint)) {
-	auto const delta = F_POINT {moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y};
-	auto const rotationAngle = atan2(delta.y, delta.x);
-	ClipReference            = thred::rotangf(borderClipReference, rotationAngle, rotationCenter);
-	auto reversedData        = clipReversedData.begin();
-	for (auto& data : clipFillData) {
-	  data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
-	  ++reversedData;
-	}
-	ci::ritclp(clipFillData, stitchPoint);
-	stitchPoint = moveToCoords;
+  auto const itVertex     = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 2);
+  auto       moveToCoords = *itVertex;
+  if (!ci::nupnt(clipAngle, moveToCoords, stitchPoint)) {
+	return;
   }
+  auto const delta = F_POINT {moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y};
+  auto const rotationAngle = atan2(delta.y, delta.x);
+  ClipReference            = thred::rotangf(borderClipReference, rotationAngle, rotationCenter);
+  auto reversedData        = clipReversedData.begin();
+  for (auto& data : clipFillData) {
+	data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
+	++reversedData;
+  }
+  ci::ritclp(clipFillData, stitchPoint);
+  stitchPoint = moveToCoords;
 }
 
 void ci::linsid(uint32_t                    vertexIndex,
