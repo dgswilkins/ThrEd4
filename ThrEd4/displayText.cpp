@@ -83,10 +83,8 @@ void displayText::tabmsg(uint32_t code, bool top) {
 }
 
 void displayText::hsizmsg() {
-  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_HSIZ)),
-                                  (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN),
-                                  (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN));
+  auto const fmtStr = displayText::format2(
+      IDS_HSIZ, (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN), (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN));
   displayText::shoMsg(fmtStr, false);
 }
 
@@ -125,7 +123,7 @@ void displayText::msgflt(uint32_t messageId, float value) {
 }
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SIZ)), threadSizeText, threadSize);
+  auto const fmtStr = displayText::format2(IDS_SIZ, threadSizeText, threadSize);
   displayText::shoMsg(fmtStr, true);
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
@@ -171,8 +169,7 @@ void displayText::clrhbut(uint32_t startButton) {
 }
 
 void displayText::ritnum(uint32_t code, uint32_t value) {
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(code)), value);
-  displayText::butxt(HNUM, fmtStr);
+  displayText::butxt(HNUM, displayText::format(code, value));
 }
 
 void displayText::riter() {
@@ -187,8 +184,7 @@ void displayText::pntmsg(uint32_t msgID) {
 void displayText::shoseln(uint32_t code0, uint32_t code1) {
   auto const msg0   = displayText::loadStr(code0);
   auto const msg1   = displayText::loadStr(code1);
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SHOSEL)), msg0, msg1);
-  displayText::shoMsg(fmtStr, false);
+  displayText::shoMsg(displayText::format2(IDS_SHOSEL, msg0, msg1), false);
 }
 
 auto displayText::clpmsgs(uint32_t code) -> bool {
@@ -367,7 +363,7 @@ void di::bxtxt(uint32_t iButton, uint32_t iMessage) {
 }
 
 void di::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(iMessage)), data);
+  auto const fmtStr = displayText::format(iMessage, data);
   SetWindowText(ButtonWin->operator[](iButton), fmtStr.c_str());
 }
 

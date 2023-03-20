@@ -181,17 +181,16 @@ void menu::auxmen() {
   EnableMenuItem(MainMenu, ID_AUXPES, MF_DISABLED | MF_GRAYED);
 #endif
   CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
-  auto const auxTxt = displayText::loadStr(IDS_AUXTXT);
   switch (IniFile.auxFileType) {
 	case AUXDST: {
-	  auxMsg.assign(fmt::format(fmt::runtime(auxTxt), L"DST"));
+	  auxMsg.assign(displayText::format(IDS_AUXTXT, L"DST"));
 	  CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 	  break;
 	}
 	case AUXPES:
 #if PESACT
 	{
-	  auxMsg.assign(fmt::format(fmt::runtime(auxTxt), L"PES"));
+	  auxMsg.assign(displayText::format(IDS_AUXTXT, L"PES"));
 	  CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
 	  break;
 	}
@@ -201,7 +200,7 @@ void menu::auxmen() {
 	}
 #endif
 	default: {
-	  auxMsg.assign(fmt::format(fmt::runtime(auxTxt), L"PCS"));
+	  auxMsg.assign(displayText::format(IDS_AUXTXT, L"PCS"));
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
   }

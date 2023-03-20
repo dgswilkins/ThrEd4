@@ -46,12 +46,6 @@ void ritnum(uint32_t code, uint32_t value);
 void savdisc();
 void setWindowFont(HWND hWnd, HFONT hFont) noexcept;
 void shoMsg(std::wstring const& message, bool top);
-
-template <class inType> void showMessage(uint32_t messageId, inType value) {
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(messageId)), value);
-  displayText::shoMsg(fmtStr, true);
-}
-
 void shord();
 void shoseln(uint32_t code0, uint32_t code1);
 void spltmsg();
@@ -59,4 +53,25 @@ void tabmsg(uint32_t code, bool top);
 void tomsg();
 void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
+
+template <class inType> auto format(uint32_t messageId, inType value) -> std::wstring {
+  return fmt::format(fmt::runtime(displayText::loadStr(messageId)), value);
+}
+
+template <class inTypeA, class inTypeB>
+auto format2(uint32_t messageId, inTypeA valueA, inTypeB valueB) -> std::wstring {
+  return fmt::format(fmt::runtime(displayText::loadStr(messageId)), valueA, valueB);
+}
+
+template <class inTypeA, class inTypeB, class inTypeC, class inTypeD, class inTypeE>
+auto format5(uint32_t messageId, inTypeA valueA, inTypeB valueB, inTypeC valueC, inTypeD valueD, inTypeE valueE)
+    -> std::wstring {
+  return fmt::format(fmt::runtime(displayText::loadStr(messageId)), valueA, valueB, valueC, valueD, valueE);
+}
+
+template <class inType> void showMessage(uint32_t messageId, inType value) {
+  auto const fmtStr = displayText::format(messageId, value);
+  displayText::shoMsg(fmtStr, true);
+}
+
 } // namespace displayText

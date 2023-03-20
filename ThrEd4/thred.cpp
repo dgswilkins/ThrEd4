@@ -885,7 +885,7 @@ auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
 		  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-		  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);
+		  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
 		  SetWindowText(ThrEdWindow, fmtStr.c_str());
 		  return TRUE;
 		}
@@ -2610,7 +2610,7 @@ void thi::rstAll() {
 }
 
 void thred::ritot(uint32_t number) {
-  auto const txt = fmt::format(fmt::runtime(displayText::loadStr(IDS_TOT)), number);
+  auto const txt = displayText::format(IDS_TOT, number);
   displayText::butxt(HTOT, txt);
 }
 
@@ -2647,11 +2647,11 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   }
   constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
   if (fabs(maxLength) < DIGITLIM) {
-	auto const strMax = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMAX)), (maxLength * IPFGRAN));
+	auto const strMax = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
 	displayText::butxt(HMAXLEN, strMax);
   }
   if (fabs(minLength) < DIGITLIM) {
-	auto const strMin = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMIN)), (minLength * IPFGRAN));
+	auto const strMin = displayText::format(IDS_LENMIN, (minLength * IPFGRAN));
 	displayText::butxt(HMINLEN, strMin);
   }
 }
@@ -2676,9 +2676,9 @@ void thi::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint
 	++stitch;
 	++stitchFwd1;
   }
-  auto const maxStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMAX)), (maxLength * IPFGRAN));
+  auto const maxStr = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
   displayText::butxt(HMAXLEN, maxStr);
-  auto const minStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_LENMIN)), (minLength * IPFGRAN));
+  auto const minStr = displayText::format(IDS_LENMIN, (minLength * IPFGRAN));
   displayText::butxt(HMINLEN, minStr);
 }
 
@@ -3155,7 +3155,7 @@ void thi::ritlayr() {
 	displayText::butxt(HLAYR, blank);
   }
   else {
-	auto const txt = fmt::format(fmt::runtime(displayText::loadStr(IDS_LAYR)), layer);
+	auto const txt = displayText::format(IDS_LAYR, layer);
 	displayText::butxt(HLAYR, txt);
   }
 }
@@ -3554,7 +3554,7 @@ auto thi::chkattr(fs::path const& filename) -> bool {
   if (writePerms != fs::perms::none) {
 	return false;
   }
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_OVRLOK)), filename.wstring());
+  auto const fmtStr = displayText::format(IDS_OVRLOK, filename.wstring());
   auto const buttonPressed =
       MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_OVRIT).c_str(), MB_YESNO);
   if (buttonPressed != IDYES) {
@@ -3984,7 +3984,7 @@ void thi::dun() {
 	StateMap->set(StateFlag::SAVEX);
 	return;
   }
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SAVFIL)), ThrName->wstring());
+  auto const fmtStr = displayText::format(IDS_SAVFIL, ThrName->wstring());
   if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
 	thred::save();
   }
@@ -4764,7 +4764,7 @@ void thi::nuFil(FileIndices fileIndex) {
   menu::auxmen();
   lenCalc();
   auto const fmtStr =
-      fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), newFileName.wstring(), *DesignerName);
+      displayText::format2(IDS_THRDBY, newFileName.wstring(), *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   StateMap->set(StateFlag::INIT);
   StateMap->reset(StateFlag::TRSET);
@@ -5570,7 +5570,7 @@ void thi::newFil() {
   backup::deldu();
   auto& desName = IniFile.designerName;
   DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
@@ -6917,7 +6917,7 @@ void thi::deltot() {
   thred::coltab();
   thred::zumhom();
   auto const wTxt =
-      fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), ThrName->wstring(), *DesignerName);
+      displayText::format2(IDS_THRDBY, ThrName->wstring(), *DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
@@ -7638,7 +7638,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  auto const spEHCN = gsl::span {ExtendedHeader->creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
 	  redfnam(*DesignerName);
-	  auto fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), ThrName->wstring(), *DesignerName);
+	  auto fmtStr = displayText::format2(IDS_THRDBY, ThrName->wstring(), *DesignerName);
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
   }
@@ -8705,7 +8705,7 @@ void thi::thumnail() {
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
 	auto const fmtStr =
-	    fmt::format(fmt::runtime(displayText::loadStr(IDS_FFINDERR)), searchName.wstring(), dwError);
+	    displayText::format2(IDS_FFINDERR, searchName.wstring(), dwError);
 	displayText::shoMsg(fmtStr, true);
 	unthum();
 	return;
@@ -9015,7 +9015,7 @@ void thi::desiz() {
 	    (rectangle.top > IniFile.hoopSizeY)) {
 	  info += displayText::loadStr(IDS_STCHOUT);
 	}
-	info += fmt::format(fmt::runtime(displayText::loadStr(IDS_STCHS)),
+	info += displayText::format5(IDS_STCHS,
 	                    wrap::toUnsigned(StitchBuffer->size()),
 	                    xSize,
 	                    (xSize * MMTOINCH),
@@ -9026,20 +9026,20 @@ void thi::desiz() {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
-	info += fmt::format(fmt::runtime(displayText::loadStr(IDS_FORMS)),
+	info += displayText::format5(IDS_FORMS,
 	                    FormList->size(),
 	                    xSize,
 	                    (xSize * MMTOINCH),
 	                    ySize,
 	                    (ySize * MMTOINCH));
   }
-  info += fmt::format(fmt::runtime(displayText::loadStr(IDS_HUPWID)),
+  info += displayText::format2(IDS_HUPWID,
                       (IniFile.hoopSizeX * IPFGRAN),
                       (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
 	auto  modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
-	info += fmt::format(fmt::runtime(displayText::loadStr(IDS_CREATBY)), *DesignerName, modifier);
+	info += displayText::format2(IDS_CREATBY, *DesignerName, modifier);
   }
   displayText::shoMsg(info, true);
 }
@@ -9382,7 +9382,7 @@ void thi::rotmrk() {
   auto const segments   = std::round(PI_F2 / tAngle);
   IniFile.rotationAngle = PI_F2 / segments;
   auto const fmtStr =
-      fmt::format(fmt::runtime(displayText::loadStr(IDS_ROTMARK)), IniFile.rotationAngle * RADDEGF, segments);
+      displayText::format2(IDS_ROTMARK, IniFile.rotationAngle * RADDEGF, segments);
   displayText::shoMsg(fmtStr, false);
 }
 
@@ -9891,7 +9891,7 @@ void thi::closfn() {
   bitmap::delmap();
   backup::deldu();
   displayText::clrhbut(3);
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
@@ -16638,7 +16638,7 @@ void thi::init() {
   menu::chkmen();
   // check command line-should be last item in init
   ducmd();
-  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
