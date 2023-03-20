@@ -1800,7 +1800,6 @@ void texture::setshft() {
 }
 
 void texture::writeScreenWidth(int32_t position) {
-  auto const scrWidth =
-      displayText::format(IDS_TXWID, (TextureScreen.width * IPFGRAN));
+  auto const scrWidth = displayText::format(IDS_TXWID, (TextureScreen.width * IPFGRAN));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

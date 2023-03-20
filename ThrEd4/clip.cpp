@@ -348,7 +348,7 @@ void ci::linsid(uint32_t                    vertexIndex,
                 uint32_t                    currentSide,
                 F_POINT&                    stitchPoint,
                 F_POINT const&              borderClipReference) {
-  auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 1);
+  auto const itVertex  = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 1);
   auto const length    = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
   auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
   if (clipCount == 0U) {
@@ -369,7 +369,7 @@ void ci::linsid(uint32_t                    vertexIndex,
 
 void clip::clpout(float width) {
   auto const& form = FormList->operator[](ClosestFormToCursor);
-  if ( form.type == FRMLINE) {
+  if (form.type == FRMLINE) {
 	satin::satout(form, width);
 	return;
   }
@@ -479,8 +479,7 @@ auto ci::fxpnt(uint32_t                  vertexIndex,
                uint32_t                  currentSide,
                F_POINT const&            stitchPoint,
                float                     adjustedSpace,
-               uint32_t nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>))
-    -> bool {
+               uint32_t nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
   moveToCoords        = *itVertex;
   auto length         = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
@@ -705,7 +704,7 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 
 void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   ci::dulast(chainEndPoints);
-  auto const& form = FormList->operator[](ClosestFormToCursor); 
+  auto const& form = FormList->operator[](ClosestFormToCursor);
   if (form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
 	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
@@ -757,7 +756,7 @@ void ci::clpcrnr(FRM_HEAD const&       form,
                  std::vector<F_POINT>& clipFillData,
                  uint32_t              vertex,
                  F_POINT const&        rotationCenter) {
-  auto const nextVertex = form::nxt(form, vertex);
+  auto const  nextVertex = form::nxt(form, vertex);
   auto const  itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
   auto const* points     = StateMap->test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (nullptr == points) {

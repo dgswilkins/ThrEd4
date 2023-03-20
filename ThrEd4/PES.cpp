@@ -555,7 +555,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   }
   auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());
 
-  constexpr auto PESSTR      = "#PES"; // PES lead in value
+  constexpr auto PESSTR = "#PES"; // PES lead in value
   if (strncmp(static_cast<const char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) != 0) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);

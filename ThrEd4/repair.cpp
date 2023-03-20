@@ -246,7 +246,7 @@ void ri::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BAD_COUNTS {};
   auto& formList     = *FormList;
-  for (auto const &form : *FormList) {
+  for (auto const& form : *FormList) {
 	if (form.vertexCount != 0U) {
 	  formList[iDestination++] = form;
 	}

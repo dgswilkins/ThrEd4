@@ -977,7 +977,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  ++itChar;
 	}
   }
-  // clang-format off
+// clang-format off
   // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
   #pragma warning(push)
   #pragma warning(disable : 26481)

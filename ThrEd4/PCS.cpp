@@ -160,11 +160,11 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  auto iStitch      = uint16_t {};
-  auto color        = 0U;
+  auto iStitch = uint16_t {};
+  auto color   = 0U;
   StitchBuffer->clear();
   StitchBuffer->reserve(PCSHeader.stitchCount);
-  for (auto const &stitch : pcsDataBuffer) {
+  for (auto const& stitch : pcsDataBuffer) {
 	if (stitch.tag == 3) {
 	  thred::addColor(iStitch, stitch.fx);
 	  color = NOTFRM | stitch.fx;

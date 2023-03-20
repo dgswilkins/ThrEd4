@@ -159,16 +159,14 @@ auto ti::trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT> {
 }
 
 void ti::trcstpnum() {
-  auto const fmtStr =
-      displayText::format(IDS_TRCSTP, (IniFile.traceLength * IPFGRAN));
+  auto const fmtStr = displayText::format(IDS_TRCSTP, (IniFile.traceLength * IPFGRAN));
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   SetWindowText(TraceStepWin, fmtStr.c_str());
 }
 
 void ti::trcratnum() {
-  constexpr auto HLIN = uint32_t {HNUM};
-  auto const     fmtStr =
-      displayText::format(IDS_TRCRAT, -log10(IniFile.traceRatio - 1.0F));
+  constexpr auto HLIN   = uint32_t {HNUM};
+  auto const     fmtStr = displayText::format(IDS_TRCRAT, -log10(IniFile.traceRatio - 1.0F));
   displayText::butxt(HLIN, fmtStr);
 }
 

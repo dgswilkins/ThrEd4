@@ -1345,7 +1345,7 @@ void thi::stchPars() {
       (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT))
           ? std::lround(wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio)
           : std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
-  
+
   if ((StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
 	StitchWindowSize.cy = (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT))
 	                          ? ThredWindowRect.bottom - (*ScrollSize * 2)
@@ -4763,8 +4763,7 @@ void thi::nuFil(FileIndices fileIndex) {
   }
   menu::auxmen();
   lenCalc();
-  auto const fmtStr =
-      displayText::format2(IDS_THRDBY, newFileName.wstring(), *DesignerName);
+  auto const fmtStr = displayText::format2(IDS_THRDBY, newFileName.wstring(), *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   StateMap->set(StateFlag::INIT);
   StateMap->reset(StateFlag::TRSET);
@@ -6036,11 +6035,11 @@ void thi::clipSelectedForm() {
   EmptyClipboard();
   auto const thrEdClip      = RegisterClipboardFormat(ThrEdClipFormat);
   auto*      clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(GlobalLock(clipHandle));
-  clipFormHeader->clipType = CLP_FRM;
-  clipFormHeader->form     = form;
-  auto* ptrFormVertices    = convertFromPtr<F_POINT*>(std::next(clipFormHeader));
-  auto  startVertex        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-  auto  endVertex          = wrap::next(startVertex, form.vertexCount);
+  clipFormHeader->clipType  = CLP_FRM;
+  clipFormHeader->form      = form;
+  auto* ptrFormVertices     = convertFromPtr<F_POINT*>(std::next(clipFormHeader));
+  auto  startVertex         = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto  endVertex           = wrap::next(startVertex, form.vertexCount);
 
   auto const vertices = gsl::span(ptrFormVertices, form.vertexCount);
   std::copy(startVertex, endVertex, vertices.begin());
@@ -6119,14 +6118,14 @@ void thi::clipSelectedForm() {
 }
 
 void thi::clipSelectedForms() {
-  auto       length    = 0U;
+  auto length = 0U;
   for (auto& selectedForm : (*SelectedFormList)) {
 	auto& currentForm = FormList->operator[](selectedForm);
 	length += sizfclp(currentForm);
   }
   // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
   auto clipHandle = GlobalAlloc(GHND, length + sizeof(FORMS_CLIP));
-  if (clipHandle == nullptr) { //exit gracefully without altering the clipboard
+  if (clipHandle == nullptr) { // exit gracefully without altering the clipboard
 	return;
   }
   if (OpenClipboard(ThrEdWindow) == 0) {
@@ -6135,7 +6134,7 @@ void thi::clipSelectedForms() {
   EmptyClipboard();
   auto const thrEdClip       = RegisterClipboardFormat(ThrEdClipFormat);
   auto*      clipFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
-  clipFormsHeader->clipType = CLP_FRMS;
+  clipFormsHeader->clipType  = CLP_FRMS;
   wrap::narrow(clipFormsHeader->formCount, SelectedFormList->size());
   // Skip past the header
   auto*      ptrForms = convertFromPtr<FRM_HEAD*>(std::next(clipFormsHeader));
@@ -6345,7 +6344,7 @@ void thi::clipSelectedStitches() {
 	return;
   }
   EmptyClipboard();
-  Clip = RegisterClipboardFormat(PcdClipFormat);
+  Clip                      = RegisterClipboardFormat(PcdClipFormat);
   auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
   auto const spData         = gsl::span(clipStitchData, length);
   thred::savclp(spData[0], StitchBuffer->operator[](iSource), length);
@@ -6916,8 +6915,7 @@ void thi::deltot() {
   rstAll();
   thred::coltab();
   thred::zumhom();
-  auto const wTxt =
-      displayText::format2(IDS_THRDBY, ThrName->wstring(), *DesignerName);
+  auto const wTxt = displayText::format2(IDS_THRDBY, ThrName->wstring(), *DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
@@ -8704,8 +8702,7 @@ void thi::thumnail() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
-	auto const fmtStr =
-	    displayText::format2(IDS_FFINDERR, searchName.wstring(), dwError);
+	auto const fmtStr  = displayText::format2(IDS_FFINDERR, searchName.wstring(), dwError);
 	displayText::shoMsg(fmtStr, true);
 	unthum();
 	return;
@@ -9015,27 +9012,16 @@ void thi::desiz() {
 	    (rectangle.top > IniFile.hoopSizeY)) {
 	  info += displayText::loadStr(IDS_STCHOUT);
 	}
-	info += displayText::format5(IDS_STCHS,
-	                    wrap::toUnsigned(StitchBuffer->size()),
-	                    xSize,
-	                    (xSize * MMTOINCH),
-	                    ySize,
-	                    (ySize * MMTOINCH));
+	info += displayText::format5(
+	    IDS_STCHS, wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
   }
   if (!FormList->empty()) {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
-	info += displayText::format5(IDS_FORMS,
-	                    FormList->size(),
-	                    xSize,
-	                    (xSize * MMTOINCH),
-	                    ySize,
-	                    (ySize * MMTOINCH));
+	info += displayText::format5(IDS_FORMS, FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
   }
-  info += displayText::format2(IDS_HUPWID,
-                      (IniFile.hoopSizeX * IPFGRAN),
-                      (IniFile.hoopSizeY * IPFGRAN));
+  info += displayText::format2(IDS_HUPWID, (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
 	auto  modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
@@ -9381,8 +9367,7 @@ void thi::rotmrk() {
   auto const tAngle     = highestAngle - lowestAngle;
   auto const segments   = std::round(PI_F2 / tAngle);
   IniFile.rotationAngle = PI_F2 / segments;
-  auto const fmtStr =
-      displayText::format2(IDS_ROTMARK, IniFile.rotationAngle * RADDEGF, segments);
+  auto const fmtStr = displayText::format2(IDS_ROTMARK, IniFile.rotationAngle * RADDEGF, segments);
   displayText::shoMsg(fmtStr, false);
 }
 

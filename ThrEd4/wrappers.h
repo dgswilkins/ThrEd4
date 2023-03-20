@@ -27,7 +27,7 @@
 
 namespace wrap {
 
-  template <class inType>
+template <class inType>
 auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
                                       (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>)))
     -> float {

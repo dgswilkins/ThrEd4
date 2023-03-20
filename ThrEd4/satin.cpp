@@ -353,7 +353,7 @@ void satin::satadj(FRM_HEAD& form) {
   // ensure all guide endpoints are on valid vertices
   auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
   {
-	auto itGuide = itFirstGuide; //copy is intended
+	auto itGuide = itFirstGuide; // copy is intended
 	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 	  auto const endCount = (form.vertexCount - 1);
 	  if (itGuide->finish > endCount) {
