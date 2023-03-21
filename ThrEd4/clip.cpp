@@ -301,17 +301,14 @@ auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoin
 }
 
 auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool {
-  auto       retval        = false;
   auto const adjustedPoint = F_POINT {(point.x - ClipReference.x), (point.y - ClipReference.y)};
   if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(OSequence->size()))) {
-	retval = true;
+	return true;
   }
-  else {
-	std::ranges::transform(clipFillData, std::back_inserter(*OSequence), [&adjustedPoint](auto const& data) noexcept {
-	  return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
-	});
-  }
-  return retval;
+  std::ranges::transform(clipFillData, std::back_inserter(*OSequence), [&adjustedPoint](auto const& data) noexcept {
+	return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
+  });
+  return false;
 }
 
 void ci::lincrnr(uint32_t                    vertexIndex,
@@ -323,7 +320,7 @@ void ci::lincrnr(uint32_t                    vertexIndex,
                  F_POINT&                    stitchPoint,
                  F_POINT const&              borderClipReference) {
   auto const itVertex     = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 2);
-  auto       moveToCoords = *itVertex;
+  auto       moveToCoords = *itVertex; // intended copy
   if (!ci::nupnt(clipAngle, moveToCoords, stitchPoint)) {
 	return;
   }
