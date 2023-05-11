@@ -303,12 +303,12 @@ auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoin
 auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool {
   auto const adjustedPoint = F_POINT {(point.x - ClipReference.x), (point.y - ClipReference.y)};
   if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(OSequence->size()))) {
-	return true;
+	return false;
   }
   std::ranges::transform(clipFillData, std::back_inserter(*OSequence), [&adjustedPoint](auto const& data) noexcept {
 	return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
   });
-  return false;
+  return true;
 }
 
 void ci::lincrnr(uint32_t                    vertexIndex,
@@ -358,7 +358,9 @@ void ci::linsid(uint32_t                    vertexIndex,
 	++reversedData;
   }
   for (auto iClip = 0U; iClip < clipCount; ++iClip) {
-	ci::ritclp(clipFillData, stitchPoint);
+	if (!ci::ritclp(clipFillData, stitchPoint)) {
+	  break;
+	}
 	stitchPoint.x += vector0.x;
 	stitchPoint.y += vector0.y;
   }
@@ -415,7 +417,7 @@ auto ci::clpsid(uint32_t                    vertexIndex,
 	++reversedData;
   }
   for (auto stepCount = 0U; stepCount < clipCount; ++stepCount) {
-	if (ci::ritclp(clipFillData, insertPoint)) {
+	if (!ci::ritclp(clipFillData, insertPoint)) {
 	  break;
 	}
 	insertPoint.x += step.x;
@@ -779,7 +781,7 @@ void ci::clpcrnr(FRM_HEAD const&       form,
   OSequence->push_back(point);
   OSequence->push_back(*itVertex);
   OSequence->push_back(point);
-  if (!ci::ritclp(clipFillData, point)) {
+  if (ci::ritclp(clipFillData, point)) {
 	OSequence->push_back(point);
 	OSequence->push_back(*itVertex);
   }
@@ -830,7 +832,7 @@ void ci::picfn(FRM_HEAD const&       form,
 	OSequence->push_back(outerPoint);
 	OSequence->push_back(firstPoint);
 	OSequence->push_back(outerPoint);
-	if (ci::ritclp(clipFillData, outerPoint)) {
+	if (!ci::ritclp(clipFillData, outerPoint)) {
 	  flag = false;
 	  break;
 	}
