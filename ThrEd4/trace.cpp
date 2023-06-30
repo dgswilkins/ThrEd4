@@ -53,7 +53,7 @@ void decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept;
 
-static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
+inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
 void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
 auto ducolm() -> uint32_t;
@@ -235,7 +235,7 @@ void ti::tracwnd() {
 }
 
 // Check Translation
-static inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
+inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
   destination = (source >> (shift & NIBMASK)) & BYTMASK;
 }
 
