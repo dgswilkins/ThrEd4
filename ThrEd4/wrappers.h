@@ -284,11 +284,11 @@ void setCursor(HCURSOR hCursor) noexcept;
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 
 template <class inType>
-auto to_ptrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
+auto toPtrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
     -> ptrdiff_t {
   static_assert(std::is_same_v<inType, ptrdiff_t> || std::is_same_v<inType, uint32_t> ||
                     std::is_same_v<inType, int>,
-                "to_ptrdiff cannot be used here.");
+                "toPtrdiff cannot be used here.");
   if constexpr (std::is_same_v<inType, ptrdiff_t>) {
 	return invar;
   }

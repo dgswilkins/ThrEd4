@@ -1092,13 +1092,13 @@ void formForms::setear() {
   auto const formVertexCount  = form.vertexCount;
   auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
   auto       nextVertex       = std::next(firstVertex);
-  auto const count            = wrap::to_ptrdiff(formVertexCount) / 4;
+  auto const count            = wrap::toPtrdiff(formVertexCount) / 4;
   auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
   auto       lastVertex       = std::next(firstVertex, count + 1);
   auto       verticalPosition = lastVertex->y;
   --lastVertex;
   auto step        = verticalPosition - lastVertex->y;
-  auto leftVertex  = std::next(firstVertex, wrap::to_ptrdiff(formVertexCount) - count);
+  auto leftVertex  = std::next(firstVertex, wrap::toPtrdiff(formVertexCount) - count);
   auto rightVertex = std::next(firstVertex, count + 1);
   for (auto iStep = 0; iStep < count; ++iStep) {
 	leftVertex->y  = verticalPosition;

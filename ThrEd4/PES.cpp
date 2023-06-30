@@ -480,8 +480,8 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
   for (auto const& stitch : *StitchBuffer) {
-	auto const xCoord = wrap::to_ptrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
-	auto const yCoord = wrap::to_ptrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
+	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
 	auto const iRow       = std::next((*iThumbnail).begin(), xCoord);
 	*iRow                 = 1U;
@@ -491,8 +491,8 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   thumbnail        = IMAGE_WITH_FRAME;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
   for (auto const& stitch : *StitchBuffer) {
-	auto const xCoord = wrap::to_ptrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
-	auto const yCoord = wrap::to_ptrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
+	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
 	auto const iRow       = std::next((*iThumbnail).begin(), xCoord);
 	if (stitchColor == (stitch.attribute & COLMSK)) {
