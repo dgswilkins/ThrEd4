@@ -356,9 +356,9 @@ auto toUnsigned(inType invar) noexcept(std::is_same_v<inType, uint32_t> || std::
 auto wcsToFloat(wchar_t const* buffer) -> float;
 
 template <class outType>
-void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<outType, unsigned long>) {
+void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<outType, unsigned long>) { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, unsigned long>, "no need to use wrap::wcstoULong here.");
-  if constexpr (std::is_same_v<outType, unsigned long>) {
+    if constexpr (std::is_same_v<outType, unsigned long>) { // NOLINT(google-runtime-int)
 	outvar = std::wcstoul(invar, nullptr, 10);
   }
   else {
@@ -367,7 +367,7 @@ void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<o
 }
 
 template <class outType>
-auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType {
+auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, long>, "no need to use wrap::wcstoLong here.");
   if constexpr (std::is_same_v<outType, long>) {
 	return std::wcstol(buffer, nullptr, 10);
