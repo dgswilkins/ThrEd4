@@ -55,7 +55,9 @@ namespace pci {
 auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
 } // namespace pci
 
-static auto PCSHeader = PCSHEADER {}; // pcs file header
+namespace {
+auto PCSHeader = PCSHEADER {}; // pcs file header
+} // namespace
 
 auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)

@@ -41,8 +41,10 @@ class BACK_HEAD // Backup header
 };
 
 // Main Variables
-static auto UndoBufferWriteIndex = uint32_t {}; // undo storage pointer
-static auto UndoBufferReadIndex  = uint32_t {}; // undo retrieval pointers
+namespace {
+auto UndoBufferWriteIndex = uint32_t {}; // undo storage pointer
+auto UndoBufferReadIndex  = uint32_t {}; // undo retrieval pointers
+} // namespace
 
 // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
 #pragma warning(push)

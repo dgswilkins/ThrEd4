@@ -36,7 +36,9 @@ void sfn(FRM_HEAD const& form, uint32_t startVertex, F_POINT& stitchPoint);
 void unsat();
 } // namespace si
 
-static auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-line
+namespace {
+auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-line
+} // namespace
 
 void satin::delsac(uint32_t formIndex) {
   auto& formList = *FormList;

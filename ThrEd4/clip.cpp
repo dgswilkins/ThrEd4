@@ -99,7 +99,9 @@ void xclpfn(std::vector<F_POINT> const& tempClipPoints,
             F_POINT const&              rotationCenter);
 } // namespace ci
 
-static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
+namespace {
+auto ClipReference = F_POINT {}; // clipboard reference formOrigin
+} // namespace
 
 auto ci::findclp(uint32_t formIndex) -> uint32_t {
   for (auto spForms = std::ranges::subrange(FormList->begin(), wrap::next(FormList->begin(), formIndex));

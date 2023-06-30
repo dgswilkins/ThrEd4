@@ -516,9 +516,11 @@ auto vclpComp(V_CLP_X const& vclpx1, V_CLP_X const& vclpx2) noexcept -> bool;
 auto vscmp(uint32_t index1, uint32_t index2) noexcept -> bool;
 } // namespace fi
 
-static auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
-static auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert
-static auto FormVertexPrev = uint32_t {}; // form vertex storage for form vertex insert
+namespace {
+auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
+auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert
+auto FormVertexPrev = uint32_t {}; // form vertex storage for form vertex insert
+} // namespace
 
 auto fi::fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
@@ -2229,7 +2231,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
   static constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 6.0F/15.0F, 8.0F/15.0F, 5.0F/15.0F, 9.0F/15.0F, 4.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  2.0F/15.0F, 12.0F/15.0F,  1.0F/15.0F, 13.0F/15.0F,  0.0F/15.0F, 14.0F/15.0F};
   // clang-format on
 
-  static auto levels = std::array<float const*, 16> {LEVEL00.data(),
+  auto levels = std::array<float const*, 16> {LEVEL00.data(),
                                                      LEVEL01.data(),
                                                      LEVEL02.data(),
                                                      LEVEL03.data(),
@@ -3939,7 +3941,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
   }
   auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1U] - groupIndexSequence[group0]) / 2U;
   auto index0 = 0U;
-  while ((count0 != 0U) && lineEndPoint0.operator[](wrap::to_ptrdiff(index0)).line != line0) {
+  while ((count0 != 0U) && lineEndPoint0.operator[](wrap::toPtrdiff(index0)).line != line0) {
 	--count0;
 	index0 += 2;
   }
@@ -3949,7 +3951,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
   auto const lineEndPoint1 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group1]);
   auto       index1        = 0U;
   auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
-  while ((count1 != 0U) && lineEndPoint1.operator[](wrap::to_ptrdiff(index1)).line != line1) {
+  while ((count1 != 0U) && lineEndPoint1.operator[](wrap::toPtrdiff(index1)).line != line1) {
 	--count1;
 	index1 += 2;
   }
@@ -6983,7 +6985,7 @@ void form::duhart(uint32_t sideCount) {
   stepAngle /= HARTSTEP;
   auto       lastVertex    = iVertex;
   auto const itFirstVertex = wrap::next(FormVertices->begin(), savedVertexIndex);
-  while (point.x > itFirstVertex->x && iVertex < wrap::to_ptrdiff(2U * HSIDEMAX)) {
+  while (point.x > itFirstVertex->x && iVertex < wrap::toPtrdiff(2U * HSIDEMAX)) {
 	FormVertices->push_back(F_POINT {point.x, point.y});
 	++iVertex;
 	point.x += length * cos(angle);

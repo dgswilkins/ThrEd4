@@ -227,8 +227,10 @@ void uspacfn(uint32_t formIndex, float spacing);
 void xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept;
 } // namespace xi
 
-static auto DesignSize = F_POINT {};                        // design size
-static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
+namespace {
+auto DesignSize = F_POINT {};                        // design size
+auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
+} // namespace
 
 void xt::setfchk() {
   if (IniFile.dataCheck != 0U) {

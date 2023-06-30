@@ -676,175 +676,173 @@ class THR_HEAD_EX // thred v1.0 file header extension
 #pragma pack(pop)
 
 // main variables
-static auto FormControlPoints =
+namespace {
+auto FormControlPoints =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
-static auto ExtendedHeader = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
-static auto DesignerName   = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
-static auto ArgCount       = int32_t {};                           // command line argument count
-static auto ArgList        = gsl::narrow_cast<LPTSTR*>(nullptr);   // command line argument array
-static auto ThredWindowRect = RECT {};                             // main window size
-static auto ColorBarSize    = gsl::narrow_cast<int32_t*>(nullptr); // Color bar width scaled for DPI
-static auto ColorBarRect    = RECT {};                             // color bar rectangle
-static auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which thred was executed
-static auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
-static auto LargestStitchIndex = uint32_t {}; // pointer to the largest stitch in the selected range
-static auto CurrentStitchIndex = uint32_t {}; // pointer to the current selection for length search
-static auto ThredDC            = gsl::narrow_cast<HDC>(nullptr); // main device context handle
-static auto ScreenSizePixels   = SIZE {};                        // screen size in pixels
-static auto StitchWindowAbsRect = RECT {};                       // stitch window size,absolute
-static auto NearestPixel        = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // selected points
-static auto NearestPoint = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of the closest points
-static auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
-static auto PrevGroupEndStitch      = uint32_t {}; // higher end of previous selection
-static auto StitchWindowAspectRatio = float {};    // aspect ratio of the stitch window
-static auto ClipOrigin              = POINT {};    // origin of clipboard box in stitch coordinates
-static auto SelectBoxSize           = SIZE {};     // size of the select box
-static auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
-static auto RotationHandleAngle = float {};    // angle of the rotation handle
-static auto ThreadSize30        = TSIZ30;      // #30 thread size
-static auto ThreadSize40        = TSIZ40;      // #40 thread size
-static auto ThreadSize60        = TSIZ60;      // #60 thread size
-static auto RunPoint            = uint32_t {}; // point for animating stitchout
-static auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
-static auto MovieTimeStep       = int32_t {};  // time delay for stitchout
-static auto LRUMenuId =
-    std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-static auto LastKeyCode = std::numeric_limits<wchar_t>::max();             // last key code
-static auto VersionNames =
-    gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
-static auto FileVersionIndex = uint8_t {};             // points to old version to be read
-static auto ClipFormsCount   = uint32_t {};            // number of forms the on the clipboard
-static auto StitchArrow      = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
-static auto SelectedRange    = RANGE {}; // first and last stitch for min/max stitch select
-static auto NameOrder        = std::array<uint32_t, DNLEN> {}; // designer name order table
-static auto NameEncoder      = std::array<uint8_t, DNELEN> {}; // designer name encoding
-static auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
-static auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
-static auto SelectedFormsRange = RANGE {};              // range of selected forms
-static auto ZoomMin            = float {};              // minimum allowed zoom value
-static auto BalaradOffset      = F_POINT {}; // balarad offset
-static auto FormVerticesAsLine =
+auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr);  // thred file header extension
+auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
+auto ArgCount        = int32_t {};                               // command line argument count
+auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr);       // command line argument array
+auto ThredWindowRect = RECT {};                                  // main window size
+auto ColorBarSize    = gsl::narrow_cast<int32_t*>(nullptr);      // Color bar width scaled for DPI
+auto ColorBarRect    = RECT {};                                  // color bar rectangle
+auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which thred was executed
+auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
+auto LargestStitchIndex  = uint32_t {}; // pointer to the largest stitch in the selected range
+auto CurrentStitchIndex  = uint32_t {}; // pointer to the current selection for length search
+auto ThredDC             = gsl::narrow_cast<HDC>(nullptr); // main device context handle
+auto ScreenSizePixels    = SIZE {};                        // screen size in pixels
+auto StitchWindowAbsRect = RECT {};                        // stitch window size,absolute
+auto NearestPixel        = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // selected points
+auto NearestPoint = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of the closest points
+auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
+auto PrevGroupEndStitch      = uint32_t {}; // higher end of previous selection
+auto StitchWindowAspectRatio = float {};    // aspect ratio of the stitch window
+auto ClipOrigin              = POINT {};    // origin of clipboard box in stitch coordinates
+auto SelectBoxSize           = SIZE {};     // size of the select box
+auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
+auto RotationHandleAngle = float {};    // angle of the rotation handle
+auto ThreadSize30        = TSIZ30;      // #30 thread size
+auto ThreadSize40        = TSIZ40;      // #40 thread size
+auto ThreadSize60        = TSIZ60;      // #60 thread size
+auto RunPoint            = uint32_t {}; // point for animating stitchout
+auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
+auto MovieTimeStep       = int32_t {};  // time delay for stitchout
+auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
+auto LastKeyCode = std::numeric_limits<wchar_t>::max(); // last key code
+auto VersionNames = gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
+auto FileVersionIndex = uint8_t {};                     // points to old version to be read
+auto ClipFormsCount   = uint32_t {};                    // number of forms the on the clipboard
+auto StitchArrow      = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
+auto SelectedRange    = RANGE {}; // first and last stitch for min/max stitch select
+auto NameOrder        = std::array<uint32_t, DNLEN> {}; // designer name order table
+auto NameEncoder      = std::array<uint8_t, DNELEN> {}; // designer name encoding
+auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
+auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
+auto SelectedFormsRange = RANGE {};              // range of selected forms
+auto ZoomMin            = float {};              // minimum allowed zoom value
+auto BalaradOffset      = F_POINT {};            // balarad offset
+auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
-static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
+auto LastFormSelected = uint32_t {};                // end point of selected range of forms
 
 // cursors
-static auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
-static auto DLineCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // dline
-static auto NeedleUpCursor        = gsl::narrow_cast<HCURSOR>(nullptr); // upright needle
-static auto NeedleLeftUpCursor    = gsl::narrow_cast<HCURSOR>(nullptr); // left up needle
-static auto NeedleLeftDownCursor  = gsl::narrow_cast<HCURSOR>(nullptr); // left down needle
-static auto NeedleRightUpCursor   = gsl::narrow_cast<HCURSOR>(nullptr); // right up needle
-static auto NeedleRightDownCursor = gsl::narrow_cast<HCURSOR>(nullptr); // right down needle
-static auto ArrowCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // arrow
-static auto CrossCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // cross
+auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
+auto DLineCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // dline
+auto NeedleUpCursor        = gsl::narrow_cast<HCURSOR>(nullptr); // upright needle
+auto NeedleLeftUpCursor    = gsl::narrow_cast<HCURSOR>(nullptr); // left up needle
+auto NeedleLeftDownCursor  = gsl::narrow_cast<HCURSOR>(nullptr); // left down needle
+auto NeedleRightUpCursor   = gsl::narrow_cast<HCURSOR>(nullptr); // right up needle
+auto NeedleRightDownCursor = gsl::narrow_cast<HCURSOR>(nullptr); // right down needle
+auto ArrowCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // arrow
+auto CrossCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // cross
 
 // Pens
-static auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
-static auto LinePen        = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
-static auto BoxPen         = std::array<HPEN, 4> {};          // box pens
-static auto CrossPen       = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
-static auto GroupSelectPen = gsl::narrow_cast<HPEN>(nullptr); // pen for group select
-static auto BackgroundPen  = gsl::narrow_cast<HPEN>(nullptr); // background color pen
-static auto ZoomMarkPen    = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
-static auto KnotPen        = gsl::narrow_cast<HPEN>(nullptr); // knot pen
-static auto BackgroundPenWidth = int32_t {};                  // width of the background pen
-static auto UserPen            = gsl::narrow_cast<std::vector<HPEN>*>(nullptr); // user color pens
+auto LayerPen           = std::array<HPEN, LAYERMAX> {};   //
+auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
+auto BoxPen             = std::array<HPEN, 4> {};          // box pens
+auto CrossPen           = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
+auto GroupSelectPen     = gsl::narrow_cast<HPEN>(nullptr); // pen for group select
+auto BackgroundPen      = gsl::narrow_cast<HPEN>(nullptr); // background color pen
+auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
+auto KnotPen            = gsl::narrow_cast<HPEN>(nullptr); // knot pen
+auto BackgroundPenWidth = int32_t {};                      // width of the background pen
+auto UserPen            = gsl::narrow_cast<std::vector<HPEN>*>(nullptr); // user color pens
 
 // brushes
-static auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
-static auto DefaultColorBrush = std::array<HBRUSH, COLORCNT> {};   // default color brushes
-static auto UserColorBrush    = std::array<HBRUSH, COLORCNT> {};   // user color brushes
+auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
+auto DefaultColorBrush = std::array<HBRUSH, COLORCNT> {};   // default color brushes
+auto UserColorBrush    = std::array<HBRUSH, COLORCNT> {};   // user color brushes
 
 // for the choose color dialog box
-static auto ColorStruct = CHOOSECOLOR {};
-static auto CustomColor = std::array<COLORREF, COLORCNT> {};
+auto ColorStruct = CHOOSECOLOR {};
+auto CustomColor = std::array<COLORREF, COLORCNT> {};
 
 // for the background color dialog box
-static auto BackgroundColorStruct = CHOOSECOLOR {};
-static auto CustomBackgroundColor = std::array<COLORREF, COLORCNT> {};
+auto BackgroundColorStruct = CHOOSECOLOR {};
+auto CustomBackgroundColor = std::array<COLORREF, COLORCNT> {};
 
 // threads
-static auto    ThreadSize          = std::array<wchar_t, COLORCNT> {}; // user selected thread sizes
-static auto    ThreadSizePixels    = std::array<int32_t, COLORCNT> {}; // thread sizes in pixels
-static auto    ThreadSizeIndex     = std::array<uint32_t, COLORCNT> {}; // thread size indices
-static auto    ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size change windows
+auto           ThreadSize          = std::array<wchar_t, COLORCNT> {}; // user selected thread sizes
+auto           ThreadSizePixels    = std::array<int32_t, COLORCNT> {}; // thread sizes in pixels
+auto           ThreadSizeIndex     = std::array<uint32_t, COLORCNT> {}; // thread size indices
+auto           ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size change windows
 constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
 
 // windows
-static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
-static auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
-static auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
-static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
-static auto UserColorWin  = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // user color windows
-static auto SideWindow    = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // side message windows
-static auto ThreadSizeWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // thread size windows
+auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
+auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
+auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
+auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
+auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
+auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
+auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
 
-static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
-static auto DisplayedColorBitmap =
-    std::bitset<32> {}; // Map of color numbers in design that are actually displayed
-static auto MoveAnchor       = uint32_t {}; // for resequencing stitches
-static auto RotateAngle      = float {};    // angle for pixel rotate
-static auto PickColorMsgSize = SIZE {};     // size of the pick color message
-static auto InsertSize       = SIZE {};     // size of file insert window
-static auto InsertCenter     = F_POINT {};  // center point in inserted file
-static auto NumericCode      = wchar_t {};  // keyboard numerical input
-static auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
+auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
+auto DisplayedColorBitmap = std::bitset<32> {}; // Map of color numbers in design that are actually displayed
+auto MoveAnchor       = uint32_t {};            // for resequencing stitches
+auto RotateAngle      = float {};               // angle for pixel rotate
+auto PickColorMsgSize = SIZE {};                // size of the pick color message
+auto InsertSize       = SIZE {};                // size of file insert window
+auto InsertCenter     = F_POINT {};             // center point in inserted file
+auto NumericCode      = wchar_t {};             // keyboard numerical input
+auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
-static auto SideWindowEntryBuffer =
+auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
-static auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
-static auto MsgBuffer     = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // for user messages
+auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
+auto MsgBuffer     = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // for user messages
 
 // graphics variables
 
-static constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
-                                                                       0x00800000,
-                                                                       0x00FF0000,
-                                                                       0x00808000,
-                                                                       0x00FFFF00,
-                                                                       0x00800080,
-                                                                       0x00FF00FF,
-                                                                       0x00000080,
-                                                                       0x000000FF,
-                                                                       0x00008000,
-                                                                       0x0000FF00,
-                                                                       0x00008080,
-                                                                       0x0000FFFF,
-                                                                       0x00808080,
-                                                                       0x00C0C0C0,
-                                                                       0x00FFFFFF};
+constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
+                                                                0x00800000,
+                                                                0x00FF0000,
+                                                                0x00808000,
+                                                                0x00FFFF00,
+                                                                0x00800080,
+                                                                0x00FF00FF,
+                                                                0x00000080,
+                                                                0x000000FF,
+                                                                0x00008000,
+                                                                0x0000FF00,
+                                                                0x00008080,
+                                                                0x0000FFFF,
+                                                                0x00808080,
+                                                                0x00C0C0C0,
+                                                                0x00FFFFFF};
 
-static auto BoxOffset = std::array<int32_t, 4> {};
+auto BoxOffset = std::array<int32_t, 4> {};
 
-static auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
-static auto DefaultDirectory = gsl::narrow_cast<fs::path*>(nullptr);
-static auto BalaradName0     = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
-static auto BalaradName1     = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
-static auto BalaradName2     = gsl::narrow_cast<fs::path*>(nullptr);
-static auto IniFileName      = gsl::narrow_cast<fs::path*>(nullptr); //.ini file name
-static auto PreviousNames    = gsl::narrow_cast<std::vector<fs::path>*>(nullptr);
-static auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
+auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
+auto DefaultDirectory = gsl::narrow_cast<fs::path*>(nullptr);
+auto BalaradName0     = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
+auto BalaradName1     = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
+auto BalaradName2     = gsl::narrow_cast<fs::path*>(nullptr);
+auto IniFileName      = gsl::narrow_cast<fs::path*>(nullptr); //.ini file name
+auto PreviousNames    = gsl::narrow_cast<std::vector<fs::path>*>(nullptr);
+auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
 
-static auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
+auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
 
-static auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
-static auto ThumbnailIndex = uint32_t {};        // index into the thumbnail filname table
+auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
+auto ThumbnailIndex        = uint32_t {}; // index into the thumbnail filname table
 
-static auto ThumbnailSearchString =
+auto ThumbnailSearchString =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // storage for the thumbnail search string
 
-static auto InsertedVertexIndex = uint32_t {}; // saved vertex pointer for inserting files
-static auto InsertedFormIndex   = uint32_t {}; // saved form pointer for inserting files
-static auto InsertedStitchIndex = uint32_t {}; // saved stitch pointer for inserting files
-static auto MoveLine0           = std::array<POINT, LNPNTS> {}; // move point line
-static auto MoveLine1           = std::array<POINT, LNPNTS> {}; // move point line
-static auto ClipInsertBoxLine = std::array<POINT, SQPNTS> {}; // for displaying clipboard insert rectangle
-static auto RotateBoxOutline = std::array<POINT, SQPNTS> {}; // for drawing the rotate rectangle
-static auto RotateBoxCrossVertLine = std::array<POINT, LNPNTS> {}; // vertical part of the rotate cross
-static auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part of the rotate cross
-static auto RotateBoxToCursorLine =
-    std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
-static auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
+auto InsertedVertexIndex = uint32_t {};                  // saved vertex pointer for inserting files
+auto InsertedFormIndex   = uint32_t {};                  // saved form pointer for inserting files
+auto InsertedStitchIndex = uint32_t {};                  // saved stitch pointer for inserting files
+auto MoveLine0           = std::array<POINT, LNPNTS> {}; // move point line
+auto MoveLine1           = std::array<POINT, LNPNTS> {}; // move point line
+auto ClipInsertBoxLine = std::array<POINT, SQPNTS> {}; // for displaying clipboard insert rectangle
+auto RotateBoxOutline  = std::array<POINT, SQPNTS> {}; // for drawing the rotate rectangle
+auto RotateBoxCrossVertLine = std::array<POINT, LNPNTS> {}; // vertical part of the rotate cross
+auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part of the rotate cross
+auto RotateBoxToCursorLine = std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
+auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
+} // namespace
 
 auto thred::getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
   if (clipMemory == nullptr) {

@@ -89,10 +89,12 @@ void wavinit(HWND hwndlg);
 auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 } // namespace ffi
 
-static auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
-static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
-static auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
-static auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
+namespace {
+auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
+auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
+auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
+auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
+} // namespace
 
 auto const DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZCRV,

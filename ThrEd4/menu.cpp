@@ -7,12 +7,14 @@
 #include "menu.h"
 
 // menus
-static auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
-static auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
-static auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
-static auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
-static auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
-static auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
+namespace {
+auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
+auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
+auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
+auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
+auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
+auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
+} // namespace
 
 void menu::disableRedo() {
   if (StateMap->testAndReset(StateFlag::REDUSHO)) {
@@ -384,7 +386,9 @@ void menu::fil2men() {
   StateMap->set(StateFlag::DUMEN);
 }
 
-static auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
+namespace {
+auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
+} // namespace
 
 void menu::chkmen() {
   constexpr auto LASTCODE = DataCode.size();

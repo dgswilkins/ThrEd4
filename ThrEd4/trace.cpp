@@ -83,32 +83,33 @@ auto icolsum(COLORREF col) -> uint32_t;
 #endif
 } // namespace ti
 
-static auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
-static auto TraceDownWindow    = std::array<HWND, CHANLCNT> {}; // trace down number windows
-static auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select windows
-static auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number windows
-static auto CurrentTracePoint  = POINT {};                      // current point being traced
-static auto TraceDataSize      = uint32_t {}; // size of the trace bitmap in double words
-static auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
-static auto TraceRGBFlag =
-    std::array<StateFlag, 3> {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
-static auto TraceRGBMask = std::array<uint32_t, 3> {REDMSK, GRNMSK, BLUMSK}; // trace masks
-static auto TraceRGB     = std::array<uint32_t, 3> {BLUCOL, GRNCOL, REDCOL}; // trace colors
-static auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
-static auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
-static auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
-static auto UpPixelColor     = COLORREF {}; // color of the up reference pixel
-static auto DownPixelColor   = COLORREF {}; // color of the down reference pixel
-static auto InvertUpColor    = COLORREF {}; // complement color of the up reference pixel
-static auto InvertDownColor  = COLORREF {}; // complement color of the down reference pixel
-static auto TraceMsgPoint    = POINT {};    // message point for trace parsing
-static auto HighColors  = std::array<uint32_t, CHANLCNT> {}; // separated upper reference colors
-static auto LowColors   = std::array<uint32_t, CHANLCNT> {}; // separated lower reference colors
-static auto ColumnColor = uint32_t {};                       // trace color column
-static auto TraceShift  = std::array<uint32_t, 3> {0U, BYTSHFT, WRDSHFT}; // trace shift values
-static auto TraceBrush  = std::array<HBRUSH, CHANLCNT> {};      // red,green,and blue brushes
-static auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr); // trace number input window
-static auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
+namespace {
+auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
+auto TraceDownWindow    = std::array<HWND, CHANLCNT> {}; // trace down number windows
+auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select windows
+auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number windows
+auto CurrentTracePoint  = POINT {};                      // current point being traced
+auto TraceDataSize      = uint32_t {};                   // size of the trace bitmap in double words
+auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
+auto TraceRGBFlag = std::array<StateFlag, 3> {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
+auto TraceRGBMask = std::array<uint32_t, 3> {REDMSK, GRNMSK, BLUMSK}; // trace masks
+auto TraceRGB     = std::array<uint32_t, 3> {BLUCOL, GRNCOL, REDCOL}; // trace colors
+auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
+auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
+auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
+auto UpPixelColor     = COLORREF {};                          // color of the up reference pixel
+auto DownPixelColor   = COLORREF {};                          // color of the down reference pixel
+auto InvertUpColor    = COLORREF {}; // complement color of the up reference pixel
+auto InvertDownColor  = COLORREF {}; // complement color of the down reference pixel
+auto TraceMsgPoint    = POINT {};    // message point for trace parsing
+auto HighColors       = std::array<uint32_t, CHANLCNT> {}; // separated upper reference colors
+auto LowColors        = std::array<uint32_t, CHANLCNT> {}; // separated lower reference colors
+auto ColumnColor      = uint32_t {};                       // trace color column
+auto TraceShift       = std::array<uint32_t, 3> {0U, BYTSHFT, WRDSHFT}; // trace shift values
+auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {}; // red,green,and blue brushes
+auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr); // trace number input window
+auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
+} // namespace
 
 void trace::initColorRef() noexcept {
   UpPixelColor    = 0;

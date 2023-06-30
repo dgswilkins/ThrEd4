@@ -52,27 +52,28 @@ auto saveName(fs::path& fileName);
 auto stch2bit(F_POINT& point) -> POINT;
 } // namespace bi
 
-static auto BitmapBackgroundColors =
-    gsl::narrow_cast<std::vector<COLORREF>*>(nullptr); // for the bitmap color dialog box
-static auto BitmapColor          = BITCOL;             // bitmap color
-static auto BitMapColorStruct    = CHOOSECOLOR {};
-static auto BitmapDC             = HDC {};  // bitmap device context
-static auto BitmapDstRect        = RECT {}; // stitch window destination rectangle for zooomed view
-static auto BitmapFileHandle     = HANDLE {};           // bitmap handle
-static auto BitmapFileHeader     = BITMAPFILEHEADER {}; // bitmap file header
-static auto BitmapFileHeaderV4   = BITMAPV4HEADER {};   // bitmap version4 file header
-static auto BitmapHeight         = int {};              // bitmap height
-static auto BitmapInfo           = BITMAPINFO {};       // bitmap info
-static auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
-static auto BitmapPen            = HPEN {};             // bitmap pen
-static auto BitmapSizeinStitches = F_POINT {};          // bitmap end points in stitch points
-static auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
-static auto BitmapWidth          = int {};              // bitmap width
-static auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
-static auto TraceBitmap          = HBITMAP {};          // trace bitmap
-static auto TraceDC              = HDC {};              // trace device context
-static auto UTF16BMPname = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
-static auto UTF8BMPname  = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
+namespace {
+auto BitmapBackgroundColors = gsl::narrow_cast<std::vector<COLORREF>*>(nullptr); // for the bitmap color dialog box
+auto BitmapColor          = BITCOL;                                              // bitmap color
+auto BitMapColorStruct    = CHOOSECOLOR {};
+auto BitmapDC             = HDC {};    // bitmap device context
+auto BitmapDstRect        = RECT {};   // stitch window destination rectangle for zooomed view
+auto BitmapFileHandle     = HANDLE {}; // bitmap handle
+auto BitmapFileHeader     = BITMAPFILEHEADER {}; // bitmap file header
+auto BitmapFileHeaderV4   = BITMAPV4HEADER {};   // bitmap version4 file header
+auto BitmapHeight         = int {};              // bitmap height
+auto BitmapInfo           = BITMAPINFO {};       // bitmap info
+auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
+auto BitmapPen            = HPEN {};             // bitmap pen
+auto BitmapSizeinStitches = F_POINT {};          // bitmap end points in stitch points
+auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
+auto BitmapWidth          = int {};              // bitmap width
+auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
+auto TraceBitmap          = HBITMAP {};          // trace bitmap
+auto TraceDC              = HDC {};              // trace device context
+auto UTF16BMPname         = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
+auto UTF8BMPname          = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
+} // namespace
 
 constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making

@@ -208,7 +208,9 @@ void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float 
 void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace pi
 
-static auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
+namespace {
+auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
+} // namespace
 
 static constexpr auto INDEX00 = THREAD {{0x00, 0x00, 0x00}, "Unknown", ""};
 static constexpr auto INDEX01 = THREAD {{0x1a, 0x0a, 0x94}, "Prussian Blue", "ETP007"};

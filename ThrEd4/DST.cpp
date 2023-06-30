@@ -72,8 +72,10 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling f
 constexpr auto TYPJMP = 0x830000U; // dst jump stitch mask
 constexpr auto TYPREG = 0x030000U; // dst regular stitch mask
 
-static auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
-static auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
+namespace {
+auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
+auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
+} // namespace
 
 class DSTDAT
 {
