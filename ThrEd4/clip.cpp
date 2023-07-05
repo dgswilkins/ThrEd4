@@ -250,21 +250,22 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 }
 
 void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept {
-  if (!ClipBuffer->empty()) {
-	auto const midpoint = wrap::midl(clipRect.right, clipRect.left);
-	if (auto const& clipBuffer = *ClipBuffer; clipBuffer[0].x > midpoint) {
-	  auto iBuffer = clipBuffer.begin();
-	  for (auto& reversed : clipReversedData) {
-		reversed = F_POINT {clipRect.right - iBuffer->x, iBuffer->y};
-		++iBuffer;
-	  }
+  if (ClipBuffer->empty()) {
+	return;
+  }
+  auto const midpoint = wrap::midl(clipRect.right, clipRect.left);
+  if (auto const& clipBuffer = *ClipBuffer; clipBuffer[0].x > midpoint) {
+	auto iBuffer = clipBuffer.begin();
+	for (auto& reversed : clipReversedData) {
+	  reversed = F_POINT {clipRect.right - iBuffer->x, iBuffer->y};
+	  ++iBuffer;
 	}
-	else {
-	  auto iBuffer = clipBuffer.begin();
-	  for (auto& reversed : clipReversedData) {
-		reversed = *iBuffer;
-		++iBuffer;
-	  }
+  }
+  else {
+	auto iBuffer = clipBuffer.begin();
+	for (auto& reversed : clipReversedData) {
+	  reversed = *iBuffer;
+	  ++iBuffer;
 	}
   }
 }
