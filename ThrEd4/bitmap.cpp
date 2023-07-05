@@ -460,14 +460,15 @@ auto bi::nuBit() noexcept -> BOOL {
 }
 
 void bitmap::setBmpColor() {
-  if (bi::nuBit() != 0U) {
-	BitmapColor = bi::fswap(BitMapColorStruct.rgbResult);
-	if (bitmap::ismap()) {
-	  bitmap::bfil(BackgroundColor);
-	}
-	thred::nuPen(BitmapPen, 1, BitmapColor);
-	thred::zumhom();
+  if (bi::nuBit() == 0U) {
+	return;
   }
+  BitmapColor = bi::fswap(BitMapColorStruct.rgbResult);
+  if (bitmap::ismap()) {
+	bitmap::bfil(BackgroundColor);
+  }
+  thred::nuPen(BitmapPen, 1, BitmapColor);
+  thred::zumhom();
 }
 
 void bitmap::setBBCV(std::vector<COLORREF>* value) noexcept {
