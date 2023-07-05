@@ -215,38 +215,39 @@ auto clip::numclp(uint32_t formIndex) -> uint32_t {
 }
 
 void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) {
-  if (!StateMap->test(StateFlag::NOCLP)) {
-	ClipBuffer->clear();
-	if (clipEntries != 0U) {
-	  ClipBuffer->reserve(clipEntries);
-	  for (auto const clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
-	                                                     wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
-	       auto const& iClip : clipPoints) {
-		ClipBuffer->emplace_back(F_POINT_ATTR {iClip.x, iClip.y, 0});
-	  }
-	  clipRect.left = clipRect.right = ClipBuffer->front().x;
-	  clipRect.bottom = clipRect.top = ClipBuffer->front().y;
-	  for (auto const& clip : *ClipBuffer) {
-		if (clip.x < clipRect.left) {
-		  clipRect.left = clip.x;
-		}
-		if (clip.x > clipRect.right) {
-		  clipRect.right = clip.x;
-		}
-		if (clip.y < clipRect.bottom) {
-		  clipRect.bottom = clip.y;
-		}
-		if (clip.y > clipRect.top) {
-		  clipRect.top = clip.y;
-		}
-	  }
-	}
-	else {
-	  clipRect = F_RECTANGLE {};
-	}
-	ClipRectSize.cx = clipRect.right - clipRect.left;
-	ClipRectSize.cy = clipRect.top - clipRect.bottom;
+  if (StateMap->test(StateFlag::NOCLP)) {
+	return;
   }
+  ClipBuffer->clear();
+  if (clipEntries != 0U) {
+	ClipBuffer->reserve(clipEntries);
+	for (auto const  clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
+                                                       wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
+	     auto const& iClip : clipPoints) {
+	  ClipBuffer->emplace_back(F_POINT_ATTR {iClip.x, iClip.y, 0});
+	}
+	clipRect.left = clipRect.right = ClipBuffer->front().x;
+	clipRect.bottom = clipRect.top = ClipBuffer->front().y;
+	for (auto const& clip : *ClipBuffer) {
+	  if (clip.x < clipRect.left) {
+		clipRect.left = clip.x;
+	  }
+	  if (clip.x > clipRect.right) {
+		clipRect.right = clip.x;
+	  }
+	  if (clip.y < clipRect.bottom) {
+		clipRect.bottom = clip.y;
+	  }
+	  if (clip.y > clipRect.top) {
+		clipRect.top = clip.y;
+	  }
+	}
+  }
+  else {
+	clipRect = F_RECTANGLE {};
+  }
+  ClipRectSize.cx = clipRect.right - clipRect.left;
+  ClipRectSize.cy = clipRect.top - clipRect.bottom;
 }
 
 void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept {
