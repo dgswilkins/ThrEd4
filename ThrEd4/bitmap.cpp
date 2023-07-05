@@ -106,109 +106,104 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   auto bytesRead = DWORD {};
-  if (wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
-	// check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
-	if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType == MB_SIG) {
-	  auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
-	  if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
-		fileHeaderSize = sizeof(BITMAPV4HEADER);
-	  }
-	  if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
-		return;
-	  }
-	}
-	else {
-	  bitmap::resetBmpFile(true);
-	  return;
-	}
-  }
-  else {
+  if (!wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
 	auto errorCode = GetLastError();
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
 	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil", errorCode);
 	return;
   }
-  if (bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
-	if (!StateMap->testAndReset(StateFlag::WASESC)) {
-	  StateMap->reset(StateFlag::TRSET);
-	}
-	BitmapWidth  = BitmapFileHeaderV4.bV4Width;
-	BitmapHeight = BitmapFileHeaderV4.bV4Height;
-	StateMap->set(StateFlag::INIT);
-	ZoomRect.left   = 0.0F;
-	ZoomRect.bottom = 0.0F;
-	wrap::narrow_cast(ZoomRect.right, UnzoomedRect.cx);
-	wrap::narrow_cast(ZoomRect.top, UnzoomedRect.cy);
-	BitmapDC = CreateCompatibleDC(StitchWindowDC);
-	if (BitmapFileHeaderV4.bV4BitCount == 1) {
-	  StateMap->set(StateFlag::MONOMAP);
-	  auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U) << 2U;
-	  if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
-		bitmapWidthBytes += 4U;
-	  }
-	  auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
-	  auto monoBitmapData = std::vector<uint8_t> {};
-	  monoBitmapData.resize(bitmapSizeBytes);
-	  if (!wrap::readFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, L"ReadFile for monoBitmapData in bfil")) {
-		return;
-	  }
-	  CloseHandle(hBitmapFile);
-	  auto const flag = bi::binv(monoBitmapData);
-	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
-	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
-	  BitmapInfoHeader               = {};
-	  BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
-	  BitmapInfoHeader.biWidth       = BitmapWidth;
-	  BitmapInfoHeader.biHeight      = BitmapHeight;
-	  BitmapInfoHeader.biPlanes      = 1U;
-	  BitmapInfoHeader.biBitCount    = BPP32;
-	  BitmapInfoHeader.biCompression = BI_RGB;
-	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
-	  // Synchronize
-	  GdiFlush();
-	  auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
-	  auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
-	  auto       srcOffset = 0U;
-	  auto       dstOffset = 0;
-	  auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
-	  for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-		auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
-		auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
-		bi::bitlin(spLineSrc, spLineDst, foreground, background);
-		srcOffset += bitmapWidthBytes;
-		dstOffset += BitmapWidth;
-	  }
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC); deviceContext != nullptr) {
-		SelectObject(deviceContext, bitmap);
-		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
-		SelectObject(BitmapDC, hBitmapFile);
-		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
-		DeleteObject(bitmap);
-		DeleteObject(deviceContext);
-	  }
-	}
-	else {
-	  CloseHandle(hBitmapFile);
-	  StateMap->reset(StateFlag::MONOMAP);
-	  hBitmapFile = LoadImage(
-	      ThrEdInstance, UTF16BMPname->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
-	  SelectObject(BitmapDC, hBitmapFile);
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	bi::bitsiz();
-	trace::initColorRef();
-	StateMap->reset(StateFlag::HIDMAP);
+  // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
+  if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType != MB_SIG) {
+	bitmap::resetBmpFile(true);
+	return;
   }
-  else {
+  auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
+  if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
+	fileHeaderSize = sizeof(BITMAPV4HEADER);
+  }
+  if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
+	return;
+  }
+  if (!bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
 	displayText::tabmsg(IDS_BMAP, false);
+	return;
   }
+  if (!StateMap->testAndReset(StateFlag::WASESC)) {
+	StateMap->reset(StateFlag::TRSET);
+  }
+  BitmapWidth  = BitmapFileHeaderV4.bV4Width;
+  BitmapHeight = BitmapFileHeaderV4.bV4Height;
+  StateMap->set(StateFlag::INIT);
+  ZoomRect.left   = 0.0F;
+  ZoomRect.bottom = 0.0F;
+  wrap::narrow_cast(ZoomRect.right, UnzoomedRect.cx);
+  wrap::narrow_cast(ZoomRect.top, UnzoomedRect.cy);
+  BitmapDC = CreateCompatibleDC(StitchWindowDC);
+  if (BitmapFileHeaderV4.bV4BitCount == 1) {
+	StateMap->set(StateFlag::MONOMAP);
+	auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U) << 2U;
+	if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
+	  bitmapWidthBytes += 4U;
+	}
+	auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
+	auto monoBitmapData = std::vector<uint8_t> {};
+	monoBitmapData.resize(bitmapSizeBytes);
+	if (!wrap::readFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, L"ReadFile for monoBitmapData in bfil")) {
+	  return;
+	}
+	CloseHandle(hBitmapFile);
+	auto const flag       = bi::binv(monoBitmapData);
+	auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
+	auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
+	BitmapInfoHeader      = {};
+	BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
+	BitmapInfoHeader.biWidth       = BitmapWidth;
+	BitmapInfoHeader.biHeight      = BitmapHeight;
+	BitmapInfoHeader.biPlanes      = 1U;
+	BitmapInfoHeader.biBitCount    = BPP32;
+	BitmapInfoHeader.biCompression = BI_RGB;
+	BitmapInfo.bmiHeader           = BitmapInfoHeader;
+	auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto const bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	// Synchronize
+	GdiFlush();
+	auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
+	auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
+	auto       srcOffset = 0U;
+	auto       dstOffset = 0;
+	auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
+	for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
+	  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
+	  auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
+	  bi::bitlin(spLineSrc, spLineDst, foreground, background);
+	  srcOffset += bitmapWidthBytes;
+	  dstOffset += BitmapWidth;
+	}
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC); deviceContext != nullptr) {
+	  SelectObject(deviceContext, bitmap);
+	  hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
+	  SelectObject(BitmapDC, hBitmapFile);
+	  BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
+	  DeleteObject(bitmap);
+	  DeleteObject(deviceContext);
+	}
+  }
+  else {
+	CloseHandle(hBitmapFile);
+	StateMap->reset(StateFlag::MONOMAP);
+	hBitmapFile = LoadImage(
+	    ThrEdInstance, UTF16BMPname->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+	SelectObject(BitmapDC, hBitmapFile);
+	StateMap->set(StateFlag::RESTCH);
+  }
+  bi::bitsiz();
+  trace::initColorRef();
+  StateMap->reset(StateFlag::HIDMAP);
 }
 
 // Get a rough estimate of whether black or white
