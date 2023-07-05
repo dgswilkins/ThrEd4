@@ -704,12 +704,13 @@ void bi::pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
 }
 
 void bitmap::bfrm(FRM_HEAD const& form) {
-  if (form.vertexCount != 0U) {
-	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	  bi::pxlin(form, iVertex, iVertex + 1U);
-	}
-	if (form.type != FRMLINE) {
-	  bi::pxlin(form, form.vertexCount - 1U, 0);
-	}
+  if (form.vertexCount == 0U) {
+	return;
+  }
+  for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
+	bi::pxlin(form, iVertex, iVertex + 1U);
+  }
+  if (form.type != FRMLINE) {
+	bi::pxlin(form, form.vertexCount - 1U, 0);
   }
 }
