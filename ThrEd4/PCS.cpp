@@ -306,7 +306,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   if (!wrap::readFile(fileHandle, pcsStitchBuffer.data(), fileSize, &bytesRead, L"ReadFile for pcsStitchBuffer in insPCS")) {
 	return false;
   }
-  if (bytesRead == fileSize) {
+  if (bytesRead != fileSize) {
 	StateMap->reset(StateFlag::INIT);
 	displayText::tabmsg(IDS_SHRTF, false);
 	thred::coltab();
