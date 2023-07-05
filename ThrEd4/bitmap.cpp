@@ -375,48 +375,52 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
       CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-  if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
-	auto dwOptions = DWORD {};
-	hResult        = pFileOpen->GetOptions(&dwOptions);
-	if (SUCCEEDED(hResult)) {
-	  static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-	  hResult +=
-	      pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
-	  hResult += pFileOpen->SetTitle(L"Open Thred File");
-#if USE_DEFBDIR
-	  // If we want to, we can set the default directory rather than using the OS mechanism for last used
-	  auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-	  // NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
-	  hResult += SHCreateItemFromParsingName(directory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
-	  hResult += pFileOpen->SetFolder(psiFrom);
-	  if (nullptr != psiFrom) {
-		psiFrom->Release();
-	  }
-#else
-	  UNREFERENCED_PARAMETER(directory);
-#endif
-	  if (SUCCEEDED(hResult)) {
-		hResult = pFileOpen->Show(nullptr);
-		if (SUCCEEDED(hResult)) {
-		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		  hResult     = pFileOpen->GetResult(&pItem);
-		  if (SUCCEEDED(hResult) && (nullptr != pItem)) {
-			// NOLINTNEXTLINE(readability-qualified-auto)
-			auto pszFilePath = PWSTR {nullptr};
-			hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-			if (SUCCEEDED(hResult)) {
-			  fileName.assign(pszFilePath);
-			  CoTaskMemFree(pszFilePath);
-			  return true;
-			}
-		  }
-		}
-	  }
-	}
+  if (FAILED(hResult) || (nullptr == pFileOpen)) {
+	return false;
   }
-  return false;
+  auto dwOptions = DWORD {};
+  hResult        = pFileOpen->GetOptions(&dwOptions);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
+  hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+  hResult += pFileOpen->SetTitle(L"Open Thred File");
+#if USE_DEFBDIR
+  // If we want to, we can set the default directory rather than using the OS mechanism for last used
+  auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
+  // NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
+  hResult += SHCreateItemFromParsingName(directory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+  hResult += pFileOpen->SetFolder(psiFrom);
+  if (nullptr != psiFrom) {
+	psiFrom->Release();
+  }
+#else
+  UNREFERENCED_PARAMETER(directory);
+#endif
+  if (FAILED(hResult)) {
+	return false;
+  }
+  hResult = pFileOpen->Show(nullptr);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+  hResult     = pFileOpen->GetResult(&pItem);
+  if (FAILED(hResult) || (nullptr == pItem)) {
+	return false;
+  }
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto pszFilePath = PWSTR {nullptr};
+  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  fileName.assign(pszFilePath);
+  CoTaskMemFree(pszFilePath);
+  return true;
 }
 
 void bitmap::lodbmp(fs::path const& directory) {
