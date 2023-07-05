@@ -420,30 +420,31 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
 }
 
 void bitmap::lodbmp(fs::path const& directory) {
-  if (bi::loadName(directory, *UTF16BMPname)) {
-	bitmap::resetBmpFile(false);
-	trace::untrace();
-#if USE_SHORT_NAME
-	auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), NULL, 0);
-	auto       dest  = std::vector<wchar_t> {};
-	dest.resize(pleng);
-	GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
-	auto filePart = fs::path {dest.data()};
-	auto saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
-#else
-	auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());
-#endif
-	if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
-	  std::ranges::copy(saveFile, UTF8BMPname.begin());
-	  bitmap::bfil(BackgroundColor);
-	}
-	else {
-	  // THR version 2 file can only store a 16 character filename
-	  // Give the user a little more info why the bitmap has not been loaded
-	  displayText::showMessage(IDS_BMPLONG, ThrName->wstring());
-	}
-	StateMap->set(StateFlag::RESTCH);
+  if (!bi::loadName(directory, *UTF16BMPname)) {
+	return;
   }
+  bitmap::resetBmpFile(false);
+  trace::untrace();
+#if USE_SHORT_NAME
+  auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), NULL, 0);
+  auto       dest  = std::vector<wchar_t> {};
+  dest.resize(pleng);
+  GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
+  auto filePart = fs::path {dest.data()};
+  auto saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
+#else
+  auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());
+#endif
+  if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
+	std::ranges::copy(saveFile, UTF8BMPname.begin());
+	bitmap::bfil(BackgroundColor);
+  }
+  else {
+	// THR version 2 file can only store a 16 character filename
+	// Give the user a little more info why the bitmap has not been loaded
+	displayText::showMessage(IDS_BMPLONG, ThrName->wstring());
+  }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 auto bi::nuBit() noexcept -> BOOL {
