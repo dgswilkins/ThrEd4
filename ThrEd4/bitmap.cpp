@@ -280,12 +280,13 @@ constexpr auto bi::gudtyp(WORD bitCount) noexcept -> bool {
 }
 
 void bitmap::resetBmpFile(bool reset) {
-  if (bitmap::ismap()) {
-	DeleteObject(BitmapFileHandle);
-	ReleaseDC(ThrEdWindow, BitmapDC);
-	if (reset) {
-	  UTF8BMPname.fill(0);
-	}
+  if (!bitmap::ismap()) {
+	return;
+  }
+  DeleteObject(BitmapFileHandle);
+  ReleaseDC(ThrEdWindow, BitmapDC);
+  if (reset) {
+	UTF8BMPname.fill(0);
   }
 }
 
