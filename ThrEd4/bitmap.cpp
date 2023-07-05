@@ -584,19 +584,20 @@ void bitmap::drawBmpBackground() {
   if (StateMap->test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }
-  if (bi::bitar()) {
-	StretchBlt(StitchWindowMemDC,
-	           BitmapDstRect.left,
-	           BitmapDstRect.top,
-	           BitmapDstRect.right - BitmapDstRect.left,
-	           BitmapDstRect.bottom - BitmapDstRect.top,
-	           deviceContext,
-	           BitmapSrcRect.left,
-	           BitmapSrcRect.top,
-	           BitmapSrcRect.right - BitmapSrcRect.left,
-	           BitmapSrcRect.bottom - BitmapSrcRect.top,
-	           SRCCOPY);
+  if (!bi::bitar()) {
+	return;
   }
+  StretchBlt(StitchWindowMemDC,
+             BitmapDstRect.left,
+             BitmapDstRect.top,
+             BitmapDstRect.right - BitmapDstRect.left,
+             BitmapDstRect.bottom - BitmapDstRect.top,
+             deviceContext,
+             BitmapSrcRect.left,
+             BitmapSrcRect.top,
+             BitmapSrcRect.right - BitmapSrcRect.left,
+             BitmapSrcRect.bottom - BitmapSrcRect.top,
+             SRCCOPY);
 }
 
 auto bi::bitar() -> bool {
