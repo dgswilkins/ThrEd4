@@ -118,50 +118,51 @@ void backup::deldu() {
 
 void backup::redbak() {
   auto const* undoData = convertFromPtr<BACK_HEAD*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
-  if (undoData != nullptr) {
-	StitchBuffer->clear();
-	if (undoData->stitchCount != 0U) {
-	  auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
-	  StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
-	}
-	else {
-	  StateMap->reset(StateFlag::INIT);
-	}
-	UnzoomedRect = undoData->zoomRect;
-	FormList->clear();
-	if (undoData->formCount != 0U) {
-	  auto const span = gsl::span {undoData->forms, undoData->formCount};
-	  FormList->insert(FormList->end(), span.begin(), span.end());
-	}
-	FormVertices->clear();
-	if (undoData->vertexCount != 0U) {
-	  auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
-	  FormVertices->insert(FormVertices->end(), span.begin(), span.end());
-	}
-	SatinGuides->clear();
-	if (undoData->guideCount != 0U) {
-	  auto const span = gsl::span {undoData->guide, undoData->guideCount};
-	  SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
-	}
-	ClipPoints->clear();
-	if (undoData->clipPointCount != 0U) {
-	  auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
-	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
-	}
-	// ToDo - add field in BACK_HEAD to keep track of number of colors
-	constexpr auto UCOLSIZE     = UserColor.size();
-	auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
-	auto const     spUserColors = gsl::span {UserColor};
-	std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
-	thred::refreshColors();
-	TexturePointsBuffer->clear();
-	if (undoData->texturePointCount != 0U) {
-	  auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
-	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
-	}
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
+  if (undoData == nullptr) {
+	return;
   }
+  StitchBuffer->clear();
+  if (undoData->stitchCount != 0U) {
+	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
+	StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
+  }
+  else {
+	StateMap->reset(StateFlag::INIT);
+  }
+  UnzoomedRect = undoData->zoomRect;
+  FormList->clear();
+  if (undoData->formCount != 0U) {
+	auto const span = gsl::span {undoData->forms, undoData->formCount};
+	FormList->insert(FormList->end(), span.begin(), span.end());
+  }
+  FormVertices->clear();
+  if (undoData->vertexCount != 0U) {
+	auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
+	FormVertices->insert(FormVertices->end(), span.begin(), span.end());
+  }
+  SatinGuides->clear();
+  if (undoData->guideCount != 0U) {
+	auto const span = gsl::span {undoData->guide, undoData->guideCount};
+	SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
+  }
+  ClipPoints->clear();
+  if (undoData->clipPointCount != 0U) {
+	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
+	ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
+  }
+  // ToDo - add field in BACK_HEAD to keep track of number of colors
+  constexpr auto UCOLSIZE     = UserColor.size();
+  auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+  auto const     spUserColors = gsl::span {UserColor};
+  std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
+  thred::refreshColors();
+  TexturePointsBuffer->clear();
+  if (undoData->texturePointCount != 0U) {
+	auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
+	TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
+  }
+  thred::coltab();
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void backup::redo() {
