@@ -60,49 +60,50 @@ void backup::dudat() {
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT(modernize-avoid-c-arrays)
   auto* backupData = convertFromPtr<BACK_HEAD*>(undoBuffer[UndoBufferWriteIndex].get());
-  if (backupData != nullptr) {
-	backupData->zoomRect  = UnzoomedRect;
-	backupData->formCount = formCount;
-	backupData->forms     = convertFromPtr<FRM_HEAD*>(&backupData[1]);
-	if (formCount != 0) {
-	  auto const spForms = gsl::span {backupData->forms, FormList->size()};
-	  std::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
-	}
-	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
-	backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(&backupData->forms[formCount]);
-	if (!StitchBuffer->empty()) {
-	  auto const spStitches = gsl::span {backupData->stitches, StitchBuffer->size()};
-	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
-	}
-	backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
-	backupData->vertices    = convertFromPtr<F_POINT*>(&backupData->stitches[StitchBuffer->size()]);
-	if (!FormVertices->empty()) {
-	  auto const spVertices = gsl::span {backupData->vertices, FormVertices->size()};
-	  std::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
-	}
-	backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
-	backupData->guide      = convertFromPtr<SAT_CON*>(&backupData->vertices[FormVertices->size()]);
-	if (!SatinGuides->empty()) {
-	  auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
-	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
-	}
-	backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
-	backupData->clipPoints     = convertFromPtr<F_POINT*>(&backupData->guide[SatinGuides->size()]);
-	if (!ClipPoints->empty()) {
-	  auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
-	  std::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
-	}
-	backupData->colors = convertFromPtr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
-	{
-	  auto const spColors = gsl::span {backupData->colors, COLORCNT};
-	  std::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
-	}
-	backupData->texturePoints     = convertFromPtr<TX_PNT*>(&backupData->colors[COLORCNT]);
-	backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
-	if (!TexturePointsBuffer->empty()) {
-	  auto const spTexturePoints = gsl::span {backupData->texturePoints, backupData->texturePointCount};
-	  std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), spTexturePoints.begin());
-	}
+  if (backupData == nullptr) {
+	return;
+  }
+  backupData->zoomRect  = UnzoomedRect;
+  backupData->formCount = formCount;
+  backupData->forms     = convertFromPtr<FRM_HEAD*>(&backupData[1]);
+  if (formCount != 0) {
+	auto const spForms = gsl::span {backupData->forms, FormList->size()};
+	std::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
+  }
+  backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
+  backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(&backupData->forms[formCount]);
+  if (!StitchBuffer->empty()) {
+	auto const spStitches = gsl::span {backupData->stitches, StitchBuffer->size()};
+	std::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
+  }
+  backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
+  backupData->vertices    = convertFromPtr<F_POINT*>(&backupData->stitches[StitchBuffer->size()]);
+  if (!FormVertices->empty()) {
+	auto const spVertices = gsl::span {backupData->vertices, FormVertices->size()};
+	std::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
+  }
+  backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
+  backupData->guide      = convertFromPtr<SAT_CON*>(&backupData->vertices[FormVertices->size()]);
+  if (!SatinGuides->empty()) {
+	auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
+	std::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
+  }
+  backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
+  backupData->clipPoints     = convertFromPtr<F_POINT*>(&backupData->guide[SatinGuides->size()]);
+  if (!ClipPoints->empty()) {
+	auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
+	std::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
+  }
+  backupData->colors = convertFromPtr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
+  {
+	auto const spColors = gsl::span {backupData->colors, COLORCNT};
+	std::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
+  }
+  backupData->texturePoints     = convertFromPtr<TX_PNT*>(&backupData->colors[COLORCNT]);
+  backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
+  if (!TexturePointsBuffer->empty()) {
+	auto const spTexturePoints = gsl::span {backupData->texturePoints, backupData->texturePointCount};
+	std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), spTexturePoints.begin());
   }
 }
 #pragma warning(pop)
