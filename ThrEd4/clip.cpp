@@ -145,21 +145,24 @@ void clip::delmclp(uint32_t formIndex) {
 }
 
 void clip::deleclp(uint32_t formIndex) {
-  if (!ClipPoints->empty()) {
-	if (auto& form = FormList->operator[](formIndex); form.isEdgeClip()) {
-	  auto destIndex = ci::findclp(formIndex);
-	  if (form.isClipX()) {
-		destIndex += form.lengthOrCount.clipCount;
-	  }
-	  auto const itStartClip = wrap::next(ClipPoints->cbegin(), destIndex);
-	  auto const itEndClip   = wrap::next(itStartClip, form.clipEntries);
-	  ClipPoints->erase(itStartClip, itEndClip);
-	  ci::clpsub(formIndex, form.clipEntries);
-	  form.clipEntries    = 0;
-	  form.borderClipData = 0;
-	  form.edgeType       = 0;
-	}
+  if (ClipPoints->empty()) {
+	return;
   }
+  auto& form = FormList->operator[](formIndex);
+  if (!form.isEdgeClip()) {
+	return;
+  }
+  auto destIndex = ci::findclp(formIndex);
+  if (form.isClipX()) {
+	destIndex += form.lengthOrCount.clipCount;
+  }
+  auto const itStartClip = wrap::next(ClipPoints->cbegin(), destIndex);
+  auto const itEndClip   = wrap::next(itStartClip, form.clipEntries);
+  ClipPoints->erase(itStartClip, itEndClip);
+  ci::clpsub(formIndex, form.clipEntries);
+  form.clipEntries    = 0;
+  form.borderClipData = 0;
+  form.edgeType       = 0;
 }
 
 void clip::delclps(uint32_t formIndex) {
