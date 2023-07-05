@@ -294,33 +294,37 @@ auto bi::saveName(fs::path& fileName) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-  if (SUCCEEDED(hResult) && (nullptr != pFileSave)) {
-	constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
-	hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
-	hResult += pFileSave->SetFileTypeIndex(0);
-	hResult += pFileSave->SetTitle(L"Save Bitmap");
-	auto const bmpName = UTF16BMPname->filename().wstring();
-	hResult += pFileSave->SetFileName(bmpName.c_str());
-	hResult += pFileSave->SetDefaultExtension(L"bmp");
-	if (SUCCEEDED(hResult)) {
-	  hResult = pFileSave->Show(nullptr);
-	  if (SUCCEEDED(hResult)) {
-		auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		hResult     = pFileSave->GetResult(&pItem);
-		if (SUCCEEDED(hResult) && (nullptr != pItem)) {
-		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto pszFilePath = PWSTR {nullptr};
-		  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-		  if (SUCCEEDED(hResult)) {
-			fileName.assign(pszFilePath);
-			CoTaskMemFree(pszFilePath);
-			return true;
-		  }
-		}
-	  }
-	}
+  if (FAILED(hResult) || (nullptr == pFileSave)) {
+	return false;
   }
-  return false;
+  constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+  hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+  hResult += pFileSave->SetFileTypeIndex(0);
+  hResult += pFileSave->SetTitle(L"Save Bitmap");
+  auto const bmpName = UTF16BMPname->filename().wstring();
+  hResult += pFileSave->SetFileName(bmpName.c_str());
+  hResult += pFileSave->SetDefaultExtension(L"bmp");
+  if (FAILED(hResult)) {
+	return false;
+  }
+  hResult = pFileSave->Show(nullptr);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+  hResult     = pFileSave->GetResult(&pItem);
+  if (FAILED(hResult) || (nullptr == pItem)) {
+	return false;
+  }
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto pszFilePath = PWSTR {nullptr};
+  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  fileName.assign(pszFilePath);
+  CoTaskMemFree(pszFilePath);
+  return true;
 }
 
 void bitmap::savmap() {
