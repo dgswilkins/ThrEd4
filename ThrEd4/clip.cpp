@@ -285,21 +285,21 @@ void ci::setvct(uint32_t vertexIndex,
 auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoint) noexcept -> bool {
   auto const sinAngle = sin(clipAngle);
   auto const cosAngle = cos(clipAngle);
-  if (auto length = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
-      length > ClipRectSize.cx) {
-	constexpr auto ITLIMIT = 10U; // Iteration limit
-	for (auto step = 0U; step < ITLIMIT; ++step) {
-	  length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
-	  auto const delta = ClipRectSize.cx - length;
-	  moveToCoords.x += delta * cosAngle;
-	  moveToCoords.y += delta * sinAngle;
-	  if (constexpr auto DLTLIMIT = 0.01F; fabs(delta) < DLTLIMIT) {
-		break;
-	  }
-	}
-	return true;
+  auto       length   = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
+  if (length <= ClipRectSize.cx) {
+	return false;
   }
-  return false;
+  constexpr auto ITLIMIT = 10U; // Iteration limit
+  for (auto step = 0U; step < ITLIMIT; ++step) {
+	length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
+	auto const delta = ClipRectSize.cx - length;
+	moveToCoords.x += delta * cosAngle;
+	moveToCoords.y += delta * sinAngle;
+	if (constexpr auto DLTLIMIT = 0.01F; fabs(delta) < DLTLIMIT) {
+	  break;
+	}
+  }
+  return true;
 }
 
 auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool {
