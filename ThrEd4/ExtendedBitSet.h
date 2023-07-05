@@ -44,11 +44,11 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
   auto getLast() -> size_t {
 	size_t foundBit = super::find_first();
 	if (foundBit != super::npos) {
-	  do {
-		if (super::find_next(foundBit) != super::npos) {
-		  foundBit = super::find_next(foundBit);
-		}
-	  } while (super::find_next(foundBit) != super::npos);
+	  auto nextFoundBit = super::find_next(foundBit);
+	  while (nextFoundBit != super::npos) {
+		foundBit     = nextFoundBit;
+		nextFoundBit = super::find_next(foundBit);
+	  }
 	}
 	if (foundBit != super::npos) {
 	  super::reset(foundBit);

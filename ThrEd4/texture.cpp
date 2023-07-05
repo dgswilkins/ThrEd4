@@ -229,7 +229,7 @@ void texture::redtx() {
   auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(TextureHistory->size());
   TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
-  do {
+  while (true) {
 	if (!txi::txnam(name)) {
 	  break;
 	}
@@ -276,7 +276,8 @@ void texture::redtx() {
 	}
 	StateMap->set(StateFlag::WASTXBAK);
 	CloseHandle(handle);
-  } while (false);
+	break;
+  }
   txi::redtbak();
 }
 

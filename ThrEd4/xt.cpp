@@ -704,7 +704,7 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto const& indentedPoint = xt::insid(form);
   auto        upDir         = startVertex;
   auto        downDir       = startVertex;
-  do {
+  while (true) {
 	if (upDir == endVertex) {
 	  StateMap->reset(StateFlag::WLKDIR);
 	  break;
@@ -715,7 +715,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	}
 	upDir   = form::nxt(form, upDir);
 	downDir = form::prv(form, downDir);
-  } while (true);
+  }
   auto iStitch = destination;
   while (startVertex != endVertex) {
 	if (iStitch != 0U) {

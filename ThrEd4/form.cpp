@@ -4062,7 +4062,8 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
 	  continue;
 	}
 	auto pivot = previousLevel;
-	do {
+	auto flag  = true;
+	while (flag) {
 	  if (pivot != 0U) {
 		--pivot;
 	  }
@@ -4071,7 +4072,10 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
 	  }
 	  --(itRegionPath[pivot].count);
 	  ++(itRegionPath[pivot].pcon);
-	} while (itRegionPath[pivot].count == 0);
+	  if (itRegionPath[pivot].count != 0) {
+		flag = false;
+	  }
+	} 
 	++pivot;
 	while (pivot <= previousLevel) {
 	  if (pivot != 0U) {
@@ -4922,34 +4926,34 @@ void fi::bakseq() {
 			OSequence->push_back(F_POINT {bPrevious.x, bPrevious.y});
 			auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
 			            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
-			do {
+			while (true) {
 			  OSequence->push_back(F_POINT {0.0F, yVal});
 			  if (yVal > bCurrent.y) {
 				break;
 			  }
 			  OSequence->back().x = bCurrent.x;
 			  yVal += UserStitchLength;
-			} while (true);
+			}
 			OSequence->back() = bCurrent;
 			break;
 		  }
 		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
 		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
 		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
-		  do {
+		  while (true) {
 			OSequence->push_back(F_POINT {0.0F, yVal});
 			if (yVal < bPrevious.y) {
 			  break;
 			}
 			OSequence->back().x = bCurrent.x;
 			yVal -= UserStitchLength;
-		  } while (true);
+		  }
 		  OSequence->back() = bPrevious;
 		  break;
 		}
 		auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
 		            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
-		do {
+		while (true) {
 		  OSequence->push_back(F_POINT {0.0F, yVal});
 		  if (yVal > bCurrent.y) {
 			break;
@@ -4958,7 +4962,7 @@ void fi::bakseq() {
 		  delta.x             = slope * delta.y;
 		  OSequence->back().x = bNext.x + delta.x;
 		  yVal += UserStitchLength;
-		} while (true);
+		}
 		OSequence->back() = bCurrent;
 		break;
 	  }
@@ -4968,7 +4972,7 @@ void fi::bakseq() {
 		}
 		auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
 		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
-		do {
+		while (true) {
 		  OSequence->push_back(F_POINT {0.0F, yVal});
 		  if (yVal < bCurrent.y) {
 			break;
@@ -4977,7 +4981,7 @@ void fi::bakseq() {
 		  delta.x             = slope * delta.y;
 		  OSequence->back().x = bNext.x + delta.x;
 		  yVal -= UserStitchLength;
-		} while (true);
+		}
 		OSequence->back() = bCurrent;
 		break;
 	  }
@@ -7570,7 +7574,7 @@ auto form::rotpar() -> F_POINT {
   if (StateMap->test(StateFlag::GMRK)) {
 	return ZoomMarkPoint;
   }
-  do {
+  while (true) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  RotationRect = FormList->operator[](ClosestFormToCursor).rectangle;
 	  StateMap->set(StateFlag::FRMROT);
@@ -7594,7 +7598,8 @@ auto form::rotpar() -> F_POINT {
 	  RotationRect = SelectedVerticesRect;
 	  break;
 	}
-  } while (false);
+	break;
+  } 
   return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
                   wrap::midl(RotationRect.top, RotationRect.bottom)};
 }

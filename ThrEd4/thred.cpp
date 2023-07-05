@@ -185,6 +185,7 @@ void doInitZoomed();
 auto doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool;
 void doStretch(uint32_t start, uint32_t end);
 void drawBackground();
+void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStitch, const float& maxYcoord);
 void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
 void drwStch();
 void drwknot();
@@ -273,6 +274,7 @@ auto handleEndKey(int32_t& retflag) -> bool;
 auto handleFileMenu(WORD const& wParameter) -> bool;
 auto handleFillMenu(WORD const& wParameter) -> bool;
 auto handleFormDataSheet() -> bool;
+void handleFormSelected();
 auto handleHomeKey(bool& retflag) -> bool;
 auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRM_HEAD const& textureForm, bool& retflag)
     -> bool;
@@ -2254,7 +2256,7 @@ void thi::chknum() {
 	  }
 	  return;
 	}
-	do {
+	while (true) {
 	  auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
 	  if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
 		thred::savdo();
@@ -2442,7 +2444,8 @@ void thi::chknum() {
 		}
 		break;
 	  }
-	} while (false);
+	  break;
+	} 
   }
 
   StateMap->set(StateFlag::RESTCH);
@@ -4825,7 +4828,7 @@ void thi::zumin() {
   }
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
   if (!StateMap->testAndReset(StateFlag::BZUMIN)) {
-	do {
+	while (true) {
 	  if (StateMap->test(StateFlag::GMRK)) {
 		stitchPoint = ZoomMarkPoint;
 		break;
@@ -4898,7 +4901,8 @@ void thi::zumin() {
 	  if (!thred::inStitchWin()) {
 		stitchPoint = centr();
 	  }
-	} while (false);
+	  break;
+	}
   }
   auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
   ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
@@ -4939,7 +4943,7 @@ void thi::zumout() {
   if (!StateMap->test(StateFlag::ZUMED)) {
 	return;
   }
-  do {
+  while (true) {
 	if (StateMap->test(StateFlag::GMRK)) {
 	  stitchPoint = ZoomMarkPoint;
 	  break;
@@ -4976,7 +4980,8 @@ void thi::zumout() {
 	if (!thred::inStitchWin()) {
 	  stitchPoint = centr();
 	}
-  } while (false);
+	break;
+  }
   ZoomFactor /= ZUMFCT;
   constexpr auto ZMCLAMP = 0.98F; // clamp the zoom factor
   if (ZoomFactor > ZMCLAMP) {
@@ -5397,7 +5402,7 @@ auto thi::closlin() -> uint32_t {
 	  auto intersection = F_POINT {};
 	  auto deltaX       = 0.0F;
 	  auto deltaY       = 0.0F;
-	  do {
+	  while (true) {
 		if (yab == 0) {
 		  // stitch is horizontal
 		  intersection.x = offsetX;
@@ -5458,7 +5463,8 @@ auto thi::closlin() -> uint32_t {
 		  }
 		}
 		tsum = sqrt(deltaX * deltaX + deltaY * deltaY);
-	  } while (false);
+		break;
+	  }
 	  if (tsum < sum) {
 		sum = tsum;
 		closestPoint = wrap::toUnsigned(iStitch) + ColorChangeTable->operator[](iChange).stitchIndex;
@@ -7091,7 +7097,7 @@ void thi::delet() {
 		break;
 	  }
 	  case SAT: {
-		do {
+		while (true) {
 		  if (ClosestVertexToCursor <= 1) {
 			if ((form.attribute & FRMEND) != 0U) {
 			  if (form.wordParam != 0U) {
@@ -7121,7 +7127,8 @@ void thi::delet() {
 			}
 			++itGuide;
 		  }
-		} while (false);
+		  break;
+		}
 		break;
 	  }
 	  default: {
@@ -8434,7 +8441,7 @@ void thi::rembig() {
 	return;
   }
   thred::savdo();
-  do {
+  while (true) {
 	if (!SelectedFormList->empty()) {
 	  auto range = RANGE {};
 	  for (auto const selectedForm : (*SelectedFormList)) {
@@ -8466,7 +8473,8 @@ void thi::rembig() {
 	  break;
 	}
 	thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
-  } while (false);
+	break;
+  }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
@@ -10605,7 +10613,7 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  xt::mvshft();
 	  return true;
 	}
-	do {
+	while (true) {
 	  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(Msg.pt));
 	  }
@@ -10677,7 +10685,8 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  else {
 		wrap::setCursor(ArrowCursor);
 	  }
-	} while (false);
+	  break;
+	} 
 	if (StateMap->test(StateFlag::FPUNCLP)) {
 	  unpclp();
 	  setpclp();
@@ -11283,6 +11292,30 @@ auto thi::handleEitherButtonDown(bool& retflag) -> bool {
   return false;
 }
 
+void thi::handleFormSelected() {
+  if (FormMenuChoice != 0U) {
+	chknum();
+	FormMenuChoice = 0;
+	return;
+  }
+  if (FormDataSheet != nullptr) {
+	thred::undat();
+	thred::unsid();
+	FormMenuChoice = 0;
+	StateMap->set(StateFlag::RESTCH);
+	return;
+  }
+  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
+  lenCalc();
+  if (!StateMap->testAndReset(StateFlag::ENTROT)) {
+	StateMap->reset(StateFlag::FORMSEL);
+  }
+  StateMap->set(StateFlag::DUMEN);
+  if (!closPnt1(ClosestPointIndex)) {
+	unbox();
+  }
+}
+
 auto thi::handleRightButtonDown() -> bool {
   if (StateMap->test(StateFlag::TXTRED) && (MsgWindow == nullptr)) {
 	texture::txtrbut();
@@ -11366,29 +11399,7 @@ auto thi::handleRightButtonDown() -> bool {
 		return true;
 	  }
 	  if (StateMap->test(StateFlag::FORMSEL)) {
-		do {
-		  if (FormMenuChoice != 0U) {
-			chknum();
-			FormMenuChoice = 0;
-			break;
-		  }
-		  if (FormDataSheet != nullptr) {
-			thred::undat();
-			thred::unsid();
-			FormMenuChoice = 0;
-			StateMap->set(StateFlag::RESTCH);
-			break;
-		  }
-		  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
-		  lenCalc();
-		  if (!StateMap->testAndReset(StateFlag::ENTROT)) {
-			StateMap->reset(StateFlag::FORMSEL);
-		  }
-		  StateMap->set(StateFlag::DUMEN);
-		  if (!closPnt1(ClosestPointIndex)) {
-			unbox();
-		  }
-		} while (false);
+		  thi::handleFormSelected();
 	  }
 	  if (form::closfrm()) {
 		StateMap->set(StateFlag::FORMSEL);
@@ -11542,7 +11553,7 @@ auto thi::updateHoopSize() {
 }
 
 auto thi::updateFillColor() -> bool {
-  do {
+  while (true) {
 	thred::savdo();
 	if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
 	  xt::dufcol(VerticalIndex + 1U);
@@ -11571,7 +11582,8 @@ auto thi::updateFillColor() -> bool {
 	  return true;
 	}
 	form::nufilcol(VerticalIndex);
-  } while (false);
+	break;
+  }
   auto buffer = std::array<wchar_t, 2> {};
   wrap::narrow(buffer[0], VerticalIndex + '0');
   SetWindowText(ValueWindow->operator[](LBRDCOL), buffer.data());
@@ -11658,7 +11670,7 @@ auto thi::handleSideWindowActive() -> bool {
   }
   form.borderColor &= COLMSK;
   if (StateMap->testAndReset(StateFlag::BRDACT)) {
-	do {
+	while (true) {
 	  if (Msg.hwnd == SideWindow->operator[](0)) {
 		if (form.isEdgeClip()) {
 		  clip::deleclp(ClosestFormToCursor);
@@ -11721,9 +11733,9 @@ auto thi::handleSideWindowActive() -> bool {
 	  }
 	  if (Msg.hwnd == SideWindow->operator[](EDGECLIPX)) {
 		form::filclpx();
-		break;
 	  }
-	} while (false);
+	  break;
+	}
 	formForms::refrm();
 	form::refil(ClosestFormToCursor);
 	thred::unmsg();
@@ -11742,7 +11754,7 @@ auto thi::handleSideWindowActive() -> bool {
 	}
   }
   auto textureFlag = false;
-  do {
+  while (true) {
 	if (Msg.hwnd == SideWindow->operator[](0)) { // none
 	  form.type = FRMFPOLY;
 	  form::delmfil(ClosestFormToCursor);
@@ -11903,9 +11915,9 @@ auto thi::handleSideWindowActive() -> bool {
 	  if (texture::dutxtfil()) {
 		textureFlag = true;
 	  }
-	  break;
 	}
-  } while (false);
+	break;
+  } 
   if (textureFlag) {
 	thred::unsid();
 	DestroyWindow(FormDataSheet);
@@ -11926,7 +11938,7 @@ auto thi::handleFormDataSheet() -> bool {
   chknum();
   thred::unsid();
   auto& form = FormList->operator[](ClosestFormToCursor);
-  do {
+  while (true) {
 	if (Msg.hwnd == ValueWindow->operator[](LTXOF) || Msg.hwnd == LabelWindow->operator[](LTXOF)) {
 	  FormMenuChoice = LTXOF;
 	  formForms::sidwnd(ValueWindow->operator[](LTXOF));
@@ -12226,7 +12238,8 @@ auto thi::handleFormDataSheet() -> bool {
 	  formForms::sidwnd(ValueWindow->operator[](LMINBRD));
 	  break;
 	}
-  } while (false);
+	break;
+  }
   outDebugString(L"handleLeftButtonDown:FormMenuChoice [{}]\n", FormMenuChoice);
 
   return true;
@@ -16773,6 +16786,50 @@ auto thi::getMaxCount() -> uint32_t {
   return maxCount;
 }
 
+void thi::drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStitch, const float& maxYcoord) {
+  // write an equation for this line
+  auto const xDelta     = iStitch.x - prevStitch.x;
+  auto const yDelta     = prevStitch.y - iStitch.y;
+  auto const slope      = xDelta / yDelta;
+  auto const offset     = iStitch.x + slope * iStitch.y;
+  auto       stitchLine = std::array<POINT, LNPNTS> {};
+  // does the line intersect with the top of the screen?
+  auto gapToEdge = offset - slope * ZoomRect.top;
+  if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
+	stitchLine[0] =
+	    POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+	           wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.x)};
+	stitchLine[1] = POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+	                       wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.x)};
+	wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
+	return;
+  }
+  // does the line intersect the bottom of the screen?
+  gapToEdge = offset - slope * ZoomRect.bottom;
+  if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
+	stitchLine[0] =
+	    POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+	           wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
+	stitchLine[1] = POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+	                       wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
+	wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
+	return;
+  }
+  // does the line intersect the left side of the screen?
+  if (slope != 0.0F) {
+	gapToEdge = (offset - ZoomRect.left) / slope;
+	if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
+	  stitchLine[0] =
+	      POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+	             wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
+	  stitchLine[1] =
+	      POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+	             wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
+	  wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
+	}
+  }
+}
+
 void thi::doInitZoomed() {
   if (StitchBuffer->empty()) {
 	return;
@@ -16869,51 +16926,7 @@ void thi::doInitZoomed() {
 		  if (iStitch == prevStitch) {
 			continue;
 		  }
-		  // write an equation for this line
-		  auto const xDelta     = iStitch.x - prevStitch.x;
-		  auto const yDelta     = prevStitch.y - iStitch.y;
-		  auto const slope      = xDelta / yDelta;
-		  auto const offset     = iStitch.x + slope * iStitch.y;
-		  auto       stitchLine = std::array<POINT, LNPNTS> {};
-		  do {
-			// does the line intersect with the top of the screen?
-			auto gapToEdge = offset - slope * ZoomRect.top;
-			if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
-			  stitchLine[0] = POINT {
-			      wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
-			      wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.x)};
-			  stitchLine[1] =
-			      POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
-			             wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.x)};
-			  wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
-			  break;
-			}
-			// does the line intersect the bottom of the screen?
-			gapToEdge = offset - slope * ZoomRect.bottom;
-			if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
-			  stitchLine[0] = POINT {
-			      wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
-			      wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
-			  stitchLine[1] =
-			      POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
-			             wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
-			  wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
-			  break;
-			}
-			// does the line intersect the left side of the screen?
-			if (slope != 0.0F) {
-			  gapToEdge = (offset - ZoomRect.left) / slope;
-			  if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
-				stitchLine[0] = POINT {
-				    wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
-				    wrap::ceil<int32_t>(maxYcoord - (prevStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
-				stitchLine[1] =
-				    POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
-				           wrap::ceil<int32_t>(maxYcoord - (iStitch.y - ZoomRect.bottom) * ZoomRatio.y)};
-				wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
-			  }
-			}
-		  } while (false);
+		  drawOffScreenLine(iStitch, prevStitch, maxYcoord);
 		}
 	  }
 	  prevStitch = iStitch;
@@ -17265,75 +17278,76 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	CloseHandle(thrEdFile);
 	return;
   }
-  do {
-	SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
-	auto formList = std::vector<FRM_HEAD> {};
-	formList.resize(stitchHeader.formCount);
-	auto vertexList = std::vector<F_POINT> {};
-	vertexList.resize(stitchHeader.vertexCount);
-	if (fileTypeVersion < 2) {
-	  auto formListOriginal = std::vector<FRM_HEAD_O> {};
-	  formListOriginal.resize(stitchHeader.formCount);
-	  auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(formListOriginal);
-	  if (!wrap::readFile(thrEdFile, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in ritbak")) {
-		return;
-	  }
-	  if (bytesRead != bytesToRead) {
-		break;
-	  }
-	  std::ranges::copy(formListOriginal, formList.begin());
-	}
-	else {
-	  auto inFormList = std::vector<FRM_HEAD_OUT> {};
-	  inFormList.resize(stitchHeader.formCount);
-	  auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
-	  if (!wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in ritbak")) {
-		return;
-	  }
-	  if (bytesRead != bytesToRead) {
-		break;
-	  }
-	  std::ranges::copy(inFormList, formList.begin());
-	}
-	auto const bytesToRead = stitchHeader.vertexCount * wrap::sizeofType(vertexList);
-	if (!wrap::readFile(thrEdFile, vertexList.data(), bytesToRead, &bytesRead, L"ReadFile for vertexList in ritbak")) {
+  SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
+  auto formList = std::vector<FRM_HEAD> {};
+  formList.resize(stitchHeader.formCount);
+  auto vertexList = std::vector<F_POINT> {};
+  vertexList.resize(stitchHeader.vertexCount);
+  if (fileTypeVersion < 2) {
+	auto formListOriginal = std::vector<FRM_HEAD_O> {};
+	formListOriginal.resize(stitchHeader.formCount);
+	auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(formListOriginal);
+	if (!wrap::readFile(thrEdFile, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in ritbak")) {
 	  return;
 	}
 	if (bytesRead != bytesToRead) {
-	  break;
+	  CloseHandle(thrEdFile);
+	  return;
 	}
-	auto lines    = std::vector<POINT> {};
-	auto maxLines = 0U;
-	for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
-	  if (formList[iForm].vertexCount > maxLines) {
-		maxLines = formList[iForm].vertexCount;
-	  }
+	std::ranges::copy(formListOriginal, formList.begin());
+  }
+  else {
+	auto inFormList = std::vector<FRM_HEAD_OUT> {};
+	inFormList.resize(stitchHeader.formCount);
+	auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
+	if (!wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in ritbak")) {
+	  return;
 	}
-	lines.resize(wrap::toSize(maxLines) + 1U);
-	auto iVertex = 0U;
-	for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
-	  auto const iLine = iVertex;
-	  for (auto iVertexInForm = 0U;
-	       (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
-	       ++iVertexInForm) {
-		lines[iVertexInForm] = {
-		    std::lround(vertexList[iVertex].x * ratio),
-		    std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iVertex++].y * ratio)};
-	  }
-	  lines[formList[iForm].vertexCount] = {
-	      std::lround(vertexList[iLine].x * ratio),
-	      std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iLine].y * ratio)};
-	  SelectObject(drawItem.hDC, FormPen);
-	  SetROP2(drawItem.hDC, R2_XORPEN);
-	  if (formList[iForm].type == FRMLINE) {
-		wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount);
-	  }
-	  else {
-		wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount + 1U);
-	  }
-	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
+	if (bytesRead != bytesToRead) {
+	  CloseHandle(thrEdFile);
+	  return;
 	}
-  } while (false);
+	std::ranges::copy(inFormList, formList.begin());
+  }
+  auto const bytesToRead = stitchHeader.vertexCount * wrap::sizeofType(vertexList);
+  if (!wrap::readFile(thrEdFile, vertexList.data(), bytesToRead, &bytesRead, L"ReadFile for vertexList in ritbak")) {
+	return;
+  }
+  if (bytesRead != bytesToRead) {
+	CloseHandle(thrEdFile);
+	return;
+  }
+  auto lines    = std::vector<POINT> {};
+  auto maxLines = 0U;
+  for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
+	if (formList[iForm].vertexCount > maxLines) {
+	  maxLines = formList[iForm].vertexCount;
+	}
+  }
+  lines.resize(wrap::toSize(maxLines) + 1U);
+  auto iVertex = 0U;
+  for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
+	auto const iLine = iVertex;
+	for (auto iVertexInForm = 0U;
+	     (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
+	     ++iVertexInForm) {
+	  lines[iVertexInForm] = {
+	      std::lround(vertexList[iVertex].x * ratio),
+	      std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iVertex++].y * ratio)};
+	}
+	lines[formList[iForm].vertexCount] = {
+	    std::lround(vertexList[iLine].x * ratio),
+	    std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iLine].y * ratio)};
+	SelectObject(drawItem.hDC, FormPen);
+	SetROP2(drawItem.hDC, R2_XORPEN);
+	if (formList[iForm].type == FRMLINE) {
+	  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount);
+	}
+	else {
+	  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount + 1U);
+	}
+	SetROP2(StitchWindowMemDC, R2_COPYPEN);
+  }
   CloseHandle(thrEdFile);
 }
 

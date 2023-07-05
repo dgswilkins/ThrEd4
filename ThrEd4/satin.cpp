@@ -481,17 +481,17 @@ void satin::satadj(FRM_HEAD& form) {
 	}
 	{
 	  auto iVertex = 0U;
-	  auto itGuide = itFirstGuide;
-	  do {
+	  auto itGuide = itFirstGuide; //intentional copy
+	  while (iVertex < form.vertexCount) {
 		iVertex = wrap::toUnsigned(satinMap.getFirst());
 		if (iVertex < form.vertexCount) {
 		  (itGuide++)->start = iVertex;
 		}
-	  } while (iVertex < form.vertexCount);
+	  }
 	  currentGuidesCount = wrap::distance<uint32_t>(itFirstGuide, itGuide);
 	}
 	satinMap.reset();
-	auto itGuide = itFirstGuide;
+	auto itGuide = itFirstGuide; // intentional copy
 	for (auto iGuide = 0U; iGuide < currentGuidesCount; ++iGuide) {
 	  auto iForward = itGuide->finish;
 	  auto iReverse = iForward;
@@ -535,12 +535,12 @@ void satin::satadj(FRM_HEAD& form) {
 	}
 	auto iReverse = 0U;
 	itGuide       = itFirstGuide;
-	do {
+	while (iReverse < form.vertexCount) {
 	  iReverse = wrap::toUnsigned(satinMap.getLast());
 	  if (iReverse < form.vertexCount) {
 		(itGuide++)->finish = iReverse;
 	  }
-	} while (iReverse < form.vertexCount);
+	}
 	auto iGuide = wrap::distance<uint32_t>(itFirstGuide, itGuide);
 	if (iGuide < currentGuidesCount) {
 	  iGuide = currentGuidesCount;
@@ -969,15 +969,15 @@ void si::satfn(FRM_HEAD const&           form,
       F_POINT {line1Delta.x / wrap::toFloat(line1Count), line1Delta.y / wrap::toFloat(line1Count)};
   auto line2Step =
       F_POINT {line2Delta.x / wrap::toFloat(line2Count), line2Delta.y / wrap::toFloat(line2Count)};
-  bool flag        = false;
+  bool flag        = true;
   auto iLine1Count = 1U;
   auto iLine2Count = 1U;
-  auto stitchPoint = *(wrap::next(itFirstVertex, line1Start));
+  auto stitchPoint = *(wrap::next(itFirstVertex, line1Start)); // intentional copy
   auto loop        = 0U;
 
   constexpr auto LOOPLIM = 20000U; // limit the iterations
 
-  do {
+  while (flag && (loop < LOOPLIM)) {
 	flag = false;
 	++loop;
 	if (StateMap->test(StateFlag::FTHR)) {
@@ -1067,7 +1067,7 @@ void si::satfn(FRM_HEAD const&           form,
 		flag = true;
 	  }
 	}
-  } while (flag && (loop < LOOPLIM));
+  }
 }
 
 void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
@@ -1142,7 +1142,7 @@ void satin::satfil(FRM_HEAD& form) {
       F_POINT {itFirstVertex->x - itPreviousVertex->x, itFirstVertex->y - itPreviousVertex->y};
   length += hypot(lastDelta.x, lastDelta.y);
   lengths.push_back(length);
-  do {
+  while (true) {
 	auto const& endGuide = form.wordParam;
 	if (endGuide != 0U) {
 	  if (form.satinGuideCount != 0U) {
@@ -1196,7 +1196,8 @@ void satin::satfil(FRM_HEAD& form) {
 	  --iVertex;
 	}
 	si::satfn(form, lengths, 0, iVertex, form.vertexCount, iVertex);
-  } while (false);
+	break;
+  } 
   LineSpacing = savedSpacing;
 }
 

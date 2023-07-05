@@ -60,6 +60,7 @@ auto ducolm() -> uint32_t;
 void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
 void dutrac();
 void dutrnum0(uint32_t colNum);
+void getColors();
 void hidwnd(HWND hwnd) noexcept;
 void hideTraceWin() noexcept;
 void ritrcol(COLORREF& colRef, uint32_t colNum) noexcept;
@@ -1077,6 +1078,37 @@ void trace::blak() {
   StateMap->set(StateFlag::RESTCH);
 }
 
+void ti::getColors() {
+	if (wrap::pressed(VK_SHIFT)) {
+	  UpPixelColor &= TraceRGBMask[ColumnColor];
+	  DownPixelColor |= TraceRGB[2 - ColumnColor];
+	  return;
+	}
+	auto const ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
+	auto const position      = wrap::floor<uint32_t>(ratio * 255.0);
+	auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
+	auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift[ColumnColor]);
+	if (tracePosition < traceColor) {
+	  UpPixelColor &= TraceRGBMask[ColumnColor];
+	  UpPixelColor |= tracePosition;
+	  return;
+	}
+	traceColor = DownPixelColor & TraceRGB[2 - ColumnColor];
+	if (tracePosition > traceColor) {
+	  DownPixelColor &= TraceRGBMask[ColumnColor];
+	  DownPixelColor |= tracePosition;
+	  return;
+	}
+	if (Msg.message == WM_LBUTTONDOWN) {
+	  UpPixelColor &= TraceRGBMask[ColumnColor];
+	  UpPixelColor |= position << TraceShift[ColumnColor];
+	}
+	else {
+	  DownPixelColor &= TraceRGBMask[ColumnColor];
+	  DownPixelColor |= position << TraceShift[ColumnColor];
+	}
+}
+
 void trace::tracpar() {
   if (StateMap->test(StateFlag::TRNIN0)) {
 	trace::dutrnum2();
@@ -1092,36 +1124,7 @@ void trace::tracpar() {
   else {
 	ColumnColor = ti::ducolm();
 	if (TraceMsgPoint.y < ButtonHeight * 15) {
-	  do {
-		if (wrap::pressed(VK_SHIFT)) {
-		  UpPixelColor &= TraceRGBMask[ColumnColor];
-		  DownPixelColor |= TraceRGB[2 - ColumnColor];
-		  break;
-		}
-		auto const ratio    = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
-		auto const position = wrap::floor<uint32_t>(ratio * 255.0);
-		auto traceColor     = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
-		auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift[ColumnColor]);
-		if (tracePosition < traceColor) {
-		  UpPixelColor &= TraceRGBMask[ColumnColor];
-		  UpPixelColor |= tracePosition;
-		  break;
-		}
-		traceColor = DownPixelColor & TraceRGB[2 - ColumnColor];
-		if (tracePosition > traceColor) {
-		  DownPixelColor &= TraceRGBMask[ColumnColor];
-		  DownPixelColor |= tracePosition;
-		  break;
-		}
-		if (Msg.message == WM_LBUTTONDOWN) {
-		  UpPixelColor &= TraceRGBMask[ColumnColor];
-		  UpPixelColor |= position << TraceShift[ColumnColor];
-		}
-		else {
-		  DownPixelColor &= TraceRGBMask[ColumnColor];
-		  DownPixelColor |= position << TraceShift[ColumnColor];
-		}
-	  } while (false);
+	  ti::getColors();
 	  auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
 	  thred::redraw(*itTraceControlWindow);
 	  trace::trace();
