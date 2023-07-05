@@ -325,37 +325,38 @@ auto bi::saveName(fs::path& fileName) {
 
 void bitmap::savmap() {
   if (bitmap::ismap() && (nullptr != TraceBitmapData)) {
-	if (StateMap->test(StateFlag::MONOMAP)) {
-	  displayText::tabmsg(IDS_SAVMAP, false);
-	  return;
-	}
-	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  displayText::tabmsg(IDS_MAPCHG, false);
-	  return;
-	}
-	if (auto fileName = fs::path {}; bi::saveName(fileName)) {
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const hBitmap =
-	      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	  if (hBitmap == INVALID_HANDLE_VALUE) {
-		displayText::crmsg(*UTF16BMPname);
-		return;
-	  }
-	  auto bytesWritten = DWORD {};
-	  WriteFile(hBitmap, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesWritten, nullptr);
-	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
-	  auto buffer = std::vector<uint8_t> {};
-	  buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
-	  auto const spTrace = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(BitmapWidth) * BitmapHeight);
-	  bi::movmap(spTrace, buffer);
-	  WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
-	  CloseHandle(hBitmap);
-	}
-  }
-  else {
 	displayText::tabmsg(IDS_SHOMAP, false);
+	return;
   }
+  if (StateMap->test(StateFlag::MONOMAP)) {
+	displayText::tabmsg(IDS_SAVMAP, false);
+	return;
+  }
+  if (!StateMap->test(StateFlag::WASTRAC)) {
+	displayText::tabmsg(IDS_MAPCHG, false);
+	return;
+  }
+  auto fileName = fs::path {};
+  if (!bi::saveName(fileName)) {
+	return;
+  }
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const hBitmap =
+      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  if (hBitmap == INVALID_HANDLE_VALUE) {
+	displayText::crmsg(*UTF16BMPname);
+	return;
+  }
+  auto bytesWritten = DWORD {};
+  WriteFile(hBitmap, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesWritten, nullptr);
+  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
+  auto buffer = std::vector<uint8_t> {};
+  buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
+  auto const spTrace = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(BitmapWidth) * BitmapHeight);
+  bi::movmap(spTrace, buffer);
+  WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
+  CloseHandle(hBitmap);
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
