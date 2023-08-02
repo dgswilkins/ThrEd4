@@ -378,9 +378,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
     satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam), rectangle(rhs.rectangle),
     fillType(rhs.fillType), edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing),
     lengthOrCount(rhs.lengthOrCount), borderSize(rhs.borderSize), edgeSpacing(rhs.edgeSpacing),
-    edgeStitchLen(rhs.edgeStitchLen), picoLength(rhs.res), maxFillStitchLen(0.0F),
-    minFillStitchLen(0.0F), maxBorderStitchLen(0.0F), minBorderStitchLen(0.0F), underlaySpacing(0.0F),
-    underlayStitchLen(0.0F), underlayStitchAngle(0.0F), underlayIndent(0.0F), txof(0.0F) {
+    edgeStitchLen(rhs.edgeStitchLen), picoLength(rhs.res) {
   if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
       ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
