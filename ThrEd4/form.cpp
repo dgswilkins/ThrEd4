@@ -2588,12 +2588,12 @@ void fi::chkbrd(FRM_HEAD const& form) {
 void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
                std::vector<uint32_t>&   groupIndexSequence,
                std::vector<SMAL_PNT_L>& lineEndpoints) {
-  auto const [min, max] = std::minmax_element(
+  auto const mmTuple = std::minmax_element(
       currentFillVertices.begin(),
       currentFillVertices.end(),
       [](F_POINT const& first, F_POINT const& second) { return first.x < second.x; });
-  auto const highX           = max->x;
-  auto const lineOffset      = std::floor(min->x / LineSpacing);
+  auto const highX           = mmTuple.second->x;
+  auto const lineOffset      = std::floor(mmTuple.first->x / LineSpacing);
   auto const lowX            = LineSpacing * lineOffset;
   auto       fillLineCount   = wrap::floor<uint32_t>((highX - lowX) / LineSpacing + 1.0F);
   auto const step            = (highX - lowX) / wrap::toFloat(fillLineCount);
