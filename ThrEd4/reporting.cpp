@@ -20,7 +20,7 @@ void rpt::reportError(const wchar_t* prompt, DWORD& errorCode) {
                                  0,
                                  nullptr);
   if (res != 0U) {
-	auto const msg = gsl::span(static_cast<wchar_t*>(lpMsgBuf), res);
+	auto const msg = gsl::span<wchar_t> {static_cast<wchar_t*>(lpMsgBuf), res};
 	// erase the \r\n at the end of the msg
 	msg[wrap::toSize(res) - 2U] = 0;
 #ifdef _DEBUG
