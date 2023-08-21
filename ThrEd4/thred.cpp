@@ -8390,17 +8390,17 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
   auto stitchIt     = wrap::next(StitchBuffer->begin(), start);
   auto nextStitchIt = stitchIt + 1U;
   for (auto iSource = start; iSource < finish; ++iSource) {
-	auto const delta = F_POINT {(*nextStitchIt).x - (*stitchIt).x, (*nextStitchIt).y - (*stitchIt).y};
+	auto const delta = F_POINT {nextStitchIt->x - nextStitchIt->x, nextStitchIt->y - nextStitchIt->y};
 	auto const length = hypot(delta.x, delta.y);
 	newStitches.push_back(*stitchIt);
 	if (length > IniFile.maxStitchLength) {
 	  auto const stitchCount = std::ceil(length / UserStitchLength);
 	  auto const step        = F_POINT {delta.x / stitchCount, delta.y / stitchCount};
-	  auto       point       = F_POINT {(*stitchIt).x + step.x, (*stitchIt).y + step.y};
-	  auto       attribute   = (*stitchIt).attribute;
-	  if (attribute != (*nextStitchIt).attribute) {
-		if (((attribute & NOTFRM) == 0U) && (((*nextStitchIt).attribute & TYPMSK) != 0U)) {
-		  if ((attribute & FRMSK) != ((*nextStitchIt).attribute & FRMSK)) {
+	  auto       point       = F_POINT {stitchIt->x + step.x, stitchIt->y + step.y};
+	  auto       attribute   = stitchIt->attribute;
+	  if (attribute != nextStitchIt->attribute) {
+		if (((attribute & NOTFRM) == 0U) && ((nextStitchIt->attribute & TYPMSK) != 0U)) {
+		  if ((attribute & FRMSK) != (nextStitchIt->attribute & FRMSK)) {
 			attribute &= NTYPMSK;
 			attribute |= NOTFRM;
 		  }

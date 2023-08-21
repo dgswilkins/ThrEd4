@@ -7069,7 +7069,7 @@ void form::dulens(uint32_t sides) {
   auto       itVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + iVertex - 1U);
   auto const xCoord   = stitchPoint.x;
   for (; iVertex != 1; --iVertex) {
-	FormVertices->push_back(F_POINT {xCoord + xCoord - (*itVertex).x, (*itVertex).y});
+	FormVertices->push_back(F_POINT {xCoord + xCoord - itVertex->x, itVertex->y});
 	--itVertex;
   }
   currentForm.vertexCount = wrap::toUnsigned(FormVertices->size() - currentForm.vertexIndex);
@@ -7949,7 +7949,7 @@ void fi::frmpnts(uint32_t type) {
   for (auto itStitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
        itStitch != StitchBuffer->end();
        ++itStitch) {
-	if (((*itStitch).attribute & (ALTYPMSK | FRMSK)) != trg) {
+	if ((itStitch->attribute & (ALTYPMSK | FRMSK)) != trg) {
 	  GroupStitchIndex = wrap::distance<uint32_t>(StitchBuffer->begin(), itStitch) - 1U;
 	  bFlag            = true;
 	  break;

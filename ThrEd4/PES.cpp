@@ -483,7 +483,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
-	auto const iRow       = std::next((*iThumbnail).begin(), xCoord);
+	auto const iRow       = std::next(iThumbnail->begin(), xCoord);
 	*iRow                 = 1U;
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
@@ -494,7 +494,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
-	auto const iRow       = std::next((*iThumbnail).begin(), xCoord);
+	auto const iRow       = std::next(iThumbnail->begin(), xCoord);
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  *iRow = 1U;
 	}

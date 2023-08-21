@@ -327,7 +327,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT;
 	auto yVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
 	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT;
-	(*StitchBuffer).emplace_back(xVal, yVal, newAttribute);
+	StitchBuffer->emplace_back(xVal, yVal, newAttribute);
   }
   auto const newStitchCount = StitchBuffer->size();
   for (; insertIndex < newStitchCount; ++insertIndex) {
