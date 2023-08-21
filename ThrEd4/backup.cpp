@@ -67,43 +67,43 @@ void backup::dudat() {
   backupData->formCount = formCount;
   backupData->forms     = convertFromPtr<FRM_HEAD*>(&backupData[1]);
   if (formCount != 0) {
-	auto const spForms = gsl::span {backupData->forms, FormList->size()};
-	std::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
+	auto const spForms = gsl::span<FRM_HEAD> {backupData->forms, FormList->size()};
+	std::ranges::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
   }
   backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
   backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(&backupData->forms[formCount]);
   if (!StitchBuffer->empty()) {
-	auto const spStitches = gsl::span {backupData->stitches, StitchBuffer->size()};
-	std::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
+	auto const spStitches = gsl::span<F_POINT_ATTR> {backupData->stitches, StitchBuffer->size()};
+	std::ranges::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
   }
   backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
   backupData->vertices    = convertFromPtr<F_POINT*>(&backupData->stitches[StitchBuffer->size()]);
   if (!FormVertices->empty()) {
-	auto const spVertices = gsl::span {backupData->vertices, FormVertices->size()};
-	std::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
+	auto const spVertices = gsl::span<F_POINT> {backupData->vertices, FormVertices->size()};
+	std::ranges::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
   }
   backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
   backupData->guide      = convertFromPtr<SAT_CON*>(&backupData->vertices[FormVertices->size()]);
   if (!SatinGuides->empty()) {
-	auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
-	std::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
+	auto const spGuides = gsl::span<SAT_CON> {backupData->guide, backupData->guideCount};
+	std::ranges::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
   }
   backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
   backupData->clipPoints     = convertFromPtr<F_POINT*>(&backupData->guide[SatinGuides->size()]);
   if (!ClipPoints->empty()) {
-	auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
-	std::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
+	auto const spClipPoints = gsl::span<F_POINT> {backupData->clipPoints, backupData->clipPointCount};
+	std::ranges::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
   }
   backupData->colors = convertFromPtr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
   {
-	auto const spColors = gsl::span {backupData->colors, COLORCNT};
-	std::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
+	auto const spColors = gsl::span<COLORREF> {backupData->colors, COLORCNT};
+	std::ranges::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
   }
   backupData->texturePoints     = convertFromPtr<TX_PNT*>(&backupData->colors[COLORCNT]);
   backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
   if (!TexturePointsBuffer->empty()) {
-	auto const spTexturePoints = gsl::span {backupData->texturePoints, backupData->texturePointCount};
-	std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), spTexturePoints.begin());
+	auto const spTexturePoints = gsl::span<TX_PNT> {backupData->texturePoints, backupData->texturePointCount};
+	std::ranges::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), spTexturePoints.begin());
   }
 }
 #pragma warning(pop)
@@ -124,7 +124,7 @@ void backup::redbak() {
   }
   StitchBuffer->clear();
   if (undoData->stitchCount != 0U) {
-	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
+	auto const span = gsl::span<F_POINT_ATTR> {undoData->stitches, undoData->stitchCount};
 	StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
   }
   else {
@@ -133,33 +133,33 @@ void backup::redbak() {
   UnzoomedRect = undoData->zoomRect;
   FormList->clear();
   if (undoData->formCount != 0U) {
-	auto const span = gsl::span {undoData->forms, undoData->formCount};
+	auto const span = gsl::span<FRM_HEAD> {undoData->forms, undoData->formCount};
 	FormList->insert(FormList->end(), span.begin(), span.end());
   }
   FormVertices->clear();
   if (undoData->vertexCount != 0U) {
-	auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
+	auto const span = gsl::span<F_POINT> {undoData->vertices, undoData->vertexCount};
 	FormVertices->insert(FormVertices->end(), span.begin(), span.end());
   }
   SatinGuides->clear();
   if (undoData->guideCount != 0U) {
-	auto const span = gsl::span {undoData->guide, undoData->guideCount};
+	auto const span = gsl::span<SAT_CON> {undoData->guide, undoData->guideCount};
 	SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
   }
   ClipPoints->clear();
   if (undoData->clipPointCount != 0U) {
-	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
+	auto const span = gsl::span<F_POINT> {undoData->clipPoints, undoData->clipPointCount};
 	ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
   }
   // ToDo - add field in BACK_HEAD to keep track of number of colors
   constexpr auto UCOLSIZE     = UserColor.size();
-  auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+  auto const     spUndoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
   auto const     spUserColors = gsl::span {UserColor};
-  std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
+  std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
   thred::refreshColors();
   TexturePointsBuffer->clear();
   if (undoData->texturePointCount != 0U) {
-	auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
+	auto const span = gsl::span<TX_PNT> {undoData->texturePoints, undoData->texturePointCount};
 	TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
   }
   thred::coltab();
