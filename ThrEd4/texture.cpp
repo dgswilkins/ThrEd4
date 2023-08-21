@@ -929,7 +929,7 @@ void txi::txtclp(FRM_HEAD& textureForm) {
   }
   textureForm           = *clipForm;
   auto*      vertices   = convertFromPtr<F_POINT*>(std::next(clipForm));
-  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
+  auto const spVertices = gsl::span<F_POINT> {vertices, textureForm.vertexCount};
   AngledFormVertices->clear();
   AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
   textureForm.vertexIndex = 0;
