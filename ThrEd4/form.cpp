@@ -915,7 +915,7 @@ void form::delfrms() {
   }
 }
 
-void form::fselrct(uint32_t iForm) {
+void form::fselrct(uint32_t iForm) noexcept {
   // clang-format off
   auto const& form = FormList->operator[](iForm);
   std::array<F_POINT, OUTPNTS> formOutline;

@@ -90,7 +90,7 @@ void frmon();
 void frmovlin();
 auto frmrng(uint32_t iForm, RANGE& range) -> bool;
 void frmsadj();
-void fselrct(uint32_t iForm);
+void fselrct(uint32_t iForm) noexcept;
 void fsizpar(FRM_HEAD& form) noexcept;
 auto getblen() noexcept -> float;
 auto getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;
