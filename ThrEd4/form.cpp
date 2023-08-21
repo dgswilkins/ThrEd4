@@ -2292,7 +2292,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
 	}
 	return;
   }
-  auto const spLevels = gsl::span(levels.operator[](count), count);
+  auto const spLevels = gsl::span<const float> {levels.operator[](count), count};
   for (auto const& level : spLevels) {
 	fi::fillSB(pivot, startAngle, radius, stitchPoint, level);
 	startAngle += stepAngle;
