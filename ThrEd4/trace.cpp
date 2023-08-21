@@ -665,7 +665,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 // remove all points on straight lines except the endpoints
 // check for straightness by comparing slope of sections
 void ti::decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
-  auto traceDiff = std::array<TRACE_PNT, 2> {};
+  std::array<TRACE_PNT, 2> traceDiff;
   // always keep the first point
   dst.push_back(src.front());
   auto const itTP  = src.begin();

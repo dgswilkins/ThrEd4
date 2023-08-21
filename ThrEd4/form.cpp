@@ -869,7 +869,7 @@ void form::ratsr() {
 
 void form::ritfrct(uint32_t iForm, HDC hDC) {
   auto pixelOutline = std::array<POINT, OUTPNTS> {};
-  auto formOutline  = std::array<F_POINT, OUTPNTS> {};
+  std::array<F_POINT, OUTPNTS> formOutline;
   ratsr();
   SelectObject(StitchWindowDC, FormPen);
   SetROP2(StitchWindowDC, R2_XORPEN);
@@ -918,7 +918,7 @@ void form::delfrms() {
 void form::fselrct(uint32_t iForm) {
   // clang-format off
   auto const& form = FormList->operator[](iForm);
-  auto formOutline = std::array<F_POINT, SQPNTS> {};
+  std::array<F_POINT, OUTPNTS> formOutline;
   auto line        = std::array<POINT, SQPNTS> {};
   // clang-format on
   formOutline[0].x = formOutline[3].x = formOutline[4].x = form.rectangle.left;
@@ -4103,7 +4103,7 @@ auto fi::reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
                 uint32_t                             iRegion,
                 std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
                 std::vector<REGION> const&           regionsList) noexcept -> float {
-  auto corners = std::array<SMAL_PNT_L, SQRCORNS> {};
+  std::array<SMAL_PNT_L, SQRCORNS> corners;
   auto index   = sortedLineIndices[regionsList[iRegion].start];
   corners[0]   = lineEndpoints[index];
   corners[1]   = lineEndpoints[++index];
@@ -4133,7 +4133,7 @@ void fi::nxtrgn(std::vector<RG_SEQ>&           tempPath,
                 uint32_t                       pathMapIndex,
                 uint32_t&                      sequencePathIndex,
                 int32_t                        visitedIndex) {
-  auto lastRegionCorners = std::array<F_POINT, SQRCORNS> {};
+  std::array<F_POINT, SQRCORNS> lastRegionCorners;
   auto pathLength        = ptrdiff_t {1}; // length of the path to the region
   while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 	++pathLength;
