@@ -2340,7 +2340,7 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	CloseClipboard();
 	return;
   }
-  auto const spClipData = gsl::span(clipStitchData, count);
+  auto const spClipData = gsl::span<CLIP_STITCH> {clipStitchData, count};
   thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
   for (auto iStitch = 1U; iStitch < count; ++iStitch) {
 	thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
