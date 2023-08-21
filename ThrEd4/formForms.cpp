@@ -96,7 +96,7 @@ auto ValueWindowCoords = RECT {}; // location of right windows in the form data 
 auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
 } // namespace
 
-auto const DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
+auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZCRV,
     IDS_DAZSAW,
     IDS_DAZRMP,

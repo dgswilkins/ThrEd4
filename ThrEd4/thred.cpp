@@ -6025,7 +6025,7 @@ void thi::clipSelectedForm() {
   auto  stitchCount = 0U;
   auto  length      = 0U;
   auto  clipSize    = 0U;
-  auto& form        = FormList->operator[](ClosestFormToCursor);
+  auto const& form        = FormList->operator[](ClosestFormToCursor);
   sizclp(form, firstStitch, stitchCount, length, clipSize);
   clipSize += sizeof(FORM_CLIP);
   // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
@@ -6042,8 +6042,8 @@ void thi::clipSelectedForm() {
   clipFormHeader->clipType  = CLP_FRM;
   clipFormHeader->form      = form;
   auto* ptrFormVertices     = convertFromPtr<F_POINT*>(std::next(clipFormHeader));
-  auto  startVertex         = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-  auto  endVertex           = wrap::next(startVertex, form.vertexCount);
+  auto  const startVertex         = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto  const endVertex           = wrap::next(startVertex, form.vertexCount);
 
   auto const vertices = gsl::span<F_POINT> {ptrFormVertices, form.vertexCount};
   std::copy(startVertex, endVertex, vertices.begin());
@@ -6051,8 +6051,8 @@ void thi::clipSelectedForm() {
   auto  iGuide    = 0U;
   if (form.type == SAT) {
 	iGuide          = form.satinGuideCount;
-	auto startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-	auto endGuide   = wrap::next(startGuide, iGuide);
+	auto const startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	auto const endGuide   = wrap::next(startGuide, iGuide);
 
 	auto const guides = gsl::span<SAT_CON> {ptrGuides, iGuide};
 	std::copy(startGuide, endGuide, guides.begin());
@@ -6061,8 +6061,8 @@ void thi::clipSelectedForm() {
   auto  iClip   = 0U;
   if (form.isClipX()) {
 	iClip          = form.lengthOrCount.clipCount;
-	auto startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-	auto endMclp   = wrap::next(startMclp, iClip);
+	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+	auto const endMclp   = wrap::next(startMclp, iClip);
 
 	auto const mclps = gsl::span<F_POINT> {ptrMclp, iClip};
 	std::copy(startMclp, endMclp, mclps.begin());
@@ -6071,16 +6071,16 @@ void thi::clipSelectedForm() {
   iClip           = 0U;
   if (form.isEdgeClipX()) {
 	iClip          = form.clipEntries;
-	auto startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-	auto endClip   = wrap::next(startClip, iClip);
+	auto const startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	auto const endClip   = wrap::next(startClip, iClip);
 
 	auto const points = gsl::span<F_POINT> {ptrPoints, iClip};
 	std::copy(startClip, endClip, points.begin());
   }
   auto* textures = convertFromPtr<TX_PNT*>(wrap::next(ptrPoints, iClip));
   if (form.isTexture()) {
-	auto startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-	auto endTexture   = wrap::next(startTexture, form.fillInfo.texture.count);
+	auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
+	auto const endTexture   = wrap::next(startTexture, form.fillInfo.texture.count);
 
 	auto const spDest = gsl::span<TX_PNT> {textures, form.fillInfo.texture.count};
 	std::copy(startTexture, endTexture, spDest.begin());
@@ -9030,7 +9030,7 @@ void thi::desiz() {
   info += displayText::format2(IDS_HUPWID, (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
-	auto  modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
+	auto  const modifier = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
 	info += displayText::format2(IDS_CREATBY, *DesignerName, modifier);
   }
   displayText::shoMsg(info, true);
