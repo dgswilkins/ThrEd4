@@ -2231,7 +2231,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
   static constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 6.0F/15.0F, 8.0F/15.0F, 5.0F/15.0F, 9.0F/15.0F, 4.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  2.0F/15.0F, 12.0F/15.0F,  1.0F/15.0F, 13.0F/15.0F,  0.0F/15.0F, 14.0F/15.0F};
   // clang-format on
 
-  auto constexpr levels = std::array<float const*, 16> {LEVEL00.data(),
+  auto constexpr LEVELS = std::array<float const*, 16> {LEVEL00.data(),
                                                      LEVEL01.data(),
                                                      LEVEL02.data(),
                                                      LEVEL03.data(),
@@ -2292,7 +2292,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
 	}
 	return;
   }
-  auto const spLevels = gsl::span<const float> {levels.operator[](count), count};
+  auto const spLevels = gsl::span<const float> {LEVELS.operator[](count), count};
   for (auto const& level : spLevels) {
 	fi::fillSB(pivot, startAngle, radius, stitchPoint, level);
 	startAngle += stepAngle;
