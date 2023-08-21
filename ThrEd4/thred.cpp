@@ -954,10 +954,10 @@ auto thred::getMsgBufferValue() -> float {
 
 void thi::getdes() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-      // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
+      // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
 
 auto thi::stlen(uint32_t iStitch) -> float {
@@ -10592,10 +10592,10 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 
 void thi::dufdef() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-      // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
+      // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
 
 auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,

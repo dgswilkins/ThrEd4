@@ -2493,11 +2493,11 @@ void xt::nudsiz() {
   }
   DesignSize.x = designSizeRect.right - designSizeRect.left;
   DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType CppClangTidyPerformanceNoIntToPtr
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(
       ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType CppClangTidyPerformanceNoIntToPtr
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
 
   if (nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
 	return;
