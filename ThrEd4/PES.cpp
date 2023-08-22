@@ -604,11 +604,11 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  continue;
 	}
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-	auto constexpr color = RGB(PES_THREAD[0].color.r,
+	auto constexpr COLOR = RGB(PES_THREAD[0].color.r,
 	                       PES_THREAD[0].color.g,
 	                       PES_THREAD[0].color.b); // color unknown
 
-	*iUserColor = color;
+	*iUserColor = COLOR;
 	++iUserColor;
   }
   auto loc = F_POINT {};
