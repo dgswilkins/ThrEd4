@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "switches.h"
 #include "backup.h"
+#include "balarad.h"
 #include "bitmap.h"
 #include "clip.h"
 #include "displayText.h"
@@ -37,24 +38,6 @@
 #ifdef ALLOCFAILURE
 // #include <new.h>
 #endif
-
-#pragma pack(push, 1)
-class BAL_STITCH // balarad stitch
-{
-  public:
-  uint8_t code {};
-  uint8_t flag {};
-  float   x {};
-  float   y {};
-
-  // constexpr BAL_STITCH() noexcept = default;
-  // BAL_STITCH(BAL_STITCH const&) = default;
-  // BAL_STITCH(BAL_STITCH&&) = default;
-  // BAL_STITCH& operator=(BAL_STITCH const& rhs) = default;
-  // BAL_STITCH& operator=(BAL_STITCH&&) = default;
-  //~BAL_STITCH() = default;
-};
-#pragma pack(pop)
 
 #pragma pack(push, 1)
 class FORM_CLIP // form data clipboard header
@@ -380,7 +363,6 @@ void rSelbox();
 auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
 void rebak();
 void rebox();
-void redbal();
 void redfnam(std::wstring& designerName);
 void redini();
 void reldun();
@@ -389,7 +371,6 @@ void rembig();
 void respac(FRM_HEAD& form) noexcept;
 void retrac();
 void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem);
-void ritbal();
 void ritcor(F_POINT_ATTR const& pointAttribute);
 void ritcur();
 void ritfnam(std::wstring const& designerName);
@@ -473,7 +454,6 @@ auto stlen(uint32_t iStitch) -> float;
 void stretch();
 void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
 void tglhid();
-void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
 void thrsav();
 void thumbak();
 void thumnail();
@@ -518,10 +498,6 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t;
 } // namespace thi
 
 constexpr auto ARROWPNT = 3U;              // points required to draw arrow
-constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
-constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
-constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
-constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
 constexpr auto CHSDEF   = 24.0F;           // default chain stitch length
 constexpr auto CHRDEF   = 0.25;            // default chain stitch ratio
 constexpr auto DEFPIX   = uint16_t {2U};   // default nudge pixels
@@ -590,27 +566,6 @@ class COL_CHANGE
   // COL_CHANGE& operator=(COL_CHANGE&&) = default;
   //~COL_CHANGE() = default;
 };
-
-#pragma pack(push, 1)
-class BAL_HEAD // balarad file header
-{
-  public:
-  COLORREF color[256] {};
-  uint32_t signature {};
-  uint16_t version {};
-  float    hoopSizeX {};
-  float    hoopSizeY {};
-  COLORREF backgroundColor {};
-  uint8_t  res[1006] {};
-
-  // constexpr BAL_HEAD() noexcept = default;
-  // BAL_HEAD(BAL_HEAD const&) = default;
-  // BAL_HEAD(BAL_HEAD&&) = default;
-  // BAL_HEAD& operator=(BAL_HEAD const& rhs) = default;
-  // BAL_HEAD& operator=(BAL_HEAD&&) = default;
-  //~BAL_HEAD() = default;
-};
-#pragma pack(pop)
 
 class FIND_INFO
 {
@@ -723,7 +678,6 @@ auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
 auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
 auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
-auto BalaradOffset      = F_POINT {};            // balarad offset
 auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 auto LastFormSelected = uint32_t {};                // end point of selected range of forms
@@ -818,9 +772,6 @@ auto BoxOffset = std::array<int32_t, 4> {};
 
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
 auto DefaultDirectory = gsl::narrow_cast<fs::path*>(nullptr);
-auto BalaradName0     = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
-auto BalaradName1     = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
-auto BalaradName2     = gsl::narrow_cast<fs::path*>(nullptr);
 auto IniFileName      = gsl::narrow_cast<fs::path*>(nullptr); //.ini file name
 auto PreviousNames    = gsl::narrow_cast<std::vector<fs::path>*>(nullptr);
 auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
@@ -1365,6 +1316,10 @@ void thi::stchPars() {
   }
 }
 
+void thred::redrawColorBar() noexcept {
+  RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
+}
+
 void thred::redraw(HWND window) noexcept {
   RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
   if (window != MainStitchWin) {
@@ -1449,7 +1404,7 @@ void thred::movStch() {
   }
   MoveWindow(ColorBar, ThredWindowRect.right - *ColorBarSize, 0, *ColorBarSize, ThredWindowRect.bottom, TRUE);
   thi::nuRct();
-  thred::redraw(ColorBar);
+  thred::redrawColorBar();
 }
 
 void thred::unbsho() {
@@ -3224,7 +3179,7 @@ void thi::dubox(POINT const& stitchCoordsInPixels) {
   StateMap->reset(StateFlag::ELIN);
   StateMap->set(StateFlag::SELBOX);
   StateMap->reset(StateFlag::FRMPSEL);
-  thred::redraw(ColorBar);
+  thred::redrawColorBar();
   displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 }
 
@@ -3361,171 +3316,6 @@ auto thi::savcmp() noexcept -> bool {
 #endif
 }
 
-void thi::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag) {
-  balaradStitch.push_back(BAL_STITCH {code,
-                                      flag,
-                                      (StitchBuffer->operator[](source).x - BalaradOffset.x) * BALRATIO,
-                                      (StitchBuffer->operator[](source).y - BalaradOffset.y) * BALRATIO});
-}
-
-void thi::redbal() {
-  auto fileSize = uintmax_t {};
-  if (!thred::getFileSize(*BalaradName2, fileSize)) {
-	return;
-  }
-  auto balaradHeader = BAL_HEAD {};
-  StitchBuffer->clear();
-  FormList->clear();
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const balaradFile =
-      CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  if (balaradFile == INVALID_HANDLE_VALUE) {
-	return;
-  }
-  auto bytesRead = DWORD {};
-  if (!wrap::readFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, L"ReadFile for balaradHeader in redbal")) {
-	return;
-  }
-  if (bytesRead != sizeof(balaradHeader)) {
-	CloseHandle(balaradFile);
-	return;
-  }
-  auto balaradStitch = std::vector<BAL_STITCH> {};
-
-  auto const newSize = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
-  balaradStitch.resize(gsl::narrow<size_t>(newSize));
-  if (!wrap::readFile(balaradFile, balaradStitch.data(), (fileSize - sizeof(balaradHeader)), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
-	return;
-  }
-  auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
-  BackgroundColor         = balaradHeader.backgroundColor;
-  IniFile.backgroundColor = balaradHeader.backgroundColor;
-  thred::nuPen(BackgroundPen, 1, BackgroundColor);
-  BackgroundPenWidth = 1;
-  DeleteObject(BackgroundBrush);
-  BackgroundBrush        = CreateSolidBrush(BackgroundColor);
-  constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
-  IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
-  IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
-  UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  BalaradOffset.x        = IniFile.hoopSizeX * 0.5F;
-  BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
-  IniFile.hoopType       = CUSTHUP;
-  UserColor.fill(0);
-  auto const spBHC = gsl::span {balaradHeader.color};
-  auto       iBHC  = spBHC.begin();
-  UserColor[0]     = *iBHC;
-  auto color       = 0U;
-  thred::addColor(0, color);
-  for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
-	switch (balaradStitch[iStitch].code) {
-	  case BALNORM: {
-		StitchBuffer->push_back(F_POINT_ATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
-		                                      balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
-		                                      color});
-		break;
-	  }
-	  case BALSTOP: {
-		color = DST::colmatch(*(iBHC++));
-
-		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-		thred::addColor(currentStitch, color);
-		break;
-	  }
-	  default: {
-		outDebugString(L"default hit in redbal: code [{}]\n", balaradStitch[iStitch].code);
-		break;
-	  }
-	}
-  }
-  auto itUserPen = UserPen->begin();
-  auto ucb       = UserColorBrush.begin();
-  for (auto const& ucolor : UserColor) {
-	*(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
-	thi::nuBrush(*ucb, ucolor);
-	++ucb;
-  }
-  thred::coltab();
-  thred::redraw(ColorBar);
-  StateMap->set(StateFlag::INIT);
-  StateMap->set(StateFlag::RESTCH);
-  CloseHandle(balaradFile);
-}
-
-void thi::ritbal() {
-  auto balaradHeader = BAL_HEAD {};
-  if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
-	auto outputName = (WorkingFileName->empty()) ? (*DefaultDirectory / L"balfil.thr") : *WorkingFileName;
-	outputName.replace_extension(L".thv");
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto balaradFile =
-	    CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (balaradFile == INVALID_HANDLE_VALUE) {
-	  return;
-	}
-	auto       color  = gsl::narrow_cast<uint8_t>(StitchBuffer->front().attribute & COLMSK);
-	auto const spBHC  = gsl::span {balaradHeader.color};
-	auto       iBHC   = spBHC.begin();
-	auto const bhcEnd = std::next(spBHC.begin(), UserColor.size());
-	*iBHC             = UserColor[color];
-	for (auto const& stitch : *StitchBuffer) {
-	  if (color != (stitch.attribute & COLMSK)) {
-		color     = stitch.attribute & COLMSK;
-		*(iBHC++) = UserColor[color];
-		if (iBHC == bhcEnd) {
-		  break;
-		}
-	  }
-	}
-	// NOLINTNEXTLINE(clang-diagnostic-four-char-constants)
-	balaradHeader.signature       = 'drbm';
-	balaradHeader.backgroundColor = BackgroundColor;
-	balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRATIO;
-	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
-	auto bytesWritten             = DWORD {};
-	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
-	BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
-	BalaradOffset.y    = IniFile.hoopSizeY * 0.5F;
-	auto balaradStitch = std::vector<BAL_STITCH> {};
-	balaradStitch.reserve(StitchBuffer->size() + 2U);
-	color        = StitchBuffer->front().attribute & COLMSK;
-	auto iOutput = 0U;
-	thr2bal(balaradStitch, 0, BALJUMP, 0);
-	++iOutput;
-	auto stitch = StitchBuffer->begin();
-	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	  thr2bal(balaradStitch, iStitch, BALNORM, 0);
-	  ++iOutput;
-	  if ((stitch->attribute & COLMSK) != color) {
-		color = stitch->attribute & COLMSK;
-		thr2bal(balaradStitch, iStitch, BALSTOP, color);
-		++iOutput;
-	  }
-	  ++stitch;
-	}
-	WriteFile(balaradFile, balaradStitch.data(), iOutput * wrap::sizeofType(balaradStitch), &bytesWritten, nullptr);
-	CloseHandle(balaradFile);
-	balaradFile =
-	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	auto const outString = utf::utf16ToUtf8(outputName.wstring());
-	wrap::writeFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
-	CloseHandle(balaradFile);
-  }
-  else {
-	if (!BalaradName1->empty()) {
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const balaradFile =
-	      CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	  CloseHandle(balaradFile);
-	}
-  }
-  if (!BalaradName0->empty()) {
-	fs::remove(*BalaradName0);
-  }
-}
-
 void thi::dstcurs() noexcept {
   DestroyCursor(FormCursor);
   DestroyCursor(DLineCursor);
@@ -3538,7 +3328,7 @@ void thi::dstcurs() noexcept {
 
 void thi::reldun() {
   texture::txdun();
-  ritbal();
+  bal::ritbal();
   ritini();
   dstcurs();
   PostQuitMessage(0);
@@ -3975,8 +3765,9 @@ void thi::dun() {
   thred::unsid();
   thred::unbsho();
   rstAll();
+  gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
-  if (savcmp() || (!BalaradName0->empty())) {
+  if (savcmp() || (!balaradName0->empty())) {
 	reldun();
 	return;
   }
@@ -4746,7 +4537,7 @@ void thi::nuFil(FileIndices fileIndex) {
   for (auto const& iColor : *UserColorWin) {
 	thred::redraw(iColor);
   }
-  thred::redraw(ColorBar);
+  thred::redrawColorBar();
   if (!StitchBuffer->empty()) {
 	StateMap->set(StateFlag::INIT);
   }
@@ -11285,7 +11076,7 @@ auto thi::handleEitherButtonDown(bool& retflag) -> bool {
 	  StateMap->set(StateFlag::SELBOX);
 	  selCol();
 	}
-	thred::redraw(ColorBar);
+	thred::redrawColorBar();
 	return true;
   }
   retflag = false;
@@ -11437,7 +11228,7 @@ auto thi::handleRightButtonDown() -> bool {
 			thred::grpAdj();
 		  }
 		  nuAct(GroupStitchIndex);
-		  thred::redraw(ColorBar);
+		  thred::redrawColorBar();
 		  return true;
 		}
 		if (StateMap->test(StateFlag::GRPSEL)) {
@@ -11447,7 +11238,7 @@ auto thi::handleRightButtonDown() -> bool {
 		  ClosestPointIndex = code;
 		  thred::grpAdj();
 		  nuAct(GroupStitchIndex);
-		  thred::redraw(ColorBar);
+		  thred::redrawColorBar();
 		  return true;
 		}
 		rebox();
@@ -13266,7 +13057,7 @@ auto thi::handleHomeKey(bool& retflag) -> bool {
 	  }
 	}
 	thred::grpAdj();
-	thred::redraw(ColorBar);
+	thred::redrawColorBar();
 	return true;
   }
   if (wrap::pressed(VK_SHIFT)) {
@@ -13280,7 +13071,7 @@ auto thi::handleHomeKey(bool& retflag) -> bool {
 	}
 	GroupStitchIndex = ColorChangeTable->operator[](iColor).stitchIndex;
 	thred::grpAdj();
-	thred::redraw(ColorBar);
+	thred::redrawColorBar();
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
@@ -13336,7 +13127,7 @@ auto thi::handleEndKey(int32_t& retflag) -> bool {
 		}
 	  }
 	  thred::grpAdj();
-	  thred::redraw(ColorBar);
+	  thred::redrawColorBar();
 	  retflag = 2;
 	  return true;
 	}
@@ -13350,7 +13141,7 @@ auto thi::handleEndKey(int32_t& retflag) -> bool {
 	}
 	GroupStitchIndex = ColorChangeTable->operator[](iColor).stitchIndex - 1U;
 	thred::grpAdj();
-	thred::redraw(ColorBar);
+	thred::redrawColorBar();
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
@@ -13437,7 +13228,7 @@ auto thi::handleRightKey(bool& retflag) -> bool {
 		  }
 		}
 		thred::grpAdj();
-		thred::redraw(ColorBar);
+		thred::redrawColorBar();
 	  }
 	}
   }
@@ -13473,7 +13264,7 @@ auto thi::handleRightKey(bool& retflag) -> bool {
 			if (GroupStitchIndex < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 			  ++GroupStitchIndex;
 			  thred::grpAdj();
-			  thred::redraw(ColorBar);
+			  thred::redrawColorBar();
 			}
 		  }
 		}
@@ -13528,7 +13319,7 @@ auto thi::handleLeftKey(bool& retflag) -> bool {
 		  nuAct(GroupStitchIndex);
 		}
 		thred::grpAdj();
-		thred::redraw(ColorBar);
+		thred::redrawColorBar();
 	  }
 	}
   }
@@ -13563,7 +13354,7 @@ auto thi::handleLeftKey(bool& retflag) -> bool {
 			if (GroupStitchIndex != 0U) {
 			  --GroupStitchIndex;
 			  thred::grpAdj();
-			  thred::redraw(ColorBar);
+			  thred::redrawColorBar();
 			}
 		  }
 		}
@@ -16125,7 +15916,8 @@ void thi::ducmd() {
 	return;
   }
   CloseHandle(balaradFile);
-  *BalaradName0 = balaradFileName;
+  gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
+  *balaradName0 = balaradFileName;
   if (ArgCount <= 2) {
 	return;
   }
@@ -16142,18 +15934,20 @@ void thi::ducmd() {
   }
   auto readBuffer = std::vector<char> {};
   readBuffer.resize(_MAX_PATH + 1);
-  *BalaradName1  = balaradFileName;
+  gsl::not_null<fs::path *> const balaradName1 = bal::getBN1();
+  *balaradName1  = balaradFileName;
   auto bytesRead = DWORD {};
   if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
 	return;
   }
   if (bytesRead != 0U) {
 	readBuffer.resize(bytesRead);
-	BalaradName2->assign(readBuffer.data());
-	redbal();
+	gsl::not_null<fs::path*> const balaradName2 = bal::getBN2();
+	balaradName2->assign(readBuffer.data());
+	bal::redbal();
   }
   CloseHandle(balaradFile);
-  fs::remove(*BalaradName1);
+  fs::remove(*balaradName1);
 }
 
 void thi::setPrefs() {
@@ -18027,9 +17821,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  AngledFormVertices        = &privateAngledFormVertices;
 	  AuxName                   = &privateAuxName;
 	  BSequence                 = &privateBSequence;
-	  BalaradName0              = &privateBalaradName0;
-	  BalaradName1              = &privateBalaradName1;
-	  BalaradName2              = &privateBalaradName2;
 	  ButtonWin                 = &privateButtonWin;
 	  ClipBuffer                = &privateClipBuffer;
 	  ClipPoints                = &privateClipPoints;
@@ -18085,6 +17876,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ValueWindow               = &privateValueWindow;
 	  VersionNames              = &privateVersionNames;
 	  WorkingFileName           = &privateWorkingFileName;
+	  bal::setBN0(&privateBalaradName0);
+	  bal::setBN1(&privateBalaradName1);
+	  bal::setBN2(&privateBalaradName2);
 	  bitmap::setBBCV(&privateBitmapBackgroundColor);
 	  bitmap::setUBfilename(&privateUserBMPFileName);
 	  DST::setColFilename(&privateColorFileName);
@@ -18204,4 +17998,25 @@ void thred::refreshColors() noexcept {
   for (auto const& iColor : *UserColorWin) {
 	thred::redraw(iColor);
   }
+}
+
+void thred::initPenBrush() noexcept {
+  auto itUserPen = UserPen->begin();
+  auto ucb       = UserColorBrush.begin();
+  for (auto const& ucolor : UserColor) {
+	*(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
+	thi::nuBrush(*ucb, ucolor);
+	++ucb;
+  }
+}
+
+void thred::initBackPenBrush() noexcept {
+  thred::nuPen(BackgroundPen, 1, BackgroundColor);
+  BackgroundPenWidth = 1;
+  DeleteObject(BackgroundBrush);
+  BackgroundBrush = CreateSolidBrush(BackgroundColor);
+}
+
+auto thred::setFileName() -> fs::path {
+  return (WorkingFileName->empty()) ? (*DefaultDirectory / L"balfil.thr") : *WorkingFileName;
 }

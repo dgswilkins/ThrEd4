@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="backup.cpp" />
+    <ClCompile Include="balarad.cpp" />
     <ClCompile Include="bitmap.cpp" />
     <ClCompile Include="displayText.cpp" />
     <ClCompile Include="DST.cpp" />
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backup.h" />
+    <ClInclude Include="balarad.h" />
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="clipStitch.h" />
     <ClInclude Include="displayText.h" />
