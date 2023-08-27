@@ -63,8 +63,10 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
   }
 }
 
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter" 
+#endif
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(misc-unused-parameters)
@@ -89,7 +91,10 @@ constexpr auto sizeofType(std::vector<T> const* vec) noexcept(std::is_same_v<uin
 	return gsl::narrow<uint32_t>(sizeof(T));
   }
 }
+
+#if defined(__clang__)
 #pragma clang diagnostic pop
+#endif
 
 template <class T>
 auto sizeofVector(std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
