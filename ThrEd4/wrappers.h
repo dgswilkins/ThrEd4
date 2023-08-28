@@ -65,13 +65,12 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
 
 #if defined(__clang__)
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter" 
+#pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(misc-unused-parameters)
-constexpr auto sizeofType(std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>)
-    -> uint32_t {
+constexpr auto sizeofType(std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -82,8 +81,7 @@ constexpr auto sizeofType(std::vector<T> const& vec) noexcept(std::is_same_v<uin
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(misc-unused-parameters)
-constexpr auto sizeofType(std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>)
-    -> uint32_t {
+constexpr auto sizeofType(std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -308,7 +306,7 @@ auto toPtrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::i
 	  if constexpr (std::is_same_v<inType, uint32_t>) {
 		return gsl::narrow<ptrdiff_t>(invar); // uint32_t -> ptrdiff (32 bit)
 	  }
-	  else { 
+	  else {
 		return invar; // int -> ptrdiff
 	  }
 	}

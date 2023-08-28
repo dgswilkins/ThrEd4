@@ -406,7 +406,7 @@ void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& fea
   auto nextPoint    = F_POINT {};
 
   auto const& bCurrent = BSequence->operator[](iSequence);
-  auto& bNext          = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+  auto&       bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
@@ -1065,7 +1065,7 @@ auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> c
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
 	  if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 		auto const& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
-		auto length             = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
+		auto        length      = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
 		if (length < minimumLength) {
 		  minimumLength = length;
 		  direction     = false;
@@ -1557,7 +1557,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	          code);
   }
   for (auto iSequence = InterleaveSequenceIndices->operator[](ilData.pins).index;
-       iSequence < InterleaveSequenceIndices->     operator[](wrap::toSize(ilData.pins) + 1U).index;
+       iSequence < InterleaveSequenceIndices->operator[](wrap::toSize(ilData.pins) + 1U).index;
        ++iSequence) {
 	if (ilData.output > 0) {
 	  if (auto const& interleave = InterleaveSequence->operator[](iSequence);
@@ -1682,7 +1682,7 @@ void xt::intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t f
 	auto code = 0U;
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
 	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
-	         InterleaveSequenceIndices->                    operator[](iSequence).color;
+	         InterleaveSequenceIndices->operator[](iSequence).color;
 	  if ((form.extendedAttribute & AT_STRT) != 0U) {
 		if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 		  auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);

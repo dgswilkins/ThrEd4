@@ -71,7 +71,7 @@ void unpclp();
 // main variables
 namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
-auto ClipOrigin        = POINT {}; // origin of clipboard box in stitch coordinates
+auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
 auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 } // namespace
@@ -233,8 +233,8 @@ void tfc::clipSelectedForm() {
 	if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
 	    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
 	  tfc::savclp(spData[iDestination++],
-	                StitchBuffer->operator[](iTexture),
-	                (StitchBuffer->operator[](iTexture).attribute & COLMSK));
+	              StitchBuffer->operator[](iTexture),
+	              (StitchBuffer->operator[](iTexture).attribute & COLMSK));
 	}
 	++iTexture;
   }
@@ -478,8 +478,8 @@ void tfc::clipSelectedStitches() {
   ++iSource;
   for (auto iStitch = 1U; iStitch < length; ++iStitch) {
 	tfc::savclp(spData[iStitch],
-	              StitchBuffer->operator[](iSource),
-	              (StitchBuffer->operator[](iSource).attribute & COLMSK));
+	            StitchBuffer->operator[](iSource),
+	            (StitchBuffer->operator[](iSource).attribute & COLMSK));
 	++iSource;
   }
   GlobalUnlock(clipHandle);

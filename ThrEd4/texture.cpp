@@ -1509,9 +1509,9 @@ void texture::txsnap() {
   auto const halfGrid = IniFile.gridSize / 2;
   if (!SelectedTexturePointsList->empty()) {
 	for (auto const& iPoint : *SelectedTexturePointsList) {
-	  auto& texturePoint = TempTexturePoints->operator[](iPoint);
-	  auto const yStep   = std::floor((texturePoint.y + halfGrid) / IniFile.gridSize);
-	  texturePoint.y     = yStep * IniFile.gridSize;
+	  auto&      texturePoint = TempTexturePoints->operator[](iPoint);
+	  auto const yStep        = std::floor((texturePoint.y + halfGrid) / IniFile.gridSize);
+	  texturePoint.y          = yStep * IniFile.gridSize;
 	}
   }
   else {
@@ -1683,7 +1683,7 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 	return;
   }
   for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	auto const&              currentPoint =
+	auto const& currentPoint =
 	    TexturePointsBuffer->operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
 	if (currentPoint.line != 0U) {
 	  auto const iSegment            = currentPoint.line - 1U;

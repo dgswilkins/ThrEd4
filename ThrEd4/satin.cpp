@@ -481,7 +481,7 @@ void satin::satadj(FRM_HEAD& form) {
 	}
 	{
 	  auto iVertex = 0U;
-	  auto itGuide = itFirstGuide; //intentional copy
+	  auto itGuide = itFirstGuide; // intentional copy
 	  while (iVertex < form.vertexCount) {
 		iVertex = wrap::toUnsigned(satinMap.getFirst());
 		if (iVertex < form.vertexCount) {
@@ -1197,7 +1197,7 @@ void satin::satfil(FRM_HEAD& form) {
 	}
 	si::satfn(form, lengths, 0, iVertex, form.vertexCount, iVertex);
 	break;
-  } 
+  }
   LineSpacing = savedSpacing;
 }
 
@@ -1474,11 +1474,11 @@ void si::outfn(FRM_HEAD const& form,
       (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT)
           ? F_POINT {0.0F, satinWidth}
           : satOffset(finish, start, satinWidth);
-  auto const     itVertex = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
-                                ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
-                                : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
-  InsidePoints-> operator[](finish).x = itVertex->x - offset.x;
-  InsidePoints-> operator[](finish).y = itVertex->y - offset.y;
+  auto const itVertex = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
+                            ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
+                            : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+  InsidePoints->operator[](finish).x  = itVertex->x - offset.x;
+  InsidePoints->operator[](finish).y  = itVertex->y - offset.y;
   OutsidePoints->operator[](finish).x = itVertex->x + offset.x;
   OutsidePoints->operator[](finish).y = itVertex->y + offset.y;
 }

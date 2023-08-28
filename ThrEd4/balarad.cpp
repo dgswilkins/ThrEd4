@@ -65,7 +65,7 @@ void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t co
 
 // main variables
 namespace {
-auto BalaradOffset = F_POINT {}; // balarad offset
+auto BalaradOffset = F_POINT {};                           // balarad offset
 auto BalaradName0  = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
 auto BalaradName1  = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
 auto BalaradName2  = gsl::narrow_cast<fs::path*>(nullptr);
@@ -106,7 +106,6 @@ void bali::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint
                                       (StitchBuffer->operator[](source).x - BalaradOffset.x) * BALRATIO,
                                       (StitchBuffer->operator[](source).y - BalaradOffset.y) * BALRATIO});
 }
-
 
 void bal::redbal() {
   auto fileSize = uintmax_t {};

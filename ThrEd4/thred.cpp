@@ -429,15 +429,15 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t;
 #endif
 } // namespace thi
 
-constexpr auto ARROWPNT = 3U;              // points required to draw arrow
-constexpr auto CHSDEF   = 24.0F;           // default chain stitch length
-constexpr auto CHRDEF   = 0.25;            // default chain stitch ratio
-constexpr auto DEFPIX   = uint16_t {2U};   // default nudge pixels
-constexpr auto DEFULEN  = 12.0F;           // default underlay stitch length
-constexpr auto DNDLEN   = 256U;            // designer name decoding table length
-constexpr auto DNELEN   = 128U;            // designer name encoding table length
-constexpr auto DNLEN    = 50U;             // designer name order table length
-constexpr auto FNDFLMAX = 512U;            // max number of files that can be found
+constexpr auto ARROWPNT = 3U;            // points required to draw arrow
+constexpr auto CHSDEF   = 24.0F;         // default chain stitch length
+constexpr auto CHRDEF   = 0.25;          // default chain stitch ratio
+constexpr auto DEFPIX   = uint16_t {2U}; // default nudge pixels
+constexpr auto DEFULEN  = 12.0F;         // default underlay stitch length
+constexpr auto DNDLEN   = 256U;          // designer name decoding table length
+constexpr auto DNELEN   = 128U;          // designer name encoding table length
+constexpr auto DNLEN    = 50U;           // designer name order table length
+constexpr auto FNDFLMAX = 512U;          // max number of files that can be found
 constexpr auto FLTTHR   = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Filter specifications
 constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
 constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
@@ -608,7 +608,7 @@ auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
 auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
 auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
-auto LastFormSelected = uint32_t {};                // end point of selected range of forms
+auto LastFormSelected   = uint32_t {};           // end point of selected range of forms
 
 // cursors
 auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
@@ -2316,7 +2316,7 @@ void thi::chknum() {
 		break;
 	  }
 	  break;
-	} 
+	}
   }
 
   StateMap->set(StateFlag::RESTCH);
@@ -2637,8 +2637,8 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	if (lastStitch != 0U) {
 	  --lastStitch;
 	  while (iStitch < lastStitch) {
-		auto const& stitch = StitchBuffer->operator[](iStitch);
-		auto& outStitch    = StitchBuffer->operator[](iOutputStitch);
+		auto const& stitch    = StitchBuffer->operator[](iStitch);
+		auto&       outStitch = StitchBuffer->operator[](iOutputStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a knot?
 			prevPoint = outStitch;
@@ -3280,7 +3280,8 @@ void thi::duver(fs::path const& name) {
 
 void thi::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
-	auto const spSrc = gsl::span<const char> {gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count)};
+	auto const spSrc =
+	    gsl::span<const char> {gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count)};
 	destination.insert(destination.end(), spSrc.begin(), spSrc.end());
   }
 }
@@ -7726,17 +7727,17 @@ void thi::longer() {
   if (ClosestPointIndex == LargestStitchIndex) {
 	return;
   }
-  auto const& start        = StitchBuffer->operator[](ClosestPointIndex);
-  auto const& startFwd1    = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  auto const rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
-                                 ? SelectedRange.finish
-                                 : SelectedRange.finish - 1U;
-  auto       iStitch       = ClosestPointIndex + 1U;
+  auto const& start         = StitchBuffer->operator[](ClosestPointIndex);
+  auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+  auto const  currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
+  auto const  rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
+                                  ? SelectedRange.finish
+                                  : SelectedRange.finish - 1U;
+  auto        iStitch       = ClosestPointIndex + 1U;
   for (; iStitch < rangeEnd; ++iStitch) {
 	auto const& stitch     = StitchBuffer->operator[](iStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	auto const  length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (util::closeEnough(length, currentLength)) {
 	  flag = false;
 	  break;
@@ -7747,7 +7748,7 @@ void thi::longer() {
 	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; ++currentStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
-	  auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	  auto const  length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length > currentLength && length < minimumLength) {
 		minimumLength = length;
 		iStitch       = currentStitch;
@@ -7767,14 +7768,14 @@ void thi::shorter() {
   if (ClosestPointIndex == SmallestStitchIndex) {
 	return;
   }
-  auto const& start        = StitchBuffer->operator[](ClosestPointIndex);
-  auto const& startFwd1    = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  auto       currentStitch = ClosestPointIndex;
+  auto const& start         = StitchBuffer->operator[](ClosestPointIndex);
+  auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+  auto const  currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
+  auto        currentStitch = ClosestPointIndex;
   for (; currentStitch != 0; --currentStitch) {
 	auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
-	auto const length      = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
+	auto const  length     = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
 	if (util::closeEnough(length, currentLength)) {
 	  --currentStitch;
 	  flag = false;
@@ -7787,7 +7788,7 @@ void thi::shorter() {
 	for (; iStitch < SelectedRange.finish - 1U; ++iStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](iStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	  auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	  auto const  length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length < currentLength && length > maximumLength) {
 		maximumLength = length;
 		currentStitch = iStitch;
@@ -8260,8 +8261,8 @@ void thi::desiz() {
   }
   info += displayText::format2(IDS_HUPWID, (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
-	auto& modifierName = ExtendedHeader->modifierName;
-	auto  const modifier = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
+	auto&      modifierName = ExtendedHeader->modifierName;
+	auto const modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
 	info += displayText::format2(IDS_CREATBY, *DesignerName, modifier);
   }
   displayText::shoMsg(info, true);
@@ -8289,7 +8290,7 @@ void thi::sidhup() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto SW_FLAGS = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
-	auto const  idx = gsl::narrow_cast<int32_t>(iHoop);
+	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
 	SideWindow->operator[](iHoop) =
 	    CreateWindow(L"STATIC",
 	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
@@ -9488,8 +9489,8 @@ void thi::fixpclp(uint32_t closestFormToCursor) {
   auto const stitchPoint = thred::pxCor2stch(point);
   auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
   auto const count       = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
-  auto& form             = FormList->operator[](closestFormToCursor);
-  auto const             nextVertex = form::nxt(form, ClosestVertexToCursor);
+  auto&      form        = FormList->operator[](closestFormToCursor);
+  auto const nextVertex  = form::nxt(form, ClosestVertexToCursor);
   form::fltspac(nextVertex, count);
   form.vertexCount += count;
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + nextVertex);
@@ -9886,7 +9887,7 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		wrap::setCursor(ArrowCursor);
 	  }
 	  break;
-	} 
+	}
 	if (StateMap->test(StateFlag::FPUNCLP)) {
 	  tfc::fpUnClip();
 	}
@@ -10596,7 +10597,7 @@ auto thi::handleRightButtonDown() -> bool {
 		return true;
 	  }
 	  if (StateMap->test(StateFlag::FORMSEL)) {
-		  thi::handleFormSelected();
+		thi::handleFormSelected();
 	  }
 	  if (form::closfrm()) {
 		StateMap->set(StateFlag::FORMSEL);
@@ -11114,7 +11115,7 @@ auto thi::handleSideWindowActive() -> bool {
 	  }
 	}
 	break;
-  } 
+  }
   if (textureFlag) {
 	thred::unsid();
 	DestroyWindow(FormDataSheet);
@@ -11956,7 +11957,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		unbox();
 		unboxs();
 		auto const index = StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK;
-		auto const                       spTSP = wrap::next(ThreadSizePixels.begin(), index);
+		auto const spTSP = wrap::next(ThreadSizePixels.begin(), index);
 		setbak(*spTSP + 3);
 		auto linePoints = std::vector<POINT> {};
 		linePoints.resize(3);
@@ -12302,7 +12303,7 @@ auto thi::handleEndKey(int32_t& retflag) -> bool {
 	}
 	else {
 	  if (StateMap->test(StateFlag::SELBOX)) {
-		auto const                            iColor = pt2colInd(ClosestPointIndex);
+		auto const iColor = pt2colInd(ClosestPointIndex);
 		ClosestPointIndex = ColorChangeTable->operator[](iColor).stitchIndex - 1U;
 	  }
 	  else {
@@ -15064,7 +15065,7 @@ void thi::ducmd() {
   }
   CloseHandle(balaradFile);
   gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
-  *balaradName0 = balaradFileName;
+  *balaradName0                               = balaradFileName;
   if (ArgCount <= 2) {
 	return;
   }
@@ -15081,9 +15082,9 @@ void thi::ducmd() {
   }
   auto readBuffer = std::vector<char> {};
   readBuffer.resize(_MAX_PATH + 1);
-  gsl::not_null<fs::path *> const balaradName1 = bal::getBN1();
-  *balaradName1  = balaradFileName;
-  auto bytesRead = DWORD {};
+  gsl::not_null<fs::path*> const balaradName1 = bal::getBN1();
+  *balaradName1                               = balaradFileName;
+  auto bytesRead                              = DWORD {};
   if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
 	return;
   }

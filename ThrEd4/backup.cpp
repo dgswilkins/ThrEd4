@@ -152,9 +152,9 @@ void backup::redbak() {
 	ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
   }
   // ToDo - add field in BACK_HEAD to keep track of number of colors
-  constexpr auto UCOLSIZE     = UserColor.size();
-  auto const     spUndoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
-  auto const     spUserColors = gsl::span {UserColor};
+  constexpr auto UCOLSIZE = UserColor.size();
+  auto const spUndoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+  auto const spUserColors = gsl::span {UserColor};
   std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
   thred::refreshColors();
   TexturePointsBuffer->clear();
