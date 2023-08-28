@@ -4,6 +4,7 @@
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
+#include "formClip.h"
 #include "formForms.h"
 #include "globals.h"
 #include "satin.h"
@@ -93,7 +94,6 @@ void ritxfrm(FRM_HEAD const& textureForm);
 void ritxrct() noexcept(std::is_same_v<size_t, uint32_t>);
 void rollbackTexture(std::vector<TX_HIST>::iterator const& texture);
 void setxclp(FRM_HEAD const& form);
-void setxfrm() noexcept;
 void setxmov();
 void stxlin();
 void txang(FRM_HEAD& form);
@@ -116,7 +116,6 @@ void txshrnk(FRM_HEAD const& textureForm);
 void txsiz(float ratio, FRM_HEAD const& textureForm);
 void txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept;
 auto txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t, uint32_t>) -> bool;
-void txtclp(FRM_HEAD& textureForm);
 void txtdel();
 void txtlin();
 void txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>);
@@ -137,6 +136,10 @@ auto TempTexturePoints = static_cast<std::vector<TX_PNT>*>(nullptr); // temporar
 auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
 auto TextureScreen = TXTR_SCREEN {}; // texture editor layout parameters
 } // namespace
+
+void texture::setTxtCurLoc(POINT location) noexcept {
+  TextureCursorLocation = location;
+}
 
 void texture::initTextures(std::vector<TX_PNT>*   ptrTexturePoints,
                            std::vector<uint32_t>* ptrTexturePointsList,
@@ -887,7 +890,7 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
   wrap::polyline(StitchWindowDC, formLines.data(), vertexCount);
 }
 
-void txi::setxfrm() noexcept {
+void texture::setxfrm() noexcept {
   auto angleRect = F_RECTANGLE {};
   txi::angrct(angleRect);
   auto& angledFormVertices = *AngledFormVertices;
@@ -907,40 +910,6 @@ void txi::setxfrm() noexcept {
   TextureScreen.formCenter.x = wrap::midl(angleRect.right, angleRect.left);
   TextureScreen.formCenter.y = wrap::midl(angleRect.top, angleRect.bottom);
   txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
-}
-
-void txi::txtclp(FRM_HEAD& textureForm) {
-  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
-  if (0U == thrEdClip) {
-	return;
-  }
-  auto const clipData = GetClipboardData(thrEdClip); // NOLINT(readability-qualified-auto)
-  if (nullptr == clipData) {
-	return;
-  }
-  auto const clipMemory = GlobalLock(clipData); // NOLINT(readability-qualified-auto)
-  if (nullptr == clipMemory) {
-	return;
-  }
-  auto* clipForm = thred::getClipForm(clipMemory);
-  if (nullptr == clipForm) {
-	GlobalUnlock(clipMemory);
-	return;
-  }
-  textureForm           = *clipForm;
-  auto*      vertices   = convertFromPtr<F_POINT*>(std::next(clipForm));
-  auto const spVertices = gsl::span<F_POINT> {vertices, textureForm.vertexCount};
-  AngledFormVertices->clear();
-  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
-  textureForm.vertexIndex = 0;
-  StateMap->reset(StateFlag::TXTLIN);
-  StateMap->set(StateFlag::TXTCLP);
-  StateMap->set(StateFlag::TXTMOV);
-  txi::setxfrm();
-  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-  GlobalUnlock(clipMemory);
-  StateMap->set(StateFlag::RESTCH);
-  StateMap->reset(StateFlag::WASWROT);
 }
 
 void txi::dutxtlin() noexcept {
@@ -1648,7 +1617,7 @@ void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
 	}
 	case 'V': {
 	  if (OpenClipboard(ThrEdWindow) != 0) {
-		txi::txtclp(textureForm);
+		tfc::txtclp(textureForm);
 	  }
 	  break;
 	}

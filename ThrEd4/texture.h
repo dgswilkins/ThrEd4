@@ -19,6 +19,8 @@ void rstxt();
 void rtrtx(FRM_HEAD const& form);
 void savtxt();
 void setshft();
+void setTxtCurLoc(POINT location) noexcept;
+void setxfrm() noexcept;
 void setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments);
 void txdun();
 void txof();

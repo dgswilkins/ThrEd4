@@ -85,7 +85,6 @@ void notcwlk();
 void notund();
 void notwlk();
 void nudsiz();
-void rtrclp();
 void selalfrm();
 void setclpspac();
 void setcwlk();

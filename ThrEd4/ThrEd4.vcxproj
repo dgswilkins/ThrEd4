@@ -25,6 +25,7 @@
     <ClCompile Include="displayText.cpp" />
     <ClCompile Include="DST.cpp" />
     <ClCompile Include="form.cpp" />
+    <ClCompile Include="formClip.cpp" />
     <ClCompile Include="formForms.cpp" />
     <ClCompile Include="clip.cpp" />
     <ClCompile Include="globals.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="EnumMap.h" />
     <ClInclude Include="ExtendedBitSet.h" />
     <ClInclude Include="form.h" />
+    <ClInclude Include="formClip.h" />
     <ClInclude Include="formForms.h" />
     <ClInclude Include="clip.h" />
     <ClInclude Include="formHeader.h" />

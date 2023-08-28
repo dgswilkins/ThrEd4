@@ -204,7 +204,6 @@ auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> c
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
 auto orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool;
 auto orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool;
-void rtrclpfn(FRM_HEAD const& form);
 void ritwlk(FRM_HEAD& form, uint32_t walkMask);
 void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
 void sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
@@ -2303,62 +2302,6 @@ void xt::duauxnam(fs::path& auxName) {
 	  auxName.replace_extension("pcs");
 	  break;
 	}
-  }
-}
-
-void xi::rtrclpfn(FRM_HEAD const& form) {
-  if (OpenClipboard(ThrEdWindow) == 0) {
-	return;
-  }
-  auto count = 0U;
-  if (auto clipRect = F_RECTANGLE {}; form.isEdgeClip()) {
-	count = form.clipEntries;
-	clip::oclp(clipRect, form.borderClipData, count);
-  }
-  else {
-	if (form.isClip()) {
-	  count = form.lengthOrCount.clipCount;
-	  clip::oclp(clipRect, form.angleOrClipData.clip, count);
-	}
-  }
-  if (count == 0U) {
-	CloseClipboard();
-	return;
-  }
-  LowerLeftStitch.x = 0.0F;
-  LowerLeftStitch.y = 0.0F;
-  EmptyClipboard();
-  Clip = RegisterClipboardFormat(PcdClipFormat);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
-  if (nullptr == clipHandle) {
-	CloseClipboard();
-	return;
-  }
-  auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-  if (nullptr == clipStitchData) {
-	CloseClipboard();
-	return;
-  }
-  auto const spClipData = gsl::span<CLIP_STITCH> {clipStitchData, count};
-  thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
-  for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-	thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
-  }
-  GlobalUnlock(clipHandle);
-  SetClipboardData(Clip, clipHandle);
-  CloseClipboard();
-}
-
-void xt::rtrclp() {
-  if (!StateMap->test(StateFlag::FORMSEL)) {
-	return;
-  }
-  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.isTexture()) {
-	texture::rtrtx(form);
-  }
-  else {
-	xi::rtrclpfn(form);
   }
 }
 
