@@ -77,23 +77,18 @@ auto chkok() noexcept -> bool;
 auto chkup(uint32_t count, size_t iStitch) -> uint32_t;
 auto chkwnd(HWND window) noexcept -> bool;
 void closfn();
-void clpadj();
 void clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept;
 auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
 void cros(uint32_t iStitch);
 void crtcurs() noexcept;
 void defNam(fs::path const& fileName);
 auto defTxt(uint32_t iColor) -> COLORREF;
-void defpref();
 void delcol();
 void deldir();
-void delfre();
-void delknot();
 void delknt();
 void delsfrms();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
-void deltot();
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
@@ -120,7 +115,6 @@ void dubuf(std::vector<char>& buffer);
 void duclp() noexcept(std::is_same_v<size_t, uint32_t>);
 void ducmd();
 void ducros(HDC hDC);
-void dufdef() noexcept;
 void dugrid();
 void duhom();
 void duinsfil();
@@ -142,8 +136,6 @@ void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
 auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
 void f1del(uint32_t formIndex);
-void fil2sel(uint32_t stat);
-void filclos();
 auto find1st() -> uint32_t;
 auto finrng(uint32_t find) noexcept -> bool;
 void fixpclp(uint32_t closestFormToCursor);
@@ -151,7 +143,6 @@ void fnamtabs();
 void fndknt();
 void formStretch(uint32_t form);
 void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
-void frmcursel(uint32_t cursorType);
 void frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 void frmsnap(uint32_t start, uint32_t count) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto frmstch() -> bool;
@@ -159,27 +150,18 @@ auto frmstch() -> bool;
 auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
 void getbak();
-void getdes() noexcept;
 void getDocsFolder(fs::path& directory);
-void getfrmbox();
-void getfrmpix();
 auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
 auto getMaxCount() -> uint32_t;
 auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
-void getnpix();
-void getstpix();
 void gotbox();
 void gselrng() noexcept;
-auto handleEditMenu(WORD const& wParameter) -> bool;
 auto handleEitherButtonDown(bool& retflag) -> bool;
-auto handleFileMenu(WORD const& wParameter) -> bool;
-auto handleFillMenu(WORD const& wParameter) -> bool;
 auto handleFormDataSheet() -> bool;
 void handleFormSelected();
 auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRM_HEAD const& textureForm, bool& retflag)
     -> bool;
 auto handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool;
-auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
 auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                      float               xyRatio,
                      float&              rotationAngle,
@@ -188,8 +170,6 @@ auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
 auto handleRightButtonDown() -> bool;
 auto handleSideWindowActive() -> bool;
-auto handleViewMenu(WORD const& wParameter) -> bool;
-void hidknot();
 void hidwnd(HWND hwnd) noexcept;
 void ilin() noexcept;
 void ilin1() noexcept;
@@ -199,7 +179,6 @@ void init();
 auto inrng(uint32_t stitch) noexcept -> bool;
 void insadj();
 void inscol();
-void insfil(fs::path& insertedFile);
 auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool;
 auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
 auto isLine(std::vector<POINT> const& boxOutline) noexcept -> bool;
@@ -210,19 +189,13 @@ void lenCalc();
 void lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
 void lensadj();
 void loadColors() noexcept;
-void lock();
 
 auto CALLBACK lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 void makCol() noexcept;
 auto makbig(uint32_t start, uint32_t finish) -> uint32_t;
 void movchk();
-void movi();
 void movins();
-void mv2b();
-void mv2f();
-void nedof();
-void nedon();
 void newFil();
 auto getSaveName(fs::path& fileName, FileIndices& fileType) -> bool;
 void noMsg();
@@ -235,7 +208,6 @@ void nuRct() noexcept;
 void nuStchSiz(uint32_t iColor, int32_t width) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
 void nucols();
-void nulayr(uint8_t play);
 void nunams();
 void nuselrct();
 void nuslst(uint32_t find);
@@ -247,13 +219,8 @@ constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
 void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& KnotStep, uint32_t KnotAttribute);
 auto oldwnd(HWND window) noexcept -> bool;
-void ovrlay();
 void patdun();
-void pcsbsavof();
-void pcsbsavon();
 void prtred(HANDLE fileHandle, uint32_t code);
-void purg();
-void purgdir();
 auto pxchk(float pixelSize) -> uint16_t;
 void rSelbox();
 auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
@@ -272,13 +239,11 @@ void ritlock(gsl::span<WIN32_FIND_DATA const> fileInfo, HWND hwndlg) noexcept;
 void ritrot(float rotationAngle, F_POINT const& rotationCenter);
 void rngal();
 void rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter);
-void rotauxsel(uint32_t stat);
 void rotfns(float rotationAngle);
 void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept;
 void rotstch(F_POINT_ATTR& stitch, float rotationAngle, F_POINT const& rotationCenter) noexcept;
 auto rsed() noexcept -> uint32_t;
 void rshft(POINT const& shiftPoint);
-void rstAll();
 void rstdu();
 void rthumnam(uint32_t iThumbnail);
 void sachk();
@@ -290,18 +255,11 @@ void selin(uint32_t start, uint32_t end, HDC hDC);
 auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool;
 void setSideWinVal(int index);
 void setbak(int32_t penWidth) noexcept;
-void setdst();
-void setgrd(COLORREF color);
 void setknt();
 void setLayerPens() noexcept;
-#if PESACT
-void setpes();
-#endif
-void setpcs();
 void setPrefs();
 void setsped();
 void shft2box();
-void shoknot();
 void shownd(HWND hwnd) noexcept;
 auto sidclp() -> bool;
 void sidhup();
@@ -335,7 +293,6 @@ void unthum();
 auto updateHoopSize();
 auto updateFillColor() -> bool;
 auto updatePreferences() -> bool;
-void vubak();
 
 auto CALLBACK wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
@@ -739,11 +696,11 @@ auto thred::getMsgBufferValue() -> float {
   return wrap::wcsToFloat(MsgBuffer->data());
 }
 
-void thi::getdes() noexcept {
+void thred::getdes() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
       // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
 
@@ -2318,7 +2275,7 @@ auto CALLBACK thi::enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   return TRUE;
 }
 
-void thi::rstAll() {
+void thred::rstAll() {
   StateMap->reset(StateFlag::WASFPNT);
   StateMap->reset(StateFlag::WASFRMFRM);
   StateMap->reset(StateFlag::FPUNCLP);
@@ -2380,14 +2337,14 @@ void thi::rstAll() {
   DestroyWindow(PreferencesWindow);
   thred::undat();
   if (StateMap->testAndReset(StateFlag::INSFRM)) {
-	insadj();
+	thi::insadj();
   }
   StateMap->reset(StateFlag::FUNCLP);
   if (StateMap->testAndReset(StateFlag::SATPNT)) {
 	satin::satfix();
   }
   if (StateMap->testAndReset(StateFlag::RUNPAT)) {
-	patdun();
+	thi::patdun();
   }
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::FRMPSEL);
@@ -2614,7 +2571,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	                    wrap::next(StitchBuffer->begin(), endStitch));
 	thred::coltab();
   }
-  rstAll();
+  thred::rstAll();
   thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
   lenCalc();
   StateMap->set(StateFlag::RESTCH);
@@ -3553,19 +3510,19 @@ void thred::savAs() {
 	}
 	case FileIndices::PCS: {
 	  WorkingFileName->replace_extension(L".pcs");
-	  thi::setpcs();
+	  menu::setpcs();
 	  break;
 	}
 #if PESACT
 	case FileIndices::PES: {
 	  WorkingFileName->replace_extension(L".pes");
-	  thi::setpes();
+	  menu::setpes();
 	  break;
 	}
 #endif
 	case FileIndices::DST: {
 	  WorkingFileName->replace_extension(L".dst");
-	  thi::setdst();
+	  menu::setdst();
 	  break;
 	}
   }
@@ -3601,7 +3558,7 @@ void thred::dun() {
   }
   thred::unsid();
   thred::unbsho();
-  thi::rstAll();
+  thred::rstAll();
   gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
   if (thi::savcmp() || (!balaradName0->empty())) {
@@ -5159,7 +5116,7 @@ void thi::newFil() {
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   rstdu();
-  rstAll();
+  thred::rstAll();
   displayText::clrhbut(3);
   StateMap->reset(StateFlag::MOVSET);
   thred::unbox();
@@ -5634,7 +5591,7 @@ void thred::cut() {
 	}
   }
   thred::coltab();
-  thi::rstAll();
+  thred::rstAll();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -5781,7 +5738,7 @@ void thi::delknt() {
                 [](F_POINT_ATTR const& stitch) -> bool { return (stitch.attribute & KNOTMSK) != 0U; });
 }
 
-void thi::delknot() {
+void thred::delknot() {
   // Find the first knot stitch, if any
   auto const firstStitch = std::ranges::find_if(*StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
 	return ((stitch.attribute & KNOTMSK) != 0U);
@@ -6007,7 +5964,7 @@ void thi::setsped() {
   SetTimer(ThrEdWindow, 0, elapsedTimePerFrame, nullptr);
 }
 
-void thi::deltot() {
+void thred::deltot() {
   auto& desName = IniFile.designerName;
   DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
   TexturePointsBuffer->clear();
@@ -6016,7 +5973,7 @@ void thi::deltot() {
   FormVertices->clear();
   SatinGuides->clear();
   StateMap->reset(StateFlag::GMRK);
-  rstAll();
+  thred::rstAll();
   thred::coltab();
   thred::zumhom();
   auto const wTxt = displayText::format2(IDS_THRDBY, ThrName->wstring(), *DesignerName);
@@ -6115,7 +6072,7 @@ void thred::delet() {
 	return;
   }
   if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_SHIFT)) {
-	thi::deltot();
+	thred::deltot();
 	thi::fndknt();
 	return;
   }
@@ -6168,7 +6125,7 @@ void thred::delet() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::delstchm();
 	thred::coltab();
-	thi::rstAll();
+	thred::rstAll();
 	xt::setfchk();
 	thi::fndknt();
 	StateMap->set(StateFlag::RESTCH);
@@ -6267,13 +6224,13 @@ void thred::delet() {
   thi::fndknt();
 }
 
-void thi::movi() {
+void thred::movi() {
   if (StateMap->test(StateFlag::GRPSEL)) {
-	rstAll();
+	thred::rstAll();
 	StateMap->set(StateFlag::GRPSEL);
   }
   else {
-	rstAll();
+	thred::rstAll();
   }
   if (StitchBuffer->empty()) {
 	return;
@@ -6327,7 +6284,7 @@ void thi::movi() {
   scrollInfo.nPos  = MAXDELAY - MovieTimeStep;
   SetScrollInfo(SpeedScrollBar, SB_CTL, &scrollInfo, TRUE);
   FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
-  setsped();
+  thi::setsped();
 }
 
 void thred::redclp() {
@@ -6411,7 +6368,7 @@ void thi::drwmrk(HDC hDC) {
   SetROP2(hDC, R2_COPYPEN);
 }
 
-void thi::vubak() {
+void thred::vubak() {
   if (WorkingFileName->empty() && !StateMap->test(StateFlag::THUMSHO)) {
 	return;
   }
@@ -6468,15 +6425,15 @@ auto thi::gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount)
   return userStitchCount;
 }
 
-void thi::insfil(fs::path& insertedFile) {
+void thred::insfil(fs::path& insertedFile) {
   auto successFlag       = false;
   auto insertedRectangle = F_RECTANGLE {BIGFLOAT, TNYFLOAT, TNYFLOAT, BIGFLOAT};
   if (insertedFile.empty()) {
-	getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
+	thi::getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
   }
   InsertedStitchIndex = wrap::toUnsigned(StitchBuffer->size());
-  if (isthr(insertedFile)) {
-	if (insTHR(insertedFile, insertedRectangle)) {
+  if (thi::isthr(insertedFile)) {
+	if (thi::insTHR(insertedFile, insertedRectangle)) {
 	  successFlag = true;
 	}
   }
@@ -6763,7 +6720,7 @@ void thi::getbak() {
   unthum();
   StateMap->set(StateFlag::FRMOF);
   *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
-  insfil(*WorkingFileName);
+  thred::insfil(*WorkingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
   }
@@ -6803,7 +6760,7 @@ void thi::thumbak() {
   getbak();
 }
 
-void thi::purg() {
+void thred::purg() {
   if (ThrName->empty()) {
 	return;
   }
@@ -6816,7 +6773,7 @@ void thi::purg() {
   }
 }
 
-void thi::purgdir() {
+void thred::purgdir() {
   StateMap->set(StateFlag::PRGMSG);
   displayText::showMessage(IDS_DELBAK, DefaultDirectory->wstring());
   displayText::okcan();
@@ -6853,7 +6810,7 @@ auto thi::chkok() noexcept -> bool {
   return chkwnd(OKButton);
 }
 
-void thi::mv2f() {
+void thred::mv2f() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
@@ -6895,7 +6852,7 @@ void thi::mv2f() {
   }
 }
 
-void thi::mv2b() {
+void thred::mv2b() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
 	auto       tempStitchBuffer = std::vector<F_POINT_ATTR> {};
@@ -7154,7 +7111,7 @@ void thi::rotfns(float rotationAngle) {
   thred::rotfn(rotationAngle, rotationCenter);
 }
 
-void thi::nulayr(uint8_t play) {
+void thred::showOnlyLayer(uint8_t play) {
   ActiveLayer = play;
   menu::ladj();
   if (ActiveLayer == 0U) {
@@ -7267,7 +7224,7 @@ auto thi::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   return false;
 }
 
-void thi::delfre() {
+void thred::delfre() {
   auto currentStitchCount = 0U;
   thred::savdo();
   // ToDo - this loop does not delete all free stitches. look at frmdel as well
@@ -7600,7 +7557,7 @@ void thred::thumnail() {
   SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
-  thi::vubak();
+  thred::vubak();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7906,29 +7863,12 @@ void thi::sidhup() {
   }
 }
 
-void thi::setpcs() {
-  IniFile.auxFileType = AUXPCS;
-  menu::auxmen();
-}
-
-#if PESACT
-void thi::setpes() {
-  IniFile.auxFileType = AUXPES;
-  menu::auxmen();
-}
-#endif
-
-void thi::setdst() {
-  IniFile.auxFileType = AUXDST;
-  menu::auxmen();
-}
-
 void thred::fop() {
   trace::untrace();
   if (!FormList->empty() || (!StitchBuffer->empty())) {
 	if (thi::savcmp()) {
 	  thi::nuFil(FileIndices::THR);
-	  thi::nulayr(0U);
+	  thred::showOnlyLayer(0U);
 	}
 	else {
 	  displayText::savdisc();
@@ -7937,7 +7877,7 @@ void thred::fop() {
   }
   else {
 	thi::nuFil(FileIndices::THR);
-	thi::nulayr(0U);
+	thred::showOnlyLayer(0U);
   }
 }
 
@@ -7956,7 +7896,7 @@ void thi::clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noe
   }
 }
 
-void thi::clpadj() {
+void thred::clpadj() {
   if (!StateMap->test(StateFlag::GRPSEL)) {
 	displayText::shoseln(IDS_GRPMSG, IDS_RNGEND);
 	return;
@@ -7969,7 +7909,7 @@ void thi::clpadj() {
                                        StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
   ++iStitch;
   while (iStitch < GroupEndStitch) {
-	clpradj(clipRectAdjusted, StitchBuffer->operator[](iStitch++));
+	thi::clpradj(clipRectAdjusted, StitchBuffer->operator[](iStitch++));
   }
   if (StitchBuffer->operator[](iStitch).x < clipRectAdjusted.left) {
 	clipRectAdjusted.left = StitchBuffer->operator[](iStitch).x;
@@ -7999,7 +7939,7 @@ void thred::shftflt(F_POINT const& point) noexcept {
   }
 }
 
-void thi::defpref() {
+void thred::defpref() {
   constexpr auto APSPAC  = 10.8F;         // applique border spacing
   constexpr auto DEFBPIX = uint16_t {4U}; // default form box pixels
   constexpr auto DEFANG  = 0.7853981F;    // default fill angle, 45 degrees
@@ -8301,40 +8241,6 @@ void thi::srchk() {
   duselrng(SelectedRange);
 }
 
-void thi::nedon() {
-  UserFlagMap->reset(UserFlag::NEDOF);
-  menu::nedmen();
-}
-
-void thi::nedof() {
-  UserFlagMap->set(UserFlag::NEDOF);
-  menu::nedmen();
-}
-
-void thi::shoknot() {
-  UserFlagMap->reset(UserFlag::KNOTOF);
-  menu::knotmen();
-  StateMap->set(StateFlag::RESTCH);
-}
-
-void thi::hidknot() {
-  UserFlagMap->set(UserFlag::KNOTOF);
-  menu::knotmen();
-  StateMap->set(StateFlag::RESTCH);
-}
-
-void thi::pcsbsavon() {
-  UserFlagMap->reset(UserFlag::BSAVOF);
-  menu::bsavmen();
-  StateMap->set(StateFlag::RESTCH);
-}
-
-void thi::pcsbsavof() {
-  UserFlagMap->set(UserFlag::BSAVOF);
-  menu::bsavmen();
-  StateMap->set(StateFlag::RESTCH);
-}
-
 void thred::tglhid() {
   if (!StateMap->testAndFlip(StateFlag::HIDSTCH)) {
 	StateMap->reset(StateFlag::FRMOF);
@@ -8386,45 +8292,21 @@ void thred::retrac() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thi::setgrd(COLORREF color) {
+void thred::setgrd(COLORREF color) {
   menu::setGridCols(color);
   thred::nuPen(GridPen, 1, color);
   IniFile.gridColor = color;
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thi::ovrlay() {
+void thred::ovrlay() {
   auto fileName = fs::path {};
-  insfil(fileName);
+  thred::insfil(fileName);
   StateMap->reset(StateFlag::INSFIL);
   StateMap->reset(StateFlag::FRMOF);
   StateMap->set(StateFlag::INIT);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void thi::fil2sel(uint32_t stat) {
-  UserFlagMap->set(UserFlag::FIL2OF);
-  if (stat != 0U) {
-	UserFlagMap->reset(UserFlag::FIL2OF);
-  }
-  menu::fil2men();
-}
-
-void thi::rotauxsel(uint32_t stat) {
-  UserFlagMap->set(UserFlag::ROTAUX);
-  if (stat == 0U) {
-	UserFlagMap->reset(UserFlag::ROTAUX);
-  }
-  menu::rotauxmen();
-}
-
-void thi::frmcursel(uint32_t cursorType) {
-  UserFlagMap->set(UserFlag::FRMX);
-  if (cursorType == 0U) {
-	UserFlagMap->reset(UserFlag::FRMX);
-  }
-  menu::frmcurmen();
 }
 
 void thi::stchsnap(uint32_t start, uint32_t finish) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
@@ -8624,12 +8506,12 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
   return FALSE;
 }
 
-void thi::lock() {
+void thred::fileLock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
   // ToDo - Replace FNDFLMAX with maximum files in subdirectory
   auto lockInfo = FIND_INFO(FNDFLMAX);
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
+  DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
 }
 
 void thred::delstch() {
@@ -8638,7 +8520,7 @@ void thred::delstch() {
   StitchBuffer->shrink_to_fit();
   TexturePointsBuffer->clear();
   TexturePointsBuffer->shrink_to_fit();
-  thi::rstAll();
+  thred::rstAll();
   form::clrfills();
   thred::resetColorChanges();
   auto const blank = std::wstring {};
@@ -8648,7 +8530,7 @@ void thred::delstch() {
 }
 
 void thi::closfn() {
-  deltot();
+  thred::deltot();
   Knots->clear();
   WorkingFileName->clear();
   bitmap::delmap();
@@ -8658,9 +8540,9 @@ void thi::closfn() {
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
-void thi::filclos() {
-  if (savcmp()) {
-	closfn();
+void thred::filclos() {
+  if (thi::savcmp()) {
+	thi::closfn();
 	return;
   }
   StateMap->set(StateFlag::FCLOS);
@@ -8762,34 +8644,6 @@ void thred::nudgfn(float deltaX, float deltaY) {
   input.mi.dx      = pixel.x;
   input.mi.dy      = pixel.y;
   SendInput(1, &input, sizeof(INPUT));
-}
-
-void thi::getnpix() {
-  displayText::showMessage(IDS_NUDG, IniFile.nudgePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::PIXIN);
-  displayText::numWnd();
-}
-
-void thi::getstpix() {
-  displayText::showMessage(IDS_STCHP, IniFile.stitchSizePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::STPXIN);
-  displayText::numWnd();
-}
-
-void thi::getfrmpix() {
-  displayText::showMessage(IDS_FRMP, IniFile.formVertexSizePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FRMPXIN);
-  displayText::numWnd();
-}
-
-void thi::getfrmbox() {
-  displayText::showMessage(IDS_FRMBOX, IniFile.formBoxSizePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FRMBOXIN);
-  displayText::numWnd();
 }
 
 void thred::bakmrk() {
@@ -9176,10 +9030,10 @@ void thred::qcode() {
 	  return;
 	}
 
-	thi::rstAll();
+	thred::rstAll();
   }
   else {
-	thi::rstAll();
+	thred::rstAll();
   }
   StateMap->set(StateFlag::RESTCH);
   auto const blank = std::wstring {};
@@ -9313,11 +9167,11 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
   return FALSE;
 }
 
-void thi::dufdef() noexcept {
+void thred::dufdef() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
       // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
 
@@ -9963,7 +9817,7 @@ auto thi::handleEitherButtonDown(bool& retflag) -> bool {
 		  else {
 			rebak();
 		  }
-		  rstAll();
+		  thred::rstAll();
 		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
@@ -10001,7 +9855,7 @@ auto thi::handleEitherButtonDown(bool& retflag) -> bool {
 	else {
 	  ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(StitchBuffer->size()));
 	  thred::nuAct(ClosestPointIndex);
-	  rstAll();
+	  thred::rstAll();
 	  StateMap->set(StateFlag::SELBOX);
 	  thred::selCol();
 	}
@@ -10180,7 +10034,7 @@ auto thi::handleRightButtonDown() -> bool {
 		StateMap->reset(StateFlag::SIDACT);
 		if (StateMap->testAndReset(StateFlag::INSRT)) {
 		  ReleaseCapture();
-		  rstAll();
+		  thred::rstAll();
 		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
@@ -11778,1332 +11632,6 @@ auto thi::handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   return {};
 }
 
-auto thi::handleEditMenu(WORD const& wParameter) -> bool {
-  auto flag = false;
-  switch (wParameter) {
-	case ID_KNOTAT: { // edit / Set / Knot at Selected Stitch
-	  thred::set1knot();
-	  flag = true;
-	  break;
-	}
-	case ID_FRM2COL: { // edit / Set / Form Color to  stitch Color
-	  form::col2frm();
-	  flag = true;
-	  break;
-	}
-	case ID_SNAP2GRD: { // edit / Snap / to Grid
-	  thred::gsnap();
-	  flag = true;
-	  break;
-	}
-	case ID_EDIT_SELECTCOLOR: { // edit / Select / Color
-	  thred::selCol();
-	  flag = true;
-	  break;
-	}
-	case ID_REPAIR: { // edit / Repair Data
-	  repair::repar();
-	  flag = true;
-	  break;
-	}
-	case ID_FRMIND: { // edit / Form Update / Indent
-	  xt::setEdit(IDS_UWLKIND, StateFlag::FSETFIND);
-	  flag = true;
-	  break;
-	}
-	case ID_SETSIZ: { // edit / Set / Design Size
-	  xt::nudsiz();
-	  flag = true;
-	  break;
-	}
-	case ID_FRMHI: { // edit / Form Update / Height
-	  xt::setEdit(IDS_HI, StateFlag::FSETFHI);
-	  flag = true;
-	  break;
-	}
-	case ID_FRMWID: { // edit / Form Update / Width
-	  xt::setEdit(IDS_WID, StateFlag::FSETFWID);
-	  flag = true;
-	  break;
-	}
-	case ID_MAXFLEN: { // edit / Form Update / Fill /  Maximum Stitch Length
-	  xt::setEdit(IDS_TXT20, StateFlag::FSETFMAX);
-	  flag = true;
-	  break;
-	}
-	case ID_MINFLEN: { // edit / Form Update / Fill /  Minimum Stitch Length
-	  xt::setEdit(IDS_TXT21, StateFlag::FSETFMIN);
-	  flag = true;
-	  break;
-	}
-	case ID_MAXBLEN: { // edit / Form Update / Border /  Maximum Stitch Length
-	  xt::setEdit(IDS_TXT22, StateFlag::FSETBMAX);
-	  flag = true;
-	  break;
-	}
-	case ID_MINBLEN: { // edit / Form Update / Border /  Minimum Stitch Length
-	  xt::setEdit(IDS_TXT23, StateFlag::FSETBMIN);
-	  flag = true;
-	  break;
-	}
-	case ID_SETBSPAC: { // edit / Form Update / Border /  Spacing
-	  xt::setEdit(IDS_SETFSPAC, StateFlag::FSETBSPAC);
-	  flag = true;
-	  break;
-	}
-	case ID_SETBLEN: { // edit / Form Update / Border /  Stitch Length
-	  xt::setEdit(IDS_SETFLEN, StateFlag::FSETBLEN);
-	  flag = true;
-	  break;
-	}
-	case ID_SETBCOL: { // edit / Form Update / Border /  Color
-	  xt::setEdit(IDS_COL, StateFlag::FSETBCOL);
-	  flag = true;
-	  break;
-	}
-	case ID_SETFCOL: { // edit / Form Update / Fill /  Color
-	  xt::setEdit(IDS_COL, StateFlag::FSETFCOL);
-	  flag = true;
-	  break;
-	}
-	case ID_SETUCOL: { // edit / Form Update / Underlay /  Color
-	  xt::setEdit(IDS_COL, StateFlag::FSETUCOL);
-	  flag = true;
-	  break;
-	}
-	case ID_SETFANG: { // edit / Form Update / Fill /  Angle
-	  xt::setEdit(IDS_SETFANG, StateFlag::FSETFANG);
-	  flag = true;
-	  break;
-	}
-	case ID_SETFSPAC: { // edit / Form Update / Fill /  Spacing
-	  xt::setEdit(IDS_SETFSPAC, StateFlag::FSETFSPAC);
-	  flag = true;
-	  break;
-	}
-	case ID_SETFLEN: { // edit / Form Update / Fill /  Stitch Length
-	  xt::setEdit(IDS_SETFLEN, StateFlag::FSETFLEN);
-	  flag = true;
-	  break;
-	}
-	case ID_SETUANG: { // edit / Form Update / Underlay /  Angle
-	  xt::setEdit(IDS_SETUANG, StateFlag::FSETUANG);
-	  flag = true;
-	  break;
-	}
-	case ID_SETUSPAC: { // edit / Form Update / Underlay /  Spacing
-	  xt::setEdit(IDS_SETUSPAC, StateFlag::FSETUSPAC);
-	  flag = true;
-	  break;
-	}
-	case ID_UNDLEN: { // edit / Form Update / Underlay / Stitch Length
-	  xt::setEdit(IDS_SETULEN, StateFlag::FSETULEN);
-	  flag = true;
-	  break;
-	}
-	case ID_SETCWLK: { // edit / Form Update / Center Walk / On
-	  xt::setcwlk();
-	  flag = true;
-	  break;
-	}
-	case ID_SETWLK: { // edit / Form Update / Edge Walk /  On
-	  xt::setwlk();
-	  flag = true;
-	  break;
-	}
-	case ID_SETUND: { // edit / Form Update / Underlay / On
-	  xt::setund();
-	  flag = true;
-	  break;
-	}
-	case ID_NOTCWLK: { // edit / Form Update / Center Walk / Off
-	  xt::notcwlk();
-	  flag = true;
-	  break;
-	}
-	case ID_NOTWLK: { // edit / Form Update / Edge Walk / Off
-	  xt::notwlk();
-	  flag = true;
-	  break;
-	}
-	case ID_NOTUND: { // edit / Form Update / Underlay / Off
-	  xt::notund();
-	  flag = true;
-	  break;
-	}
-	case ID_SELUND: { // edit / Select / Form Underlay Stitches
-	  form::selfil(UNDMSK);
-	  flag = true;
-	  break;
-	}
-	case ID_SELWLK: { // edit / Select / Form Edge Walk Stitches
-	  form::selfil(WLKMSK);
-	  flag = true;
-	  break;
-	}
-	case ID_ALFRM: { // edit / Select / All Forms
-	  xt::selalfrm();
-	  flag = true;
-	  break;
-	}
-	case ID_FILSTRT: { // Edit / Set / Fill Start Point
-	  xt::setfilstrt();
-	  flag = true;
-	  break;
-	}
-	case ID_FILEND: { // Edit / Set / Fill End Point
-	  xt::setfilend();
-	  flag = true;
-	  break;
-	}
-	case ID_2FTHR: { // edit / Convert / to Feather Ribbon
-	  StateMap->set(StateFlag::CNV2FTH);
-	  satin::ribon();
-	  flag = true;
-	  break;
-	}
-	case ID_FTHDEF: { // edit / Set / Feather Defaults
-	  dufdef();
-	  flag = true;
-	  break;
-	}
-	case ID_SRTF: { // edit / Sort / by Form
-	  form::srtfrm();
-	  flag = true;
-	  break;
-	}
-	case ID_CROP: { // edit / Crop to Form
-	  form::crop();
-	  flag = true;
-	  break;
-	}
-	case ID_BLAK: { // edit / Trace / Reset Form Pixels
-	  trace::blak();
-	  flag = true;
-	  break;
-	}
-	case ID_TRDIF: { // edit / Trace / Find Edges
-	  trace::trdif();
-	  flag = true;
-	  break;
-	}
-	case ID_TRACEDG: { // edit / Trace / Show Traced Edges
-	  trace::tracedg();
-	  flag = true;
-	  break;
-	}
-	case ID_TRCSEL: { // edit / Trace / Select Colors
-	  trace::trcsel();
-	  flag = true;
-	  break;
-	}
-	case ID_TRACE: { // edit / Trace / Trace Mode
-	  trace::trinit();
-	  flag = true;
-	  break;
-	}
-	case ID_RETRACE: { // edit / Retrace
-	  thred::retrac();
-	  flag = true;
-	  break;
-	}
-	case ID_DELKNOT: { // edit / Delete / Knots
-	  delknot();
-	  flag = true;
-	  break;
-	}
-	case ID_STCHS2FRM: { // edit / Convert / Stitches to Form
-	  form::stchs2frm();
-	  flag = true;
-	  break;
-	}
-	case ID_SPLTFRM: { // edit / Split Form
-	  form::spltfrm();
-	  flag = true;
-	  break;
-	}
-	case ID_UNBEAN: { // edit / Convert / from Bean to Line
-	  form::debean();
-	  flag = true;
-	  break;
-	}
-	case ID_DUBEAN: { // edit / Convert / to Bean
-	  form::dubean();
-	  flag = true;
-	  break;
-	}
-	case ID_SRTBF: { // edit / Sort / by Color then Form
-	  form::srtbyfrm();
-	  flag = true;
-	  break;
-	}
-	case ID_CENTIRE: { // edit / Center / Entire Design
-	  form::centir();
-	  flag = true;
-	  break;
-	}
-	case ID_CNTRX: { // edit / Center / Both
-	  StateMap->reset(StateFlag::CNTRH);
-	  StateMap->reset(StateFlag::CNTRV);
-	  form::cntrx();
-	  flag = true;
-	  break;
-	}
-	case ID_CNTRH: { // edit / Center / Horizontal
-	  StateMap->reset(StateFlag::CNTRH);
-	  StateMap->set(StateFlag::CNTRV);
-	  form::cntrx();
-	  flag = true;
-	  break;
-	}
-	case ID_CNTRV: { // edit / Center / Vertical
-	  StateMap->set(StateFlag::CNTRH);
-	  StateMap->reset(StateFlag::CNTRV);
-	  form::cntrx();
-	  flag = true;
-	  break;
-	}
-	case ID_FRMNUM: { // edit / Set / Form Number
-	  formForms::frmnum();
-	  flag = true;
-	  break;
-	}
-	case ID_MRKPNT: { // edit / Set / Zoom Mark at Selected Point
-	  thred::pntmrk();
-	  flag = true;
-	  break;
-	}
-	case ID_ROTSEG: { // edit / Set / Rotation / Segments
-	  thred::rotseg();
-	  flag = true;
-	  break;
-	}
-	case ID_ROTMRK: { // edit / Set / Rotation / Angle from Mark
-	  thred::rotmrk();
-	  flag = true;
-	  break;
-	}
-	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
-	  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * 0.5F, wrap::toFloat(UnzoomedRect.cy) * 0.5F);
-	  StateMap->set(StateFlag::RESTCH);
-	  flag = true;
-	  break;
-	}
-	case ID_SETROT: { // edit / Set / Rotation / Angle
-	  form::setrang();
-	  flag = true;
-	  break;
-	}
-	case ID_REMBIG: { // edit / Delete / Large Stitches
-	  thred::rembig();
-	  flag = true;
-	  break;
-	}
-	case ID_SHRINK: { // edit / Shrink Clipboard Border
-	  form::shrnk();
-	  flag = true;
-	  break;
-	}
-	case ID_DUPAGAIN: { // edit / Rotate / and Duplicate again
-	  StateMap->reset(StateFlag::ROTCLOCK);
-	  form::dupfn(IniFile.rotationAngle);
-	  flag = true;
-	  break;
-	}
-	case ID_CLPADJ: { // edit / Set / Range Ends for Clipboard Fills
-	  clpadj();
-	  flag = true;
-	  break;
-	}
-	case ID_DELTOT: { // edit / Delete / All Forms and Stitches
-	  deltot();
-	  flag = true;
-	  break;
-	}
-	case ID_RIBON: { // edit / Convert / to Satin Ribbon
-	  StateMap->reset(StateFlag::CNV2FTH);
-	  satin::ribon();
-	  flag = true;
-	  break;
-	}
-	case ID_CNTR: { // edit / Center / Forms
-	  form::fcntr();
-	  flag = true;
-	  break;
-	}
-	case ID_SELALSTCH: { // edit / Select / All Stitches
-	  thred::selalstch();
-	  flag = true;
-	  break;
-	}
-	case ID_UNGRPLO: { // edit / Ungroup / First
-	  keys::ungrplo();
-	  flag = true;
-	  break;
-	}
-	case ID_UNGRPHI: { // edit / Ungroup / Last
-	  keys::ungrphi();
-	  flag = true;
-	  break;
-	}
-	case ID_MOVMRK: { // edit / Move / to Mark
-	  keys::movmrk();
-	  flag = true;
-	  break;
-	}
-	case ID_SELFIL: { // edit / Select / Form Fill Stitches
-	  form::selfil(FRMFIL);
-	  flag = true;
-	  break;
-	}
-	case ID_SELBRD: { // edit / Select / Form Border Stitches
-	  form::selfil(FRMBFIL);
-	  flag = true;
-	  break;
-	}
-	case ID_SELAP: { // edit / Select / Form Applique Stitches
-	  form::selfil(FRMAPFIL);
-	  flag = true;
-	  break;
-	}
-	case ID_SELFSTCHS: { // edit / Select / Form Stitches
-	  form::selalfil();
-	  flag = true;
-	  break;
-	}
-	case ID_SETMRK: { // edit / Set / Order Mark
-	  keys::setmov();
-	  flag = true;
-	  break;
-	}
-	case ID_DELFRE: { // edit / Delete / Free Stitches
-	  delfre();
-	  flag = true;
-	  break;
-	}
-	case ID_SELAL: { // edit / Select / All Forms and Stitches
-	  form::selal();
-	  flag = true;
-	  break;
-	}
-	case ID_REFILAL: { // edit / Refill All
-	  form::refilal();
-	  flag = true;
-	  break;
-	}
-	case ID_CHK: { // edit / Check Range
-	  auto stitchRange = F_POINT {};
-	  thred::chkrng(stitchRange);
-	  StateMap->set(StateFlag::RESTCH);
-	  flag = true;
-	  break;
-	}
-	case ID_RTRVCLP: { // edit / Retrieve Clipboard Stitches
-	  tfc::rtrclp();
-	  flag = true;
-	  break;
-	}
-	case ID_SORT: { // edit / Sort / Auto
-	  xt::fsort();
-	  flag = true;
-	  break;
-	}
-	case ID_LAYMOV0: { // edit / Move to Layer / 0
-	  constexpr auto TOLAYER0 = 0U;
-	  form::movlayr(TOLAYER0);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYMOV1: { // edit / Move to Layer / 1
-	  constexpr auto TOLAYER1 = 1U;
-	  form::movlayr(TOLAYER1);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYMOV2: { // edit / Move to Layer / 2
-	  constexpr auto TOLAYER2 = 2U;
-	  form::movlayr(TOLAYER2);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYMOV3: { // edit / Move to Layer / 3
-	  constexpr auto TOLAYER3 = 3U;
-	  form::movlayr(TOLAYER3);
-	  break;
-	}
-	case ID_LAYMOV4: { // edit / Move to Layer / 4
-	  constexpr auto TOLAYER4 = 4U;
-	  form::movlayr(TOLAYER4);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYCPY0: { // edit / Copy to Layer / 0
-	  constexpr auto TOLAYER0 = 0U;
-	  form::cpylayr(TOLAYER0);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYCPY1: { // edit / Copy to Layer / 1
-	  constexpr auto TOLAYER1 = 1U;
-	  form::cpylayr(TOLAYER1);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYCPY2: { // edit / Copy to Layer / 2
-	  constexpr auto TOLAYER2 = 2U;
-	  form::cpylayr(TOLAYER2);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYCPY3: { // edit / Copy to Layer / 3
-	  constexpr auto TOLAYER3 = 3U;
-	  form::cpylayr(TOLAYER3);
-	  flag = true;
-	  break;
-	}
-	case ID_LAYCPY4: { // edit / Copy to Layer / 4
-	  constexpr auto TOLAYER4 = 4U;
-	  form::cpylayr(TOLAYER4);
-	  flag = true;
-	  break;
-	}
-	case ID_ROTDUP: { // edit / Rotate / and Duplicate
-	  StateMap->reset(StateFlag::ROTCLOCK);
-	  form::rotdup();
-	  flag = true;
-	  break;
-	}
-	case ID_ROTAGAIN: { // edit / Rotate / Again
-	  form::rotagain();
-	  flag = true;
-	  break;
-	}
-	case ID_ROTCMD: { // edit / Rotate / Command
-	  form::rotcmd();
-	  flag = true;
-	  break;
-	}
-	case ID_DELFRMS: { // edit / Delete / All Forms
-	  form::delfrms();
-	  rstAll();
-	  StateMap->set(StateFlag::RESTCH);
-	  flag = true;
-	  break;
-	}
-	case ID_SNAP2: { // edit / Snap / Together
-	  form::snap();
-	  flag = true;
-	  break;
-	}
-	case ID_FLPORD: { // edit / Flip / Order
-	  form::flpord();
-	  flag = true;
-	  break;
-	}
-	case ID_MV2BAK: { // edit / move / to End
-	  mv2b();
-	  flag = true;
-	  break;
-	}
-	case ID_MV2FRNT: { // edit / move / to Start
-	  mv2f();
-	  flag = true;
-	  break;
-	}
-	case ID_DELETE: { // edit / Delete / Selected
-	  thred::delet();
-	  flag = true;
-	  break;
-	}
-	case ID_FLIPH: { // edit / Flip / Horizontal
-	  form::fliph();
-	  flag = true;
-	  break;
-	}
-	case ID_FLIPV: { // edit / Flip / Vertical
-	  thred::savdo();
-	  form::flipv();
-	  flag = true;
-	  break;
-	}
-	case ID_FRM0: { // edit / Set / Form Zero Point
-	  form::frm0();
-	  flag = true;
-	  break;
-	}
-	case ID_HIDBIT: { // edit / Trace / Hide Bitmap
-	  thred::hidbit();
-	  flag = true;
-	  break;
-	}
-	case ID_DELSTCH: { // edit / Delete / All Stitches
-	  thred::delstch();
-	  flag = true;
-	  break;
-	}
-	case ID_KNOTS: { // edit / Set / Knots
-	  thred::setknots();
-	  flag = true;
-	  break;
-	}
-	case ID_REMZERO: { // edit / Delete / Small Stitches
-	  thred::duzero();
-	  flag = true;
-	  break;
-	}
-	case ID_EDIT_RESET_COL: { // edit / Reset Colors
-	  auto ucb         = UserColorBrush.begin();
-	  auto itUserColor = UserColor.begin();
-	  auto itUserPen   = UserPen->begin();
-	  auto ucw         = UserColorWin->begin();
-	  for (auto const& color : DEFAULT_COLORS) {
-		*itUserColor = color;
-		thi::nuBrush(*ucb, *itUserColor);
-		thred::nuPen(*itUserPen, 1, *itUserColor);
-		thred::redraw(*ucw);
-		++ucb;
-		++itUserColor;
-		++itUserPen;
-		++ucw;
-	  }
-	  StateMap->set(StateFlag::RESTCH);
-	  flag = true;
-	  break;
-	}
-	case ID_DESNAM: { // edit / Set / Designer Name
-	  getdes();
-	  flag = true;
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in handleEditMenu: wParameter [{}]\n", wParameter);
-	  break;
-	}
-  }
-  return flag;
-}
-
-auto thi::handleViewMenu(WORD const& wParameter) -> bool {
-  auto flag = false;
-  switch (wParameter) {
-	case ID_WARNOF: // view / set / Warn if edited
-	  xt::chgwrn();
-	  flag = true;
-	  break;
-	case ID_CLPSPAC: { // view / set / Clipboard Fill  Spacing
-	  xt::setclpspac();
-	  flag = true;
-	  break;
-	}
-	case ID_FIL2SEL_ON: { // view / Set / Fill at Select / On
-	  fil2sel(1);
-	  flag = true;
-	  break;
-	}
-	case ID_FIL2SEL_OFF: { // view / Set / Fill at Select / Off
-	  fil2sel(0);
-	  flag = true;
-	  break;
-	}
-	case ID_USPAC: { // view / Set / Underlay / Spacing
-	  xt::setuspac();
-	  flag = true;
-	  break;
-	}
-	case ID_UANG: { // view / Set / Underlay / Angle
-	  xt::setuang();
-	  flag = true;
-	  break;
-	}
-	case ID_USTCH: { // view / Set / Underlay / Stitch Length
-	  xt::setulen();
-	  flag = true;
-	  break;
-	}
-	case ID_WIND: { // view / Set / Underlay / Indent
-	  xt::setwlkind();
-	  flag = true;
-	  break;
-	}
-	case ID_FRMX: { // view / Set / Form Cursor / Cross
-	  frmcursel(1);
-	  flag = true;
-	  break;
-	}
-	case ID_FRMBOX: { // view / Set / Form Cursor / Box
-	  frmcursel(0);
-	  flag = true;
-	  break;
-	}
-	case ID_ROTAUXON: { // view / Set / Rotate Machine File / On
-	  rotauxsel(1);
-	  flag = true;
-	  break;
-	}
-	case ID_ROTAUXOFF: { // view / Set / Rotate Machine File / Off
-	  rotauxsel(0);
-	  flag = true;
-	  break;
-	}
-	case ID_STCHPIX: { // view / Set / Point Size / Stitch Point Boxes
-	  getstpix();
-	  flag = true;
-	  break;
-	}
-	case ID_FRMPIX: { // view / Set / Point Size / Form Point Triangles
-	  getfrmpix();
-	  flag = true;
-	  break;
-	}
-	case ID_FRMPBOX: { // view / Set / Point Size / Form Box
-	  getfrmbox();
-	  flag = true;
-	  break;
-	}
-	case ID_BAKMRK: { // view / Retrieve Mark
-	  thred::bakmrk();
-	  flag = true;
-	  break;
-	}
-	case ID_MARKESC: { // view / Set / Retrieve Mark / Escape
-	  UserFlagMap->set(UserFlag::MARQ);
-	  menu::qchk();
-	  flag = true;
-	  break;
-	}
-	case ID_MARKQ: { // view / Set / Retrieve Mark / Q
-	  UserFlagMap->reset(UserFlag::MARQ);
-	  menu::qchk();
-	  flag = true;
-	  break;
-	}
-	case ID_NUDGPIX: { // view / Set / Nudge Pixels
-	  getnpix();
-	  flag = true;
-	  break;
-	}
-	case ID_GRDHI: { // view / Set / Grid Mask / High
-	  setgrd(GRDHI);
-	  flag = true;
-	  break;
-	}
-	case ID_GRDMED: { // view / Set / Grid Mask / Medium
-	  setgrd(GRDMED);
-	  flag = true;
-	  break;
-	}
-	case ID_GRDEF: { // view / Set / Grid Mask / Default
-	  setgrd(GRDDEF);
-	  flag = true;
-	  break;
-	}
-	case ID_GRDRED: { // view / Set / Grid Mask / UnRed
-	  setgrd(GRDRED);
-	  flag = true;
-	  break;
-	}
-	case ID_GRDBLU: { // view / Set / Grid Mask / UnBlue
-	  setgrd(GRDBLU);
-	  flag = true;
-	  break;
-	}
-	case ID_GRDGRN: { // view / Set / Grid Mask / UnGreen
-	  setgrd(GRDGRN);
-	  flag = true;
-	  break;
-	}
-	case ID_LINBEXACT: { // view / Set / Line Border Spacing / Exact
-	  UserFlagMap->reset(UserFlag::LINSPAC);
-	  menu::linbmen();
-	  flag = true;
-	  break;
-	}
-	case ID_LINBEVEN: { // view / Set / Line Border Spacing / Even
-	  UserFlagMap->set(UserFlag::LINSPAC);
-	  menu::linbmen();
-	  flag = true;
-	  break;
-	}
-	case ID_BSAVON: { // view / Set / PCS Bitmap Save / On
-	  pcsbsavon();
-	  flag = true;
-	  break;
-	}
-	case ID_BSAVOF: { // view / Set / PCS Bitmap Save / Off
-	  pcsbsavof();
-	  flag = true;
-	  break;
-	}
-	case ID_KNOTON: { // view / Knots / On
-	  shoknot();
-	  flag = true;
-	  break;
-	}
-	case ID_KNOTOF: { // view / Knots / Off
-	  hidknot();
-	  flag = true;
-	  break;
-	}
-	case ID_RSTNEDL: { // view / Set / Needle Cursor / Off
-	  nedof();
-	  flag = true;
-	  break;
-	}
-	case ID_SETNEDL: { // view / Set / Needle Cursor / On
-	  nedon();
-	  flag = true;
-	  break;
-	}
-	case ID_SETPREF: { // view / Set / Default Preferences
-	  defpref();
-	  flag = true;
-	  break;
-	}
-	case ID_AUXPCS: { // view / Set / Machine File Type / Pfaff PCS
-	  setpcs();
-	  flag = true;
-	  break;
-	}
-#if PESACT
-	case ID_AUXPES: { // view / Set / Machine File Type / Brother PES
-	  setpes();
-	  flag = true;
-	  break;
-	}
-#endif
-	case ID_AUXDST: { // view / Set / Machine File Type / Tajima DST
-	  setdst();
-	  flag = true;
-	  break;
-	}
-	case ID_ABOUT: { // view / About ThrEd4
-	  displayText::tabmsg(IDS_CPYRIT, false);
-	  flag = true;
-	  break;
-	}
-	case ID_DESIZ: { // view / Design Information
-	  keys::desiz();
-	  flag = true;
-	  break;
-	}
-	case ID_VUSELTHRDS: { // view / Show Threads for Selected Color
-	  menu::vuselthr();
-	  flag = true;
-	  break;
-	}
-	case ID_VUTHRDS: { // view / Show Threads
-	  menu::vuthrds();
-	  flag = true;
-	  break;
-	}
-	case ID_VUBAK: { // view / Backups
-	  vubak();
-	  flag = true;
-	  break;
-	}
-	case ID_SETAP: { // view / Set / Applique Color
-	  form::setap();
-	  flag = true;
-	  break;
-	}
-	case ID_RUNPAT: { // view / Movie
-	  thi::movi();
-	  flag = true;
-	  break;
-	}
-	case ID_CHKOF: { // view / Set / Data check / Off
-	  xt::chgchk(0);
-	  flag = true;
-	  break;
-	}
-	case ID_CHKON: { // view / Set / Data check / On
-	  xt::chgchk(1);
-	  flag = true;
-	  break;
-	}
-	case ID_CHKREP: { // view / Set / Data Check / Auto Repair on
-	  xt::chgchk(2);
-	  flag = true;
-	  break;
-	}
-	case ID_CHKREPMSG: { // view / Set / Data Check / Auto Repair with Message
-	  xt::chgchk(3);
-	  flag = true;
-	  break;
-	}
-	case ID_LENDEF: { // view / Set / Default Stitch Lengths
-	  IniFile.maxStitchLength = MAXSIZ * PFGRAN;
-	  UserStitchLength        = USESIZ * PFGRAN;
-	  MinStitchLength         = MINSIZ * PFGRAN;
-	  flag                    = true;
-	  break;
-	}
-	case ID_TSIZDEF: { // view / Thread Size / Set Defaults
-	  ThreadSize30 = TSIZ30;
-	  ThreadSize40 = TSIZ40;
-	  ThreadSize60 = TSIZ60;
-	  flag         = true;
-	  break;
-	}
-	case ID_SIZ30: { // view / Thread Size / 30
-	  displayText::tsizmsg(L"30", ThreadSize30);
-	  StateMap->set(StateFlag::ENTR30);
-	  flag = true;
-	  break;
-	}
-	case ID_SIZ40: { // view / Thread Size / 40
-	  displayText::tsizmsg(L"40", ThreadSize40);
-	  StateMap->set(StateFlag::ENTR40);
-	  flag = true;
-	  break;
-	}
-	case ID_SIZ60: { // view / Thread Size / 60
-	  displayText::tsizmsg(L"60", ThreadSize60);
-	  StateMap->set(StateFlag::ENTR60);
-	  flag = true;
-	  break;
-	}
-	case ID_VIEW_STCHBAK: { // view / Set / Background Color
-	  if (nuBak() != 0U) {
-		BackgroundColor = BackgroundColorStruct.rgbResult;
-		thred::nuPen(BackgroundPen, 1, BackgroundColor);
-		BackgroundPenWidth = 1;
-		DeleteObject(BackgroundBrush);
-		BackgroundBrush = CreateSolidBrush(BackgroundColor);
-		if (bitmap::ismap()) {
-		  bitmap::bfil(BackgroundColor);
-		}
-		thred::zumhom();
-	  }
-	  flag = true;
-	  break;
-	}
-	case ID_BITCOL: { // view / Set / Bitmap Color
-	  bitmap::setBmpColor();
-	  flag = true;
-	  break;
-	}
-	case VU_ZUMFUL: { // view / Zoom Full
-	  thred::zumhom();
-	  flag = true;
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in handleViewMenu: wParameter [{}]\n", wParameter);
-	  break;
-	}
-  }
-  return flag;
-}
-
-auto thi::handleFileMenu(WORD const& wParameter) -> bool {
-  auto flag = false;
-  switch (wParameter) {
-	case ID_CLOSE: { // file / Close
-	  filclos();
-	  flag = true;
-	  break;
-	}
-	case ID_DELMAP: { // file / Remove Bitmap
-	  bitmap::delmap();
-	  flag = true;
-	  break;
-	}
-	case ID_SAVMAP: { // file / Save Bitmap
-	  bitmap::savmap();
-	  flag = true;
-	  break;
-	}
-	case ID_FLOK: { // file / Locking
-	  lock();
-	  flag = true;
-	  break;
-	}
-	case ID_OVRLAY: { // file / Overlay
-	  ovrlay();
-	  flag = true;
-	  break;
-	}
-	case ID_INSFIL: { // file / Insert
-	  auto fileName = fs::path {};
-	  insfil(fileName);
-	  flag = true;
-	  break;
-	}
-	case ID_THUM: { // file / Thumbnails
-	  thred::thumnail();
-	  flag = true;
-	  break;
-	}
-	case ID_PURGDIR: { // file / Delete Backups / All backups in the selected directory
-	  purgdir();
-	  flag = true;
-	  break;
-	}
-	case ID_PURG: { // file / Delete Backups / Backups for the selected file
-	  purg();
-	  flag = true;
-	  break;
-	}
-	case ID_OPNPCD: { // file / Open Auxiliary file
-	  switch (IniFile.auxFileType) {
-		case AUXDST: {
-		  nuFil(FileIndices::DST);
-		  break;
-		}
-#if PESACT
-		case AUXPES: {
-		  nuFil(FileIndices::PES);
-		  break;
-		}
-#endif
-		default: {
-		  nuFil(FileIndices::PCS);
-		}
-	  }
-	  nulayr(0U);
-	  flag = true;
-	  break;
-	}
-	case ID_HIDBITF: { // file / Hide Bitmap
-	  thred::hidbit();
-	  flag = true;
-	  break;
-	}
-	case ID_LODBIT: { // file / Load Bitmap
-	  bitmap::lodbmp(*DefaultDirectory);
-	  flag = true;
-	  break;
-	}
-	case ID_FILE_OPEN1: { // file / Open
-	  thred::fop();
-	  flag = true;
-	  break;
-	}
-	case ID_FILE_SAVE3: { // file / Save As
-	  thred::colchk();
-	  thred::savAs();
-	  flag = true;
-	  break;
-	}
-	case ID_FILE_SAVE2: { // file / Save
-	  thred::colchk();
-	  thred::save();
-	  flag = true;
-	  break;
-	}
-	case ID_FILE_NEW1: { // file / New
-	  if (savcmp()) {
-		newFil();
-		nulayr(0U);
-	  }
-	  else {
-		displayText::savdisc();
-		StateMap->set(StateFlag::NEWBAK);
-		StateMap->reset(StateFlag::PRFACT);
-		thred::undat();
-	  }
-	  flag = true;
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in handleFileMenu: wParameter [{}]\n", wParameter);
-	  break;
-	}
-  }
-  return flag;
-}
-
-auto thi::handleFillMenu(WORD const& wParameter) -> bool {
-  auto flag = false;
-  switch (wParameter) {
-	case ID_BOLD: { // fill / Border / Bean
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
-		thred::savdo();
-	  }
-	  form::dubold();
-	  flag = true;
-	  break;
-	}
-	case ID_TXFIL: { // Fill / Texture Editor
-	  texture::dutxtfil();
-	  flag = true;
-	  break;
-	}
-	case ID_FETHR: { // fill / Feather
-	  xt::fethr();
-	  flag = true;
-	  break;
-	}
-	case ID_FILCLPX: { // fill / Border / Clipboard, Even
-	  form::filclpx();
-	  flag = true;
-	  break;
-	}
-	case ID_LINCHN: { // fill / Border / Line chain
-	  StateMap->set(StateFlag::LINCHN);
-	  form::chain();
-	  flag = true;
-	  break;
-	}
-	case ID_OPNCHN: { // fill / Border / Open chain
-	  StateMap->reset(StateFlag::LINCHN);
-	  form::chain();
-	  flag = true;
-	  break;
-	}
-	case ID_DUBFIL: { // fill / Border / Double
-	  form::dubfil();
-	  flag = true;
-	  break;
-	}
-	case ID_HORCLP: { // fill / Clipboard / Horizontal
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
-		thred::savdo();
-	  }
-	  form::horclp();
-	  flag = true;
-	  break;
-	}
-	case ID_ANGCLP: { // fill / Clipboard / Angle
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
-		thred::savdo();
-	  }
-	  form::angclp();
-	  flag = true;
-	  break;
-	}
-	case ID_VRTCLP: { // fill / Clipboard / Vertical
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
-		thred::savdo();
-	  }
-	  form::vrtclp();
-	  flag = true;
-	  break;
-	}
-	case ID_REFILF: { // fill / Refill
-	  thred::filfrms();
-	  flag = true;
-	  break;
-	}
-	case ID_CONTF: { // fill / Contour
-	  form::contfil();
-	  flag = true;
-	  break;
-	}
-	case ID_PICOT: { // fill / Border / Picot
-	  form::picot();
-	  flag = true;
-	  break;
-	}
-	case ID_FILBUT: { // fill / Border / Buttonhole
-	  form::bhol();
-	  flag = true;
-	  break;
-	}
-	case ID_CLPFIL: { // fill / Clipboard / Fan
-	  form::clpfil();
-	  flag = true;
-	  break;
-	}
-	case ID_PERP: { // fill / Border / Perpendicular Satin
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
-		thred::savdo();
-	  }
-	  form::prpbrd(LineSpacing);
-	  flag = true;
-	  break;
-	}
-	case ID_FILANG: { // fill / Angle
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		thred::savdo();
-	  }
-	  form::filangl();
-	  flag = true;
-	  break;
-	}
-	case ID_APLIQ: { // fill / Border / Applique
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		thred::savdo();
-	  }
-	  form::apliq();
-	  flag = true;
-	  break;
-	}
-	case ID_SATBRD: { // fill / Border / Angle Satin
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		thred::savdo();
-	  }
-	  satin::satbrd();
-	  flag = true;
-	  break;
-	}
-	case ID_FILCLP: { // fill / Border / Clipboard
-	  form::fclp();
-	  flag = true;
-	  break;
-	}
-	case ID_FILIN: { // fill / Border / Line
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		thred::savdo();
-	  }
-	  form::bord();
-	  flag = true;
-	  break;
-	}
-	case ID_UNFIL: { // fill / Unfill
-	  thred::savdo();
-	  form::unfil();
-	  thred::coltab();
-	  flag = true;
-	  break;
-	}
-	case ID_FILSAT: { // fill / Fan
-	  StateMap->reset(StateFlag::FTHR);
-	  form::filsat();
-	  flag = true;
-	  break;
-	}
-	case ID_FILL_VERT: { // fill / Vertical
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
-		thred::savdo();
-	  }
-	  form::filvrt();
-	  flag = true;
-	  break;
-	}
-	case ID_FILL_HOR: { // fill / Horizontal
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		thred::savdo();
-	  }
-	  form::filhor();
-	  flag = true;
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in handleFillMenu: wParameter [{}]\n", wParameter);
-	  break;
-	}
-  }
-  return flag;
-}
-
-auto thi::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool {
-  auto flag = false;
-  switch (wParameter) {
-	case ID_HLP: { // help
-	  hlp::help();
-	  flag = true;
-	  break;
-	}
-	case ID_LA: { // all (Show all layers)
-	  nulayr(0U);
-	  flag = true;
-	  break;
-	}
-	case ID_L1: { // 1 (Show layer 1 only)
-	  nulayr(1U);
-	  flag = true;
-	  break;
-	}
-	case ID_L2: { // 2 (Show layer 2 only)
-	  nulayr(2U);
-	  flag = true;
-	  break;
-	}
-	case ID_L3: { // 3 (Show layer 3 only)
-	  nulayr(3U);
-	  flag = true;
-	  break;
-	}
-	case ID_L4: { // 4 (Show layer 4 only)
-	  nulayr(4U);
-	  flag = true;
-	  break;
-	}
-	case ID_FRMOF: { // frm+
-	  if (wrap::pressed(VK_SHIFT)) {
-		thred::tglhid();
-	  }
-	  else {
-		form::tglfrm();
-	  }
-	  flag = true;
-	  break;
-	}
-	case ID_PREF: { // pref
-	  formForms::prfmsg();
-	  flag = true;
-	  break;
-	}
-	case ID_ADEND: { // add
-	  auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
-	  if (!StitchBuffer->empty()) {
-		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1U);
-	  }
-	  thred::endpnt(stitchCoordsInPixels);
-	  StateMap->set(StateFlag::BAKEND);
-	  StateMap->set(StateFlag::RESTCH);
-	  flag = true;
-	  break;
-	}
-	case ID_REDO: { // redo
-	  if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
-		backup::redo();
-	  }
-	  flag = true;
-	  break;
-	}
-	case ID_FORM: { // Form
-	  form::frmon();
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		formForms::refrm();
-	  }
-	  else {
-		form::form();
-	  }
-	  flag = true;
-	  break;
-	}
-	case ID_ROT: { // rot
-	  thred::rot(rotationCenter);
-	  flag = true;
-	  break;
-	}
-	case ZUMIN: { // in
-	  if (StateMap->test(StateFlag::GMRK) || StateMap->test(StateFlag::SELBOX) ||
-	      StateMap->test(StateFlag::INSRT) || StateMap->test(StateFlag::GRPSEL) ||
-	      StateMap->test(StateFlag::FORMSEL)) {
-		thred::zumin();
-	  }
-	  else {
-		StateMap->reset(StateFlag::BZUM);
-		StateMap->set(StateFlag::BOXZUM);
-		StateMap->reset(StateFlag::BZUMIN);
-		StateMap->set(StateFlag::VCAPT);
-		SetCapture(ThrEdWindow);
-	  }
-	  flag = true;
-	  break;
-	}
-	case ID_ZUMOUT: { // out
-	  thred::zumout();
-	  flag = true;
-	  break;
-	}
-	case ID_BACK: { // undo
-	  backup::bak();
-	  flag = true;
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in handleMainMenu: wParameter [{}]\n", wParameter);
-	  break;
-	}
-  }
-  return flag;
-}
-
 auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
     -> bool {
   if (Msg.message == WM_MOUSEMOVE) {
@@ -13400,7 +11928,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		}
 	  }
 	  if (code == L'I') {
-		thi::movi();
+		thred::movi();
 		LastKeyCode = L'I';
 		return true;
 	  }
@@ -13469,19 +11997,19 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 	  if (wParameter >= ID_FILE_OPEN1 && wParameter <= ID_AUXPES) {
 		thred::undat();
 	  }
-	  if (thi::handleMainMenu(wParameter, rotationCenter)) {
+	  if (menu::handleMainMenu(wParameter, rotationCenter)) {
 		break;
 	  }
-	  if (thi::handleEditMenu(wParameter)) {
+	  if (menu::handleEditMenu(wParameter)) {
 		break;
 	  }
-	  if (thi::handleFileMenu(wParameter)) {
+	  if (menu::handleFileMenu(wParameter)) {
 		break;
 	  }
-	  if (thi::handleFillMenu(wParameter)) {
+	  if (menu::handleFillMenu(wParameter)) {
 		break;
 	  }
-	  if (thi::handleViewMenu(wParameter)) {
+	  if (menu::handleViewMenu(wParameter)) {
 		break;
 	  }
 	  break;
@@ -13665,11 +12193,11 @@ void thi::ducmd() {
 }
 
 void thi::setPrefs() {
-  defpref();
+  thred::defpref();
   getDocsFolder(*DefaultDirectory);
   if (DesignerName->empty()) {
 	DesignerName->assign(displayText::loadStr(IDS_UNAM));
-	getdes();
+	thred::getdes();
   }
 }
 
@@ -14022,7 +12550,7 @@ void thi::init() {
   if (IniFile.underlaySpacing == 0.0F) {
 	IniFile.underlaySpacing = DEFUSPAC;
   }
-  setgrd(IniFile.gridColor);
+  thred::setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
   ButtonWin->resize(BTNCOUNT);
   auto const blank = std::wstring {};
@@ -15652,7 +14180,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 	  if (DesignerName->empty()) {
 		DesignerName->assign(displayText::loadStr(IDS_UNAM));
-		thi::getdes();
+		thred::getdes();
 	  }
 	  auto xyRatio        = 1.0F; // expand form aspect ratio
 	  auto rotationAngle  = 0.0F;
@@ -15778,4 +14306,93 @@ void thred::setSrchSmallest() {
 
 auto thred::getZoomMin() -> float {
   return ZoomMin;
+}
+
+void thred::resetColors(){
+  auto ucb         = UserColorBrush.begin();
+  auto itUserColor = UserColor.begin();
+  auto itUserPen   = UserPen->begin();
+  auto ucw         = UserColorWin->begin();
+  for (auto const& color : DEFAULT_COLORS) {
+	*itUserColor = color;
+	thi::nuBrush(*ucb, *itUserColor);
+	thred::nuPen(*itUserPen, 1, *itUserColor);
+	thred::redraw(*ucw);
+	++ucb;
+	++itUserColor;
+	++itUserPen;
+	++ucw;
+  }
+  StateMap->set(StateFlag::RESTCH);
+}
+
+void thred::setThreadSize() {
+  ThreadSize30 = TSIZ30;
+  ThreadSize40 = TSIZ40;
+  ThreadSize60 = TSIZ60;
+}
+
+void thred::viewThread30(){
+  displayText::tsizmsg(L"30", ThreadSize30);
+StateMap->set(StateFlag::ENTR30);
+}
+
+void thred::viewThread40() {
+displayText::tsizmsg(L"40", ThreadSize40);
+  StateMap->set(StateFlag::ENTR40);
+}
+
+void thred::viewThread60() {
+  displayText::tsizmsg(L"60", ThreadSize60);
+  StateMap->set(StateFlag::ENTR60);
+}
+
+void thred::setBackGroundColor() {
+  if (thi::nuBak() != 0U) {
+	BackgroundColor = BackgroundColorStruct.rgbResult;
+	thred::nuPen(BackgroundPen, 1, BackgroundColor);
+	BackgroundPenWidth = 1;
+	DeleteObject(BackgroundBrush);
+	BackgroundBrush = CreateSolidBrush(BackgroundColor);
+	if (bitmap::ismap()) {
+	  bitmap::bfil(BackgroundColor);
+	}
+	thred::zumhom();
+  }
+}
+
+void thred::openAuxFile() {
+  switch (IniFile.auxFileType) {
+	case AUXDST: {
+	  thi::nuFil(FileIndices::DST);
+	  break;
+	}
+#if PESACT
+	case AUXPES: {
+	  thi::nuFil(FileIndices::PES);
+	  break;
+	}
+#endif
+	default: {
+	  thi::nuFil(FileIndices::PCS);
+	}
+  }
+  thred::showOnlyLayer(0U);
+}
+
+void thred::openNewFile() {
+  if (thi::savcmp()) {
+	thi::newFil();
+	thred::showOnlyLayer(0U);
+  }
+  else {
+	displayText::savdisc();
+	StateMap->set(StateFlag::NEWBAK);
+	StateMap->reset(StateFlag::PRFACT);
+	thred::undat();
+  }
+}
+
+void thred::openBitMapFile() {
+  bitmap::lodbmp(*DefaultDirectory);
 }

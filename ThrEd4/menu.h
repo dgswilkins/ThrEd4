@@ -20,6 +20,11 @@ void fil2men();
 void flipFormOnOff();
 void flipHideBitmap();
 void frmcurmen();
+auto handleEditMenu(WORD const& wParameter) -> bool;
+auto handleFileMenu(WORD const& wParameter) -> bool;
+auto handleFillMenu(WORD const& wParameter) -> bool;
+auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
+auto handleViewMenu(WORD const& wParameter) -> bool;
 void init() noexcept;
 void knotmen();
 void ladj();
@@ -32,6 +37,11 @@ void resetFormOnOff();
 void resetThreadView();
 void rotauxmen();
 void setGridCols(const COLORREF& color);
+void setdst();
+#if PESACT
+void setpes();
+#endif
+void setpcs();
 void vuselthr();
 void vuthrds();
 void wrnmen();
