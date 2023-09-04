@@ -30,6 +30,7 @@
     <ClCompile Include="clip.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
+    <ClCompile Include="keys.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="PCS.cpp" />
     <ClCompile Include="PES.cpp" />
@@ -65,6 +66,7 @@
     <ClInclude Include="fRectangle.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="iniFile.h" />
+    <ClInclude Include="keys.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />
