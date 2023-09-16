@@ -12,7 +12,6 @@
 #include "formClip.h"
 #include "formForms.h"
 #include "globals.h"
-#include "hlp.h"
 #include "keys.h"
 #include "menu.h"
 #include "PCS.h"
