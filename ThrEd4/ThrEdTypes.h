@@ -3,6 +3,7 @@
 
 // Local Headers
 #include "Resources\resource.h"
+#include "utf8conv.h"
 #include "point.h"
 
 // Open Source headers
@@ -20,17 +21,15 @@
 #include <ShlObj.h>
 
 #ifdef _DEBUG
-#define WIDEN2(x) L##x
-#define WIDEN(x) WIDEN2(x)
-#define WFILE WIDEN(__FILE__)
-#define outDebugString(X, ...) makeDebugString(__LINE__, WFILE, X, __VA_ARGS__)
+#define outDebugString(X, ...) TraceLoc(std::source_location::current(), X, __VA_ARGS__)
 template <typename... Args>
-void makeDebugString(int line, const wchar_t* fileName, const wchar_t* strX, Args&&... args) {
-  auto const strY = fmt::format(FMT_COMPILE(L"{}({}) : {}"), fileName, line, strX);
+void TraceLoc(std::source_location loc, const wchar_t* strX, Args&&... args) {
+  auto       name = utf::utf8ToUtf16(std::string(loc.file_name()));
+  auto       line = loc.line();
+  auto const strY = fmt::format(FMT_COMPILE(L" {}({}) : {}"), name, line, strX);
   auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
   OutputDebugString(strZ.c_str());
 }
-
 #else
 #define outDebugString(X, ...)
 #endif
