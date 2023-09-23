@@ -13,6 +13,7 @@
 #include "hlp.h"
 #include "keys.h"
 #include "menu.h"
+#include "mouse.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
@@ -40,7 +41,7 @@ void           seldwn();
 void           selfrm0();
 void           selfrmx();
 void           selup();
-} // namespace mni
+} // namespace kyi
 
 auto keys::getMoveAnchor() noexcept -> uint32_t {
   return MoveAnchor;
@@ -106,7 +107,7 @@ void kyi::ritcur() {
   auto iBMB       = bitmapBits.begin();
   auto iIBMB      = std::next(bitmapBits.begin(), 32);
   GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
-  if (currentCursor != thred::getArrowCursor()) {
+  if (currentCursor != mouse::getArrowCursor()) {
 	constexpr auto ICONROWS = 32; // rows in the icon
 	for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 	  auto const     bitmapInverse = kyi::byteSwap(*(iIBMB++));

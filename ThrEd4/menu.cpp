@@ -27,6 +27,13 @@ auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
 auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
 auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
+
+constexpr auto GRDHI          = uint32_t {0xffffffU};             // grid high color
+constexpr auto GRDMED         = uint32_t {0x404040U};             // grid medium color
+constexpr auto GRDDEF         = uint32_t {0x202020U};             // grid default color
+constexpr auto GRDRED         = uint32_t {0xff2020U};             // grid red color
+constexpr auto GRDBLU         = uint32_t {0x20ff20U};             // grid green color
+constexpr auto GRDGRN         = uint32_t {0x2020ffU};             // grid blue color
 } // namespace
 
 // menu internal namespace
@@ -1804,4 +1811,8 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
 	}
   }
   return flag;
+}
+
+auto menu::getGridDefColor() -> uint32_t {
+  return GRDDEF;
 }
