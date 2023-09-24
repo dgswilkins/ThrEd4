@@ -1813,6 +1813,6 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
   return flag;
 }
 
-auto menu::getGridDefColor() -> uint32_t {
+auto menu::getGridDefColor() noexcept -> uint32_t {
   return GRDDEF;
 }

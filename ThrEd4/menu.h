@@ -19,7 +19,7 @@ void fil2men();
 void flipFormOnOff();
 void flipHideBitmap();
 void frmcurmen();
-auto getGridDefColor() -> uint32_t;
+auto getGridDefColor() noexcept -> uint32_t;
 auto handleEditMenu(WORD const& wParameter) -> bool;
 auto handleFileMenu(WORD const& wParameter) -> bool;
 auto handleFillMenu(WORD const& wParameter) -> bool;
