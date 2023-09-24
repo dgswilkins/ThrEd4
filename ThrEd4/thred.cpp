@@ -3844,7 +3844,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 #endif
   }
   hResult += pFileOpen->SetTitle(L"Open Thred File");
-#if 0
+#if USE_DEFAULTDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
 		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
 		hResult += SHCreateItemFromParsingName(DefaultDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
