@@ -69,7 +69,7 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
 #endif
 
 template <class T>
-#pragma warning(suppress : 4100) // NOLINTNEXTLINE(misc-unused-parameters)
+#pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape, misc-unused-parameters)
 constexpr auto sizeofType(std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
@@ -80,7 +80,7 @@ constexpr auto sizeofType(std::vector<T> const& vec) noexcept(std::is_same_v<uin
 }
 
 template <class T>
-#pragma warning(suppress : 4100) // NOLINTNEXTLINE(misc-unused-parameters)
+#pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape, misc-unused-parameters)
 constexpr auto sizeofType(std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
