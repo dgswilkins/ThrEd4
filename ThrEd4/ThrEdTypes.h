@@ -13,6 +13,7 @@
 #pragma warning(disable : 6387)  // supress warning for fmt library header
 #pragma warning(disable : 26455) // supress warning for library headers
 #pragma warning(disable : 26812) // supress warning for fmt library header
+#pragma warning(disable : 4702) // supress warning for fmt library header
 #include "fmt/xchar.h"
 #include "fmt/compile.h"
 #pragma warning(pop)
