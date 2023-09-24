@@ -24,6 +24,8 @@
 #ifdef _DEBUG
 #define outDebugString(X, ...) traceLoc(std::source_location::current(), X, __VA_ARGS__)
 template <typename... Args>
+// this should not be neccessary as I think F.19 is satisfied but clang does not like it
+// NOLINTNEXTLINE (cppcoreguidelines-missing-std-forward)
 void traceLoc(std::source_location loc, const wchar_t* strX, Args&&... args) {
   auto       name = utf::utf8ToUtf16(std::string(loc.file_name()));
   auto       line = loc.line();
