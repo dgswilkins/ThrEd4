@@ -246,6 +246,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t;
 #endif
 } // namespace thi
 
+namespace {
 constexpr auto ARROWPNT = 3U;            // points required to draw arrow
 constexpr auto CHSDEF   = 24.0F;         // default chain stitch length
 constexpr auto CHRDEF   = 0.25;          // default chain stitch ratio
@@ -278,6 +279,7 @@ constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeter
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
+} // namespace
 
 // file menu items
 enum FileMenuItems {
