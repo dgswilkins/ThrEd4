@@ -36,8 +36,10 @@ llvmlibc-*,\
 -llvmlibc-callee-namespace,\
 -llvmlibc-implementation-in-namespace,\
 -llvmlibc-restrict-system-libc-headers,\
+-llvmlibc-inline-function-decl,\
 misc-*,\
 -misc-non-private-member-variables-in-classes,\
+-misc-include-cleaner,\
 modernize-*,\
 -modernize-avoid-c-arrays,\
 -modernize-use-default-member-init,\
