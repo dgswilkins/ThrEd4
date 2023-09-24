@@ -3,7 +3,6 @@
 // Local Headers
 #include "clipStitch.h"
 #include "formHeader.h"
-#include "point.h"
 
 // Standard Libraries
 #include <filesystem>
