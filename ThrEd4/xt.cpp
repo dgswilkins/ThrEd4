@@ -797,7 +797,7 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  auto const thisVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
 	  OSequence->emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
-	                                wrap::midl(thisVertex->y, nextVertex->y));
+	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -805,12 +805,12 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
 	  OSequence->emplace_back(wrap::midl(finishVertex->x, startVertex->x),
-	                                wrap::midl(finishVertex->y, startVertex->y));
+	                          wrap::midl(finishVertex->y, startVertex->y));
 	  --itGuide;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
 	  OSequence->emplace_back(wrap::midl(itVertex[0].x, itVertex[1].x),
-	                                wrap::midl(itVertex[0].y, itVertex[1].y));
+	                          wrap::midl(itVertex[0].y, itVertex[1].y));
 	}
   }
   else {

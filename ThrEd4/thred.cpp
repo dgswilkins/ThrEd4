@@ -118,7 +118,6 @@ void dusel(HDC hDC);
 void duselrng(RANGE& selectedRange);
 void dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize);
 
-
 void duver(fs::path const& name);
 void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
 
@@ -1322,8 +1321,9 @@ void thi::movins() {
 	return;
   }
   if (StateMap->test(StateFlag::LIN1)) {
-	(StateMap->test(StateFlag::BAKEND)) ? thred::endpnt(thred::stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U)))
-	                                    : thred::endpnt(thred::stch2px1(0U));
+	(StateMap->test(StateFlag::BAKEND))
+	    ? thred::endpnt(thred::stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U)))
+	    : thred::endpnt(thred::stch2px1(0U));
   }
   else {
 	thred::duIns();
@@ -3845,13 +3845,13 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
   }
   hResult += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFAULTDIR
-		// If we want to, we can set the default directory rather than using the OS mechanism for last used
-		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-		hResult += SHCreateItemFromParsingName(DefaultDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
-		hResult += pFileOpen->SetFolder(psiFrom);
-		if (nullptr != psiFrom) {
-		  psiFrom->Release();
-		}
+  // If we want to, we can set the default directory rather than using the OS mechanism for last used
+  auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
+  hResult += SHCreateItemFromParsingName(DefaultDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+  hResult += pFileOpen->SetFolder(psiFrom);
+  if (nullptr != psiFrom) {
+	psiFrom->Release();
+  }
 #endif
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (FAILED(hResult)) {
@@ -7997,15 +7997,16 @@ void thred::rotmrk() {
 	auto const originalAngle = atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
 	++itVertex;
 	for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-	  thi::angdif(lowestAngle,
-	         highestAngle,
+	  thi::angdif(
+	      lowestAngle,
+	      highestAngle,
 	      thi::nuang(originalAngle, itVertex->x - ZoomMarkPoint.x, itVertex->y - ZoomMarkPoint.y));
 	  ++itVertex;
 	}
 	for (auto const& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & FRMSK) == codedFormIndex) {
 		thi::angdif(lowestAngle,
-		       highestAngle,
+		            highestAngle,
 		            thi::nuang(originalAngle, stitch.x - ZoomMarkPoint.x, stitch.y - ZoomMarkPoint.y));
 	  }
 	}
@@ -8016,10 +8017,10 @@ void thred::rotmrk() {
 	                                 StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
 	  thi::angdif(lowestAngle,
-	         highestAngle,
+	              highestAngle,
 	              thi::nuang(originalAngle,
-	               StitchBuffer->operator[](iStitch).x - ZoomMarkPoint.x,
-	               StitchBuffer->operator[](iStitch).y - ZoomMarkPoint.y));
+	                         StitchBuffer->operator[](iStitch).x - ZoomMarkPoint.x,
+	                         StitchBuffer->operator[](iStitch).y - ZoomMarkPoint.y));
 	}
   }
   auto const tAngle     = highestAngle - lowestAngle;
@@ -8045,7 +8046,8 @@ void thred::rotseg() {
 
 void thred::pntmrk() {
   if (StateMap->test(StateFlag::SELBOX)) {
-	thred::dumrk(StitchBuffer->operator[](ClosestPointIndex).x, StitchBuffer->operator[](ClosestPointIndex).y);
+	thred::dumrk(StitchBuffer->operator[](ClosestPointIndex).x,
+	             StitchBuffer->operator[](ClosestPointIndex).y);
 	return;
   }
   if (StateMap->test(StateFlag::FRMPSEL)) {
@@ -8391,7 +8393,8 @@ void thred::fileLock() {
   // ToDo - Replace FNDFLMAX with maximum files in subdirectory
   auto lockInfo = FIND_INFO(FNDFLMAX);
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
+  DialogBoxParam(
+      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
 }
 
 void thred::delstch() {
@@ -8553,7 +8556,7 @@ void thred::nuscol(size_t iColor) {
 }
 
 void thred::movchk() {
-  static auto draggedColor    = uint8_t {};
+  static auto draggedColor = uint8_t {};
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
@@ -9054,7 +9057,7 @@ void thred::dufdef() noexcept {
       // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
 
-auto thred::displayBackups() -> bool{
+auto thred::displayBackups() -> bool {
   auto iVersion = uint8_t {};
   for (auto const& iBackup : BackupViewer) {
 	if (Msg.hwnd == iBackup) {
@@ -9092,7 +9095,8 @@ auto thred::inColorbar() noexcept -> bool {
 }
 
 auto thred::getColorbarVertPosition() noexcept -> float {
-  return(wrap::toFloat(Msg.pt.y - ColorBarRect.top) / wrap::toFloat(ColorBarRect.bottom - ColorBarRect.top));
+  return (wrap::toFloat(Msg.pt.y - ColorBarRect.top) /
+          wrap::toFloat(ColorBarRect.bottom - ColorBarRect.top));
 }
 
 void thred::handleFormSelected() {
@@ -9954,8 +9958,8 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
   }
   if (Msg.message == WM_LBUTTONDOWN) {
 	{
-	  auto       retflag = true;
-	  auto const retval  = mouse::handleLeftButtonDown(stretchBoxLine, xyRatio, textureForm, retflag);
+	  auto retflag = true;
+	  auto const retval = mouse::handleLeftButtonDown(stretchBoxLine, xyRatio, textureForm, retflag);
 	  if (retflag) {
 		return retval;
 	  }
@@ -12591,7 +12595,7 @@ auto thred::getZoomMin() noexcept -> float {
   return ZoomMin;
 }
 
-void thred::resetColors(){
+void thred::resetColors() {
   auto ucb         = UserColorBrush.begin();
   auto itUserColor = UserColor.begin();
   auto itUserPen   = UserPen->begin();
@@ -12615,13 +12619,13 @@ void thred::setThreadSize() noexcept {
   ThreadSize60 = TSIZ60;
 }
 
-void thred::viewThread30(){
+void thred::viewThread30() {
   displayText::tsizmsg(L"30", ThreadSize30);
-StateMap->set(StateFlag::ENTR30);
+  StateMap->set(StateFlag::ENTR30);
 }
 
 void thred::viewThread40() {
-displayText::tsizmsg(L"40", ThreadSize40);
+  displayText::tsizmsg(L"40", ThreadSize40);
   StateMap->set(StateFlag::ENTR40);
 }
 
@@ -12688,20 +12692,19 @@ void thred::destroyChangeThreadSizeWindows() noexcept {
   }
 }
 
-// ToDo - rename me
 void thred::updateThreadSize(uint32_t threadSizeSelected) {
   VerticalIndex -= 13U;
   static constexpr auto THREAD_SIZE_MAP = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 
   auto const itThreadSize = wrap::next(ThreadSize.begin(), threadSizeSelected);
-  auto const tsm    = wrap::next(THREAD_SIZE_MAP.begin(), VerticalIndex);
-  *itThreadSize     = *tsm;
-  auto const tsi    = wrap::next(ThreadSizeIndex.begin(), threadSizeSelected);
-  *tsi              = VerticalIndex;
-  auto buffer       = std::array<wchar_t, 3> {};
-  buffer[0]         = *itThreadSize;
-  buffer[1]         = L'0';
-  auto const tsw    = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
+  auto const tsm          = wrap::next(THREAD_SIZE_MAP.begin(), VerticalIndex);
+  *itThreadSize           = *tsm;
+  auto const tsi          = wrap::next(ThreadSizeIndex.begin(), threadSizeSelected);
+  *tsi                    = VerticalIndex;
+  auto buffer             = std::array<wchar_t, 3> {};
+  buffer[0]               = *itThreadSize;
+  buffer[1]               = L'0';
+  auto const tsw          = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
   SetWindowText(*tsw, buffer.data());
   StateMap->set(StateFlag::RESTCH);
   thred::destroyChangeThreadSizeWindows();
@@ -12711,8 +12714,8 @@ auto thred::createChangeThreadSizeWindows() -> uint32_t {
   static constexpr auto THREAD_SIZES = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
   thred::savdo();
   auto const threadSizeSelected = VerticalIndex;
-  auto idx           = gsl::narrow_cast<int32_t>(VerticalIndex);
-  auto iStr          = THREAD_SIZES.begin();
+  auto       idx                = gsl::narrow_cast<int32_t>(VerticalIndex);
+  auto       iStr               = THREAD_SIZES.begin();
   std::ranges::generate(ChangeThreadSizeWin, [&idx, &iStr]() mutable noexcept -> HWND {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	return CreateWindow(L"STATIC",
@@ -12735,7 +12738,7 @@ void thred::updateUserColor() {
   if (Msg.message == WM_LBUTTONDOWN && (thi::nuCol(UserColor[VerticalIndex]) != 0U)) {
 	thred::savdo();
 	auto const itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
-	*itUserColor     = ColorStruct.rgbResult;
+	*itUserColor           = ColorStruct.rgbResult;
 	auto const itUserPen   = wrap::next(UserPen->begin(), VerticalIndex);
 	thred::nuPen(*itUserPen, 1, *itUserColor);
 	auto const ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
@@ -12863,28 +12866,28 @@ void thred::setRotateCapture() {
   }
 }
 
-auto thred::chkForm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool{
+auto thred::chkForm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   return form::chkfrm(FormControlPoints, stretchBoxLine, xyRatio);
 }
 
 auto thred::getAdjustedPoint(F_POINT stitchPoint) noexcept -> F_POINT {
   return F_POINT {(StitchRangeRect.left + wrap::toFloat(SelectBoxOffset.x)) - stitchPoint.x,
-               (StitchRangeRect.bottom + wrap::toFloat(SelectBoxOffset.y)) - stitchPoint.y};
+                  (StitchRangeRect.bottom + wrap::toFloat(SelectBoxOffset.y)) - stitchPoint.y};
 }
 
 auto thred::updateZoomFactor(F_POINT& newSize) noexcept -> float {
   if (newSize.x > newSize.y) {
-	newSize.y  = newSize.x / StitchWindowAspectRatio;
+	newSize.y = newSize.x / StitchWindowAspectRatio;
 	return newSize.x / wrap::toFloat(UnzoomedRect.cx);
   }
-  newSize.x  = newSize.y * StitchWindowAspectRatio;
+  newSize.x = newSize.y * StitchWindowAspectRatio;
   return newSize.y / wrap::toFloat(UnzoomedRect.cx);
 }
 
 auto thred::getAdjustedDelta() -> F_POINT {
   RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   return F_POINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
-               gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
+                  gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
 }
 
 auto thred::getRotationHandleAngle() noexcept -> float {

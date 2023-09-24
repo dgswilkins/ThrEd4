@@ -5000,7 +5000,7 @@ void fi::bakseq() {
 		}
 		auto const userStitchLength2 = UserStitchLength * 2.0F;
 		if (length <= userStitchLength2) {
-			OSequence->emplace_back(bCurrent.x, bCurrent.y);
+		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		  break;
 		}
 		auto point = bNext; // intended copy

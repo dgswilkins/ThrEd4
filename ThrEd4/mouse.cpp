@@ -232,9 +232,9 @@ auto mouse::handleEitherButtonDown() -> bool {
 }
 
 auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
-                               float&              xyRatio,
-                               FRM_HEAD const&     textureForm,
-                               bool&               retflag) -> bool {
+                                 float&              xyRatio,
+                                 FRM_HEAD const&     textureForm,
+                                 bool&               retflag) -> bool {
   static auto threadSizeSelected = uint32_t {}; // thread selected for size change
 
   retflag = true;
@@ -406,7 +406,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   if (!StateMap->test(StateFlag::ROTAT) && StateMap->test(StateFlag::GRPSEL)) {
 	auto const* formControlPoints = thred::getFormControlPoints();
-	auto const& controlPoint = *formControlPoints;
+	auto const& controlPoint      = *formControlPoints;
 	if (thred::iselpnt()) {
 	  for (auto iSide = 0U; iSide < wrap::toUnsigned(stretchBoxLine.size()); ++iSide) {
 		stretchBoxLine[iSide] = controlPoint[wrap::toSize(iSide) * 2U];
@@ -588,8 +588,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   thred::unmsg();
-  if (thred::inStitchWin() &&
-      !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
+  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
 	thred::unpat();
 	if (StateMap->testAndReset(StateFlag::ROTAT)) {
 	  thred::setRotateCapture();
@@ -908,7 +907,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	thred::savdo();
 	ReleaseCapture();
 	thred::unsel();
-	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+	auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
 	auto const adjustedPoint = thred::getAdjustedPoint(stitchPoint);
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	  StitchBuffer->operator[](iStitch).x -= adjustedPoint.x;
@@ -1028,7 +1027,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	auto newSize = F_POINT {stitchPoint.x - ZoomBoxOrigin.x, stitchPoint.y - ZoomBoxOrigin.y};
 	stitchPoint  = F_POINT {ZoomBoxOrigin.x + newSize.x * 0.5F, ZoomBoxOrigin.y + newSize.y * 0.5F};
 	auto const saveFactor = ZoomFactor;
-	ZoomFactor = thred::updateZoomFactor(newSize);
+	ZoomFactor            = thred::updateZoomFactor(newSize);
 	if (ZoomFactor < thred::getZoomMin()) {
 	  ZoomFactor = saveFactor;
 	  thred::zumin();
@@ -1049,10 +1048,10 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 }
 
 auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
-                          float               xyRatio,
-                          float&              rotationAngle,
-                          F_POINT const&      rotationCenter,
-                          FRM_HEAD const&     textureForm) -> bool {
+                            float               xyRatio,
+                            float&              rotationAngle,
+                            F_POINT const&      rotationCenter,
+                            FRM_HEAD const&     textureForm) -> bool {
   if (StateMap->test(StateFlag::TXTMOV)) {
 	texture::txtrmov(textureForm);
 	return true;
@@ -1424,8 +1423,7 @@ auto mouse::handleRightButtonDown() -> bool {
   if (thred::unselectAll()) {
 	return true;
   }
-  if (thred::inStitchWin() &&
-      !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
+  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {

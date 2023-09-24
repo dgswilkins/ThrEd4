@@ -173,8 +173,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  continue;
 	}
 	StitchBuffer->emplace_back(wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
-	                                      wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
-	                                      color);
+	                           wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
+	                           color);
 	if (iStitch++ >= PCSHeader.stitchCount) {
 	  break;
 	}
