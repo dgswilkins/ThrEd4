@@ -3353,7 +3353,7 @@ void fi::ritseg(FRM_HEAD const&              form,
 	}
 	chksid(form, clipSegments[currentSegmentIndex].asid, clipIntersectSide, currentFormVertices);
 	while (iPoint <= clipSegments[currentSegmentIndex].finish) {
-	  OSequence->push_back(F_POINT {clipStitchPoints[iPoint].x, clipStitchPoints[iPoint++].y});
+	  OSequence->emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint++].y);
 	}
 	clipIntersectSide = clipSegments[currentSegmentIndex].zsid;
   }
@@ -3365,7 +3365,7 @@ void fi::ritseg(FRM_HEAD const&              form,
 	chksid(form, clipSegments[currentSegmentIndex].zsid, clipIntersectSide, currentFormVertices);
 	if (clipSegments[currentSegmentIndex].start != 0U) {
 	  while (iPoint >= clipSegments[currentSegmentIndex].start) {
-		OSequence->push_back(F_POINT {clipStitchPoints[iPoint].x, clipStitchPoints[iPoint--].y});
+		OSequence->emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint--].y);
 	  }
 	}
 	else {
