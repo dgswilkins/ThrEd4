@@ -22,9 +22,9 @@
 #include <ShlObj.h>
 
 #ifdef _DEBUG
-#define outDebugString(X, ...) TraceLoc(std::source_location::current(), X, __VA_ARGS__)
+#define outDebugString(X, ...) traceLoc(std::source_location::current(), X, __VA_ARGS__)
 template <typename... Args>
-void TraceLoc(std::source_location loc, const wchar_t* strX, Args&&... args) {
+void traceLoc(std::source_location loc, const wchar_t* strX, Args&&... args) {
   auto       name = utf::utf8ToUtf16(std::string(loc.file_name()));
   auto       line = loc.line();
   auto const strY = fmt::format(FMT_COMPILE(L" {}({}) : {}"), name, line, strX);
