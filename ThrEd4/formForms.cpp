@@ -864,12 +864,12 @@ void formForms::dasyfrm() {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
-	FormVertices->push_back(F_POINT {referencePoint.x + diameter * cos(angle),
-	                                 referencePoint.y + diameter * sin(angle)});
+	FormVertices->emplace_back(referencePoint.x + diameter * cos(angle),
+	                                 referencePoint.y + diameter * sin(angle));
 	++iVertex;
 	for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; ++iSegment) {
-	  FormVertices->push_back(F_POINT {referencePoint.x + holeDiameter * cos(angle),
-	                                   referencePoint.y + holeDiameter * sin(angle)});
+	  FormVertices->emplace_back(referencePoint.x + holeDiameter * cos(angle),
+	                                   referencePoint.y + holeDiameter * sin(angle));
 	  ++iVertex;
 	  angle -= holeSegmentAngle;
 	}
@@ -941,8 +941,8 @@ void formForms::dasyfrm() {
 		  break;
 		}
 	  }
-	  FormVertices->push_back(F_POINT {referencePoint.x + cos(angle) * distanceFromDaisyCenter,
-	                                   referencePoint.y + sin(angle) * distanceFromDaisyCenter});
+	  FormVertices->emplace_back(referencePoint.x + cos(angle) * distanceFromDaisyCenter,
+	                                   referencePoint.y + sin(angle) * distanceFromDaisyCenter);
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {

@@ -894,16 +894,16 @@ void si::satfn(FRM_HEAD const&           form,
 	if (StateMap->test(StateFlag::FTHR)) {
 	  if (form.vertexCount != 0U) {
 		auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
-		BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
+		BSequence->emplace_back(itVertex->x, itVertex->y, 0);
 	  }
 	}
 	else {
 	  if (StateMap->test(StateFlag::BARSAT)) {
 		if (form.vertexCount != 0U) {
 		  auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
-		  BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
+		  BSequence->emplace_back(itVertex->x, itVertex->y, 0);
 		  itVertex = wrap::next(itFirstVertex, line2Start % form.vertexCount);
-		  BSequence->emplace_back(B_SEQ_PNT {itVertex->x, itVertex->y, 0});
+		  BSequence->emplace_back(itVertex->x, itVertex->y, 0);
 		}
 	  }
 	  else {
@@ -987,10 +987,10 @@ void si::satfn(FRM_HEAD const&           form,
 		line2Point.x += line2Step.x;
 		line2Point.y += line2Step.y;
 		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-		  BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 0});
+		  BSequence->emplace_back(line1Point.x, line1Point.y, 0);
 		}
 		else {
-		  BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 1});
+		  BSequence->emplace_back(line2Point.x, line2Point.y, 1);
 		}
 		--line1Count;
 		--line2Count;
@@ -1004,12 +1004,12 @@ void si::satfn(FRM_HEAD const&           form,
 		  line2Point.x += line2Step.x;
 		  line2Point.y += line2Step.y;
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 0});
-			BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 1});
+			BSequence->emplace_back(line1Point.x, line1Point.y, 0);
+			BSequence->emplace_back(line2Point.x, line2Point.y, 1);
 		  }
 		  else {
-			BSequence->emplace_back(B_SEQ_PNT {line2Point.x, line2Point.y, 2});
-			BSequence->emplace_back(B_SEQ_PNT {line1Point.x, line1Point.y, 3});
+			BSequence->emplace_back(line2Point.x, line2Point.y, 2);
+			BSequence->emplace_back(line1Point.x, line1Point.y, 3);
 		  }
 		  --line1Count;
 		  --line2Count;
@@ -1430,7 +1430,7 @@ void satin::sbrd(FRM_HEAD const& form) {
   StateMap->reset(StateFlag::SAT1);
   StateMap->reset(StateFlag::FILDIR);
   OSequence->clear();
-  OSequence->push_back(F_POINT {});
+  OSequence->emplace_back();
   if ((form.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
 	satin::satout(form, form.borderSize * URAT);

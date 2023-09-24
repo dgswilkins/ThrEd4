@@ -230,7 +230,7 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	for (auto const  clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
                                                        wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
 	     auto const& iClip : clipPoints) {
-	  ClipBuffer->emplace_back(F_POINT_ATTR {iClip.x, iClip.y, 0});
+	  ClipBuffer->emplace_back(iClip.x, iClip.y, 0);
 	}
 	clipRect.left = clipRect.right = ClipBuffer->front().x;
 	clipRect.bottom = clipRect.top = ClipBuffer->front().y;
@@ -737,7 +737,7 @@ void ci::xclpfn(std::vector<F_POINT> const& tempClipPoints,
   auto const rotationAngle = atan2(delta.y, delta.x);
   for (auto const& clip : tempClipPoints) {
 	auto const point = thred::rotangf(clip, rotationAngle, rotationCenter);
-	OSequence->push_back(F_POINT {chainStartPoint->x + point.x, chainStartPoint->y + point.y});
+	OSequence->emplace_back(chainStartPoint->x + point.x, chainStartPoint->y + point.y);
   }
 }
 

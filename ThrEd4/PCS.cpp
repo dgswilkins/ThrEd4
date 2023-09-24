@@ -172,9 +172,9 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  color = NOTFRM | stitch.fx;
 	  continue;
 	}
-	StitchBuffer->push_back(F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+	StitchBuffer->emplace_back(wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
 	                                      wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
-	                                      color});
+	                                      color);
 	if (iStitch++ >= PCSHeader.stitchCount) {
 	  break;
 	}

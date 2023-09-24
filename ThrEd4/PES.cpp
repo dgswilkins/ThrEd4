@@ -623,7 +623,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto const pecCount   = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
   StitchBuffer->clear();
   StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
-  StitchBuffer->push_back(F_POINT_ATTR {});
+  StitchBuffer->emplace_back();
   constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
   auto       pesColorIndex = uint32_t {1U};
@@ -661,7 +661,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 	  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 		loc.y -= locof;
-		StitchBuffer->push_back(F_POINT_ATTR {loc.x, loc.y, color});
+		StitchBuffer->emplace_back(loc.x, loc.y, color);
 	  }
 	  else {
 		loc.x += locof;

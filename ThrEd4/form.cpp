@@ -2455,19 +2455,19 @@ void fi::bhfn(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
   for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
 	auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
 	auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
-	OSequence->push_back(F_POINT {firstPoint});
-	OSequence->push_back(F_POINT {innerPoint});
-	OSequence->push_back(F_POINT {firstPoint});
-	OSequence->push_back(F_POINT {outerPoint});
-	OSequence->push_back(F_POINT {firstPoint});
-	OSequence->push_back(F_POINT {outerPoint});
-	OSequence->push_back(F_POINT {firstPoint});
+	OSequence->emplace_back(firstPoint);
+	OSequence->emplace_back(innerPoint);
+	OSequence->emplace_back(firstPoint);
+	OSequence->emplace_back(outerPoint);
+	OSequence->emplace_back(firstPoint);
+	OSequence->emplace_back(outerPoint);
+	OSequence->emplace_back(firstPoint);
 	innerPoint.x += step.x;
 	innerPoint.y += step.y;
   }
   auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
-  OSequence->push_back(F_POINT {firstPoint});
-  OSequence->push_back(F_POINT {innerPoint});
+  OSequence->emplace_back(firstPoint);
+  OSequence->emplace_back(innerPoint);
 }
 
 void fi::bhcrnr(FRM_HEAD const& form, uint32_t vertex) {
@@ -2485,9 +2485,9 @@ void fi::bhcrnr(FRM_HEAD const& form, uint32_t vertex) {
   delta.y *= ratio;
   auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
   OSequence->push_back(*itVertex);
-  OSequence->push_back(F_POINT {point});
+  OSequence->emplace_back(point);
   OSequence->push_back(*itVertex);
-  OSequence->push_back(F_POINT {point});
+  OSequence->emplace_back(point);
   OSequence->push_back(*itVertex);
 }
 
@@ -2998,19 +2998,19 @@ public:
 	  auto const polyLine = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
 	  if (auto const polyDiff = P_VEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
 	      StateMap->testAndFlip(StateFlag::FILDIR)) {
-		OSequence->push_back(F_POINT {lowPoint});
+		OSequence->emplace_back(lowPoint);
 		for (auto iVertex = 0U; iVertex < (selectedVertexCount - 1); ++iVertex) {
 		  auto const length = polyLines[iVertex].length * polyDiff.length;
 		  auto const angle  = polyLines[iVertex].angle + polyDiff.angle;
-		  OSequence->push_back(F_POINT {lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length});
+		  OSequence->emplace_back(lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length);
 		}
 	  }
 	  else {
-		OSequence->push_back(F_POINT {highPoint});
+		OSequence->emplace_back(highPoint);
 		for (auto iVertex = selectedVertexCount - 1U; iVertex != 0; --iVertex) {
 		  auto const length = polyLines[iVertex - 1U].length * polyDiff.length;
 		  auto const angle  = polyLines[iVertex - 1U].angle + polyDiff.angle;
-		  OSequence->push_back(F_POINT {lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length});
+		  OSequence->emplace_back(lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length);
 		}
 	  }
 	}
@@ -3371,7 +3371,7 @@ void fi::ritseg(FRM_HEAD const&              form,
 	else {
 	  // while (iPoint < clipSegments[currentSegmentIndex].start) { // This line makes no sense. Maybe the replacement does?
 	  while (iPoint-- != 0U) {
-		OSequence->push_back(F_POINT {clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y});
+		OSequence->emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
 	  }
 	}
 	clipIntersectSide = clipSegments[currentSegmentIndex].asid;
@@ -4247,11 +4247,11 @@ void fi::movseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
                 std::vector<uint32_t> const&   sortedLineIndices,
                 uint32_t                       ind) {
   auto lineEndPoint = wrap::next(lineEndpoints.begin(), sortedLineIndices[ind]);
-  BSequence->emplace_back(B_SEQ_PNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
+  BSequence->emplace_back(lineEndPoint->x, lineEndPoint->y, SEQBOT);
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
   //             and not the next entry in sortedLines
   ++lineEndPoint;
-  BSequence->emplace_back(B_SEQ_PNT {lineEndPoint->x, lineEndPoint->y, SEQTOP});
+  BSequence->emplace_back(lineEndPoint->x, lineEndPoint->y, SEQTOP);
 }
 
 void fi::brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
@@ -4902,7 +4902,7 @@ void fi::bakseq() {
   }
   OSequence->clear();
   StateMap->reset(StateFlag::FILDIR);
-  OSequence->push_back(F_POINT {BSequence->operator[](iSequence).x, BSequence->operator[](iSequence).y});
+  OSequence->emplace_back(BSequence->operator[](iSequence).x, BSequence->operator[](iSequence).y);
   if (iSequence != 0U) {
 	--iSequence;
   }
@@ -4926,11 +4926,11 @@ void fi::bakseq() {
 	  case SEQTOP: {
 		if ((form.extendedAttribute & AT_SQR) != 0U) {
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			OSequence->push_back(F_POINT {bPrevious.x, bPrevious.y});
+			OSequence->emplace_back(bPrevious.x, bPrevious.y);
 			auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
 			            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
 			while (true) {
-			  OSequence->push_back(F_POINT {0.0F, yVal});
+			  OSequence->emplace_back(0.0F, yVal);
 			  if (yVal > bCurrent.y) {
 				break;
 			  }
@@ -4940,11 +4940,11 @@ void fi::bakseq() {
 			OSequence->back() = bCurrent;
 			break;
 		  }
-		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
 		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
 		  while (true) {
-			OSequence->push_back(F_POINT {0.0F, yVal});
+			OSequence->emplace_back(0.0F, yVal);
 			if (yVal < bPrevious.y) {
 			  break;
 			}
@@ -4957,7 +4957,7 @@ void fi::bakseq() {
 		auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
 		            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
 		while (true) {
-		  OSequence->push_back(F_POINT {0.0F, yVal});
+		  OSequence->emplace_back(0.0F, yVal);
 		  if (yVal > bCurrent.y) {
 			break;
 		  }
@@ -4976,7 +4976,7 @@ void fi::bakseq() {
 		auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
 		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
 		while (true) {
-		  OSequence->push_back(F_POINT {0.0F, yVal});
+		  OSequence->emplace_back(0.0F, yVal);
 		  if (yVal < bCurrent.y) {
 			break;
 		  }
@@ -4993,12 +4993,12 @@ void fi::bakseq() {
 		StateMap->reset(StateFlag::FILDIR);
 		auto const length = hypot(delta.x, delta.y);
 		if (length == 0.0F) {
-		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		  break;
 		}
 		auto const userStitchLength2 = UserStitchLength * 2.0F;
 		if (length <= userStitchLength2) {
-		  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+			OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		  break;
 		}
 		auto point = bNext; // intended copy
@@ -5011,10 +5011,10 @@ void fi::bakseq() {
 		while (count != 0U) {
 		  point.x += step.x;
 		  point.y += step.y;
-		  OSequence->push_back(F_POINT {point.x, point.y});
+		  OSequence->emplace_back(point.x, point.y);
 		  --count;
 		}
-		OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+		OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		break;
 	  }
 	  default: {
@@ -5098,8 +5098,8 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
 	                                     clipRatio.x * (bottomDelta.y) + bottomLeftPoint.y};
 	auto       middleDelta    = F_POINT {};
 	dudif(bottomMidpoint, topMidpoint, middleDelta);
-	OSequence->push_back(F_POINT {clipRatio.y * middleDelta.x + bottomMidpoint.x,
-	                              clipRatio.y * middleDelta.y + bottomMidpoint.y});
+	OSequence->emplace_back(clipRatio.y * middleDelta.x + bottomMidpoint.x,
+	                        clipRatio.y * middleDelta.y + bottomMidpoint.y);
   }
 }
 
@@ -6993,7 +6993,7 @@ void form::duhart(uint32_t sideCount) {
   auto       lastVertex    = iVertex;
   auto const itFirstVertex = wrap::next(FormVertices->begin(), savedVertexIndex);
   while (point.x > itFirstVertex->x && iVertex < wrap::toPtrdiff(2U * HSIDEMAX)) {
-	FormVertices->push_back(F_POINT {point.x, point.y});
+	FormVertices->emplace_back(point.x, point.y);
 	++iVertex;
 	point.x += length * cos(angle);
 	point.y += length * sin(angle);
@@ -7013,8 +7013,8 @@ void form::duhart(uint32_t sideCount) {
   iVertex           = lastVertex - 2;
   itVertex          = std::next(itFirstVertex, iVertex);
   for (; iVertex != 0; --iVertex) {
-	FormVertices->push_back(
-	    F_POINT {maximumX + maximumX - itVertex->x - 2 * (maximumX - itFirstVertex->x), itVertex->y});
+	FormVertices->emplace_back(maximumX + maximumX - itVertex->x - 2 * (maximumX - itFirstVertex->x),
+	                           itVertex->y);
 	--itVertex;
 	++iDestination;
   }
@@ -7072,7 +7072,7 @@ void form::dulens(uint32_t sides) {
   auto       itVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + iVertex - 1U);
   auto const xCoord   = stitchPoint.x;
   for (; iVertex != 1; --iVertex) {
-	FormVertices->push_back(F_POINT {xCoord + xCoord - itVertex->x, itVertex->y});
+	FormVertices->emplace_back(xCoord + xCoord - itVertex->x, itVertex->y);
 	--itVertex;
   }
   currentForm.vertexCount = wrap::toUnsigned(FormVertices->size() - currentForm.vertexIndex);

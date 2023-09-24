@@ -642,7 +642,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  if (StateMap->test(StateFlag::BAKEND)) {
 			thred::xlin1();
 			auto const iStitch = wrap::toUnsigned(StitchBuffer->size());
-			StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, code});
+			StitchBuffer->emplace_back(stitchPoint.x, stitchPoint.y, code);
 			thred::duzrat();
 			InsertLine[0] = thred::stch2px1(iStitch);
 			InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
@@ -692,10 +692,10 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		InsertLine[0]          = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1]          = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-		StitchBuffer->push_back(
-		    {stitchPoint.x,
-		     stitchPoint.y,
-		     USMSK | ActiveColor | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM});
+		StitchBuffer->emplace_back(stitchPoint.x,
+		                           stitchPoint.y,
+		                           USMSK | ActiveColor |
+		                               gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM);
 		thred::addColor(0, ActiveColor);
 		StateMap->set(StateFlag::LIN1);
 		StateMap->set(StateFlag::INSRT);
