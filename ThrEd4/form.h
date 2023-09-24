@@ -139,6 +139,7 @@ void selal();
 void selalfil();
 void selfil(uint32_t type);
 void selsqr(POINT const& controlPoint, HDC hDC);
+void setLayerPens() noexcept;
 void setap();
 void setexpand(float xyRatio);
 void setfpnt();

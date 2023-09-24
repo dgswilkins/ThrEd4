@@ -348,6 +348,7 @@ auto getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
             std::vector<float> const& lengths,
             uint32_t                  iPoint,
             std::vector<F_POINT> const& currentFormVertices) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> float;
+auto getLayerPen(uint32_t layer) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> HPEN;
 auto getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uint32_t>;
 void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
 auto insect(FRM_HEAD const&             form,
@@ -520,6 +521,7 @@ namespace {
 auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 auto FormVertexNext = uint32_t {};                     // form vertex storage for form vertex insert
 auto FormVertexPrev = uint32_t {};                     // form vertex storage for form vertex insert
+auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
 } // namespace
 
 auto fi::fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept -> bool {
@@ -1044,7 +1046,7 @@ void form::drwfrm() {
 		fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
 		SelectObject(StitchWindowMemDC, FormPen3px);
 		wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
-		SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
+		SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
 		lastPoint = form.wordParam + 1U;
 	  }
 	  auto const maxGuide      = FormList->operator[](iForm).satinGuideCount;
@@ -1060,7 +1062,7 @@ void form::drwfrm() {
 		++itGuide;
 	  }
 	}
-	SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
+	SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
 	if (form.type == FRMLINE) {
 	  if (form.vertexCount > 0) {
 		fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
@@ -9265,4 +9267,17 @@ void form::srtfrm() {
   std::ranges::copy(highStitchBuffer, StitchBuffer->begin());
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
+}
+
+auto fi::getLayerPen(uint32_t layer) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> HPEN {
+  auto const itLayerPen = wrap::next(LayerPen.begin(), layer);
+  return *itLayerPen;
+}
+
+void form::setLayerPens() noexcept {
+  LayerPen[0] = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
+  LayerPen[1] = wrap::createPen(PS_SOLID, PENNWID, PENTRQSE);
+  LayerPen[2] = wrap::createPen(PS_SOLID, PENNWID, PENLILAC);
+  LayerPen[3] = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
+  LayerPen[4] = wrap::createPen(PS_SOLID, PENNWID, PENTEAL);
 }

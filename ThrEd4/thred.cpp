@@ -212,7 +212,6 @@ auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint
 void setSideWinVal(int index);
 void setbak(int32_t penWidth) noexcept;
 void setknt();
-void setLayerPens() noexcept;
 void setPrefs();
 void setsped();
 void shft2box();
@@ -428,7 +427,6 @@ auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
 
 // Pens
-auto LayerPen           = std::array<HPEN, LAYERMAX> {};   //
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
 auto BoxPen             = std::array<HPEN, 4> {};          // box pens
 auto CrossPen           = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
@@ -10705,19 +10703,6 @@ void thi::chkirct() noexcept {
   }
 }
 
-auto thred::getLayerPen(uint32_t layer) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> HPEN {
-  auto const itLayerPen = wrap::next(LayerPen.begin(), layer);
-  return *itLayerPen;
-}
-
-void thi::setLayerPens() noexcept {
-  LayerPen[0] = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
-  LayerPen[1] = wrap::createPen(PS_SOLID, PENNWID, PENTRQSE);
-  LayerPen[2] = wrap::createPen(PS_SOLID, PENNWID, PENLILAC);
-  LayerPen[3] = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
-  LayerPen[4] = wrap::createPen(PS_SOLID, PENNWID, PENTEAL);
-}
-
 void thi::createBrushes() noexcept {
   auto dcb         = DefaultColorBrush.begin();
   auto ucb         = UserColorBrush.begin();
@@ -10911,7 +10896,7 @@ void thi::init() {
   ZoomMarkPen     = wrap::createPen(PS_SOLID, PENMWID, PENLMGRN);
   SelectAllPen    = wrap::createPen(PS_SOLID, PENNWID, PENROSY);
   KnotPen         = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
-  setLayerPens();
+  form::setLayerPens();
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
   auto tsi           = ThreadSizeIndex.begin();
