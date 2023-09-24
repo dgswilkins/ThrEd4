@@ -12877,10 +12877,8 @@ auto thred::updateZoomFactor(F_POINT& newSize) noexcept -> float {
 	newSize.y  = newSize.x / StitchWindowAspectRatio;
 	return newSize.x / wrap::toFloat(UnzoomedRect.cx);
   }
-  else {
-	newSize.x  = newSize.y * StitchWindowAspectRatio;
-	return newSize.y / wrap::toFloat(UnzoomedRect.cx);
-  }
+  newSize.x  = newSize.y * StitchWindowAspectRatio;
+  return newSize.y / wrap::toFloat(UnzoomedRect.cx);
 }
 
 auto thred::getAdjustedDelta() -> F_POINT {
