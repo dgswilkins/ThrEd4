@@ -7,7 +7,6 @@ auto handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::vector
     -> bool;
 void movmrk();
 void setmov();
-void setMoveAnchor(uint32_t source) noexcept;
 void ungrphi();
 void ungrplo();
 } // namespace keys

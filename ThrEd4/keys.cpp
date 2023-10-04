@@ -41,13 +41,14 @@ void           seldwn();
 void           selfrm0();
 void           selfrmx();
 void           selup();
+void           setMoveAnchor(uint32_t source) noexcept;
 } // namespace kyi
 
 auto keys::getMoveAnchor() noexcept -> uint32_t {
   return MoveAnchor;
 }
 
-void keys::setMoveAnchor(uint32_t source) noexcept {
+void kyi::setMoveAnchor(uint32_t source) noexcept {
   MoveAnchor = source;
 }
 
@@ -206,7 +207,7 @@ void keys::movmrk() {
 
 void keys::setmov() {
   if (StateMap->test(StateFlag::SELBOX)) {
-	keys::setMoveAnchor(ClosestPointIndex);
+	kyi::setMoveAnchor(ClosestPointIndex);
 	StateMap->set(StateFlag::MOVSET);
 	StateMap->set(StateFlag::RESTCH);
   }
