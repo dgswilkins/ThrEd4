@@ -188,7 +188,6 @@ void setSmallestStitchVal();
 void setSrchLargest();
 void setSrchSmallest();
 void setThreadSize() noexcept;
-void setVerticalIndex(uint8_t index) noexcept;
 void setgrd(COLORREF color);
 void setknots();
 void setpsel();

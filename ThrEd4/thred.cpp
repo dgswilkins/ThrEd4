@@ -12545,10 +12545,6 @@ auto thred::getVerticalIndex() noexcept -> uint8_t {
   return VerticalIndex;
 }
 
-void thred::setVerticalIndex(uint8_t index) noexcept {
-  VerticalIndex = index;
-}
-
 auto thred::getColorChangeIndex(uint32_t iColor) noexcept -> uint16_t {
   return ColorChangeTable->operator[](iColor).stitchIndex;
 }
