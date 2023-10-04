@@ -92,6 +92,7 @@
     <ClInclude Include="xt.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\vcpkg-configuration.json" />
     <None Include="..\vcpkg.json" />
     <None Include="cpp.hint" />
     <None Include="Resources\dlin.cur" />
