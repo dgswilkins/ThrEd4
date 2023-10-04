@@ -20,6 +20,5 @@
       "name": "ms-gsl",
       "version": "4.0.0"
     }
-  ],
-  "builtin-baseline": "64adda19c86e89526b5e27703a193c14477cce07"
+  ]
 }
