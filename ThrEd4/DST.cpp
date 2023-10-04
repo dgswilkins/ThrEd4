@@ -61,6 +61,7 @@ void dstin(uint32_t number, POINT& pout) noexcept;
 void dstran(std::vector<DSTREC>& DSTData);
 auto dtrn(DSTREC* dpnt) -> uint32_t;
 auto dudbits(SIZE const& dif) -> uint32_t;
+void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
 void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace di
 
@@ -214,7 +215,7 @@ auto di::dtrn(DSTREC* dpnt) -> uint32_t {
   return *(convertFromPtr<uint32_t*>(dpnt));
 }
 
-void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
+void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
   auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
   auto colorData = std::vector<uint32_t> {};
@@ -959,7 +960,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   dstRecords.reserve(StitchBuffer->size() + 128U);
   auto dstOffset = DST_OFFSETS {};
   auto dstHeader = DSTHED {};
-  DST::ritdst(dstOffset, dstRecords, saveStitches);
+  di::ritdst(dstOffset, dstRecords, saveStitches);
   // dstHeader fields are fixed width, so use strncpy in its intended way.
   // Use sizeof to ensure no overrun if the format string is wrong length
   strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)

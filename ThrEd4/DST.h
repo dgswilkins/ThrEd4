@@ -54,7 +54,6 @@ class DST_OFFSETS
 namespace DST { // NOLINT(readability-identifier-naming)
 auto colmatch(COLORREF color) -> uint32_t;
 auto readDSTFile(fs::path const& newFileName) -> bool;
-void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
 auto saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 void setColFilename(fs::path* directory) noexcept;
 void setRGBFilename(fs::path* directory) noexcept;
