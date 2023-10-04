@@ -42,6 +42,7 @@ void bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destina
 void bitsiz();
 
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
+auto getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
 auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
@@ -83,7 +84,7 @@ constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   return swapped >> BPB;
 }
 
-auto bitmap::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
+auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
   auto const bitmap =
       CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0);
@@ -168,7 +169,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	BitmapInfo.bmiHeader           = BitmapInfoHeader;
 	auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	auto const bitmap = bi::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	// Synchronize
 	GdiFlush();
 	auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
@@ -662,7 +663,7 @@ auto bitmap::getrmap() -> uint32_t {
                                         0U};
 
   auto const info = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
-  TraceBitmap     = bitmap::getBitmap(BitmapDC, &info, &TraceBitmapData);
+  TraceBitmap     = bi::getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
   auto bitmapSize = 0U;
   if (TraceDC != nullptr) {
