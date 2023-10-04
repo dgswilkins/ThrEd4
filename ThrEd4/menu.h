@@ -42,7 +42,6 @@ void setdst();
 void setpes();
 #endif
 void setpcs();
-void vuselthr();
 void vuthrds();
 void wrnmen();
 } // namespace menu

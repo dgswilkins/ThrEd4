@@ -51,6 +51,7 @@ void pcsbsavof();
 void pcsbsavon();
 void rotauxsel(uint32_t stat);
 void shoknot();
+void vuselthr();
 } // namespace mni
 
 void mni::fil2sel(uint32_t stat) {
@@ -423,7 +424,7 @@ void menu::vuthrds() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void menu::vuselthr() {
+void mni::vuselthr() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -1335,7 +1336,7 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VUSELTHRDS: { // view / Show Threads for Selected Color
-	  menu::vuselthr();
+	  mni::vuselthr();
 	  flag = true;
 	  break;
 	}
