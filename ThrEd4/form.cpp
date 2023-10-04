@@ -234,6 +234,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
             boost::dynamic_bitset<>&       sequenceMap,
             uint32_t&                      lastGroup,
             uint32_t&                      sequenceIndex);
+void chan(uint32_t formIndex);
 void chkbrd(FRM_HEAD const& form);
 void chksid(FRM_HEAD const& form, uint32_t vertexIndex, uint32_t clipIntersectSide, std::vector<F_POINT> const& currentFormVertices);
 auto clipComp(gsl::not_null<CLIP_SORT const*> arg1, gsl::not_null<CLIP_SORT const*> arg2) noexcept -> bool;
@@ -9125,7 +9126,7 @@ void form::col2frm() {
   }
 }
 
-void form::chan(uint32_t formIndex) {
+void fi::chan(uint32_t formIndex) {
   auto& currentForm              = FormList->operator[](formIndex);
   currentForm.borderColor        = ActiveColor;
   currentForm.edgeSpacing        = IniFile.chainSpace;
@@ -9144,7 +9145,7 @@ void form::chain() {
   thred::savdo();
   if (SelectedFormList->empty()) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  chan(ClosestFormToCursor);
+	  fi::chan(ClosestFormToCursor);
 	  StateMap->set(StateFlag::INIT);
 	  thred::coltab();
 	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
@@ -9153,7 +9154,7 @@ void form::chain() {
 	return;
   }
   for (auto const selectedForm : (*SelectedFormList)) {
-	chan(selectedForm);
+	fi::chan(selectedForm);
   }
   StateMap->set(StateFlag::INIT);
   thred::coltab();

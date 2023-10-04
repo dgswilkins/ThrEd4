@@ -21,7 +21,6 @@ void bord();
 void bsizpar(FRM_HEAD& currentForm) noexcept;
 void centir();
 void chain();
-void chan(uint32_t formIndex);
 void chkcont();
 auto chkdel(FRM_HEAD const& currentForm) noexcept -> bool;
 auto chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
