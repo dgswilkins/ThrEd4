@@ -46,6 +46,10 @@ auto UndoBufferWriteIndex = uint32_t {}; // undo storage pointer
 auto UndoBufferReadIndex  = uint32_t {}; // undo retrieval pointers
 } // namespace
 
+namespace bui {
+void redbak();
+} // namespace bui
+
 // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
 #pragma warning(push)
 #pragma warning(disable : 26481)
@@ -117,7 +121,7 @@ void backup::deldu() {
   StateMap->reset(StateFlag::BAKACT);
 }
 
-void backup::redbak() {
+void bui::redbak() {
   auto const* undoData = convertFromPtr<BACK_HEAD*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
   if (undoData == nullptr) {
 	return;
@@ -177,7 +181,7 @@ void backup::redo() {
 	menu::enableRedo();
   }
   menu::enableUndo();
-  redbak();
+  bui::redbak();
 }
 
 void backup::bak() {
@@ -218,7 +222,7 @@ void backup::bak() {
   StateMap->reset(StateFlag::GRPSEL);
   StateMap->reset(StateFlag::SCROS);
   StateMap->reset(StateFlag::ECROS);
-  redbak();
+  bui::redbak();
 }
 
 void backup::updateWriteIndex() {
