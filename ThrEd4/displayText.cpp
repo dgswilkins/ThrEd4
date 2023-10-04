@@ -9,6 +9,7 @@
 // displayText internal namespace
 namespace di {
 void bxtxt(uint32_t iButton, uint32_t iMessage);
+auto clpmsgs(uint32_t code) -> bool;
 void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
 void sdmsg();
 } // namespace di
@@ -187,7 +188,7 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
   displayText::shoMsg(displayText::format2(IDS_SHOSEL, msg0, msg1), false);
 }
 
-auto displayText::clpmsgs(uint32_t code) -> bool {
+auto di::clpmsgs(uint32_t code) -> bool {
   form::ispcdclp();
   if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS, false);
@@ -205,7 +206,7 @@ void displayText::frm1pnt() {
 
 auto displayText::filmsgs(uint32_t code) -> bool {
   if (!SelectedFormList->empty()) {
-	return displayText::clpmsgs(code);
+	return di::clpmsgs(code);
   }
   if (!FormList->empty()) {
 	displayText::frm1pnt();
@@ -221,7 +222,7 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 		  return false;
 		}
 	  }
-	  return displayText::clpmsgs(code);
+	  return di::clpmsgs(code);
 	}
 
 	displayText::tabmsg(IDS_FILSEL, false);
