@@ -110,6 +110,7 @@ void ducmd();
 void ducros(HDC hDC);
 void dugrid();
 void duhom();
+void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1);
 void dumov();
 auto dunum(wchar_t code) noexcept -> bool;
 void duprct(FRM_HEAD const& form);
@@ -4754,7 +4755,7 @@ void thred::toglHid() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thred::dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1) {
+void thi::dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1) {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   if (moveLine0[0].x == moveLine1[1].x && moveLine0[0].y == moveLine1[1].y) {
@@ -4779,7 +4780,7 @@ void thred::dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> co
 
 void thred::unlin() {
   if (StateMap->test(StateFlag::WASLIN)) {
-	thred::dulin(MoveLine0, MoveLine1);
+	thi::dulin(MoveLine0, MoveLine1);
   }
 }
 
@@ -10955,7 +10956,7 @@ void thi::relin() {
   MoveLine0[0] = thred::stch2px1(ClosestPointIndex - 1);
   MoveLine1[1] = thred::stch2px1(ClosestPointIndex + 1U);
   StateMap->reset(StateFlag::WASLIN);
-  thred::dulin(MoveLine0, MoveLine1);
+  thi::dulin(MoveLine0, MoveLine1);
 }
 
 void thi::dumov() {
@@ -12806,7 +12807,7 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
 	StateMap->set(StateFlag::ISUP);
 	MoveLine1[1] = thred::stch2px1(ClosestPointIndex + 1U);
   }
-  thred::dulin(MoveLine0, MoveLine1);
+  thi::dulin(MoveLine0, MoveLine1);
   SetCapture(ThrEdWindow);
   StateMap->set(StateFlag::CAPT);
   displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
@@ -12884,7 +12885,7 @@ auto thred::getRotationHandleAngle() noexcept -> float {
 
 void thred::updateMoveLine() {
   MoveLine0[1] = MoveLine1[0] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-  thred::dulin(MoveLine0, MoveLine1);
+  thi::dulin(MoveLine0, MoveLine1);
 }
 
 void thred::setSmallestStitchVal() {

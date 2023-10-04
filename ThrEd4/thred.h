@@ -53,7 +53,6 @@ void duSelbox() noexcept;
 void dubox(POINT const& stitchCoordsInPixels);
 void dufdef() noexcept;
 void duinsfil();
-void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1);
 void dumrk(float xCoord, float yCoord);
 void dun();
 void durotu() noexcept(std::is_same_v<size_t, uint32_t>);
