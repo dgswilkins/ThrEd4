@@ -59,7 +59,6 @@ void duhart(uint32_t sideCount);
 void dulens(uint32_t sides);
 void duinsf() noexcept;
 void dupfn(float rotationAngle);
-void duprot(float rotationAngle);
 void dupsel(HDC hDC);
 void durpoli(uint32_t vertexCount);
 void duspir(uint32_t stepCount);

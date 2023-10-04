@@ -277,6 +277,7 @@ void dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
             uint32_t                       start,
             uint32_t                       finish,
             uint32_t&                      lastGroup);
+void duprot(float rotationAngle);
 void duprots(float rotationAngle, F_POINT const& rotationCenter);
 void duprotfs(float rotationAngle);
 void durgn(FRM_HEAD const&                form,
@@ -7693,7 +7694,7 @@ void fi::adfrm(uint32_t iForm) {
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 }
 
-void form::duprot(float rotationAngle) {
+void fi::duprot(float rotationAngle) {
   thred::savdo();
   fi::adfrm(ClosestFormToCursor);
   auto const rotationCenter = form::rotpar();
@@ -8227,7 +8228,7 @@ void form::dupfn(float rotationAngle) {
 	return;
   }
   if (StateMap->test(StateFlag::FORMSEL)) {
-	form::duprot(usedAngle);
+	fi::duprot(usedAngle);
 	return;
   }
   if (StateMap->test(StateFlag::GRPSEL)) {
