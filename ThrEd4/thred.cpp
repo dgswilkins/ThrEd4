@@ -216,6 +216,7 @@ void setbak(int32_t penWidth) noexcept;
 void setknt();
 void setPrefs();
 void setsped();
+void setsrch(uint32_t stitch);
 void shft2box();
 void shownd(HWND hwnd) noexcept;
 auto sidclp() -> bool;
@@ -7392,7 +7393,7 @@ void thred::shorter() {
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
 
-void thred::setsrch(uint32_t stitch) {
+void thi::setsrch(uint32_t stitch) {
   CurrentStitchIndex = stitch;
   thi::lensadj();
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
@@ -12569,11 +12570,11 @@ void thred::chkDelCol() {
 }
 
 void thred::setSrchLargest() {
-  thred::setsrch(LargestStitchIndex);
+  thi::setsrch(LargestStitchIndex);
 }
 
 void thred::setSrchSmallest() {
-  thred::setsrch(SmallestStitchIndex);
+  thi::setsrch(SmallestStitchIndex);
 }
 
 auto thred::getZoomMin() noexcept -> float {
@@ -12886,12 +12887,12 @@ void thred::updateMoveLine() {
 
 void thred::setSmallestStitchVal() {
   thi::srchk();
-  thred::setsrch(SmallestStitchIndex);
+  thred::setSrchSmallest();
   thi::lensadj();
 }
 
 void thred::setLargestStitchVal() {
   thi::srchk();
-  thred::setsrch(LargestStitchIndex);
+  thred::setSrchLargest();
   thi::lensadj();
 }

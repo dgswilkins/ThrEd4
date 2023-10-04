@@ -191,7 +191,6 @@ void setThreadSize() noexcept;
 void setgrd(COLORREF color);
 void setknots();
 void setpsel();
-void setsrch(uint32_t stitch);
 void shft(F_POINT const& delta) noexcept;
 void shftflt(F_POINT const& point) noexcept;
 void shorter();
