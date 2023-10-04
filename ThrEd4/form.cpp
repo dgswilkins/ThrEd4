@@ -333,6 +333,7 @@ void fnvrt(std::vector<F_POINT>&    currentFillVertices,
            std::vector<uint32_t>&   groupIndexSequence,
            std::vector<SMAL_PNT_L>& lineEndpoints);
 auto fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept -> bool;
+void frmlin(FRM_HEAD const& form);
 void frmpnts(uint32_t type);
 void frmpoly(gsl::span<POINT> const& source) noexcept;
 void frmsqr(uint32_t vertexIndex, uint32_t iVertex);
@@ -675,7 +676,7 @@ auto fi::px2stchf(POINT const& screen) noexcept -> F_POINT {
                   factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
 
-void form::frmlin(FRM_HEAD const& form) {
+void fi::frmlin(FRM_HEAD const& form) {
   if (form.vertexCount == 0U) {
 	return;
   }
@@ -1026,7 +1027,7 @@ void form::drwfrm() {
   auto const maxForm = FormList->size();
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
 	auto const& form = FormList->operator[](iForm);
-	form::frmlin(form);
+	fi::frmlin(form);
 	if (FormLines->empty()) {
 	  continue;
 	}
@@ -1536,7 +1537,7 @@ void form::frmovlin() {
   else {
 	NewFormVertexCount = form.vertexCount + 1U;
   }
-  form::frmlin(form);
+  fi::frmlin(form);
   auto        previousPoint = form::prv(form, ClosestVertexToCursor);
   auto const& formLines     = *FormLines;
   for (auto iPoint = 0U; iPoint < 3U; ++iPoint) {
@@ -5925,7 +5926,7 @@ void fi::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT stitchPoint) {
 	  ++(form.angleOrClipData.guide.finish);
 	}
   }
-  form::frmlin(form);
+  fi::frmlin(form);
 }
 
 void form::insat() { // insert a point in a form
@@ -6044,7 +6045,7 @@ void form::frm0() {
 }
 
 void form::rinfrm() {
-  form::frmlin(*FormForInsert);
+  fi::frmlin(*FormForInsert);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   auto const& formLines = *FormLines;
@@ -6096,7 +6097,7 @@ void form::setins() {
 	FormVertexPrev = form::nxt(*FormForInsert, FormVertexPrev);
 	FormVertexNext = form::nxt(*FormForInsert, FormVertexPrev);
   }
-  form::frmlin(*FormForInsert);
+  fi::frmlin(*FormForInsert);
   InsertLine[0]   = FormLines->operator[](FormVertexPrev);
   InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
   InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
@@ -8719,7 +8720,7 @@ auto fi::spltlin() -> bool {
   }
   auto const itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex + ClosestVertexToCursor);
   fi::nufpnt(ClosestVertexToCursor, srcForm, *itVertex);
-  form::frmlin(srcForm);
+  fi::frmlin(srcForm);
   FormList->insert(wrap::next(FormList->cbegin(), ClosestFormToCursor), 1, srcForm);
   // insert may invalidate the srcForm reference, so build a new one
   auto& form       = FormList->operator[](ClosestFormToCursor);

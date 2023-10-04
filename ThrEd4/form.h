@@ -81,7 +81,6 @@ void fltspac(uint32_t vertexOffset, uint32_t count);
 void form();
 void frm0();
 void frmadj(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>));
-void frmlin(FRM_HEAD const& form);
 void frmlin(std::vector<F_POINT> const& vertices);
 void frmnumfn(uint32_t& oldFormIndex, uint32_t newFormIndex);
 void frmon();
