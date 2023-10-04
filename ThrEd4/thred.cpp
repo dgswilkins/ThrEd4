@@ -80,6 +80,7 @@ void cros(uint32_t iStitch);
 void defNam(fs::path const& fileName);
 auto defTxt(uint32_t iColor) -> COLORREF;
 void delcol();
+void delfstchs();
 void delknt();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
@@ -5398,7 +5399,7 @@ void thred::rot(F_POINT& rotationCenter) {
   thred::ritrot(0, rotationCenter);
 }
 
-void thred::delfstchs() {
+void thi::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
   auto const firstStitch = std::ranges::find_if(*StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
@@ -5535,7 +5536,7 @@ void thred::cut() {
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  thred::delfstchs();
+	  thi::delfstchs();
 	  thred::frmdel();
 	}
 	else {

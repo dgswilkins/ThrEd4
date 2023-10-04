@@ -39,7 +39,6 @@ void defpref();
 void deldir();
 void delet();
 void delfre();
-void delfstchs();
 void delinf() noexcept;
 void delknot();
 void delsfrms();
