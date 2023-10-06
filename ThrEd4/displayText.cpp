@@ -62,7 +62,8 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
   auto const xOffset = mainRect.left - thredRect.left;
   auto       yOffset = 3;
   if (!top) {
-	yOffset = (mainRect.bottom - mainRect.top) - 12 - messageSize.cy;
+	constexpr auto PXOFFSET = 12; // pixel offset
+	yOffset = (mainRect.bottom - mainRect.top) - PXOFFSET - messageSize.cy;
   }
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   MsgWindow = CreateWindow(L"STATIC",
