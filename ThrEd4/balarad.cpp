@@ -39,16 +39,19 @@ class BAL_STITCH // balarad stitch
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+constexpr auto MAXCOL = 256;  // maximum number of colors in balarad file
+constexpr auto BALPAD = 1006; // balarad file header padding
+
 class BAL_HEAD // balarad file header
 {
   public:
-  COLORREF color[256] {};
+  COLORREF color[MAXCOL] {};
   uint32_t signature {};
   uint16_t version {};
   float    hoopSizeX {};
   float    hoopSizeY {};
   COLORREF backgroundColor {};
-  uint8_t  res[1006] {};
+  uint8_t  res[BALPAD] {};
 
   // constexpr BAL_HEAD() noexcept = default;
   // BAL_HEAD(BAL_HEAD const&) = default;
@@ -75,6 +78,7 @@ constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
 constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
 constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
 constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
+constexpr auto BALHALF  = 0.5F;            // half factor
 
 auto bal::getBN0() noexcept -> fs::path* {
   return BalaradName0;
@@ -145,8 +149,8 @@ void bal::redbal() {
   IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
   IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
   UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  BalaradOffset.x        = IniFile.hoopSizeX * 0.5F;
-  BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
+  BalaradOffset.x        = IniFile.hoopSizeX * BALHALF;
+  BalaradOffset.y        = IniFile.hoopSizeY * BALHALF;
   IniFile.hoopType       = CUSTHUP;
   UserColor.fill(0);
   auto const spBHC = gsl::span {balaradHeader.color};
@@ -216,8 +220,8 @@ void bal::ritbal() {
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
 	auto bytesWritten             = DWORD {};
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
-	BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
-	BalaradOffset.y    = IniFile.hoopSizeY * 0.5F;
+	BalaradOffset.x    = IniFile.hoopSizeX * BALHALF;
+	BalaradOffset.y    = IniFile.hoopSizeY * BALHALF;
 	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color        = StitchBuffer->front().attribute & COLMSK;
