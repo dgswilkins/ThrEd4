@@ -203,9 +203,21 @@ constexpr auto BHWIDTH  = 20.0F; // Button hole width
 constexpr auto CLPMIN   = 0.5F;  // if clipboard data width less than this, then don't fill
 constexpr auto CLPMINVT = 1.2F;  // Minimum clip width for skinny vertical clips
 constexpr auto FRECONT  = 0x80U; // 1000 0000 contour refil
+constexpr auto HALF     = 0.5F;  // multiplication factor
 constexpr auto NFRECONT = 0x7fU; // 0111 1111 contour refil
 constexpr auto SEQTOP   = int32_t {2};
 constexpr auto SEQBOT   = int32_t {3};
+
+// rectangle position indices
+constexpr auto PTL  = 0; // top left corner
+constexpr auto PTM  = 1; // top midpoint
+constexpr auto PTR  = 2; // top right corner
+constexpr auto PRM  = 3; // right midpoint
+constexpr auto PBR  = 4; // bottom right corner
+constexpr auto PBM  = 5; // bottom midpoint
+constexpr auto PBL  = 6; // bottom left corner
+constexpr auto PLM  = 7; // left midpoint
+constexpr auto PTLE = 8; // top left endpoint
 
 namespace fi {
 void adfrm(uint32_t iForm);
@@ -802,7 +814,8 @@ void fi::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   line[1]                     = thred::stch2pxr(*itCurrentVertex);
   auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, *ScreenDPI, STDDPI)) /
                      wrap::toFloat(StitchWindowClientRect.right);
-  auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0F;
+  constexpr auto DFACT  = 2.0F;
+  auto       length = (ZoomRect.right - ZoomRect.left) * ratio * DFACT;
   auto const delta =
       F_POINT {itPreviousVertex->x - itCurrentVertex->x, itPreviousVertex->y - itCurrentVertex->y};
   auto       angle  = atan2(delta.y, delta.x);
@@ -811,7 +824,7 @@ void fi::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto       offset = F_POINT {xVal, yVal};
   auto const point  = F_POINT {itCurrentVertex->x + offset.x, itCurrentVertex->y + offset.y};
   angle             = atan2(-delta.x, delta.y);
-  length /= 2.0F;
+  length *= HALF;
   xVal               = length * cos(angle);
   yVal               = length * sin(angle);
   offset             = F_POINT {xVal, yVal};
@@ -881,12 +894,12 @@ void form::ritfrct(uint32_t iForm, HDC hDC) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   auto const& rectangle = FormList->operator[](iForm).rectangle;
   SelectObject(hDC, FormSelectedPen);
-  formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle.left;
-  formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle.top;
-  formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle.right;
-  formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
-  formOutline[1].x = formOutline[5].x = wrap::midl(rectangle.right, rectangle.left);
-  formOutline[3].y = formOutline[7].y = wrap::midl(rectangle.top, rectangle.bottom);
+  formOutline[PTL].x = formOutline[PBL].x = formOutline[PLM].x = formOutline[PTLE].x = rectangle.left;
+  formOutline[PTL].y = formOutline[PTM].y = formOutline[PTR].y = formOutline[PTLE].y = rectangle.top;
+  formOutline[PTR].x = formOutline[PRM].x = formOutline[PBR].x = rectangle.right;
+  formOutline[PBR].y = formOutline[PBM].y = formOutline[PBL].y = rectangle.bottom;
+  formOutline[PTM].x = formOutline[PBM].x = wrap::midl(rectangle.right, rectangle.left);
+  formOutline[PRM].y = formOutline[PLM].y = wrap::midl(rectangle.top, rectangle.bottom);
 
   auto ipixelOutline = pixelOutline.begin();
   for (auto& controlPoint : formOutline) {
@@ -969,12 +982,12 @@ void form::fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
 }
 
 void form::rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept {
-  line[0].x = line[6].x = line[7].x = line[8].x = rectangle.left;
-  line[0].y = line[1].y = line[2].y = line[8].y = rectangle.top;
-  line[2].x = line[3].x = line[4].x = rectangle.right;
-  line[4].y = line[5].y = line[6].y = rectangle.bottom;
-  line[1].x = line[5].x = ((rectangle.right - rectangle.left) / 2) + rectangle.left;
-  line[3].y = line[7].y = ((rectangle.bottom - rectangle.top) / 2) + rectangle.top;
+  line[PTL].x = line[PBL].x = line[PLM].x = line[PTLE].x = rectangle.left;
+  line[PTL].y = line[PTM].y = line[PTR].y = line[PTLE].y = rectangle.top;
+  line[PTR].x = line[PRM].x = line[PBR].x = rectangle.right;
+  line[PBR].y = line[PBM].y = line[PBL].y = rectangle.bottom;
+  line[PTM].x = line[PBM].x = ((rectangle.right - rectangle.left) / 2) + rectangle.left;
+  line[PRM].y = line[PLM].y = ((rectangle.bottom - rectangle.top) / 2) + rectangle.top;
 }
 
 void form::dubig() {
@@ -1449,8 +1462,8 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
   auto const varD = lineEnd.y - lineStart.y;
   if ((varC == 0.0F) && (varD == 0.0F)) {
 	distance = sqrt(varA * varB);
-	// Arbitrarily choose the first point since start and end are the same
-	return -0.1F;
+	constexpr auto FIRST = -0.1F; // Arbitrarily choose the first point since start and end are the same
+	return FIRST;
   }
   auto const dot     = varA * varC + varB * varD;
   auto const lenSqrd = varC * varC + varD * varD;
@@ -1503,7 +1516,7 @@ auto form::closfrm() -> bool {
 	  }
 	  minimumLength = length;
 	  closestForm   = iForm;
-	  if (param < 0.5F) {
+	  if (param < HALF) {
 		closestVertex = iVertex;
 	  }
 	  else {
@@ -1783,7 +1796,7 @@ void fi::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float sti
   auto const length      = hypot(delta.x, delta.y);
   auto       stitchCount = (UserFlagMap->test(UserFlag::LINSPAC))
                                ? wrap::ceil<uint32_t>(length / stitchSize)
-                               : wrap::round<uint32_t>((length - stitchSize / 2.0F) / stitchSize + 1.0F);
+                               : wrap::round<uint32_t>((length - stitchSize * HALF) / stitchSize + 1.0F);
   auto       step        = F_POINT {};
   if (UserFlagMap->test(UserFlag::LINSPAC)) {
 	if (stitchCount != 0U) {
@@ -2174,7 +2187,7 @@ void fi::duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& st
   auto const delta0  = F_POINT {finish0.x - start0.x, finish0.y - start0.y};
   auto const delta1  = F_POINT {finish1.x - start1.x, finish1.y - start1.y};
   auto const length0 = hypot(delta0.x, delta0.y);
-  auto       count   = wrap::round<uint32_t>(length0 / (LineSpacing / 2.0F));
+  auto       count   = wrap::round<uint32_t>(length0 / (LineSpacing * HALF));
   if (count == 0U) {
 	++count;
   }
@@ -2203,7 +2216,9 @@ auto form::psg() noexcept -> uint32_t {
   }
   auto const temp = PseudoRandomValue & 0x48000000U;
   PseudoRandomValue <<= 1U;
-  if (temp == 0x40000000U || temp == 0x8000000U) {
+  constexpr auto BIT27 = 0x8000000U;
+  constexpr auto BIT30 = 0x40000000U;
+  if (temp == BIT30 || temp == BIT27) {
 	++PseudoRandomValue;
   }
   return PseudoRandomValue;
@@ -2236,6 +2251,8 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
   static constexpr auto LEVEL14 = std::array<float, 14U>{ 7.0F/14.0F, 6.0F/14.0F, 8.0F/14.0F, 5.0F/14.0F, 9.0F/14.0F, 4.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F, 12.0F/14.0F,  1.0F/14.0F, 13.0F/14.0F,  0.0F/14.0F };
   static constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 6.0F/15.0F, 8.0F/15.0F, 5.0F/15.0F, 9.0F/15.0F, 4.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  2.0F/15.0F, 12.0F/15.0F,  1.0F/15.0F, 13.0F/15.0F,  0.0F/15.0F, 14.0F/15.0F};
   // clang-format on
+
+  constexpr auto LEVELSMAX = uint32_t {15U}; // max number of levels defined in the table
 
   auto constexpr LEVELS = std::array<float const*, 16> {LEVEL00.data(),
                                                         LEVEL01.data(),
@@ -2290,7 +2307,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
   if (count == 0U) {
 	count = 1U;
   }
-  if (count > 15U) {
+  if (count > LEVELSMAX) {
 	for (auto iCount = 0U; iCount < count; ++iCount) {
 	  auto const level = wrap::toFloat(form::psg() % count) / wrap::toFloat(count);
 	  fi::fillSB(pivot, startAngle, radius, stitchPoint, level);
@@ -3535,7 +3552,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   }
   auto regionCrossingData = std::vector<V_CLP_X> {}; // region crossing data for vertical clipboard fills
   // reserve a little more than we need. Determined empirically
-  regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * 5U);
+  constexpr auto RESFACT = size_t {5U}; // use this as the reservation factor
+  regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * RESFACT);
   auto vCurr = itFirstVertex; // intentional copy
   for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	auto const itNextVertex = wrap::next(itFirstVertex, form::nxt(form, iVertex));
@@ -3572,7 +3590,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   iclpx.push_back(wrap::toUnsigned(regionCrossingData.size()));
   auto clipStitchPoints = std::vector<CLIP_PNT> {};
   // Reserve some memory, but probably not enough
-  clipStitchPoints.reserve(1000U);
+  constexpr auto CSPRES = size_t {1000U};
+  clipStitchPoints.reserve(CSPRES);
   auto pasteLocation = F_POINT {};
   auto texture       = TexturePointsBuffer->begin();
   if (auto iclpxSize = wrap::toUnsigned(iclpx.size()); iclpxSize != 0U) {
@@ -3709,7 +3728,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   if (auto endPoint = wrap::toUnsigned(clipStitchPoints.size()); endPoint != 0U) {
 	--endPoint;
 	// reserve a reasonable amount but not the full amount potentially required
-	clipSegments.reserve(endPoint / 10U);
+	constexpr auto CSRES = uint32_t {8U};
+	clipSegments.reserve(endPoint / CSRES);
 	auto previousPoint = 0U;
 	for (auto iPoint = 0U; iPoint < endPoint; ++iPoint) {
 	  switch (clipStitchPoints[iPoint].flag) {
@@ -4352,7 +4372,7 @@ void fi::dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	minimumY = 0.0F;
   }
   else {
-	minimumY /= 2.0F;
+	minimumY *= HALF;
   }
   BSequence->emplace_back(
       lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y + minimumY, 0);
@@ -5643,12 +5663,7 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
   thred::duzrat();
   auto const rectangle    = form::sRct2px(currentForm.rectangle);
   auto&      formControls = *formControlPoints;
-  formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
-  formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;
-  formControls[2].x = formControls[3].x = formControls[4].x = rectangle.right;
-  formControls[4].y = formControls[5].y = formControls[6].y = rectangle.bottom;
-  formControls[1].x = formControls[5].x = std::lround(wrap::midl(rectangle.right, rectangle.left));
-  formControls[3].y = formControls[7].y = std::lround(wrap::midl(rectangle.top, rectangle.bottom));
+  form::rct2sel(rectangle, formControls);
 
   auto minimumLength    = BIGDBL;
   auto formControlIndex = 0U;
@@ -6209,7 +6224,7 @@ void fi::sapliq(uint32_t formIndex) {
   if (UserFlagMap->test(UserFlag::DUND)) {
 	form.edgeType |= EGUND;
   }
-  form.edgeSpacing = LineSpacing / 2.0F;
+  form.edgeSpacing = LineSpacing * HALF;
   form.borderSize  = IniFile.borderWidth;
   form::bsizpar(form);
   wrap::narrow_cast(form.borderColor, ActiveColor | gsl::narrow_cast<uint8_t>(AppliqueColor << 4U));
@@ -6862,7 +6877,7 @@ void form::dustar(uint32_t starCount, float length) {
 	starCount = STARMAX;
   }
   auto const stepAngle   = PI_F / wrap::toFloat(starCount);
-  auto       angle       = stepAngle / 2.0F + PI_F;
+  auto       angle       = stepAngle * HALF + PI_F;
   auto const vertexCount = starCount * 2U;
   auto       newForm     = FRM_HEAD {};
   newForm.vertexIndex    = thred::adflt(vertexCount);
