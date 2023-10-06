@@ -617,7 +617,8 @@ void ci::fxlen(FRM_HEAD const&           form,
 	  auto interval   = minimumInterval;
 	  minimumSpacing  = adjustedSpace;
 	  interval /= wrap::toFloat(initialCount);
-	  adjustedSpace += interval / 2.0F;
+	  constexpr auto CLPHALF = 0.5F; // factor for half
+	  adjustedSpace += interval * CLPHALF;
 	  largestSpacing = smallestSpacing + interval;
 	}
 	else {
@@ -745,7 +746,8 @@ void clip::duxclp(FRM_HEAD const& form) {
   auto chainEndPoints = std::vector<F_POINT> {};
   // reserve some memory and rely on push_back behaviour
   // and geometric memory re-allocation for efficiency
-  chainEndPoints.reserve(50U);
+  constexpr auto CLRES = size_t {50U}; // testing shows this to be a good value
+  chainEndPoints.reserve(CLRES);
   ci::dufxlen(form, chainEndPoints);
   auto tempClipPoints = std::vector<F_POINT> {};
   tempClipPoints.reserve(ClipBuffer->size());
@@ -952,7 +954,8 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
 	return;
   }
   ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
-  auto backupAt = 8U;
+  constexpr auto CHLEN    = size_t {8U}; // number of stitches in a chain
+  auto backupAt = CHLEN;
   if (StateMap->test(StateFlag::LINCHN)) {
 	--backupAt;
   }
@@ -965,7 +968,8 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
 void clip::chnfn(FRM_HEAD const& form) {
   auto chainEndPoints = std::vector<F_POINT> {};
   // reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
-  chainEndPoints.reserve(50U);
+  constexpr auto CLRES = size_t {50U}; // testing shows this to be a good value
+  chainEndPoints.reserve(CLRES);
   clip::deleclp(ClosestFormToCursor);
   ci::dufxlen(form, chainEndPoints);
   ci::dulast(chainEndPoints);
