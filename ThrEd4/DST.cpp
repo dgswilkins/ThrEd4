@@ -221,7 +221,8 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number
-  colorData.reserve(32);
+  constexpr auto DSTRES = size_t {32U}; // testing shows this to be a good value
+  colorData.reserve(DSTRES);
   colorData.push_back(COLVER);
   colorData.push_back(BackgroundColor);
   auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
@@ -363,6 +364,7 @@ auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
                                                      (((767 - meanR) * deltaB * deltaB) / 256))));
 }
@@ -957,7 +959,8 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   auto dstRecords = std::vector<DSTREC> {};
   // There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
-  dstRecords.reserve(StitchBuffer->size() + 128U);
+  constexpr auto RECRES = size_t {128U}; // testing shows this to be a good value
+  dstRecords.reserve(StitchBuffer->size() + RECRES);
   auto dstOffset = DST_OFFSETS {};
   auto dstHeader = DSTHED {};
   di::ritdst(dstOffset, dstRecords, saveStitches);
@@ -984,7 +987,8 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
   #pragma warning(push)
   #pragma warning(disable : 26481)
-  spDstHdrDesc.back() = 0xd;
+  constexpr auto CAR = uint8_t{0xd}; // ASCII carriage return
+  spDstHdrDesc.back() = CAR;
   strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
   strncpy(static_cast<char *>(dstHeader.recs),  fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
   strncpy(static_cast<char *>(dstHeader.cohed),      "CO:",      sizeof(dstHeader.cohed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)                                            
