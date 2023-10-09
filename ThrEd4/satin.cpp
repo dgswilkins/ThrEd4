@@ -483,9 +483,14 @@ void satin::satadj(FRM_HEAD& form) {
 	  auto iVertex = 0U;
 	  auto itGuide = itFirstGuide; // intentional copy
 	  while (iVertex < form.vertexCount) {
-		iVertex = wrap::toUnsigned(satinMap.getFirst());
+		if (auto const bitpos = satinMap.getFirst(); bitpos != std::numeric_limits<size_t>::max()) {
+		  iVertex = wrap::toUnsigned(bitpos);
 		if (iVertex < form.vertexCount) {
 		  (itGuide++)->start = iVertex;
+		}
+	  }
+		else { // there are no more guides so exit the loop
+		  break;
 		}
 	  }
 	  currentGuidesCount = wrap::distance<uint32_t>(itFirstGuide, itGuide);
@@ -536,9 +541,14 @@ void satin::satadj(FRM_HEAD& form) {
 	auto iReverse = 0U;
 	itGuide       = itFirstGuide;
 	while (iReverse < form.vertexCount) {
-	  iReverse = wrap::toUnsigned(satinMap.getLast());
+	  if (auto const bitpos = satinMap.getLast(); bitpos != std::numeric_limits<size_t>::max()) {
+		iReverse = wrap::toUnsigned(bitpos);
 	  if (iReverse < form.vertexCount) {
 		(itGuide++)->finish = iReverse;
+	  }
+	}
+	  else { // there are no more guides so exit the loop
+		break;
 	  }
 	}
 	auto iGuide = wrap::distance<uint32_t>(itFirstGuide, itGuide);
