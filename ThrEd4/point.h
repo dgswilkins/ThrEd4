@@ -33,7 +33,7 @@ auto constexpr closeEnough(float first, float second) -> bool {
 }
 
 auto constexpr closeEnough(double first, double second) -> bool {
-  // test if the floats are so close together that they can be considered equal
+  // test if the doubles are so close together that they can be considered equal
   auto const val = (first > second) ? (first - second) : (second - first);
   return (val < DBL_EPSILON);
 }
@@ -140,6 +140,7 @@ class B_SEQ_PNT
   //~B_SEQ_PNT() = default;
 };
 
+// ToDo - This should use wrap::toFloat but there would be a circular dependency
 inline B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
     x(gsl::narrow<float>(rhsX)), y(gsl::narrow<float>(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
