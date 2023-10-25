@@ -19,7 +19,8 @@ void wrap::polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
 }
 
 auto wrap::pressed(int virtKey) noexcept -> bool {
-  return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & 0x8000U) != 0U;
+  constexpr auto HIGHBIT = 0x8000U;
+  return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & HIGHBIT) != 0U;
 }
 
 void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {

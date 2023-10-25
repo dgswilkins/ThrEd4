@@ -25,6 +25,8 @@
 #include <vector>
 #include <cmath>
 
+constexpr auto MINDBL = 4e-5; // small number for conversions
+
 namespace wrap {
 
 template <class inType>
@@ -40,11 +42,11 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
 	try {
 	  return gsl::narrow<float>(invar);
 	}
-	catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
+	catch (gsl::narrowing_error const& e) { // check if we are seeing a significant rounding error
 	  UNREFERENCED_PARAMETER(e);
 	  auto const var  = gsl::narrow_cast<float>(invar);
 	  auto const diff = abs(invar - gsl::narrow_cast<double>(var));
-	  if (diff > 4e-5) {
+	  if (diff > MINDBL) {
 		throw std::runtime_error("conversion error above limit");
 	  }
 	  return var;
@@ -172,7 +174,7 @@ template <class inType>
 auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> float {
   // static_assert(!std::is_same_v<inType, float>, "no need to use wrap::midl here.");
   if constexpr (std::is_same_v<inType, float>) {
-	return (high - low) / 2.0F + low;
+	return (high - low) * HALF + low;
   }
   else {
 	return (gsl::narrow<float>(high) - gsl::narrow<float>(low)) / 2.0F + gsl::narrow<float>(low);
@@ -371,10 +373,10 @@ template <class outType>
 void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<outType, unsigned long>) { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, unsigned long>, "no need to use wrap::wcstoULong here.");
   if constexpr (std::is_same_v<outType, unsigned long>) { // NOLINT(google-runtime-int)
-	outvar = std::wcstoul(invar, nullptr, 10);
+	outvar = std::wcstoul(invar, nullptr, DECRAD);
   }
   else {
-	outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
+	outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, DECRAD));
   }
 }
 
@@ -382,10 +384,10 @@ template <class outType>
 auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, long>, "no need to use wrap::wcstoLong here.");
   if constexpr (std::is_same_v<outType, long>) { // NOLINT(google-runtime-int)
-	return std::wcstol(buffer, nullptr, 10);
+	return std::wcstol(buffer, nullptr, DECRAD);
   }
   else {
-	return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
+	return gsl::narrow<outType>(std::wcstol(buffer, nullptr, DECRAD));
   }
 }
 
