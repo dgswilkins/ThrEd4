@@ -1040,18 +1040,25 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  break;
 		}
 		case IDC_DEFTEAR: {
-		  IniFile.formSides      = 20;
-		  IniFile.tearTailLength = 1.1F;
+		  constexpr auto TEARSIDES = uint16_t {20U};
+		  constexpr auto TEARTAILFACT = 1.1F;
+		  constexpr auto TEARTWIST    = 1.6F;
+		  IniFile.formSides      = TEARSIDES;
+		  IniFile.tearTailLength = TEARTAILFACT;
 		  IniFile.tearTwistStep  = 0.0F;
-		  IniFile.tearTwistRatio = 1.6F;
+		  IniFile.tearTwistRatio = TEARTWIST;
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}
 		case IDC_DEFPAIS: {
-		  IniFile.formSides      = 24U;
-		  IniFile.tearTailLength = 1.15F;
-		  IniFile.tearTwistStep  = 0.3F * PFGRAN;
-		  IniFile.tearTwistRatio = 1.8F;
+		  constexpr auto PAISSIDES    = uint16_t {24U};
+		  constexpr auto PAISTAILFACT = 1.15F;
+		  constexpr auto PAISSTEP    = 0.3F;
+		  constexpr auto PAISTWIST    = 1.8F;
+		  IniFile.formSides      = PAISSIDES;
+		  IniFile.tearTailLength = PAISTAILFACT;
+		  IniFile.tearTwistStep  = PAISSTEP * PFGRAN;
+		  IniFile.tearTwistRatio = PAISTWIST;
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}
@@ -1114,7 +1121,7 @@ void formForms::setear() {
   firstVertex->y = nextVertex->y = verticalPosition;
   firstVertex->x += twistStep;
   nextVertex->x += twistStep;
-  verticalPosition -= step / 2.0F;
+  verticalPosition -= step * HALF;
   FormVertices->push_back(*firstVertex);
   firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
   nextVertex = std::next(firstVertex);
