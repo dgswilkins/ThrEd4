@@ -849,8 +849,9 @@ constexpr uint32_t NOTFRM    = 0x00080000U; // 0000 0000 0000 1000 0000 0000 000
 constexpr uint32_t FRMSHFT   = 4U;
 constexpr uint32_t LAYSHFT   = 25U; // shift layer data in stitch attribute
 constexpr uint32_t FLAYSHFT  = 1U;  // shift layer data in form attribute
-constexpr uint32_t TYPSHFT   = 29U;
+constexpr uint32_t TYPSHFT   = 29U; // stitch type if it is not special
 constexpr uint32_t USHFT     = 31U; // user edited stitches shift
+constexpr uint32_t STSHFT    = 18U; // stitch type definitions begin at 19
 
 /*
 bit definitions for F_POINT_ATTR.attribute

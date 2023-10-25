@@ -342,10 +342,10 @@ void xi::nurat(FEATHER& feather) noexcept {
 	}
 	case FTHSIN: {
 	  if (remainder > feather.globalRatio) {
-		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F + PI_F) * 0.5F + 0.5F;
+		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F + PI_F) * HALF + HALF;
 	  }
 	  else {
-		feather.ratio = sin(remainder / feather.globalRatio * PI_F) * 0.5F + 0.5F;
+		feather.ratio = sin(remainder / feather.globalRatio * PI_F) * HALF + HALF;
 	  }
 	  feather.ratio *= feather.formRatio;
 	  break;
@@ -410,8 +410,8 @@ void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& fea
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
-  if (length < (2.0F * feather.minStitch)) {
-	feather.ratio = 0.5F;
+  if (length < (DBLF * feather.minStitch)) {
+	feather.ratio = HALF;
 	ratpnt(iSequence, iSequence + 1, currentPoint, feather.ratio);
 	ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
   }
@@ -451,7 +451,7 @@ void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
   auto adjustedPoint = F_POINT {};
   auto currentPoint  = F_POINT {};
   auto nextPoint     = F_POINT {};
-  feather.ratioLocal = 0.5F;
+  feather.ratioLocal = HALF;
   duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
   feather.ratioLocal       = feather.minStitch / length / 2;
   auto const& sequence     = OSequence->operator[](iSequence);
@@ -505,8 +505,9 @@ void xt::fthrfn(FRM_HEAD& form) {
   if (res > (feather.phaseIndex << 1U)) {
 	++ind;
   }
+  constexpr auto FSTEPSZ = 4.0F; 
   feather.globalPosition = 0.0F;
-  feather.globalStep     = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
+  feather.globalStep     = (FSTEPSZ / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
   feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
   feather.globalRatio    = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
   feather.globalUp       = feather.globalPhase * feather.globalRatio;
@@ -694,7 +695,8 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto       length      = hypot(finish.x - start.x, finish.y - start.y);
   auto       startVertex = form::closflt(form, start.x, start.y);
   auto const endVertex   = form::closflt(form, finish.x, finish.y);
-  if (length < 5.0F) {
+  constexpr auto MINCONN     = 5.0F; // if connector is less than this, don't bother
+  if (length < MINCONN) {
 	return 0;
   }
   if (startVertex == endVertex) {
@@ -975,11 +977,13 @@ auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
   if (bit == 0) {
 	return 0U;
   }
-  auto const result = gsl::narrow_cast<uint8_t>((bit & B1MASK) - 18U);
-  if ((result != 12U) || ((maskedAttribute & TYPATMSK) == 0)) {
+  auto const     result  = gsl::narrow_cast<uint8_t>((bit & B1MASK) - STSHFT);
+  constexpr auto USRSTCH = 12U;
+  if ((result != USRSTCH) ||                 // check if bit 31 is set (user edited stitch)
+      ((maskedAttribute & TYPATMSK) == 0)) { // check if the stitch is a form stitch
 	return result & NIBMASK;
   }
-  return 1U;
+  return 1U; // must be an applique stitch 
 }
 
 void xi::durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
