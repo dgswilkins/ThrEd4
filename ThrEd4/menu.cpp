@@ -847,7 +847,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
-	  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * 0.5F, wrap::toFloat(UnzoomedRect.cy) * 0.5F);
+	  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * HALF, wrap::toFloat(UnzoomedRect.cy) * HALF);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
