@@ -568,7 +568,8 @@ void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t 
   destination.spcy = 0;
   // ToDo - Are these structure members needed?
   destination.myst = 1;
-  destination.tag  = 0x14;
+  constexpr auto DTAG = uint8_t {0x14};
+  destination.tag  = DTAG;
 }
 
 void fci::rtrclpfn(FRM_HEAD const& form) {
