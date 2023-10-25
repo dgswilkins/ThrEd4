@@ -15,6 +15,7 @@ static constexpr uint8_t THUMBWID = 48U;
 using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 #pragma pack(push, 1)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 class PECHDR
 {
   public:
@@ -36,6 +37,7 @@ class PECHDR
   // PECHDR& operator=(PECHDR&&) = default;
   //~PECHDR() = default;
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -77,6 +79,7 @@ class PES_COLOR_LIST
 
 #pragma pack(push, 1)
 // clang-format off
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 class PESHED
 {
   public:
@@ -122,10 +125,12 @@ class PESHED
   // PESHED& operator=(PESHED&&) = default;
   //~PESHED() = default;
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 // clang-format on
 #pragma pack(pop)
 
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 class PESLED
 {
   public:
@@ -138,6 +143,7 @@ class PESLED
   // PESLED& operator=(PESLED&&) = default;
   //~PESLED() = default;
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -340,9 +346,11 @@ auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> u
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color.b) - gsl::narrow_cast<int32_t>(translatedColor.b);
-  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
                                          (((767 - meanR) * deltaB * deltaB) / 256)));
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset) {
@@ -426,9 +434,11 @@ void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, fl
 }
 
 void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   buffer.push_back(0xfe);
   buffer.push_back(0xb0);
   buffer.push_back(val);
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
@@ -454,8 +464,11 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
 	auto const yDelta = stitchFwd1.y - thisStitch.y;
 	rpcrd(buffer, thisStitch, xDelta, yDelta);
   }
+  // add the end marker
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   buffer.push_back(0xffU);
-  buffer.push_back(0x0U);
+  buffer.push_back(0x00U);
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 void pi::writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image) {
@@ -629,9 +642,11 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto       pesColorIndex = uint32_t {1U};
   auto const pesStitches   = gsl::span<const uint8_t> {pesStitch, pecCount};
   while (iPESstitch < pecCount) {
+	// check for end marker NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xff && pesStitches[iPESstitch + 1U] == 0) {
 	  break;
 	}
+	// check for color change NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xfe && pesStitches[iPESstitch + 1U] == 0xb0) {
 	  color = pi::dupcol(pesColors, wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
 	  iPESstitch += 2;
@@ -650,12 +665,14 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		++iPESstitch;
 	  }
 	  else {
-		if (pesStitches[iPESstitch] > 0x3f) {
+		// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+		if (pesStitches[iPESstitch] > 0x3f) { // if the value is more than 63 flip sign  
 		  locof = wrap::toFloat(pesStitches[iPESstitch]) - 128.0F;
 		}
 		else {
 		  locof = pesStitches[iPESstitch];
 		}
+		// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 	  }
 	  locof *= IPECFACT;
 	  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
@@ -705,6 +722,10 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto PESVSTR = "0001";    // PES version
   constexpr auto EMBSTR  = "CEmbOne"; // emb section lead in
   constexpr auto SEWSTR  = "CSewSeg"; // sewing segment leadin
+
+  constexpr auto AT5OFF  = 350.0F; // Affine transform offset 5
+  constexpr auto AT6OFF  = 100.0F; // Affine transform offset 6
+
   // ReSharper disable once CppDeprecatedEntity
   strncpy(static_cast<char*>(pesHeader.ledI), PESISTR, strlen(PESISTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
   // ReSharper disable once CppDeprecatedEntity
@@ -744,8 +765,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.ysiz         = wrap::round<int16_t>(designSizeY);
   auto const hoopSizeX   = IniFile.hoopSizeX * PECFACT;
   auto const hoopSizeY   = IniFile.hoopSizeY * PECFACT;
-  pesHeader.atfm5        = 350.0F + (hoopSizeX / 2.0F) - (designSizeX / 2.0F);
-  pesHeader.atfm6        = 100.0F + (designSizeY) + (hoopSizeY / 2.0F) - (designSizeY / 2.0F);
+  pesHeader.atfm5        = AT5OFF + (hoopSizeX * HALF) - (designSizeX * HALF);
+  pesHeader.atfm6        = AT6OFF + (designSizeY) + (hoopSizeY * HALF) - (designSizeY * HALF);
   auto pesBuffer         = std::vector<uint8_t> {};
   // ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
   auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
@@ -839,6 +860,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
   pesHeader.blct    = 1;
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+  // write the header end markers
   pesHeader.hnd1[0] = 0xff;
   pesHeader.hnd1[1] = 0xff;
   pesHeader.hnd1[2] = 0x00;
@@ -848,6 +871,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.hnd2[1] = 0xff;
   pesHeader.hnd2[2] = 0x00;
   pesHeader.hnd2[3] = 0x00;
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
   GroupStartStitch  = 0;
   GroupEndStitch    = wrap::toUnsigned(StitchBuffer->size() - 1U);
   auto bytesWritten = DWORD {};
@@ -878,6 +902,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   std::fill(fstart, fend, ' ');
   pecHeader->labnd = '\r'; // 13 = carriage return
   wrap::narrow(pecHeader->colorCount, pesThreadCount);
+  // write the remainder of the header with magic numbers
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   pecHeader->hnd1        = 0x00ff;
   pecHeader->thumbHeight = THUMBHGT;
   pecHeader->thumbWidth  = THUMBWID / BTSPBYTE;
@@ -891,6 +917,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pecHeader2->height          = pesHeader.ysiz;
   pecHeader2->unknown4        = 0x01e0;
   pecHeader2->unknown5        = 0x01b0;
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 
   constexpr auto PECMASK1 = uint16_t {0x9000U}; //
   constexpr auto LOWBMASK = uint16_t {0x00ffU}; // low byte mask
