@@ -3708,7 +3708,7 @@ void thi::stchWnd() {
   ShowWindow(HorizontalScrollBar, SW_HIDE);
 }
 
-// check if a click occurred in a vertical set of 16 windows
+// check if a click occurred in a vertical set of windows
 // and calculate which window had the click
 auto thi::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
   auto topRect    = RECT {};
@@ -3719,7 +3719,8 @@ auto thi::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
       clickCoord.y <= topRect.top || clickCoord.y >= bottomRect.bottom) {
 	return false;
   }
-  VerticalIndex = COLORMAX - gsl::narrow<uint8_t>((bottomRect.bottom - clickCoord.y) / ButtonHeight);
+  auto const indexRange = gsl::narrow<uint8_t>(((bottomRect.bottom - topRect.top) / ButtonHeight) - 1);
+  VerticalIndex = indexRange - gsl::narrow<uint8_t>((bottomRect.bottom - clickCoord.y) / ButtonHeight);
   if (VerticalIndex > COLORMAX) { // Something has broken so do something reasonable
 	VerticalIndex &= COLMSK;
 	return false;
@@ -12679,7 +12680,6 @@ void thred::destroyChangeThreadSizeWindows() noexcept {
 }
 
 void thred::updateThreadSize(uint32_t threadSizeSelected) {
-  VerticalIndex -= 13U;
   static constexpr auto THREAD_SIZE_MAP = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 
   auto const itThreadSize = wrap::next(ThreadSize.begin(), threadSizeSelected);
