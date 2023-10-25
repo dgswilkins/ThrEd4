@@ -14,6 +14,7 @@
 
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
 // clang-format off
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 class DSTHED // dst file header
 {
   public:
@@ -50,6 +51,7 @@ class DSTHED // dst file header
   // DSTHED& operator=(DSTHED&&) = default;
   //~DSTHED() = default;
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 // clang-format on
 #pragma pack(pop)
 
@@ -363,10 +365,11 @@ auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
                                                      (((767 - meanR) * deltaB * deltaB) / 256))));
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
