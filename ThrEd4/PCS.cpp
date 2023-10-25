@@ -9,6 +9,9 @@
 
 #pragma pack(push, 1)
 
+constexpr auto PCSBMPNSZ = 14;            // Bitmap filename maximum length in PCS spec
+constexpr auto LEADIN    = int8_t {0x32}; // LEADIN marker for PCS file
+
 class PCSHEADER // pcs file header structure
 {
   public:
@@ -68,7 +71,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	displayText::crmsg(auxName);
 	return false;
   }
-  PCSHeader.leadIn     = 0x32;
+  PCSHeader.leadIn     = LEADIN;
   PCSHeader.colorCount = COLORCNT;
   auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
   wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
@@ -110,7 +113,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	return false;
   }
   if (UserFlagMap->test(UserFlag::BSAVOF)) {
-	constexpr auto BLANK = std::array<char, 14> {};
+	constexpr auto BLANK = std::array<char, PCSBMPNSZ> {};
 	if (FALSE == WriteFile(fileHandle, BLANK.data(), wrap::toUnsigned(BLANK.size()), &bytesWritten, nullptr)) {
 	  displayText::riter();
 	  CloseHandle(fileHandle);
@@ -119,7 +122,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	CloseHandle(fileHandle);
 	return true;
   }
-  if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
+  if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), PCSBMPNSZ, &bytesWritten, nullptr)) {
 	displayText::riter();
 	CloseHandle(fileHandle);
 	return false;
@@ -151,7 +154,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   std::ranges::copy(PCSHeader.colors, UserColor.begin());
-  fileSize -= uintmax_t {14U} + sizeof(PCSHeader);
+  fileSize -= uintmax_t {PCSBMPNSZ} + sizeof(PCSHeader);
   auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
   auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
   pcsDataBuffer.resize(pcsStitchCount);
@@ -180,10 +183,10 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	}
   }
   // Grab the bitmap filename
-  if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, L"ReadFile for getBmpNameData in readPCSFile")) {
+  if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), PCSBMPNSZ, &bytesRead, L"ReadFile for getBmpNameData in readPCSFile")) {
 	return false;
   }
-  if (bytesRead != 14) {
+  if (bytesRead != PCSBMPNSZ) {
 	// NOLINTNEXTLINE
 	outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 	return false;
@@ -292,14 +295,14 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   if (!wrap::readFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, L"ReadFile for pcsFileHeader in insPCS")) {
 	return false;
   }
-  if (pcsFileHeader.leadIn != 0x32 || pcsFileHeader.colorCount != COLORCNT) {
+  if (pcsFileHeader.leadIn != LEADIN || pcsFileHeader.colorCount != COLORCNT) {
 	// ToDo - Add error message
 	CloseHandle(fileHandle);
 	return false;
   }
   auto fileSize = uintmax_t {};
   thred::getFileSize(insertedFile, fileSize);
-  fileSize -= sizeof(pcsFileHeader) + 14;
+  fileSize -= sizeof(pcsFileHeader) + PCSBMPNSZ;
   auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
   auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
   pcsStitchBuffer.resize(pcsStitchCount);
