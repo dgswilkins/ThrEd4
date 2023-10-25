@@ -103,13 +103,13 @@ void kyi::ritcur() {
   cursorPosition.y -= (StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot));
   // ToDo - replace with GetDIBits
   constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
+  constexpr auto ICONROWS = 32;  // rows in the icon
 
   auto bitmapBits = std::array<uint8_t, ICONSIZE> {};
   auto iBMB       = bitmapBits.begin();
-  auto iIBMB      = std::next(bitmapBits.begin(), 32);
+  auto iIBMB      = std::next(bitmapBits.begin(), ICONROWS);
   GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
   if (currentCursor != mouse::getArrowCursor()) {
-	constexpr auto ICONROWS = 32; // rows in the icon
 	for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 	  auto const     bitmapInverse = kyi::byteSwap(*(iIBMB++));
 	  auto           bitMask       = uint32_t {1U} << HBSHFT;
@@ -127,7 +127,6 @@ void kyi::ritcur() {
 	}
 	return;
   }
-  constexpr auto ICONROWS = 32; // rows in the icon
   for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 	auto const     mask          = kyi::byteSwap(*(iBMB++));
 	auto const     bitmapInverse = kyi::byteSwap(*(iIBMB++));
@@ -1224,7 +1223,7 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
-		  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * 0.5F, wrap::toFloat(UnzoomedRect.cy) * 0.5F);
+		  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * HALF, wrap::toFloat(UnzoomedRect.cy) * HALF);
 		}
 		else {
 		  if (thred::inStitchWin()) {
