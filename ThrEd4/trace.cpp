@@ -23,6 +23,19 @@ constexpr auto LEVELCNT = uint32_t {256U};      // number of color levels in a b
 constexpr auto POINTMAX = size_t {500000U};     // maximum number of trace points to consider
 constexpr auto REDCOL   = uint32_t {0x0000ffU}; // code for the color red
 constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
+constexpr auto TRBASE   = 0.1F; // Trace ratio base 
+constexpr auto TROFF    = 1.0F; // Trace ratio offset
+
+constexpr auto TRWINROW01 = int32_t {15};
+constexpr auto TRWINROW02 = int32_t {16};
+constexpr auto TRWINROW03 = int32_t {17};
+constexpr auto TRWINROW04 = int32_t {18};
+constexpr auto TRWINROW05 = int32_t {19};
+constexpr auto TRWINROW06 = int32_t {20};
+constexpr auto TRWINROW07 = int32_t {21};
+constexpr auto TRWINROW08 = int32_t {22};
+constexpr auto TRWINROW09 = int32_t {23};
+constexpr auto TRWINROW10 = int32_t {24};
 
 // edge tracing directions
 enum TraceDirection {
@@ -114,7 +127,7 @@ auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
 
 void trace::initColorRef() noexcept {
   UpPixelColor    = 0;
-  DownPixelColor  = 0x7f7f7f;
+  DownPixelColor  = 0x7f7f7f; // light DimGray NOLINT(cppcoreguidelines-avoid-magic-numbers)
   InvertUpColor   = PENWHITE;
   InvertDownColor = PENGRAY;
 }
@@ -135,7 +148,7 @@ void trace::initTraceWindows() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
   TraceStepWin            = CreateWindowEx(
-      0L, L"STATIC", L"", DW_STYLE, 0, ButtonHeight * 18, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      0L, L"STATIC", L"", DW_STYLE, 0, ButtonHeight * TRWINROW04, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   auto iTraceControlWindow = TraceControlWindow.begin();
   auto iTraceDownWindow    = TraceDownWindow.begin();
   auto iTraceSelectWindow  = TraceSelectWindow.begin();
@@ -144,10 +157,10 @@ void trace::initTraceWindows() {
   auto iTraceRGB           = TraceRGB.begin();
   for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
 	auto const channel       = gsl::narrow_cast<int32_t>(iRGB);
-	*(iTraceControlWindow++) = ti::trcsub(ButtonWidth * channel, 0, ButtonHeight * 15);
-	*(iTraceSelectWindow++)  = ti::trcsub(ButtonWidth * channel, ButtonHeight * 15, ButtonHeight);
-	*(iTraceUpWindow++)      = ti::trcsub(ButtonWidth * channel, ButtonHeight * 16, ButtonHeight);
-	*(iTraceDownWindow++)    = ti::trcsub(ButtonWidth * channel, ButtonHeight * 17, ButtonHeight);
+	*(iTraceControlWindow++) = ti::trcsub(ButtonWidth * channel, 0, ButtonHeight * TRWINROW01);
+	*(iTraceSelectWindow++)  = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW01, ButtonHeight);
+	*(iTraceUpWindow++)      = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW02, ButtonHeight);
+	*(iTraceDownWindow++)    = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW03, ButtonHeight);
 	*(iTraceBrush++)         = CreateSolidBrush(*(iTraceRGB++));
   }
 }
@@ -168,7 +181,7 @@ void ti::trcstpnum() {
 
 void ti::trcratnum() {
   constexpr auto HLIN   = uint32_t {HNUM};
-  auto const     fmtStr = displayText::format(IDS_TRCRAT, -log10(IniFile.traceRatio - 1.0F));
+  auto const     fmtStr = displayText::format(IDS_TRCRAT, -log10(IniFile.traceRatio - TROFF));
   displayText::butxt(HLIN, fmtStr);
 }
 
@@ -1008,7 +1021,7 @@ void ti::dutrnum0(uint32_t colNum) {
 }
 
 void trace::dutrnum2() {
-  ti::dutrnum0(wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, 10)));
+  ti::dutrnum0(wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD)));
 }
 
 void trace::dutrnum1() {
@@ -1024,7 +1037,7 @@ void trace::dutrnum1() {
 	ti::trcstpnum();
   }
   else {
-	IniFile.traceRatio = 1.0F + pow(0.1F, traceLength);
+	IniFile.traceRatio = TROFF + pow(TRBASE, traceLength);
 	ti::trcratnum();
   }
 }
@@ -1123,68 +1136,68 @@ void trace::tracpar() {
   }
   else {
 	ColumnColor = ti::ducolm();
-	if (TraceMsgPoint.y < ButtonHeight * 15) {
+	if (TraceMsgPoint.y < ButtonHeight * TRWINROW01) {
 	  ti::getColors();
 	  auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
 	  thred::redraw(*itTraceControlWindow);
 	  trace::trace();
 	}
 	else {
-	  auto const position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
-	  if (position < 16U) {
+	  auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight);
+	  if (position < TRWINROW02) {
 		StateMap->flip(TraceRGBFlag[ColumnColor]);
 		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
 		thred::redraw(*itTraceSelectWindow);
 		trace::trace();
 	  }
 	  else {
-		if (position < 18U) {
+		if (position < TRWINROW04) {
 		  StateMap->set(StateFlag::NUMIN);
 		  StateMap->set(StateFlag::TRNIN0);
 		  TraceMsgIndex       = 0;
 		  TraceInputBuffer[0] = 0;
-		  if (position < 17U) {
-			ti::trnumwnd0(ButtonHeight * 16);
+		  if (position < TRWINROW03) {
+			ti::trnumwnd0(ButtonHeight * TRWINROW02);
 			StateMap->set(StateFlag::TRNUP);
 		  }
 		  else {
-			ti::trnumwnd0(ButtonHeight * 17);
+			ti::trnumwnd0(ButtonHeight * TRWINROW03);
 			StateMap->reset(StateFlag::TRNUP);
 		  }
 		}
 		else {
-		  if (position < 20U) {
+		  if (position < TRWINROW06) {
 			StateMap->set(StateFlag::NUMIN);
 			StateMap->set(StateFlag::TRNIN1);
 			thred::resetMsgBuffer();
-			if (position < 19U) {
-			  ti::trnumwnd1(ButtonHeight * 18);
+			if (position < TRWINROW05) {
+			  ti::trnumwnd1(ButtonHeight * TRWINROW04);
 			  StateMap->set(StateFlag::TRNUP);
 			}
 			else {
-			  ti::trnumwnd1(ButtonHeight * 19);
+			  ti::trnumwnd1(ButtonHeight * TRWINROW05);
 			  StateMap->reset(StateFlag::TRNUP);
 			}
 		  }
 		  else {
 			switch (position) {
-			  case 20U: {
+			  case TRWINROW06: {
 				trace::trdif();
 				break;
 			  }
-			  case 21U: {
+			  case TRWINROW07: {
 				thred::hidbit();
 				break;
 			  }
-			  case 22U: {
+			  case TRWINROW08: {
 				trace::blak();
 				break;
 			  }
-			  case 23U: {
+			  case TRWINROW09: {
 				trace::trcsel();
 				break;
 			  }
-			  case 24U: {
+			  case TRWINROW10: {
 				trace::tracedg();
 				break;
 			  }
@@ -1325,10 +1338,12 @@ void trace::traceNumberInput(wchar_t NumericCode) {
   *(itTraceInputBuffer++) = NumericCode;
   *itTraceInputBuffer     = 0;
   ++TraceMsgIndex;
-  auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, 10));
+  auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD));
   switch (TraceMsgIndex) {
 	case 2: {
-	  if (traceColor > 25) {
+	  // if it is greater than 25, we can process as-is since the maximum value is 255 
+	  constexpr auto TWODIGIT = uint32_t {25U};
+	  if (traceColor > TWODIGIT) { 
 		ti::dutrnum0(traceColor);
 	  }
 	  break;
