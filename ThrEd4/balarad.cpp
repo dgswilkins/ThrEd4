@@ -78,7 +78,6 @@ constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
 constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
 constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
 constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
-constexpr auto BALHALF  = 0.5F;            // half factor
 
 auto bal::getBN0() noexcept -> fs::path* {
   return BalaradName0;
@@ -149,8 +148,8 @@ void bal::redbal() {
   IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
   IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
   UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  BalaradOffset.x        = IniFile.hoopSizeX * BALHALF;
-  BalaradOffset.y        = IniFile.hoopSizeY * BALHALF;
+  BalaradOffset.x        = IniFile.hoopSizeX * HALF;
+  BalaradOffset.y        = IniFile.hoopSizeY * HALF;
   IniFile.hoopType       = CUSTHUP;
   UserColor.fill(0);
   auto const spBHC = gsl::span {balaradHeader.color};
@@ -220,8 +219,8 @@ void bal::ritbal() {
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
 	auto bytesWritten             = DWORD {};
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
-	BalaradOffset.x    = IniFile.hoopSizeX * BALHALF;
-	BalaradOffset.y    = IniFile.hoopSizeY * BALHALF;
+	BalaradOffset.x    = IniFile.hoopSizeX * HALF;
+	BalaradOffset.y    = IniFile.hoopSizeY * HALF;
 	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color        = StitchBuffer->front().attribute & COLMSK;

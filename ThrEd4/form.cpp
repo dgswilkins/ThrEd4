@@ -203,21 +203,9 @@ constexpr auto BHWIDTH  = 20.0F; // Button hole width
 constexpr auto CLPMIN   = 0.5F;  // if clipboard data width less than this, then don't fill
 constexpr auto CLPMINVT = 1.2F;  // Minimum clip width for skinny vertical clips
 constexpr auto FRECONT  = 0x80U; // 1000 0000 contour refil
-constexpr auto HALF     = 0.5F;  // multiplication factor
 constexpr auto NFRECONT = 0x7fU; // 0111 1111 contour refil
 constexpr auto SEQTOP   = int32_t {2};
 constexpr auto SEQBOT   = int32_t {3};
-
-// rectangle position indices
-constexpr auto PTL  = 0; // top left corner
-constexpr auto PTM  = 1; // top midpoint
-constexpr auto PTR  = 2; // top right corner
-constexpr auto PRM  = 3; // right midpoint
-constexpr auto PBR  = 4; // bottom right corner
-constexpr auto PBM  = 5; // bottom midpoint
-constexpr auto PBL  = 6; // bottom left corner
-constexpr auto PLM  = 7; // left midpoint
-constexpr auto PTLE = 8; // top left endpoint
 
 namespace fi {
 void adfrm(uint32_t iForm);

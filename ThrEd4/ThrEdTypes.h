@@ -125,6 +125,20 @@ constexpr auto PENWWID  = 5;                    // Wide pen width
 constexpr auto STDDPI   = int32_t {96};         // Default DPI
 
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
+constexpr auto HALF = 0.5F; // factor for halving
+constexpr auto DBLF = 2.0F; // factor for doubling
+constexpr auto DECRAD = int {10}; // decimal radix
+
+// rectangle position indices
+constexpr auto PTL  = 0; // top left corner       80-1-2
+constexpr auto PTM  = 1; // top midpoint           |   |
+constexpr auto PTR  = 2; // top right corner       7   3
+constexpr auto PRM  = 3; // right midpoint         |   |
+constexpr auto PBR  = 4; // bottom right corner    6-5-4
+constexpr auto PBM  = 5; // bottom midpoint
+constexpr auto PBL  = 6; // bottom left corner
+constexpr auto PLM  = 7; // left midpoint
+constexpr auto PTLE = 8; // top left endpoint
 
 // main menu items
 enum MainMenuItems {

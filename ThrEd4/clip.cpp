@@ -617,8 +617,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 	  auto interval   = minimumInterval;
 	  minimumSpacing  = adjustedSpace;
 	  interval /= wrap::toFloat(initialCount);
-	  constexpr auto CLPHALF = 0.5F; // factor for half
-	  adjustedSpace += interval * CLPHALF;
+	  adjustedSpace += interval * HALF;
 	  largestSpacing = smallestSpacing + interval;
 	}
 	else {
