@@ -475,15 +475,15 @@ void texture::drwtxtr() {
   auto const flag = (pixelSpace > editSpace);
   TextureScreen.editToPixelRatio =
       flag ? extraWidth / wrap::toFloat(StitchWindowClientRect.bottom)
-           : TextureScreen.areaHeight * 2.0F / wrap::toFloat(StitchWindowClientRect.bottom);
+           : TextureScreen.areaHeight * DBLF / wrap::toFloat(StitchWindowClientRect.bottom);
+  constexpr auto BIAS = 2.0F;
   TextureScreen.xOffset =
       flag ? 0.0F
            : (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
-              TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F)) /
-                 2.0F;
+              TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + BIAS)) *
+                 HALF;
   auto const yOffset   = flag ? wrap::round<LONG>((wrap::toFloat(StitchWindowClientRect.bottom) -
-                                                 TextureScreen.areaHeight / TextureScreen.editToPixelRatio) /
-                                                2.0F)
+                                                 TextureScreen.areaHeight / TextureScreen.editToPixelRatio) * HALF)
                               : StitchWindowClientRect.bottom / 4;
   TextureScreen.top    = yOffset;
   TextureScreen.bottom = StitchWindowClientRect.bottom - yOffset;
@@ -733,8 +733,8 @@ void txi::setxclp(FRM_HEAD const& form) {
   txi::deorg(screenOffset);
   txi::px2ed(screenOffset, editorOffset);
   if (StateMap->testAndReset(StateFlag::TXHCNTR)) {
-	editorOffset.x = (wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing) / 2.0F +
-	                 TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing / 2.0F;
+	editorOffset.x = (wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing) * HALF +
+	                 TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing * HALF;
   }
   else {
 	editorOffset.x -= TextureScreen.formCenter.x;
@@ -978,7 +978,7 @@ void txi::chktxnum() {
 		texture::savtxt();
 		TextureScreen.spacing  = value;
 		IniFile.textureSpacing = value;
-		TextureScreen.width    = value * wrap::toFloat(TextureScreen.lines) + value / 2.0F;
+		TextureScreen.width    = value * wrap::toFloat(TextureScreen.lines) + value * HALF;
 		StateMap->set(StateFlag::CHKTX);
 		break;
 	  }
@@ -1711,7 +1711,7 @@ void texture::rtrtx(FRM_HEAD const& form) {
   TextureScreen.spacing    = form.fillSpacing;
   TextureScreen.lines      = gsl::narrow<uint16_t>(form.fillInfo.texture.lines);
   TextureScreen.width =
-      wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0F;
+      wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing * HALF;
   texture::savtxt();
 }
 
@@ -1765,7 +1765,7 @@ void texture::setshft() {
   }
   TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / wrap::toFloat(line);
   TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
-  TextureScreen.width = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing / 2.0F;
+  TextureScreen.width = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing * HALF;
   StateMap->set(StateFlag::TXTRED);
   StateMap->set(StateFlag::RESTCH);
 }
