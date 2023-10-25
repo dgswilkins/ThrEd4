@@ -5391,8 +5391,8 @@ void thred::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
 }
 
 void thred::rot(F_POINT& rotationCenter) {
-  if (!StateMap->test(StateFlag::FORMSEL) || SelectedFormList->empty() || !StateMap->test(StateFlag::BIGBOX) ||
-      !StateMap->test(StateFlag::GRPSEL) || !StateMap->test(StateFlag::FPSEL)) {
+  if (!StateMap->test(StateFlag::FORMSEL) && SelectedFormList->empty() && !StateMap->test(StateFlag::BIGBOX) &&
+      !StateMap->test(StateFlag::GRPSEL) && !StateMap->test(StateFlag::FPSEL)) {
 	// no rotatable selections found
 	displayText::shoseln(IDS_FGRPF, IDS_ROT);
 	return;
