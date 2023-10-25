@@ -485,10 +485,10 @@ void satin::satadj(FRM_HEAD& form) {
 	  while (iVertex < form.vertexCount) {
 		if (auto const bitpos = satinMap.getFirst(); bitpos != std::numeric_limits<size_t>::max()) {
 		  iVertex = wrap::toUnsigned(bitpos);
-		if (iVertex < form.vertexCount) {
-		  (itGuide++)->start = iVertex;
+		  if (iVertex < form.vertexCount) {
+			(itGuide++)->start = iVertex;
+		  }
 		}
-	  }
 		else { // there are no more guides so exit the loop
 		  break;
 		}
@@ -543,10 +543,10 @@ void satin::satadj(FRM_HEAD& form) {
 	while (iReverse < form.vertexCount) {
 	  if (auto const bitpos = satinMap.getLast(); bitpos != std::numeric_limits<size_t>::max()) {
 		iReverse = wrap::toUnsigned(bitpos);
-	  if (iReverse < form.vertexCount) {
-		(itGuide++)->finish = iReverse;
+		if (iReverse < form.vertexCount) {
+		  (itGuide++)->finish = iReverse;
+		}
 	  }
-	}
 	  else { // there are no more guides so exit the loop
 		break;
 	  }
@@ -733,7 +733,7 @@ void si::satends(FRM_HEAD const& form, uint32_t isBlunt, float width) {
   auto const& vertexIndex = form.vertexIndex;
   auto        itVertex    = wrap::next(FormVertices->cbegin(), vertexIndex);
   if ((isBlunt & SBLNT) != 0U) {
-	auto step = F_POINT {sin(FormAngles->front()) * width / 2.0F, cos(FormAngles->front()) * width / 2.0F};
+	auto step = F_POINT {sin(FormAngles->front()) * width * HALF, cos(FormAngles->front()) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
 	  step.x = -step.x;
 	  step.y = -step.y;
@@ -747,8 +747,10 @@ void si::satends(FRM_HEAD const& form, uint32_t isBlunt, float width) {
   auto const& vertexCount = form.vertexCount;
   itVertex                = wrap::next(itVertex, vertexCount - 1U);
   if ((isBlunt & FBLNT) != 0U) {
-	auto step = F_POINT {sin(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F,
-	                     cos(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F};
+	constexpr auto SKIPVL = uint32_t {2U}; // check vertex before last
+
+	auto step = F_POINT {sin(FormAngles->operator[](vertexCount - SKIPVL)) * width * HALF,
+	                     cos(FormAngles->operator[](vertexCount - SKIPVL)) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
 	  step.x = -step.x;
 	  step.y = -step.y;
@@ -1171,7 +1173,7 @@ void satin::satfil(FRM_HEAD& form) {
 		si::satfn(form, lengths, 2, 3, 2, 1);
 		break;
 	  }
-	  length       = (length - lengths[1]) / 2.0F;
+	  length       = (length - lengths[1]) * HALF;
 	  auto iVertex = 1U;
 	  if (!StateMap->test(StateFlag::BARSAT)) {
 		auto const vNext = std::next(itFirstVertex);
@@ -1192,7 +1194,7 @@ void satin::satfil(FRM_HEAD& form) {
 	  si::satmf(form, lengths);
 	  break;
 	}
-	length /= 2.0F;
+	length *= HALF;
 	auto iVertex = 0U;
 	if (!StateMap->test(StateFlag::BARSAT) && !StateMap->test(StateFlag::FTHR)) {
 	  OSequence->push_back(*itFirstVertex);
@@ -1420,7 +1422,7 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
 	  ++count;
 	}
   }
-  satinWidth /= 2.0F;
+  satinWidth *= HALF;
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	si::outfn(form, iVertex, iVertex + 1, satinWidth);
   }
@@ -1457,7 +1459,7 @@ void satin::sbrd(FRM_HEAD const& form) {
 auto si::satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept -> F_POINT {
   constexpr auto SATHRESH = 10.0F;
 
-  auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;
+  auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) * HALF;
   auto factor = 1.0F / cos(angle);
   if (factor < -SATHRESH) {
 	factor = -SATHRESH;
