@@ -133,10 +133,10 @@ auto ceil(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same_
   }
   else {
 	if constexpr (std::is_same_v<outType, float>) {
-	  return std::ceilf(gsl::narrow<float>(invar));
+	  return std::ceilf(wrap::toFloat(invar));
 	}
 	else {
-	  return gsl::narrow<outType>(std::ceilf(gsl::narrow<float>(invar)));
+	  return gsl::narrow<outType>(std::ceilf(wrap::toFloat(invar)));
 	}
   }
 }
@@ -158,10 +158,10 @@ auto floor(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same
   }
   else {
 	if constexpr (std::is_same_v<outType, float>) {
-	  return std::floorf(gsl::narrow<float>(invar));
+	  return std::floorf(wrap::toFloat(invar));
 	}
 	else {
-	  return gsl::narrow<outType>(std::floorf(gsl::narrow<float>(invar)));
+	  return gsl::narrow<outType>(std::floorf(wrap::toFloat(invar)));
 	}
   }
 }
@@ -177,7 +177,7 @@ auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> fl
 	return (high - low) * HALF + low;
   }
   else {
-	return (gsl::narrow<float>(high) - gsl::narrow<float>(low)) / 2.0F + gsl::narrow<float>(low);
+	return (wrap::toFloat(high) - wrap::toFloat(low)) * HALF + wrap::toFloat(low);
   }
 }
 
