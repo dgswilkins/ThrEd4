@@ -75,7 +75,7 @@ void backup::dudat() {
 	std::ranges::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
   }
   backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
-  backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(std::next(backupData->forms, formCount));
+  backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(std::next(backupData->forms, wrap::toPtrdiff(formCount)));
   if (!StitchBuffer->empty()) {
 	auto const spStitches = gsl::span<F_POINT_ATTR> {backupData->stitches, StitchBuffer->size()};
 	std::ranges::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
