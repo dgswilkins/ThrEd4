@@ -11406,6 +11406,9 @@ void thi::drwStch() {
   if (StateMap->test(StateFlag::INIT)) {
 	thi::doDrwInit();
   }
+  if (StateMap->test(StateFlag::ROTAT) || StateMap->test(StateFlag::ROTCAPT) || StateMap->test(StateFlag::MOVCNTR)) {
+	thred::ritrot(0, form::rotpar());
+  }
   if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	form::drwfrm();
   }
