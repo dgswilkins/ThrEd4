@@ -12,7 +12,6 @@ clang-analyzer-*,\
 cppcoreguidelines-*,\
 -cppcoreguidelines-avoid-c-arrays,\
 -cppcoreguidelines-avoid-non-const-global-variables,\
--cppcoreguidelines-macro-usage,\
 -cppcoreguidelines-pro-bounds-constant-array-index,\
 -cppcoreguidelines-pro-type-reinterpret-cast,\
 -cppcoreguidelines-pro-type-union-access,\
