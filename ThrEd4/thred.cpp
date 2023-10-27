@@ -472,7 +472,7 @@ auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side me
 auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
-auto DisplayedColorBitmap = std::bitset<32> {}; // Map of color numbers in design that are actually displayed
+auto DisplayedColorBitmap = std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are actually displayed
 auto RotateAngle      = float {};               // angle for pixel rotate
 auto PickColorMsgSize = SIZE {};                // size of the pick color message
 auto InsertSize       = SIZE {};                // size of file insert window
@@ -669,6 +669,8 @@ void thi::fnamtabs() {
   constexpr auto NORDSED    = uint32_t {0x5a5a5a5aU}; // name order seed
   constexpr auto NCODSED    = uint32_t {0x73ef5a7eU}; // name encoding seed
   constexpr auto NCODOF     = uint8_t {80U};          // name encoding offset
+  constexpr auto MAX8B      = uint8_t{127};           // max value of a signed byte
+  constexpr auto NDXOFF     = uint8_t {32U};          // index offset
   constexpr auto NAMELEN    = NameOrder.size();
   auto           iNameOrder = NameOrder.begin();
   for (auto iName = 0U; iName < NAMELEN; ++iName) {
@@ -691,8 +693,8 @@ void thi::fnamtabs() {
 	std::swap(*destination, *source);
   }
   NameDecoder.fill(0);
-  auto index = wrap::next(NameEncoder.begin(), 32U);
-  for (auto iName = uint8_t {32U}; iName < uint8_t {127U}; ++iName) {
+  auto index = wrap::next(NameEncoder.begin(), NDXOFF);
+  for (auto iName = NDXOFF; iName < uint8_t {MAX8B}; ++iName) {
 	auto iND = wrap::next(NameDecoder.begin(), *(index++));
 	*iND     = iName;
   }
@@ -738,6 +740,7 @@ void thi::ritfnam(std::wstring const& designerName) {
 }
 
 void thi::redfnam(std::wstring& designerName) {
+  constexpr auto NNN       = uint8_t {111U}; // string substitute character
   auto       tmpName       = std::array<uint8_t, NameOrder.size()> {};
   auto       designer      = std::string {};
   auto       iNameOrder    = NameOrder.begin();
@@ -748,7 +751,7 @@ void thi::redfnam(std::wstring& designerName) {
 	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[index]);
 	}
 	else {
-	  iTmpName = 111;
+	  iTmpName = NNN;
 	}
 	++iNameOrder;
   }
@@ -1661,7 +1664,7 @@ void thi::chknum() {
 				  break;
 				}
 				default: {
-				  form.edgeSpacing = value * 0.5F;
+				  form.edgeSpacing = value * HALF;
 				}
 			  }
 			  break;
@@ -2714,12 +2717,12 @@ void thi::nuselrct() {
   auto outline = std::vector<F_POINT> {};
   outline.resize(FormControlPoints->size());
   thred::unsel();
-  outline[0].x = outline[6].x = outline[7].x = outline[8].x = StitchRangeRect.left;
-  outline[1].x = outline[5].x = wrap::midl(StitchRangeRect.right, StitchRangeRect.left);
-  outline[0].y = outline[1].y = outline[2].y = outline[8].y = StitchRangeRect.top;
-  outline[3].y = outline[7].y = wrap::midl(StitchRangeRect.top, StitchRangeRect.bottom);
-  outline[4].y = outline[5].y = outline[6].y = StitchRangeRect.bottom;
-  outline[2].x = outline[3].x = outline[4].x = StitchRangeRect.right;
+  outline[PTL].x = outline[PBL].x = outline[PLM].x = outline[PTLE].x = StitchRangeRect.left;
+  outline[PTL].y = outline[PTM].y = outline[PTR].y = outline[PTLE].y = StitchRangeRect.top;
+  outline[PTR].x = outline[PRM].x = outline[PBR].x = StitchRangeRect.right;
+  outline[PBR].y = outline[PBM].y = outline[PBL].y = StitchRangeRect.bottom;
+  outline[PTM].x = outline[PBM].x = wrap::midl(StitchRangeRect.right, StitchRangeRect.left);
+  outline[PRM].y = outline[PLM].y = wrap::midl(StitchRangeRect.top, StitchRangeRect.bottom);
 
   auto iPoint = outline.begin();
   for (auto& controlPoint : *FormControlPoints) {
@@ -5212,17 +5215,13 @@ void thred::rSelbox() {
       wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                           (stitchPoint.y - ZoomRect.bottom - wrap::toFloat(SelectBoxOffset.y)) * ratio -
                           wrap::toFloat(adjustedSelectSize.cy))};
-  auto& formControls = *FormControlPoints;
-  formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x =
-      stitchCoordsInPixels.x;
-  formControls[1].x = formControls[5].x = stitchCoordsInPixels.x + adjustedSelectSize.cx / 2;
-  formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y =
-      stitchCoordsInPixels.y;
-  formControls[3].y = formControls[7].y = stitchCoordsInPixels.y + adjustedSelectSize.cy / 2;
-  formControls[4].y = formControls[5].y = formControls[6].y =
-      stitchCoordsInPixels.y + adjustedSelectSize.cy;
-  formControls[2].x = formControls[3].x = formControls[4].x =
-      stitchCoordsInPixels.x + adjustedSelectSize.cx;
+  auto& frmCtrls  = *FormControlPoints;
+  frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = stitchCoordsInPixels.x;
+  frmCtrls[PTL].y = frmCtrls[PTM].y = frmCtrls[PTR].y = frmCtrls[PTLE].y = stitchCoordsInPixels.y;
+  frmCtrls[PBR].y = frmCtrls[PBM].y = frmCtrls[PBL].y = stitchCoordsInPixels.y + adjustedSelectSize.cy;
+  frmCtrls[PTR].x = frmCtrls[PRM].x = frmCtrls[PBR].x = stitchCoordsInPixels.x + adjustedSelectSize.cx;
+  frmCtrls[PTM].x = frmCtrls[PBM].x = stitchCoordsInPixels.x + adjustedSelectSize.cx / 2;
+  frmCtrls[PRM].y = frmCtrls[PLM].y = stitchCoordsInPixels.y + adjustedSelectSize.cy / 2;
   StateMap->set(StateFlag::SELSHO);
   thi::dusel(StitchWindowDC);
 }
@@ -5667,12 +5666,13 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
 }
 
 void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
+  constexpr auto KNL      = 2.0F; // knot length
   auto const startIt  = wrap::next(StitchBuffer->begin(), start);
   auto       finishIt = std::next(startIt);
   auto       delta    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
   auto       length   = hypot(delta.x, delta.y);
   ++finishIt;
-  while (length < 2.0F && finishIt != StitchBuffer->end()) {
+  while (length < KNL && finishIt != StitchBuffer->end()) {
 	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	length = hypot(delta.x, delta.y);
 	++finishIt;
@@ -5900,12 +5900,15 @@ void thi::stchout() {
 }
 
 void thi::setsped() {
-  auto elapsedTimePerFrame = 100U; // units are millseconds
+  constexpr auto DEFET = uint32_t {100U}; // default elapsed time per frame. Units are millseconds
+  constexpr auto DEFUT = double {10.0}; // default user time per frame. Units are millseconds
+
+  auto elapsedTimePerFrame = DEFET;
   if (MovieTimeStep == 0) {
 	MovieTimeStep = 1;
   }
-  auto const userTimePerFrame = wrap::toDouble(MovieTimeStep) / 10.0;
-  if (userTimePerFrame < 10.0) {
+  auto const userTimePerFrame = wrap::toDouble(MovieTimeStep) / DEFUT;
+  if (userTimePerFrame < DEFUT) {
 	StitchesPerFrame        = wrap::round<uint32_t>(elapsedTimePerFrame / userTimePerFrame);
 	constexpr auto SPFCLAMP = 99U; // maximum stitches per frame
 	if (StitchesPerFrame > SPFCLAMP) {
@@ -6184,6 +6187,7 @@ void thred::delet() {
 
 void thred::movi() {
   constexpr auto    MOVITIM = int32_t {12}; // default movie time
+  constexpr auto MLEN = 10000.0F; // default movie length (millisecs)
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rstAll();
 	StateMap->set(StateFlag::GRPSEL);
@@ -6225,7 +6229,7 @@ void thred::movi() {
                              ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
                              : gsl::narrow_cast<float>(StitchBuffer->size());
   if (!StateMap->test(StateFlag::WASPAT)) {
-	MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0F * MOVITIM / stepCount);
+	MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
   }
   if (MovieTimeStep < MINDELAY) {
 	MovieTimeStep = MINDELAY;
@@ -6414,7 +6418,7 @@ void thred::insfil(fs::path& insertedFile) {
   InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
   auto const initialInsertPoint = POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
   thred::insflin(initialInsertPoint);
-  NewFormVertexCount = 5U;
+  NewFormVertexCount = 5U; // inserted file is a rectangle NOLINT(cppcoreguidelines-avoid-magic-numbers)
   StateMap->set(StateFlag::SHOFRM);
   StateMap->set(StateFlag::INSFIL);
   form::dufrm();
@@ -7830,6 +7834,7 @@ void thred::defpref() {
   constexpr auto DEFANG  = 0.7853981F;    // default fill angle, 45 degrees
 
   UserFlagMap->reset();
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   UserColor = {0x00000000,
                0x002dffff,
                0x003f87e9,
@@ -7880,6 +7885,7 @@ void thred::defpref() {
                            0x00d3d3c7,
                            0x007c9c84,
                            0x009acddc};
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 
   bitmap::setBmpBackColor();
   IniFile.dazdef();
@@ -7895,7 +7901,7 @@ void thred::defpref() {
   UserFlagMap->reset(UserFlag::SQRFIL);
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
-  IniFile.gridSize        = 2.0F * PFGRAN; // 2mm default spacing
+  IniFile.gridSize        = 2.0F * PFGRAN; // 2mm default spacing NOLINT(cppcoreguidelines-avoid-magic-numbers)
   IniFile.hoopType        = LARGHUP;
   IniFile.hoopSizeX       = LHUPX;
   IniFile.hoopSizeY       = LHUPY;
@@ -7912,7 +7918,7 @@ void thred::defpref() {
   MinStitchLength         = MINSIZ * PFGRAN;
   IniFile.clipOffset      = 0;
   IniFile.fillPhase       = 0;
-  bitmap::setBitmapColor(0xc8dfee);
+  bitmap::setBitmapColor(0xc8dfee); // light cornflower blue NOLINT(cppcoreguidelines-avoid-magic-numbers)
   if (IniFile.customHoopX == 0.0F) {
 	IniFile.customHoopX = LHUPX;
   }
@@ -7922,7 +7928,7 @@ void thred::defpref() {
   PicotSpacing = IPICSPAC;
   UserFlagMap->set(UserFlag::FIL2OF);
   menu::fil2men();
-  BackgroundColor = 0xa8c4b1;
+  BackgroundColor = 0xa8c4b1; // lighter Dark Sea green NOLINT(cppcoreguidelines-avoid-magic-numbers)
   UnzoomedRect.cx = std::lround(IniFile.hoopSizeX);
   UnzoomedRect.cy = std::lround(IniFile.hoopSizeY);
   IniFile.defWav();
@@ -8723,13 +8729,14 @@ void thi::delcol() {
 }
 
 void thred::set1knot() {
+  constexpr auto KNTSTCH = size_t {5U}; // number of stitches in knot
   if (StitchBuffer->empty() || (!StateMap->test(StateFlag::SELBOX))) {
 	displayText::tabmsg(IDS_NOSTCHSEL, false);
 	return;
   }
   thred::savdo();
   auto buffer = std::vector<F_POINT_ATTR> {};
-  buffer.reserve(StitchBuffer->size() + 5U);
+  buffer.reserve(StitchBuffer->size() + KNTSTCH);
   buffer.insert(buffer.begin(), StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U));
   if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	StateMap->set(StateFlag::FILDIR);
@@ -9869,7 +9876,7 @@ auto thred::handleFormDataSheet() -> bool {
 }
 
 void thred::updateBackground() {
-  BackgroundColor = 0x505050;
+  BackgroundColor = 0x505050; // darker DimGrey NOLINT(cppcoreguidelines-avoid-magic-numbers)
   thred::nuPen(BackgroundPen, 1, BackgroundColor);
   BackgroundPenWidth = 1;
   DeleteObject(BackgroundBrush);
@@ -10138,7 +10145,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  }
 		  case VK_UP:
 		  case VK_PRIOR: { // page up
-			nuthbak(8U);
+			nuthbak(QUADRT + QUADRT);
 			break;
 		  }
 		  case VK_HOME: {
@@ -10148,7 +10155,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  }
 		  case VK_END: {
 			ThumbnailIndex = wrap::toUnsigned(Thumbnails->size());
-			nuthbak(4);
+			nuthbak(QUADRT);
 			break;
 		  }
 		  case VK_BACK: // backspace
@@ -10557,8 +10564,9 @@ void thi::redini() {
 	  if (IniFile.showStitchThreshold < 0) {
 		IniFile.showStitchThreshold = 0;
 	  }
-	  if (IniFile.showStitchThreshold > 9.0F) {
-		IniFile.showStitchThreshold = 9.0F;
+	  constexpr auto SSTCLAMP = 9.0F; // clamp the show stitch threshold to this value
+	  if (IniFile.showStitchThreshold > SSTCLAMP) {
+		IniFile.showStitchThreshold = SSTCLAMP;
 	  }
 	  ShowStitchThreshold = IniFile.showStitchThreshold;
 	  if (IniFile.threadSize30 != 0.0F) {
@@ -10606,7 +10614,7 @@ void thi::redini() {
 		ButtonholeCornerLength = IniFile.buttonholeCornerLength;
 	  }
 	  if (IniFile.gridSize == 0.0F) {
-		IniFile.gridSize = 12.0F;
+		IniFile.gridSize = 12.0F; // set this to a sensible value NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	  }
 	  IniFile.setWav();
 	  IniFile.setFeather();
@@ -10654,7 +10662,7 @@ void thi::redini() {
 	IniFile.gridColor = menu::getGridDefColor();
   }
   if (IniFile.fillAngle == 0.0F) {
-	IniFile.fillAngle = PI_F / 6.0F;
+	IniFile.fillAngle = PI_F / 6.0F; // set this to a sensible number NOLINT(cppcoreguidelines-avoid-magic-numbers)
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const deviceContext = GetDC(nullptr);
@@ -10700,11 +10708,12 @@ void thi::chkirct() noexcept {
   if (IniFile.initialWindowCoords.bottom < 0) {
 	IniFile.initialWindowCoords.bottom = 0;
   }
-  if (IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left < 300) {
+  constexpr auto MINWINSZ = LONG {300}; // if the minimum window dimension is less than this, resize
+  if (IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left < MINWINSZ) {
 	IniFile.initialWindowCoords.left  = 0;
 	IniFile.initialWindowCoords.right = screenLimits.cx / 2;
   }
-  if (IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top < 300) {
+  if (IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top < MINWINSZ) {
 	IniFile.initialWindowCoords.top    = 0;
 	IniFile.initialWindowCoords.bottom = screenLimits.cy / 2;
   }
@@ -10739,7 +10748,8 @@ void thi::init() {
 	GetMenuItemRect(ThrEdWindow, MainMenu, iMenu, &mRect);
 	wRect.right += (mRect.right - mRect.left);
   }
-  wRect.right += 20;
+  constexpr auto MENUWS = LONG {20}; // menu righthand whitespace
+  wRect.right += MENUWS;
   auto const sWidth = wRect.right - wRect.left;
   if (sWidth < screenHalfWidth) {
 	wRect.right = wRect.left += screenHalfWidth;
@@ -10768,7 +10778,7 @@ void thi::init() {
   auto const hFont = displayText::getThrEdFont(FONTSIZE);
   SelectObject(ThredDC, hFont);
   SelectObject(StitchWindowDC, hFont);
-  constexpr int32_t TXTSIDS = 6; // extra pixels in a text box
+  constexpr auto TXTSIDS = int32_t {6}; // extra pixels in a text box
   auto const        size    = thred::txtWid(L"MM");
   ButtonWidth               = size.cx + TXTSIDS;
   ButtonWidthX3             = ButtonWidth * 3;
@@ -10814,10 +10824,12 @@ void thi::init() {
 	IniFile.formVertexSizePixels = DEFPNTPX;
   }
   if (IniFile.formSides == 0U) {
-	IniFile.formSides = 24U;
+	constexpr auto FSID = uint16_t {24U}; // initial number of sides
+	IniFile.formSides      = FSID;
   }
   if (IniFile.tearTailLength == 0.0F) {
-	IniFile.tearTailLength = 1.4F;
+	constexpr auto TAILLEN = 1.4F; // initial tail length
+	IniFile.tearTailLength = TAILLEN;
   }
   if (IniFile.underlayStitchLen == 0.0F) {
 	IniFile.underlayStitchLen = DEFULEN;
@@ -10962,30 +10974,53 @@ void thi::relin() {
   thi::dulin(MoveLine0, MoveLine1);
 }
 
+/* Arrow box points
+ *                      06
+ *                     / \
+ *				   2--1  5--4
+ *                  \       /
+ *                   \     /
+ *                    \   /
+ *                      3
+*/
 void thi::dumov() {
-  auto const sCurr = wrap::next(StitchBuffer->begin(), keys::getMoveAnchor());
+  // Arrow Box Indices
+  constexpr auto ABP0 = 0;
+  constexpr auto ABP1 = 1;
+  constexpr auto ABP2 = 2;
+  constexpr auto ABP3 = 3;
+  constexpr auto ABP4 = 4;
+  constexpr auto ABP5 = 5;
+  constexpr auto ABP6 = 6;
+  constexpr auto ABPOINTS = 7U; // Number of arrow box points
+
+  constexpr auto ABLX = 12; // Arrow Length
+  constexpr auto ABSX = 2;  // Arrow shaft width
+  constexpr auto ABWX = 6;  // Arrow Width
+  constexpr auto ABHY = 20; // Arrow length
+
+  auto const     sCurr = wrap::next(StitchBuffer->begin(), keys::getMoveAnchor());
   if (sCurr->x < ZoomRect.left || sCurr->x > ZoomRect.right || sCurr->y < ZoomRect.bottom ||
       sCurr->y > ZoomRect.top) {
 	return;
   }
   auto const sNext              = std::next(sCurr);
   RotateAngle                   = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
-  constexpr auto ABPOINTS       = 7U; // Number of arrow box points
   auto           arrowBox       = std::array<POINT, ABPOINTS> {};
   auto const     abCenterPixels = sdCor2px(StitchBuffer->operator[](keys::getMoveAnchor()));
-  arrowBox[0]                   = abCenterPixels;
-  arrowBox[6]                   = abCenterPixels;
-  auto offsetFromCenter         = POINT {abCenterPixels.x + 12, abCenterPixels.y + 2};
-  rotpix(offsetFromCenter, arrowBox[1], abCenterPixels);
-  offsetFromCenter.y = abCenterPixels.y - 2;
-  rotpix(offsetFromCenter, arrowBox[5], abCenterPixels);
-  offsetFromCenter.y = abCenterPixels.y + 6;
-  rotpix(offsetFromCenter, arrowBox[2], abCenterPixels);
-  offsetFromCenter.y = abCenterPixels.y - 6;
-  rotpix(offsetFromCenter, arrowBox[4], abCenterPixels);
-  offsetFromCenter.x = abCenterPixels.x + 20;
+  arrowBox[ABP0]                = abCenterPixels;
+  arrowBox[ABP6]                = abCenterPixels;
+  auto offsetFromCenter         = POINT {abCenterPixels.x + ABLX, abCenterPixels.y + ABSX};
+  rotpix(offsetFromCenter, arrowBox[ABP1], abCenterPixels);
+  offsetFromCenter.y = abCenterPixels.y - ABSX;
+  rotpix(offsetFromCenter, arrowBox[ABP5], abCenterPixels);
+  offsetFromCenter.y = abCenterPixels.y + ABWX;
+  rotpix(offsetFromCenter, arrowBox[ABP2], abCenterPixels);
+  offsetFromCenter.y = abCenterPixels.y - ABWX;
+  rotpix(offsetFromCenter, arrowBox[ABP4], abCenterPixels);
+  offsetFromCenter.x = abCenterPixels.x + ABHY;
   offsetFromCenter.y = abCenterPixels.y;
-  rotpix(offsetFromCenter, arrowBox[3], abCenterPixels);
+  rotpix(offsetFromCenter, arrowBox[ABP3], abCenterPixels);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   wrap::polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
@@ -11546,7 +11581,8 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	  CloseHandle(thrEdFile);
 	  return;
 	}
-	SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);
+	// skip over BMP name
+	SetFilePointer(thrEdFile, gsl::narrow<LONG>(bitmap::getBmpNameLength()), nullptr, FILE_CURRENT);
 	auto brushColor = COLORREF {};
 	if (!wrap::readFile(thrEdFile, &brushColor, sizeof(brushColor), &bytesRead, L"ReadFile for brushColor in ritbak")) {
 	  return;
@@ -11586,13 +11622,17 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	DeleteObject(pen);
   }
   else {
-	SetFilePointer(thrEdFile, 84, nullptr, FILE_CURRENT);
+	// no stitches in file so skip over BMP name , background color & user colors 
+	constexpr auto SKIP1 = LONG {16 + sizeof(COLORREF) + sizeof(COLORREF) * COLORCNT};
+	SetFilePointer(thrEdFile, SKIP1, nullptr, FILE_CURRENT);
   }
   if (stitchHeader.formCount == 0U) {
 	CloseHandle(thrEdFile);
 	return;
   }
-  SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
+  // skip over custom colors (64 bytes)  and thread sizes (16 bytes) to forms
+  constexpr auto SKIP2 = LONG {sizeof(COLORREF) * COLORCNT + 16};
+  SetFilePointer(thrEdFile, SKIP2, nullptr, FILE_CURRENT);
   auto formList = std::vector<FRM_HEAD> {};
   formList.resize(stitchHeader.formCount);
   auto vertexList = std::vector<F_POINT> {};
@@ -12114,13 +12154,15 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	}
 	case WM_MOVE: {
 	  GetClientRect(p_hWnd, &ThredWindowRect);
-	  if ((ThredWindowRect.right - ThredWindowRect.left) < 20) {
+	  constexpr auto SMALLWIN  = LONG {20}; // Smallest ThrEd window dimension
+	  constexpr auto DEFWINDIM = LONG {300}; // default small Thred window dimension
+	  if ((ThredWindowRect.right - ThredWindowRect.left) < SMALLWIN) {
 		ThredWindowRect.left  = 0;
-		ThredWindowRect.right = 300;
+		ThredWindowRect.right = DEFWINDIM;
 	  }
-	  if ((ThredWindowRect.bottom - ThredWindowRect.top) < 20) {
+	  if ((ThredWindowRect.bottom - ThredWindowRect.top) < SMALLWIN) {
 		ThredWindowRect.top    = 0;
-		ThredWindowRect.bottom = 300;
+		ThredWindowRect.bottom = DEFWINDIM; 
 	  }
 	  thred::movStch();
 	  if (StateMap->test(StateFlag::RUNPAT)) {
@@ -12182,6 +12224,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   UNREFERENCED_PARAMETER(lpCmdLine);
   UNREFERENCED_PARAMETER(nShowCmd);
 
+  constexpr auto ICONDIM = int {32}; // window icon x & y dimension in pixels
+
   auto flag = false;
   ArgList   = CommandLineToArgvW(GetCommandLine(), &ArgCount);
 
@@ -12205,7 +12249,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	winClass.hInstance   = ThrEdInstance;
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	winClass.hIcon = gsl::narrow_cast<HICON>(
-	    LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+	    LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, ICONDIM, ICONDIM, LR_SHARED)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	winClass.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
 	                            //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	winClass.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
@@ -12264,7 +12308,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		    nullptr,           // bmpUnchecked
 		    0,                 // ItemData
 		    FormOnOff->data(), // TypeData
-		    16,                // cch
+		    1,                 // cch (dummy value since we use SetMenuItemInfo)
 #if (WINVER >= 0x0500)
 		    nullptr // bmpItem
 #endif              /* WINVER >= 0x0500 */
@@ -12324,7 +12368,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  privateSideWindowEntryBuffer.resize(SWBLEN);
 	  privateTextureHistory.resize(ITXBUFSZ);
 	  privateThreadSizeWin.resize(COLORCNT);
-	  privateThumbnailSearchString.reserve(32);
+	  constexpr auto TSSSIZ = size_t {32U}; // size of the message buffer
+	  privateThumbnailSearchString.reserve(TSSSIZ);
 	  privateUndoBuffer.resize(UNDOLEN);
 	  privateUserColorWin.resize(COLORCNT);
 	  privateUserPen.resize(COLORCNT);
@@ -12817,15 +12862,13 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
 void thred::setFormControls() {
   auto formsRect = F_RECTANGLE {};
   thred::selRct(formsRect);
-  auto& formControls = *FormControlPoints;
-  formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x =
-      std::lround(formsRect.left);
-  formControls[1].x = formControls[5].x = std::lround(wrap::midl(formsRect.right, formsRect.left));
-  formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y =
-      std::lround(formsRect.top);
-  formControls[3].y = formControls[7].y = std::lround(wrap::midl(formsRect.top, formsRect.bottom));
-  formControls[4].y = formControls[5].y = formControls[6].y = std::lround(formsRect.bottom);
-  formControls[2].x = formControls[3].x = formControls[4].x = std::lround(formsRect.right);
+  auto& frmCtrls = *FormControlPoints;
+  frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = std::lround(formsRect.left);
+  frmCtrls[PTL].y = frmCtrls[PTR].y = frmCtrls[PTM].y = frmCtrls[PTLE].y = std::lround(formsRect.top);
+  frmCtrls[PTR].x = frmCtrls[PRM].x = frmCtrls[PBR].x = std::lround(formsRect.right);
+  frmCtrls[PBR].y = frmCtrls[PBM].y = frmCtrls[PBL].y = std::lround(formsRect.bottom);
+  frmCtrls[PRM].y = frmCtrls[PLM].y = std::lround(wrap::midl(formsRect.top, formsRect.bottom));
+  frmCtrls[PTM].x = frmCtrls[PBM].x = std::lround(wrap::midl(formsRect.right, formsRect.left));
 }
 
 void thred::setRotateCapture() {
