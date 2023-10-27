@@ -85,9 +85,9 @@ constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
 }
 
 auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast 
   auto const bitmap =
-      CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0);
+      CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0); // NOLINT(readability-qualified-auto, cppcoreguidelines-pro-type-reinterpret-cast)
   if (*ppvBits != nullptr) {
 	return bitmap;
   }

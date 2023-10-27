@@ -8403,9 +8403,9 @@ void thred::fileLock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
   // ToDo - Replace FNDFLMAX with maximum files in subdirectory
   auto lockInfo = FIND_INFO(FNDFLMAX);
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
   DialogBoxParam(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
+      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 }
 
 void thred::delstch() {
@@ -9065,7 +9065,7 @@ void thred::dufdef() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
       // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
 

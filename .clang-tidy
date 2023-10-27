@@ -13,7 +13,6 @@ cppcoreguidelines-*,\
 -cppcoreguidelines-avoid-c-arrays,\
 -cppcoreguidelines-avoid-non-const-global-variables,\
 -cppcoreguidelines-pro-bounds-constant-array-index,\
--cppcoreguidelines-pro-type-reinterpret-cast,\
 -cppcoreguidelines-pro-type-union-access,\
 fuchsia-*,\
 -fuchsia-default-arguments-calls,\

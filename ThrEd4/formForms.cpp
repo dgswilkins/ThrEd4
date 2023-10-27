@@ -832,7 +832,7 @@ void formForms::dasyfrm() {
   // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult < 1) {
@@ -1083,7 +1083,7 @@ void formForms::setear() {
   // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
@@ -1248,7 +1248,7 @@ void formForms::wavfrm() {
   // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
