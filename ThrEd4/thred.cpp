@@ -6183,6 +6183,7 @@ void thred::delet() {
 }
 
 void thred::movi() {
+  constexpr auto    MOVITIM = int32_t {12}; // default movie time
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rstAll();
 	StateMap->set(StateFlag::GRPSEL);

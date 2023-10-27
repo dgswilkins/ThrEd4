@@ -56,7 +56,6 @@ constexpr float   USESIZ   = 3.5F;              // user preferred size
 constexpr auto    MAXSIZ   = 9.0F;              // default maximum stitch size
 constexpr float   SHOPNTS  = 0.00F;             // show stitch points when zoom below this
 constexpr float   STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
-constexpr int32_t MOVITIM  = 12;                // default movie time
 constexpr float   DEFSPACE = 0.45F;             // default stitch spacing
 constexpr float   PI_F     = 3.1415927F;        // PI to single precision
 constexpr float   PI_F2    = PI_F * 2.0F;       //
