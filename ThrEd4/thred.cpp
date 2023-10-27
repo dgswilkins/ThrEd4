@@ -6187,7 +6187,6 @@ void thred::delet() {
 
 void thred::movi() {
   constexpr auto    MOVITIM = int32_t {12}; // default movie time
-  constexpr auto MLEN = 10000.0F; // default movie length (millisecs)
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rstAll();
 	StateMap->set(StateFlag::GRPSEL);
@@ -6229,6 +6228,7 @@ void thred::movi() {
                              ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
                              : gsl::narrow_cast<float>(StitchBuffer->size());
   if (!StateMap->test(StateFlag::WASPAT)) {
+	constexpr auto MLEN = 10000.0F; // default movie length (millisecs)
 	MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
   }
   if (MovieTimeStep < MINDELAY) {
