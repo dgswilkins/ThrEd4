@@ -26,7 +26,7 @@ class PECHDR
   uint8_t                  ukn2 {};  // Unknown
   uint16_t                 hnd1 {};  // Unknown (0x00ff)
   uint8_t                  thumbWidth {};  // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
-                          // Thus, 6 would mean 6x8 = 48 pixels per line
+                                           // So, 6 would mean 6x8 = 48 pixels per line
   uint8_t                  thumbHeight {}; // Thumbnail image height in pixels (38)
   std::array<uint8_t, 12>  ukn3 {};        // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
   uint8_t                  colorCount {};  // Number of colors minus one, 0xFF means 0 colors
@@ -117,8 +117,8 @@ class PESHED
   std::array<uint8_t, 4> hnd2 {};  // 5b-5e  header end (FF FF 00 00)
   uint16_t               cslen {}; // 5f,60  CSewSeg length (7)
   std::array<char, 7>    cs {};    // 61-67  CSewSeg identification (CSewSeg)
-// uint16_t styp1;     // 68,69  Stitch type (0)
-// uint16_t scol;      // 6a,6b  Stitch Palette thread index
+//  uint16_t               styp1;    // 68,69  Stitch type (0)
+//  uint16_t               scol;     // 6a,6b  Stitch Palette thread index
 
   constexpr PESHED() noexcept = default;
   // PESHED(PESHED&&) = default;
