@@ -28,8 +28,8 @@ class F_STARTS
 
 union FILL_STARTS {
   public:
-  F_STARTS fillNamed;
-  uint32_t fillArray[sizeof(F_STARTS) / sizeof(uint32_t)] {};
+  F_STARTS                                                    fillNamed;
+  std::array<uint32_t, (sizeof(F_STARTS) / sizeof(uint32_t))> fillArray {};
 
   // inline FILL_STARTS() noexcept;
   // FILL_STARTS(FILL_STARTS const&) = default;
