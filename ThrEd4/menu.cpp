@@ -159,7 +159,6 @@ void menu::setdst() {
 
 void menu::disableRedo() {
   if (StateMap->testAndReset(StateFlag::REDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 	StateMap->set(StateFlag::DUMEN);
   }
@@ -167,7 +166,6 @@ void menu::disableRedo() {
 
 void menu::enableRedo() {
   if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
 	StateMap->set(StateFlag::DUMEN);
   }
@@ -175,7 +173,6 @@ void menu::enableRedo() {
 
 void menu::disableUndo() {
   if (StateMap->testAndReset(StateFlag::UNDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
 	StateMap->set(StateFlag::DUMEN);
   }
@@ -183,7 +180,6 @@ void menu::disableUndo() {
 
 void menu::enableUndo() {
   if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
 	StateMap->set(StateFlag::DUMEN);
   }
@@ -192,11 +188,9 @@ void menu::enableUndo() {
 void menu::ladj() {
   for (auto const& iLayer : LAYRLIST) {
 	if (iLayer.value == ActiveLayer) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_GRAYED);
 	}
 	else {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_ENABLED);
 	}
   }
@@ -368,12 +362,12 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> lruMenuId,
 		AppendMenu(FileMenu,
 		           MF_BYCOMMAND | MF_STRING,
 		           iLRU,
-		           previousName->wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
+		           previousName->wstring().c_str());
 	  }
 	  else {
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto const fileHandle = FindFirstFile(previousName->c_str(), &findData);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		if (fileHandle == INVALID_HANDLE_VALUE) {
 		  previousName->clear();
 		}
@@ -381,7 +375,7 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> lruMenuId,
 		  AppendMenu(FileMenu,
 		             MF_BYCOMMAND | MF_STRING,
 		             iLRU,
-		             previousName->wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
+		             previousName->wstring().c_str());
 		  FindClose(fileHandle);
 		}
 	  }
@@ -401,23 +395,18 @@ void menu::init() noexcept {
 }
 
 void menu::resetThreadView() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
   StateMap->reset(StateFlag::COL);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
   StateMap->set(StateFlag::DUMEN);
 }
 
 void menu::vuthrds() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
 	StateMap->reset(StateFlag::THRDS);
   }
   else {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED);
 	StateMap->set(StateFlag::THRDS);
   }
@@ -425,14 +414,11 @@ void menu::vuthrds() {
 }
 
 void mni::vuselthr() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
 	StateMap->reset(StateFlag::COL);
   }
   else {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
 	StateMap->set(StateFlag::COL);
   }
@@ -475,9 +461,7 @@ public:
 }
 
 void menu::duhbit(uint32_t cod) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CheckMenuItem(MainMenu, ID_HIDBIT, MF_BYCOMMAND | cod);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CheckMenuItem(MainMenu, ID_HIDBITF, MF_BYCOMMAND | cod);
 }
 

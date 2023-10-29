@@ -15,7 +15,7 @@ static constexpr uint8_t THUMBWID = 48U;
 using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 #pragma pack(push, 1)
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(readability-magic-numbers)
 // clang-format off
 class PECHDR
 {
@@ -39,7 +39,7 @@ class PECHDR
   //~PECHDR() = default;
 };
 // clang-format on
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -80,7 +80,7 @@ class PES_COLOR_LIST
 };
 
 #pragma pack(push, 1)
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(readability-magic-numbers)
 class PESHED
 {
   public:
@@ -126,11 +126,11 @@ class PESHED
   // PESHED& operator=(PESHED&&) = default;
   //~PESHED() = default;
 };
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(readability-magic-numbers)
 class PESLED
 {
   public:
@@ -143,7 +143,7 @@ class PESLED
   // PESLED& operator=(PESLED&&) = default;
   //~PESLED() = default;
 };
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -339,18 +339,18 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 // clang-format on
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
   auto translatedColor = PES_THREAD[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color.b) - gsl::narrow_cast<int32_t>(translatedColor.b);
-  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
-  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTBEGIN(readability-magic-numbers)
+  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NO LINTNEXTLINE(readability-magic-numbers)
   return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
                                          (((767 - meanR) * deltaB * deltaB) / 256)));
-  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTEND(readability-magic-numbers)
 }
 
 void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset) {
@@ -434,11 +434,11 @@ void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, fl
 }
 
 void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
-  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTBEGIN(readability-magic-numbers)
   buffer.push_back(0xfe);
   buffer.push_back(0xb0);
   buffer.push_back(val);
-  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTEND(readability-magic-numbers)
 }
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
@@ -464,10 +464,10 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
 	rpcrd(buffer, thisStitch, xDelta, yDelta);
   }
   // add the end marker
-  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTBEGIN(readability-magic-numbers)
   buffer.push_back(0xffU);
   buffer.push_back(0x00U);
-  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTEND(readability-magic-numbers)
 }
 
 void pi::writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image) {
@@ -522,7 +522,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
   auto const& threadColor = PES_THREAD[pesColors[index++] % THTYPCNT];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   auto       iUserColor = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
@@ -608,7 +608,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		continue;
 	  }
 	  auto const& threadColor = PES_THREAD[pesColors[iColor]];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 	  *iUserColor      = color;
 	  ++iUserColor;
@@ -617,7 +617,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  }
 	  continue;
 	}
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	auto constexpr COLOR = RGB(PES_THREAD[0].color.r,
 	                           PES_THREAD[0].color.g,
 	                           PES_THREAD[0].color.b); // color unknown
@@ -643,11 +643,11 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto       pesColorIndex = uint32_t {1U};
   auto const pesStitches   = gsl::span<const uint8_t> {pesStitch, pecCount};
   while (iPESstitch < pecCount) {
-	// check for end marker NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+	// check for end marker NOLINTNEXTLINE(readability-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xff && pesStitches[iPESstitch + 1U] == 0) {
 	  break;
 	}
-	// check for color change NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
+	// check for color change NOLINTNEXTLINE(readability-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xfe && pesStitches[iPESstitch + 1U] == 0xb0) {
 	  color = pi::dupcol(pesColors, wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
 	  iPESstitch += 2;
@@ -666,14 +666,14 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		++iPESstitch;
 	  }
 	  else {
-		// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+		// NOLINTBEGIN(readability-magic-numbers)
 		if (pesStitches[iPESstitch] > 0x3f) { // if the value is more than 63 flip sign  
 		  locof = wrap::toFloat(pesStitches[iPESstitch]) - 128.0F;
 		}
 		else {
 		  locof = pesStitches[iPESstitch];
 		}
-		// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+		// NOLINTEND(readability-magic-numbers)
 	  }
 	  locof *= IPECFACT;
 	  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
@@ -698,8 +698,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
@@ -861,7 +861,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
   pesHeader.blct    = 1;
-  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTBEGIN(readability-magic-numbers)
   // write the header end markers
   pesHeader.hnd1[0] = 0xff;
   pesHeader.hnd1[1] = 0xff;
@@ -872,7 +872,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.hnd2[1] = 0xff;
   pesHeader.hnd2[2] = 0x00;
   pesHeader.hnd2[3] = 0x00;
-  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTEND(readability-magic-numbers)
   GroupStartStitch  = 0;
   GroupEndStitch    = wrap::toUnsigned(StitchBuffer->size() - 1U);
   auto bytesWritten = DWORD {};
@@ -904,7 +904,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pecHeader->labnd = '\r'; // 13 = carriage return
   wrap::narrow(pecHeader->colorCount, pesThreadCount);
   // write the remainder of the header with magic numbers
-  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTBEGIN(readability-magic-numbers)
   pecHeader->hnd1        = 0x00ff;
   pecHeader->thumbHeight = THUMBHGT;
   pecHeader->thumbWidth  = THUMBWID / BTSPBYTE;
@@ -918,7 +918,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pecHeader2->height          = pesHeader.ysiz;
   pecHeader2->unknown4        = 0x01e0;
   pecHeader2->unknown5        = 0x01b0;
-  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+  // NOLINTEND(readability-magic-numbers)
 
   constexpr auto PECMASK1 = uint16_t {0x9000U}; //
   constexpr auto LOWBMASK = uint16_t {0x00ffU}; // low byte mask

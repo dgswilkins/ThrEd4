@@ -8,7 +8,6 @@ auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
 	return std::wcstof(buffer, nullptr);
   }
   catch (...) {
-	// NOLINTNEXTLINE
 	outDebugString(L"wcstof failed trying to convert '{}'\n", buffer);
 	return 0.0F;
   }

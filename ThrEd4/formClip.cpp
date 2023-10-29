@@ -164,7 +164,7 @@ void fci::clipSelectedForm() {
   auto const& form        = FormList->operator[](ClosestFormToCursor);
   fci::sizclp(form, firstStitch, stitchCount, length, clipSize);
   clipSize += sizeof(FORM_CLIP);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto clipHandle = GlobalAlloc(GHND, clipSize);
   if (clipHandle == nullptr) {
 	return;
@@ -229,7 +229,6 @@ void fci::clipSelectedForm() {
 	return;
   }
   Clip = RegisterClipboardFormat(PcdClipFormat);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -263,7 +262,7 @@ void fci::clipSelectedForms() {
 	auto& currentForm = FormList->operator[](selectedForm);
 	length += fci::sizfclp(currentForm);
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto clipHandle = GlobalAlloc(GHND, length + sizeof(FORMS_CLIP));
   if (clipHandle == nullptr) { // exit gracefully without altering the clipboard
 	return;
@@ -405,7 +404,6 @@ void fci::clipSelectedForms() {
 	return;
   }
   Clip = RegisterClipboardFormat(PcdClipFormat);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -429,7 +427,7 @@ void fci::clipSelectedForms() {
 }
 
 void fci::clipSelectedPoints() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto const clipHandle = GlobalAlloc(
       GHND, (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT) + sizeof(FORM_VERTEX_CLIP));
   if (clipHandle == nullptr) {
@@ -475,7 +473,7 @@ void fci::clipSelectedStitches() {
   }
   auto const length  = GroupEndStitch - GroupStartStitch + 1U;
   auto       iSource = GroupStartStitch;
-  // NOLINTNEXTLINE(hicpp-signed-bitwise,readability-qualified-auto)
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto const clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
   if (clipHandle == nullptr) {
 	return;
@@ -595,7 +593,6 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   LowerLeftStitch.y = 0.0F;
   EmptyClipboard();
   Clip = RegisterClipboardFormat(PcdClipFormat);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
   if (nullptr == clipHandle) {
 	CloseClipboard();

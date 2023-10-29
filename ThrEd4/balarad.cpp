@@ -123,7 +123,7 @@ void bal::redbal() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const balaradFile =
       CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   if (balaradFile == INVALID_HANDLE_VALUE) {
 	return;
   }
@@ -196,7 +196,7 @@ void bal::ritbal() {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto balaradFile =
 	    CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
 	if (balaradFile == INVALID_HANDLE_VALUE) {
 	  return;
 	}

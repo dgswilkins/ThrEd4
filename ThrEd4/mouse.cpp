@@ -133,19 +133,17 @@ auto mouse::getArrowCursor() noexcept -> HCURSOR {
 #pragma warning(push)
 #pragma warning(disable : 26493) // Don't use C-style casts (type.4)
 void mouse::crtcurs() noexcept {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  ArrowCursor = LoadCursor(nullptr, IDC_ARROW);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  CrossCursor = LoadCursor(nullptr, IDC_CROSS);
-  // clang-format off
-  FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));      // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));      // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright));   // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp));   // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown));  // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));    // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  // clang-format on
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
+  ArrowCursor           = LoadCursor(nullptr, IDC_ARROW);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
+  CrossCursor           = LoadCursor(nullptr, IDC_CROSS);
+  FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));
+  DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));
+  NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright));
+  NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown));
+  NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp));
+  NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown));
+  NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));
 }
 #pragma warning(pop)
 
@@ -197,7 +195,6 @@ auto mouse::handleEitherButtonDown() -> bool {
 	thred::unpat();
 	auto const colorBarPosition = thred::getColorbarVertPosition();
 	if (Msg.message == WM_RBUTTONDOWN) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if (((Msg.wParam & MK_SHIFT) != 0U) &&
 	      (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL))) {
 		thred::unbox();
@@ -1361,7 +1358,6 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) {
 	  SetCapture(ThrEdWindow);
 	}
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	if (StateMap->test(StateFlag::BZUMIN) && ((Msg.wParam & MK_LBUTTON) != 0U)) {
 	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
@@ -1425,7 +1421,6 @@ auto mouse::handleRightButtonDown() -> bool {
   }
   if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm()) {
@@ -1449,7 +1444,6 @@ auto mouse::handleRightButtonDown() -> bool {
 		  form::nufsel();
 		}
 	  }
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_CONTROL) != 0U) {
 		if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		  StateMap->set(StateFlag::WASEL);
@@ -1490,7 +1484,6 @@ auto mouse::handleRightButtonDown() -> bool {
 	  }
 	}
 	if (StateMap->test(StateFlag::INIT) || (!ThrName->empty())) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
 		if (StateMap->test(StateFlag::SELBOX)) {
 		  auto const code = ClosestPointIndex;

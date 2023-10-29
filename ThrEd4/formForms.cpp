@@ -127,7 +127,6 @@ auto ffi::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       windowName.c_str(),
                       SS_NOTIFY | WS_CHILD | WS_VISIBLE,
@@ -146,7 +145,6 @@ auto ffi::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -165,7 +163,6 @@ auto ffi::numwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -494,7 +491,6 @@ void formForms::refrm() {
   if (FormDataSheet != nullptr) {
 	DestroyWindow(FormDataSheet);
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   FormDataSheet = CreateWindow(L"STATIC",
                                nullptr,
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -518,7 +514,6 @@ void formForms::sidwnd(HWND wnd) {
   FormMenuChoice = savedChoice;
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -538,7 +533,6 @@ void formForms::prfsid(HWND wnd) {
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -553,7 +547,6 @@ void formForms::prfsid(HWND wnd) {
 }
 
 void ffi::prftwin(std::wstring const& text) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CreateWindow(L"STATIC",
                text.c_str(),
                WS_CHILD | WS_VISIBLE,
@@ -568,7 +561,6 @@ void ffi::prftwin(std::wstring const& text) noexcept {
 }
 
 auto ffi::prfnwin(std::wstring const& text) noexcept -> HWND {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       text.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -609,7 +601,6 @@ void formForms::prfmsg() {
   formForms::maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   PreferencesWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -745,7 +736,7 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -811,7 +802,7 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
 		  break;
 		}
@@ -832,7 +823,7 @@ void formForms::dasyfrm() {
   // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult < 1) {
@@ -1020,7 +1011,7 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1063,7 +1054,7 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1083,7 +1074,7 @@ void formForms::setear() {
   // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
@@ -1187,7 +1178,7 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1228,7 +1219,7 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1248,7 +1239,7 @@ void formForms::wavfrm() {
   // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {

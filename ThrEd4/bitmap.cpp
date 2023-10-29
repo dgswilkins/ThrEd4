@@ -99,7 +99,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto hBitmapFile =
       CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
 	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
 	CloseHandle(hBitmapFile);
@@ -291,7 +291,7 @@ auto bi::saveName(fs::path& fileName) {
   auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
-      CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
+      CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   if (FAILED(hResult) || (nullptr == pFileSave)) {
 	return false;
   }
@@ -345,7 +345,7 @@ void bitmap::savmap() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hBitmap =
       CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (hBitmap == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(*UTF16BMPname);
 	return;
@@ -355,7 +355,7 @@ void bitmap::savmap() {
   WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
   auto buffer = std::vector<uint8_t> {};
   buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
-  auto const spTrace = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(BitmapWidth) * BitmapHeight);
+  auto const spTrace = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(BitmapWidth * BitmapHeight));
   bi::movmap(spTrace, buffer);
   WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
   CloseHandle(hBitmap);
@@ -377,7 +377,7 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
-      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
+      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   if (FAILED(hResult) || (nullptr == pFileOpen)) {
 	return false;
   }
@@ -394,7 +394,6 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
 #if USE_DEFBDIR
   // If we want to, we can set the default directory rather than using the OS mechanism for last used
   auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-  // NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
   hResult += SHCreateItemFromParsingName(directory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
   hResult += pFileOpen->SetFolder(psiFrom);
   if (nullptr != psiFrom) {
@@ -455,7 +454,6 @@ void bitmap::lodbmp(fs::path const& directory) {
 }
 
 auto bi::nuBit() noexcept -> BOOL {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
   BitMapColorStruct.lCustData      = 0;

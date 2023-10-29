@@ -127,13 +127,12 @@ auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
 
 void trace::initColorRef() noexcept {
   UpPixelColor    = 0;
-  DownPixelColor  = 0x7f7f7f; // light DimGray NOLINT(cppcoreguidelines-avoid-magic-numbers)
+  DownPixelColor  = 0x7f7f7f; // light DimGray NOLINT(readability-magic-numbers)
   InvertUpColor   = PENWHITE;
   InvertDownColor = PENGRAY;
 }
 
 auto ti::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
   // NOLINTNEXTLINE(readability-qualified-auto)
   if (auto const window = CreateWindowEx(
@@ -145,7 +144,6 @@ auto ti::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) 
 }
 
 void trace::initTraceWindows() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
   TraceStepWin            = CreateWindowEx(
       0L, L"STATIC", L"", DW_STYLE, 0, ButtonHeight * TRWINROW04, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
@@ -175,7 +173,6 @@ auto ti::trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT> {
 
 void ti::trcstpnum() {
   auto const fmtStr = displayText::format(IDS_TRCSTP, (IniFile.traceLength * IPFGRAN));
-  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   SetWindowText(TraceStepWin, fmtStr.c_str());
 }
 
@@ -1054,14 +1051,12 @@ auto ti::ducolm() -> uint32_t {
 }
 
 void ti::trnumwnd0(int32_t position) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
   TraceNumberInput        = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
 void ti::trnumwnd1(int32_t position) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
   GeneralNumberInputBox   = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);

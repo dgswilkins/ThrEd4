@@ -1131,7 +1131,6 @@ auto xi::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> co
 
 void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
   for (auto iRegion = 0U; iRegion < count; ++iRegion) {
-	// NOLINTNEXTLINE
 	outDebugString(
 	    L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 	    iRegion,
@@ -2341,7 +2340,7 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -2384,7 +2383,6 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  break;
 		}
 		default: {
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		  outDebugString(L"default hit in fangfn: wparam [{}]\n", LOWORD(wparam));
 		  break;
 		}
@@ -2443,7 +2441,7 @@ void xt::nudsiz() {
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+      ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
 
   if (nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
@@ -2496,7 +2494,6 @@ void xt::mvshft() {
   if (!StateMap->test(StateFlag::BZUMIN)) {
 	return;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) == 0U) {
 	return;
   }

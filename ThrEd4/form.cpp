@@ -1436,7 +1436,6 @@ void form::duform(int32_t formType) {
 	  formForms::dasyfrm();
 	  break;
 	default:
-	  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion) ToDo - why is this neccessary?
 	  outDebugString(L"default hit in duform: formType [{}]\n", formType);
 	  break;
   }
@@ -6260,7 +6259,6 @@ void form::apliq() {
 
 void form::setap() {
   AppliqueColor = ActiveColor;
-  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   displayText::showMessage(IDS_APCOL, (AppliqueColor + 1U));
 }
 
@@ -7464,7 +7462,7 @@ void fi::snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t en
 
 void fi::doTimeWindow(float rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram) {
   auto const checkLength = wrap::round<uint32_t>(SnapLength * 2.0F + 1.0F);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise,readability-qualified-auto)
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto const timeWindow = CreateWindow(L"STATIC",
                                        nullptr,
                                        WS_CHILD | WS_VISIBLE | WS_BORDER,

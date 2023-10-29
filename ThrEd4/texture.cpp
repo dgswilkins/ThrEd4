@@ -173,7 +173,7 @@ void texture::txdun() {
   auto bytesWritten = DWORD {};
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (handle == INVALID_HANDLE_VALUE) {
 	CloseHandle(handle);
 	return;
@@ -238,7 +238,7 @@ void texture::redtx() {
 	}
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const handle = CreateFile(name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	if (handle == INVALID_HANDLE_VALUE) {
 	  CloseHandle(handle);
 	  break;
@@ -547,7 +547,7 @@ void texture::drwtxtr() {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize * 2U);
   }
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
   displayText::drwtxbut(TextureScreen);
 }
@@ -998,7 +998,6 @@ void txi::butsid(uint32_t windowId) {
   txi::chktxnum();
   TextureWindowId = windowId;
   GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideWindowButton = CreateWindow(L"STATIC",
                                   nullptr,
                                   SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
