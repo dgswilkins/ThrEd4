@@ -195,7 +195,7 @@ void ritfnam(std::wstring const& designerName);
 void ritini();
 void ritlayr();
 void ritloc();
-void ritlock(gsl::span<WIN32_FIND_DATA const> fileInfo, HWND hwndlg) noexcept;
+void ritlock(std::vector<WIN32_FIND_DATA> const& fileInfo, HWND hwndlg) noexcept;
 void rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter);
 void rotfns(float rotationAngle);
 void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept;
@@ -258,7 +258,6 @@ constexpr auto DEFULEN  = 12.0F;         // default underlay stitch length
 constexpr auto DNDLEN   = 256U;          // designer name decoding table length
 constexpr auto DNELEN   = 128U;          // designer name encoding table length
 constexpr auto DNLEN    = 50U;           // designer name order table length
-constexpr auto FNDFLMAX = 512U;          // max number of files that can be found
 constexpr auto FLTTHR   = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Filter specifications
 constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
 constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
@@ -320,23 +319,6 @@ class COL_CHANGE
   // COL_CHANGE& operator=(COL_CHANGE&&) = default;
   //~COL_CHANGE() = default;
 };
-
-class FIND_INFO
-{
-  public:
-  uint32_t                           count {};
-  std::unique_ptr<WIN32_FIND_DATA[]> data {};
-
-  explicit FIND_INFO(size_t n);
-  FIND_INFO(FIND_INFO const&)                        = delete;
-  FIND_INFO(FIND_INFO&&)                             = default;
-  auto operator=(FIND_INFO const& rhs) -> FIND_INFO& = delete;
-  auto operator=(FIND_INFO&&) -> FIND_INFO&          = default;
-  ~FIND_INFO()                                       = default;
-};
-
-FIND_INFO::FIND_INFO(size_t n) : data {std::make_unique<WIN32_FIND_DATA[]>(n)} {
-}
 
 #pragma pack(push, 1)
 class THR_HEAD // thred file header
@@ -8254,7 +8236,7 @@ void thred::gsnap() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thi::ritlock(gsl::span<WIN32_FIND_DATA const> fileInfo, HWND hwndlg) noexcept {
+void thi::ritlock(std::vector<WIN32_FIND_DATA> const& fileInfo, HWND hwndlg) noexcept {
   SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
   SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
   for (auto const& iFile : fileInfo) {
@@ -8282,33 +8264,37 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 	  if (lparam != 0U) {
+		// ToDo - investigate C++17 option shown here: https://web.archive.org/web/20220812120940/https://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-		auto*      fileInfo   = reinterpret_cast<FIND_INFO*>(lparam);
+		auto*      fileInfo   = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(lparam);
 		auto const searchName = *DefaultDirectory / L"*.thr";
+		auto       result     = WIN32_FIND_DATA {};
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), fileInfo->data.get());
+		auto const searchResult =
+		    FindFirstFile(searchName.wstring().c_str(), &result);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 		if (searchResult == INVALID_HANDLE_VALUE) {
 		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
 		  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
 		  return TRUE;
 		}
-		fileInfo->count = 1;
-		while (FindNextFile(searchResult, &fileInfo->data[fileInfo->count++])) { }
-		--(fileInfo->count);
-		auto const spFileInfo = gsl::span<WIN32_FIND_DATA> {fileInfo->data.get(), fileInfo->count};
-		ritlock(spFileInfo, hwndlg);
+		fileInfo->push_back(result);
+
+		while (FindNextFile(searchResult, &result)) { 
+		  fileInfo->push_back(result);
+		}
+		ritlock(*fileInfo, hwndlg);
 	  }
 	  break;
 	}
 	case WM_COMMAND: {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  auto const* fileInfo = reinterpret_cast<FIND_INFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+	  auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
 		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
-		auto const spFileInfo = gsl::span<WIN32_FIND_DATA> {fileInfo->data.get(), fileInfo->count};
+		auto& spFileInfo = *fileInfo;
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
@@ -8397,10 +8383,8 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
   return FALSE;
 }
 
-void thred::fileLock() {
-  // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
-  // ToDo - Replace FNDFLMAX with maximum files in subdirectory
-  auto lockInfo = FIND_INFO(FNDFLMAX);
+void thred::fileLock() noexcept {
+  auto lockInfo = std::vector<WIN32_FIND_DATA> {};
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
   DialogBoxParam(
       ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)

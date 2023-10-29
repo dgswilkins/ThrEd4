@@ -62,7 +62,7 @@ void duzrat() noexcept;
 void endpnt(POINT const& stitchCoordsInPixels);
 void esccode();
 void filclos();
-void fileLock();
+void fileLock() noexcept;
 void filfrms();
 auto findFirstStitch(uint32_t form) -> uint32_t;
 auto findLastStitch(uint32_t form) -> uint32_t;
