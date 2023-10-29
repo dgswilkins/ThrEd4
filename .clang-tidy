@@ -27,11 +27,6 @@ llvm-*,\
 -llvm-header-guard,\
 -llvm-include-order,\
 -llvm-qualified-auto,\
-llvmlibc-*,\
--llvmlibc-callee-namespace,\
--llvmlibc-implementation-in-namespace,\
--llvmlibc-restrict-system-libc-headers,\
--llvmlibc-inline-function-decl,\
 misc-*,\
 -misc-non-private-member-variables-in-classes,\
 -misc-include-cleaner,\
