@@ -45,13 +45,15 @@ constexpr auto BALPAD = 1006; // balarad file header padding
 class BAL_HEAD // balarad file header
 {
   public:
-  COLORREF color[MAXCOL] {};
+  std::array<COLORREF, MAXCOL> color {};
+
   uint32_t signature {};
   uint16_t version {};
   float    hoopSizeX {};
   float    hoopSizeY {};
   COLORREF backgroundColor {};
-  uint8_t  res[BALPAD] {};
+
+  std::array<uint8_t, BALPAD> res {};
 
   // constexpr BAL_HEAD() noexcept = default;
   // BAL_HEAD(BAL_HEAD const&) = default;
