@@ -231,7 +231,7 @@ extern boost::dynamic_bitset<>* TracedMap;
 
 extern SIZE UnzoomedRect;
 
-extern std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer;
+extern std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer; // NOLINT(modernize-avoid-c-arrays)
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 
