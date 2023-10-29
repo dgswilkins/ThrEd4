@@ -16,20 +16,21 @@ using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, TH
 
 #pragma pack(push, 1)
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// clang-format off
 class PECHDR
 {
   public:
-  char     label[19] {};  // Label string prefixed with "LA:" and padded with space (0x20)
-  int8_t   labnd {};      // carriage return character
-  uint8_t  ukn1[11] {};   // Unknown (' ')
-  uint8_t  ukn2 {};       // Unknown
-  uint16_t hnd1 {};       // Unknown (0x00ff)
-  uint8_t  thumbWidth {}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
+  std::array<char, 19>     label {}; // Label string prefixed with "LA:" and padded with space (0x20)
+  int8_t                   labnd {}; // carriage return character
+  std::array<uint8_t, 11>  ukn1 {};  // Unknown (' ')
+  uint8_t                  ukn2 {};  // Unknown
+  uint16_t                 hnd1 {};  // Unknown (0x00ff)
+  uint8_t                  thumbWidth {};  // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
                           // Thus, 6 would mean 6x8 = 48 pixels per line
-  uint8_t thumbHeight {}; // Thumbnail image height in pixels (38)
-  uint8_t ukn3[12] {};    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
-  uint8_t colorCount {};  // Number of colors minus one, 0xFF means 0 colors
-  uint8_t pad[463] {};    // Pad bytes up to 512.
+  uint8_t                  thumbHeight {}; // Thumbnail image height in pixels (38)
+  std::array<uint8_t, 12>  ukn3 {};        // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
+  uint8_t                  colorCount {};  // Number of colors minus one, 0xFF means 0 colors
+  std::array<uint8_t, 463> pad {};         // Pad bytes up to 512.
 
   constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;
@@ -37,6 +38,7 @@ class PECHDR
   // PECHDR& operator=(PECHDR&&) = default;
   //~PECHDR() = default;
 };
+// clang-format on
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 #pragma pack(pop)
 
@@ -78,44 +80,43 @@ class PES_COLOR_LIST
 };
 
 #pragma pack(push, 1)
-// clang-format off
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 class PESHED
 {
   public:
-  char     ledI[4] {}; //   0-3  Identification (#PES)         
-  char     ledV[4] {}; //   4-7  version (0001)         
-  uint32_t off     {}; //   8-b  Absolute PEC section byte offset
-  uint16_t hpsz    {}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-  uint16_t usdn    {}; //   e,f  Use existing design area (1)
-  uint16_t blct    {}; // 10,11  CSewSeg segment block count (1)
-  uint8_t  hnd1[4] {}; // 12-15  header end (FF FF 00 00)                      
-  uint16_t celn    {}; // 16,17  Length of following string (7)
-  char     ce[7]   {}; // 18-1e  CEmbOne identification (CEmbOne)              
-  int16_t  xlft    {}; // 1f,20  Extent left
-  int16_t  xtop    {}; // 21,22  Extent top
-  int16_t  xrht    {}; // 23,24  Extent right
-  int16_t  xbot    {}; // 25,26  Extent bottom
-  int16_t  plft    {}; // 27,28  Extent left position
-  int16_t  ptop    {}; // 29,2a  Extent top position
-  int16_t  prht    {}; // 2b,2c  Extent right position
-  int16_t  pbot    {}; // 2d,2e  Extent bottom position
-  float    atfm1   {}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
-  float    atfm2   {}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
-  float    atfm3   {}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
-  float    atfm4   {}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
-  float    atfm5   {}; // 3f-42  Affine transform Left_Pos
-  float    atfm6   {}; // 43-46  Affine transform Bottom_Pos
-  uint16_t ukn1    {}; // 47,48  unknown (1)
-  int16_t  xtrn    {}; // 49,4a  CSewSeg x coordinate translation (0)
-  int16_t  ytrn    {}; // 4b,4c  CSewSeg y coordinate translation (0)
-  int16_t  xsiz    {}; // 4d,4e  CSewSeg width
-  int16_t  ysiz    {}; // 4f,50  CSewSeg height
-  int8_t   ukn2[8] {}; // 51,58  unknown (0)                                   
-  uint16_t bcnt    {}; // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-  uint8_t  hnd2[4] {}; // 5b-5e  header end (FF FF 00 00)                      
-  uint16_t cslen   {}; // 5f,60  CSewSeg length (7)
-  char     cs[7]   {}; // 61-67  CSewSeg identification (CSewSeg)              
+  std::array<char, 4>    ledI {};  //   0-3  Identification (#PES)
+  std::array<char, 4>    ledV {};  //   4-7  version (0001)
+  uint32_t               off {};   //   8-b  Absolute PEC section byte offset
+  uint16_t               hpsz {};  //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+  uint16_t               usdn {};  //   e,f  Use existing design area (1)
+  uint16_t               blct {};  // 10,11  CSewSeg segment block count (1)
+  std::array<uint8_t, 4> hnd1 {};  // 12-15  header end (FF FF 00 00)
+  uint16_t               celn {};  // 16,17  Length of following string (7)
+  std::array<char, 7>    ce {};    // 18-1e  CEmbOne identification (CEmbOne)
+  int16_t                xlft {};  // 1f,20  Extent left
+  int16_t                xtop {};  // 21,22  Extent top
+  int16_t                xrht {};  // 23,24  Extent right
+  int16_t                xbot {};  // 25,26  Extent bottom
+  int16_t                plft {};  // 27,28  Extent left position
+  int16_t                ptop {};  // 29,2a  Extent top position
+  int16_t                prht {};  // 2b,2c  Extent right position
+  int16_t                pbot {};  // 2d,2e  Extent bottom position
+  float                  atfm1 {}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
+  float                  atfm2 {}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
+  float                  atfm3 {}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
+  float                  atfm4 {}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
+  float                  atfm5 {}; // 3f-42  Affine transform Left_Pos
+  float                  atfm6 {}; // 43-46  Affine transform Bottom_Pos
+  uint16_t               ukn1 {};  // 47,48  unknown (1)
+  int16_t                xtrn {};  // 49,4a  CSewSeg x coordinate translation (0)
+  int16_t                ytrn {};  // 4b,4c  CSewSeg y coordinate translation (0)
+  int16_t                xsiz {};  // 4d,4e  CSewSeg width
+  int16_t                ysiz {};  // 4f,50  CSewSeg height
+  std::array<int8_t, 8>  ukn2 {};  // 51,58  unknown (0)
+  uint16_t               bcnt {};  // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+  std::array<uint8_t, 4> hnd2 {};  // 5b-5e  header end (FF FF 00 00)
+  uint16_t               cslen {}; // 5f,60  CSewSeg length (7)
+  std::array<char, 7>    cs {};    // 61-67  CSewSeg identification (CSewSeg)
 // uint16_t styp1;     // 68,69  Stitch type (0)
 // uint16_t scol;      // 6a,6b  Stitch Palette thread index
 
@@ -126,7 +127,6 @@ class PESHED
   //~PESHED() = default;
 };
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
-// clang-format on
 #pragma pack(pop)
 
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
@@ -134,8 +134,8 @@ class PESHED
 class PESLED
 {
   public:
-  int8_t   ver[8] {};
-  uint32_t pec {};
+  std::array<int8_t, 8> ver {};
+  uint32_t              pec {};
 
   constexpr PESLED() noexcept = default;
   // PESLED(PESLED&&) = default;
@@ -443,8 +443,7 @@ void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto*      pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
-  auto&      pad        = pecHeader->pad;
-  auto const pesColors  = gsl::span<uint8_t> {std::begin(pad), sizeof(pad)};
+  auto& pesColors  = pecHeader->pad;
   auto       thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto iColor  = 1U;
@@ -571,16 +570,19 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());
 
   constexpr auto PESSTR = "#PES"; // PES lead in value
-  if (strncmp(static_cast<const char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) != 0) {
+  if (strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
   }
-  auto        contFlag      = false;
-  const char* verStrArray[] = {
+  constexpr auto VERLEN   = 13; // number of version strings in the array
+
+  constexpr std::array<const char*, VERLEN> VER_STRINGS = {
       "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
-  for (auto const& version : verStrArray) {
-	if (strncmp(static_cast<const char*>(pesHeader->ledV), version, strlen(version)) == 0) {
+
+  auto contFlag = false;
+  for (auto const& version : VER_STRINGS) {
+	if (strncmp(pesHeader->ledV.data(), version, pesHeader->ledV.size()) == 0) {
 	  contFlag = true;
 	  break;
 	}
@@ -597,8 +599,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   auto const pesColorCount = pecHeader->colorCount + 1U;
-  auto&      pad           = pecHeader->pad;
-  auto const pesColors     = gsl::span<uint8_t> {std::begin(pad), pesColorCount};
+  auto const pesColors     = gsl::span<uint8_t> {pecHeader->pad.data(), pesColorCount};
   auto       colorMap      = boost::dynamic_bitset<>(THTYPCNT);
   auto       iUserColor    = UserColor.begin();
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
@@ -727,15 +728,15 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto AT6OFF  = 100.0F; // Affine transform offset 6
 
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.ledI), PESISTR, strlen(PESISTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.ledV), PESVSTR, strlen(PESVSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.celn, strlen(EMBSTR));
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.ce), EMBSTR, pesHeader.celn); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.ce.data(), EMBSTR, pesHeader.celn); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.cslen, strlen(SEWSTR));
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.cs.data(), SEWSTR, pesHeader.cslen); // NO LINT(clang-diagnostic-deprecated-declarations)
   {
 	auto iPEC = PESequivColors.begin();
 	for (auto const& color : UserColor) {
