@@ -237,6 +237,8 @@
     </None>
     <None Include="cpp.hint" />
     <None Include="..\vcpkg.json" />
+    <None Include="..\vcpkg-configuration.json" />
+    <None Include="..\.clang-tidy" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico">
