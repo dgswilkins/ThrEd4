@@ -25,92 +25,100 @@ constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 class INI_FILE // ini file structure
 {
   public:
-  char     defaultDirectory[DPLEN] {};             // default directory
-  COLORREF stitchColors[COLORCNT] {};              // colors
-  COLORREF stitchPreferredColors[COLORCNT] {};     // stitch preference colors
-  COLORREF backgroundPreferredColors[COLORCNT] {}; // background preference colors
-  COLORREF backgroundColor {};                     // background color
-  COLORREF bitmapColor {};                         // bitmap color
-  float    minStitchLength {};                     // minimum stitch length
-  float    showStitchThreshold {};                 // show stitch points
-  float    threadSize30 {};                        // millimeter size of 30 weight thread
-  float    threadSize40 {};                        // millimeter size of 40 weight thread
-  float    threadSize60 {};                        // millimeter size of 60 weight thread
-  float    userStitchLength {};                    // user stitch length
-  float    maxStitchLength {};                     // maximum stitch length
-  float    smallStitchLength {};                   // small stitch size
-  float    stitchBoxesThreshold {};                // show sitch box level
-  float    stitchSpace {};                         // stitch spacing between lines of stitches
-  float    fillAngle {};                           // fill angle
-  uint32_t userFlagMap {};                         // bitmap for user variables
-  float    borderWidth {};                         // border width
-  uint32_t appliqueColor {};                       // applique color
-  char     prevNames[OLDNUM][_MAX_PATH] {{}};      // last file names
-  float    snapLength {};                          // snap together length
-  float    starRatio {};                           // star ratio
-  float    spiralWrap {};                          // spiral wrap
-  COLORREF bitmapBackgroundColors[COLORCNT] {};    // bitmap background color preferences
-  float    buttonholeCornerLength {};              // buttonhole fill corner length
-  float    picotSpace {};                          // space between border picots
-  int8_t   hoopType {};                            // hoop type
-  int8_t   auxFileType {};                         // machine file type
-  float    hoopSizeX {};                           // hoop x size
-  float    hoopSizeY {};                           // hoop y size
-  float    rotationAngle {};                       // rotation angle
-  float    gridSize {};                            // grid size
-  float    clipOffset {};                          // clipboard offset
-  RECT     initialWindowCoords {};                 // initial window coordinates
-  COLORREF gridColor {};                           // grid color
-  uint32_t fillPhase {};                           // clipboard fill phase
-  float    customHoopX {};                         // custom hoop width
-  float    customHoopY {};                         // custom hoop height
-  float    traceLength {};                         // lens points
-  float    traceRatio {};                          // trace ratio
-  float    chainSpace {};                          // chain space
-  float    chainRatio {};                          // chain ratio
-  float    lensRatio {};                           // lens aspect ratio
-  float    AppStitchLen {};                        // Applique stitch length
-  float    cursorNudgeStep {};                     // cursor nudge step
-  uint16_t nudgePixels {};                         // nudge pixels
-  float    eggRatio {};                            // egg ratio
-  uint16_t stitchSizePixels {};                    // size of stitch points in pixels
-  uint16_t formVertexSizePixels {};                // size of form points in pixels
-  uint16_t formSides {};                           // sides of a created form
-  float    tearTailLength {};                      // length of the tear tail
-  float    tearTwistStep {};                       // tear twist step
-  float    tearTwistRatio {};                      // tear twist ratio
-  uint16_t wavePoints {};                          // wave points
-  uint16_t waveStart {};                           // wave strting point
-  uint16_t waveEnd {};                             // wave ending point;
-  uint16_t waveLobes {};                           // wave lobes
-  uint8_t  featherFillType {};                     // feather fill type
-  uint8_t  featherUpCount {};                      // feather up count
-  uint8_t  featherDownCount {};                    // feather down count
-  uint8_t  featherType {};                         // feather bits
-  float    featherRatio {};                        // feather ratio
-  float    featherMinStitchSize {};                // feather floor
-  uint16_t featherCount {};                        // feather fill psg granularity
-  char     p2cName[MAX_PATH] {};                   // pes2card file
-  float    underlayIndent {};                      // edge walk/underlay indent
-  float    underlayAngle {};                       // underlay angle
-  float    underlaySpacing {};                     // underlay spacing
-  float    underlayStitchLen {};                   // underlay stitch length
-  float    daisyDiameter {};                       // daisy diameter
-  float    daisyPetalLen {};                       // daisy petal length
-  float    daisyHoleDiameter {};                   // daisy hole diameter
-  uint32_t daisyPetalCount {};                     // daisy petals
-  uint32_t daisyPetalPoints {};                    // daisy petal points
-  uint32_t daisyInnerCount {};                     // daisy inner count
-  uint8_t  daisyBorderType {};                     // daisy border type
-  uint8_t  dataCheck {};                           // data check
-  float    textureHeight {};                       // textured fill height
-  float    textureWidth {};                        // textured fill width
-  float    textureSpacing {};                      // textured fill spacing
-  uint16_t formBoxSizePixels {};                   // form box pixels
-  uint16_t daisyHeartCount {};                     // daisy heart count
-  uint16_t textureEditorSize {};                   // texture editor pixels
-  float    clpspc {};                              // clipboard fill spacing
-  char     designerName[NAME_LEN] {};              // designer name
+  std::array<char, DPLEN>        defaultDirectory {};          // default directory
+  std::array<COLORREF, COLORCNT> stitchColors {};              // colors
+  std::array<COLORREF, COLORCNT> stitchPreferredColors {};     // stitch preference colors
+  std::array<COLORREF, COLORCNT> backgroundPreferredColors {}; // background preference colors
+
+  COLORREF backgroundColor {};      // background color
+  COLORREF bitmapColor {};          // bitmap color
+  float    minStitchLength {};      // minimum stitch length
+  float    showStitchThreshold {};  // show stitch points
+  float    threadSize30 {};         // millimeter size of 30 weight thread
+  float    threadSize40 {};         // millimeter size of 40 weight thread
+  float    threadSize60 {};         // millimeter size of 60 weight thread
+  float    userStitchLength {};     // user stitch length
+  float    maxStitchLength {};      // maximum stitch length
+  float    smallStitchLength {};    // small stitch size
+  float    stitchBoxesThreshold {}; // show sitch box level
+  float    stitchSpace {};          // stitch spacing between lines of stitches
+  float    fillAngle {};            // fill angle
+  uint32_t userFlagMap {};          // bitmap for user variables
+  float    borderWidth {};          // border width
+  uint32_t appliqueColor {};        // applique color
+
+  std::array<std::array<char, _MAX_PATH>, OLDNUM> prevNames {{}}; // last file names
+
+  float snapLength {}; // snap together length
+  float starRatio {};  // star ratio
+  float spiralWrap {}; // spiral wrap
+
+  std::array<COLORREF, COLORCNT> bitmapBackgroundColors {}; // bitmap background color preferences
+
+  float    buttonholeCornerLength {}; // buttonhole fill corner length
+  float    picotSpace {};             // space between border picots
+  int8_t   hoopType {};               // hoop type
+  int8_t   auxFileType {};            // machine file type
+  float    hoopSizeX {};              // hoop x size
+  float    hoopSizeY {};              // hoop y size
+  float    rotationAngle {};          // rotation angle
+  float    gridSize {};               // grid size
+  float    clipOffset {};             // clipboard offset
+  RECT     initialWindowCoords {};    // initial window coordinates
+  COLORREF gridColor {};              // grid color
+  uint32_t fillPhase {};              // clipboard fill phase
+  float    customHoopX {};            // custom hoop width
+  float    customHoopY {};            // custom hoop height
+  float    traceLength {};            // lens points
+  float    traceRatio {};             // trace ratio
+  float    chainSpace {};             // chain space
+  float    chainRatio {};             // chain ratio
+  float    lensRatio {};              // lens aspect ratio
+  float    AppStitchLen {};           // Applique stitch length
+  float    cursorNudgeStep {};        // cursor nudge step
+  uint16_t nudgePixels {};            // nudge pixels
+  float    eggRatio {};               // egg ratio
+  uint16_t stitchSizePixels {};       // size of stitch points in pixels
+  uint16_t formVertexSizePixels {};   // size of form points in pixels
+  uint16_t formSides {};              // sides of a created form
+  float    tearTailLength {};         // length of the tear tail
+  float    tearTwistStep {};          // tear twist step
+  float    tearTwistRatio {};         // tear twist ratio
+  uint16_t wavePoints {};             // wave points
+  uint16_t waveStart {};              // wave strting point
+  uint16_t waveEnd {};                // wave ending point;
+  uint16_t waveLobes {};              // wave lobes
+  uint8_t  featherFillType {};        // feather fill type
+  uint8_t  featherUpCount {};         // feather up count
+  uint8_t  featherDownCount {};       // feather down count
+  uint8_t  featherType {};            // feather bits
+  float    featherRatio {};           // feather ratio
+  float    featherMinStitchSize {};   // feather floor
+  uint16_t featherCount {};           // feather fill psg granularity
+
+  std::array<char, MAX_PATH> p2cName {}; // pes2card file
+
+  float    underlayIndent {};    // edge walk/underlay indent
+  float    underlayAngle {};     // underlay angle
+  float    underlaySpacing {};   // underlay spacing
+  float    underlayStitchLen {}; // underlay stitch length
+  float    daisyDiameter {};     // daisy diameter
+  float    daisyPetalLen {};     // daisy petal length
+  float    daisyHoleDiameter {}; // daisy hole diameter
+  uint32_t daisyPetalCount {};   // daisy petals
+  uint32_t daisyPetalPoints {};  // daisy petal points
+  uint32_t daisyInnerCount {};   // daisy inner count
+  uint8_t  daisyBorderType {};   // daisy border type
+  uint8_t  dataCheck {};         // data check
+  float    textureHeight {};     // textured fill height
+  float    textureWidth {};      // textured fill width
+  float    textureSpacing {};    // textured fill spacing
+  uint16_t formBoxSizePixels {}; // form box pixels
+  uint16_t daisyHeartCount {};   // daisy heart count
+  uint16_t textureEditorSize {}; // texture editor pixels
+  float    clpspc {};            // clipboard fill spacing
+
+  std::array<char, NAME_LEN> designerName {}; // designer name
 
   // constexpr INI_FILE() noexcept = default;
   // INI_FILE(INI_FILE const&) = default;
