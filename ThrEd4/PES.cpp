@@ -384,7 +384,7 @@ void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
 #pragma warning(disable : 4996)
 void pi::pecnam(gsl::span<char> const& label) {
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(label.data(), "LA:", 3); 
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
@@ -392,7 +392,7 @@ void pi::pecnam(gsl::span<char> const& label) {
   }
   auto* ptr = std::next(label.data(), 3U);
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(ptr, fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(ptr, fileStem.c_str(), lblSize); 
 }
 #pragma warning(pop)
 
