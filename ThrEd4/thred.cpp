@@ -367,15 +367,15 @@ class THR_HEAD // thred file header
 class THR_HEAD_EX // thred v1.0 file header extension
 {
   public:
-  float    hoopSizeX {};              // hoop size x dimension
-  float    hoopSizeY {};              // hoop size y dimension
-  float    stgran {};                 // stitches per millimeter
-  char     creatorName[NAME_LEN] {};  // name of the file creator
-  char     modifierName[NAME_LEN] {}; // name of last file modifier
-  int8_t   auxFormat {};              // auxillary file format
-  int8_t   stres {};                  // reserved
-  uint32_t texturePointCount {};      // textured fill point count
-  int8_t   res[RES_SIZE] {};          // reserved for expansion
+  float                        hoopSizeX {};         // hoop size x dimension
+  float                        hoopSizeY {};         // hoop size y dimension
+  float                        stgran {};            // stitches per millimeter
+  std::array<char, NAME_LEN>   creatorName {};       // name of the file creator
+  std::array<char, NAME_LEN>   modifierName {};      // name of last file modifier
+  int8_t                       auxFormat {};         // auxillary file format
+  int8_t                       stres {};             // reserved
+  uint32_t                     texturePointCount {}; // textured fill point count
+  std::array<int8_t, RES_SIZE> res {};               // reserved for expansion
 
   // constexpr THR_HEAD_EX() noexcept = default;
   // THR_HEAD_EX(THR_HEAD_EX const&) = default;
@@ -5054,8 +5054,7 @@ void thred::newFil() {
   StateMap->reset(StateFlag::CMPDO);
   bitmap::resetBmpFile(true);
   backup::deldu();
-  auto& desName = IniFile.designerName;
-  DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
+  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
@@ -5926,8 +5925,7 @@ void thi::setsped() {
 }
 
 void thred::deltot() {
-  auto& desName = IniFile.designerName;
-  DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
+  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   TexturePointsBuffer->clear();
   FormList->clear();
   StitchBuffer->clear();
@@ -10541,13 +10539,13 @@ void thi::redini() {
 	}
 	else {
 	  auto const directory =
-	      utf::utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
+	      utf::utf8ToUtf16(std::string(IniFile.defaultDirectory.data()));
 	  DefaultDirectory->assign(directory);
 	  {
 		auto previousName = PreviousNames->begin();
 		for (auto const& prevName : IniFile.prevNames) {
-		  if (strlen(std::begin(prevName)) != 0U) {
-			previousName->assign(utf::utf8ToUtf16(std::string(std::begin(prevName))));
+		  if (strlen(prevName.data()) != 0U) {
+			previousName->assign(utf::utf8ToUtf16(std::string(prevName.data())));
 		  }
 		  else {
 			previousName->clear();
@@ -10555,7 +10553,7 @@ void thi::redini() {
 		  ++previousName;
 		}
 	  }
-	  DesignerName->assign(utf::utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
+	  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
 	  thi::loadColors();
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
@@ -12587,8 +12585,7 @@ auto thred::setFileName() -> fs::path {
 }
 
 auto thred::getDesigner() -> std::wstring {
-  auto&      modifierName = ExtendedHeader->modifierName;
-  auto const modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
+  auto const modifier     = utf::utf8ToUtf16(std::string(ExtendedHeader->modifierName.data()));
   return displayText::format2(IDS_CREATBY, *DesignerName, modifier);
 }
 
