@@ -443,20 +443,20 @@ void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto*      pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
-  auto& pesColors  = pecHeader->pad;
   auto       thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto iColor  = 1U;
   auto color   = StitchBuffer->front().attribute & COLMSK;
   auto iPEC    = wrap::next(PESequivColors.begin(), color);
-  pesColors[0] = *iPEC;
+  auto iPesColors = pecHeader->pad.begin();
+  *iPesColors++ = *iPEC;
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	if ((stitchFwd1.attribute & COLMSK) != color) {
 	  color = stitchFwd1.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
 	  iPEC              = wrap::next(PESequivColors.begin(), color);
-	  pesColors[iColor] = *iPEC;
+	  *iPesColors++ = *iPEC;
 	  ++iColor;
 	}
 	auto const xDelta = stitchFwd1.x - thisStitch.x;
