@@ -544,7 +544,7 @@ void trace::tracedg() {
 	  TracedEdges->set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 	}
   }
-  auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+  auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
   for (auto& iPixel : spTBD) {
