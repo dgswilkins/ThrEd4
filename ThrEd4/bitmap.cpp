@@ -174,16 +174,16 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	// Synchronize
 	GdiFlush();
 	auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
-	auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
+	auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth * BitmapHeight));
 	auto       srcOffset = 0U;
-	auto       dstOffset = 0;
+	auto       dstOffset = 0U;
 	auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
 	for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
 	  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
-	  auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
+	  auto const spLineDst = spBits.subspan(dstOffset, wrap::toSize(BitmapWidth));
 	  bi::bitlin(spLineSrc, spLineDst, foreground, background);
 	  srcOffset += bitmapWidthBytes;
-	  dstOffset += BitmapWidth;
+	  dstOffset += wrap::toUnsigned(BitmapWidth);
 	}
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC); deviceContext != nullptr) {
