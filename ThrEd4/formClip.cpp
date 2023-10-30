@@ -336,7 +336,7 @@ void fci::clipSelectedForms() {
 	  pointsSize += form.clipEntries;
 	}
   }
-  auto pointCount = 0;
+  auto pointCount = uint32_t {0U};
   if (pointsSize != 0U) {
 	auto const points = gsl::span<F_POINT> {ptrPoints, pointsSize};
 	for (auto& selectedForm : (*SelectedFormList)) {
@@ -359,7 +359,7 @@ void fci::clipSelectedForms() {
 	}
   }
   // Skip past the points
-  auto* textures     = convertFromPtr<TX_PNT*>(std::next(ptrPoints, pointCount));
+  auto* textures     = convertFromPtr<TX_PNT*>(std::next(ptrPoints, wrap::toPtrdiff(pointCount)));
   auto  textureCount = uint16_t {};
   iForm              = 0;
   for (auto& selectedForm : (*SelectedFormList)) {
