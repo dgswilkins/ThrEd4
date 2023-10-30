@@ -343,7 +343,7 @@ void trace::trdif() {
   if (!StateMap->test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
-  auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(bitmapSize));
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
 	  auto iPoint = iHeight * bitmap::getBitmapWidth();
