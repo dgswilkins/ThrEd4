@@ -1264,7 +1264,6 @@ void trace::wasTrace() {
   auto       iTraceShift         = TraceShift.begin();
   auto       iTraceRGB           = TraceRGB.begin();
   auto       iTraceRGBFlag       = TraceRGBFlag.begin();
-  auto       iRGB                = 0U;
   for (auto const& brush : TraceBrush) {
 	if (DrawItem->hwndItem == *(iTraceUpWindow++)) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
@@ -1312,7 +1311,6 @@ void trace::wasTrace() {
 	++iTraceShift;
 	++iTraceRGB;
 	++iTraceRGBFlag;
-	++iRGB;
   }
 }
 
