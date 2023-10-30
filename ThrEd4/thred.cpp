@@ -856,7 +856,6 @@ void thred::coltab() {
 	}
 	currentColor = stitchIt->attribute & COLMSK;
   }
-  auto iColor      = 0U;
   auto iStitch     = 0U;
   currentColor     = std::numeric_limits<decltype(currentColor)>::max();
   auto const range = F_RECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
@@ -879,7 +878,6 @@ void thred::coltab() {
 	auto const nextColor = stitch.attribute & COLMSK;
 	if (currentColor != nextColor) {
 	  addColor(iStitch, nextColor);
-	  ++iColor;
 	  currentColor = nextColor;
 	}
 	++iStitch;
@@ -5526,7 +5524,6 @@ void thi::doStretch(uint32_t start, uint32_t end) {
   auto       firstStitch  = wrap::next(StitchBuffer->begin(), start);
   auto       centerStitch = std::next(firstStitch);
   auto       lastStitch   = std::next(centerStitch);
-  auto       offsetStitch = centerStitch - StitchBuffer->begin();
   auto const endStitch    = wrap::next(StitchBuffer->begin(), end);
   thred::savdo();
   while (lastStitch != endStitch) {
@@ -5542,7 +5539,6 @@ void thi::doStretch(uint32_t start, uint32_t end) {
 	++firstStitch;
 	++centerStitch;
 	++lastStitch;
-	++offsetStitch;
   }
   StateMap->set(StateFlag::RESTCH);
 }
