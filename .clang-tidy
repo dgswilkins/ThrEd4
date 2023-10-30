@@ -1,37 +1,22 @@
 ---
-Checks:            "-*,\
-boost-*,\
-bugprone-*,\
+Checks:            "*,\
+-altera-*,\
 -bugprone-easily-swappable-parameters,\
-cert-*,\
-clang-analyzer-*,\
-cppcoreguidelines-*,\
 -cppcoreguidelines-avoid-c-arrays,\
+-cppcoreguidelines-avoid-magic-numbers,\
 -cppcoreguidelines-avoid-non-const-global-variables,\
 -cppcoreguidelines-pro-bounds-constant-array-index,\
 -cppcoreguidelines-pro-type-union-access,\
-fuchsia-*,\
--fuchsia-default-arguments-calls,\
--fuchsia-default-arguments-declarations,\
--fuchsia-overloaded-operator,\
--fuchsia-trailing-return,\
-google-*,\
--google-readability-namespace-comments,\
-hicpp-*,\
+-fuchsia-*,\
+-llvmlibc-*,\
 -hicpp-avoid-c-arrays,\
-llvm-*,\
 -llvm-header-guard,\
 -llvm-include-order,\
 -llvm-qualified-auto,\
-misc-*,\
 -misc-non-private-member-variables-in-classes,\
 -misc-include-cleaner,\
-modernize-*,\
-performance-*,\
-portability-*,\
-readability-*,\
--readability-function-cognitive-complexity,\
--readability-magic-numbers"
+-readability-function-cognitive-complexity
+"
 WarningsAsErrors:  ''
 HeaderFilterRegex: '^.*ThrEd4\\ThrEd4\\(?!Resources\\).*\.(h|hxx|cxx)$'
 FormatStyle:       'file'
