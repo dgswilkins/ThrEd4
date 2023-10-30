@@ -968,7 +968,7 @@ void trace::trcsel() {
   trace::trace();
   StateMap->reset(StateFlag::HIDMAP);
   StateMap->reset(StateFlag::TRSET);
-  auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+  auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
   for (auto& iPixel : spTBD) {
 	auto colors                = ti::trcols(iPixel);
