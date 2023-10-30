@@ -9090,7 +9090,7 @@ void thred::updateHoopSize() {
   if (itHwnd == SideWindow->end()) {
 	return;
   }
-  switch (auto const option = std::distance(SideWindow->begin(), itHwnd) + 1U; option) {
+  switch (auto const option = std::distance(SideWindow->begin(), itHwnd) + 1; option) {
 	case SETCUST: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
 	  IniFile.customHoopY = IniFile.hoopSizeY;
