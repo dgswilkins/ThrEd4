@@ -322,7 +322,6 @@ void displayText::savdisc() {
 
 namespace {
 auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
 }
@@ -392,6 +391,6 @@ auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 
 #pragma warning(suppress : 26461) // con.3 The pointer argument can be marked as a pointer to const
 void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }

@@ -339,7 +339,6 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 // clang-format on
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
   auto translatedColor = PES_THREAD[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
@@ -522,7 +521,6 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
   auto const& threadColor = PES_THREAD[pesColors[index++] % THTYPCNT];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   auto       iUserColor = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
@@ -608,7 +606,6 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		continue;
 	  }
 	  auto const& threadColor = PES_THREAD[pesColors[iColor]];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 	  *iUserColor      = color;
 	  ++iUserColor;
@@ -617,7 +614,6 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  }
 	  continue;
 	}
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	auto constexpr COLOR = RGB(PES_THREAD[0].color.r,
 	                           PES_THREAD[0].color.g,
 	                           PES_THREAD[0].color.b); // color unknown
@@ -699,7 +695,6 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = CreateFile(
       auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;

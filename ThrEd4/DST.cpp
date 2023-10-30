@@ -124,7 +124,6 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
 	if (colorFile != INVALID_HANDLE_VALUE) {
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
@@ -314,7 +313,6 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto colorFile =
       CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                colorData.data(),
@@ -324,7 +322,6 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   }
   CloseHandle(colorFile);
   colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                &colorData[2],
@@ -355,9 +352,7 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
 }
 
 auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   auto color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
@@ -953,7 +948,6 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
       auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;

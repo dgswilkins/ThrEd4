@@ -736,7 +736,6 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -802,7 +801,6 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
 		  break;
 		}
@@ -822,7 +820,6 @@ void formForms::dasyfrm() {
   thred::unmsg();
   // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
@@ -1011,7 +1008,6 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1054,7 +1050,6 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1073,7 +1068,6 @@ void formForms::setear() {
   thred::unmsg();
   // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
@@ -1178,7 +1172,6 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1219,7 +1212,6 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1238,7 +1230,6 @@ void formForms::wavfrm() {
   thred::unmsg();
   // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on

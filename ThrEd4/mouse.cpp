@@ -133,9 +133,7 @@ auto mouse::getArrowCursor() noexcept -> HCURSOR {
 #pragma warning(push)
 #pragma warning(disable : 26493) // Don't use C-style casts (type.4)
 void mouse::crtcurs() noexcept {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   ArrowCursor           = LoadCursor(nullptr, IDC_ARROW);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   CrossCursor           = LoadCursor(nullptr, IDC_CROSS);
   FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));
   DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));

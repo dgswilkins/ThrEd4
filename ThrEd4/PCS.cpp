@@ -68,7 +68,6 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
       auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
@@ -285,7 +284,6 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
 	return false;

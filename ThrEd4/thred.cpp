@@ -516,7 +516,6 @@ auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
 } // namespace
 
 auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -528,7 +527,6 @@ auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -610,7 +608,6 @@ auto thred::getMsgBufferValue() -> float {
 void thred::getdes() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
@@ -2172,7 +2169,6 @@ auto thi::oldwnd(HWND window) noexcept -> bool {
 }
 
 auto CALLBACK thi::enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   UNREFERENCED_PARAMETER(lParam);
   if (oldwnd(hwnd)) {
 	return DestroyWindow(hwnd);
@@ -2919,7 +2915,6 @@ void thi::getDocsFolder(fs::path& directory) {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
   auto const hResult  = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (SUCCEEDED(hResult)) {
 	directory.assign(ppszPath); // make a local copy of the path
   }
@@ -3004,7 +2999,6 @@ void thi::ritini() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const iniFileHandle = CreateFile(
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (iniFileHandle != INVALID_HANDLE_VALUE) {
 	auto bytesRead = DWORD {};
 	WriteFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
@@ -3203,7 +3197,6 @@ void thi::thrsav() {
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const file = FindFirstFile(geName.wstring().c_str(), &fileData);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	if (file != INVALID_HANDLE_VALUE) {
 	  StateMap->reset(StateFlag::CMPDO);
 	  for (auto& version : *VersionNames) {
@@ -3238,7 +3231,6 @@ void thi::thrsav() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
       CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(*ThrName);
 	return;
@@ -3323,7 +3315,6 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult) || (nullptr == pFileSave)) {
 	return false;
   }
@@ -3338,24 +3329,20 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
   hResult += pFileSave->SetTitle(L"Save As");
   hResult += pFileSave->SetFileName(fileName.filename().c_str());
   hResult += pFileSave->SetDefaultExtension(L"thr");
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
   hResult = pFileSave->Show(nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
   auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
   hResult     = pFileSave->GetResult(&pItem);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult) || (nullptr == pItem)) {
 	return false;
   }
   auto reply = 0U;
   hResult    = pFileSave->GetFileTypeIndex(&reply);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
@@ -3386,7 +3373,6 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto pszFilePath = PWSTR {nullptr};
   hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
@@ -3771,13 +3757,11 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
       CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult) || (nullptr == pFileOpen)) {
 	return false;
   }
   auto dwOptions = DWORD {};
   hResult        = pFileOpen->GetOptions(&dwOptions);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
@@ -3830,25 +3814,21 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	psiFrom->Release();
   }
 #endif
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
   hResult = pFileOpen->Show(nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
   auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
   hResult     = pFileOpen->GetResult(&pItem);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult) || (nullptr == pItem)) {
 	return false;
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto pszFilePath = PWSTR {nullptr};
   hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	return false;
   }
@@ -4125,7 +4105,6 @@ auto thred::getFileHandle(fs::path const& newFileName, HANDLE& fileHandle) -> bo
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const handle =
       CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (handle == INVALID_HANDLE_VALUE) {
 	if (GetLastError() == ERROR_SHARING_VIOLATION) {
 	  displayText::filnopn(IDS_FNOPNA, newFileName);
@@ -6389,7 +6368,6 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
 	return false;
@@ -7421,7 +7399,6 @@ void thred::thumnail() {
   auto const searchName = *DefaultDirectory / L"*.thr";
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const file = FindFirstFile(searchName.wstring().c_str(), &fileData);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
 	auto const fmtStr  = displayText::format2(IDS_FFINDERR, searchName.wstring(), dwError);
@@ -8250,7 +8227,6 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto const searchResult =
 		    FindFirstFile(searchName.wstring().c_str(), &result);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		if (searchResult == INVALID_HANDLE_VALUE) {
 		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
 		  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
@@ -8272,7 +8248,6 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
 		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
 		auto& spFileInfo = *fileInfo;
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
 			EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
@@ -8355,7 +8330,6 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void thred::fileLock() noexcept {
   auto lockInfo = std::vector<WIN32_FIND_DATA> {};
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
   DialogBoxParam(
       ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 }
@@ -8917,7 +8891,6 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_
 }
 
 auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -8952,7 +8925,6 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -9014,7 +8986,6 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 void thred::dufdef() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
       // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
 }
@@ -10256,7 +10227,6 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  ++previousName;
 		}
 	  }
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  auto const wParameter = LOWORD(Msg.wParam);
 	  if (wParameter >= ID_FILE_OPEN1 && wParameter <= ID_AUXPES) {
 		thred::undat();
@@ -10349,7 +10319,6 @@ void thi::ritloc() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
   auto const hResult  = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (FAILED(hResult)) {
 	CoTaskMemFree(ppszPath); // free up the path memory block
 	return;
@@ -10361,7 +10330,6 @@ void thi::ritloc() {
   lockFilePath /= L"thredloc.txt";
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (lockFile != INVALID_HANDLE_VALUE) {
 	auto       bytesWritten = DWORD {};
 	auto const value        = utf::utf16ToUtf8(*HomeDirectory);
@@ -10399,7 +10367,6 @@ void thi::ducmd() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto balaradFile =
       CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (balaradFile == INVALID_HANDLE_VALUE) {
 	return;
   }
@@ -10416,7 +10383,6 @@ void thi::ducmd() {
   balaradFileName = *HomeDirectory / arg2.substr(4);
   balaradFile =
       CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (balaradFile == INVALID_HANDLE_VALUE) {
 	return;
   }
@@ -10470,7 +10436,6 @@ void thi::redini() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const iniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (iniFileHandle == INVALID_HANDLE_VALUE) {
 	setPrefs();
   }
@@ -10682,7 +10647,6 @@ void thi::init() {
   auto const screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) / 2;
   ReleaseDC(nullptr, deviceContext);
   TexturePointsBuffer->clear();
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
   MainMenu   = GetMenu(ThrEdWindow);
   auto wRect = RECT {};
@@ -11457,7 +11421,6 @@ void thi::dubar() {
 void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (thrEdFile == INVALID_HANDLE_VALUE) {
 	return;
   }
@@ -11684,7 +11647,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_HSCROLL: {
 	  constexpr auto SPEDLIN = int32_t {30};  // speed change for line message on speed scroll bar
 	  constexpr auto SPEDPAG = int32_t {120}; // speed change for page message on speed scroll bar
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
 		case SB_LINELEFT: {
 		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
@@ -11756,7 +11718,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 			  auto const position = HIWORD(wParam);
 			  MovieTimeStep       = MAXDELAY - position;
 			  setsped();
@@ -11767,7 +11728,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
 			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 			  ZoomRect.left        = wrap::toFloat(HIWORD(wParam));
 			  ZoomRect.right       = ZoomRect.left + zoomWidth;
 			  auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
@@ -11788,7 +11748,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	  break;
 	}
 	case WM_VSCROLL: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wParam)) {
 		case SB_LINEDOWN: {
 		  auto scrollPoint = POINT {};
@@ -11818,7 +11777,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		}
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  ZoomRect.top    = wrap::toFloat(UnzoomedRect.cy) - wrap::toFloat(HIWORD(wParam));
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
@@ -11874,7 +11832,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			  }
 			}
 		  }
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 		  BitBlt(StitchWindowDC,                // handle to destination DC
 		         0,                             // x-coord of destination upper-left corner
 		         0,                             // y-coord of destination upper-left corner
@@ -12184,19 +12141,16 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	winClass.cbClsExtra  = 0;
 	winClass.cbWndExtra  = 0;
 	winClass.hInstance   = ThrEdInstance;
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	winClass.hIcon = gsl::narrow_cast<HICON>(
 	    LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, ICONDIM, ICONDIM, LR_SHARED));
 	winClass.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
 	                            //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	winClass.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	winClass.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);
 	winClass.lpszClassName = L"thred";
 	winClass.hIconSm       = nullptr;
 
 #if HIGHDPI
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(readability-qualified-auto)
 	auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 #endif
 

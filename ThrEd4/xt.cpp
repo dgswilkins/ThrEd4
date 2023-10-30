@@ -2340,7 +2340,6 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -2439,7 +2438,6 @@ void xt::nudsiz() {
   DesignSize.x = designSizeRect.right - designSizeRect.left;
   DesignSize.y = designSizeRect.top - designSizeRect.bottom;
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(
       ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr

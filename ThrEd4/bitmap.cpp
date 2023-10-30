@@ -99,7 +99,6 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto hBitmapFile =
       CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts 
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
 	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
 	CloseHandle(hBitmapFile);
@@ -345,7 +344,6 @@ void bitmap::savmap() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hBitmap =
       CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
   if (hBitmap == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(*UTF16BMPname);
 	return;
