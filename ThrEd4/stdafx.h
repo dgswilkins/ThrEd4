@@ -24,11 +24,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26812) // supress warning for fmt library header
-#pragma warning(disable : 26814) // supress warning for boost library header
 #include "boost/dynamic_bitset.hpp"
 #include "fmt/xchar.h"
 #include "gsl/gsl"

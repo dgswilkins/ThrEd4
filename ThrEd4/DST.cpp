@@ -979,9 +979,6 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	}
   }
   // clang-format off
-  // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
-  #pragma warning(push)
-  #pragma warning(disable : 26481)
   constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
   spDstHdrDesc.back() = CAR;
   strncpy(dstHeader.recshed.data(),  "ST:",                                                             dstHeader.recshed.size());
@@ -1007,7 +1004,6 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   strncpy(dstHeader.pdhed.data(),    "PD",                                                              dstHeader.pdhed.size());
   strncpy(dstHeader.pd.data(),       "******\r",                                                        dstHeader.pd.size());
   strncpy(dstHeader.eof.data(),      "\x1a",                                                            dstHeader.eof.size());
-  #pragma warning(pop)
   // clang-format on
   auto& res = dstHeader.res;
   std::ranges::fill(res, ' ');

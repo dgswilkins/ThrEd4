@@ -5,10 +5,7 @@
 #include "warnings.h"
 
 // Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "gsl/gsl"
-#pragma warning(pop)
 
 // Standard Libraries
 #include <cstdint>

@@ -50,9 +50,7 @@ namespace bui {
 void redbak();
 } // namespace bui
 
-// Supress bounds.1 	Don't use pointer arithmetic. Use span instead
 #pragma warning(push)
-#pragma warning(disable : 26481)
 void backup::dudat() {
   auto& undoBuffer = *UndoBuffer;
   undoBuffer[UndoBufferWriteIndex].reset(nullptr);

@@ -130,8 +130,6 @@ auto mouse::getArrowCursor() noexcept -> HCURSOR {
   return ArrowCursor;
 }
 
-#pragma warning(push)
-#pragma warning(disable : 26493) // Don't use C-style casts (type.4)
 void mouse::crtcurs() noexcept {
   ArrowCursor           = LoadCursor(nullptr, IDC_ARROW);
   CrossCursor           = LoadCursor(nullptr, IDC_CROSS);
@@ -143,7 +141,6 @@ void mouse::crtcurs() noexcept {
   NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown));
   NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));
 }
-#pragma warning(pop)
 
 void mouse::dstcurs() noexcept {
   DestroyCursor(FormCursor);
