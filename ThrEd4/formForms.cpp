@@ -1067,9 +1067,9 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 void formForms::setear() {
   thred::unmsg();
   // clang-format off
-  // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
 	return;
@@ -1229,9 +1229,9 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 void formForms::wavfrm() {
   thred::unmsg();
   // clang-format off
-  // resharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  // resharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
 	return;

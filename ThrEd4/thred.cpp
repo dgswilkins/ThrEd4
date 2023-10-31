@@ -2934,7 +2934,6 @@ void thi::ritini() {
   constexpr char FILLCHAR  = '\0';
   std::ranges::fill(IniFile.defaultDirectory, FILLCHAR);
   auto const spIDD = gsl::span {IniFile.defaultDirectory};
-  // ReSharper disable CppExpressionWithoutSideEffects
   std::ranges::copy(directory, spIDD.begin());
   auto previousName = PreviousNames->begin();
   for (auto& prevName : IniFile.prevNames) {
@@ -2949,7 +2948,6 @@ void thi::ritini() {
   auto const designer = utf::utf16ToUtf8(*DesignerName);
   std::ranges::fill(IniFile.designerName, FILLCHAR);
   auto const spIDN = gsl::span {IniFile.designerName};
-  // ReSharper disable CppExpressionWithoutSideEffects
   std::ranges::copy(designer, spIDN.begin());
   auto const spISC = gsl::span {IniFile.stitchColors};
   std::ranges::copy(UserColor, spISC.begin());
@@ -5008,7 +5006,6 @@ void thred::newFil() {
   thi::ritfnam(*DesignerName);
   auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
-  // ReSharper disable CppExpressionWithoutSideEffects
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   thi::rstdu();

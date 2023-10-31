@@ -381,8 +381,8 @@ void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
+// ReSharper disable CppDeprecatedEntity
 void pi::pecnam(gsl::span<char> const& label) {
-  // ReSharper disable once CppDeprecatedEntity
   strncpy(label.data(), "LA:", 3); 
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::utf16ToUtf8(AuxName->stem());
@@ -390,9 +390,9 @@ void pi::pecnam(gsl::span<char> const& label) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
   auto* ptr = std::next(label.data(), 3U);
-  // ReSharper disable once CppDeprecatedEntity
   strncpy(ptr, fileStem.c_str(), lblSize); 
 }
+// ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
 
 void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta) {
@@ -722,16 +722,14 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto AT5OFF  = 350.0F; // Affine transform offset 5
   constexpr auto AT6OFF  = 100.0F; // Affine transform offset 6
 
-  // ReSharper disable once CppDeprecatedEntity
+// ReSharper disable CppDeprecatedEntity
   strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
-  // ReSharper disable once CppDeprecatedEntity
   strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.celn, strlen(EMBSTR));
-  // ReSharper disable once CppDeprecatedEntity
   strncpy(pesHeader.ce.data(), EMBSTR, pesHeader.celn); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.cslen, strlen(SEWSTR));
-  // ReSharper disable once CppDeprecatedEntity
   strncpy(pesHeader.cs.data(), SEWSTR, pesHeader.cslen); // NO LINT(clang-diagnostic-deprecated-declarations)
+  // ReSharper restore CppDeprecatedEntity
   {
 	auto iPEC = PESequivColors.begin();
 	for (auto const& color : UserColor) {

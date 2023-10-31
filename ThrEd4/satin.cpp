@@ -325,7 +325,6 @@ void si::satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32
   auto const  endGuide          = wrap::next(startGuide, (form.satinGuideCount - size));
   SatinGuides->erase(startGuide, endGuide);
   auto const itGuide = wrap::next(SatinGuides->begin(), currentFormGuides);
-  // ReSharper disable CppExpressionWithoutSideEffects
   std::ranges::copy(source, itGuide);
 }
 
