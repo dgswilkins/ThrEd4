@@ -7582,9 +7582,6 @@ void fi::dufcntr(F_POINT& center) noexcept {
 }
 
 auto form::rotpar() -> F_POINT {
-  if (StateMap->test(StateFlag::GMRK)) {
-	return ZoomMarkPoint;
-  }
   while (true) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  RotationRect = FormList->operator[](ClosestFormToCursor).rectangle;
@@ -7611,8 +7608,13 @@ auto form::rotpar() -> F_POINT {
 	}
 	break;
   }
-  return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
-                  wrap::midl(RotationRect.top, RotationRect.bottom)};
+  if (StateMap->test(StateFlag::GMRK)) {
+	return ZoomMarkPoint;
+  }
+  else {
+	return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
+	                wrap::midl(RotationRect.top, RotationRect.bottom)};
+  }
 }
 
 void fi::rotentr(float rotationAngle) {
