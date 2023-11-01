@@ -8,7 +8,6 @@
 
 // Open Source headers
 #pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #pragma warning(disable : 4702) // supress warning for fmt library header
 #include "fmt/xchar.h"
 #include "fmt/compile.h"
