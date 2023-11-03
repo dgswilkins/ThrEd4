@@ -7711,8 +7711,9 @@ void fi::duprotfs(float rotationAngle) {
   auto const rotationCenter = form::rotpar();
   for (auto const selectedForm : (*SelectedFormList)) {
 	adfrm(selectedForm);
-	thred::rotfn(rotationAngle, rotationCenter);
+	form::refil(FormList->size()-1U);
   }
+  thred::rotfn(rotationAngle, rotationCenter);
 }
 
 void fi::duprots(float rotationAngle, F_POINT const& rotationCenter) {
