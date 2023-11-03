@@ -280,7 +280,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::duinsfil();
 	return true;
   }
-  if (StateMap->test(StateFlag::BIGBOX) && thred::chkbig(stretchBoxLine, xyRatio)) {
+  if (!StateMap->test(StateFlag::ROTAT) && StateMap->test(StateFlag::BIGBOX) &&
+      thred::chkbig(stretchBoxLine, xyRatio)) {
 	return true;
   }
   if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
