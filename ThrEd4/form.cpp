@@ -464,7 +464,7 @@ auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
             std::vector<REGION> const&           regionsList) noexcept -> float;
 void ritapbrd();
 void ritbrd(FRM_HEAD const& form);
-void ritfil();
+void ritfil(FRM_HEAD& form);
 auto ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen) -> bool;
 void ritseg(FRM_HEAD const&              form,
             std::vector<CLIP_PNT> const& clipStitchPoints,
@@ -1681,11 +1681,10 @@ void fi::ritapbrd() {
   form::chkseq(true);
 }
 
-void fi::ritfil() {
+void fi::ritfil(FRM_HEAD& form) {
   if (OSequence->empty()) {
 	return;
   }
-  auto const& form = FormList->operator[](ClosestFormToCursor);
   InterleaveSequenceIndices->emplace_back(INS_REC {
       TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
   form::chkseq(false);
@@ -5365,14 +5364,14 @@ void fi::swSatFillType(FRM_HEAD& form) {
 	  UserStitchLength   = form.lengthOrCount.stitchLength;
 	  satin::satfil(form);
 	  LineSpacing = spacing;
-	  fi::ritfil();
+	  fi::ritfil(form);
 	  break;
 	}
 	case CLPF: {
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
 	  fi::fmclp(form);
-	  fi::ritfil();
+	  fi::ritfil(form);
 	  break;
 	}
 	case FTHF: {
@@ -5430,7 +5429,7 @@ void form::refilfn(uint32_t formIndex) {
 	  fi::swEdgeType(form, angledForm);
 	  if (form.fillType == CONTF && ((form.attribute & FRECONT) != 0)) {
 		fi::contf(form);
-		fi::ritfil();
+		fi::ritfil(form);
 	  }
 	  break;
 	}
@@ -5446,7 +5445,7 @@ void form::refilfn(uint32_t formIndex) {
 	  auto const spacing = LineSpacing;
 	  LineSpacing        = form.fillSpacing;
 	  fi::swPolyFillType(form, angledForm, textureSegments);
-	  fi::ritfil();
+	  fi::ritfil(form);
 	  LineSpacing = spacing;
 	  fi::chkbrd(form);
 	  break;
