@@ -7610,10 +7610,8 @@ auto form::rotpar() -> F_POINT {
   if (StateMap->test(StateFlag::GMRK)) {
 	return ZoomMarkPoint;
   }
-  else {
-	return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
-	                wrap::midl(RotationRect.top, RotationRect.bottom)};
-  }
+  return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
+                  wrap::midl(RotationRect.top, RotationRect.bottom)};
 }
 
 void fi::rotentr(float rotationAngle) {
