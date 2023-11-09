@@ -12148,6 +12148,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	winClass.hIconSm       = nullptr;
 
 #if HIGHDPI
+	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 #endif
 
