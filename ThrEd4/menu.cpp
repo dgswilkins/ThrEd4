@@ -359,10 +359,7 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> lruMenuId,
   for (auto const& iLRU : *lruMenuId) {
 	if (!previousName->empty()) {
 	  if (StateMap->test(StateFlag::SAVAS)) {
-		AppendMenu(FileMenu,
-		           MF_BYCOMMAND | MF_STRING,
-		           iLRU,
-		           previousName->wstring().c_str());
+		AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, iLRU, previousName->wstring().c_str());
 	  }
 	  else {
 		// NOLINTNEXTLINE(readability-qualified-auto)
@@ -371,10 +368,7 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> lruMenuId,
 		  previousName->clear();
 		}
 		else {
-		  AppendMenu(FileMenu,
-		             MF_BYCOMMAND | MF_STRING,
-		             iLRU,
-		             previousName->wstring().c_str());
+		  AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, iLRU, previousName->wstring().c_str());
 		  FindClose(fileHandle);
 		}
 	  }

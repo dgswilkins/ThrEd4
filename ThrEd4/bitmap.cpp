@@ -38,7 +38,10 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 namespace bi {
 auto binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool;
 auto bitar() -> bool;
-void bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background) noexcept;
+void bitlin(gsl::span<uint8_t> const&  source,
+            gsl::span<uint32_t> const& destination,
+            COLORREF                   foreground,
+            COLORREF                   background) noexcept;
 void bitsiz();
 
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
@@ -144,7 +147,8 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   BitmapDC = CreateCompatibleDC(StitchWindowDC);
   if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	StateMap->set(StateFlag::MONOMAP);
-	constexpr auto SR5              = uint8_t {5}; // Shift Right 
+	constexpr auto SR5 = uint8_t {5}; // Shift Right
+
 	auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> SR5) << 2U;
 	if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
 	  bitmapWidthBytes += 4U;
@@ -225,7 +229,10 @@ auto bi::binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool {
   return whiteBits > blackBits;
 }
 
-void bi::bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background) noexcept {
+void bi::bitlin(gsl::span<uint8_t> const&  source,
+                gsl::span<uint32_t> const& destination,
+                COLORREF                   foreground,
+                COLORREF                   background) noexcept {
   auto       dst       = destination.begin();
   auto const subSource = source.subspan(0, source.size() - 1);
   for (auto const& src : subSource) {

@@ -505,15 +505,15 @@ void xt::fthrfn(FRM_HEAD& form) {
   if (res > (feather.phaseIndex << 1U)) {
 	++ind;
   }
-  constexpr auto FSTEPSZ = 4.0F; 
+  constexpr auto FSTEPSZ = 4.0F;
   feather.globalPosition = 0.0F;
-  feather.globalStep     = (FSTEPSZ / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
-  feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
-  feather.globalRatio    = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
-  feather.globalUp       = feather.globalPhase * feather.globalRatio;
-  feather.globalDown     = feather.globalPhase - feather.globalUp;
-  form.fillType          = FTHF;
-  feather.phase          = 1U;
+  feather.globalStep  = (FSTEPSZ / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
+  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
+  feather.globalRatio = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
+  feather.globalUp    = feather.globalPhase * feather.globalRatio;
+  feather.globalDown  = feather.globalPhase - feather.globalUp;
+  form.fillType       = FTHF;
+  feather.phase       = 1U;
   BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
   BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -695,7 +695,8 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto       length      = hypot(finish.x - start.x, finish.y - start.y);
   auto       startVertex = form::closflt(form, start.x, start.y);
   auto const endVertex   = form::closflt(form, finish.x, finish.y);
-  constexpr auto MINCONN     = 5.0F; // if connector is less than this, don't bother
+
+  constexpr auto MINCONN = 5.0F; // if connector is less than this, don't bother
   if (length < MINCONN) {
 	return 0;
   }
@@ -983,7 +984,7 @@ auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
       ((maskedAttribute & TYPATMSK) == 0)) { // check if the stitch is a form stitch
 	return result & NIBMASK;
   }
-  return 1U; // must be an applique stitch 
+  return 1U; // must be an applique stitch
 }
 
 void xi::durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {

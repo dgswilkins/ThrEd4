@@ -803,8 +803,8 @@ void fi::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, *ScreenDPI, STDDPI)) /
                      wrap::toFloat(StitchWindowClientRect.right);
   constexpr auto DFACT  = 2.0F;
-  auto       length = (ZoomRect.right - ZoomRect.left) * ratio * DFACT;
-  auto const delta =
+  auto           length = (ZoomRect.right - ZoomRect.left) * ratio * DFACT;
+  auto const     delta =
       F_POINT {itPreviousVertex->x - itCurrentVertex->x, itPreviousVertex->y - itCurrentVertex->y};
   auto       angle  = atan2(delta.y, delta.x);
   auto       xVal   = length * cos(angle);
@@ -7709,7 +7709,7 @@ void fi::duprotfs(float rotationAngle) {
   auto const rotationCenter = form::rotpar();
   for (auto const selectedForm : (*SelectedFormList)) {
 	adfrm(selectedForm);
-	form::refil(wrap::toUnsigned(FormList->size()-1U));
+	form::refil(wrap::toUnsigned(FormList->size() - 1U));
   }
   thred::rotfn(rotationAngle, rotationCenter);
 }

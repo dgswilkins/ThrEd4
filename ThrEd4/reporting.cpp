@@ -19,7 +19,7 @@ void rpt::reportError(const wchar_t* prompt, DWORD& errorCode) {
                                  reinterpret_cast<LPTSTR>(&lpMsgBuf),
                                  0,
                                  nullptr);
-// NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+  // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
   if (res != 0U) {
 	auto const msg = gsl::span<wchar_t> {static_cast<wchar_t*>(lpMsgBuf), res};
 	// erase the \r\n at the end of the msg

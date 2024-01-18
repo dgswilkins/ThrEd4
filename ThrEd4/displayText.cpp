@@ -63,6 +63,7 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
   auto       yOffset = 3;
   if (!top) {
 	constexpr auto PXOFFSET = 12; // pixel offset
+
 	yOffset = (mainRect.bottom - mainRect.top) - PXOFFSET - messageSize.cy;
   }
   MsgWindow = CreateWindow(L"STATIC",
@@ -257,7 +258,7 @@ void displayText::spltmsg() {
 
 void displayText::okcan() {
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton = CreateWindow(L"STATIC",
+  OKButton     = CreateWindow(L"STATIC",
                           displayText::loadStr(IDS_OKENT).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -285,7 +286,7 @@ void displayText::savdisc() {
   di::sdmsg();
   StateMap->reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton = CreateWindow(L"STATIC",
+  OKButton      = CreateWindow(L"STATIC",
                           displayText::loadStr(IDS_SAV).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -307,7 +308,7 @@ void displayText::savdisc() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  CancelButton = CreateWindow(L"STATIC",
+  CancelButton  = CreateWindow(L"STATIC",
                               displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               2 * ButtonWidthX3 + 25,

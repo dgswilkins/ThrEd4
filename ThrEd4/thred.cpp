@@ -454,12 +454,13 @@ auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side me
 auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
-auto DisplayedColorBitmap = std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are actually displayed
-auto RotateAngle      = float {};               // angle for pixel rotate
-auto PickColorMsgSize = SIZE {};                // size of the pick color message
-auto InsertSize       = SIZE {};                // size of file insert window
-auto InsertCenter     = F_POINT {};             // center point in inserted file
-auto NumericCode      = wchar_t {};             // keyboard numerical input
+auto DisplayedColorBitmap =
+    std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are actually displayed
+auto RotateAngle      = float {};        // angle for pixel rotate
+auto PickColorMsgSize = SIZE {};         // size of the pick color message
+auto InsertSize       = SIZE {};         // size of file insert window
+auto InsertCenter     = F_POINT {};      // center point in inserted file
+auto NumericCode      = wchar_t {};      // keyboard numerical input
 auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
 auto SideWindowEntryBuffer =
@@ -646,7 +647,7 @@ void thi::fnamtabs() {
   constexpr auto NORDSED    = uint32_t {0x5a5a5a5aU}; // name order seed
   constexpr auto NCODSED    = uint32_t {0x73ef5a7eU}; // name encoding seed
   constexpr auto NCODOF     = uint8_t {80U};          // name encoding offset
-  constexpr auto MAX8B      = uint8_t{127};           // max value of a signed byte
+  constexpr auto MAX8B      = uint8_t {127};          // max value of a signed byte
   constexpr auto NDXOFF     = uint8_t {32U};          // index offset
   constexpr auto NAMELEN    = NameOrder.size();
   auto           iNameOrder = NameOrder.begin();
@@ -717,11 +718,11 @@ void thi::ritfnam(std::wstring const& designerName) {
 }
 
 void thi::redfnam(std::wstring& designerName) {
-  constexpr auto NNN       = uint8_t {111U}; // string substitute character
-  auto       tmpName       = std::array<uint8_t, NameOrder.size()> {};
-  auto       designer      = std::string {};
-  auto       iNameOrder    = NameOrder.begin();
-  auto const spCreatorName = gsl::span {ExtendedHeader->creatorName};
+  constexpr auto NNN           = uint8_t {111U}; // string substitute character
+  auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
+  auto           designer      = std::string {};
+  auto           iNameOrder    = NameOrder.begin();
+  auto const     spCreatorName = gsl::span {ExtendedHeader->creatorName};
   for (auto& iTmpName : tmpName) {
 	auto const& index = *iNameOrder;
 	if (index < spCreatorName.size()) {
@@ -3191,7 +3192,7 @@ void thi::thrsav() {
   }
   if (!StateMap->testAndReset(StateFlag::IGNAM)) {
 	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-	auto geName = *WorkingFileName;
+	auto geName   = *WorkingFileName;
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const file = FindFirstFile(geName.wstring().c_str(), &fileData);
@@ -3463,7 +3464,7 @@ void thred::dun() {
 }
 
 void thi::dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize) {
-    SideWindow->operator[](entry.value) = CreateWindow(L"STATIC",
+  SideWindow->operator[](entry.value) = CreateWindow(L"STATIC",
                                                      displayText::loadStr(entry.stringID).c_str(),
                                                      SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                                      3,
@@ -3502,7 +3503,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 		}
 	  }
 	}
-		SideMessageWindow = CreateWindow(L"STATIC",
+	SideMessageWindow = CreateWindow(L"STATIC",
 	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 parentListRect.right - ThredWindowOrigin.x + 3,
@@ -3563,7 +3564,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 	  break;
 	}
   }
-    SideMessageWindow = CreateWindow(L"STATIC",
+  SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    parentListRect.right - ThredWindowOrigin.x + 3,
@@ -3621,7 +3622,7 @@ auto thi::centr() noexcept -> F_POINT {
 void thi::stchWnd() {
   stchPars();
   MainStitchWin = nullptr;
-    MainStitchWin = CreateWindow(L"STATIC",
+  MainStitchWin = CreateWindow(L"STATIC",
                                nullptr,
                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3,
@@ -3639,7 +3640,7 @@ void thi::stchWnd() {
 	return;
   }
   GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
-    VerticalScrollBar = CreateWindow(L"SCROLLBAR",
+  VerticalScrollBar   = CreateWindow(L"SCROLLBAR",
                                    nullptr,
                                    SBS_VERT | WS_CHILD | WS_VISIBLE,
                                    StitchWindowSize.cx + ButtonWidthX3,
@@ -3650,7 +3651,7 @@ void thi::stchWnd() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-    HorizontalScrollBar = CreateWindow(L"SCROLLBAR",
+  HorizontalScrollBar = CreateWindow(L"SCROLLBAR",
                                      nullptr,
                                      SBS_HORZ | WS_CHILD | WS_VISIBLE,
                                      ButtonWidthX3,
@@ -4259,7 +4260,7 @@ void thred::nuTHRfile() {
 }
 
 auto thi::nuCol(COLORREF init) noexcept -> BOOL {
-    ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
+  ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   ColorStruct.hwndOwner      = ThrEdWindow;
   ColorStruct.lCustData      = 0;
   ColorStruct.lpCustColors   = CustomColor.data();
@@ -4271,7 +4272,7 @@ auto thi::nuCol(COLORREF init) noexcept -> BOOL {
 }
 
 auto thi::nuBak() noexcept -> BOOL {
-    BackgroundColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
+  BackgroundColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BackgroundColorStruct.hwndOwner      = ThrEdWindow;
   BackgroundColorStruct.lCustData      = 0;
   BackgroundColorStruct.lpCustColors   = CustomBackgroundColor.data();
@@ -5608,10 +5609,10 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
 
 void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
   constexpr auto KNL      = 2.0F; // knot length
-  auto const startIt  = wrap::next(StitchBuffer->begin(), start);
-  auto       finishIt = std::next(startIt);
-  auto       delta    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto       length   = hypot(delta.x, delta.y);
+  auto const     startIt  = wrap::next(StitchBuffer->begin(), start);
+  auto           finishIt = std::next(startIt);
+  auto           delta    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto           length   = hypot(delta.x, delta.y);
   ++finishIt;
   while (length < KNL && finishIt != StitchBuffer->end()) {
 	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
@@ -5842,7 +5843,7 @@ void thi::stchout() {
 
 void thi::setsped() {
   constexpr auto DEFET = uint32_t {100U}; // default elapsed time per frame. Units are millseconds
-  constexpr auto DEFUT = double {10.0}; // default user time per frame. Units are millseconds
+  constexpr auto DEFUT = double {10.0};   // default user time per frame. Units are millseconds
 
   auto elapsedTimePerFrame = DEFET;
   if (MovieTimeStep == 0) {
@@ -6126,7 +6127,7 @@ void thred::delet() {
 }
 
 void thred::movi() {
-  constexpr auto    MOVITIM = int32_t {12}; // default movie time
+  constexpr auto MOVITIM = int32_t {12}; // default movie time
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rstAll();
 	StateMap->set(StateFlag::GRPSEL);
@@ -6151,7 +6152,7 @@ void thred::movi() {
   }
   thred::movStch();
   if (!StateMap->test(StateFlag::WASPAT)) {
-		SpeedScrollBar = CreateWindow(L"SCROLLBAR",
+	SpeedScrollBar = CreateWindow(L"SCROLLBAR",
 	                              nullptr,
 	                              SBS_HORZ | WS_CHILD | WS_VISIBLE,
 	                              ButtonWidthX3,
@@ -6168,7 +6169,7 @@ void thred::movi() {
                              : gsl::narrow_cast<float>(StitchBuffer->size());
   if (!StateMap->test(StateFlag::WASPAT)) {
 	constexpr auto MLEN = 10000.0F; // default movie length (millisecs)
-	MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
+	MovieTimeStep       = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
   }
   if (MovieTimeStep < MINDELAY) {
 	MovieTimeStep = MINDELAY;
@@ -6178,11 +6179,11 @@ void thred::movi() {
   }
   auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
   scrollInfo.cbSize = sizeof(scrollInfo);
-    scrollInfo.fMask = SIF_ALL;
-  scrollInfo.nMax  = MAXDELAY;
-  scrollInfo.nMin  = MINDELAY;
-  scrollInfo.nPage = 1;
-  scrollInfo.nPos  = MAXDELAY - MovieTimeStep;
+  scrollInfo.fMask  = SIF_ALL;
+  scrollInfo.nMax   = MAXDELAY;
+  scrollInfo.nMin   = MINDELAY;
+  scrollInfo.nPage  = 1;
+  scrollInfo.nPos   = MAXDELAY - MovieTimeStep;
   SetScrollInfo(SpeedScrollBar, SB_CTL, &scrollInfo, TRUE);
   FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
   thi::setsped();
@@ -6280,7 +6281,7 @@ void thred::vubak() {
 	if ((iPosition & 2U) != 0U) {
 	  verticalLocation = deltaY;
 	}
-		*itHWndBV = CreateWindow(L"STATIC",
+	*itHWndBV = CreateWindow(L"STATIC",
 	                         L"",
 	                         SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                         deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U) + ButtonWidthX3,
@@ -7355,7 +7356,7 @@ void thi::barnam(HWND window, uint32_t iThumbnail) {
 	SetWindowText(window, static_cast<LPCWSTR>(L""));
 	return;
   }
-  auto const thumbPath    = fs::path(Thumbnails->operator[](ThumbnailsSelected.at(iThumbnail)).data());
+  auto const thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected.at(iThumbnail)).data());
   constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
   auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
@@ -7655,7 +7656,7 @@ void thi::sidhup() {
   StateMap->set(StateFlag::HUPMSG);
   GetWindowRect(ValueWindow->operator[](PRFHUPTYP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
-    constexpr auto SMW_FLAGS = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
+  constexpr auto SMW_FLAGS = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
   SideMessageWindow        = CreateWindow(L"STATIC",
                                    nullptr,
                                    SMW_FLAGS,
@@ -7667,7 +7668,7 @@ void thi::sidhup() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-    constexpr auto SW_FLAGS = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
+  constexpr auto SW_FLAGS  = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
 	SideWindow->operator[](iHoop) =
@@ -8222,8 +8223,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		auto       result     = WIN32_FIND_DATA {};
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const searchResult =
-		    FindFirstFile(searchName.wstring().c_str(), &result);
+		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &result);
 		if (searchResult == INVALID_HANDLE_VALUE) {
 		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
 		  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
@@ -8231,7 +8231,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		}
 		fileInfo->push_back(result);
 
-		while (FindNextFile(searchResult, &result)) { 
+		while (FindNextFile(searchResult, &result)) {
 		  fileInfo->push_back(result);
 		}
 		ritlock(*fileInfo, hwndlg);
@@ -8242,7 +8242,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	  auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
-				constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
+		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
 		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
 		auto& spFileInfo = *fileInfo;
 		switch (LOWORD(wparam)) {
@@ -8252,14 +8252,14 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  }
 		  case IDC_LOCKAL: {
 			for (auto& iFile : spFileInfo) {
-			  			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 			}
 			ritlock(spFileInfo, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCKAL: {
 			for (auto& iFile : spFileInfo) {
-			  			  iFile.dwFileAttributes &= NROMASK;
+			  iFile.dwFileAttributes &= NROMASK;
 			}
 			ritlock(spFileInfo, hwndlg);
 			break;
@@ -8269,9 +8269,9 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
 			for (auto& iFile : spFileInfo) {
-			  			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
+			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
 				if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0)) {
-				  				  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+				  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 				}
 				++fileError;
 			  }
@@ -8284,9 +8284,9 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
 			for (auto& iFile : spFileInfo) {
-			  			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
+			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
 				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
-				  				  iFile.dwFileAttributes &= NROMASK;
+				  iFile.dwFileAttributes &= NROMASK;
 				}
 				++fileError;
 			  }
@@ -8310,7 +8310,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			return TRUE;
 		  }
 		  default: {
-						outDebugString(L"default hit in lockPrc 1: wparam [{}]\n", LOWORD(wparam));
+			outDebugString(L"default hit in lockPrc 1: wparam [{}]\n", LOWORD(wparam));
 			break;
 		  }
 		}
@@ -8328,8 +8328,11 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 void thred::fileLock() noexcept {
   auto lockInfo = std::vector<WIN32_FIND_DATA> {};
 #pragma warning(suppress : 26490)
-  DialogBoxParam(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  DialogBoxParam(ThrEdInstance,
+                 MAKEINTRESOURCE(IDD_DLOCK),
+                 ThrEdWindow,
+                 thi::lockPrc,
+                 reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 }
 
 void thred::delstch() {
@@ -8492,7 +8495,7 @@ void thred::nuscol(size_t iColor) {
 
 void thred::movchk() {
   static auto draggedColor = uint8_t {};
-    if ((Msg.wParam & MK_LBUTTON) != 0U) {
+  if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
 	  if (thred::inDefaultColorWindows()) {
 		draggedColor = VerticalIndex & COLORMAX;
@@ -8556,7 +8559,7 @@ void thred::movchk() {
 	}
   }
   if (!switchColors) {
-	auto const swapColor                   = UserColor.at(wrap::toSize(VerticalIndex));
+	auto const swapColor                      = UserColor.at(wrap::toSize(VerticalIndex));
 	UserColor.at(wrap::toSize(VerticalIndex)) = UserColor.at(wrap::toSize(draggedColor));
 	if (!key) {
 	  UserColor.at(wrap::toSize(draggedColor)) = swapColor;
@@ -8967,7 +8970,7 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 		  break;
 		}
 		default: {
-		  		  outDebugString(L"default hit in fthdefprc 1: wparam [{}]\n", LOWORD(wparam));
+		  outDebugString(L"default hit in fthdefprc 1: wparam [{}]\n", LOWORD(wparam));
 		  break;
 		}
 	  }
@@ -10272,7 +10275,7 @@ void thi::makCol() noexcept {
   auto       yOffset      = int32_t {};
 
   for (auto& tsw : *ThreadSizeWin) {
-		*dcw = CreateWindow(L"STATIC",
+	*dcw = CreateWindow(L"STATIC",
 	                    nullptr,
 	                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                    0,
@@ -10284,7 +10287,7 @@ void thi::makCol() noexcept {
 	                    ThrEdInstance,
 	                    nullptr);
 	displayText::setWindowFont(*(dcw++), hFont);
-		*(ucw++)  = CreateWindow(L"STATIC",
+	*(ucw++)  = CreateWindow(L"STATIC",
                             nullptr,
                             SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                             ButtonWidth,
@@ -10296,17 +10299,17 @@ void thi::makCol() noexcept {
                             ThrEdInstance,
                             nullptr);
 	buffer[0] = *(itThreadSize++);
-		tsw = CreateWindow(L"STATIC",
-	                   buffer.data(),
-	                   SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                   ButtonWidth * 2,
-	                   yOffset,
-	                   ButtonWidth,
-	                   ButtonHeight,
-	                   ThrEdWindow,
-	                   nullptr,
-	                   ThrEdInstance,
-	                   nullptr);
+	tsw       = CreateWindow(L"STATIC",
+                       buffer.data(),
+                       SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                       ButtonWidth * 2,
+                       yOffset,
+                       ButtonWidth,
+                       ButtonHeight,
+                       ThrEdWindow,
+                       nullptr,
+                       ThrEdInstance,
+                       nullptr);
 	displayText::setWindowFont(tsw, hFont);
 	yOffset += ButtonHeight;
   }
@@ -10450,8 +10453,7 @@ void thi::redini() {
 	  setPrefs();
 	}
 	else {
-	  auto const directory =
-	      utf::utf8ToUtf16(std::string(IniFile.defaultDirectory.data()));
+	  auto const directory = utf::utf8ToUtf16(std::string(IniFile.defaultDirectory.data()));
 	  DefaultDirectory->assign(directory);
 	  {
 		auto previousName = PreviousNames->begin();
@@ -10671,7 +10673,7 @@ void thi::init() {
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
   SetStretchBltMode(ThredDC, COLORONCOLOR);
-    StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
+  StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
   StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
   chkirct();
   if (!UserFlagMap->test(UserFlag::SAVMAX)) {
@@ -10687,10 +10689,11 @@ void thi::init() {
   SelectObject(ThredDC, hFont);
   SelectObject(StitchWindowDC, hFont);
   constexpr auto TXTSIDS = int32_t {6}; // extra pixels in a text box
-  auto const        size    = thred::txtWid(L"MM");
-  ButtonWidth               = size.cx + TXTSIDS;
-  ButtonWidthX3             = ButtonWidth * 3;
-  ButtonHeight              = size.cy + 4;
+  auto const     size    = thred::txtWid(L"MM");
+
+  ButtonWidth   = size.cx + TXTSIDS;
+  ButtonWidthX3 = ButtonWidth * 3;
+  ButtonHeight  = size.cy + 4;
   std::ranges::generate(BoxOffset, [step = int32_t {1}, offsetStepSize = thred::txtWid(L"0")]() mutable -> int32_t {
 	return offsetStepSize.cx * step++;
   });
@@ -10733,7 +10736,7 @@ void thi::init() {
   }
   if (IniFile.formSides == 0U) {
 	constexpr auto FSID = uint16_t {24U}; // initial number of sides
-	IniFile.formSides      = FSID;
+	IniFile.formSides   = FSID;
   }
   if (IniFile.tearTailLength == 0.0F) {
 	constexpr auto TAILLEN = 1.4F; // initial tail length
@@ -10750,21 +10753,21 @@ void thi::init() {
   ButtonWin->resize(BTNCOUNT);
   auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
-		auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
+	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
 	auto buttonTxt = std::wstring {};
 	switch (iButton) {
 	  case HBOXSEL: {
-				windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		buttonTxt.assign(displayText::loadStr(IDS_BOXSEL));
 		break;
 	  }
 	  case HUPTO: {
-				windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		buttonTxt.assign(displayText::loadStr(IDS_UPOF));
 		break;
 	  }
 	  case HHID: {
-				windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
+		windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		buttonTxt.assign(displayText::loadStr(IDS_PIKOL));
 		break;
 	  }
@@ -10785,7 +10788,7 @@ void thi::init() {
 	                                              nullptr);
   }
   trace::initTraceWindows();
-    ColorBar = CreateWindow(L"STATIC",
+  ColorBar = CreateWindow(L"STATIC",
                           L"",
                           SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           ThredWindowRect.right - *ColorBarSize,
@@ -10885,7 +10888,7 @@ void thi::relin() {
  *                   \     /
  *                    \   /
  *                      3
-*/
+ */
 void thi::dumov() {
   // Arrow Box Indices
   constexpr auto ABP0 = 0;
@@ -10895,6 +10898,7 @@ void thi::dumov() {
   constexpr auto ABP4 = 4;
   constexpr auto ABP5 = 5;
   constexpr auto ABP6 = 6;
+
   constexpr auto ABPOINTS = 7U; // Number of arrow box points
 
   constexpr auto ABLX = 12; // Arrow Length
@@ -10902,18 +10906,18 @@ void thi::dumov() {
   constexpr auto ABWX = 6;  // Arrow Width
   constexpr auto ABHY = 20; // Arrow length
 
-  auto const     sCurr = wrap::next(StitchBuffer->begin(), keys::getMoveAnchor());
+  auto const sCurr = wrap::next(StitchBuffer->begin(), keys::getMoveAnchor());
   if (sCurr->x < ZoomRect.left || sCurr->x > ZoomRect.right || sCurr->y < ZoomRect.bottom ||
       sCurr->y > ZoomRect.top) {
 	return;
   }
-  auto const sNext              = std::next(sCurr);
-  RotateAngle                   = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
-  auto           arrowBox       = std::array<POINT, ABPOINTS> {};
-  auto const     abCenterPixels = sdCor2px(StitchBuffer->operator[](keys::getMoveAnchor()));
-  arrowBox[ABP0]                = abCenterPixels;
-  arrowBox[ABP6]                = abCenterPixels;
-  auto offsetFromCenter         = POINT {abCenterPixels.x + ABLX, abCenterPixels.y + ABSX};
+  auto const sNext          = std::next(sCurr);
+  RotateAngle               = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
+  auto       arrowBox       = std::array<POINT, ABPOINTS> {};
+  auto const abCenterPixels = sdCor2px(StitchBuffer->operator[](keys::getMoveAnchor()));
+  arrowBox[ABP0]            = abCenterPixels;
+  arrowBox[ABP6]            = abCenterPixels;
+  auto offsetFromCenter     = POINT {abCenterPixels.x + ABLX, abCenterPixels.y + ABSX};
   rotpix(offsetFromCenter, arrowBox[ABP1], abCenterPixels);
   offsetFromCenter.y = abCenterPixels.y - ABSX;
   rotpix(offsetFromCenter, arrowBox[ABP5], abCenterPixels);
@@ -11215,10 +11219,10 @@ void thi::doDrwInit() {
   if (StateMap->test(StateFlag::ZUMED)) {
 	auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
 	scrollInfo.cbSize = sizeof(scrollInfo);
-		scrollInfo.fMask = SIF_ALL;
-	scrollInfo.nMax  = UnzoomedRect.cy;
-	scrollInfo.nMin  = 0;
-	scrollInfo.nPage = wrap::round<UINT>(ZoomRect.top - ZoomRect.bottom);
+	scrollInfo.fMask  = SIF_ALL;
+	scrollInfo.nMax   = UnzoomedRect.cy;
+	scrollInfo.nMin   = 0;
+	scrollInfo.nPage  = wrap::round<UINT>(ZoomRect.top - ZoomRect.bottom);
 	scrollInfo.nPos =
 	    wrap::round<decltype(scrollInfo.nPos)>(wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top);
 	SetScrollInfo(VerticalScrollBar, SB_CTL, &scrollInfo, TRUE);
@@ -11344,7 +11348,8 @@ void thi::drwStch() {
   if (StateMap->test(StateFlag::INIT)) {
 	thi::doDrwInit();
   }
-  if (StateMap->test(StateFlag::ROTAT) || StateMap->test(StateFlag::ROTCAPT) || StateMap->test(StateFlag::MOVCNTR)) {
+  if (StateMap->test(StateFlag::ROTAT) || StateMap->test(StateFlag::ROTCAPT) ||
+      StateMap->test(StateFlag::MOVCNTR)) {
 	thred::ritrot(0, form::rotpar());
   }
   if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
@@ -11523,7 +11528,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	DeleteObject(pen);
   }
   else {
-	// no stitches in file so skip over BMP name , background color & user colors 
+	// no stitches in file so skip over BMP name , background color & user colors
 	constexpr auto SKIP1 = LONG {16 + sizeof(COLORREF) + sizeof(COLORREF) * COLORCNT};
 	SetFilePointer(thrEdFile, SKIP1, nullptr, FILE_CURRENT);
   }
@@ -11739,7 +11744,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  return 1;
 		}
 		default: {
-		  		  outDebugString(L"default hit in wndProc 1: wParam [{}]\n", LOWORD(wParam));
+		  outDebugString(L"default hit in wndProc 1: wParam [{}]\n", LOWORD(wParam));
 		  break;
 		}
 	  }
@@ -11775,6 +11780,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		}
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
+
 		  ZoomRect.top    = wrap::toFloat(UnzoomedRect.cy) - wrap::toFloat(HIWORD(wParam));
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
@@ -11785,7 +11791,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  return 1;
 		}
 		default: {
-		  		  outDebugString(L"default hit in wndProc 2: wParam [{}]\n", LOWORD(wParam));
+		  outDebugString(L"default hit in wndProc 2: wParam [{}]\n", LOWORD(wParam));
 		  break;
 		}
 	  }
@@ -12047,7 +12053,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	}
 	case WM_MOVE: {
 	  GetClientRect(p_hWnd, &ThredWindowRect);
-	  constexpr auto SMALLWIN  = LONG {20}; // Smallest ThrEd window dimension
+	  constexpr auto SMALLWIN  = LONG {20};  // Smallest ThrEd window dimension
 	  constexpr auto DEFWINDIM = LONG {300}; // default small Thred window dimension
 	  if ((ThredWindowRect.right - ThredWindowRect.left) < SMALLWIN) {
 		ThredWindowRect.left  = 0;
@@ -12055,7 +12061,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	  }
 	  if ((ThredWindowRect.bottom - ThredWindowRect.top) < SMALLWIN) {
 		ThredWindowRect.top    = 0;
-		ThredWindowRect.bottom = DEFWINDIM; 
+		ThredWindowRect.bottom = DEFWINDIM;
 	  }
 	  thred::movStch();
 	  if (StateMap->test(StateFlag::RUNPAT)) {
@@ -12133,14 +12139,14 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	ThrEdInstance = hInstance;
 	auto winClass =
 	    WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-	winClass.cbSize = sizeof(WNDCLASSEX);
-		winClass.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	winClass.cbSize      = sizeof(WNDCLASSEX);
+	winClass.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	winClass.lpfnWndProc = thi::wndProc;
 	winClass.cbClsExtra  = 0;
 	winClass.cbWndExtra  = 0;
 	winClass.hInstance   = ThrEdInstance;
-	winClass.hIcon = gsl::narrow_cast<HICON>(
-	    LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, ICONDIM, ICONDIM, LR_SHARED));
+	winClass.hIcon       = gsl::narrow_cast<HICON>(
+        LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, ICONDIM, ICONDIM, LR_SHARED));
 	winClass.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
 	                            //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	winClass.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
@@ -12350,7 +12356,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto           privateColorBarSize = COLSIZ;
 	  ColorBarSize                       = &privateColorBarSize;
 	  if (IniFile.initialWindowCoords.right != 0) {
-				ThrEdWindow = CreateWindow(L"thred",
+		ThrEdWindow = CreateWindow(L"thred",
 		                           L"",
 		                           WS_OVERLAPPEDWINDOW,
 		                           IniFile.initialWindowCoords.left,
@@ -12363,7 +12369,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		                           &createParams);
 	  }
 	  else {
-				ThrEdWindow = CreateWindow(L"thred",
+		ThrEdWindow = CreateWindow(L"thred",
 		                           L"",
 		                           WS_OVERLAPPEDWINDOW,
 		                           CW_USEDEFAULT,
@@ -12475,7 +12481,7 @@ auto thred::setFileName() -> fs::path {
 }
 
 auto thred::getDesigner() -> std::wstring {
-  auto const modifier     = utf::utf8ToUtf16(std::string(ExtendedHeader->modifierName.data()));
+  auto const modifier = utf::utf8ToUtf16(std::string(ExtendedHeader->modifierName.data()));
   return displayText::format2(IDS_CREATBY, *DesignerName, modifier);
 }
 
@@ -12639,7 +12645,7 @@ auto thred::createChangeThreadSizeWindows() -> uint32_t {
   auto       idx                = gsl::narrow_cast<int32_t>(VerticalIndex);
   auto       iStr               = THREAD_SIZES.begin();
   std::ranges::generate(ChangeThreadSizeWin, [&idx, &iStr]() mutable noexcept -> HWND {
-		return CreateWindow(L"STATIC",
+	return CreateWindow(L"STATIC",
 	                    *(iStr++),
 	                    WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                    ButtonWidthX3,

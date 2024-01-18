@@ -23,8 +23,8 @@ constexpr auto LEVELCNT = uint32_t {256U};      // number of color levels in a b
 constexpr auto POINTMAX = size_t {500000U};     // maximum number of trace points to consider
 constexpr auto REDCOL   = uint32_t {0x0000ffU}; // code for the color red
 constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
-constexpr auto TRBASE   = 0.1F; // Trace ratio base 
-constexpr auto TROFF    = 1.0F; // Trace ratio offset
+constexpr auto TRBASE   = 0.1F;                 // Trace ratio base
+constexpr auto TROFF    = 1.0F;                 // Trace ratio offset
 
 constexpr auto TRWINROW01 = int32_t {15};
 constexpr auto TRWINROW02 = int32_t {16};
@@ -156,10 +156,10 @@ void trace::initTraceWindows() {
   for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
 	auto const channel       = gsl::narrow_cast<int32_t>(iRGB);
 	*(iTraceControlWindow++) = ti::trcsub(ButtonWidth * channel, 0, ButtonHeight * TRWINROW01);
-	*(iTraceSelectWindow++)  = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW01, ButtonHeight);
-	*(iTraceUpWindow++)      = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW02, ButtonHeight);
-	*(iTraceDownWindow++)    = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW03, ButtonHeight);
-	*(iTraceBrush++)         = CreateSolidBrush(*(iTraceRGB++));
+	*(iTraceSelectWindow++) = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW01, ButtonHeight);
+	*(iTraceUpWindow++) = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW02, ButtonHeight);
+	*(iTraceDownWindow++) = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW03, ButtonHeight);
+	*(iTraceBrush++) = CreateSolidBrush(*(iTraceRGB++));
   }
 }
 
@@ -1092,9 +1092,9 @@ void ti::getColors() {
 	DownPixelColor |= TraceRGB.at(2 - ColumnColor);
 	return;
   }
-  auto const ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
-  auto const position      = wrap::floor<uint32_t>(ratio * 255.0);
-  auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(2 - ColumnColor));
+  auto const ratio      = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
+  auto const position   = wrap::floor<uint32_t>(ratio * 255.0);
+  auto       traceColor = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(2 - ColumnColor));
   auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift.at(ColumnColor));
   if (tracePosition < traceColor) {
 	UpPixelColor &= TraceRGBMask.at(ColumnColor);
@@ -1334,9 +1334,9 @@ void trace::traceNumberInput(wchar_t NumericCode) {
   auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD));
   switch (TraceMsgIndex) {
 	case 2: {
-	  // if it is greater than 25, we can process as-is since the maximum value is 255 
+	  // if it is greater than 25, we can process as-is since the maximum value is 255
 	  constexpr auto TWODIGIT = uint32_t {25U};
-	  if (traceColor > TWODIGIT) { 
+	  if (traceColor > TWODIGIT) {
 		ti::dutrnum0(traceColor);
 	  }
 	  break;

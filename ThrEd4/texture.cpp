@@ -481,7 +481,8 @@ void texture::drwtxtr() {
               TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + BIAS)) *
                  HALF;
   auto const yOffset   = flag ? wrap::round<LONG>((wrap::toFloat(StitchWindowClientRect.bottom) -
-                                                 TextureScreen.areaHeight / TextureScreen.editToPixelRatio) * HALF)
+                                                 TextureScreen.areaHeight / TextureScreen.editToPixelRatio) *
+                                                HALF)
                               : StitchWindowClientRect.bottom / 4;
   TextureScreen.top    = yOffset;
   TextureScreen.bottom = StitchWindowClientRect.bottom - yOffset;

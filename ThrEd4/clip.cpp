@@ -953,7 +953,8 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
 	return;
   }
   ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
-  constexpr auto CHLEN    = size_t {8U}; // number of stitches in a chain
+  constexpr auto CHLEN = size_t {8U}; // number of stitches in a chain
+
   auto backupAt = CHLEN;
   if (StateMap->test(StateFlag::LINCHN)) {
 	--backupAt;

@@ -117,8 +117,9 @@ class PESHED
   std::array<uint8_t, 4> hnd2 {};  // 5b-5e  header end (FF FF 00 00)
   uint16_t               cslen {}; // 5f,60  CSewSeg length (7)
   std::array<char, 7>    cs {};    // 61-67  CSewSeg identification (CSewSeg)
-//  uint16_t               styp1;    // 68,69  Stitch type (0)
-//  uint16_t               scol;     // 6a,6b  Stitch Palette thread index
+
+  //  uint16_t               styp1;    // 68,69  Stitch type (0)
+  //  uint16_t               scol;     // 6a,6b  Stitch Palette thread index
 
   constexpr PESHED() noexcept = default;
   // PESHED(PESHED&&) = default;
@@ -383,14 +384,14 @@ void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
 #pragma warning(disable : 4996)
 // ReSharper disable CppDeprecatedEntity
 void pi::pecnam(gsl::span<char> const& label) {
-  strncpy(label.data(), "LA:", 3); 
+  strncpy(label.data(), "LA:", 3);
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
   auto* ptr = std::next(label.data(), 3U);
-  strncpy(ptr, fileStem.c_str(), lblSize); 
+  strncpy(ptr, fileStem.c_str(), lblSize);
 }
 // ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
@@ -441,20 +442,20 @@ void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
 }
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
-  auto*      pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
-  auto       thisStitch = F_POINT {};
+  auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
+  auto  thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
-  auto iColor  = 1U;
-  auto color   = StitchBuffer->front().attribute & COLMSK;
-  auto iPEC    = wrap::next(PESequivColors.begin(), color);
+  auto iColor     = 1U;
+  auto color      = StitchBuffer->front().attribute & COLMSK;
+  auto iPEC       = wrap::next(PESequivColors.begin(), color);
   auto iPesColors = pecHeader->pad.begin();
-  *iPesColors++ = *iPEC;
+  *iPesColors++   = *iPEC;
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	if ((stitchFwd1.attribute & COLMSK) != color) {
 	  color = stitchFwd1.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
-	  iPEC              = wrap::next(PESequivColors.begin(), color);
+	  iPEC          = wrap::next(PESequivColors.begin(), color);
 	  *iPesColors++ = *iPEC;
 	  ++iColor;
 	}
@@ -521,8 +522,8 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
   auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
-  auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-  auto       iUserColor = UserColor.cbegin();
+  auto const  color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+  auto        iUserColor  = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
 	if (*iUserColor == color) {
 	  return iColor;
@@ -573,7 +574,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  constexpr auto VERLEN   = 13; // number of version strings in the array
+  constexpr auto VERLEN = 13; // number of version strings in the array
 
   constexpr std::array<const char*, VERLEN> VER_STRINGS = {
       "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
@@ -606,8 +607,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		continue;
 	  }
 	  auto const& threadColor = PES_THREAD.at(pesColors[iColor]);
-	  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-	  *iUserColor      = color;
+	  auto const  color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+	  *iUserColor             = color;
 	  ++iUserColor;
 	  if (iUserColor == UserColor.end()) {
 		break;
@@ -663,7 +664,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  }
 	  else {
 		// NOLINTBEGIN(readability-magic-numbers)
-		if (pesStitches[iPESstitch] > 0x3f) { // if the value is more than 63 flip sign  
+		if (pesStitches[iPESstitch] > 0x3f) { // if the value is more than 63 flip sign
 		  locof = wrap::toFloat(pesStitches[iPESstitch]) - 128.0F;
 		}
 		else {
@@ -718,11 +719,10 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto PESVSTR = "0001";    // PES version
   constexpr auto EMBSTR  = "CEmbOne"; // emb section lead in
   constexpr auto SEWSTR  = "CSewSeg"; // sewing segment leadin
+  constexpr auto AT5OFF  = 350.0F;    // Affine transform offset 5
+  constexpr auto AT6OFF  = 100.0F;    // Affine transform offset 6
 
-  constexpr auto AT5OFF  = 350.0F; // Affine transform offset 5
-  constexpr auto AT6OFF  = 100.0F; // Affine transform offset 6
-
-// ReSharper disable CppDeprecatedEntity
+  // ReSharper disable CppDeprecatedEntity
   strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
   strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.celn, strlen(EMBSTR));
@@ -852,8 +852,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	colorEntries[0]         = threadList[paletteIndex].blockIndex;
 	colorEntries[1]         = threadList[paletteIndex].colorIndex;
   }
-  pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
-  pesHeader.blct    = 1;
+  pesHeader.off  = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
+  pesHeader.blct = 1;
   // NOLINTBEGIN(readability-magic-numbers)
   // write the header end markers
   pesHeader.hnd1[0] = 0xff;

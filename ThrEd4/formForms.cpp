@@ -601,7 +601,7 @@ void formForms::prfmsg() {
   formForms::maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
-  PreferencesWindow = CreateWindow(L"STATIC",
+  PreferencesWindow      = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    ButtonWidthX3 + 3,
@@ -1027,25 +1027,25 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  break;
 		}
 		case IDC_DEFTEAR: {
-		  constexpr auto TEARSIDES = uint16_t {20U};
+		  constexpr auto TEARSIDES    = uint16_t {20U};
 		  constexpr auto TEARTAILFACT = 1.1F;
 		  constexpr auto TEARTWIST    = 1.6F;
-		  IniFile.formSides      = TEARSIDES;
-		  IniFile.tearTailLength = TEARTAILFACT;
-		  IniFile.tearTwistStep  = 0.0F;
-		  IniFile.tearTwistRatio = TEARTWIST;
+		  IniFile.formSides           = TEARSIDES;
+		  IniFile.tearTailLength      = TEARTAILFACT;
+		  IniFile.tearTwistStep       = 0.0F;
+		  IniFile.tearTwistRatio      = TEARTWIST;
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}
 		case IDC_DEFPAIS: {
 		  constexpr auto PAISSIDES    = uint16_t {24U};
 		  constexpr auto PAISTAILFACT = 1.15F;
-		  constexpr auto PAISSTEP    = 0.3F;
+		  constexpr auto PAISSTEP     = 0.3F;
 		  constexpr auto PAISTWIST    = 1.8F;
-		  IniFile.formSides      = PAISSIDES;
-		  IniFile.tearTailLength = PAISTAILFACT;
-		  IniFile.tearTwistStep  = PAISSTEP * PFGRAN;
-		  IniFile.tearTwistRatio = PAISTWIST;
+		  IniFile.formSides           = PAISSIDES;
+		  IniFile.tearTailLength      = PAISTAILFACT;
+		  IniFile.tearTwistStep       = PAISSTEP * PFGRAN;
+		  IniFile.tearTwistRatio      = PAISTWIST;
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}

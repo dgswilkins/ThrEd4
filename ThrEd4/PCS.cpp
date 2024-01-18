@@ -19,7 +19,7 @@ class PCSHEADER // pcs file header structure
   int8_t   hoopType {};
   uint16_t colorCount {};
 
-  std::array<COLORREF, COLORCNT> colors {}; 
+  std::array<COLORREF, COLORCNT> colors {};
 
   uint16_t stitchCount {};
 

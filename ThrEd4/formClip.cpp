@@ -228,7 +228,7 @@ void fci::clipSelectedForm() {
 	CloseClipboard();
 	return;
   }
-  Clip = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = RegisterClipboardFormat(PcdClipFormat);
   clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -403,7 +403,7 @@ void fci::clipSelectedForms() {
 	CloseClipboard();
 	return;
   }
-  Clip = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = RegisterClipboardFormat(PcdClipFormat);
   clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -565,9 +565,9 @@ void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t 
   wrap::narrow(destination.y, integer);
   destination.spcy = 0;
   // ToDo - Are these structure members needed?
-  destination.myst = 1;
+  destination.myst    = 1;
   constexpr auto DTAG = uint8_t {0x14};
-  destination.tag  = DTAG;
+  destination.tag     = DTAG;
 }
 
 void fci::rtrclpfn(FRM_HEAD const& form) {
@@ -593,6 +593,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   LowerLeftStitch.y = 0.0F;
   EmptyClipboard();
   Clip = RegisterClipboardFormat(PcdClipFormat);
+
   auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
   if (nullptr == clipHandle) {
 	CloseClipboard();
