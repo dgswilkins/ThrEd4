@@ -38,7 +38,7 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 namespace bi {
 auto binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool;
 auto bitar() -> bool;
-void bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background);
+void bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background) noexcept;
 void bitsiz();
 
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
@@ -225,7 +225,7 @@ auto bi::binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool {
   return whiteBits > blackBits;
 }
 
-void bi::bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background) {
+void bi::bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background) noexcept {
   auto       dst       = destination.begin();
   auto const subSource = source.subspan(0, source.size() - 1);
   for (auto const& src : subSource) {
