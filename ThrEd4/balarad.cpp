@@ -212,8 +212,8 @@ void bal::ritbal() {
 		}
 	  }
 	}
-	// NOLINTNEXTLINE(clang-diagnostic-four-char-constants)
-	balaradHeader.signature       = 'drbm';
+	constexpr auto DRBM           = 0x6472626d; // integer representation of 'drbm'
+	balaradHeader.signature       = DRBM;
 	balaradHeader.backgroundColor = BackgroundColor;
 	balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRATIO;
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
