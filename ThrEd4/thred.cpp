@@ -8327,6 +8327,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void thred::fileLock() noexcept {
   auto lockInfo = std::vector<WIN32_FIND_DATA> {};
+#pragma warning(suppress : 26490)
   DialogBoxParam(
       ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, thi::lockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 }
