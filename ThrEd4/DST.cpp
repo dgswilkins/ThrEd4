@@ -890,7 +890,7 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
   };
   auto const xOffset = DSTMAX + dif.cx;
   auto const yOffset = DSTMAX + dif.cy;
-  return X_DST[wrap::toSize(xOffset)] | Y_DST[wrap::toSize(yOffset)];
+  return X_DST.at(wrap::toSize(xOffset)) | Y_DST.at(wrap::toSize(yOffset));
 }
 
 void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {

@@ -988,7 +988,7 @@ auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
 
 void xi::durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const itStitch = wrap::next(StitchBuffer->begin(), record.start);
-  record.type = gsl::narrow_cast<decltype(record.type)>(STITCH_TYPES[dutyp(itStitch->attribute)]);
+  record.type = gsl::narrow_cast<decltype(record.type)>(STITCH_TYPES.at(dutyp(itStitch->attribute)));
   auto const attribute = itStitch->attribute & SRTMSK;
   record.color         = attribute & COLMSK;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
@@ -1326,7 +1326,7 @@ void xi::duatf(uint32_t ind) {
   auto const attribute       = StitchBuffer->operator[](ind).attribute;
   auto       attributeFields = ATFLD {(attribute & COLMSK),
 									  ((attribute & FRMSK) >> FRMSHFT),
-									  gsl::narrow_cast<uint32_t>(STITCH_TYPES[dutyp(attribute)]),
+									  gsl::narrow_cast<uint32_t>(STITCH_TYPES.at(dutyp(attribute))),
 									  ((attribute >> LAYSHFT) & MSK3BITS),
 									  0};
   // clang-format on
@@ -1379,7 +1379,7 @@ void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fil
 	}
 	if (auto const attribute = StitchBuffer->operator[](iSourceStitch).attribute;
 	    codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
-	  switch (auto const type = STITCH_TYPES[xi::dutyp(attribute)]; type) {
+	  switch (auto const type = STITCH_TYPES.at(xi::dutyp(attribute)); type) {
 		case TYPE_APPLIQUE: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;

@@ -2825,7 +2825,7 @@ void thred::nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept {
 void thi::nuStchSiz(uint32_t iColor, int32_t width) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const tsp = wrap::next(ThreadSizePixels.begin(), iColor);
   if (width != *tsp) {
-	thred::nuPen(UserPen->operator[](iColor), width, UserColor[iColor]);
+	thred::nuPen(UserPen->operator[](iColor), width, UserColor.at(iColor));
 	*tsp = width;
   }
 }
@@ -6614,7 +6614,7 @@ void thi::getbak() {
   }
   unthum();
   StateMap->set(StateFlag::FRMOF);
-  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
+  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(*WorkingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
@@ -7355,7 +7355,7 @@ void thi::barnam(HWND window, uint32_t iThumbnail) {
 	SetWindowText(window, static_cast<LPCWSTR>(L""));
 	return;
   }
-  auto const thumbPath    = fs::path(Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
+  auto const thumbPath    = fs::path(Thumbnails->operator[](ThumbnailsSelected.at(iThumbnail)).data());
   constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
   auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
@@ -7414,7 +7414,7 @@ void thred::thumnail() {
   auto       iThumbnail = 0U;
   auto const thumbSize  = Thumbnails->size();
   while (iThumbnail < 4 && iThumbnail < thumbSize) {
-	ThumbnailsSelected[iThumbnail] = iThumbnail;
+	ThumbnailsSelected.at(iThumbnail) = iThumbnail;
 	++iThumbnail;
   }
   ThumbnailIndex = ThumbnailDisplayCount = iThumbnail;
@@ -7443,7 +7443,7 @@ void thi::nuthsel() {
 	auto itHWndBV = BackupViewer.begin();
 	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
 	  if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
-		ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
+		ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 		thred::redraw(*itHWndBV);
 		++itHWndBV;
 		++iThumbnail;
@@ -7454,7 +7454,7 @@ void thi::nuthsel() {
   else {
 	auto itHWndBV = BackupViewer.begin();
 	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
-	  ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
+	  ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 	  thred::redraw(*itHWndBV);
 	  ++itHWndBV;
 	  ++iThumbnail;
@@ -8555,10 +8555,10 @@ void thred::movchk() {
 	}
   }
   if (!switchColors) {
-	auto const swapColor                   = UserColor[wrap::toSize(VerticalIndex)];
-	UserColor[wrap::toSize(VerticalIndex)] = UserColor[wrap::toSize(draggedColor)];
+	auto const swapColor                   = UserColor.at(wrap::toSize(VerticalIndex));
+	UserColor.at(wrap::toSize(VerticalIndex)) = UserColor.at(wrap::toSize(draggedColor));
 	if (!key) {
-	  UserColor[wrap::toSize(draggedColor)] = swapColor;
+	  UserColor.at(wrap::toSize(draggedColor)) = swapColor;
 	  thred::nuscol(draggedColor);
 	}
 	thred::nuscol(VerticalIndex);
@@ -8604,7 +8604,7 @@ void thi::inscol() {
   }
   for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
 	if (iColor != 0U) {
-	  UserColor[iColor] = UserColor[iColor - 1U];
+	  UserColor.at(iColor) = UserColor.at(iColor - 1U);
 	}
 	thred::nuscol(iColor);
   }
@@ -8643,7 +8643,7 @@ void thi::delcol() {
 	}
   }
   for (auto iColor = VerticalIndex; iColor < COLORMAX; ++iColor) {
-	UserColor[iColor] = UserColor[wrap::toSize(iColor) + 1U];
+	UserColor.at(iColor) = UserColor.at(wrap::toSize(iColor) + 1U);
 	thred::nuscol(iColor);
   }
   thred::coltab();
@@ -11894,7 +11894,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
 		  if (DisplayedColorBitmap.test(iColor)) {
-			SetBkColor(DrawItem->hDC, DEFAULT_COLORS[iColor]);
+			SetBkColor(DrawItem->hDC, DEFAULT_COLORS.at(iColor));
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
 			auto const colorNum = fmt::format(FMT_COMPILE(L"{}"), iColor + 1U);
 			auto       textSize = SIZE {};
@@ -11934,7 +11934,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  auto itHWndBV = BackupViewer.begin();
 		  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
 			if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
-			  ritbak(Thumbnails->operator[](ThumbnailsSelected[iThumb]).data(), *DrawItem);
+			  ritbak(Thumbnails->operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
 			  rthumnam(iThumb);
 			  return 1;
 			}
@@ -12655,7 +12655,7 @@ auto thred::createChangeThreadSizeWindows() -> uint32_t {
 }
 
 void thred::updateUserColor() {
-  if (Msg.message == WM_LBUTTONDOWN && (thi::nuCol(UserColor[VerticalIndex]) != 0U)) {
+  if (Msg.message == WM_LBUTTONDOWN && (thi::nuCol(UserColor.at(VerticalIndex)) != 0U)) {
 	thred::savdo();
 	auto const itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
 	*itUserColor           = ColorStruct.rgbResult;

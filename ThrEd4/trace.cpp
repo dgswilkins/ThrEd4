@@ -349,7 +349,7 @@ void trace::trdif() {
 	  auto iPoint = iHeight * bitmap::getBitmapWidth();
 	  ++iPoint;
 	  for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
-		ti::difbits(TraceShift[iRGB], std::next(spTBD.begin(), iPoint));
+		ti::difbits(TraceShift.at(iRGB), std::next(spTBD.begin(), iPoint));
 		differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
 
 		auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
@@ -364,11 +364,11 @@ void trace::trdif() {
 	auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
 	auto       pos   = size_t {0U};
 	for (auto& iPixel : spTBD) {
-	  iPixel &= TraceRGBMask[iRGB];
+	  iPixel &= TraceRGBMask.at(iRGB);
 	  if (differenceBitmap[pos] != 0U) {
 		auto const adjustedColorSum =
 		    wrap::round<uint32_t>(wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
-		iPixel |= adjustedColorSum << TraceShift[iRGB];
+		iPixel |= adjustedColorSum << TraceShift.at(iRGB);
 	  }
 	  ++pos;
 	}
@@ -470,11 +470,11 @@ void trace::trace() {
   InvertDownColor = DownPixelColor ^ COLMASK;
   auto colors     = ti::trcols(InvertUpColor);
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	HighColors[iRGB] = colors[iRGB];
+	HighColors.at(iRGB) = colors.at(iRGB);
   }
   colors = ti::trcols(InvertDownColor);
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	LowColors[iRGB] = colors[iRGB];
+	LowColors.at(iRGB) = colors.at(iRGB);
   }
   if (TracedMap->empty()) {
 	TracedMap->resize(TraceDataSize, false);
@@ -907,10 +907,10 @@ void trace::trinit() {
 	std::ranges::copy(colors, HighColors.begin());
 	colors = ti::trcols(color);
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  if (colors[iRGB] > HighColors[iRGB]) {
-		std::swap(colors[iRGB], HighColors[iRGB]);
+	  if (colors.at(iRGB) > HighColors.at(iRGB)) {
+		std::swap(colors.at(iRGB), HighColors.at(iRGB));
 	  }
-	  componentPeak[iRGB] = ((HighColors[iRGB] - colors[iRGB]) / 2) + colors[iRGB];
+	  componentPeak.at(iRGB) = ((HighColors.at(iRGB) - colors.at(iRGB)) / 2) + colors.at(iRGB);
 	}
   }
   else {
@@ -942,10 +942,10 @@ void trace::trinit() {
   }
   InvertDownColor = 0U;
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	if (componentPeak[iRGB] != 0U) {
-	  --(componentPeak[iRGB]);
+	if (componentPeak.at(iRGB) != 0U) {
+	  --(componentPeak.at(iRGB));
 	}
-	InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
+	InvertDownColor |= componentPeak.at(iRGB) << TraceShift.at(iRGB);
   }
   DownPixelColor = InvertDownColor ^ COLMASK;
   InvertUpColor  = PENWHITE;
@@ -981,7 +981,7 @@ void trace::trcsel() {
 	if (colors[2] > maximumColorComponent) {
 	  iRGB = 0;
 	}
-	iPixel &= TraceRGB[iRGB];
+	iPixel &= TraceRGB.at(iRGB);
   }
   bitmap::bitbltBitmap();
   StateMap->set(StateFlag::WASDSEL);
@@ -990,9 +990,9 @@ void trace::trcsel() {
 }
 
 void ti::ritrcol(COLORREF& colRef, uint32_t colNum) noexcept {
-  colRef &= TraceRGBMask[ColumnColor];
+  colRef &= TraceRGBMask.at(ColumnColor);
   colNum &= BYTMASK;
-  colRef |= (colNum << TraceShift[ColumnColor]);
+  colRef |= (colNum << TraceShift.at(ColumnColor));
 }
 
 void ti::dutrnum0(uint32_t colNum) {
@@ -1088,32 +1088,32 @@ void trace::blak() {
 
 void ti::getColors() {
   if (wrap::pressed(VK_SHIFT)) {
-	UpPixelColor &= TraceRGBMask[ColumnColor];
-	DownPixelColor |= TraceRGB[2 - ColumnColor];
+	UpPixelColor &= TraceRGBMask.at(ColumnColor);
+	DownPixelColor |= TraceRGB.at(2 - ColumnColor);
 	return;
   }
   auto const ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
   auto const position      = wrap::floor<uint32_t>(ratio * 255.0);
-  auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
-  auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift[ColumnColor]);
+  auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(2 - ColumnColor));
+  auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift.at(ColumnColor));
   if (tracePosition < traceColor) {
-	UpPixelColor &= TraceRGBMask[ColumnColor];
+	UpPixelColor &= TraceRGBMask.at(ColumnColor);
 	UpPixelColor |= tracePosition;
 	return;
   }
-  traceColor = DownPixelColor & TraceRGB[2 - ColumnColor];
+  traceColor = DownPixelColor & TraceRGB.at(2 - ColumnColor);
   if (tracePosition > traceColor) {
-	DownPixelColor &= TraceRGBMask[ColumnColor];
+	DownPixelColor &= TraceRGBMask.at(ColumnColor);
 	DownPixelColor |= tracePosition;
 	return;
   }
   if (Msg.message == WM_LBUTTONDOWN) {
-	UpPixelColor &= TraceRGBMask[ColumnColor];
-	UpPixelColor |= position << TraceShift[ColumnColor];
+	UpPixelColor &= TraceRGBMask.at(ColumnColor);
+	UpPixelColor |= position << TraceShift.at(ColumnColor);
   }
   else {
-	DownPixelColor &= TraceRGBMask[ColumnColor];
-	DownPixelColor |= position << TraceShift[ColumnColor];
+	DownPixelColor &= TraceRGBMask.at(ColumnColor);
+	DownPixelColor |= position << TraceShift.at(ColumnColor);
   }
 }
 
@@ -1140,7 +1140,7 @@ void trace::tracpar() {
 	else {
 	  auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight);
 	  if (position < TRWINROW02) {
-		StateMap->flip(TraceRGBFlag[ColumnColor]);
+		StateMap->flip(TraceRGBFlag.at(ColumnColor));
 		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
 		thred::redraw(*itTraceSelectWindow);
 		trace::trace();

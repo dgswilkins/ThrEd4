@@ -340,7 +340,7 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
-  auto translatedColor = PES_THREAD[colorIndex].color;
+  auto translatedColor = PES_THREAD.at(colorIndex).color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
@@ -520,7 +520,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 }
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
-  auto const& threadColor = PES_THREAD[pesColors[index++] % THTYPCNT];
+  auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
   auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   auto       iUserColor = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
@@ -605,7 +605,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  if (colorMap.test_set(pesColors[iColor])) {
 		continue;
 	  }
-	  auto const& threadColor = PES_THREAD[pesColors[iColor]];
+	  auto const& threadColor = PES_THREAD.at(pesColors[iColor]);
 	  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 	  *iUserColor      = color;
 	  ++iUserColor;

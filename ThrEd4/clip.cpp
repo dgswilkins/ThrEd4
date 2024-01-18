@@ -931,7 +931,7 @@ void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
-	OSequence->push_back(chainPoint[CHAIN_SEQUENCE[iChain]]);
+	OSequence->push_back(chainPoint.at(CHAIN_SEQUENCE.at(iChain)));
   }
 }
 

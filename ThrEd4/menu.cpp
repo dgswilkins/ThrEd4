@@ -519,7 +519,7 @@ void menu::chkmen() {
   for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
 	auto const code = (iCode == IniFile.dataCheck) ? gsl::narrow_cast<UINT>(MF_CHECKED)
 	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
-	CheckMenuItem(MainMenu, DataCode[iCode], code);
+	CheckMenuItem(MainMenu, DataCode.at(iCode), code);
   }
   StateMap->set(StateFlag::DUMEN);
 }

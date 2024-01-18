@@ -4941,7 +4941,7 @@ void fi::bakseq() {
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			OSequence->emplace_back(bPrevious.x, bPrevious.y);
 			auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
-			            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
+			            wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
 			while (true) {
 			  OSequence->emplace_back(0.0F, yVal);
 			  if (yVal > bCurrent.y) {
@@ -4955,7 +4955,7 @@ void fi::bakseq() {
 		  }
 		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
-		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
+		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
 		  while (true) {
 			OSequence->emplace_back(0.0F, yVal);
 			if (yVal < bPrevious.y) {
@@ -4968,7 +4968,7 @@ void fi::bakseq() {
 		  break;
 		}
 		auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
-		            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
+		            wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
 		while (true) {
 		  OSequence->emplace_back(0.0F, yVal);
 		  if (yVal > bCurrent.y) {
@@ -4987,7 +4987,7 @@ void fi::bakseq() {
 		  break;
 		}
 		auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
-		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
+		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
 		while (true) {
 		  OSequence->emplace_back(0.0F, yVal);
 		  if (yVal < bCurrent.y) {
