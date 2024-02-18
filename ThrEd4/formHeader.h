@@ -70,10 +70,11 @@ union FLENCNT {
 
 #pragma pack(push, 1)
 union FLENCNTOUT {
-  public:
+  private:
   float    stitchLength {};
   uint32_t clipCount;
 
+  public:
   FLENCNTOUT() noexcept = default;
   // FLENCNTOUT(FLENCNTOUT const&) = default;
   // FLENCNTOUT(FLENCNTOUT&&) = default;
@@ -81,13 +82,22 @@ union FLENCNTOUT {
   // FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
   //~FLENCNTOUT() = default;
 
-  explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
+  explicit FLENCNTOUT(FLENCNT const& rhs) noexcept : clipCount(rhs.clipCount) {};
   inline auto operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT&;
+
+  // Getter and Setter for stitchLength
+  inline auto getStitchLength() const noexcept -> float {
+	return stitchLength;
+  }
+  void setStitchLength(float value) noexcept { stitchLength = value; }
+
+  // Getter and Setter for clipCount
+  inline auto getClipCount() const noexcept -> uint32_t {
+	return clipCount;
+  }
+  void setClipCount(uint32_t value) noexcept { clipCount = value; }
 };
 #pragma pack(pop)
-
-inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept : clipCount(rhs.clipCount) {
-}
 
 inline auto FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT& {
   clipCount = rhs.clipCount;
@@ -95,11 +105,11 @@ inline auto FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT& {
   return *this;
 }
 
-inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept : clipCount(rhs.clipCount) {
+inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept : clipCount(rhs.getClipCount()) {
 }
 
 inline auto FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT& {
-  clipCount = rhs.clipCount;
+  clipCount = rhs.getClipCount();
 
   return *this;
 }
@@ -452,7 +462,7 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     underlayStitchLen(rhs.underlayStitchLen), underlayStitchAngle(rhs.underlayStitchAngle),
     underlayIndent(rhs.underlayIndent), txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
   if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.getClipCount() != 0U))) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
@@ -488,7 +498,7 @@ inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
   fillSpacing     = rhs.fillSpacing;
   lengthOrCount   = rhs.lengthOrCount;
   if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.getClipCount() != 0U))) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
