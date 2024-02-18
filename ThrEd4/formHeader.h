@@ -387,8 +387,8 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
   else {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
-  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+  if (isEdgeClipX() || 
+	isClipX()) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
@@ -426,8 +426,8 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   else {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
-  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+  if (isEdgeClipX() ||
+      isClipX()) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
@@ -470,8 +470,8 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
   else {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
-  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.getClipCount() != 0U))) {
+  if (rhs.isEdgeClipX() ||
+      rhs.isClipX()) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
@@ -511,8 +511,8 @@ inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
   else {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
-  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.getClipCount() != 0U))) {
+  if (rhs.isEdgeClipX() ||
+      rhs.isClipX()) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
@@ -572,8 +572,8 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
   else {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
-  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+  if (isEdgeClipX() ||
+      isClipX()) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
@@ -611,8 +611,8 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   else {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
-  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
-      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+  if (isEdgeClipX() ||
+      isClipX()) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
   }
   else {
