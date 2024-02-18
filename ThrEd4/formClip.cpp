@@ -122,7 +122,7 @@ auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t
 	clipSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
   if (form.isClipX()) {
-	clipSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
+	clipSize += form.lengthOrCount.getClipCount() * wrap::sizeofType(ClipPoints);
   }
   if (form.isTexture()) {
 	clipSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
@@ -149,7 +149,7 @@ void fci::sizclp(FRM_HEAD const& form,
 	fileSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
   if (form.isClipX()) {
-	fileSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
+	fileSize += form.lengthOrCount.getClipCount() * wrap::sizeofType(ClipPoints);
   }
   if (form.isTexture()) {
 	fileSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
@@ -196,7 +196,7 @@ void fci::clipSelectedForm() {
   auto* ptrMclp = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, iGuide));
   auto  iClip   = 0U;
   if (form.isClipX()) {
-	iClip                = form.lengthOrCount.clipCount;
+	iClip                = form.lengthOrCount.getClipCount();
 	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 	auto const endMclp   = wrap::next(startMclp, iClip);
 
@@ -330,7 +330,7 @@ void fci::clipSelectedForms() {
   for (auto& selectedForm : (*SelectedFormList)) {
 	auto& form = FormList->operator[](selectedForm);
 	if (form.isClipX()) {
-	  pointsSize += form.lengthOrCount.clipCount;
+	  pointsSize += form.lengthOrCount.getClipCount();
 	}
 	if (form.isEdgeClip()) {
 	  pointsSize += form.clipEntries;
@@ -343,7 +343,7 @@ void fci::clipSelectedForms() {
 	  auto& form = FormList->operator[](selectedForm);
 	  if (form.isClipX()) {
 		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-		for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
+		for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
 		  points[pointCount++] = *offsetStart;
 		  ++offsetStart;
 		}
@@ -581,7 +581,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   }
   else {
 	if (form.isClip()) {
-	  count = form.lengthOrCount.clipCount;
+	  count = form.lengthOrCount.getClipCount();
 	  clip::oclp(clipRect, form.angleOrClipData.clip, count);
 	}
   }
@@ -744,7 +744,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			clipCount += form.lengthOrCount.clipCount;
+			clipCount += form.lengthOrCount.getClipCount();
 		  }
 		  if (form.isEdgeClipX()) {
 			clipCount += form.clipEntries;
@@ -758,9 +758,9 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			form.angleOrClipData.clip = thred::adclp(form.lengthOrCount.clipCount);
+			form.angleOrClipData.clip = thred::adclp(form.lengthOrCount.getClipCount());
 			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
-			for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
+			for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
 			}
@@ -835,10 +835,10 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto* ptrClipData = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, formIter.satinGuideCount));
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
-			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.lengthOrCount.clipCount};
+			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.lengthOrCount.getClipCount()};
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
-			clipCount += formIter.lengthOrCount.clipCount;
+			clipCount += formIter.lengthOrCount.getClipCount();
 		  }
 		  if (formIter.isEdgeClipX()) {
 			ptrClipData             = convertFromPtr<F_POINT*>(wrap::next(ptrClipData, clipCount));

@@ -1033,7 +1033,7 @@ void txi::txpar(FRM_HEAD& form) {
   wrap::narrow(form.fillInfo.texture.lines, TextureScreen.lines);
   form.fillInfo.texture.height    = TextureScreen.areaHeight;
   form.fillSpacing                = TextureScreen.spacing;
-  form.lengthOrCount.stitchLength = IniFile.userStitchLength;
+  form.lengthOrCount.setStitchLength(IniFile.userStitchLength);
   form.maxFillStitchLen           = IniFile.maxStitchLength;
   form.minFillStitchLen           = IniFile.minStitchLength;
   form.fillColor                  = ActiveColor;
