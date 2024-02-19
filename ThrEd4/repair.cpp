@@ -151,7 +151,7 @@ void ri::chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 }
 
 void ri::chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
-  if (badData.guideCount == form.satinOrAngle.guide) {
+  if (badData.guideCount == form.satinOrAngle.getGuide()) {
 	badData.guideCount += form.satinGuideCount;
   }
   else {
@@ -375,20 +375,20 @@ void ri::repsat() {
 	if (form.type != SAT) {
 	  continue;
 	}
-	auto const guideDifference = form.satinOrAngle.guide;
+	auto const guideDifference = form.satinOrAngle.getGuide();
 	if (FormVertices->size() > wrap::toSize(guideDifference) + form.vertexCount) {
-	  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
 	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
 	  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
 	  std::copy(startGuide, endGuide, destination);
-	  form.satinOrAngle.guide = guideCount;
+	  form.satinOrAngle.setGuide(guideCount);
 	  guideCount += form.satinGuideCount;
 	  ri::bcup(form, badData);
 	  continue;
 	}
 	if (guideDifference < SatinGuides->size()) {
 	  wrap::narrow(form.satinGuideCount, SatinGuides->size() - guideDifference);
-	  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
 	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
 	  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
 	  std::copy(startGuide, endGuide, destination);

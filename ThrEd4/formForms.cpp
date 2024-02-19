@@ -343,7 +343,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == ANGCLPF) {
 	  labelWindow[LSACANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LSACANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.satinOrAngle.angle * RADDEGF)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.satinOrAngle.getAngle() * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
@@ -874,7 +874,7 @@ void formForms::dasyfrm() {
   if (UserFlagMap->test(UserFlag::DAZD)) {
 	form.satinGuideCount    = IniFile.daisyPetalCount - 1U;
 	form.wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
-	form.satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
+	form.satinOrAngle.setGuide(satin::adsatk(IniFile.daisyPetalCount - 1));
   }
   auto const halfPetalPointCount = IniFile.daisyPetalPoints / 2;
   auto       angle               = 0.0F;
@@ -933,7 +933,7 @@ void formForms::dasyfrm() {
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
+		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide() + iMacroPetal);
 		itGuide->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		itGuide->finish = iVertex;
 	  }

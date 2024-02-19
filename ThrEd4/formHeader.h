@@ -253,11 +253,12 @@ union TF_INFO {
 
 union SATINANGLEOUT;
 
-union SATINANGLE {
-  public:
+class SATINANGLE {
+  private:
   uint32_t guide {};
-  float    angle;
+  float    angle {};
 
+  public:
   SATINANGLE() noexcept = default;
   // SATINANGLE(SATINANGLE const&) = default;
   // SATINANGLE(SATINANGLE&&) = default;
@@ -265,8 +266,39 @@ union SATINANGLE {
   // SATINANGLE& operator=(SATINANGLE&&) = default;
   //~SATINANGLE() = default;
 
-  explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
-  inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
+  // Getter and Setter for guide
+  inline auto getGuide() const noexcept -> uint32_t {
+    return guide;
+  }
+  
+  void setGuide(uint32_t value) noexcept {
+    guide = value;
+  }
+
+  void incGuide() noexcept {
+	++guide;
+  }
+
+  void decGuide() noexcept {
+	--guide;
+  }
+
+  void incGuide(uint32_t value) noexcept {
+	guide += value;
+  }
+
+  void decGuide(uint32_t value) noexcept {
+	guide -= value;
+  }
+
+  // Getter and Setter for angle
+  inline auto getAngle() const noexcept -> float {
+    return angle;
+  }
+  
+  void setAngle(float value) noexcept {
+    angle = value;
+  }
 };
 
 #pragma pack(push, 1)
@@ -283,46 +315,25 @@ union SATINANGLEOUT {
   // SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
   //~SATINANGLEOUT() = default;
 
-  explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
-  inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
-
   // Getter and Setter for guide
-  //inline auto getGuide() const noexcept -> DWORD {
-  //  return guide;
-  //}
+  inline auto getGuide() const noexcept -> DWORD {
+    return guide;
+  }
   
-  //void setGuide(DWORD value) noexcept {
-  //  guide = value;
-  //}
+  void setGuide(DWORD value) noexcept {
+    guide = value;
+  }
 
   // Getter and Setter for angle
   inline auto getAngle() const noexcept -> float {
     return angle;
   }
   
-  //void setAngle(float value) noexcept {
-  //  angle = value;
-  //}
+  void setAngle(float value) noexcept {
+    angle = value;
+  }
 };
 #pragma pack(pop)
-
-inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept : angle(rhs.angle) {
-}
-
-inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT& {
-  angle = rhs.angle;
-
-  return *this;
-}
-
-inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept : angle(rhs.getAngle()) {
-}
-
-inline auto SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE& {
-  angle = rhs.getAngle();
-
-  return *this;
-}
 
 #pragma pack(push, 1)
 class FRM_HEAD_O // Original form header used prior to version 2
@@ -483,7 +494,7 @@ class FRM_HEAD_OUT
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
-    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries), satinOrAngle(rhs.satinOrAngle),
+    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
     borderClipData(rhs.borderClipData), // Todo - Should we be copying this value?
     satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam), rectangle(rhs.rectangle),
     fillType(rhs.fillType), edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing),
@@ -508,6 +519,12 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
 	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
 	}
   }
+  if (fillType == ANGCLPF) {
+	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  }
+  else {
+	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
 }
 
 inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
@@ -518,12 +535,17 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   borderColor     = rhs.borderColor;
   clipEntries     = rhs.clipEntries;
   vertexIndex     = 0U;
-  satinOrAngle    = rhs.satinOrAngle;
   borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
   satinGuideCount = rhs.satinGuideCount;
   wordParam       = rhs.wordParam;
   rectangle       = rhs.rectangle;
   fillType        = rhs.fillType;
+  if (fillType == ANGCLPF) {
+	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  }
+  else {
+	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;
   if (isClip()) {
@@ -556,7 +578,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
 inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     attribute(rhs.attribute), vertexCount(gsl::narrow<uint16_t>(rhs.vertexCount)), type(rhs.type),
     fillColor(rhs.fillColor), borderColor(rhs.borderColor),
-    clipEntries(gsl::narrow<uint16_t>(rhs.clipEntries)), satinOrAngle(rhs.satinOrAngle),
+    clipEntries(gsl::narrow<uint16_t>(rhs.clipEntries)),
     satinGuideCount(gsl::narrow<uint16_t>(rhs.satinGuideCount)),
     wordParam(gsl::narrow<uint16_t>(rhs.wordParam)), rectangle(rhs.rectangle), fillType(rhs.fillType),
     edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing), borderSize(rhs.borderSize),
@@ -587,6 +609,12 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
 	}
   }
+  if (fillType == ANGCLPF) {
+	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  }
+  else {
+	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
 }
 
 inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
@@ -597,12 +625,17 @@ inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
   borderColor     = rhs.borderColor;
   clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
   vertexIndex     = 0; // do not write the pointer value to file
-  satinOrAngle    = rhs.satinOrAngle;
   borderClipData  = 0; // do not write the pointer value to file
   satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
   wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
   rectangle       = rhs.rectangle;
   fillType        = rhs.fillType;
+  if (fillType == ANGCLPF) {
+	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  }
+  else {
+	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;
   if (rhs.isClip()) {
@@ -651,7 +684,7 @@ inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
-    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries), satinOrAngle(rhs.satinOrAngle),
+    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
     satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam), rectangle(rhs.rectangle),
     fillType(rhs.fillType), edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing),
     borderSize(rhs.borderSize), edgeSpacing(rhs.edgeSpacing), edgeStitchLen(rhs.edgeStitchLen),
@@ -681,6 +714,12 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
 	}
   }
+  if (fillType == ANGCLPF) {
+	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  }
+  else {
+	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
 }
 
 inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
@@ -691,12 +730,17 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   borderColor     = rhs.borderColor;
   clipEntries     = rhs.clipEntries;
   vertexIndex     = 0U; // do not read the index from a v2 file
-  satinOrAngle    = rhs.satinOrAngle;
   borderClipData  = 0U; // do not read the index from a v2 file
   satinGuideCount = rhs.satinGuideCount;
   wordParam       = rhs.wordParam;
   rectangle       = rhs.rectangle;
   fillType        = rhs.fillType;
+  if (fillType == ANGCLPF) {
+	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  }
+  else {
+	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;
   if (isClip()) {

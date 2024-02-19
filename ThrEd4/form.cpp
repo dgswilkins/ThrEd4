@@ -626,7 +626,7 @@ void form::chkcont() {
 	if (form.satinGuideCount != 0U) {
 	  auto shortestGuideIndex = 0U;
 	  auto minimumLength      = MAXDWORD;
-	  auto itGuide            = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto itGuide            = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (auto const length = itGuide->finish - itGuide->start; length < minimumLength) {
 		  minimumLength      = length;
@@ -634,7 +634,7 @@ void form::chkcont() {
 		}
 		++itGuide;
 	  }
-	  auto const shortestGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + shortestGuideIndex);
+	  auto const shortestGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide() + shortestGuideIndex);
 
 	  form.angleOrClipData.setGuide(*shortestGuide);
 	  satin::delsac(ClosestFormToCursor);
@@ -1054,7 +1054,7 @@ void form::drwfrm() {
 	  }
 	  auto const maxGuide      = FormList->operator[](iForm).satinGuideCount;
 	  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
 	  for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
 		auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
 		auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
@@ -3873,7 +3873,7 @@ void form::angclpfn(FRM_HEAD const&               form,
   auto const rotationAngle = StateMap->test(StateFlag::ISUND) ? PI_FHALF - angledForm.underlayStitchAngle
                              : StateMap->test(StateFlag::TXFIL)
                                  ? PI_FHALF - angledForm.angleOrClipData.getAngle()
-                                 : PI_FHALF - angledForm.satinOrAngle.angle;
+                                 : PI_FHALF - angledForm.satinOrAngle.getAngle();
   auto const rotationCenter = F_POINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
                                        wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
   angledFormVertices.clear();
@@ -5777,7 +5777,7 @@ void form::rotfrm(FRM_HEAD& form, uint32_t newStartVertex) {
 	iRotated  = form::nxt(form, iRotated);
 	++itVertex;
   }
-  auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
+  auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide());
   auto       rotatedIt    = itStartGuide; // intended copy
   if (form.type == SAT && form.vertexCount != 0U) {
 	if (form.wordParam != 0U) {
@@ -5903,7 +5903,7 @@ void fi::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT stitchPoint) {
   auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + vertex + 1U);
   *itVertex           = stitchPoint;
   if (form.satinGuideCount != 0U) {
-	auto itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
+	auto itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide());
 	for (auto ind = 0U; ind < form.satinGuideCount; ++ind) {
 	  if (itGuide->start > vertex) {
 		++(itGuide->start);
@@ -7669,8 +7669,8 @@ void fi::adfrm(uint32_t iForm) {
   auto const itVertex            = wrap::next(FormVertices->cbegin(), originalVertexIndex);
   FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
-	auto const originalGuide       = currentForm.satinOrAngle.guide;
-	currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
+	auto const originalGuide       = currentForm.satinOrAngle.getGuide();
+	currentForm.satinOrAngle.setGuide(wrap::toUnsigned(SatinGuides->size()));
 
 	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
 	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
@@ -7743,8 +7743,8 @@ void fi::cplayfn(uint32_t iForm, uint32_t layer) {
             wrap::next(itVertex, currentForm.vertexCount),
             wrap::next(FormVertices->begin(), currentForm.vertexIndex));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
-	auto const originalGuide       = currentForm.satinOrAngle.guide;
-	currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
+	auto const originalGuide       = currentForm.satinOrAngle.getGuide();
+	currentForm.satinOrAngle.setGuide(wrap::toUnsigned(SatinGuides->size()));
 
 	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), originalGuide);
 	auto const itEndGuide   = wrap::next(itStartGuide, currentForm.satinGuideCount);
@@ -8303,10 +8303,10 @@ void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
   dest.vertexIndex = formSourceIndex;
   formSourceIndex += dest.vertexCount;
   if (dest.satinGuideCount != 0U) {
-	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), dest.satinOrAngle.guide);
+	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), dest.satinOrAngle.getGuide());
 	auto const itEndGuide   = wrap::next(itStartGuide, dest.satinGuideCount);
 	tempGuides.insert(tempGuides.end(), itStartGuide, itEndGuide);
-	dest.satinOrAngle.guide = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
+	dest.satinOrAngle.setGuide(wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount));
   }
   auto const& form = FormList->operator[](formIndex);
   if (form.isEdgeClipX()) {
@@ -8753,7 +8753,7 @@ void form::spltfrm() {
 	if (currentForm.satinGuideCount == 0U) {
 	  return;
 	}
-	auto itGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinOrAngle.guide);
+	auto itGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinOrAngle.getGuide());
 	for (auto guideIndex = 0U; guideIndex < currentForm.satinGuideCount; ++guideIndex) {
 	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 		satin::spltsat(guideIndex);
@@ -8936,7 +8936,7 @@ void form::angsclp(FRM_HEAD& form) {
   form.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
-  form.satinOrAngle.angle = IniFile.fillAngle;
+  form.satinOrAngle.setAngle(IniFile.fillAngle);
   form.fillSpacing        = IniFile.clipOffset;
   auto itClipPoint        = wrap::next(ClipPoints->begin(), form.angleOrClipData.getClip());
   for (auto const& clip : *ClipBuffer) {
