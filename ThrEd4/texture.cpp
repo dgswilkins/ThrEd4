@@ -1060,7 +1060,7 @@ void txi::txang(FRM_HEAD& form) {
   if (TempTexturePoints->empty()) {
 	return;
   }
-  form.fillType              = TXANGF;
+  form.fillType = TXANGF;
   form.angleOrClipData.setAngle(IniFile.fillAngle);
   txi::txpar(form);
 }

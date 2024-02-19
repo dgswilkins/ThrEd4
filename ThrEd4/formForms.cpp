@@ -337,13 +337,15 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LFRMANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.angleOrClipData.getAngle() * RADDEGF)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.angleOrClipData.getAngle() * RADDEGF)),
+	                  ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == ANGCLPF) {
 	  labelWindow[LSACANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LSACANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.satinOrAngle.getAngle() * RADDEGF)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.satinOrAngle.getAngle() * RADDEGF)),
+	                  ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
@@ -872,8 +874,8 @@ void formForms::dasyfrm() {
   auto const petalSegmentAngle = PI_F2 / wrap::toFloat(petalVertexCount);
   auto const deltaPetalAngle   = PI_F / wrap::toFloat(IniFile.daisyPetalPoints);
   if (UserFlagMap->test(UserFlag::DAZD)) {
-	form.satinGuideCount    = IniFile.daisyPetalCount - 1U;
-	form.wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
+	form.satinGuideCount = IniFile.daisyPetalCount - 1U;
+	form.wordParam       = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
 	form.satinOrAngle.setGuide(satin::adsatk(IniFile.daisyPetalCount - 1));
   }
   auto const halfPetalPointCount = IniFile.daisyPetalPoints / 2;

@@ -9347,7 +9347,7 @@ auto thred::handleSideWindowActive() -> bool {
 		}
 		thi::respac(form);
 		// ToDo - should we be using the angle information already present
-		form.fillType              = ANGF;
+		form.fillType = ANGF;
 		form.angleOrClipData.setAngle(IniFile.fillAngle);
 		clip::delmclp(ClosestFormToCursor);
 		break;
@@ -9460,7 +9460,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
 	{
 	  if (form.isTexture()) {
-		form.fillType              = TXANGF;
+		form.fillType = TXANGF;
 		form.angleOrClipData.setAngle(IniFile.fillAngle);
 		break;
 	  }

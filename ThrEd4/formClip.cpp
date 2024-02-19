@@ -729,7 +729,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 			form.satinOrAngle.setGuide(satin::adsatk(form.satinGuideCount));
-			auto itGuide            = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide());
+			auto itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide());
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 			  *itGuide = guides[currentGuide++];
 			  ++itGuide;
@@ -759,7 +759,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  // clang-format on
 		  if (form.isClipX()) {
 			form.angleOrClipData.setClip(thred::adclp(form.lengthOrCount.getClipCount()));
-			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.getClip());
+			auto offsetStart = wrap::next(ClipPoints->begin(), form.angleOrClipData.getClip());
 			for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
@@ -828,7 +828,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  FormVertices->insert(FormVertices->end(), vertices.begin(), vertices.end());
 		  auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrVertices, formIter.vertexCount));
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
-			auto const guides           = gsl::span<SAT_CON> {ptrGuides, formIter.satinGuideCount};
+			auto const guides = gsl::span<SAT_CON> {ptrGuides, formIter.satinGuideCount};
 			formIter.satinOrAngle.setGuide(wrap::toUnsigned(SatinGuides->size()));
 			SatinGuides->insert(SatinGuides->end(), guides.begin(), guides.end());
 		  }

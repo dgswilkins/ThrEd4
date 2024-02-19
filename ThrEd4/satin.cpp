@@ -47,7 +47,7 @@ void satin::delsac(uint32_t formIndex) {
 	return;
   }
   auto const startGuide = wrap::next(SatinGuides->cbegin(), formList[formIndex].satinOrAngle.getGuide());
-  auto const endGuide   = wrap::next(startGuide, formList[formIndex].satinGuideCount);
+  auto const endGuide = wrap::next(startGuide, formList[formIndex].satinGuideCount);
   SatinGuides->erase(startGuide, endGuide);
   for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U) &&
@@ -159,8 +159,8 @@ void satin::spltsat(uint32_t guideIndex) {
   auto const itThisGuide = wrap::next(SatinGuides->cbegin(), offset);
   SatinGuides->erase(itThisGuide);
   nextForm.satinOrAngle.setGuide(form.satinOrAngle.getGuide() + guideIndex);
-  nextForm.satinGuideCount    = form.satinGuideCount - guideIndex - 1U;
-  form.satinGuideCount        = guideIndex;
+  nextForm.satinGuideCount = form.satinGuideCount - guideIndex - 1U;
+  form.satinGuideCount     = guideIndex;
   for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
 	auto& formIter = FormList->operator[](iForm);
 	if ((formIter.type == SAT) && (formIter.satinGuideCount != 0U) && formIter.satinOrAngle.getGuide() != 0U) {
@@ -586,7 +586,8 @@ void satin::delcon(FRM_HEAD& form, uint32_t GuideIndex) {
   SatinGuides->erase(itGuide);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& afterForm = FormList->operator[](iForm);
-	if ((afterForm.type == SAT) && (afterForm.satinGuideCount != 0U) && (afterForm.satinOrAngle.getGuide() != 0U)) {
+	if ((afterForm.type == SAT) && (afterForm.satinGuideCount != 0U) &&
+	    (afterForm.satinOrAngle.getGuide() != 0U)) {
 	  afterForm.satinOrAngle.decGuide();
 	}
   }
@@ -614,8 +615,8 @@ void satin::delspnt() {
 	}
 	if (currentForm.satinGuideCount != 0U) {
 	  auto const itStartGuide = wrap::next(SatinGuides->begin(), currentForm.satinOrAngle.getGuide());
-	  auto       itGuide      = itStartGuide;
-	  auto       iGuide       = 0U;
+	  auto itGuide = itStartGuide;
+	  auto iGuide  = 0U;
 	  while (iGuide < currentForm.satinGuideCount) {
 		if (itGuide->start != ClosestVertexToCursor && itGuide->finish != ClosestVertexToCursor) {
 		  ++itGuide;
@@ -823,8 +824,8 @@ void satin::ribon() {
   newForm.attribute   = FormList->operator[](ClosestFormToCursor).attribute;
   newForm.attribute &= FRMLMSK;
   newForm.attribute |= FRMEND;
-  newForm.wordParam          = iNewVertex / 2;
-  newForm.satinGuideCount    = newForm.wordParam - 2U;
+  newForm.wordParam       = iNewVertex / 2;
+  newForm.satinGuideCount = newForm.wordParam - 2U;
   newForm.satinOrAngle.setGuide(adsatk(newForm.satinGuideCount));
   if (StateMap->test(StateFlag::CNV2FTH)) {
 	newForm.fillType                       = FTHF;
