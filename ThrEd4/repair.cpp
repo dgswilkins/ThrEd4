@@ -124,7 +124,7 @@ void repair::lodchk() {
 }
 
 void ri::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
-  if (badData.clip == formHeader.angleOrClipData.clip) {
+  if (badData.clip == formHeader.angleOrClipData.getClip()) {
 	badData.clip += formHeader.lengthOrCount.getClipCount();
   }
   else {
@@ -291,22 +291,22 @@ void ri::checkClip(const uint32_t&       clipDifference,
                    unsigned int&         badClipCount) {
   if (wrap::toSize(clipDifference) + form.lengthOrCount.getClipCount() < ClipPoints->size()) {
 	clipPoint.resize(clipPoint.size() + form.lengthOrCount.getClipCount());
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
 	auto const endClip     = wrap::next(startClip, form.lengthOrCount.getClipCount());
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
-	form.angleOrClipData.clip = clipCount;
+	form.angleOrClipData.setClip(clipCount);
 	clipCount += form.lengthOrCount.getClipCount();
 	return;
   }
   if (clipDifference < ClipPoints->size()) {
 	form.lengthOrCount.setClipCount(wrap::toUnsigned(FormVertices->size() - clipDifference));
 	clipPoint.resize(clipPoint.size() + form.lengthOrCount.getClipCount());
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
 	auto const endClip     = wrap::next(startClip, form.lengthOrCount.getClipCount());
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
-	form.angleOrClipData.clip = clipCount;
+	form.angleOrClipData.setClip(clipCount);
 	clipCount += form.lengthOrCount.getClipCount();
 	return;
   }
@@ -351,7 +351,7 @@ void ri::repclp(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
-	auto const clipDifference = (form.isClip())       ? form.angleOrClipData.clip
+	auto const clipDifference = (form.isClip())       ? form.angleOrClipData.getClip()
 	                            : (form.isEdgeClip()) ? form.borderClipData
 	                                                  : 0U;
 	if (form.isClip()) {

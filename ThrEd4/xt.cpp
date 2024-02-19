@@ -1961,7 +1961,7 @@ void xi::fangfn(uint32_t formIndex, float angle) {
 	  case HORF:
 	  case ANGF: {
 		form.fillType              = ANGF;
-		form.angleOrClipData.angle = angle;
+		form.angleOrClipData.setAngle(angle);
 		break;
 	  }
 	  case VCLPF:
@@ -1975,7 +1975,7 @@ void xi::fangfn(uint32_t formIndex, float angle) {
 	  case TXHORF:
 	  case TXANGF: {
 		form.fillType              = TXANGF;
-		form.angleOrClipData.angle = angle;
+		form.angleOrClipData.setAngle(angle);
 		break;
 	  }
 	  default: {

@@ -1061,7 +1061,7 @@ void txi::txang(FRM_HEAD& form) {
 	return;
   }
   form.fillType              = TXANGF;
-  form.angleOrClipData.angle = IniFile.fillAngle;
+  form.angleOrClipData.setAngle(IniFile.fillAngle);
   txi::txpar(form);
 }
 

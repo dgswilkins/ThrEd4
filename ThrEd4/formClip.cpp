@@ -197,7 +197,7 @@ void fci::clipSelectedForm() {
   auto  iClip   = 0U;
   if (form.isClipX()) {
 	iClip                = form.lengthOrCount.getClipCount();
-	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
 	auto const endMclp   = wrap::next(startMclp, iClip);
 
 	auto const mclps = gsl::span<F_POINT> {ptrMclp, iClip};
@@ -342,7 +342,7 @@ void fci::clipSelectedForms() {
 	for (auto& selectedForm : (*SelectedFormList)) {
 	  auto& form = FormList->operator[](selectedForm);
 	  if (form.isClipX()) {
-		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
 		for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
 		  points[pointCount++] = *offsetStart;
 		  ++offsetStart;
@@ -582,7 +582,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   else {
 	if (form.isClip()) {
 	  count = form.lengthOrCount.getClipCount();
-	  clip::oclp(clipRect, form.angleOrClipData.clip, count);
+	  clip::oclp(clipRect, form.angleOrClipData.getClip(), count);
 	}
   }
   if (count == 0U) {
@@ -758,8 +758,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			form.angleOrClipData.clip = thred::adclp(form.lengthOrCount.getClipCount());
-			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
+			form.angleOrClipData.setClip(thred::adclp(form.lengthOrCount.getClipCount()));
+			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.getClip());
 			for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
@@ -836,7 +836,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.lengthOrCount.getClipCount()};
-			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
+			formIter.angleOrClipData.setClip(wrap::toUnsigned(ClipPoints->size()));
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
 			clipCount += formIter.lengthOrCount.getClipCount();
 		  }

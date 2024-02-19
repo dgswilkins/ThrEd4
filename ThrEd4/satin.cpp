@@ -225,8 +225,7 @@ void si::satclos() {
 		StartPoint    = closestVertex - 2U;
 	  }
 	}
-	form.angleOrClipData.guide.start  = StartPoint;
-	form.angleOrClipData.guide.finish = closestVertex;
+	form.angleOrClipData.setGuide({StartPoint, closestVertex});
 	return;
   }
   auto closestVertex = StartPoint;
