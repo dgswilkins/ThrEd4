@@ -50,12 +50,12 @@ class SAT_CON_OUT
 #pragma pack(pop)
 
 inline SAT_CON_OUT::SAT_CON_OUT(SAT_CON const& rhs) :
-    start(gsl::narrow<uint16_t>(rhs.start)), finish(gsl::narrow<uint16_t>(rhs.finish)) {
+    start(gsl::narrow<decltype(start)>(rhs.start)), finish(gsl::narrow<decltype(finish)>(rhs.finish)) {
 }
 
 inline auto SAT_CON_OUT::operator=(SAT_CON const& rhs) -> SAT_CON_OUT& {
-  start  = gsl::narrow<uint16_t>(rhs.start);
-  finish = gsl::narrow<uint16_t>(rhs.finish);
+  start  = gsl::narrow<decltype(start)>(rhs.start);
+  finish = gsl::narrow<decltype(finish)>(rhs.finish);
 
   return *this;
 }
