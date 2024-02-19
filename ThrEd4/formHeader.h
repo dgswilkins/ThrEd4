@@ -31,17 +31,49 @@ inline FANGCLP::FANGCLP() noexcept {
 
 #pragma pack(push, 1)
 union FANGCLPOUT {
-  public:
+  private:
   float angle;
   DWORD clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
   SAT_CON_OUT guide;
 
+  public:
   inline FANGCLPOUT() noexcept;
   // FANGCLPOUT(FANGCLPOUT const&) = default;
   // FANGCLPOUT(FANGCLPOUT&&) = default;
   // FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
   // FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
   //~FANGCLPOUT() = default;
+
+  // Getter and Setter for angle
+  inline auto getAngle() const noexcept -> float {
+	return angle;
+  }
+  
+  void setAngle(float value) noexcept {
+	angle = value;
+  }
+
+  // Getter and Setter for clip
+  inline auto getClip() const noexcept -> DWORD {
+	return clip;
+  }
+  
+  void setClip(DWORD value) noexcept {
+	clip = value;
+  }
+
+  // Getter and Setter for guide
+  inline auto getGuide() const noexcept -> SAT_CON_OUT {
+	return guide;
+  }
+
+  void setGuide(SAT_CON_OUT value) noexcept {
+	guide = value;
+  }
+
+  void setGuide(SAT_CON value) noexcept {
+	guide = value;
+  }
 };
 #pragma pack(pop)
 
@@ -397,17 +429,16 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.clip = rhs.angleOrClipData.clip;
+	angleOrClipData.clip = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+		angleOrClipData.guide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.angle = rhs.angleOrClipData.angle;
+	  angleOrClipData.angle = rhs.angleOrClipData.getAngle();
 	}
   }
 }
@@ -435,17 +466,16 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.clip = rhs.angleOrClipData.clip;
+	angleOrClipData.clip = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+		angleOrClipData.guide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.angle = rhs.angleOrClipData.angle;
+	  angleOrClipData.angle = rhs.angleOrClipData.getAngle();
 	}
   }
 
@@ -478,19 +508,16 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
   if (rhs.isEdgeClipX() || rhs.isClipX()) {
-	angleOrClipData.clip = rhs.angleOrClipData.clip;
+	angleOrClipData.setClip(rhs.angleOrClipData.clip);
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.guide.start =
-		    gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
-		angleOrClipData.guide.finish =
-		    gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
+		angleOrClipData.setGuide(rhs.angleOrClipData.guide);
 	  }
 	}
 	else {
-	  angleOrClipData.angle = rhs.angleOrClipData.angle;
+	  angleOrClipData.setAngle(rhs.angleOrClipData.angle);
 	}
   }
 }
@@ -518,19 +545,16 @@ inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
   if (rhs.isEdgeClipX() || rhs.isClipX()) {
-	angleOrClipData.clip = rhs.angleOrClipData.clip;
+	angleOrClipData.setClip(rhs.angleOrClipData.clip);
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.guide.start =
-		    gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
-		angleOrClipData.guide.finish =
-		    gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
+		angleOrClipData.setGuide(rhs.angleOrClipData.guide);
 	  }
 	}
 	else {
-	  angleOrClipData.angle = rhs.angleOrClipData.angle;
+	  angleOrClipData.setAngle(rhs.angleOrClipData.angle);
 	}
   }
 
@@ -578,17 +602,16 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.clip = rhs.angleOrClipData.clip;
+	angleOrClipData.clip = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+		angleOrClipData.guide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.angle = rhs.angleOrClipData.angle;
+	  angleOrClipData.angle = rhs.angleOrClipData.getAngle();
 	}
   }
 }
@@ -616,17 +639,16 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
 	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.clip = rhs.angleOrClipData.clip;
+	angleOrClipData.clip = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+		angleOrClipData.guide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.angle = rhs.angleOrClipData.angle;
+	  angleOrClipData.angle = rhs.angleOrClipData.getAngle();
 	}
   }
 
