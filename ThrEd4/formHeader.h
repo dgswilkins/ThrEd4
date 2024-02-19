@@ -271,10 +271,11 @@ union SATINANGLE {
 
 #pragma pack(push, 1)
 union SATINANGLEOUT {
-  public:
+  private:
   DWORD guide {};
   float angle;
 
+  public:
   SATINANGLEOUT() noexcept = default;
   // SATINANGLEOUT(SATINANGLEOUT const&) = default;
   // SATINANGLEOUT(SATINANGLEOUT&&) = default;
@@ -284,6 +285,24 @@ union SATINANGLEOUT {
 
   explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
   inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
+
+  // Getter and Setter for guide
+  //inline auto getGuide() const noexcept -> DWORD {
+  //  return guide;
+  //}
+  
+  //void setGuide(DWORD value) noexcept {
+  //  guide = value;
+  //}
+
+  // Getter and Setter for angle
+  inline auto getAngle() const noexcept -> float {
+    return angle;
+  }
+  
+  //void setAngle(float value) noexcept {
+  //  angle = value;
+  //}
 };
 #pragma pack(pop)
 
@@ -296,11 +315,11 @@ inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANG
   return *this;
 }
 
-inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept : angle(rhs.angle) {
+inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept : angle(rhs.getAngle()) {
 }
 
 inline auto SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE& {
-  angle = rhs.angle;
+  angle = rhs.getAngle();
 
   return *this;
 }
