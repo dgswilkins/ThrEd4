@@ -17,7 +17,7 @@ constexpr auto COLORCNT = uint8_t {16U};           // Number of colors in arrays
 constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
 constexpr auto NAME_LEN = 50;                      // Length of the name fields in ThrEd headers
 constexpr auto OLDNUM   = uint32_t {4U};           // number of old filenames saved on file menu
-constexpr auto DPLEN   = 180;                      // default directory path length
+constexpr auto DPLEN    = 180;                     // default directory path length
 
 constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 

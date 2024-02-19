@@ -573,12 +573,12 @@ void xt::fethrf(uint32_t formIndex) {
   form.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
   form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
   form.extendedAttribute |= IniFile.featherType;
-  form.fillInfo.feather.count     = IniFile.featherCount;
+  form.fillInfo.feather.count = IniFile.featherCount;
   form.lengthOrCount.setStitchLength(UserStitchLength);
-  form.fillSpacing                = LineSpacing;
-  form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
-  form.fillInfo.feather.color     = (ActiveColor + 1U) & COLMSK;
-  form.fillType                   = FTHF;
+  form.fillSpacing            = LineSpacing;
+  form.fillColor              = gsl::narrow<uint8_t>(ActiveColor);
+  form.fillInfo.feather.color = (ActiveColor + 1U) & COLMSK;
+  form.fillType               = FTHF;
   form::refilfn(formIndex);
 }
 

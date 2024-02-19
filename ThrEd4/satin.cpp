@@ -815,13 +815,13 @@ void satin::ribon() {
 	  *(itVertex++) = OutsidePoints->operator[](iVertex);
 	}
   }
-  auto const iNewVertex              = wrap::distance<uint32_t>(startVertex, itVertex);
-  newForm.type                       = SAT;
-  newForm.fillColor                  = ActiveColor;
-  newForm.fillSpacing                = LineSpacing;
+  auto const iNewVertex = wrap::distance<uint32_t>(startVertex, itVertex);
+  newForm.type          = SAT;
+  newForm.fillColor     = ActiveColor;
+  newForm.fillSpacing   = LineSpacing;
   newForm.lengthOrCount.setStitchLength(IniFile.maxStitchLength);
-  newForm.vertexCount                = iNewVertex;
-  newForm.attribute                  = FormList->operator[](ClosestFormToCursor).attribute;
+  newForm.vertexCount = iNewVertex;
+  newForm.attribute   = FormList->operator[](ClosestFormToCursor).attribute;
   newForm.attribute &= FRMLMSK;
   newForm.attribute |= FRMEND;
   newForm.wordParam          = iNewVertex / 2;

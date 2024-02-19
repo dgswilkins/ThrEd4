@@ -615,8 +615,8 @@ void form::delmfil(uint32_t formIndex) {
 
 void form::fsizpar(FRM_HEAD& form) noexcept {
   form.lengthOrCount.setStitchLength(UserStitchLength);
-  form.maxFillStitchLen           = IniFile.maxStitchLength;
-  form.minFillStitchLen           = MinStitchLength;
+  form.maxFillStitchLen = IniFile.maxStitchLength;
+  form.minFillStitchLen = MinStitchLength;
 }
 
 void form::chkcont() {
@@ -5722,10 +5722,10 @@ void form::rstfrm() {
 
 void form::clrfills() noexcept {
   for (auto& formIter : *FormList) {
-	formIter.clipEntries             = 0;
+	formIter.clipEntries = 0;
 	formIter.lengthOrCount.setClipCount(0);
-	formIter.edgeType                = 0;
-	formIter.fillType                = 0;
+	formIter.edgeType = 0;
+	formIter.fillType = 0;
 	formIter.attribute &= NFRECONT;
 	formIter.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
   }
@@ -7390,9 +7390,9 @@ void fi::filsclp() {
   if (currentForm.type != SAT) {
 	currentForm.wordParam = 0;
   }
-  currentForm.type                    = SAT;
-  currentForm.fillType                = CLPF;
-  currentForm.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
+  currentForm.type                 = SAT;
+  currentForm.fillType             = CLPF;
+  currentForm.angleOrClipData.clip = clip::numclp(ClosestFormToCursor);
   currentForm.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
   auto itClipPoints = wrap::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
   for (auto const& clip : *ClipBuffer) {
@@ -7688,8 +7688,9 @@ void fi::adfrm(uint32_t iForm) {
 	currentForm.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalClip);
-	ClipPoints->insert(
-	    ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.lengthOrCount.getClipCount()));
+	ClipPoints->insert(ClipPoints->end(),
+	                   itClipPoints,
+	                   wrap::next(itClipPoints, currentForm.lengthOrCount.getClipCount()));
   }
   FormList->push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
@@ -7751,11 +7752,11 @@ void fi::cplayfn(uint32_t iForm, uint32_t layer) {
 	auto const destination  = SatinGuides->end();
 	SatinGuides->insert(destination, itStartGuide, itEndGuide);
   }
-  currentForm.clipEntries             = 0;
-  currentForm.fillType                = 0;
+  currentForm.clipEntries = 0;
+  currentForm.fillType    = 0;
   currentForm.lengthOrCount.setClipCount(0);
-  currentForm.edgeType                = 0;
-  currentForm.fillInfo.texture.index  = 0;
+  currentForm.edgeType               = 0;
+  currentForm.fillInfo.texture.index = 0;
   currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
@@ -8809,8 +8810,8 @@ void form::vrtsclp(uint32_t formIndex) {
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
   form.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
-  form.angleOrClipData.clip    = clip::numclp(formIndex);
-  form.wordParam               = IniFile.fillPhase;
+  form.angleOrClipData.clip = clip::numclp(formIndex);
+  form.wordParam            = IniFile.fillPhase;
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
@@ -8868,12 +8869,12 @@ void form::horsclp() {
   auto& form = FormList->operator[](ClosestFormToCursor);
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  auto const clipSize          = wrap::toUnsigned(ClipBuffer->size());
+  auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
   form.lengthOrCount.setClipCount(clipSize);
-  form.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
+  form.angleOrClipData.clip = clip::numclp(ClosestFormToCursor);
   // ToDo - should this be clipSize + 1?
   form.lengthOrCount.setClipCount(clipSize);
-  form.wordParam               = IniFile.fillPhase;
+  form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
@@ -8932,9 +8933,9 @@ void form::horclp() {
 void form::angsclp(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  form.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
+  form.angleOrClipData.clip = clip::numclp(ClosestFormToCursor);
   form.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
-  form.wordParam               = IniFile.fillPhase;
+  form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.satinOrAngle.angle = IniFile.fillAngle;
   form.fillSpacing        = IniFile.clipOffset;

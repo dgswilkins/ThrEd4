@@ -1031,12 +1031,12 @@ auto txi::tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexc
 void txi::txpar(FRM_HEAD& form) {
   form.type = FRMFPOLY;
   wrap::narrow(form.fillInfo.texture.lines, TextureScreen.lines);
-  form.fillInfo.texture.height    = TextureScreen.areaHeight;
-  form.fillSpacing                = TextureScreen.spacing;
+  form.fillInfo.texture.height = TextureScreen.areaHeight;
+  form.fillSpacing             = TextureScreen.spacing;
   form.lengthOrCount.setStitchLength(IniFile.userStitchLength);
-  form.maxFillStitchLen           = IniFile.maxStitchLength;
-  form.minFillStitchLen           = IniFile.minStitchLength;
-  form.fillColor                  = ActiveColor;
+  form.maxFillStitchLen = IniFile.maxStitchLength;
+  form.minFillStitchLen = IniFile.minStitchLength;
+  form.fillColor        = ActiveColor;
   form::refilfn(ClosestFormToCursor);
 }
 

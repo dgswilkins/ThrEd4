@@ -326,9 +326,8 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	ffi::nxtlin(formMenuEntryCount);
 	if (!form.isClip() && !form.isTexture()) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(displayText::loadStr(IDS_TXT5), LabelWindowCoords);
-	  valueWindow[LFRMLEN] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.lengthOrCount.getStitchLength() * IPFGRAN)),
-	                  ValueWindowCoords);
+	  valueWindow[LFRMLEN] = ffi::numwin(
+	      fmt::format(FMT_COMPILE(L"{:.2f}"), (form.lengthOrCount.getStitchLength() * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMINFIL] = ffi::txtwin(displayText::loadStr(IDS_TXT21), LabelWindowCoords);

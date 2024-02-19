@@ -75,7 +75,7 @@ void repair::lodchk() {
 	else {
 	  if (form.type == FRMLINE) {
 		if (form.fillType != CONTF) {
-		  form.fillType                = 0;
+		  form.fillType = 0;
 		  form.lengthOrCount.setClipCount(0);
 		}
 	  }
