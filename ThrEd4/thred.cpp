@@ -1464,7 +1464,7 @@ void thi::chknum() {
 		  if (upcnt > FUPCLAMP) {
 			upcnt = FUPCLAMP;
 		  }
-		  form.fillInfo.feather.upCount = wrap::round<uint8_t>(upcnt);
+		  form.feather.upCount = wrap::round<uint8_t>(upcnt);
 		  break;
 		}
 		case LFTHCOL: {
@@ -1596,17 +1596,17 @@ void thi::chknum() {
 		  switch (FormMenuChoice) {
 			case LFTHSIZ: {
 			  thred::savdo();
-			  form.fillInfo.feather.ratio = value * IPFGRAN;
+			  form.feather.ratio = value * IPFGRAN;
 			  break;
 			}
 			case LFTHNUM: {
 			  thred::savdo();
-			  form.fillInfo.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
+			  form.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
 			  break;
 			}
 			case LFTHFLR: {
 			  thred::savdo();
-			  form.fillInfo.feather.minStitchSize = value;
+			  form.feather.minStitchSize = value;
 			  break;
 			}
 			case LFTHDWNCNT: {
@@ -1616,7 +1616,7 @@ void thi::chknum() {
 			  if (dncnt > FDNCLAMP) {
 				dncnt = FDNCLAMP;
 			  }
-			  form.fillInfo.feather.downCount = wrap::round<uint8_t>(dncnt);
+			  form.feather.downCount = wrap::round<uint8_t>(dncnt);
 			  break;
 			}
 			case LFRMSPAC: {
@@ -3584,7 +3584,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 	}
 	case LFTHTYP: {
 	  for (auto const& iEntry : FTHRLIST) {
-		if (iEntry.value != form.fillInfo.feather.fillType) {
+		if (iEntry.value != form.feather.fillType) {
 		  dusid(iEntry, sideWindowLocation, sideWindowSize);
 		}
 	  }
@@ -6526,8 +6526,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		clipOffset += formIter.clipEntries;
 	  }
 	  if (formIter.isTexture()) {
-		wrap::narrow(formIter.fillInfo.texture.index, textureOffset);
-		textureOffset += formIter.fillInfo.texture.count;
+		wrap::narrow(formIter.texture.index, textureOffset);
+		textureOffset += formIter.texture.count;
 	  }
 	}
 	if (newFormVertexIndex != FormVertices->size()) {
@@ -7579,7 +7579,7 @@ void thred::nucols() {
 	if (form.fillType != 0U) {
 	  form.fillColor = ActiveColor;
 	  if (form.fillType == FTHF) {
-		form.fillInfo.feather.color = ActiveColor;
+		form.feather.color = ActiveColor;
 	  }
 	}
 	if (form.edgeType != 0U) {
@@ -8538,12 +8538,12 @@ void thred::movchk() {
 	  }
 	}
 	if (formIter.fillType == FTHF) {
-	  if (formIter.fillInfo.feather.color == VerticalIndex) {
-		formIter.fillInfo.feather.color = draggedColor;
+	  if (formIter.feather.color == VerticalIndex) {
+		formIter.feather.color = draggedColor;
 	  }
 	  else {
-		if (!key && formIter.fillInfo.feather.color == draggedColor) {
-		  formIter.fillInfo.feather.color = VerticalIndex;
+		if (!key && formIter.feather.color == draggedColor) {
+		  formIter.feather.color = VerticalIndex;
 		}
 	  }
 	}
@@ -8597,9 +8597,9 @@ void thi::inscol() {
 	if ((formIter.fillType != 0U) && (formIter.fillColor >= VerticalIndex) && (formIter.fillColor < nextColor)) {
 	  ++(formIter.fillColor);
 	}
-	if ((formIter.fillType == FTHF) && (formIter.fillInfo.feather.color >= VerticalIndex) &&
-	    (formIter.fillInfo.feather.color < nextColor)) {
-	  ++(formIter.fillInfo.feather.color);
+	if ((formIter.fillType == FTHF) && (formIter.feather.color >= VerticalIndex) &&
+	    (formIter.feather.color < nextColor)) {
+	  ++(formIter.feather.color);
 	}
 	if ((formIter.edgeType != 0U) && (formIter.borderColor >= VerticalIndex) &&
 	    (formIter.borderColor < nextColor)) {
@@ -8639,8 +8639,8 @@ void thi::delcol() {
 	if ((formIter.fillType != 0U) && (formIter.fillColor > VerticalIndex)) {
 	  --(formIter.fillColor);
 	}
-	if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
-	  --(formIter.fillInfo.feather.color);
+	if (formIter.fillType == FTHF && formIter.feather.color > VerticalIndex) {
+	  --(formIter.feather.color);
 	}
 	if ((formIter.edgeType != 0U) && (formIter.borderColor > VerticalIndex)) {
 	  --(formIter.borderColor);
@@ -9199,7 +9199,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  return Msg.hwnd == SideWindow->operator[](feather.value);
 	});
 	if (iFeather != FTHRLIST.end()) {
-	  form.fillInfo.feather.fillType = iFeather->value;
+	  form.feather.fillType = iFeather->value;
 	  thred::unsid();
 	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();

@@ -262,10 +262,10 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == FTHF) {
 	  labelWindow[LFTHCOL] = ffi::txtwin(displayText::loadStr(IDS_FTHCOL), LabelWindowCoords);
 	  valueWindow[LFTHCOL] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.color + 1U)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.color + 1U)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHTYP] = ffi::txtwin(displayText::loadStr(IDS_FTHTYP), LabelWindowCoords);
-	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.fillInfo.feather.fillType - 1U);
+	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.feather.fillType - 1U);
 	  valueWindow[LFTHTYP] = ffi::numwin(displayText::loadStr(itFeather->stringID), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHBLND] = ffi::txtwin(displayText::loadStr(IDS_FTHBLND), LabelWindowCoords);
@@ -286,25 +286,25 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  }
 	  labelWindow[LFTHUPCNT] = ffi::txtwin(displayText::loadStr(IDS_FTHUPCNT), LabelWindowCoords);
 	  valueWindow[LFTHUPCNT] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.upCount)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.upCount)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHDWNCNT] = ffi::txtwin(displayText::loadStr(IDS_FTHDWNCNT), LabelWindowCoords);
 	  valueWindow[LFTHDWNCNT] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.downCount)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.downCount)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHSIZ] = ffi::txtwin(displayText::loadStr(IDS_FTHSIZ), LabelWindowCoords);
 	  valueWindow[LFTHSIZ] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillInfo.feather.ratio)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.ratio)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
-	  if (form.fillInfo.feather.fillType == FTHPSG) {
+	  if (form.feather.fillType == FTHPSG) {
 		labelWindow[LFTHNUM] = ffi::txtwin(displayText::loadStr(IDS_FTHNUM), LabelWindowCoords);
 		valueWindow[LFTHNUM] =
-		    ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.count)), ValueWindowCoords);
+		    ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.count)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 	  }
 	  labelWindow[LFTHFLR] = ffi::txtwin(displayText::loadStr(IDS_FTHFLR), LabelWindowCoords);
 	  valueWindow[LFTHFLR] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillInfo.feather.minStitchSize * IPFGRAN)),
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.minStitchSize * IPFGRAN)),
 	                  ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}

@@ -829,14 +829,14 @@ void satin::ribon() {
   newForm.satinOrAngle.setGuide(adsatk(newForm.satinGuideCount));
   if (StateMap->test(StateFlag::CNV2FTH)) {
 	newForm.fillType                       = FTHF;
-	newForm.fillInfo.feather.ratio         = IniFile.featherRatio;
-	newForm.fillInfo.feather.upCount       = IniFile.featherUpCount;
-	newForm.fillInfo.feather.downCount     = IniFile.featherDownCount;
-	newForm.fillInfo.feather.fillType      = IniFile.featherFillType;
-	newForm.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+	newForm.feather.ratio    = IniFile.featherRatio;
+	newForm.feather.upCount  = IniFile.featherUpCount;
+	newForm.feather.downCount = IniFile.featherDownCount;
+	newForm.feather.fillType  = IniFile.featherFillType;
+	newForm.feather.minStitchSize = IniFile.featherMinStitchSize;
 	newForm.extendedAttribute              = IniFile.featherType;
-	newForm.fillInfo.feather.count         = IniFile.featherCount;
-	newForm.fillInfo.feather.color         = (ActiveColor + 1U) & COLMSK;
+	newForm.feather.count         = IniFile.featherCount;
+	newForm.feather.color         = (ActiveColor + 1U) & COLMSK;
   }
   else {
 	newForm.fillType = SATF;

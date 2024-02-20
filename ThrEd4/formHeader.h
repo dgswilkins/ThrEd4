@@ -238,23 +238,6 @@ class TXTR_INFO
 
 union TF_INFO_OUT;
 
-union TF_INFO {
-  public:
-  FTHR_INFO feather;
-  TXTR_INFO texture {};
-
-  TF_INFO() noexcept = default;
-  // TF_INFO(TF_INFO const&) = default;
-  // TF_INFO(TF_INFO&&) = default;
-  // TF_INFO& operator=(TF_INFO const& rhs) = default;
-  // TF_INFO& operator=(TF_INFO&&) = default;
-  //~TF_INFO() = default;
-
-  explicit inline TF_INFO(TF_INFO_OUT const& rhs) noexcept;
-
-  inline auto operator=(TF_INFO_OUT const& rhs) noexcept -> TF_INFO&;
-};
-
 #pragma pack(push, 1)
 union TF_INFO_OUT {
   private:
@@ -268,10 +251,6 @@ union TF_INFO_OUT {
   // TF_INFO_OUT& operator=(TF_INFO_OUT const& rhs) = default;
   // TF_INFO_OUT& operator=(TF_INFO_OUT&&) = default;
   //~TF_INFO_OUT() = default;
-
-  explicit inline TF_INFO_OUT(TF_INFO const& rhs) noexcept;
-
-  inline auto operator=(TF_INFO const& rhs) noexcept -> TF_INFO_OUT&;
 
   // Getter and Setter for feather
   inline auto getFeather() const noexcept -> FTHR_INFO {
@@ -288,28 +267,10 @@ union TF_INFO_OUT {
   }
   
   void setTexture(TXTR_INFO value) noexcept {
-    texture = value;
+	texture = value;
   }
 };
 #pragma pack(pop)
-
-inline TF_INFO::TF_INFO(TF_INFO_OUT const& rhs) noexcept {
-  feather = rhs.getFeather();
-}
-
-inline auto TF_INFO::operator=(TF_INFO_OUT const& rhs) noexcept -> TF_INFO& {
-  feather = rhs.getFeather();
-  return *this;
-}
-
-inline TF_INFO_OUT::TF_INFO_OUT(TF_INFO const& rhs) noexcept {
-  feather = rhs.feather;
-}
-
-inline auto TF_INFO_OUT::operator=(TF_INFO const& rhs) noexcept -> TF_INFO_OUT& {
-  feather = rhs.feather;
-  return *this;
-}
 
 union SATINANGLEOUT;
 
@@ -463,7 +424,8 @@ class FRM_HEAD
   float       minFillStitchLen {};    // minimum fill stitch length
   float       maxBorderStitchLen {};  // maximum border stitch length
   float       minBorderStitchLen {};  // minimum border stitch length
-  TF_INFO     fillInfo {};            // feather/texture info
+  FTHR_INFO   feather {};             // feather attributes
+  TXTR_INFO   texture {};             // texture attributes
   uint32_t    fillStart {};           // fill start point
   uint32_t    fillEnd {};             // fill end point
   float       underlaySpacing {};     // underlay spacing
@@ -548,7 +510,6 @@ class FRM_HEAD_OUT
   //~FRM_HEAD_OUT() = default;
 
   explicit inline FRM_HEAD_OUT(FRM_HEAD const& rhs);
-  inline auto operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT&;
 };
 #pragma pack(pop)
 
@@ -645,7 +606,7 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     edgeSpacing(rhs.edgeSpacing), edgeStitchLen(rhs.edgeStitchLen), picoLength(rhs.picoLength),
     extendedAttribute(rhs.extendedAttribute), maxFillStitchLen(rhs.maxFillStitchLen),
     minFillStitchLen(rhs.minFillStitchLen), maxBorderStitchLen(rhs.maxBorderStitchLen),
-    minBorderStitchLen(rhs.minBorderStitchLen), fillInfo(rhs.fillInfo),
+    minBorderStitchLen(rhs.minBorderStitchLen),
     fillStart(gsl::narrow<uint16_t>(rhs.fillStart)), fillEnd(gsl::narrow<uint16_t>(rhs.fillEnd)),
     underlaySpacing(rhs.underlaySpacing), underlayStitchLen(rhs.underlayStitchLen),
     underlayStitchAngle(rhs.underlayStitchAngle), underlayIndent(rhs.underlayIndent),
@@ -675,71 +636,12 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
   else {
 	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
   }
-}
-
-inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
-  attribute       = rhs.attribute;
-  vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
-  type            = rhs.type;
-  fillColor       = rhs.fillColor;
-  borderColor     = rhs.borderColor;
-  clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
-  vertexIndex     = 0; // do not write the pointer value to file
-  borderClipData  = 0; // do not write the pointer value to file
-  satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
-  wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
-  rectangle       = rhs.rectangle;
-  fillType        = rhs.fillType;
-  if (fillType == ANGCLPF) {
-	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+  if (rhs.isTexture()) {
+	fillInfo.setTexture(rhs.texture);
   }
   else {
-	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+	fillInfo.setFeather(rhs.feather);
   }
-  edgeType        = rhs.edgeType;
-  fillSpacing     = rhs.fillSpacing;
-  if (rhs.isClip()) {
-	lengthOrCount.setClipCount(rhs.lengthOrCount.getClipCount());
-  }
-  else {
-	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
-  }
-  if (rhs.isEdgeClipX() || rhs.isClipX()) {
-	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
-  }
-  else {
-	if (type == FRMLINE) {
-	  if (fillType == CONTF) {
-		angleOrClipData.setGuide(rhs.angleOrClipData.getGuide());
-	  }
-	}
-	else {
-	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
-	}
-  }
-
-  borderSize    = rhs.borderSize;
-  edgeSpacing   = rhs.edgeSpacing;
-  edgeStitchLen = rhs.edgeStitchLen;
-  picoLength    = rhs.picoLength;
-
-  extendedAttribute   = rhs.extendedAttribute;
-  maxFillStitchLen    = rhs.maxFillStitchLen;
-  minFillStitchLen    = rhs.minFillStitchLen;
-  maxBorderStitchLen  = rhs.maxBorderStitchLen;
-  minBorderStitchLen  = rhs.minBorderStitchLen;
-  fillInfo            = rhs.fillInfo;
-  fillStart           = gsl::narrow<uint16_t>(rhs.fillStart);
-  fillEnd             = gsl::narrow<uint16_t>(rhs.fillEnd);
-  underlaySpacing     = rhs.underlaySpacing;
-  underlayStitchLen   = rhs.underlayStitchLen;
-  underlayStitchAngle = rhs.underlayStitchAngle;
-  underlayIndent      = rhs.underlayIndent;
-  txof                = rhs.txof;
-  underlayColor       = rhs.underlayColor;
-  cres                = rhs.cres;
-
-  return *this;
 }
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
@@ -751,7 +653,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
     picoLength(rhs.picoLength), extendedAttribute(rhs.extendedAttribute),
     maxFillStitchLen(rhs.maxFillStitchLen), minFillStitchLen(rhs.minFillStitchLen),
     maxBorderStitchLen(rhs.maxBorderStitchLen), minBorderStitchLen(rhs.minBorderStitchLen),
-    fillInfo(rhs.fillInfo), fillStart(rhs.fillStart), fillEnd(rhs.fillEnd),
+    fillStart(rhs.fillStart), fillEnd(rhs.fillEnd),
     underlaySpacing(rhs.underlaySpacing), underlayStitchLen(rhs.underlayStitchLen),
     underlayStitchAngle(rhs.underlayStitchAngle), underlayIndent(rhs.underlayIndent),
     txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
@@ -779,6 +681,12 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
   }
   else {
 	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+  }
+  if (isTexture()) {
+	texture = rhs.fillInfo.getTexture();
+  }
+  else {
+	feather = rhs.fillInfo.getFeather();
   }
 }
 
@@ -833,7 +741,12 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   minFillStitchLen    = rhs.minFillStitchLen;
   maxBorderStitchLen  = rhs.maxBorderStitchLen;
   minBorderStitchLen  = rhs.minBorderStitchLen;
-  fillInfo            = rhs.fillInfo;
+  if (isTexture()) {
+	texture = rhs.fillInfo.getTexture();
+  }
+  else {
+	feather = rhs.fillInfo.getFeather();
+  }
   fillStart           = rhs.fillStart;
   fillEnd             = rhs.fillEnd;
   underlaySpacing     = rhs.underlaySpacing;

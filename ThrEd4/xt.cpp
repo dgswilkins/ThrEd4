@@ -240,14 +240,14 @@ void xt::setfchk() {
 void xi::fthvars(FRM_HEAD const& form, FEATHER& feather) {
   StateMap->reset(StateFlag::BARSAT);
   StateMap->reset(StateFlag::FTHR);
-  feather.fillType          = form.fillInfo.feather.fillType;
-  feather.formRatio         = form.fillInfo.feather.ratio;
-  feather.minStitch         = form.fillInfo.feather.minStitchSize;
-  feather.totalCount        = form.fillInfo.feather.count;
+  feather.fillType          = form.feather.fillType;
+  feather.formRatio         = form.feather.ratio;
+  feather.minStitch         = form.feather.minStitchSize;
+  feather.totalCount        = form.feather.count;
   feather.extendedAttribute = form.extendedAttribute;
-  feather.countUp           = form.fillInfo.feather.upCount;
+  feather.countUp           = form.feather.upCount;
   feather.upCount           = feather.countUp;
-  feather.countDown         = form.fillInfo.feather.downCount;
+  feather.countDown         = form.feather.downCount;
   feather.downCount         = feather.countDown;
   feather.phaseIndex        = feather.upCount + feather.downCount;
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -475,7 +475,7 @@ void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequen
 	return;
   }
   InterleaveSequenceIndices->emplace_back(
-      INS_REC {FTHMSK, form.fillInfo.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
+      INS_REC {FTHMSK, form.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
@@ -566,18 +566,18 @@ void xt::fethrf(uint32_t formIndex) {
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
   form.type                           = SAT;
-  form.fillInfo.feather.ratio         = IniFile.featherRatio;
-  form.fillInfo.feather.upCount       = IniFile.featherUpCount;
-  form.fillInfo.feather.downCount     = IniFile.featherDownCount;
-  form.fillInfo.feather.fillType      = IniFile.featherFillType;
-  form.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+  form.feather.ratio    = IniFile.featherRatio;
+  form.feather.upCount       = IniFile.featherUpCount;
+  form.feather.downCount     = IniFile.featherDownCount;
+  form.feather.fillType      = IniFile.featherFillType;
+  form.feather.minStitchSize = IniFile.featherMinStitchSize;
   form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
   form.extendedAttribute |= IniFile.featherType;
-  form.fillInfo.feather.count = IniFile.featherCount;
+  form.feather.count = IniFile.featherCount;
   form.lengthOrCount.setStitchLength(UserStitchLength);
   form.fillSpacing            = LineSpacing;
   form.fillColor              = gsl::narrow<uint8_t>(ActiveColor);
-  form.fillInfo.feather.color = (ActiveColor + 1U) & COLMSK;
+  form.feather.color = (ActiveColor + 1U) & COLMSK;
   form.fillType               = FTHF;
   form::refilfn(formIndex);
 }
@@ -1428,7 +1428,7 @@ void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fil
 		tmap |= M_FCOL;
 		fillStartsData.fillNamed.fillColor = iDestinationStitch;
 	  }
-	  if (color == form.fillInfo.feather.color) {
+	  if (color == form.feather.color) {
 		tmap |= M_FTHCOL;
 		fillStartsData.fillNamed.featherColor = iDestinationStitch;
 	  }

@@ -1030,8 +1030,8 @@ auto txi::tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexc
 
 void txi::txpar(FRM_HEAD& form) {
   form.type = FRMFPOLY;
-  wrap::narrow(form.fillInfo.texture.lines, TextureScreen.lines);
-  form.fillInfo.texture.height = TextureScreen.areaHeight;
+  wrap::narrow(form.texture.lines, TextureScreen.lines);
+  form.texture.height = TextureScreen.areaHeight;
   form.fillSpacing             = TextureScreen.spacing;
   form.lengthOrCount.setStitchLength(IniFile.userStitchLength);
   form.maxFillStitchLen = IniFile.maxStitchLength;
@@ -1066,32 +1066,31 @@ void txi::txang(FRM_HEAD& form) {
 }
 
 void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer) {
-  auto& fillInfo = current.fillInfo;
-  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
+  textureBuffer.resize(textureBuffer.size() + current.texture.count);
+  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), current.texture.index);
+  auto const endSource   = wrap::next(startSource, current.texture.count);
   auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
   std::copy(startSource, endSource, destination);
-  fillInfo.texture.index = iBuffer;
-  iBuffer += fillInfo.texture.count;
+  current.texture.index = iBuffer;
+  iBuffer += current.texture.count;
 }
 
 void texture::deltx(uint32_t formIndex) {
   auto const itForm = wrap::next(FormList->begin(), formIndex);
   auto const itNext = std::next(itForm);
   itForm->fillType  = 0;
-  if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->fillInfo.texture.count == 0U)) {
+  if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->texture.count == 0U)) {
 	return;
   }
   auto        flagShared   = false;
-  auto const& currentIndex = itForm->fillInfo.texture.index;
+  auto const& currentIndex = itForm->texture.index;
   // First check to see if the texture is shared between forms
   // check forms before current
   for (auto const spForms = std::ranges::subrange(FormList->begin(), itForm); auto const& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
-	if (current.fillInfo.texture.index == currentIndex) {
+	if (current.texture.index == currentIndex) {
 	  flagShared = true;
 	}
   }
@@ -1100,7 +1099,7 @@ void texture::deltx(uint32_t formIndex) {
 	if (!current.isTexture()) {
 	  continue;
 	}
-	if (current.fillInfo.texture.index == currentIndex) {
+	if (current.texture.index == currentIndex) {
 	  flagShared = true;
 	}
   }
@@ -1136,14 +1135,14 @@ void txi::nutx(uint32_t formIndex) {
 
   auto index = gsl::narrow_cast<uint16_t>(0U);
   if (form.isTexture()) {
-	index = form.fillInfo.texture.index;
+	index = form.texture.index;
 	texture::deltx(formIndex);
   }
   else {
 	for (auto spForms = std::ranges::subrange(FormList->begin(), wrap::next(FormList->begin(), formIndex));
 	     auto const& current : spForms | std::views::reverse) {
 	  if (current.isTexture()) {
-		auto const& texture = current.fillInfo.texture;
+		auto const& texture = current.texture;
 		index               = texture.index + texture.count;
 		break;
 	  }
@@ -1153,18 +1152,18 @@ void txi::nutx(uint32_t formIndex) {
 	return;
   }
   auto const tempPointCount =
-      gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(TempTexturePoints->size());
+      gsl::narrow<decltype(FormList->back().texture.index)>(TempTexturePoints->size());
   std::ranges::sort(*TempTexturePoints, txi::tpComp);
   auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
   TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
   for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
        auto& current : spForms) {
 	if (current.isTexture()) {
-	  current.fillInfo.texture.index += tempPointCount;
+	  current.texture.index += tempPointCount;
 	}
   }
-  form.fillInfo.texture.index = index;
-  form.fillInfo.texture.count = tempPointCount;
+  form.texture.index = index;
+  form.texture.count = tempPointCount;
 }
 
 // Ensure all lines in the texture have at least 1 point
@@ -1669,13 +1668,13 @@ void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
 }
 
 void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
-  auto const currentIndex = form.fillInfo.texture.index;
-  auto const currentCount = form.fillInfo.texture.count;
+  auto const currentIndex = form.texture.index;
+  auto const currentCount = form.texture.count;
   texture::savtxt();
   form.wordParam = 0;
   StateMap->set(StateFlag::TXFIL);
   ClipRectSize.cx = form.fillSpacing;
-  ClipRectSize.cy = form.fillInfo.texture.height;
+  ClipRectSize.cy = form.texture.height;
   if (currentCount == 0U) {
 	return;
   }
@@ -1692,11 +1691,11 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 
 void texture::rtrtx(FRM_HEAD const& form) {
   TempTexturePoints->clear();
-  auto const currentIndex = form.fillInfo.texture.index;
+  auto const currentIndex = form.texture.index;
   if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex)) {
 	return;
   }
-  auto currentCount = form.fillInfo.texture.count;
+  auto currentCount = form.texture.count;
   if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
 	currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
   }
@@ -1704,9 +1703,9 @@ void texture::rtrtx(FRM_HEAD const& form) {
   auto const startSource = std::next(TexturePointsBuffer->cbegin(), currentIndex);
   auto const endSource   = std::next(startSource, currentCount);
   std::copy(startSource, endSource, TempTexturePoints->begin());
-  TextureScreen.areaHeight = form.fillInfo.texture.height;
+  TextureScreen.areaHeight = form.texture.height;
   TextureScreen.spacing    = form.fillSpacing;
-  TextureScreen.lines      = gsl::narrow<uint16_t>(form.fillInfo.texture.lines);
+  TextureScreen.lines      = gsl::narrow<uint16_t>(form.texture.lines);
   TextureScreen.width =
       wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing * HALF;
   texture::savtxt();

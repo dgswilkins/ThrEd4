@@ -125,7 +125,7 @@ auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t
 	clipSize += form.lengthOrCount.getClipCount() * wrap::sizeofType(ClipPoints);
   }
   if (form.isTexture()) {
-	clipSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
+	clipSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
   }
   return clipSize;
 }
@@ -152,7 +152,7 @@ void fci::sizclp(FRM_HEAD const& form,
 	fileSize += form.lengthOrCount.getClipCount() * wrap::sizeofType(ClipPoints);
   }
   if (form.isTexture()) {
-	fileSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
+	fileSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
   }
 }
 
@@ -215,10 +215,10 @@ void fci::clipSelectedForm() {
   }
   auto* textures = convertFromPtr<TX_PNT*>(wrap::next(ptrPoints, iClip));
   if (form.isTexture()) {
-	auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-	auto const endTexture = wrap::next(startTexture, form.fillInfo.texture.count);
+	auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.texture.index);
+	auto const endTexture = wrap::next(startTexture, form.texture.count);
 
-	auto const spDest = gsl::span<TX_PNT> {textures, form.fillInfo.texture.count};
+	auto const spDest = gsl::span<TX_PNT> {textures, form.texture.count};
 	std::copy(startTexture, endTexture, spDest.begin());
   }
   GlobalUnlock(clipHandle);
@@ -367,12 +367,12 @@ void fci::clipSelectedForms() {
 	if (!form.isTexture()) {
 	  continue;
 	}
-	auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-	auto endPoint   = wrap::next(startPoint, form.fillInfo.texture.count);
-	auto const spDest = gsl::span<TX_PNT> {std::next(textures, textureCount), form.fillInfo.texture.count};
+	auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.texture.index);
+	auto endPoint   = wrap::next(startPoint, form.texture.count);
+	auto const spDest = gsl::span<TX_PNT> {std::next(textures, textureCount), form.texture.count};
 	std::copy(startPoint, endPoint, spDest.begin());
-	forms[iForm++].fillInfo.texture.index = textureCount;
-	textureCount += form.fillInfo.texture.count;
+	forms[iForm++].texture.index = textureCount;
+	textureCount += form.texture.count;
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(thrEdClip, clipHandle);
@@ -780,9 +780,9 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
                                                   wrap::next(wrap::next(FormList->begin(), formOffset), ClipFormsCount));
 		     auto& form : spForms) {
 		  if (form.isTexture()) {
-			textureCount += form.fillInfo.texture.count;
-			form.fillInfo.texture.index +=
-			    gsl::narrow<decltype(form.fillInfo.texture.index)>(TexturePointsBuffer->size());
+			textureCount += form.texture.count;
+			form.texture.index +=
+			    gsl::narrow<decltype(form.texture.index)>(TexturePointsBuffer->size());
 		  }
 		}
 		auto const textureSource = gsl::span<TX_PNT> {ptrTextureSource, textureCount};
@@ -850,8 +850,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  if (formIter.isTexture()) {
 			auto* ptrTextureSource = convertFromPtr<TX_PNT*>(wrap::next(ptrClipData, clipCount));
 			auto const textureSource =
-			    gsl::span<TX_PNT> {ptrTextureSource, formIter.fillInfo.texture.count};
-			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
+			    gsl::span<TX_PNT> {ptrTextureSource, formIter.texture.count};
+			wrap::narrow(formIter.texture.index, TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(
 			    TexturePointsBuffer->end(), textureSource.begin(), textureSource.end());
 		  }

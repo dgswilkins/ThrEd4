@@ -747,7 +747,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			if (form.fillType != 0U) {
 			  form.fillColor = ActiveColor;
 			  if (form.fillType == FTHF) {
-				form.fillInfo.feather.color = ActiveColor;
+				form.feather.color = ActiveColor;
 			  }
 			}
 			if (form.edgeType != 0U) {

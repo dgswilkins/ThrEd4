@@ -3455,8 +3455,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   }
   if (StateMap->test(StateFlag::TXFIL)) {
 	if ((!TexturePointsBuffer->empty()) &&
-	    form.fillInfo.texture.index + form.fillInfo.texture.count <=
-	        gsl::narrow<decltype(form.fillInfo.texture.index)>(TexturePointsBuffer->size())) {
+	    form.texture.index + form.texture.count <=
+	        gsl::narrow<decltype(form.texture.index)>(TexturePointsBuffer->size())) {
 	  clipWidth = form.fillSpacing;
 	}
 	else {
@@ -3593,18 +3593,18 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	  auto clipStitchCount    = wrap::toUnsigned(ClipBuffer->size());
 	  if (StateMap->test(StateFlag::TXFIL)) {
 		auto const textureLine =
-		    (iRegion + wrap::toUnsigned(clipGrid.left)) % wrap::toUnsigned(form.fillInfo.texture.lines);
+		    (iRegion + wrap::toUnsigned(clipGrid.left)) % wrap::toUnsigned(form.texture.lines);
 		clipStitchCount = wrap::toUnsigned(textureSegments[textureLine].stitchCount);
 
 		texture = wrap::next(TexturePointsBuffer->begin(),
-		                     form.fillInfo.texture.index + textureSegments[textureLine].line);
+		                     form.texture.index + textureSegments[textureLine].line);
 
 		lineSegmentStart.x = pasteLocation.x;
 		if (form.txof != 0.0F) {
 		  auto const lineOffset =
 		      (gsl::narrow_cast<float>(iRegion) + gsl::narrow_cast<float>(clipGrid.left)) /
-		      gsl::narrow_cast<float>(form.fillInfo.texture.lines);
-		  clipVerticalOffset = fmod(form.txof * lineOffset, form.fillInfo.texture.height);
+		      gsl::narrow_cast<float>(form.texture.lines);
+		  clipVerticalOffset = fmod(form.txof * lineOffset, form.texture.height);
 		}
 	  }
 	  else {
@@ -5423,7 +5423,7 @@ void form::refilfn(uint32_t formIndex) {
   InterleaveSequenceIndices->clear();
   StateMap->reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};
-  textureSegments.resize(wrap::toSize(form.fillInfo.texture.lines));
+  textureSegments.resize(wrap::toSize(form.texture.lines));
   switch (form.type) {
 	case FRMLINE: {
 	  fi::swEdgeType(form, angledForm);
@@ -6764,7 +6764,7 @@ void form::nufilcol(uint8_t color) noexcept {
 }
 
 void form::nufthcol(uint8_t color) noexcept {
-  auto& formColor = FormList->operator[](ClosestFormToCursor).fillInfo.feather.color;
+  auto& formColor = FormList->operator[](ClosestFormToCursor).feather.color;
   if (formColor == color) {
 	return;
   }
@@ -7756,7 +7756,7 @@ void fi::cplayfn(uint32_t iForm, uint32_t layer) {
   currentForm.fillType    = 0;
   currentForm.lengthOrCount.setClipCount(0);
   currentForm.edgeType               = 0;
-  currentForm.fillInfo.texture.index = 0;
+  currentForm.texture.index = 0;
   currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
@@ -9090,9 +9090,9 @@ void form::col2frm() {
 		  }
 		}
 		majorityColor &= COLMSK;
-		if (formIter.fillInfo.feather.color != majorityColor) {
+		if (formIter.feather.color != majorityColor) {
 		  ++colorChangedCount;
-		  wrap::narrow(formIter.fillInfo.feather.color, majorityColor);
+		  wrap::narrow(formIter.feather.color, majorityColor);
 		}
 	  }
 	}
