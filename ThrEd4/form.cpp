@@ -614,7 +614,7 @@ void form::delmfil(uint32_t formIndex) {
 }
 
 void form::fsizpar(FRM_HEAD& form) noexcept {
-  form.lengthOrCount.setStitchLength(UserStitchLength);
+  form.stitchLength = UserStitchLength;
   form.maxFillStitchLen = IniFile.maxStitchLength;
   form.minFillStitchLen = MinStitchLength;
 }
@@ -1611,7 +1611,7 @@ void form::chkseq(bool border) {
   auto userStitchLen =
       border ? (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN : form.edgeStitchLen
       : (form.isClip()) ? MaxStitchLen
-                        : form.lengthOrCount.getStitchLength();
+                        : form.stitchLength;
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {
 	if (form.maxBorderStitchLen == 0.0F) {
@@ -3034,8 +3034,8 @@ public:
 	auto itLastVertex = wrap::next(itFirstVertex, form.vertexCount - 1U);
 	OSequence->push_back(*itLastVertex);
   }
-  if (form.lengthOrCount.getStitchLength() < MinStitchLength) {
-	form.lengthOrCount.setStitchLength(MinStitchLength);
+  if (form.stitchLength < MinStitchLength) {
+	form.stitchLength = MinStitchLength;
   }
 }
 
@@ -5292,7 +5292,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	}
 	case VCLPF: {
 	  auto clipRect = F_RECTANGLE {};
-	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.lengthOrCount.getClipCount());
+	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.clipCount);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(form.vertexCount);
 	  auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -5304,14 +5304,14 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	}
 	case HCLPF: {
 	  auto clipRect = F_RECTANGLE {};
-	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.lengthOrCount.getClipCount());
+	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.clipCount);
 	  fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
 	case ANGCLPF: {
 	  auto clipRect = F_RECTANGLE {};
-	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.lengthOrCount.getClipCount());
+	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.clipCount);
 	  StateMap->reset(StateFlag::ISUND);
 	  form::angclpfn(form, textureSegments, *AngledFormVertices);
 	  doFill = false;
@@ -5361,7 +5361,7 @@ void fi::swSatFillType(FRM_HEAD& form) {
 	case SATF: {
 	  auto const spacing = LineSpacing;
 	  LineSpacing        = form.fillSpacing;
-	  UserStitchLength   = form.lengthOrCount.getStitchLength();
+	  UserStitchLength   = form.stitchLength;
 	  satin::satfil(form);
 	  LineSpacing = spacing;
 	  fi::ritfil(form);
@@ -5369,7 +5369,7 @@ void fi::swSatFillType(FRM_HEAD& form) {
 	}
 	case CLPF: {
 	  auto clipRect = F_RECTANGLE {};
-	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.lengthOrCount.getClipCount());
+	  clip::oclp(clipRect, form.angleOrClipData.getClip(), form.clipCount);
 	  fi::fmclp(form);
 	  fi::ritfil(form);
 	  break;
@@ -5409,7 +5409,7 @@ void form::refilfn(uint32_t formIndex) {
 	form.edgeSpacing = MINSPACE;
   }
   if (!form.isClip()) {
-	UserStitchLength = form.lengthOrCount.getStitchLength();
+	UserStitchLength = form.stitchLength;
   }
   if (!(StateMap->test(StateFlag::WASDO) || StateMap->test(StateFlag::FUNCLP) ||
         StateMap->test(StateFlag::FUNSCLP))) {
@@ -5723,7 +5723,7 @@ void form::rstfrm() {
 void form::clrfills() noexcept {
   for (auto& formIter : *FormList) {
 	formIter.clipEntries = 0;
-	formIter.lengthOrCount.setClipCount(0);
+	formIter.clipCount = 0;
 	formIter.edgeType = 0;
 	formIter.fillType = 0;
 	formIter.attribute &= NFRECONT;
@@ -7393,7 +7393,7 @@ void fi::filsclp() {
   currentForm.type     = SAT;
   currentForm.fillType = CLPF;
   currentForm.angleOrClipData.setClip(clip::numclp(ClosestFormToCursor));
-  currentForm.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
+  currentForm.clipCount = wrap::toUnsigned(ClipBuffer->size());
   auto itClipPoints = wrap::next(ClipPoints->begin(), currentForm.angleOrClipData.getClip());
   for (auto const& clip : *ClipBuffer) {
 	*itClipPoints = clip;
@@ -7690,7 +7690,7 @@ void fi::adfrm(uint32_t iForm) {
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalClip);
 	ClipPoints->insert(ClipPoints->end(),
 	                   itClipPoints,
-	                   wrap::next(itClipPoints, currentForm.lengthOrCount.getClipCount()));
+	                   wrap::next(itClipPoints, currentForm.clipCount));
   }
   FormList->push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
@@ -7754,7 +7754,7 @@ void fi::cplayfn(uint32_t iForm, uint32_t layer) {
   }
   currentForm.clipEntries = 0;
   currentForm.fillType    = 0;
-  currentForm.lengthOrCount.setClipCount(0);
+  currentForm.clipCount = 0;
   currentForm.edgeType               = 0;
   currentForm.texture.index = 0;
   currentForm.attribute &= NFRMLMSK;
@@ -8318,9 +8318,9 @@ void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
   }
   if (form.isClipX()) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.angleOrClipData.getClip());
-	auto const itEndClip   = wrap::next(itStartClip, dest.lengthOrCount.getClipCount());
+	auto const itEndClip   = wrap::next(itStartClip, dest.clipCount);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
-	dest.angleOrClipData.setClip(wrap::toUnsigned(tempClipPoints.size() - dest.lengthOrCount.getClipCount()));
+	dest.angleOrClipData.setClip(wrap::toUnsigned(tempClipPoints.size() - dest.clipCount));
   }
 }
 
@@ -8809,7 +8809,7 @@ void form::vrtsclp(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
+  form.clipCount = wrap::toUnsigned(ClipBuffer->size());
   form.angleOrClipData.setClip(clip::numclp(formIndex));
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
@@ -8870,10 +8870,10 @@ void form::horsclp() {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
-  form.lengthOrCount.setClipCount(clipSize);
+  form.clipCount = clipSize;
   form.angleOrClipData.setClip(clip::numclp(ClosestFormToCursor));
   // ToDo - should this be clipSize + 1?
-  form.lengthOrCount.setClipCount(clipSize);
+  form.clipCount = clipSize;
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
@@ -8934,7 +8934,7 @@ void form::angsclp(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.angleOrClipData.setClip(clip::numclp(ClosestFormToCursor));
-  form.lengthOrCount.setClipCount(wrap::toUnsigned(ClipBuffer->size()));
+  form.clipCount = wrap::toUnsigned(ClipBuffer->size());
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.satinOrAngle.setAngle(IniFile.fillAngle);

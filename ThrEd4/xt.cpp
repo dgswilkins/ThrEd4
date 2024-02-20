@@ -574,7 +574,7 @@ void xt::fethrf(uint32_t formIndex) {
   form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
   form.extendedAttribute |= IniFile.featherType;
   form.feather.count = IniFile.featherCount;
-  form.lengthOrCount.setStitchLength(UserStitchLength);
+  form.stitchLength = UserStitchLength;
   form.fillSpacing            = LineSpacing;
   form.fillColor              = gsl::narrow<uint8_t>(ActiveColor);
   form.feather.color = (ActiveColor + 1U) & COLMSK;
@@ -1887,7 +1887,7 @@ void xt::dufang(float angle) {
 
 void xi::flenfn(uint32_t formIndex, float length) {
   if (auto& form = FormList->operator[](formIndex); (form.fillType != 0U) && !form.isClip()) {
-	form.lengthOrCount.setStitchLength(length);
+	form.stitchLength = length;
 	form::refilfn(formIndex);
   }
 }
@@ -2086,7 +2086,7 @@ void xi::blenfn(uint32_t formIndex, float length) {
   if (form.isClip()) {
 	return;
   }
-  form.lengthOrCount.setStitchLength(length);
+  form.stitchLength = length;
   form::refilfn(formIndex);
 }
 

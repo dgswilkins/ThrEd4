@@ -122,7 +122,7 @@ auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t
 	clipSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
   if (form.isClipX()) {
-	clipSize += form.lengthOrCount.getClipCount() * wrap::sizeofType(ClipPoints);
+	clipSize += form.clipCount * wrap::sizeofType(ClipPoints);
   }
   if (form.isTexture()) {
 	clipSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
@@ -149,7 +149,7 @@ void fci::sizclp(FRM_HEAD const& form,
 	fileSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
   if (form.isClipX()) {
-	fileSize += form.lengthOrCount.getClipCount() * wrap::sizeofType(ClipPoints);
+	fileSize += form.clipCount * wrap::sizeofType(ClipPoints);
   }
   if (form.isTexture()) {
 	fileSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
@@ -196,7 +196,7 @@ void fci::clipSelectedForm() {
   auto* ptrMclp = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, iGuide));
   auto  iClip   = 0U;
   if (form.isClipX()) {
-	iClip                = form.lengthOrCount.getClipCount();
+	iClip                = form.clipCount;
 	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
 	auto const endMclp   = wrap::next(startMclp, iClip);
 
@@ -330,7 +330,7 @@ void fci::clipSelectedForms() {
   for (auto& selectedForm : (*SelectedFormList)) {
 	auto& form = FormList->operator[](selectedForm);
 	if (form.isClipX()) {
-	  pointsSize += form.lengthOrCount.getClipCount();
+	  pointsSize += form.clipCount;
 	}
 	if (form.isEdgeClip()) {
 	  pointsSize += form.clipEntries;
@@ -343,7 +343,7 @@ void fci::clipSelectedForms() {
 	  auto& form = FormList->operator[](selectedForm);
 	  if (form.isClipX()) {
 		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
-		for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
+		for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 		  points[pointCount++] = *offsetStart;
 		  ++offsetStart;
 		}
@@ -581,7 +581,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   }
   else {
 	if (form.isClip()) {
-	  count = form.lengthOrCount.getClipCount();
+	  count = form.clipCount;
 	  clip::oclp(clipRect, form.angleOrClipData.getClip(), count);
 	}
   }
@@ -744,7 +744,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			clipCount += form.lengthOrCount.getClipCount();
+			clipCount += form.clipCount;
 		  }
 		  if (form.isEdgeClipX()) {
 			clipCount += form.clipEntries;
@@ -758,9 +758,9 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			form.angleOrClipData.setClip(thred::adclp(form.lengthOrCount.getClipCount()));
+			form.angleOrClipData.setClip(thred::adclp(form.clipCount));
 			auto offsetStart = wrap::next(ClipPoints->begin(), form.angleOrClipData.getClip());
-			for (auto iClip = 0U; iClip < form.lengthOrCount.getClipCount(); ++iClip) {
+			for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
 			}
@@ -835,10 +835,10 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto* ptrClipData = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, formIter.satinGuideCount));
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
-			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.lengthOrCount.getClipCount()};
+			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.clipCount};
 			formIter.angleOrClipData.setClip(wrap::toUnsigned(ClipPoints->size()));
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
-			clipCount += formIter.lengthOrCount.getClipCount();
+			clipCount += formIter.clipCount;
 		  }
 		  if (formIter.isEdgeClipX()) {
 			ptrClipData             = convertFromPtr<F_POINT*>(wrap::next(ptrClipData, clipCount));

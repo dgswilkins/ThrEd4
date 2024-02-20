@@ -110,7 +110,7 @@ auto ci::findclp(uint32_t formIndex) -> uint32_t {
 	  return form.borderClipData + form.clipEntries;
 	}
 	if (form.isClip()) {
-	  return form.angleOrClipData.getClip() + form.lengthOrCount.getClipCount();
+	  return form.angleOrClipData.getClip() + form.clipCount;
 	}
   }
   return 0;
@@ -138,13 +138,13 @@ void clip::delmclp(uint32_t formIndex) {
   }
   auto const destIndex   = ci::findclp(formIndex);
   auto const itStartClip = wrap::next(ClipPoints->cbegin(), destIndex);
-  auto const itEndClip   = wrap::next(itStartClip, form.lengthOrCount.getClipCount());
+  auto const itEndClip   = wrap::next(itStartClip, form.clipCount);
   ClipPoints->erase(itStartClip, itEndClip);
   if (form.isEdgeClip()) {
-	form.borderClipData -= form.lengthOrCount.getClipCount();
+	form.borderClipData -= form.clipCount;
   }
-  ci::clpsub(formIndex, form.lengthOrCount.getClipCount());
-  form.lengthOrCount.setClipCount(0);
+  ci::clpsub(formIndex, form.clipCount);
+  form.clipCount = 0;
 }
 
 void clip::deleclp(uint32_t formIndex) {
@@ -157,7 +157,7 @@ void clip::deleclp(uint32_t formIndex) {
   }
   auto destIndex = ci::findclp(formIndex);
   if (form.isClipX()) {
-	destIndex += form.lengthOrCount.getClipCount();
+	destIndex += form.clipCount;
   }
   auto const itStartClip = wrap::next(ClipPoints->cbegin(), destIndex);
   auto const itEndClip   = wrap::next(itStartClip, form.clipEntries);
@@ -176,7 +176,7 @@ void clip::delclps(uint32_t formIndex) {
 auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
   auto find = ci::findclp(currentForm);
   if (auto const& form = FormList->operator[](currentForm); form.isClip()) {
-	find += form.lengthOrCount.getClipCount();
+	find += form.clipCount;
   }
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};

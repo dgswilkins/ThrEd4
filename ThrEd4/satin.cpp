@@ -819,7 +819,7 @@ void satin::ribon() {
   newForm.type          = SAT;
   newForm.fillColor     = ActiveColor;
   newForm.fillSpacing   = LineSpacing;
-  newForm.lengthOrCount.setStitchLength(IniFile.maxStitchLength);
+  newForm.stitchLength = IniFile.maxStitchLength;
   newForm.vertexCount = iNewVertex;
   newForm.attribute   = FormList->operator[](ClosestFormToCursor).attribute;
   newForm.attribute &= FRMLMSK;

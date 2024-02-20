@@ -76,7 +76,7 @@ void repair::lodchk() {
 	  if (form.type == FRMLINE) {
 		if (form.fillType != CONTF) {
 		  form.fillType = 0;
-		  form.lengthOrCount.setClipCount(0);
+		  form.clipCount = 0;
 		}
 	  }
 	}
@@ -125,7 +125,7 @@ void repair::lodchk() {
 
 void ri::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
   if (badData.clip == formHeader.angleOrClipData.getClip()) {
-	badData.clip += formHeader.lengthOrCount.getClipCount();
+	badData.clip += formHeader.clipCount;
   }
   else {
 	badData.attribute |= BADCLP;
@@ -219,7 +219,7 @@ auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 
 void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.isClip()) {
-	badData.clip += form.lengthOrCount.getClipCount();
+	badData.clip += form.clipCount;
   }
   if (form.isEdgeClip()) {
 	badData.clip += form.clipEntries;
@@ -289,25 +289,25 @@ void ri::checkClip(const uint32_t&       clipDifference,
                    std::vector<F_POINT>& clipPoint,
                    unsigned int&         clipCount,
                    unsigned int&         badClipCount) {
-  if (wrap::toSize(clipDifference) + form.lengthOrCount.getClipCount() < ClipPoints->size()) {
-	clipPoint.resize(clipPoint.size() + form.lengthOrCount.getClipCount());
+  if (wrap::toSize(clipDifference) + form.clipCount < ClipPoints->size()) {
+	clipPoint.resize(clipPoint.size() + form.clipCount);
 	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
-	auto const endClip     = wrap::next(startClip, form.lengthOrCount.getClipCount());
+	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
 	form.angleOrClipData.setClip(clipCount);
-	clipCount += form.lengthOrCount.getClipCount();
+	clipCount += form.clipCount;
 	return;
   }
   if (clipDifference < ClipPoints->size()) {
-	form.lengthOrCount.setClipCount(wrap::toUnsigned(FormVertices->size() - clipDifference));
-	clipPoint.resize(clipPoint.size() + form.lengthOrCount.getClipCount());
+	form.clipCount = wrap::toUnsigned(FormVertices->size() - clipDifference);
+	clipPoint.resize(clipPoint.size() + form.clipCount);
 	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
-	auto const endClip     = wrap::next(startClip, form.lengthOrCount.getClipCount());
+	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
 	form.angleOrClipData.setClip(clipCount);
-	clipCount += form.lengthOrCount.getClipCount();
+	clipCount += form.clipCount;
 	return;
   }
   ++badClipCount;

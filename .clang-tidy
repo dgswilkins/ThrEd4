@@ -5,7 +5,6 @@ Checks:            "*,\
 -cppcoreguidelines-avoid-c-arrays,\
 -cppcoreguidelines-avoid-magic-numbers,\
 -cppcoreguidelines-avoid-non-const-global-variables,\
--cppcoreguidelines-pro-type-union-access,\
 -fuchsia-*,\
 -llvmlibc-*,\
 -hicpp-avoid-c-arrays,\

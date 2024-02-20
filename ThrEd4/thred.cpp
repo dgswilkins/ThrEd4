@@ -1626,7 +1626,7 @@ void thi::chknum() {
 			}
 			case LFRMLEN: {
 			  thred::savdo();
-			  form.lengthOrCount.setStitchLength(value);
+			  form.stitchLength = value;
 			  break;
 			}
 			case LBRDSPAC: {
@@ -3082,7 +3082,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 		guideCount += form.satinGuideCount;
 	  }
 	  if (form.isClip()) {
-		clipDataCount += form.lengthOrCount.getClipCount();
+		clipDataCount += form.clipCount;
 	  }
 	  if (form.isEdgeClip()) {
 		clipDataCount += form.clipEntries;
@@ -3155,7 +3155,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	}
 	if (srcForm.isClip()) {
 	  auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.getClip());
-	  for (auto iClip = 0U; iClip < srcForm.lengthOrCount.getClipCount(); ++iClip) {
+	  for (auto iClip = 0U; iClip < srcForm.clipCount; ++iClip) {
 		points.push_back(*offsetStart);
 		++offsetStart;
 	  }
@@ -4086,7 +4086,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	// where we could not store the pointer in v2)
 	if (form.isClip()) {
 	  form.angleOrClipData.setClip(clipOffset);
-	  clipOffset += form.lengthOrCount.getClipCount();
+	  clipOffset += form.clipCount;
 	}
 	if (form.isEdgeClipX()) {
 	  form.borderClipData = clipOffset;
@@ -6519,7 +6519,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  }
 	  if (formIter.isClip()) {
 		formIter.angleOrClipData.setClip(clipOffset);
-		clipOffset += formIter.lengthOrCount.getClipCount();
+		clipOffset += formIter.clipCount;
 	  }
 	  if (formIter.isEdgeClipX()) {
 		formIter.borderClipData = clipOffset;

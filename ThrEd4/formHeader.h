@@ -130,39 +130,6 @@ inline FANGCLPOUT::FANGCLPOUT() noexcept {
   guide.finish = gsl::narrow<uint16_t>(0U);
 }
 
-union FLENCNTOUT;
-
-class FLENCNT
-{
-  private:
-  float    stitchLength {};
-  uint32_t clipCount {}; // number of points in fill clipboard data
-
-  public:
-  FLENCNT() noexcept = default;
-  // FLENCNT(FLENCNT const&) = default;
-  // FLENCNT(FLENCNT&&) = default;
-  // FLENCNT& operator=(FLENCNT const& rhs) = default;
-  // FLENCNT& operator=(FLENCNT&&) = default;
-  //~FLENCNT() = default;
-
-  // Getter and Setter for stitchLength
-  inline auto getStitchLength() const noexcept -> float {
-	return stitchLength;
-  }
-  void setStitchLength(float value) noexcept {
-	stitchLength = value;
-  }
-
-  // Getter and Setter for clipCount
-  inline auto getClipCount() const noexcept -> uint32_t {
-	return clipCount;
-  }
-  void setClipCount(uint32_t value) noexcept {
-	clipCount = value;
-  }
-};
-
 #pragma pack(push, 1)
 union FLENCNTOUT {
   private:
@@ -413,7 +380,8 @@ class FRM_HEAD
   uint8_t     fillType {};            // fill type
   uint8_t     edgeType {};            // edge type
   float       fillSpacing {};         // fill spacing
-  FLENCNT     lengthOrCount {};       // fill stitch length or clipboard count
+  float       stitchLength {};        // fill stitch length
+  uint32_t    clipCount {};			  // number of points in fill clipboard data
   FANGCLP     angleOrClipData {};     // fill angle or clipboard data pointer
   float       borderSize {};          // border size
   float       edgeSpacing {};         // edge spacing
@@ -522,10 +490,10 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
     borderSize(rhs.borderSize), edgeSpacing(rhs.edgeSpacing), edgeStitchLen(rhs.edgeStitchLen),
     picoLength(rhs.res) {
   if (isClip()) {
-	lengthOrCount.setClipCount(rhs.lengthOrCount.getClipCount());
+	clipCount = rhs.lengthOrCount.getClipCount();
   }
   else {
-	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
+	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
 	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
@@ -570,10 +538,10 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;
   if (isClip()) {
-	lengthOrCount.setClipCount(rhs.lengthOrCount.getClipCount());
+	clipCount = rhs.lengthOrCount.getClipCount();
   }
   else {
-	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
+	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
 	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
@@ -612,10 +580,10 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     underlayStitchAngle(rhs.underlayStitchAngle), underlayIndent(rhs.underlayIndent),
     txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
   if (rhs.isClip()) {
-	lengthOrCount.setClipCount(rhs.lengthOrCount.getClipCount());
+	lengthOrCount.setClipCount(rhs.clipCount);
   }
   else {
-	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
+	lengthOrCount.setStitchLength(rhs.stitchLength);
   }
   if (rhs.isEdgeClipX() || rhs.isClipX()) {
 	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
@@ -658,10 +626,10 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
     underlayStitchAngle(rhs.underlayStitchAngle), underlayIndent(rhs.underlayIndent),
     txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
   if (isClip()) {
-	lengthOrCount.setClipCount(rhs.lengthOrCount.getClipCount());
+	clipCount = rhs.lengthOrCount.getClipCount();
   }
   else {
-	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
+	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
 	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
@@ -712,10 +680,10 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;
   if (isClip()) {
-	lengthOrCount.setClipCount(rhs.lengthOrCount.getClipCount());
+	clipCount = rhs.lengthOrCount.getClipCount();
   }
   else {
-	lengthOrCount.setStitchLength(rhs.lengthOrCount.getStitchLength());
+	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
 	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
@@ -769,7 +737,7 @@ inline auto FRM_HEAD::isEdgeClip() const noexcept -> bool {
 }
 
 inline auto FRM_HEAD::isClipX() const noexcept -> bool {
-  return isClip() && (lengthOrCount.getClipCount() != 0U);
+  return isClip() && (clipCount != 0U);
 }
 
 inline auto FRM_HEAD::isEdgeClipX() const noexcept -> bool {
