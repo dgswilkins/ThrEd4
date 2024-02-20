@@ -124,7 +124,7 @@ void repair::lodchk() {
 }
 
 void ri::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
-  if (badData.clip == formHeader.angleOrClipData.getClip()) {
+  if (badData.clip == formHeader.clipIndex) {
 	badData.clip += formHeader.clipCount;
   }
   else {
@@ -291,22 +291,22 @@ void ri::checkClip(const uint32_t&       clipDifference,
                    unsigned int&         badClipCount) {
   if (wrap::toSize(clipDifference) + form.clipCount < ClipPoints->size()) {
 	clipPoint.resize(clipPoint.size() + form.clipCount);
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
-	form.angleOrClipData.setClip(clipCount);
+	form.clipIndex = clipCount;
 	clipCount += form.clipCount;
 	return;
   }
   if (clipDifference < ClipPoints->size()) {
 	form.clipCount = wrap::toUnsigned(FormVertices->size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipCount);
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
+	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
-	form.angleOrClipData.setClip(clipCount);
+	form.clipIndex = clipCount;
 	clipCount += form.clipCount;
 	return;
   }
@@ -351,7 +351,7 @@ void ri::repclp(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
-	auto const clipDifference = (form.isClip())       ? form.angleOrClipData.getClip()
+	auto const clipDifference = (form.isClip())       ? form.clipIndex
 	                            : (form.isEdgeClip()) ? form.borderClipData
 	                                                  : 0U;
 	if (form.isClip()) {

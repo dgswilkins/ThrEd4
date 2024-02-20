@@ -337,7 +337,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LFRMANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.angleOrClipData.getAngle() * RADDEGF)),
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillAngle * RADDEGF)),
 	                  ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}

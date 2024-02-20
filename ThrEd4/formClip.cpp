@@ -197,7 +197,7 @@ void fci::clipSelectedForm() {
   auto  iClip   = 0U;
   if (form.isClipX()) {
 	iClip                = form.clipCount;
-	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
+	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.clipIndex);
 	auto const endMclp   = wrap::next(startMclp, iClip);
 
 	auto const mclps = gsl::span<F_POINT> {ptrMclp, iClip};
@@ -342,7 +342,7 @@ void fci::clipSelectedForms() {
 	for (auto& selectedForm : (*SelectedFormList)) {
 	  auto& form = FormList->operator[](selectedForm);
 	  if (form.isClipX()) {
-		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.getClip());
+		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.clipIndex);
 		for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 		  points[pointCount++] = *offsetStart;
 		  ++offsetStart;
@@ -582,7 +582,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   else {
 	if (form.isClip()) {
 	  count = form.clipCount;
-	  clip::oclp(clipRect, form.angleOrClipData.getClip(), count);
+	  clip::oclp(clipRect, form.clipIndex, count);
 	}
   }
   if (count == 0U) {
@@ -758,8 +758,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			form.angleOrClipData.setClip(thred::adclp(form.clipCount));
-			auto offsetStart = wrap::next(ClipPoints->begin(), form.angleOrClipData.getClip());
+			form.clipIndex = thred::adclp(form.clipCount);
+			auto offsetStart = wrap::next(ClipPoints->begin(), form.clipIndex);
 			for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
@@ -836,7 +836,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.clipCount};
-			formIter.angleOrClipData.setClip(wrap::toUnsigned(ClipPoints->size()));
+			formIter.clipIndex = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
 			clipCount += formIter.clipCount;
 		  }

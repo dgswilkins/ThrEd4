@@ -1656,7 +1656,7 @@ void thi::chknum() {
 			}
 			case LFRMANG: {
 			  thred::savdo();
-			  form.angleOrClipData.setAngle(value * DEGRADF * IPFGRAN);
+			  form.fillAngle = value * DEGRADF * IPFGRAN;
 			  break;
 			}
 			case LSACANG: {
@@ -3154,7 +3154,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  }
 	}
 	if (srcForm.isClip()) {
-	  auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.getClip());
+	  auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.clipIndex);
 	  for (auto iClip = 0U; iClip < srcForm.clipCount; ++iClip) {
 		points.push_back(*offsetStart);
 		++offsetStart;
@@ -4085,7 +4085,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
 	// where we could not store the pointer in v2)
 	if (form.isClip()) {
-	  form.angleOrClipData.setClip(clipOffset);
+	  form.clipIndex = clipOffset;
 	  clipOffset += form.clipCount;
 	}
 	if (form.isEdgeClipX()) {
@@ -6038,19 +6038,19 @@ void thred::delet() {
 	switch (form.type) {
 	  case FRMLINE: {
 		if (form.fillType == CONTF) {
-		  if (ClosestVertexToCursor == form.angleOrClipData.getGuide().start ||
-		      ClosestVertexToCursor == form.angleOrClipData.getGuide().finish) {
+		  if (ClosestVertexToCursor == form.fillGuide.start ||
+		      ClosestVertexToCursor == form.fillGuide.finish) {
 			form::delmfil(ClosestFormToCursor);
 			form.fillType = 0;
 			thred::coltab();
 			StateMap->set(StateFlag::RESTCH);
 			return;
 		  }
-		  if (form.angleOrClipData.getGuide().start > ClosestVertexToCursor) {
-			form.angleOrClipData.decGuideStart();
+		  if (form.fillGuide.start > ClosestVertexToCursor) {
+			--form.fillGuide.start;
 		  }
-		  if (form.angleOrClipData.getGuide().finish > ClosestVertexToCursor) {
-			form.angleOrClipData.decGuideFinish();
+		  if (form.fillGuide.finish > ClosestVertexToCursor) {
+			--form.fillGuide.finish;
 		  }
 		}
 		break;
@@ -6518,7 +6518,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		}
 	  }
 	  if (formIter.isClip()) {
-		formIter.angleOrClipData.setClip(clipOffset);
+		formIter.clipIndex = clipOffset;
 		clipOffset += formIter.clipCount;
 	  }
 	  if (formIter.isEdgeClipX()) {
@@ -9348,7 +9348,7 @@ auto thred::handleSideWindowActive() -> bool {
 		thi::respac(form);
 		// ToDo - should we be using the angle information already present
 		form.fillType = ANGF;
-		form.angleOrClipData.setAngle(IniFile.fillAngle);
+		form.fillAngle = IniFile.fillAngle;
 		clip::delmclp(ClosestFormToCursor);
 		break;
 	  }
@@ -9461,7 +9461,7 @@ auto thred::handleSideWindowActive() -> bool {
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXANGF;
-		form.angleOrClipData.setAngle(IniFile.fillAngle);
+		form.fillAngle = IniFile.fillAngle;
 		break;
 	  }
 	  if (texture::dutxtfil()) {

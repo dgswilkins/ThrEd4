@@ -8,74 +8,6 @@
 
 // Standard Libraries
 #include <cstdint>
-union FANGCLPOUT;
-
-class FANGCLP {
-  private:
-  float    angle {};
-  uint32_t clip {}; // pointer to start of fill clipboard data
-  SAT_CON  guide {};
-
-  public:
-  // FANGCLP() noexcept = default;
-  // FANGCLP(FANGCLP const&) = default;
-  // FANGCLP(FANGCLP&&) = default;
-  // FANGCLP& operator=(FANGCLP const& rhs) = default;
-  // FANGCLP& operator=(FANGCLP&&) = default;
-  //~FANGCLP() = default;
-
-  // Getter and Setter for angle
-  inline auto getAngle() const noexcept -> float {
-    return angle;
-  }
-  
-  void setAngle(float value) noexcept {
-    angle = value;
-  }
-
-  // Getter and Setter for clip
-  inline auto getClip() const noexcept -> uint32_t {
-    return clip;
-  }
-  
-  void setClip(uint32_t value) noexcept {
-	clip = value;
-  }
-
-  void incClip(uint32_t value) noexcept {
-	clip += value;
-  }
-
-  void decClip(uint32_t value) noexcept {
-	clip -= value;
-  }
-
-  // Getter and Setter for guide
-  inline auto getGuide() const noexcept -> SAT_CON {
-    return guide;
-  }
-
-  void setGuide(SAT_CON value) noexcept {
-	guide = value;
-  }
-
-  void setGuide(SAT_CON_OUT value) noexcept {
-	guide = value;
-  }
-
-  void incGuideStart() noexcept {
-	++guide.start;
-  }
-  void incGuideFinish() noexcept {
-	++guide.finish;
-  }
-  void decGuideStart() noexcept {
-	--guide.start;
-  }
-  void decGuideFinish() noexcept {
-	--guide.finish;
-  }
-};
 
 #pragma pack(push, 1)
 union FANGCLPOUT {
@@ -382,7 +314,9 @@ class FRM_HEAD
   float       fillSpacing {};         // fill spacing
   float       stitchLength {};        // fill stitch length
   uint32_t    clipCount {};			  // number of points in fill clipboard data
-  FANGCLP     angleOrClipData {};     // fill angle or clipboard data pointer
+  float       fillAngle {};           // fill angle
+  uint32_t    clipIndex {};           // pointer to start of fill clipboard data
+  SAT_CON     fillGuide {};           // fill guide
   float       borderSize {};          // border size
   float       edgeSpacing {};         // edge spacing
   float       edgeStitchLen {};       // edge stitch length
@@ -496,16 +430,16 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
 	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
+	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.setGuide(rhs.angleOrClipData.getGuide());
+		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
+	  fillAngle = rhs.angleOrClipData.getAngle();
 	}
   }
   if (fillType == ANGCLPF) {
@@ -544,16 +478,16 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
 	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
+	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.setGuide(rhs.angleOrClipData.getGuide());
+		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
+	  fillAngle = rhs.angleOrClipData.getAngle();
 	}
   }
 
@@ -586,16 +520,16 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 	lengthOrCount.setStitchLength(rhs.stitchLength);
   }
   if (rhs.isEdgeClipX() || rhs.isClipX()) {
-	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
+	angleOrClipData.setClip(rhs.clipIndex);
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.setGuide(rhs.angleOrClipData.getGuide());
+		angleOrClipData.setGuide(rhs.fillGuide);
 	  }
 	}
 	else {
-	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
+	  angleOrClipData.setAngle(rhs.fillAngle);
 	}
   }
   if (fillType == ANGCLPF) {
@@ -632,16 +566,16 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
+	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.setGuide(rhs.angleOrClipData.getGuide());
+		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
+	  fillAngle = rhs.angleOrClipData.getAngle();
 	}
   }
   if (fillType == ANGCLPF) {
@@ -686,16 +620,16 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
 	stitchLength = rhs.lengthOrCount.getStitchLength();
   }
   if (isEdgeClipX() || isClipX()) {
-	angleOrClipData.setClip(rhs.angleOrClipData.getClip());
+	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
 	if (type == FRMLINE) {
 	  if (fillType == CONTF) {
-		angleOrClipData.setGuide(rhs.angleOrClipData.getGuide());
+		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
 	}
 	else {
-	  angleOrClipData.setAngle(rhs.angleOrClipData.getAngle());
+	  fillAngle = rhs.angleOrClipData.getAngle();
 	}
   }
 
