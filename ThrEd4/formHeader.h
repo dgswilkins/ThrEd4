@@ -236,20 +236,80 @@ class TXTR_INFO
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1)
+union TF_INFO_OUT;
+
 union TF_INFO {
   public:
   FTHR_INFO feather;
   TXTR_INFO texture {};
 
-  // TF_INFO() noexcept = default;
+  TF_INFO() noexcept = default;
   // TF_INFO(TF_INFO const&) = default;
   // TF_INFO(TF_INFO&&) = default;
   // TF_INFO& operator=(TF_INFO const& rhs) = default;
   // TF_INFO& operator=(TF_INFO&&) = default;
   //~TF_INFO() = default;
+
+  explicit inline TF_INFO(TF_INFO_OUT const& rhs) noexcept;
+
+  inline auto operator=(TF_INFO_OUT const& rhs) noexcept -> TF_INFO&;
+};
+
+#pragma pack(push, 1)
+union TF_INFO_OUT {
+  private:
+  FTHR_INFO feather;
+  TXTR_INFO texture {};
+
+  public:
+  TF_INFO_OUT() noexcept = default;
+  // TF_INFO_OUT(TF_INFO_OUT const&) = default;
+  // TF_INFO_OUT(TF_INFO_OUT&&) = default;
+  // TF_INFO_OUT& operator=(TF_INFO_OUT const& rhs) = default;
+  // TF_INFO_OUT& operator=(TF_INFO_OUT&&) = default;
+  //~TF_INFO_OUT() = default;
+
+  explicit inline TF_INFO_OUT(TF_INFO const& rhs) noexcept;
+
+  inline auto operator=(TF_INFO const& rhs) noexcept -> TF_INFO_OUT&;
+
+  // Getter and Setter for feather
+  inline auto getFeather() const noexcept -> FTHR_INFO {
+    return feather;
+  }
+  
+  void setFeather(FTHR_INFO value) noexcept {
+    feather = value;
+  }
+
+  // Getter and Setter for texture
+  inline auto getTexture() const noexcept -> TXTR_INFO {
+    return texture;
+  }
+  
+  void setTexture(TXTR_INFO value) noexcept {
+    texture = value;
+  }
 };
 #pragma pack(pop)
+
+inline TF_INFO::TF_INFO(TF_INFO_OUT const& rhs) noexcept {
+  feather = rhs.getFeather();
+}
+
+inline auto TF_INFO::operator=(TF_INFO_OUT const& rhs) noexcept -> TF_INFO& {
+  feather = rhs.getFeather();
+  return *this;
+}
+
+inline TF_INFO_OUT::TF_INFO_OUT(TF_INFO const& rhs) noexcept {
+  feather = rhs.feather;
+}
+
+inline auto TF_INFO_OUT::operator=(TF_INFO const& rhs) noexcept -> TF_INFO_OUT& {
+  feather = rhs.feather;
+  return *this;
+}
 
 union SATINANGLEOUT;
 
@@ -469,7 +529,7 @@ class FRM_HEAD_OUT
   float    minFillStitchLen {};    // minimum fill stitch length
   float    maxBorderStitchLen {};  // maximum border stitch length
   float    minBorderStitchLen {};  // minimum border stitch length
-  TF_INFO  fillInfo {};            // feather/texture info
+  TF_INFO_OUT  fillInfo {};            // feather/texture info
   uint16_t fillStart {};           // fill start point
   uint16_t fillEnd {};             // fill end point
   float    underlaySpacing {};     // underlay spacing
