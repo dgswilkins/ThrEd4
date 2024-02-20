@@ -803,7 +803,7 @@ void xi::fncwlk(FRM_HEAD& form) {
 	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide =
-	    wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide() + form.satinGuideCount - 1U);
+	    wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
@@ -1969,7 +1969,7 @@ void xi::fangfn(uint32_t formIndex, float angle) {
 	  case HCLPF:
 	  case ANGCLPF: {
 		form.fillType = ANGCLPF;
-		form.satinOrAngle.setAngle(angle);
+		form.clipFillAngle = angle;
 		break;
 	  }
 	  case TXVRTF:

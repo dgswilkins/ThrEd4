@@ -171,56 +171,6 @@ union TF_INFO_OUT {
 };
 #pragma pack(pop)
 
-union SATINANGLEOUT;
-
-class SATINANGLE {
-  private:
-  uint32_t guide {};
-  float    angle {};
-
-  public:
-  SATINANGLE() noexcept = default;
-  // SATINANGLE(SATINANGLE const&) = default;
-  // SATINANGLE(SATINANGLE&&) = default;
-  // SATINANGLE& operator=(SATINANGLE const& rhs) = default;
-  // SATINANGLE& operator=(SATINANGLE&&) = default;
-  //~SATINANGLE() = default;
-
-  // Getter and Setter for guide
-  inline auto getGuide() const noexcept -> uint32_t {
-    return guide;
-  }
-  
-  void setGuide(uint32_t value) noexcept {
-    guide = value;
-  }
-
-  void incGuide() noexcept {
-	++guide;
-  }
-
-  void decGuide() noexcept {
-	--guide;
-  }
-
-  void incGuide(uint32_t value) noexcept {
-	guide += value;
-  }
-
-  void decGuide(uint32_t value) noexcept {
-	guide -= value;
-  }
-
-  // Getter and Setter for angle
-  inline auto getAngle() const noexcept -> float {
-    return angle;
-  }
-  
-  void setAngle(float value) noexcept {
-    angle = value;
-  }
-};
-
 #pragma pack(push, 1)
 union SATINANGLEOUT {
   private:
@@ -304,7 +254,8 @@ class FRM_HEAD
   uint8_t     borderColor {};         // border color
   uint32_t    clipEntries {};         // number of border clipboard entries
   uint32_t    vertexIndex {};         // index into FormVertices
-  SATINANGLE  satinOrAngle {};        // satin guidelines or angle clipboard fill angle
+  uint32_t    satinGuideIndex {};     // satin guidelines
+  float       clipFillAngle {};	      // clipboard fill angle
   uint32_t    borderClipData {};      // pointer to start of border clipboard data
   uint32_t    satinGuideCount {};     // number of satin guidelines
   uint32_t    wordParam {};           // clipboard/textured fill phase or satin end guide
@@ -443,10 +394,10 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
 	}
   }
   if (fillType == ANGCLPF) {
-	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+	clipFillAngle = rhs.satinOrAngle.getAngle();
   }
   else {
-	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+	satinGuideIndex = rhs.satinOrAngle.getGuide();
   }
 }
 
@@ -464,10 +415,10 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   rectangle       = rhs.rectangle;
   fillType        = rhs.fillType;
   if (fillType == ANGCLPF) {
-	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+	clipFillAngle = rhs.satinOrAngle.getAngle();
   }
   else {
-	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+	satinGuideIndex = rhs.satinOrAngle.getGuide();
   }
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;
@@ -533,10 +484,10 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 	}
   }
   if (fillType == ANGCLPF) {
-	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+	satinOrAngle.setAngle(rhs.clipFillAngle);
   }
   else {
-	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+	satinOrAngle.setGuide(rhs.satinGuideIndex);
   }
   if (rhs.isTexture()) {
 	fillInfo.setTexture(rhs.texture);
@@ -579,10 +530,10 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 	}
   }
   if (fillType == ANGCLPF) {
-	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+	clipFillAngle  = rhs.satinOrAngle.getAngle();
   }
   else {
-	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+	satinGuideIndex = rhs.satinOrAngle.getGuide();
   }
   if (isTexture()) {
 	texture = rhs.fillInfo.getTexture();
@@ -606,10 +557,10 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   rectangle       = rhs.rectangle;
   fillType        = rhs.fillType;
   if (fillType == ANGCLPF) {
-	satinOrAngle.setAngle(rhs.satinOrAngle.getAngle());
+	clipFillAngle = rhs.satinOrAngle.getAngle();
   }
   else {
-	satinOrAngle.setGuide(rhs.satinOrAngle.getGuide());
+	satinGuideIndex = rhs.satinOrAngle.getGuide();
   }
   edgeType        = rhs.edgeType;
   fillSpacing     = rhs.fillSpacing;

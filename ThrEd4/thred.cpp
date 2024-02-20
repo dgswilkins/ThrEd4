@@ -1661,7 +1661,7 @@ void thi::chknum() {
 			}
 			case LSACANG: {
 			  thred::savdo();
-			  form.satinOrAngle.setAngle(value * DEGRADF * IPFGRAN);
+			  form.clipFillAngle = value * DEGRADF * IPFGRAN;
 			  break;
 			}
 			case LAPCOL: {
@@ -3147,7 +3147,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	}
 	if (srcForm.type == SAT) {
 	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
-	  auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.getGuide());
+	  auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
 		guides.emplace_back(*itGuide);
 		++itGuide;
@@ -4078,7 +4078,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	vertexOffset += form.vertexCount;
 	if (form.type == SAT) {
 	  if (form.satinGuideCount != 0U) {
-		form.satinOrAngle.setGuide(guideOffset);
+		form.satinGuideIndex = guideOffset;
 		guideOffset += form.satinGuideCount;
 	  }
 	}
@@ -5942,7 +5942,7 @@ void thred::delet() {
 	  }
 
 	  // ToDo - Is there a better way to do this than iterating through?
-	  auto itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide());
+	  auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		auto newGuideVal = 0U;
 		for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -6077,7 +6077,7 @@ void thred::delet() {
 			  break;
 			}
 		  }
-		  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
+		  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 		  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 			if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 			  satin::delcon(form, iGuide);
@@ -6513,7 +6513,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  vertexOffset += formIter.vertexCount;
 	  if (formIter.type == SAT) {
 		if (formIter.satinGuideCount != 0U) {
-		  formIter.satinOrAngle.setGuide(guideOffset);
+		  formIter.satinGuideIndex = guideOffset;
 		  guideOffset += formIter.satinGuideCount;
 		}
 	  }
@@ -8822,7 +8822,7 @@ void thred::qcode() {
 	  FormVertices->erase(first, last);
 	}
 	if (FormList->back().satinGuideCount != 0U) {
-	  auto const first = wrap::next(SatinGuides->begin(), FormList->back().satinOrAngle.getGuide());
+	  auto const first = wrap::next(SatinGuides->begin(), FormList->back().satinGuideIndex);
 	  auto const last  = wrap::next(first, FormList->back().satinGuideCount);
 	  SatinGuides->erase(first, last);
 	}
@@ -9358,7 +9358,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::SATF)) { // fan fill
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
-		form.satinOrAngle.setGuide(0);
+		form.satinGuideIndex = 0;
 	  }
 	  if (form.fillType != 0U) {
 		thi::respac(form);
@@ -9373,7 +9373,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::CLPF)) { // fan clip
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
-		form.satinOrAngle.setGuide(0);
+		form.satinGuideIndex = 0;
 	  }
 	  form::clpfil();
 	  break;
@@ -9427,7 +9427,7 @@ auto thred::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::FTHF)) { // feather fill
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
-		form.satinOrAngle.setGuide(0);
+		form.satinGuideIndex = 0;
 	  }
 	  xt::fethrf(ClosestFormToCursor);
 	  StateMap->set(StateFlag::INIT);
@@ -12090,7 +12090,7 @@ void thi::sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto const& form = FormList->operator[](iForm);
 	if (form.type == SAT && (form.satinGuideCount != 0U)) {
-	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
+	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
 		  satin::delsac(iForm);

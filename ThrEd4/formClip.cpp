@@ -187,7 +187,7 @@ void fci::clipSelectedForm() {
   auto  iGuide    = 0U;
   if (form.type == SAT) {
 	iGuide                = form.satinGuideCount;
-	auto const startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
+	auto const startGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 	auto const endGuide   = wrap::next(startGuide, iGuide);
 
 	auto const guides = gsl::span<SAT_CON> {ptrGuides, iGuide};
@@ -317,7 +317,7 @@ void fci::clipSelectedForms() {
 	  if (form.type != SAT) {
 		continue;
 	  }
-	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.getGuide());
+	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		guides[guideCount++] = *itGuide;
 		++itGuide;
@@ -728,8 +728,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto const offset = formOffset + iForm;
 		  auto&      form   = FormList->operator[](offset);
 		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
-			form.satinOrAngle.setGuide(satin::adsatk(form.satinGuideCount));
-			auto itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.getGuide());
+			form.satinGuideIndex = satin::adsatk(form.satinGuideCount);
+			auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 			  *itGuide = guides[currentGuide++];
 			  ++itGuide;
@@ -829,7 +829,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrVertices, formIter.vertexCount));
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
 			auto const guides = gsl::span<SAT_CON> {ptrGuides, formIter.satinGuideCount};
-			formIter.satinOrAngle.setGuide(wrap::toUnsigned(SatinGuides->size()));
+			formIter.satinGuideIndex = wrap::toUnsigned(SatinGuides->size());
 			SatinGuides->insert(SatinGuides->end(), guides.begin(), guides.end());
 		  }
 		  auto* ptrClipData = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, formIter.satinGuideCount));
