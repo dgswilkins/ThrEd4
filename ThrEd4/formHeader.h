@@ -12,9 +12,9 @@
 #pragma pack(push, 1)
 union FANGCLPOUT {
   private:
-  float angle;
-  DWORD clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-  SAT_CON_OUT guide;
+  float m_angle;
+  DWORD m_clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  SAT_CON_OUT m_guide;
 
   public:
   inline FANGCLPOUT() noexcept;
@@ -26,47 +26,47 @@ union FANGCLPOUT {
 
   // Getter and Setter for angle
   [[nodiscard]] inline auto getAngle() const noexcept -> float {
-	return angle;
+	return m_angle;
   }
   
   void setAngle(float value) noexcept {
-	angle = value;
+	m_angle = value;
   }
 
   // Getter and Setter for clip
   [[nodiscard]] inline auto getClip() const noexcept -> DWORD {
-	return clip;
+	return m_clip;
   }
   
   void setClip(DWORD value) noexcept {
-	clip = value;
+	m_clip = value;
   }
 
   // Getter and Setter for guide
   [[nodiscard]] inline auto getGuide() const noexcept -> SAT_CON_OUT {
-	return guide;
+	return m_guide;
   }
 
   void setGuide(SAT_CON_OUT value) noexcept {
-	guide = value;
+	m_guide = value;
   }
 
   void setGuide(SAT_CON value) {
-	guide = value;
+	m_guide = value;
   }
 };
 #pragma pack(pop)
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
-  guide.start  = gsl::narrow<uint16_t>(0U);
-  guide.finish = gsl::narrow<uint16_t>(0U);
+  m_guide.start  = gsl::narrow_cast<decltype(m_guide.start)>(0U);
+  m_guide.finish = gsl::narrow_cast<decltype(m_guide.finish)>(0U);
 }
 
 #pragma pack(push, 1)
 union FLENCNTOUT {
   private:
-  float    stitchLength {};
-  uint32_t clipCount;
+  float    m_stitchLength {};
+  uint32_t m_clipCount;
 
   public:
   FLENCNTOUT() noexcept = default;
@@ -78,18 +78,18 @@ union FLENCNTOUT {
 
   // Getter and Setter for stitchLength
   [[nodiscard]] inline auto getStitchLength() const noexcept -> float {
-	return stitchLength;
+	return m_stitchLength;
   }
   void setStitchLength(float value) noexcept {
-	stitchLength = value;
+	m_stitchLength = value;
   }
 
   // Getter and Setter for clipCount
   [[nodiscard]] inline auto getClipCount() const noexcept -> uint32_t {
-	return clipCount;
+	return m_clipCount;
   }
   void setClipCount(uint32_t value) noexcept {
-	clipCount = value;
+	m_clipCount = value;
   }
 };
 #pragma pack(pop)
@@ -140,8 +140,8 @@ union TF_INFO_OUT;
 #pragma pack(push, 1)
 union TF_INFO_OUT {
   private:
-  FTHR_INFO feather;
-  TXTR_INFO texture {};
+  FTHR_INFO m_feather;
+  TXTR_INFO m_texture {};
 
   public:
   TF_INFO_OUT() noexcept = default;
@@ -153,20 +153,20 @@ union TF_INFO_OUT {
 
   // Getter and Setter for feather
   [[nodiscard]] inline auto getFeather() const noexcept -> FTHR_INFO {
-    return feather;
+    return m_feather;
   }
   
   void setFeather(FTHR_INFO value) noexcept {
-    feather = value;
+    m_feather = value;
   }
 
   // Getter and Setter for texture
   [[nodiscard]] inline auto getTexture() const noexcept -> TXTR_INFO {
-    return texture;
+    return m_texture;
   }
   
   void setTexture(TXTR_INFO value) noexcept {
-	texture = value;
+	m_texture = value;
   }
 };
 #pragma pack(pop)
@@ -174,8 +174,8 @@ union TF_INFO_OUT {
 #pragma pack(push, 1)
 union SATINANGLEOUT {
   private:
-  DWORD guide {};
-  float angle;
+  DWORD m_guide {};
+  float m_angle;
 
   public:
   SATINANGLEOUT() noexcept = default;
@@ -187,20 +187,20 @@ union SATINANGLEOUT {
 
   // Getter and Setter for guide
   [[nodiscard]] inline auto getGuide() const noexcept -> DWORD {
-    return guide;
+    return m_guide;
   }
   
   void setGuide(DWORD value) noexcept {
-    guide = value;
+    m_guide = value;
   }
 
   // Getter and Setter for angle
   [[nodiscard]] inline auto getAngle() const noexcept -> float {
-    return angle;
+    return m_angle;
   }
   
   void setAngle(float value) noexcept {
-    angle = value;
+    m_angle = value;
   }
 };
 #pragma pack(pop)
