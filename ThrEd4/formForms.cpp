@@ -821,7 +821,7 @@ void formForms::dasyfrm() {
   thred::unmsg();
   // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult < 1) {
@@ -1069,7 +1069,7 @@ void formForms::setear() {
   thred::unmsg();
   // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
@@ -1231,7 +1231,7 @@ void formForms::wavfrm() {
   thred::unmsg();
   // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
