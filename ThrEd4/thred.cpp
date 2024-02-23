@@ -8459,12 +8459,14 @@ void thred::nudgfn(float deltaX, float deltaY) {
   if (deltaY != 0.0F) {
 	pixel.y = (deltaY > 0) ? -IniFile.nudgePixels : IniFile.nudgePixels;
   }
+  // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
   auto input       = INPUT {};
   input.type       = INPUT_MOUSE;
   input.mi.dwFlags = MOUSEEVENTF_MOVE;
   input.mi.dx      = pixel.x;
   input.mi.dy      = pixel.y;
   SendInput(1, &input, sizeof(INPUT));
+  // NOLINTEND(cppcoreguidelines-pro-type-union-access)
 }
 
 void thred::bakmrk() {
