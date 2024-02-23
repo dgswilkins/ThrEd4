@@ -5397,7 +5397,7 @@ void form::refilfn(uint32_t formIndex) {
   if (!(StateMap->test(StateFlag::FUNCLP) || StateMap->test(StateFlag::FUNSCLP))) {
 	thred::savdo();
   }
-  auto fillStartsData = FILL_STARTS {}; // fill start data for refill
+  auto fillStartsData = FillStartsDataType {}; // fill start data for refill
   auto fillStartsMap  = 0U;             // fill starts bitmap
   xt::fdelstch(formIndex, fillStartsData, fillStartsMap);
   StateMap->set(StateFlag::WASREFIL);

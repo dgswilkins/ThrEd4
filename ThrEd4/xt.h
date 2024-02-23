@@ -6,38 +6,19 @@
 // Standard Libraries
 #include <vector>
 
-class F_STARTS
-{
-  public:
-  uint32_t applique {};
-  uint32_t fill {};
-  uint32_t feather {};
-  uint32_t border {};
-  uint32_t appliqueColor {};
-  uint32_t fillColor {};
-  uint32_t featherColor {};
-  uint32_t borderColor {};
-
-  // constexpr F_STARTS() noexcept = default;
-  // F_STARTS(F_STARTS const&) = default;
-  // F_STARTS(F_STARTS&&) = default;
-  // F_STARTS& operator=(F_STARTS const& rhs) = default;
-  // F_STARTS& operator=(F_STARTS&&) = default;
-  //~F_STARTS() = default;
+enum FSI : size_t {  // fill starts index values
+  applique, 
+  fill,
+  feather,
+  border,
+  appliqueColor,
+  fillColor,
+  featherColor,
+  borderColor,
+  fsi_size
 };
 
-union FILL_STARTS {
-  public:
-  F_STARTS                                                    fillNamed;
-  std::array<uint32_t, (sizeof(F_STARTS) / sizeof(uint32_t))> fillArray {};
-
-  // inline FILL_STARTS() noexcept;
-  // FILL_STARTS(FILL_STARTS const&) = default;
-  // FILL_STARTS(FILL_STARTS&&) = default;
-  // FILL_STARTS& operator=(FILL_STARTS const& rhs) = default;
-  // FILL_STARTS& operator=(FILL_STARTS&&) = default;
-  //~FILL_STARTS() = default;
-};
+using FillStartsDataType = std::array<uint32_t, FSI::fsi_size>;
 
 namespace xt {
 
@@ -73,13 +54,13 @@ void dundcol(uint8_t color);
 void dushft();
 void duspac(float spacing);
 void dusulen(float length);
-void fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap);
+void fdelstch(uint32_t formIndex, FillStartsDataType& fillStartsData, uint32_t& fillStartsMap);
 void fethr();
 void fethrf(uint32_t formIndex);
 void fsort();
 void fthrfn(FRM_HEAD& form);
 auto insid(FRM_HEAD const& form) -> std::vector<F_POINT>&;
-void intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t fillStartsMap);
+void intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uint32_t fillStartsMap);
 void mvshft();
 void notcwlk();
 void notund();
