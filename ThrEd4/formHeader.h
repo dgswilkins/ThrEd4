@@ -366,6 +366,10 @@ class FRM_HEAD_OUT
 };
 #pragma pack(pop)
 
+// Use of unions in the output conversion routines is unavoidable,
+// but even using getters and setters, the warnings still occur, so....
+// NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
+
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
     borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
@@ -612,6 +616,8 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
 
   return *this;
 }
+
+// NOLINTEND(cppcoreguidelines-pro-type-union-access)
 
 inline auto FRM_HEAD::isClip() const noexcept -> bool {
   return ((1U << fillType) & CLIPTYPEMAP) != 0;
