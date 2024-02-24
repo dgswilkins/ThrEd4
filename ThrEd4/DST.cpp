@@ -16,45 +16,106 @@
 // NOLINTBEGIN(readability-magic-numbers)
 class DSTHED // dst file header
 {
-  public:
-  std::array<char, 3>   desched {};  // 00  00	description
-  std::array<char, 17>  desc {};     // 03  03
-  std::array<char, 3>   recshed {};  // 20  14	record count
-  std::array<char, 8>   recs {};     // 23  17
-  std::array<char, 3>   cohed {};    // 31  1F
-  std::array<char, 4>   co {};       // 34  22
-  std::array<char, 3>   xplushed {}; // 38  26	x+ size
-  std::array<char, 6>   xplus {};    // 41  29
-  std::array<char, 3>   xminhed {};  // 47  2F	x- size
-  std::array<char, 6>   xmin {};     // 50  32
-  std::array<char, 3>   yplushed {}; // 56  38
-  std::array<char, 6>   yplus {};    // 59  3B	y+ size
-  std::array<char, 3>   yminhed {};  // 65  41
-  std::array<char, 6>   ymin {};     // 68  44	y- size
-  std::array<char, 3>   axhed {};    // 74  4A
-  std::array<char, 7>   ax {};       // 77  4D
-  std::array<char, 3>   ayhed {};    // 84  54
-  std::array<char, 7>   ay {};       // 87  57
-  std::array<char, 3>   mxhed {};    // 94  5E
-  std::array<char, 7>   mx {};       // 97  61
-  std::array<char, 3>   myhed {};    // 104 68
-  std::array<char, 7>   my {};       // 107 6B
-  std::array<char, 2>   pdhed {};    // 114 72
-  std::array<char, 7>   pd {};       // 116 74
-  std::array<char, 1>   eof {};      // 123 7B
-  std::array<char, 388> res {};      // 124 7C
+  private:
+  std::array<char, 3>   m_desched {};  // 00  00	description
+  std::array<char, 17>  m_desc {};     // 03  03
+  std::array<char, 3>   m_recshed {};  // 20  14	record count
+  std::array<char, 8>   m_recs {};     // 23  17
+  std::array<char, 3>   m_cohed {};    // 31  1F
+  std::array<char, 4>   m_co {};       // 34  22
+  std::array<char, 3>   m_xplushed {}; // 38  26	x+ size
+  std::array<char, 6>   m_xplus {};    // 41  29
+  std::array<char, 3>   m_xminhed {};  // 47  2F	x- size
+  std::array<char, 6>   m_xmin {};     // 50  32
+  std::array<char, 3>   m_yplushed {}; // 56  38
+  std::array<char, 6>   m_yplus {};    // 59  3B	y+ size
+  std::array<char, 3>   m_yminhed {};  // 65  41
+  std::array<char, 6>   m_ymin {};     // 68  44	y- size
+  std::array<char, 3>   m_axhed {};    // 74  4A
+  std::array<char, 7>   m_ax {};       // 77  4D
+  std::array<char, 3>   m_ayhed {};    // 84  54
+  std::array<char, 7>   m_ay {};       // 87  57
+  std::array<char, 3>   m_mxhed {};    // 94  5E
+  std::array<char, 7>   m_mx {};       // 97  61
+  std::array<char, 3>   m_myhed {};    // 104 68
+  std::array<char, 7>   m_my {};       // 107 6B
+  std::array<char, 2>   m_pdhed {};    // 114 72
+  std::array<char, 7>   m_pd {};       // 116 74
+  std::array<char, 1>   m_eof {};      // 123 7B
+  std::array<char, 388> m_res {};      // 124 7C
 
+  public:
   constexpr DSTHED() noexcept = default;
   // DSTHED(DSTHED&&) = default;
   // DSTHED& operator=(DSTHED const& rhs) = default;
   // DSTHED& operator=(DSTHED&&) = default;
   //~DSTHED() = default;
+
+  void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS& dstOffset);
+  [[nodiscard]] auto chkdst() const noexcept -> bool {
+	return strncmp(m_desched.data(), "LA:", 3) == 0;
+  }
 };
 // NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
+// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
+#pragma warning(push)
+#pragma warning(disable : 4996)
+// ReSharper disable CppDeprecatedEntity
+void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS& dstOffset) {
+  // dstHeader fields are fixed width, so use strncpy in its intended way.
+  // Use sizeof to ensure no overrun if the format string is wrong length
+  strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
+  std::ranges::fill(m_desc, ' ');
+  auto const convAuxName  = utf::utf16ToUtf8(auxName);
+  auto const spDstHdrDesc = gsl::span {m_desc};
+  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
+	auto const name   = convAuxName.substr(pos + 1);
+	auto       itChar = spDstHdrDesc.begin();
+	for (auto const& iDHD : name) {
+	  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
+		*itChar = iDHD;
+	  }
+	  else {
+		break;
+	  }
+	  ++itChar;
+	}
+  }
+  constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
+  spDstHdrDesc.back() = CAR;
+  // clang-format off
+  strncpy(m_recshed.data(),  "ST:",                                                             m_recshed.size());
+  strncpy(m_recs.data(),     fmt::format(FMT_STRING("{:7d}\r"), dstRecSize).c_str(),            m_recs.size());
+  strncpy(m_cohed.data(),    "CO:",                                                             m_cohed.size());
+  strncpy(m_co.data(),       "  0\xd",                                                          m_co.size());
+  strncpy(m_xplushed.data(), "+X:",                                                             m_xplushed.size());
+  strncpy(m_xplus.data(),    fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x).c_str(), m_xplus.size());
+  strncpy(m_xminhed.data(),  "-X:",                                                             m_xminhed.size());
+  strncpy(m_xmin.data(),     fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x).c_str(), m_xmin.size());
+  strncpy(m_yplushed.data(), "+Y:",                                                             m_yplushed.size());
+  strncpy(m_yplus.data(),    fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y).c_str(), m_yplus.size());
+  strncpy(m_yminhed.data(),  "-Y:",                                                             m_yminhed.size());
+  strncpy(m_ymin.data(),     fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y).c_str(), m_ymin.size());
+  strncpy(m_axhed.data(),    "AX:",                                                             m_axhed.size());
+  strncpy(m_ax.data(),       "-    0\r",                                                        m_ax.size());
+  strncpy(m_ayhed.data(),    "AY:",                                                             m_ayhed.size());
+  strncpy(m_ay.data(),       "+    0\r",                                                        m_ay.size());
+  strncpy(m_mxhed.data(),    "MX:",                                                             m_mxhed.size());
+  strncpy(m_mx.data(),       "+    0\r",                                                        m_mx.size());
+  strncpy(m_myhed.data(),    "MY:",                                                             m_myhed.size());
+  strncpy(m_my.data(),       "+    0\r",                                                        m_my.size());
+  strncpy(m_pdhed.data(),    "PD",                                                              m_pdhed.size());
+  strncpy(m_pd.data(),       "******\r",                                                        m_pd.size());
+  strncpy(m_eof.data(),      "\x1a",                                                            m_eof.size());
+  // clang-format on
+  std::ranges::fill(m_res, ' ');
+}
+// ReSharper restore CppDeprecatedEntity
+#pragma warning(pop)
+
 namespace di {
-auto chkdst(DSTHED const* dstHeader) noexcept -> bool;
 auto coldis(COLORREF colorA, COLORREF colorB) -> DWORD;
 auto colfil() -> bool;
 void dstin(uint32_t number, POINT& pout) noexcept;
@@ -899,10 +960,6 @@ void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
                                gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
 }
 
-auto di::chkdst(DSTHED const* dstHeader) noexcept -> bool {
-  return strncmp(dstHeader->desched.data(), "LA:", 3) == 0;
-}
-
 auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   auto fileSize = uintmax_t {};
   if (!thred::getFileSize(newFileName, fileSize)) {
@@ -923,7 +980,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  if (!di::chkdst(&dstHeader)) {
+  if (!dstHeader.chkdst()) {
 	CloseHandle(fileHandle);
 	return false;
   }
@@ -940,10 +997,6 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   return true;
 }
 
-// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
-#pragma warning(push)
-#pragma warning(disable : 4996)
-// ReSharper disable CppDeprecatedEntity
 auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
@@ -953,60 +1006,14 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	return false;
   }
   auto dstRecords = std::vector<DSTREC> {};
+  auto dstRecSize = dstRecords.size();
   // There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
   constexpr auto RECRES = size_t {128U}; // testing shows this to be a good value
   dstRecords.reserve(StitchBuffer->size() + RECRES);
   auto dstOffset = DST_OFFSETS {};
-  auto dstHeader = DSTHED {};
   di::ritdst(dstOffset, dstRecords, saveStitches);
-  // dstHeader fields are fixed width, so use strncpy in its intended way.
-  // Use sizeof to ensure no overrun if the format string is wrong length
-  strncpy(dstHeader.desched.data(), "LA:", sizeof(dstHeader.desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
-  std::ranges::fill(dstHeader.desc, ' ');
-  auto const convAuxName  = utf::utf16ToUtf8(auxName);
-  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
-  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
-	auto const name   = convAuxName.substr(pos + 1);
-	auto       itChar = spDstHdrDesc.begin();
-	for (auto const& iDHD : name) {
-	  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
-		*itChar = iDHD;
-	  }
-	  else {
-		break;
-	  }
-	  ++itChar;
-	}
-  }
-  // clang-format off
-  constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
-  spDstHdrDesc.back() = CAR;
-  strncpy(dstHeader.recshed.data(),  "ST:",                                                             dstHeader.recshed.size());
-  strncpy(dstHeader.recs.data(),     fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(),     dstHeader.recs.size());
-  strncpy(dstHeader.cohed.data(),    "CO:",                                                             dstHeader.cohed.size());
-  strncpy(dstHeader.co.data(),       "  0\xd",                                                          dstHeader.co.size());
-  strncpy(dstHeader.xplushed.data(), "+X:",                                                             dstHeader.xplushed.size());
-  strncpy(dstHeader.xplus.data(),    fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x).c_str(), dstHeader.xplus.size());
-  strncpy(dstHeader.xminhed.data(),  "-X:",                                                             dstHeader.xminhed.size());
-  strncpy(dstHeader.xmin.data(),     fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x).c_str(), dstHeader.xmin.size());
-  strncpy(dstHeader.yplushed.data(), "+Y:",                                                             dstHeader.yplushed.size());
-  strncpy(dstHeader.yplus.data(),    fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y).c_str(), dstHeader.yplus.size());
-  strncpy(dstHeader.yminhed.data(),  "-Y:",                                                             dstHeader.yminhed.size());
-  strncpy(dstHeader.ymin.data(),     fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y).c_str(), dstHeader.ymin.size());
-  strncpy(dstHeader.axhed.data(),    "AX:",                                                             dstHeader.axhed.size());
-  strncpy(dstHeader.ax.data(),       "-    0\r",                                                        dstHeader.ax.size());
-  strncpy(dstHeader.ayhed.data(),    "AY:",                                                             dstHeader.ayhed.size());
-  strncpy(dstHeader.ay.data(),       "+    0\r",                                                        dstHeader.ay.size());
-  strncpy(dstHeader.mxhed.data(),    "MX:",                                                             dstHeader.mxhed.size());
-  strncpy(dstHeader.mx.data(),       "+    0\r",                                                        dstHeader.mx.size());
-  strncpy(dstHeader.myhed.data(),    "MY:",                                                             dstHeader.myhed.size());
-  strncpy(dstHeader.my.data(),       "+    0\r",                                                        dstHeader.my.size());
-  strncpy(dstHeader.pdhed.data(),    "PD",                                                              dstHeader.pdhed.size());
-  strncpy(dstHeader.pd.data(),       "******\r",                                                        dstHeader.pd.size());
-  strncpy(dstHeader.eof.data(),      "\x1a",                                                            dstHeader.eof.size());
-  // clang-format on
-  auto& res = dstHeader.res;
-  std::ranges::fill(res, ' ');
+  auto dstHeader = DSTHED {};
+  dstHeader.writeDSTHeader(auxName, dstRecSize, dstOffset);
   auto bytesWritten = DWORD {};
   if (FALSE == WriteFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr)) {
 	displayText::riter();
@@ -1021,5 +1028,3 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   CloseHandle(fileHandle);
   return true;
 }
-// ReSharper restore CppDeprecatedEntity
-#pragma warning(pop)

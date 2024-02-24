@@ -140,8 +140,8 @@ union TF_INFO_OUT;
 #pragma pack(push, 1)
 union TF_INFO_OUT {
   private:
-  FTHR_INFO m_feather;
-  TXTR_INFO m_texture {};
+  FTHR_INFO m_feather {};
+  TXTR_INFO m_texture;
 
   public:
   TF_INFO_OUT() noexcept = default;
