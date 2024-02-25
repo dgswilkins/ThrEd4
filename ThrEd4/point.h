@@ -39,12 +39,14 @@ class B_SEQ_PNT;
 
 class D_POINT
 {
-  public:
-  double x {};
-  double y {};
+  private:
+  double m_xCoordinate {};
+  double m_yCoordinate {};
 
+  public:
   // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
+  inline D_POINT(double rhsX, double rhsY) noexcept : m_xCoordinate(rhsX), m_yCoordinate(rhsY) {};
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   inline D_POINT(float rhsX, float rhsY) noexcept;
@@ -53,6 +55,16 @@ class D_POINT
   // D_POINT& operator=(D_POINT const& rhs) = default;
   // D_POINT& operator=(D_POINT&&) = default;
   //~D_POINT() = default;
+
+  // Getter for x
+  auto getX() const noexcept -> double {
+	return m_xCoordinate;
+  }
+
+  // Getter for y
+  auto getY() const noexcept -> double {
+	return m_yCoordinate;
+  }
 };
 
 #pragma pack(push, 1)
@@ -162,12 +174,12 @@ inline constexpr F_POINT::F_POINT(double rhsX, double rhsY) noexcept :
 }
 
 inline constexpr F_POINT::F_POINT(D_POINT const& rhs) noexcept :
-    x(gsl::narrow_cast<float>(rhs.x)), y(gsl::narrow_cast<float>(rhs.y)) {
+    x(gsl::narrow_cast<float>(rhs.getX())), y(gsl::narrow_cast<float>(rhs.getY())) {
 }
 
 inline constexpr auto F_POINT::operator=(D_POINT const& rhs) noexcept -> F_POINT& {
-  x = gsl::narrow_cast<float>(rhs.x);
-  y = gsl::narrow_cast<float>(rhs.y);
+  x = gsl::narrow_cast<float>(rhs.getX());
+  y = gsl::narrow_cast<float>(rhs.getY());
   return *this;
 }
 
@@ -202,9 +214,9 @@ inline constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const no
 }
 
 inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
-    x(gsl::narrow_cast<double>(rhs.x)), y(gsl::narrow_cast<double>(rhs.y)) {
+    m_xCoordinate(gsl::narrow_cast<double>(rhs.x)), m_yCoordinate(gsl::narrow_cast<double>(rhs.y)) {
 }
 
 inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
-    x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
+    m_xCoordinate(gsl::narrow_cast<double>(rhsX)), m_yCoordinate(gsl::narrow_cast<double>(rhsY)) {
 }
