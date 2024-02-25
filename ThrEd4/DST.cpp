@@ -13,6 +13,38 @@
 #endif
 
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
+class DST_OFFSETS
+{
+  private:
+  POINT m_Positive {}; // plus offset written into the destination file header
+  POINT m_Negative {}; // minus offset written into the destination file header
+
+  public:
+  constexpr DST_OFFSETS() noexcept = default;
+
+  // Getter for Positive
+  [[nodiscard]] auto getPositive() const noexcept -> POINT {
+	return m_Positive;
+  }
+
+  // Setter for Positive
+  void setPositive(const POINT& positive) noexcept {
+	m_Positive = positive;
+  }
+
+  // Getter for Negative
+  [[nodiscard]] auto getNegative() const noexcept -> POINT {
+	return m_Negative;
+  }
+
+  // Setter for Negative
+  void setNegative(const POINT& negative) noexcept {
+	m_Negative = negative;
+  }
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
 // NOLINTBEGIN(readability-magic-numbers)
 class DSTHED // dst file header
 {
@@ -87,10 +119,10 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
   spDstHdrDesc.back() = CAR;
 
   auto const recs   = fmt::format(FMT_STRING("{:7d}\r"), dstRecSize);
-  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x);
-  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x);
-  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y);
-  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y);
+  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().x);
+  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().x);
+  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().y);
+  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().y);
   // clang-format off
   strncpy(m_recshed.data(),  "ST:",          m_recshed.size());
   strncpy(m_recs.data(),     recs.c_str(),   m_recs.size());
@@ -317,10 +349,10 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   }
   auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
                                  std::lround(wrap::midl(boundingRect.top, boundingRect.bottom))};
-  DSTOffsetData.Positive.x = std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1));
-  DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
-  DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
-  DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
+  DSTOffsetData.setPositive({std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1)),
+                             std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1))});
+  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left),
+                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom)});
   auto color = dstStitchBuffer[0].attribute & COLMSK;
   for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
