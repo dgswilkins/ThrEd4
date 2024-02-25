@@ -85,30 +85,36 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
   }
   constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
   spDstHdrDesc.back() = CAR;
+
+  auto const recs   = fmt::format(FMT_STRING("{:7d}\r"), dstRecSize);
+  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x);
+  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x);
+  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y);
+  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y);
   // clang-format off
-  strncpy(m_recshed.data(),  "ST:",                                                             m_recshed.size());
-  strncpy(m_recs.data(),     fmt::format(FMT_STRING("{:7d}\r"), dstRecSize).c_str(),            m_recs.size());
-  strncpy(m_cohed.data(),    "CO:",                                                             m_cohed.size());
-  strncpy(m_co.data(),       "  0\xd",                                                          m_co.size());
-  strncpy(m_xplushed.data(), "+X:",                                                             m_xplushed.size());
-  strncpy(m_xplus.data(),    fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x).c_str(), m_xplus.size());
-  strncpy(m_xminhed.data(),  "-X:",                                                             m_xminhed.size());
-  strncpy(m_xmin.data(),     fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x).c_str(), m_xmin.size());
-  strncpy(m_yplushed.data(), "+Y:",                                                             m_yplushed.size());
-  strncpy(m_yplus.data(),    fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y).c_str(), m_yplus.size());
-  strncpy(m_yminhed.data(),  "-Y:",                                                             m_yminhed.size());
-  strncpy(m_ymin.data(),     fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y).c_str(), m_ymin.size());
-  strncpy(m_axhed.data(),    "AX:",                                                             m_axhed.size());
-  strncpy(m_ax.data(),       "-    0\r",                                                        m_ax.size());
-  strncpy(m_ayhed.data(),    "AY:",                                                             m_ayhed.size());
-  strncpy(m_ay.data(),       "+    0\r",                                                        m_ay.size());
-  strncpy(m_mxhed.data(),    "MX:",                                                             m_mxhed.size());
-  strncpy(m_mx.data(),       "+    0\r",                                                        m_mx.size());
-  strncpy(m_myhed.data(),    "MY:",                                                             m_myhed.size());
-  strncpy(m_my.data(),       "+    0\r",                                                        m_my.size());
-  strncpy(m_pdhed.data(),    "PD",                                                              m_pdhed.size());
-  strncpy(m_pd.data(),       "******\r",                                                        m_pd.size());
-  strncpy(m_eof.data(),      "\x1a",                                                            m_eof.size());
+  strncpy(m_recshed.data(),  "ST:",          m_recshed.size());
+  strncpy(m_recs.data(),     recs.c_str(),   m_recs.size());
+  strncpy(m_cohed.data(),    "CO:",          m_cohed.size());
+  strncpy(m_co.data(),       "  0\xd",       m_co.size());
+  strncpy(m_xplushed.data(), "+X:",          m_xplushed.size());
+  strncpy(m_xplus.data(),    xplus.c_str(),  m_xplus.size());
+  strncpy(m_xminhed.data(),  "-X:",          m_xminhed.size());
+  strncpy(m_xmin.data(),     xminus.c_str(), m_xmin.size());
+  strncpy(m_yplushed.data(), "+Y:",          m_yplushed.size());
+  strncpy(m_yplus.data(),    yplus.c_str(),  m_yplus.size());
+  strncpy(m_yminhed.data(),  "-Y:",          m_yminhed.size());
+  strncpy(m_ymin.data(),     yminus.c_str(), m_ymin.size());
+  strncpy(m_axhed.data(),    "AX:",          m_axhed.size());
+  strncpy(m_ax.data(),       "-    0\r",     m_ax.size());
+  strncpy(m_ayhed.data(),    "AY:",          m_ayhed.size());
+  strncpy(m_ay.data(),       "+    0\r",     m_ay.size());
+  strncpy(m_mxhed.data(),    "MX:",          m_mxhed.size());
+  strncpy(m_mx.data(),       "+    0\r",     m_mx.size());
+  strncpy(m_myhed.data(),    "MY:",          m_myhed.size());
+  strncpy(m_my.data(),       "+    0\r",     m_my.size());
+  strncpy(m_pdhed.data(),    "PD",           m_pdhed.size());
+  strncpy(m_pd.data(),       "******\r",     m_pd.size());
+  strncpy(m_eof.data(),      "\x1a",         m_eof.size());
   // clang-format on
   std::ranges::fill(m_res, ' ');
 }
