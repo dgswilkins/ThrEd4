@@ -30,6 +30,27 @@ auto constexpr closeEnough(double first, double second) -> bool {
   auto const val = (first > second) ? (first - second) : (second - first);
   return (val < DBL_EPSILON);
 }
+
+auto constexpr doubleToFloat(double value) -> float {
+  constexpr auto MINDBL = 4e-5; // small number for conversions
+
+  try {
+	return gsl::narrow<float>(value);
+  }
+  catch (gsl::narrowing_error const& e) { // check if we are seeing a significant rounding error
+	UNREFERENCED_PARAMETER(e);
+	auto const var  = gsl::narrow_cast<float>(value);
+	auto const diff = abs(value - gsl::narrow_cast<double>(var));
+	if (diff > MINDBL) {
+	  throw std::runtime_error("conversion error above limit");
+	}
+	return var;
+  }
+  catch (...) { // otherwise throw
+	throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
+  }
+}
+
 } // namespace util
 
 class F_POINT;
@@ -46,7 +67,7 @@ class D_POINT
   public:
   // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
-  inline D_POINT(double rhsX, double rhsY) noexcept : m_xCoordinate(rhsX), m_yCoordinate(rhsY) {};
+  inline D_POINT(double rhsX, double rhsY) noexcept : m_xCoordinate(rhsX), m_yCoordinate(rhsY) {}
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   inline D_POINT(float rhsX, float rhsY) noexcept;
@@ -57,12 +78,12 @@ class D_POINT
   //~D_POINT() = default;
 
   // Getter for x
-  auto getX() const noexcept -> double {
+  [[nodiscard]] auto getX() const noexcept -> double {
 	return m_xCoordinate;
   }
 
   // Getter for y
-  auto getY() const noexcept -> double {
+  [[nodiscard]] auto getY() const noexcept -> double {
 	return m_yCoordinate;
   }
 };
@@ -75,13 +96,13 @@ class F_POINT
   float y {};
 
   constexpr F_POINT() noexcept = default;
-  inline constexpr F_POINT(double rhsX, double rhsY) noexcept;
+  inline constexpr F_POINT(double rhsX, double rhsY);
   inline constexpr F_POINT(float rhsX, float rhsY) noexcept;
   inline constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
   inline constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
-  inline constexpr explicit F_POINT(D_POINT const& rhs) noexcept;
+  inline constexpr explicit F_POINT(D_POINT const& rhs);
   inline constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
-  inline constexpr auto operator=(D_POINT const& rhs) noexcept -> F_POINT&;
+  inline constexpr auto operator=(D_POINT const& rhs) -> F_POINT&;
   inline constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
   inline constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
   inline constexpr auto operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT&;
@@ -101,7 +122,7 @@ class F_POINT_ATTR
   uint32_t attribute {};
 
   constexpr F_POINT_ATTR() noexcept = default;
-  inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
+  inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA);
   inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
   inline constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
   // F_POINT_ATTR(F_POINT_ATTR const&) = default;
@@ -147,7 +168,7 @@ class B_SEQ_PNT
 
 // ToDo - This should use wrap::toFloat but there would be a circular dependency
 inline B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
-    x(gsl::narrow<float>(rhsX)), y(gsl::narrow<float>(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
+    x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
 inline B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
@@ -169,23 +190,23 @@ inline constexpr F_POINT::F_POINT(LONG rhsX, LONG rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr F_POINT::F_POINT(double rhsX, double rhsY) noexcept :
-    x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
+inline constexpr F_POINT::F_POINT(double rhsX, double rhsY) :
+    x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)) {
 }
 
-inline constexpr F_POINT::F_POINT(D_POINT const& rhs) noexcept :
-    x(gsl::narrow_cast<float>(rhs.getX())), y(gsl::narrow_cast<float>(rhs.getY())) {
+inline constexpr F_POINT::F_POINT(D_POINT const& rhs) :
+    x(util::doubleToFloat(rhs.getX())), y(util::doubleToFloat(rhs.getY())) {
 }
 
-inline constexpr auto F_POINT::operator=(D_POINT const& rhs) noexcept -> F_POINT& {
-  x = gsl::narrow_cast<float>(rhs.getX());
-  y = gsl::narrow_cast<float>(rhs.getY());
+inline constexpr auto F_POINT::operator=(D_POINT const& rhs) -> F_POINT& {
+  x = util::doubleToFloat(rhs.getX());
+  y = util::doubleToFloat(rhs.getY());
   return *this;
 }
 
 inline constexpr auto F_POINT::operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT& {
-  x = gsl::narrow_cast<float>(rhs.x);
-  y = gsl::narrow_cast<float>(rhs.y);
+  x = rhs.x;
+  y = rhs.y;
   return *this;
 }
 
@@ -205,8 +226,8 @@ inline F_POINT_ATTR::F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcep
     x(rhsX), y(rhsY), attribute(rhsA) {
 }
 
-inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept :
-    x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)), attribute(rhsA) {
+inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) :
+    x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(rhsA) {
 }
 
 inline constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {

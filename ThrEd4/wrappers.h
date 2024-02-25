@@ -20,7 +20,6 @@
 
 // Standard Libraries
 #include <vector>
-#include <cmath>
 
 constexpr auto MINDBL = 4e-5; // small number for conversions
 
@@ -36,21 +35,7 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
                  std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint64_t>),
                 "cannot use wrap::toFloat here.");
   if constexpr (std::is_same_v<inType, double>) {
-	try {
-	  return gsl::narrow<float>(invar);
-	}
-	catch (gsl::narrowing_error const& e) { // check if we are seeing a significant rounding error
-	  UNREFERENCED_PARAMETER(e);
-	  auto const var  = gsl::narrow_cast<float>(invar);
-	  auto const diff = abs(invar - gsl::narrow_cast<double>(var));
-	  if (diff > MINDBL) {
-		throw std::runtime_error("conversion error above limit");
-	  }
-	  return var;
-	}
-	catch (...) { // otherwise throw
-	  throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
-	}
+	return util::doubleToFloat(invar);
   }
   else {
 	if constexpr (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>) {
