@@ -51,7 +51,7 @@ class DSTHED // dst file header
   // DSTHED& operator=(DSTHED&&) = default;
   //~DSTHED() = default;
 
-  void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS& dstOffset);
+  void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset);
   [[nodiscard]] auto chkdst() const noexcept -> bool {
 	return strncmp(m_desched.data(), "LA:", 3) == 0;
   }
@@ -63,7 +63,7 @@ class DSTHED // dst file header
 #pragma warning(push)
 #pragma warning(disable : 4996)
 // ReSharper disable CppDeprecatedEntity
-void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS& dstOffset) {
+void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset) {
   // dstHeader fields are fixed width, so use strncpy in its intended way.
   // Use sizeof to ensure no overrun if the format string is wrong length
   strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
