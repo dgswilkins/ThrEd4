@@ -565,8 +565,8 @@ void xt::fethrf(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.type                           = SAT;
-  form.feather.ratio    = IniFile.featherRatio;
+  form.type                  = SAT;
+  form.feather.ratio         = IniFile.featherRatio;
   form.feather.upCount       = IniFile.featherUpCount;
   form.feather.downCount     = IniFile.featherDownCount;
   form.feather.fillType      = IniFile.featherFillType;
@@ -574,11 +574,11 @@ void xt::fethrf(uint32_t formIndex) {
   form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
   form.extendedAttribute |= IniFile.featherType;
   form.feather.count = IniFile.featherCount;
-  form.stitchLength = UserStitchLength;
-  form.fillSpacing            = LineSpacing;
-  form.fillColor              = gsl::narrow<uint8_t>(ActiveColor);
+  form.stitchLength  = UserStitchLength;
+  form.fillSpacing   = LineSpacing;
+  form.fillColor     = gsl::narrow<uint8_t>(ActiveColor);
   form.feather.color = (ActiveColor + 1U) & COLMSK;
-  form.fillType               = FTHF;
+  form.fillType      = FTHF;
   form::refilfn(formIndex);
 }
 
@@ -800,8 +800,7 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  OSequence->emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
 	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
-	auto itGuide =
-	    wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
+	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
@@ -1958,21 +1957,21 @@ void xi::fangfn(uint32_t formIndex, float angle) {
 	  case VRTF:
 	  case HORF:
 	  case ANGF: {
-		form.fillType = ANGF;
+		form.fillType  = ANGF;
 		form.fillAngle = angle;
 		break;
 	  }
 	  case VCLPF:
 	  case HCLPF:
 	  case ANGCLPF: {
-		form.fillType = ANGCLPF;
+		form.fillType      = ANGCLPF;
 		form.clipFillAngle = angle;
 		break;
 	  }
 	  case TXVRTF:
 	  case TXHORF:
 	  case TXANGF: {
-		form.fillType = TXANGF;
+		form.fillType  = TXANGF;
 		form.fillAngle = angle;
 		break;
 	  }

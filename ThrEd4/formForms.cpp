@@ -304,8 +304,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  }
 	  labelWindow[LFTHFLR] = ffi::txtwin(displayText::loadStr(IDS_FTHFLR), LabelWindowCoords);
 	  valueWindow[LFTHFLR] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.minStitchSize * IPFGRAN)),
-	                  ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.minStitchSize * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType != CLPF) {
@@ -326,8 +325,8 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	ffi::nxtlin(formMenuEntryCount);
 	if (!form.isClip() && !form.isTexture()) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(displayText::loadStr(IDS_TXT5), LabelWindowCoords);
-	  valueWindow[LFRMLEN] = ffi::numwin(
-	      fmt::format(FMT_COMPILE(L"{:.2f}"), (form.stitchLength * IPFGRAN)), ValueWindowCoords);
+	  valueWindow[LFRMLEN] =
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.stitchLength * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMINFIL] = ffi::txtwin(displayText::loadStr(IDS_TXT21), LabelWindowCoords);
@@ -337,15 +336,13 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LFRMANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillAngle * RADDEGF)),
-	                  ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillAngle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == ANGCLPF) {
 	  labelWindow[LSACANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LSACANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.clipFillAngle * RADDEGF)),
-	                  ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.clipFillAngle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {

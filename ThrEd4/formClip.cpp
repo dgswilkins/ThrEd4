@@ -216,7 +216,7 @@ void fci::clipSelectedForm() {
   auto* textures = convertFromPtr<TX_PNT*>(wrap::next(ptrPoints, iClip));
   if (form.isTexture()) {
 	auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.texture.index);
-	auto const endTexture = wrap::next(startTexture, form.texture.count);
+	auto const endTexture   = wrap::next(startTexture, form.texture.count);
 
 	auto const spDest = gsl::span<TX_PNT> {textures, form.texture.count};
 	std::copy(startTexture, endTexture, spDest.begin());
@@ -367,8 +367,8 @@ void fci::clipSelectedForms() {
 	if (!form.isTexture()) {
 	  continue;
 	}
-	auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.texture.index);
-	auto endPoint   = wrap::next(startPoint, form.texture.count);
+	auto       startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.texture.index);
+	auto       endPoint   = wrap::next(startPoint, form.texture.count);
 	auto const spDest = gsl::span<TX_PNT> {std::next(textures, textureCount), form.texture.count};
 	std::copy(startPoint, endPoint, spDest.begin());
 	forms[iForm++].texture.index = textureCount;
@@ -728,7 +728,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 			form.satinGuideIndex = satin::adsatk(form.satinGuideCount);
-			auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+			auto itGuide         = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 			  *itGuide = guides[currentGuide++];
 			  ++itGuide;
@@ -757,7 +757,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
 		  if (form.isClipX()) {
-			form.clipIndex = thred::adclp(form.clipCount);
+			form.clipIndex   = thred::adclp(form.clipCount);
 			auto offsetStart = wrap::next(ClipPoints->begin(), form.clipIndex);
 			for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 			  *offsetStart = clipData[currentClip++];
@@ -780,8 +780,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		     auto& form : spForms) {
 		  if (form.isTexture()) {
 			textureCount += form.texture.count;
-			form.texture.index +=
-			    gsl::narrow<decltype(form.texture.index)>(TexturePointsBuffer->size());
+			form.texture.index += gsl::narrow<decltype(form.texture.index)>(TexturePointsBuffer->size());
 		  }
 		}
 		auto const textureSource = gsl::span<TX_PNT> {ptrTextureSource, textureCount};
@@ -827,7 +826,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  FormVertices->insert(FormVertices->end(), vertices.begin(), vertices.end());
 		  auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrVertices, formIter.vertexCount));
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
-			auto const guides = gsl::span<SAT_CON> {ptrGuides, formIter.satinGuideCount};
+			auto const guides        = gsl::span<SAT_CON> {ptrGuides, formIter.satinGuideCount};
 			formIter.satinGuideIndex = wrap::toUnsigned(SatinGuides->size());
 			SatinGuides->insert(SatinGuides->end(), guides.begin(), guides.end());
 		  }
@@ -835,7 +834,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span<F_POINT> {ptrClipData, formIter.clipCount};
-			formIter.clipIndex = wrap::toUnsigned(ClipPoints->size());
+			formIter.clipIndex  = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
 			clipCount += formIter.clipCount;
 		  }
@@ -847,9 +846,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			clipCount += formIter.clipEntries;
 		  }
 		  if (formIter.isTexture()) {
-			auto* ptrTextureSource = convertFromPtr<TX_PNT*>(wrap::next(ptrClipData, clipCount));
-			auto const textureSource =
-			    gsl::span<TX_PNT> {ptrTextureSource, formIter.texture.count};
+			auto* ptrTextureSource   = convertFromPtr<TX_PNT*>(wrap::next(ptrClipData, clipCount));
+			auto const textureSource = gsl::span<TX_PNT> {ptrTextureSource, formIter.texture.count};
 			wrap::narrow(formIter.texture.index, TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(
 			    TexturePointsBuffer->end(), textureSource.begin(), textureSource.end());

@@ -47,7 +47,7 @@ void satin::delsac(uint32_t formIndex) {
 	return;
   }
   auto const startGuide = wrap::next(SatinGuides->cbegin(), formList[formIndex].satinGuideIndex);
-  auto const endGuide = wrap::next(startGuide, formList[formIndex].satinGuideCount);
+  auto const endGuide   = wrap::next(startGuide, formList[formIndex].satinGuideCount);
   SatinGuides->erase(startGuide, endGuide);
   for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U) &&
@@ -263,7 +263,7 @@ void si::satclos() {
 	return;
   }
   form.satinGuideIndex = si::nusac(ClosestFormToCursor, 1);
-  auto const itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex + initialGuideCount);
+  auto const itGuide   = wrap::next(SatinGuides->begin(), form.satinGuideIndex + initialGuideCount);
   itGuide->start       = closestVertex;
   itGuide->finish      = ClosestVertexToCursor;
   form.satinGuideCount = 1;
@@ -586,8 +586,7 @@ void satin::delcon(FRM_HEAD& form, uint32_t GuideIndex) {
   SatinGuides->erase(itGuide);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& afterForm = FormList->operator[](iForm);
-	if ((afterForm.type == SAT) && (afterForm.satinGuideCount != 0U) &&
-	    (afterForm.satinGuideIndex != 0U)) {
+	if ((afterForm.type == SAT) && (afterForm.satinGuideCount != 0U) && (afterForm.satinGuideIndex != 0U)) {
 	  --afterForm.satinGuideIndex;
 	}
   }
@@ -615,8 +614,8 @@ void satin::delspnt() {
 	}
 	if (currentForm.satinGuideCount != 0U) {
 	  auto const itStartGuide = wrap::next(SatinGuides->begin(), currentForm.satinGuideIndex);
-	  auto itGuide = itStartGuide;
-	  auto iGuide  = 0U;
+	  auto       itGuide      = itStartGuide;
+	  auto       iGuide       = 0U;
 	  while (iGuide < currentForm.satinGuideCount) {
 		if (itGuide->start != ClosestVertexToCursor && itGuide->finish != ClosestVertexToCursor) {
 		  ++itGuide;
@@ -817,22 +816,22 @@ void satin::ribon() {
   newForm.type          = SAT;
   newForm.fillColor     = ActiveColor;
   newForm.fillSpacing   = LineSpacing;
-  newForm.stitchLength = IniFile.maxStitchLength;
-  newForm.vertexCount = iNewVertex;
-  newForm.attribute   = FormList->operator[](ClosestFormToCursor).attribute;
+  newForm.stitchLength  = IniFile.maxStitchLength;
+  newForm.vertexCount   = iNewVertex;
+  newForm.attribute     = FormList->operator[](ClosestFormToCursor).attribute;
   newForm.attribute &= FRMLMSK;
   newForm.attribute |= FRMEND;
   newForm.wordParam       = iNewVertex / 2;
   newForm.satinGuideCount = newForm.wordParam - 2U;
   newForm.satinGuideIndex = adsatk(newForm.satinGuideCount);
   if (StateMap->test(StateFlag::CNV2FTH)) {
-	newForm.fillType                       = FTHF;
-	newForm.feather.ratio    = IniFile.featherRatio;
-	newForm.feather.upCount  = IniFile.featherUpCount;
-	newForm.feather.downCount = IniFile.featherDownCount;
-	newForm.feather.fillType  = IniFile.featherFillType;
+	newForm.fillType              = FTHF;
+	newForm.feather.ratio         = IniFile.featherRatio;
+	newForm.feather.upCount       = IniFile.featherUpCount;
+	newForm.feather.downCount     = IniFile.featherDownCount;
+	newForm.feather.fillType      = IniFile.featherFillType;
 	newForm.feather.minStitchSize = IniFile.featherMinStitchSize;
-	newForm.extendedAttribute              = IniFile.featherType;
+	newForm.extendedAttribute     = IniFile.featherType;
 	newForm.feather.count         = IniFile.featherCount;
 	newForm.feather.color         = (ActiveColor + 1U) & COLMSK;
   }
@@ -1260,8 +1259,8 @@ void satin::satpnt0() {
 
 void satin::satpnt1() {
   si::unsat();
-  auto const vertexCount   = TempPolygon->size();
-  auto&      formLines     = *FormLines;
+  auto const vertexCount = TempPolygon->size();
+  auto&      formLines   = *FormLines;
   formLines[vertexCount] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   satin::dusat();
   TempPolygon->push_back(thred::pxCor2stch(Msg.pt));

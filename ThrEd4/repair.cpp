@@ -75,7 +75,7 @@ void repair::lodchk() {
 	else {
 	  if (form.type == FRMLINE) {
 		if (form.fillType != CONTF) {
-		  form.fillType = 0;
+		  form.fillType  = 0;
 		  form.clipCount = 0;
 		}
 	  }
@@ -411,8 +411,8 @@ void ri::reptx() {
 	if (wrap::toUnsigned(TexturePointsBuffer->size()) >
 	    wrap::toUnsigned(formIter.texture.index) + formIter.texture.count) {
 	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter.texture.index);
-	  auto const endTexture  = wrap::next(startTexture, formIter.texture.count);
-	  auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
+	  auto const endTexture   = wrap::next(startTexture, formIter.texture.count);
+	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(formIter.texture.index, textureCount);
 	  textureCount += formIter.texture.count;
@@ -420,11 +420,10 @@ void ri::reptx() {
 	  continue;
 	}
 	if (TexturePointsBuffer->size() > formIter.texture.index) {
-	  wrap::narrow(formIter.texture.count,
-	               TexturePointsBuffer->size() - formIter.texture.index);
+	  wrap::narrow(formIter.texture.count, TexturePointsBuffer->size() - formIter.texture.index);
 	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter.texture.index);
-	  auto const endTexture  = wrap::next(startTexture, formIter.texture.count);
-	  auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
+	  auto const endTexture   = wrap::next(startTexture, formIter.texture.count);
+	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(formIter.texture.index, textureCount);
 	  ri::bcup(formIter, badData);

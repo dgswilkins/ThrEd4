@@ -613,7 +613,7 @@ void form::delmfil(uint32_t formIndex) {
 }
 
 void form::fsizpar(FRM_HEAD& form) noexcept {
-  form.stitchLength = UserStitchLength;
+  form.stitchLength     = UserStitchLength;
   form.maxFillStitchLen = IniFile.maxStitchLength;
   form.minFillStitchLen = MinStitchLength;
 }
@@ -633,8 +633,7 @@ void form::chkcont() {
 		}
 		++itGuide;
 	  }
-	  auto const shortestGuide =
-	      wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + shortestGuideIndex);
+	  auto const shortestGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + shortestGuideIndex);
 
 	  form.fillGuide = *shortestGuide;
 	  satin::delsac(ClosestFormToCursor);
@@ -1069,8 +1068,8 @@ void form::drwfrm() {
 	  if (form.vertexCount > 0) {
 		fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
 		if (form.fillType == CONTF) {
-		  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-		  auto const itStartVertex = wrap::next(itFirstVertex, form.fillGuide.start);
+		  auto const itFirstVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		  auto const itStartVertex  = wrap::next(itFirstVertex, form.fillGuide.start);
 		  auto const itFinishVertex = wrap::next(itFirstVertex, form.fillGuide.finish);
 		  thred::sCor2px(*itStartVertex, line[0]);
 		  thred::sCor2px(*itFinishVertex, line[1]);
@@ -1228,7 +1227,7 @@ void form::setmfrm(uint32_t formIndex) {
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
-	point              = form::sfCor2px(*itVertex);
+	point            = form::sfCor2px(*itVertex);
 	formLines[iForm] = POINT {point.x + offset.x, point.y + offset.y};
 	++itVertex;
   }
@@ -1296,9 +1295,9 @@ auto form::pdir(FRM_HEAD const& form, uint32_t vertex) -> uint32_t {
 
 void form::pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept {
   auto corner = POINT {screenRect.left + StitchWindowOrigin.x, screenRect.top + StitchWindowOrigin.y};
-  auto stitchPoint  = thred::pxCor2stch(corner);
-  stitchRect.left   = stitchPoint.x;
-  stitchRect.top    = stitchPoint.y;
+  auto stitchPoint = thred::pxCor2stch(corner);
+  stitchRect.left  = stitchPoint.x;
+  stitchRect.top   = stitchPoint.y;
   corner = POINT {screenRect.right + StitchWindowOrigin.x, screenRect.bottom + StitchWindowOrigin.y};
   stitchPoint       = thred::pxCor2stch(corner);
   stitchRect.right  = stitchPoint.x;
@@ -2707,13 +2706,13 @@ void fi::prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>
   ++output;
   std::copy(itVertex, wrap::next(itVertex, form.vertexCount), output);
   auto ratio = (fabs(delta.x) > fabs(delta.y)) ? fabs(REDFACT / delta.x) : fabs(REDFACT / delta.y);
-  angledFormVertices[0] = *itVertex - (delta * ratio);
-  angledForm              = FormList->operator[](ClosestFormToCursor);
-  angledForm.vertexIndex  = 0;
+  angledFormVertices[0]  = *itVertex - (delta * ratio);
+  angledForm             = FormList->operator[](ClosestFormToCursor);
+  angledForm.vertexIndex = 0;
   angledForm.vertexCount += 3;
   auto const itLastVertex     = wrap::next(itVertex, form.vertexCount - 1U);
   auto const itPreviousVertex = wrap::next(itLastVertex, -1);
-  delta = *itLastVertex - *itPreviousVertex;
+  delta                       = *itLastVertex - *itPreviousVertex;
   ratio = (fabs(delta.x) > fabs(delta.y)) ? fabs(REDFACT / delta.x) : fabs(REDFACT / delta.y);
   angledFormVertices[angledForm.vertexCount - 1U] = *itLastVertex + (delta * ratio);
 }
@@ -3847,9 +3846,8 @@ void form::angclpfn(FRM_HEAD const&               form,
                     std::vector<F_POINT>&         angledFormVertices) {
   auto angledForm = form;
   auto const rotationAngle = StateMap->test(StateFlag::ISUND) ? PI_FHALF - angledForm.underlayStitchAngle
-                             : StateMap->test(StateFlag::TXFIL)
-                                 ? PI_FHALF - angledForm.fillAngle
-                                 : PI_FHALF - angledForm.clipFillAngle;
+                             : StateMap->test(StateFlag::TXFIL) ? PI_FHALF - angledForm.fillAngle
+                                                                : PI_FHALF - angledForm.clipFillAngle;
   auto const rotationCenter = F_POINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
                                        wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
   angledFormVertices.clear();
@@ -5066,9 +5064,9 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
   auto const topDelta    = topRightPoint - topLeftPoint;
   auto const bottomDelta = bottomRightPoint - bottomLeftPoint;
   for (auto const& clip : *ClipBuffer) {
-	auto const clipRatio      = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
-	// ToDo: check if the following is correct. Should [top|bottom]Midpoint.y be calculated using clipRatio.x?	
-	auto const topMidpoint    = F_POINT {clipRatio.x * (topDelta.x) + topLeftPoint.x,
+	auto const clipRatio = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
+	// ToDo: check if the following is correct. Should [top|bottom]Midpoint.y be calculated using clipRatio.x?
+	auto const topMidpoint = F_POINT {clipRatio.x * (topDelta.x) + topLeftPoint.x,
 	                                  clipRatio.x * (topDelta.y) + topLeftPoint.y};
 
 	auto const bottomMidpoint = F_POINT {clipRatio.x * (bottomDelta.x) + bottomLeftPoint.x,
@@ -5361,7 +5359,7 @@ void form::refilfn(uint32_t formIndex) {
 	thred::savdo();
   }
   auto fillStartsData = FillStartsDataType {}; // fill start data for refill
-  auto fillStartsMap  = 0U;             // fill starts bitmap
+  auto fillStartsMap  = 0U;                    // fill starts bitmap
   xt::fdelstch(formIndex, fillStartsData, fillStartsMap);
   StateMap->set(StateFlag::WASREFIL);
   constexpr auto MINSPACE = 0.5F;
@@ -5566,10 +5564,10 @@ void fi::fsangl(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type      = FRMFPOLY;
-  form.fillColor = ActiveColor;
-  form.fillType  = ANGF;
-  form.fillAngle = IniFile.fillAngle;
+  form.type        = FRMFPOLY;
+  form.fillColor   = ActiveColor;
+  form.fillType    = ANGF;
+  form.fillAngle   = IniFile.fillAngle;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
   form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
@@ -5685,9 +5683,9 @@ void form::rstfrm() {
 void form::clrfills() noexcept {
   for (auto& formIter : *FormList) {
 	formIter.clipEntries = 0;
-	formIter.clipCount = 0;
-	formIter.edgeType = 0;
-	formIter.fillType = 0;
+	formIter.clipCount   = 0;
+	formIter.edgeType    = 0;
+	formIter.fillType    = 0;
 	formIter.attribute &= NFRECONT;
 	formIter.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
   }
@@ -6014,7 +6012,7 @@ void form::rinfrm() {
   if ((FormVertexNext != 0U) || FormForInsert->type != FRMLINE) {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
-  InsertLine[0]   = formLines[FormVertexPrev];
+  InsertLine[0] = formLines[FormVertexPrev];
   InsertLine[1] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOINSF);
   form::duinsf();
@@ -6059,7 +6057,7 @@ void form::setins() {
 	FormVertexNext = form::nxt(*FormForInsert, FormVertexPrev);
   }
   fi::frmlin(*FormForInsert);
-  InsertLine[0]   = FormLines->operator[](FormVertexPrev);
+  InsertLine[0] = FormLines->operator[](FormVertexPrev);
   InsertLine[1] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::INSFRM);
   duinsf();
@@ -6548,7 +6546,7 @@ void form::setexpand(float xyRatio) {
   switch (SelectedFormControlVertex) {
 	case 0: {
 	  reference  = F_POINT {rectangle.right, rectangle.bottom};
-	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
+	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;
 	  }
@@ -6565,7 +6563,7 @@ void form::setexpand(float xyRatio) {
 	}
 	case 1: {
 	  reference  = F_POINT {rectangle.left, rectangle.bottom};
-	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
+	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;
 	  }
@@ -6582,7 +6580,7 @@ void form::setexpand(float xyRatio) {
 	}
 	case 2: {
 	  reference  = F_POINT {rectangle.left, rectangle.top};
-	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
+	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;
 	  }
@@ -6599,7 +6597,7 @@ void form::setexpand(float xyRatio) {
 	}
 	case 3: {
 	  reference  = F_POINT {rectangle.right, rectangle.top};
-	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
+	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;
 	  }
@@ -7330,11 +7328,11 @@ void fi::filsclp() {
   if (currentForm.type != SAT) {
 	currentForm.wordParam = 0;
   }
-  currentForm.type     = SAT;
-  currentForm.fillType = CLPF;
+  currentForm.type      = SAT;
+  currentForm.fillType  = CLPF;
   currentForm.clipIndex = clip::numclp(ClosestFormToCursor);
   currentForm.clipCount = wrap::toUnsigned(ClipBuffer->size());
-  auto itClipPoints = wrap::next(ClipPoints->begin(), currentForm.clipIndex);
+  auto itClipPoints     = wrap::next(ClipPoints->begin(), currentForm.clipIndex);
   for (auto const& clip : *ClipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
@@ -7610,7 +7608,7 @@ void fi::adfrm(uint32_t iForm) {
   auto const itVertex            = wrap::next(FormVertices->cbegin(), originalVertexIndex);
   FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
-	auto const originalGuide = currentForm.satinGuideIndex;
+	auto const originalGuide    = currentForm.satinGuideIndex;
 	currentForm.satinGuideIndex = wrap::toUnsigned(SatinGuides->size());
 
 	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
@@ -7625,12 +7623,10 @@ void fi::adfrm(uint32_t iForm) {
   }
   if (currentForm.isClipX()) {
 	auto const originalClip = currentForm.clipIndex;
-	currentForm.clipIndex = wrap::toUnsigned(ClipPoints->size());
+	currentForm.clipIndex   = wrap::toUnsigned(ClipPoints->size());
 
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalClip);
-	ClipPoints->insert(ClipPoints->end(),
-	                   itClipPoints,
-	                   wrap::next(itClipPoints, currentForm.clipCount));
+	ClipPoints->insert(ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipCount));
   }
   FormList->push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
@@ -7684,7 +7680,7 @@ void fi::cplayfn(uint32_t iForm, uint32_t layer) {
             wrap::next(itVertex, currentForm.vertexCount),
             wrap::next(FormVertices->begin(), currentForm.vertexIndex));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
-	auto const originalGuide = currentForm.satinGuideIndex;
+	auto const originalGuide    = currentForm.satinGuideIndex;
 	currentForm.satinGuideIndex = wrap::toUnsigned(SatinGuides->size());
 
 	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), originalGuide);
@@ -7692,10 +7688,10 @@ void fi::cplayfn(uint32_t iForm, uint32_t layer) {
 	auto const destination  = SatinGuides->end();
 	SatinGuides->insert(destination, itStartGuide, itEndGuide);
   }
-  currentForm.clipEntries = 0;
-  currentForm.fillType    = 0;
-  currentForm.clipCount = 0;
-  currentForm.edgeType               = 0;
+  currentForm.clipEntries   = 0;
+  currentForm.fillType      = 0;
+  currentForm.clipCount     = 0;
+  currentForm.edgeType      = 0;
   currentForm.texture.index = 0;
   currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
@@ -8806,8 +8802,8 @@ void form::horsclp() {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
-  form.clipCount = clipSize;
-  form.clipIndex = clip::numclp(ClosestFormToCursor);
+  form.clipCount      = clipSize;
+  form.clipIndex      = clip::numclp(ClosestFormToCursor);
   // ToDo - should this be clipSize + 1?
   form.clipCount = clipSize;
   form.wordParam = IniFile.fillPhase;
@@ -8874,8 +8870,8 @@ void form::angsclp(FRM_HEAD& form) {
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.clipFillAngle = IniFile.fillAngle;
-  form.fillSpacing = IniFile.clipOffset;
-  auto itClipPoint = wrap::next(ClipPoints->begin(), form.clipIndex);
+  form.fillSpacing   = IniFile.clipOffset;
+  auto itClipPoint   = wrap::next(ClipPoints->begin(), form.clipIndex);
   for (auto const& clip : *ClipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;

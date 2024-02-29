@@ -203,7 +203,7 @@ auto clip::numclp(uint32_t formIndex) -> uint32_t {
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, clipSize, VAL);
-  auto itStart = wrap::next(FormList->begin(), formIndex);
+  auto itStart       = wrap::next(FormList->begin(), formIndex);
   itStart->clipIndex = find;
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += clipSize;

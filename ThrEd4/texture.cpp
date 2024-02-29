@@ -1030,9 +1030,9 @@ auto txi::tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexc
 void txi::txpar(FRM_HEAD& form) {
   form.type = FRMFPOLY;
   wrap::narrow(form.texture.lines, TextureScreen.lines);
-  form.texture.height = TextureScreen.areaHeight;
-  form.fillSpacing             = TextureScreen.spacing;
-  form.stitchLength = IniFile.userStitchLength;
+  form.texture.height   = TextureScreen.areaHeight;
+  form.fillSpacing      = TextureScreen.spacing;
+  form.stitchLength     = IniFile.userStitchLength;
   form.maxFillStitchLen = IniFile.maxStitchLength;
   form.minFillStitchLen = IniFile.minStitchLength;
   form.fillColor        = ActiveColor;
@@ -1059,7 +1059,7 @@ void txi::txang(FRM_HEAD& form) {
   if (TempTexturePoints->empty()) {
 	return;
   }
-  form.fillType = TXANGF;
+  form.fillType  = TXANGF;
   form.fillAngle = IniFile.fillAngle;
   txi::txpar(form);
 }

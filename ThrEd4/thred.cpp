@@ -5294,8 +5294,8 @@ void thred::rotflt(F_POINT& point, float const rotationAngle, F_POINT const& rot
 void thi::rotstch(F_POINT_ATTR& stitch, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
   auto const point = thred::rotang1(stitch, rotationAngle, rotationCenter);
 
-  stitch.x         = point.x;
-  stitch.y         = point.y;
+  stitch.x = point.x;
+  stitch.y = point.y;
 }
 
 void thred::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
@@ -9344,7 +9344,7 @@ auto thred::handleSideWindowActive() -> bool {
 		}
 		thi::respac(form);
 		// ToDo - should we be using the angle information already present
-		form.fillType = ANGF;
+		form.fillType  = ANGF;
 		form.fillAngle = IniFile.fillAngle;
 		clip::delmclp(ClosestFormToCursor);
 		break;
@@ -9457,7 +9457,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
 	{
 	  if (form.isTexture()) {
-		form.fillType = TXANGF;
+		form.fillType  = TXANGF;
 		form.fillAngle = IniFile.fillAngle;
 		break;
 	  }
@@ -11440,12 +11440,12 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 		if (stitchHeader.hoopType == SMALHUP) {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
-		  stitchSourceSize = F_POINT {SHUPX, SHUPY};
+		  stitchSourceSize  = F_POINT {SHUPX, SHUPY};
 		}
 		else {
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
-		  stitchSourceSize = F_POINT {LHUPX, LHUPY};
+		  stitchSourceSize  = F_POINT {LHUPX, LHUPY};
 		}
 		break;
 	  }
