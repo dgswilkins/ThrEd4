@@ -442,13 +442,14 @@ void txi::txrct2rct(TXTR_RECT const& textureRect, RECT& rectangle) noexcept {
 }
 
 void txi::ed2px(F_POINT const& editPoint, POINT& point) noexcept {
-  point.x = std::lround(editPoint.x / TextureScreen.editToPixelRatio);
-  point.y = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) - editPoint.y / TextureScreen.editToPixelRatio);
+  point = POINT {std::lround(editPoint.x / TextureScreen.editToPixelRatio),
+                 std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                             editPoint.y / TextureScreen.editToPixelRatio)};
 }
 
 void txi::px2ed(POINT const& point, F_POINT& editPoint) noexcept {
-  editPoint.x = wrap::toFloat(point.x) * TextureScreen.editToPixelRatio;
-  editPoint.y = TextureScreen.screenHeight - wrap::toFloat(point.y) * TextureScreen.editToPixelRatio;
+  editPoint = F_POINT {wrap::toFloat(point.x) * TextureScreen.editToPixelRatio,
+                       TextureScreen.screenHeight - wrap::toFloat(point.y) * TextureScreen.editToPixelRatio};
 }
 
 void texture::drwtxtr() {
@@ -905,8 +906,8 @@ void texture::setxfrm() noexcept {
 	}
 	txi::angrct(angleRect);
   }
-  TextureScreen.formCenter.x = wrap::midl(angleRect.right, angleRect.left);
-  TextureScreen.formCenter.y = wrap::midl(angleRect.top, angleRect.bottom);
+  TextureScreen.formCenter =
+      F_POINT {wrap::midl(angleRect.right, angleRect.left), wrap::midl(angleRect.top, angleRect.bottom)};
   txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
 }
 

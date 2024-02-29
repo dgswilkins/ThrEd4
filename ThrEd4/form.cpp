@@ -6636,8 +6636,7 @@ void form::setexpand(float xyRatio) {
 	  break;
 	}
 	case 3: {
-	  reference.x = rectangle.right;
-	  reference.y = rectangle.top;
+	  reference  = F_POINT {rectangle.right, rectangle.top};
 	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;

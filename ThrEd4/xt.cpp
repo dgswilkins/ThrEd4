@@ -2324,8 +2324,7 @@ auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
 }
 
 auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
-  point.x = getstxt(IDC_DESWID, dialog);
-  point.y = getstxt(IDC_DESHI, dialog);
+  point = F_POINT {getstxt(IDC_DESWID, dialog), getstxt(IDC_DESHI, dialog)};
   // ToDo - should this have a range? aspectRatio +/- %
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
@@ -2347,8 +2346,7 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  return TRUE;
 		}
 		case IDOK: {
-		  DesignSize.x = getstxt(IDC_DESWID, hwndlg);
-		  DesignSize.y = getstxt(IDC_DESHI, hwndlg);
+		  DesignSize = F_POINT {getstxt(IDC_DESWID, hwndlg), getstxt(IDC_DESHI, hwndlg)};
 		  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
 			UserFlagMap->set(UserFlag::CHREF);
 		  }

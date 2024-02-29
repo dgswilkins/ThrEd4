@@ -10925,8 +10925,7 @@ void thi::dumov() {
   rotpix(offsetFromCenter, arrowBox[ABP2], abCenterPixels);
   offsetFromCenter.y = abCenterPixels.y - ABWX;
   rotpix(offsetFromCenter, arrowBox[ABP4], abCenterPixels);
-  offsetFromCenter.x = abCenterPixels.x + ABHY;
-  offsetFromCenter.y = abCenterPixels.y;
+  offsetFromCenter = POINT {abCenterPixels.x + ABHY, abCenterPixels.y};
   rotpix(offsetFromCenter, arrowBox[ABP3], abCenterPixels);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -11442,12 +11441,14 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	switch (fileTypeVersion) {
 	  case 0: {
 		if (stitchHeader.hoopType == SMALHUP) {
-		  stitchSourceSize.x = IniFile.hoopSizeX = SHUPX;
-		  stitchSourceSize.y = IniFile.hoopSizeY = SHUPY;
+		  IniFile.hoopSizeX = SHUPX;
+		  IniFile.hoopSizeY = SHUPY;
+		  stitchSourceSize = F_POINT {SHUPX, SHUPY};
 		}
 		else {
-		  stitchSourceSize.x = IniFile.hoopSizeX = LHUPX;
-		  stitchSourceSize.y = IniFile.hoopSizeY = LHUPY;
+		  IniFile.hoopSizeX = LHUPX;
+		  IniFile.hoopSizeY = LHUPY;
+		  stitchSourceSize = F_POINT {LHUPX, LHUPY};
 		}
 		break;
 	  }
@@ -11460,8 +11461,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 		if (bytesRead != sizeof(extendedHeader)) {
 		  return;
 		}
-		stitchSourceSize.x = extendedHeader.hoopSizeX;
-		stitchSourceSize.y = extendedHeader.hoopSizeY;
+		stitchSourceSize = F_POINT {extendedHeader.hoopSizeX, extendedHeader.hoopSizeY};
 		break;
 	  }
 	  default: {
@@ -11921,13 +11921,11 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			SelectObject(DrawItem->hDC, CrossPen);
 			SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 			auto line = std::array<POINT, 2> {};
-			line[0].x = line[1].x = DrawItem->rcItem.right / 2;
-			line[0].y             = 0;
-			line[1].y             = DrawItem->rcItem.bottom;
+			line[0]   = POINT {DrawItem->rcItem.right / 2, 0};
+			line[1]   = POINT {DrawItem->rcItem.right / 2, DrawItem->rcItem.bottom};
 			wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
-			line[0].y = line[1].y = DrawItem->rcItem.bottom / 2;
-			line[0].x             = 0;
-			line[1].x             = DrawItem->rcItem.right;
+			line[0] = POINT {0, DrawItem->rcItem.bottom / 2};
+			line[1] = POINT {DrawItem->rcItem.right, DrawItem->rcItem.bottom / 2};
 			wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
 		  }
