@@ -429,8 +429,7 @@ void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, fl
 	pecEncodeInt(buffer, deltaX);
 	pecEncodeInt(buffer, deltaY);
   }
-  thisStitch.x += wrap::toFloat(deltaX) * IPECFACT;
-  thisStitch.y += -wrap::toFloat(deltaY) * IPECFACT;
+  thisStitch += F_POINT {deltaX, -deltaY} * IPECFACT;
 }
 
 void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {

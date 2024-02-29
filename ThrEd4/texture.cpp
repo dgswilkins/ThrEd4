@@ -741,8 +741,7 @@ void txi::setxclp(FRM_HEAD const& form) {
   editorOffset.y -= TextureScreen.formCenter.y;
   auto& angledFormVertices = *AngledFormVertices;
   for (auto& vertex : angledFormVertices) {
-	vertex.x += editorOffset.x;
-	vertex.y += editorOffset.y;
+	vertex += editorOffset;
   }
   auto lineCount = form.vertexCount - 1U;
   if (form.type != FRMLINE) {
@@ -901,8 +900,7 @@ void texture::setxfrm() noexcept {
   auto const height = angleRect.top - angleRect.bottom;
   if (height > TextureScreen.areaHeight) {
 	for (auto const ratio = TextureScreen.areaHeight / height * 0.95F; auto& vertex : angledFormVertices) {
-	  vertex.x *= ratio;
-	  vertex.y *= ratio;
+	  vertex *= ratio;
 	}
 	txi::angrct(angleRect);
   }
@@ -1429,8 +1427,7 @@ void txi::txsiz(float ratio, FRM_HEAD const& textureForm) {
   txi::ritxfrm(textureForm);
   auto& angledFormVertices = *AngledFormVertices;
   for (auto& vertex : angledFormVertices) {
-	vertex.x *= ratio;
-	vertex.y *= ratio;
+	vertex *= ratio;
   }
   auto angleRect = F_RECTANGLE {};
   txi::angrct(angleRect);

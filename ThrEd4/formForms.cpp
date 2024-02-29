@@ -1269,16 +1269,14 @@ void formForms::wavfrm() {
 	  for (auto index = 0U; index < count; ++index) {
 		*itVertex = currentPosition;
 		++itVertex;
-		currentPosition.x += points[index].x;
-		currentPosition.y += points[index].y;
+		currentPosition += points[index];
 	  }
 	}
 	else {
 	  for (auto index = count; index != 0; --index) {
 		*itVertex = currentPosition;
 		++itVertex;
-		currentPosition.x += points[index - 1U].x;
-		currentPosition.y += points[index - 1U].y;
+		currentPosition += points[index - 1U];
 	  }
 	}
   }

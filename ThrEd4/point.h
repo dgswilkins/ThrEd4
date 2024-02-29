@@ -111,8 +111,57 @@ class F_POINT
   // F_POINT& operator=(F_POINT const& rhs) = default;
   // F_POINT& operator=(F_POINT&&) = default;
   //~F_POINT() = default;
+
+  inline auto operator+(F_POINT_ATTR const& rhs) const noexcept -> F_POINT;
+
+  inline auto operator+(F_POINT const& rhs) const noexcept -> F_POINT {
+	return F_POINT {x + rhs.x, y + rhs.y};
+  }
+
+  inline auto operator-(F_POINT const& rhs) const noexcept -> F_POINT {
+	return F_POINT {x - rhs.x, y - rhs.y};
+  }
+
+  inline auto operator-() const noexcept -> F_POINT {
+	return F_POINT {-x, -y};
+  }
+
+  inline constexpr auto operator+=(F_POINT const& rhs) noexcept -> F_POINT& {
+	x += rhs.x;
+	y += rhs.y;
+	return *this;
+  }
+
+  inline constexpr auto operator-=(F_POINT const& rhs) noexcept -> F_POINT& {
+	x -= rhs.x;
+	y -= rhs.y;
+	return *this;
+  }
+
+  inline constexpr auto operator*=(float rhs) noexcept -> F_POINT& {
+	x *= rhs;
+	y *= rhs;
+	return *this;
+  }
+  
+  inline constexpr auto operator*(float rhs) const noexcept -> F_POINT {
+	return F_POINT {x * rhs, y * rhs};
+  }
+
+  inline constexpr auto operator*(F_POINT rhs) const noexcept -> F_POINT {
+	return F_POINT {x * rhs.x, y * rhs.y};
+  }
+
+  inline constexpr auto operator/(float rhs) const noexcept -> F_POINT {
+	return F_POINT {x / rhs, y / rhs};
+  }
+
+  inline constexpr auto operator/(F_POINT rhs) const noexcept -> F_POINT {
+	return F_POINT {x / rhs.x, y / rhs.y};
+  }
 };
 #pragma pack(pop)
+
 #pragma pack(push, 1)
 class F_POINT_ATTR
 {
@@ -124,14 +173,18 @@ class F_POINT_ATTR
   constexpr F_POINT_ATTR() noexcept = default;
   inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA);
   inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
-  inline constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
   // F_POINT_ATTR(F_POINT_ATTR const&) = default;
   // F_POINT_ATTR(F_POINT_ATTR&&) = default;
   // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
   // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
   //~F_POINT_ATTR() = default;
+  inline constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
 };
 #pragma pack(pop)
+
+inline auto F_POINT::operator+(F_POINT_ATTR const& rhs) const noexcept -> F_POINT {
+  return F_POINT {x + rhs.x, y + rhs.y};
+}
 
 class SMAL_PNT_L
 {

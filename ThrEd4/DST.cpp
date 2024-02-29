@@ -268,8 +268,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	}
 	auto dstStitch = POINT {};
 	di::dstin(di::dtrn(&record), dstStitch);
-	localStitch.x += wrap::toFloat(dstStitch.x);
-	localStitch.y += wrap::toFloat(dstStitch.y);
+	localStitch += F_POINT {dstStitch.x, dstStitch.y};
 	constexpr auto C0MASK = 0x80U;
 	if ((record.nd & C0MASK) != 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
 	  continue;

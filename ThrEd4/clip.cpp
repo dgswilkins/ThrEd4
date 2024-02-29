@@ -369,8 +369,7 @@ void ci::linsid(uint32_t                    vertexIndex,
 	if (!ci::ritclp(clipFillData, stitchPoint)) {
 	  break;
 	}
-	stitchPoint.x += vector0.x;
-	stitchPoint.y += vector0.y;
+	stitchPoint += vector0;
   }
 }
 
@@ -428,8 +427,7 @@ auto ci::clpsid(uint32_t                    vertexIndex,
 	if (!ci::ritclp(clipFillData, insertPoint)) {
 	  break;
 	}
-	insertPoint.x += step.x;
-	insertPoint.y += step.y;
+	insertPoint += step;
   }
   return true;
 }
@@ -496,8 +494,7 @@ auto ci::fxpnt(uint32_t                  vertexIndex,
   for (auto iGuess = 0U; iGuess < ITLIMIT; ++iGuess) {
 	length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
 	auto const delta = adjustedSpace - length;
-	moveToCoords.x += delta * listCOSINEs[currentSide];
-	moveToCoords.y += delta * listSINEs[currentSide];
+	moveToCoords += F_POINT {delta * listCOSINEs[currentSide], delta * listSINEs[currentSide]};
 	if (constexpr auto DLTLIMIT = 0.01F; fabs(delta) < DLTLIMIT) {
 	  break;
 	}
@@ -523,9 +520,8 @@ void ci::fxlit(uint32_t                  vertexIndex,
   auto const length   = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
   auto const count    = std::floor(length / adjustedSpace);
   auto const delta =
-      F_POINT {adjustedSpace * listCOSINEs[currentSide], adjustedSpace * listSINEs[currentSide]};
-  stitchPoint.x += delta.x * count;
-  stitchPoint.y += delta.y * count;
+      F_POINT {adjustedSpace * listCOSINEs[currentSide], adjustedSpace * listSINEs[currentSide]} * count;
+  stitchPoint += delta;
   adjCount += gsl::narrow_cast<uint32_t>(count);
 }
 
@@ -549,8 +545,7 @@ void ci::fxlin(uint32_t                  vertexIndex,
   auto const delta =
       F_POINT {adjustedSpace * ListCOSINEs[currentSide], adjustedSpace * ListSINEs[currentSide]};
   for (auto iChain = 0U; iChain < count; ++iChain) {
-	stitchPoint.x += delta.x;
-	stitchPoint.y += delta.y;
+	stitchPoint += delta;
 	chainEndPoints.push_back(stitchPoint);
   }
 }
@@ -782,8 +777,7 @@ void ci::clpcrnr(FRM_HEAD const&       form,
   }
   auto const length = hypot(delta.x, delta.y);
   auto const ratio  = form::getplen() / length;
-  delta.x *= ratio;
-  delta.y *= ratio;
+  delta *= ratio;
   auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
   OSequence->push_back(*itVertex);
   OSequence->push_back(point);
@@ -846,8 +840,7 @@ void ci::picfn(FRM_HEAD const&       form,
 	}
 	OSequence->push_back(outerPoint);
 	OSequence->push_back(firstPoint);
-	innerPoint.x += step.x;
-	innerPoint.y += step.y;
+	innerPoint += step;
   }
   if (flag) {
 	OSequence->push_back(*itFinishVertex);

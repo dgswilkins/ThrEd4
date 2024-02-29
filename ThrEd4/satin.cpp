@@ -733,8 +733,7 @@ void si::satends(FRM_HEAD const& form, uint32_t isBlunt, float width) {
   if ((isBlunt & SBLNT) != 0U) {
 	auto step = F_POINT {sin(FormAngles->front()) * width * HALF, cos(FormAngles->front()) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
-	  step.x = -step.x;
-	  step.y = -step.y;
+	  step = -step;
 	}
 	InsidePoints->front()  = F_POINT {itVertex->x + step.x, itVertex->y - step.y};
 	OutsidePoints->front() = F_POINT {itVertex->x - step.x, itVertex->y + step.y};
@@ -750,8 +749,7 @@ void si::satends(FRM_HEAD const& form, uint32_t isBlunt, float width) {
 	auto step = F_POINT {sin(FormAngles->operator[](vertexCount - SKIPVL)) * width * HALF,
 	                     cos(FormAngles->operator[](vertexCount - SKIPVL)) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
-	  step.x = -step.x;
-	  step.y = -step.y;
+	  step = -step;
 	}
 	InsidePoints->back()  = F_POINT {itVertex->x + step.x, itVertex->y - step.y};
 	OutsidePoints->back() = F_POINT {itVertex->x - step.x, itVertex->y + step.y};
@@ -992,10 +990,8 @@ void si::satfn(FRM_HEAD const&           form,
 	++loop;
 	if (StateMap->test(StateFlag::FTHR)) {
 	  while ((line1Count != 0U) && (line2Count != 0U)) {
-		line1Point.x += line1Step.x;
-		line1Point.y += line1Step.y;
-		line2Point.x += line2Step.x;
-		line2Point.y += line2Step.y;
+		line1Point += line1Step;
+		line2Point += line2Step;
 		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 		  BSequence->emplace_back(line1Point.x, line1Point.y, 0);
 		}
@@ -1009,10 +1005,8 @@ void si::satfn(FRM_HEAD const&           form,
 	else {
 	  if (StateMap->test(StateFlag::BARSAT)) {
 		while ((line1Count != 0U) && (line2Count != 0U)) {
-		  line1Point.x += line1Step.x;
-		  line1Point.y += line1Step.y;
-		  line2Point.x += line2Step.x;
-		  line2Point.y += line2Step.y;
+		  line1Point += line1Step;
+		  line2Point += line2Step;
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			BSequence->emplace_back(line1Point.x, line1Point.y, 0);
 			BSequence->emplace_back(line2Point.x, line2Point.y, 1);
@@ -1027,10 +1021,8 @@ void si::satfn(FRM_HEAD const&           form,
 	  }
 	  else {
 		while ((line1Count != 0U) && (line2Count != 0U)) {
-		  line1Point.x += line1Step.x;
-		  line1Point.y += line1Step.y;
-		  line2Point.x += line2Step.x;
-		  line2Point.y += line2Step.y;
+		  line1Point += line1Step;
+		  line2Point += line2Step;
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			if (UserFlagMap->test(UserFlag::SQRFIL)) {
 			  form::filinu(line2Point, stitchPoint);
@@ -1057,21 +1049,17 @@ void si::satfn(FRM_HEAD const&           form,
 		line1Count           = line1StitchCounts[iLine1Count++];
 		line1Next            = wrap::next(itFirstVertex, form::nxt(form, iLine1Vertex));
 		auto itCurrentVertex = wrap::next(itFirstVertex, iLine1Vertex);
-		line1Delta.x         = line1Next->x - itCurrentVertex->x;
-		line1Delta.y         = line1Next->y - itCurrentVertex->y;
+		line1Delta           = *line1Next - *itCurrentVertex;
 		iLine1Vertex         = form::nxt(form, iLine1Vertex);
-		line1Step.x          = line1Delta.x / wrap::toFloat(line1Count);
-		line1Step.y          = line1Delta.y / wrap::toFloat(line1Count);
+		line1Step            = line1Delta / wrap::toFloat(line1Count);
 	  }
 	  if ((line2Count == 0U) && iLine2Count < line2StitchCounts.size()) {
 		line2Count           = line2StitchCounts[iLine2Count++];
 		line2Previous        = wrap::next(itFirstVertex, form::prv(form, iLine2Vertex));
 		auto itCurrentVertex = wrap::next(itFirstVertex, iLine2Vertex);
-		line2Delta.x         = line2Previous->x - itCurrentVertex->x;
-		line2Delta.y         = line2Previous->y - itCurrentVertex->y;
+		line2Delta           = *line2Previous - *itCurrentVertex;
 		iLine2Vertex         = form::prv(form, iLine2Vertex);
-		line2Step.x          = line2Delta.x / wrap::toFloat(line2Count);
-		line2Step.y          = line2Delta.y / wrap::toFloat(line2Count);
+		line2Step            = line2Delta / wrap::toFloat(line2Count);
 	  }
 	  if (((line1Count != 0U) || (line2Count != 0U)) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
 		flag = true;
@@ -1334,10 +1322,8 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
   auto const outerStep = F_POINT {outerDelta.x / wrap::toFloat(count), outerDelta.y / wrap::toFloat(count)};
   auto satinBackupIndex = 0U;
   for (auto iStep = 0U; iStep < count; ++iStep) {
-	innerPoint.x += innerStep.x;
-	innerPoint.y += innerStep.y;
-	outerPoint.x += outerStep.x;
-	outerPoint.y += outerStep.y;
+	innerPoint += innerStep;
+	outerPoint += outerStep;
 	if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 	  if (innerFlag) {
 		auto const offsetDelta = F_POINT {innerPoint.x - stitchPoint.x, innerPoint.y - stitchPoint.y};
@@ -1485,10 +1471,8 @@ void si::outfn(FRM_HEAD const& form,
   auto const itVertex = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
                             ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
                             : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
-  InsidePoints->operator[](finish).x  = itVertex->x - offset.x;
-  InsidePoints->operator[](finish).y  = itVertex->y - offset.y;
-  OutsidePoints->operator[](finish).x = itVertex->x + offset.x;
-  OutsidePoints->operator[](finish).y = itVertex->y + offset.y;
+  InsidePoints->operator[](finish)  = *itVertex - offset;
+  OutsidePoints->operator[](finish) = *itVertex + offset;
 }
 
 auto si::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool {

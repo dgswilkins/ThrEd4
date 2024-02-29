@@ -1385,8 +1385,7 @@ void thred::hupfn() {
 	stitch.y += delta.y;
   }
   for (auto& formVertice : *FormVertices) {
-	formVertice.x += delta.x;
-	formVertice.y += delta.y;
+	formVertice += delta;
   }
   for (auto& form : *FormList) {
 	form.rectangle.left += delta.x;
@@ -5294,6 +5293,7 @@ void thred::rotflt(F_POINT& point, float const rotationAngle, F_POINT const& rot
 
 void thi::rotstch(F_POINT_ATTR& stitch, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
   auto const point = thred::rotang1(stitch, rotationAngle, rotationCenter);
+
   stitch.x         = point.x;
   stitch.y         = point.y;
 }
@@ -7175,8 +7175,7 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 	  attribute &= (~KNOTMSK);
 	  for (auto iStitch = 0U; iStitch < wrap::round<decltype(iStitch)>(stitchCount) - 1U; ++iStitch) {
 		newStitches.emplace_back(point.x, point.y, attribute);
-		point.x += step.x;
-		point.y += step.y;
+		point += step;
 		++adcnt;
 	  }
 	}
@@ -7550,8 +7549,7 @@ void thred::duinsfil() {
 	formRectangle.right += offset.x;
   }
   for (auto iVertex = InsertedVertexIndex; iVertex < wrap::toUnsigned(FormVertices->size()); ++iVertex) {
-	FormVertices->operator[](iVertex).x += offset.x;
-	FormVertices->operator[](iVertex).y += offset.y;
+	FormVertices->operator[](iVertex) += offset;
   }
   for (auto iStitch = InsertedStitchIndex; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	StitchBuffer->operator[](iStitch).x += offset.x;
@@ -8371,8 +8369,7 @@ void thred::filclos() {
 void thi::frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	itVertex->x += deltaX;
-	itVertex->y += deltaY;
+	*itVertex += F_POINT {deltaX, deltaY};
 	++itVertex;
   }
   form.rectangle.bottom += deltaY;

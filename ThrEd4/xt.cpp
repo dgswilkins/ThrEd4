@@ -669,8 +669,7 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 		auto point = *sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
 		  InterleaveSequence->push_back(point);
-		  point.x += step.x;
-		  point.y += step.y;
+		  point += step;
 		}
 	  }
 	  else {
@@ -745,8 +744,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	  for (auto iStep = 0U; iStep < stitchCount - 1U; ++iStep) {
 		buffer.emplace_back(localPoint.x, localPoint.y, code);
 		++iStitch;
-		localPoint.x += step.x;
-		localPoint.y += step.y;
+		localPoint += step;
 	  }
 	}
 	if (StateMap->test(StateFlag::WLKDIR)) {

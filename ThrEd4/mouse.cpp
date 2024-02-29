@@ -339,8 +339,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		itVertex->x += FormMoveDelta.x;
-		itVertex->y += FormMoveDelta.y;
+		*itVertex += FormMoveDelta;
 		++itVertex;
 	  }
 	  form.outline();
@@ -836,8 +835,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 		auto const thisIt = wrap::next(itVertex, iSelectedVertex);
-		thisIt->x += FormMoveDelta.x;
-		thisIt->y -= FormMoveDelta.y;
+		*thisIt += FormMoveDelta;
 		iSelectedVertex = form::pdir(form, iSelectedVertex);
 	  }
 	  thred::setpsel();
