@@ -258,17 +258,17 @@ void bi::bitsiz() {
       gsl::narrow<float>(UnzoomedRect.cx) / gsl::narrow<float>(UnzoomedRect.cy);
   if (auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
       bitmapAspectRatio > screenAspectRatio) {
-	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.cx);
-	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.cx) / bitmapAspectRatio;
+	BitmapSizeinStitches = F_POINT {gsl::narrow<float>(UnzoomedRect.cx),
+	                                (gsl::narrow<float>(UnzoomedRect.cx) / bitmapAspectRatio)};
   }
   else {
-	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.cy) * bitmapAspectRatio;
-	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.cy);
+	BitmapSizeinStitches = F_POINT {(gsl::narrow<float>(UnzoomedRect.cy) * bitmapAspectRatio),
+	                                gsl::narrow<float>(UnzoomedRect.cy)};
   }
-  BmpStitchRatio.x = wrap::toFloat(BitmapWidth) / BitmapSizeinStitches.x;
-  BmpStitchRatio.y = wrap::toFloat(BitmapHeight) / BitmapSizeinStitches.y;
-  StitchBmpRatio.x = BitmapSizeinStitches.x / wrap::toFloat(BitmapWidth);
-  StitchBmpRatio.y = BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight);
+  BmpStitchRatio = F_POINT {(wrap::toFloat(BitmapWidth) / BitmapSizeinStitches.x),
+                            (wrap::toFloat(BitmapHeight) / BitmapSizeinStitches.y)};
+  StitchBmpRatio = F_POINT {(BitmapSizeinStitches.x / wrap::toFloat(BitmapWidth)),
+                            (BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight))};
 }
 
 constexpr auto bi::gudtyp(WORD bitCount) noexcept -> bool {

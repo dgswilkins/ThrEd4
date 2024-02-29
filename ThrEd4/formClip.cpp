@@ -385,7 +385,7 @@ void fci::clipSelectedForms() {
   // Reserve a reasonable amount space, probably not enough though
   constexpr auto RESRATIO = 16U; // reserve space factor
   astch.reserve(StitchBuffer->size() / RESRATIO);
-  LowerLeftStitch.x = LowerLeftStitch.y = BIGFLOAT;
+  LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
   for (auto& stitch : *StitchBuffer) {
 	if (((stitch.attribute & NOTFRM) != 0U) || !formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 	  continue;
@@ -461,7 +461,7 @@ void fci::clipSelectedPoints() {
 
 void fci::clipSelectedStitches() {
   thred::rngadj();
-  LowerLeftStitch.x = LowerLeftStitch.y = BIGFLOAT;
+  LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
   for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	auto const& stitch = StitchBuffer->operator[](iStitch);
 	if (stitch.x < LowerLeftStitch.x) {
@@ -589,8 +589,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
 	CloseClipboard();
 	return;
   }
-  LowerLeftStitch.x = 0.0F;
-  LowerLeftStitch.y = 0.0F;
+  LowerLeftStitch = F_POINT {0.0F, 0.0F};
   EmptyClipboard();
   Clip = RegisterClipboardFormat(PcdClipFormat);
 

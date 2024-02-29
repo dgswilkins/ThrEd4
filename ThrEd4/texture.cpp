@@ -1433,8 +1433,8 @@ void txi::txsiz(float ratio, FRM_HEAD const& textureForm) {
   }
   auto angleRect = F_RECTANGLE {};
   txi::angrct(angleRect);
-  TextureScreen.formCenter.x = wrap::midl(angleRect.right, angleRect.left);
-  TextureScreen.formCenter.y = wrap::midl(angleRect.top, angleRect.bottom);
+  TextureScreen.formCenter =
+      F_POINT {wrap::midl(angleRect.right, angleRect.left), wrap::midl(angleRect.top, angleRect.bottom)};
   txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
   txi::ritxfrm(textureForm);
 }

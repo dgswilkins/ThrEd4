@@ -149,8 +149,7 @@ void bal::redbal() {
   IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
   IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
   UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  BalaradOffset.x        = IniFile.hoopSizeX * HALF;
-  BalaradOffset.y        = IniFile.hoopSizeY * HALF;
+  BalaradOffset          = F_POINT {IniFile.hoopSizeX * HALF, IniFile.hoopSizeY * HALF};
   IniFile.hoopType       = CUSTHUP;
   UserColor.fill(0);
   auto const spBHC = gsl::span {balaradHeader.color};
@@ -219,8 +218,7 @@ void bal::ritbal() {
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
 	auto bytesWritten             = DWORD {};
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
-	BalaradOffset.x    = IniFile.hoopSizeX * HALF;
-	BalaradOffset.y    = IniFile.hoopSizeY * HALF;
+	BalaradOffset      = F_POINT {IniFile.hoopSizeX * HALF, IniFile.hoopSizeY * HALF};
 	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color        = StitchBuffer->front().attribute & COLMSK;

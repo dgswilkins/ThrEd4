@@ -1257,8 +1257,7 @@ void satin::drwsat() {
   auto const vertexCount = TempPolygon->size();
   auto&      formLines   = *FormLines;
   formLines.resize(vertexCount + 1U);
-  formLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
-  formLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
+  formLines[vertexCount] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOSAT);
   satin::dusat();
 }
@@ -1275,8 +1274,7 @@ void satin::satpnt1() {
   si::unsat();
   auto const vertexCount   = TempPolygon->size();
   auto&      formLines     = *FormLines;
-  formLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;
-  formLines[vertexCount].y = Msg.pt.y - StitchWindowOrigin.y;
+  formLines[vertexCount] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   satin::dusat();
   TempPolygon->push_back(thred::pxCor2stch(Msg.pt));
   StateMap->set(StateFlag::RESTCH);

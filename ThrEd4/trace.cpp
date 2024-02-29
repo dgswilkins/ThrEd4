@@ -1124,8 +1124,7 @@ void trace::tracpar() {
   if (StateMap->test(StateFlag::TRNIN1)) {
 	trace::dutrnum1();
   }
-  TraceMsgPoint.x = Msg.pt.x - ThredWindowOrigin.x;
-  TraceMsgPoint.y = Msg.pt.y - ThredWindowOrigin.y;
+  TraceMsgPoint = POINT {Msg.pt.x - ThredWindowOrigin.x, Msg.pt.y - ThredWindowOrigin.y};
   if (TraceMsgPoint.x > ButtonWidthX3) {
 	ti::dutrac();
   }

@@ -286,8 +286,7 @@ void ci::setvct(uint32_t vertexIndex,
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);
   clipAngle = atan2(itFinishVertex->y - itStartVertex->y, itFinishVertex->x - itStartVertex->x);
-  vector0.x = ClipRectSize.cx * cos(clipAngle);
-  vector0.y = ClipRectSize.cx * sin(clipAngle);
+  vector0   = F_POINT {ClipRectSize.cx * cos(clipAngle), ClipRectSize.cx * sin(clipAngle)};
 }
 
 auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoint) noexcept -> bool {
@@ -301,8 +300,7 @@ auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoin
   for (auto step = 0U; step < ITLIMIT; ++step) {
 	length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
 	auto const delta = ClipRectSize.cx - length;
-	moveToCoords.x += delta * cosAngle;
-	moveToCoords.y += delta * sinAngle;
+	moveToCoords += F_POINT {delta * cosAngle, delta * sinAngle};
 	if (constexpr auto DLTLIMIT = 0.01F; fabs(delta) < DLTLIMIT) {
 	  break;
 	}
@@ -446,8 +444,7 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t st
   clipReversedData.resize(clipStitchCount);
   auto const rotationCenter =
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
-  ClipReference.x = clipRect.left;
-  ClipReference.y = rotationCenter.y;
+  ClipReference = F_POINT {clipRect.left, rotationCenter.y};
   ci::durev(clipRect, clipReversedData);
   if (form.type == FRMLINE) {
 	auto const itVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -865,8 +862,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   OSequence->clear();
   StateMap->reset(StateFlag::CLPBAK);
-  ClipReference.y = rotationCenter.y;
-  ClipReference.x = clipRect.left;
+  ClipReference = F_POINT {rotationCenter.y, clipRect.left};
 
   constexpr auto SATWIDTH = 20.0F;
   satin::satout(form, SATWIDTH);
@@ -911,21 +907,19 @@ void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint
   auto const middleYcoord = chainEndPoints[start].y + lengthDelta.y;
   chainPoint[0]           = chainEndPoints[start];
   chainPoint[4]           = chainEndPoints[finish];
-  chainPoint[1].x         = middleXcoord + offset.x;
-  chainPoint[1].y         = middleYcoord + offset.y;
-  chainPoint[3].x         = middleXcoord - offset.x;
-  chainPoint[3].y         = middleYcoord - offset.y;
+  chainPoint[1]           = F_POINT {middleXcoord + offset.x, middleYcoord + offset.y};
+  chainPoint[3]           = F_POINT {middleXcoord - offset.x, middleYcoord - offset.y};
   if (finish < chainEndPoints.size() - 1U) {
-	delta.x = chainEndPoints[wrap::toSize(finish) + 1U].x - chainEndPoints[finish].x;
-	delta.y = chainEndPoints[wrap::toSize(finish) + 1U].y - chainEndPoints[finish].y;
+	delta = F_POINT {chainEndPoints[wrap::toSize(finish) + 1U].x - chainEndPoints[finish].x,
+	                 chainEndPoints[wrap::toSize(finish) + 1U].y - chainEndPoints[finish].y};
   }
   else {
-	delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1U].x;
-	delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1U].y;
+	delta = F_POINT {chainEndPoints[finish].x - chainEndPoints[finish - 1U].x,
+	                 chainEndPoints[finish].y - chainEndPoints[finish - 1U].y};
   }
   constexpr auto CHFACTOR = 4.0F; // Chain factor
-  chainPoint[2].x         = chainEndPoints[finish].x + delta.x / CHFACTOR;
-  chainPoint[2].y         = chainEndPoints[finish].y + delta.y / CHFACTOR;
+  chainPoint[2]           = F_POINT {chainEndPoints[finish].x + delta.x / CHFACTOR,
+                           chainEndPoints[finish].y + delta.y / CHFACTOR};
   auto chainCount         = CHAINLEN;
   if (StateMap->test(StateFlag::LINCHN)) {
 	--chainCount;

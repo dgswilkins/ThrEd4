@@ -263,8 +263,8 @@ constexpr auto xi::durat(float start, float finish, float featherRatio) -> float
 }
 
 void xi::duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept {
-  point.x = durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal);
-  point.y = durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal);
+  point = F_POINT {durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal),
+                   durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal)};
 }
 
 void xi::durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather) {
@@ -388,8 +388,8 @@ void xi::fthfn(uint32_t iSequence, FEATHER& feather) {
 void xi::ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept {
   auto const& bPoint = BSequence->operator[](iPoint);
 
-  point.x = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
-  point.y = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
+  point = F_POINT {((BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x),
+                   ((BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y)};
 }
 
 auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
@@ -397,8 +397,8 @@ auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> 
 }
 
 void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept {
-  point.x = (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x;
-  point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
+  point = F_POINT {((endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x),
+                   ((endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y)};
 }
 
 void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
@@ -2436,8 +2436,8 @@ void xt::nudsiz() {
   if (flag == 0) {
 	return;
   }
-  DesignSize.x = designSizeRect.right - designSizeRect.left;
-  DesignSize.y = designSizeRect.top - designSizeRect.bottom;
+  DesignSize =
+      F_POINT {designSizeRect.right - designSizeRect.left, designSizeRect.top - designSizeRect.bottom};
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
   auto const nResult = DialogBox(
       ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)

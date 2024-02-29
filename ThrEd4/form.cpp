@@ -1136,8 +1136,8 @@ void form::drwfrm() {
 	}
 	if (StateMap->test(StateFlag::FRMPMOV)) {
 	  thred::ritmov(ClosestFormToCursor);
-	  RubberBandLine->operator[](1).x = Msg.pt.x - StitchWindowOrigin.x;
-	  RubberBandLine->operator[](1).y = Msg.pt.y - StitchWindowOrigin.y;
+	  RubberBandLine->operator[](1) =
+	      POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	}
@@ -1231,8 +1231,7 @@ void form::setmfrm(uint32_t formIndex) {
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
 	point              = form::sfCor2px(*itVertex);
-	formLines[iForm].x = point.x + offset.x;
-	formLines[iForm].y = point.y + offset.y;
+	formLines[iForm] = POINT {point.x + offset.x, point.y + offset.y};
 	++itVertex;
   }
   formLines[closeForm.vertexCount] = formLines[0];
@@ -1303,8 +1302,7 @@ void form::pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept 
   auto stitchPoint  = thred::pxCor2stch(corner);
   stitchRect.left   = stitchPoint.x;
   stitchRect.top    = stitchPoint.y;
-  corner.x          = screenRect.right + StitchWindowOrigin.x;
-  corner.y          = screenRect.bottom + StitchWindowOrigin.y;
+  corner = POINT {screenRect.right + StitchWindowOrigin.x, screenRect.bottom + StitchWindowOrigin.y};
   stitchPoint       = thred::pxCor2stch(corner);
   stitchRect.right  = stitchPoint.x;
   stitchRect.bottom = stitchPoint.y;
@@ -1793,8 +1791,8 @@ void fi::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float sti
   else {
 	// ToDo - Is this calculation correct?
 	auto const angle = atan2(delta.y, delta.x);
-	step.x           = cos(angle) * stitchSize;
-	step.y           = sin(angle) * stitchSize;
+
+	step = F_POINT {cos(angle) * stitchSize, sin(angle) * stitchSize};
   }
   if (stitchCount != 0U) {
 	auto point = F_POINT {itStartVertex->x + step.x, itStartVertex->y + step.y};
@@ -1909,9 +1907,8 @@ auto fi::projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& uppe
   if (deltaX == 0.0F) {
 	return false;
   }
-  intersection.x   = xCoordinate;
   auto const slope = (upperPoint.y - lowerPoint.y) / deltaX;
-  intersection.y   = (xCoordinate - lowerPoint.x) * slope + lowerPoint.y;
+  intersection     = F_POINT {xCoordinate, (xCoordinate - lowerPoint.x) * slope + lowerPoint.y};
   auto lower       = lowerPoint.x;
   auto upper       = upperPoint.x;
   if (lower > upper) {
@@ -5748,8 +5745,7 @@ void fi::uncon() {
 void form::drwcon() {
   fi::uncon();
   auto& formLines = *FormLines;
-  formLines[1].x  = Msg.pt.x - StitchWindowOrigin.x;
-  formLines[1].y  = Msg.pt.y - StitchWindowOrigin.y;
+  formLines[1]    = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOCON);
   fi::ducon();
 }
@@ -6054,8 +6050,7 @@ void form::rinfrm() {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
   InsertLine[0]   = formLines[FormVertexPrev];
-  InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
-  InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+  InsertLine[1] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOINSF);
   form::duinsf();
 }
@@ -6100,8 +6095,7 @@ void form::setins() {
   }
   fi::frmlin(*FormForInsert);
   InsertLine[0]   = FormLines->operator[](FormVertexPrev);
-  InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
-  InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+  InsertLine[1] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::INSFRM);
   duinsf();
   StateMap->set(StateFlag::RESTCH);
@@ -6302,8 +6296,7 @@ void form::stchrct2px(gsl::not_null<F_RECTANGLE const*> stitchRect, RECT& screen
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.left = screenCoord.x;
   screenRect.top  = screenCoord.y;
-  stitchCoord.x   = stitchRect->right;
-  stitchCoord.y   = stitchRect->bottom;
+  stitchCoord     = F_POINT {stitchRect->right, stitchRect->bottom};
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.right  = screenCoord.x;
   screenRect.bottom = screenCoord.y;
@@ -6589,8 +6582,7 @@ void form::setexpand(float xyRatio) {
   size0.x        = rectangle.right - rectangle.left;
   switch (SelectedFormControlVertex) {
 	case 0: {
-	  reference.x = rectangle.right;
-	  reference.y = rectangle.bottom;
+	  reference  = F_POINT {rectangle.right, rectangle.bottom};
 	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;
@@ -6608,8 +6600,7 @@ void form::setexpand(float xyRatio) {
 	  break;
 	}
 	case 1: {
-	  reference.x = rectangle.left;
-	  reference.y = rectangle.bottom;
+	  reference  = F_POINT {rectangle.left, rectangle.bottom};
 	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;
@@ -6627,8 +6618,7 @@ void form::setexpand(float xyRatio) {
 	  break;
 	}
 	case 2: {
-	  reference.x = rectangle.left;
-	  reference.y = rectangle.top;
+	  reference  = F_POINT {rectangle.left, rectangle.top};
 	  auto size1  = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
 		size1.x = size1.y * xyRatio;

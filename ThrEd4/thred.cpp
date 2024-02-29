@@ -633,8 +633,8 @@ void thred::duzrat() noexcept {
   if (ZoomRect.top == 0.0F) {
 	ZoomRect.top = LHUPY;
   }
-  ZoomRatio.x = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-  ZoomRatio.y = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+  ZoomRatio = F_POINT {(wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left)),
+                       (wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom))};
 }
 
 auto thi::rsed() noexcept -> uint32_t {
@@ -4886,8 +4886,7 @@ auto thred::closlin() -> uint32_t {
 	  while (true) {
 		if (yab == 0) {
 		  // stitch is horizontal
-		  intersection.x = offsetX;
-		  intersection.y = stitches[iStitch].y;
+		  intersection = F_POINT {offsetX, stitches[iStitch].y};
 		}
 		else {
 		  if (xba == 0) {
@@ -7880,8 +7879,7 @@ void thred::dumrk(float xCoord, float yCoord) {
   if (StateMap->testAndReset(StateFlag::GMRK)) {
 	thi::drwmrk(StitchWindowDC);
   }
-  ZoomMarkPoint.x = xCoord;
-  ZoomMarkPoint.y = yCoord;
+  ZoomMarkPoint = F_POINT {xCoord, yCoord};
   StateMap->set(StateFlag::INIT);
   StateMap->set(StateFlag::GMRK);
   thi::drwmrk(StitchWindowDC);
