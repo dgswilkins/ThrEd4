@@ -1381,8 +1381,7 @@ void thred::hupfn() {
   auto const hoopCenter = F_POINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
   auto const delta      = F_POINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
   for (auto& stitch : *StitchBuffer) {
-	stitch.x += delta.x;
-	stitch.y += delta.y;
+	stitch += delta;
   }
   for (auto& formVertice : *FormVertices) {
 	formVertice += delta;
@@ -5294,8 +5293,7 @@ void thred::rotflt(F_POINT& point, float const rotationAngle, F_POINT const& rot
 void thi::rotstch(F_POINT_ATTR& stitch, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
   auto const point = thred::rotang1(stitch, rotationAngle, rotationCenter);
 
-  stitch.x = point.x;
-  stitch.y = point.y;
+  stitch = point;
 }
 
 void thred::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
@@ -7552,8 +7550,7 @@ void thred::duinsfil() {
 	FormVertices->operator[](iVertex) += offset;
   }
   for (auto iStitch = InsertedStitchIndex; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	StitchBuffer->operator[](iStitch).x += offset.x;
-	StitchBuffer->operator[](iStitch).y += offset.y;
+	StitchBuffer->operator[](iStitch) += offset;
   }
   StateMap->reset(StateFlag::FRMOF);
   StateMap->set(StateFlag::INIT);
@@ -8388,8 +8385,7 @@ void thred::nudgfn(float deltaX, float deltaY) {
 	  thi::frmpos(formIt, deltaX, deltaY);
 	}
 	for (auto& stitch : *StitchBuffer) {
-	  stitch.x += deltaX;
-	  stitch.y += deltaY;
+	  stitch += F_POINT {deltaX, deltaY};
 	}
 	AllItemsRect->bottom += deltaY;
 	AllItemsRect->top += deltaY;
@@ -8406,8 +8402,7 @@ void thred::nudgfn(float deltaX, float deltaY) {
 	}
 	for (auto& stitch : *StitchBuffer) {
 	  if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
-		stitch.x += deltaX;
-		stitch.y += deltaY;
+		stitch += F_POINT {deltaX, deltaY};
 	  }
 	}
 	for (auto const selectedForm : (*SelectedFormList)) {
@@ -8423,8 +8418,7 @@ void thred::nudgfn(float deltaX, float deltaY) {
 	if ((form.fillType != 0U) || (form.edgeType != 0U)) {
 	  for (auto& stitch : *StitchBuffer) {
 		if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-		  stitch.x += deltaX;
-		  stitch.y += deltaY;
+		  stitch += F_POINT {deltaX, deltaY};
 		}
 	  }
 	}
@@ -8434,16 +8428,14 @@ void thred::nudgfn(float deltaX, float deltaY) {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  StitchBuffer->operator[](iStitch).x += deltaX;
-	  StitchBuffer->operator[](iStitch).y += deltaY;
+	  StitchBuffer->operator[](iStitch) += F_POINT {deltaX, deltaY};
 	}
 	thred::grpAdj();
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->test(StateFlag::SELBOX)) {
-	StitchBuffer->operator[](ClosestPointIndex).x += deltaX;
-	StitchBuffer->operator[](ClosestPointIndex).y += deltaY;
+	StitchBuffer->operator[](ClosestPointIndex) += F_POINT {deltaX, deltaY};
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }

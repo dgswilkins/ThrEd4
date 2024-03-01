@@ -303,8 +303,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
       F_POINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
                (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
-	iStitch.x += delta.x;
-	iStitch.y += delta.y;
+	iStitch += delta;
   }
 }
 

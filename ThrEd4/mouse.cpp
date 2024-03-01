@@ -850,8 +850,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 		  form::frmadj(iForm);
 		}
 		for (auto& stitch : *StitchBuffer) {
-		  stitch.x += FormMoveDelta.x;
-		  stitch.y -= FormMoveDelta.y;
+		  stitch += FormMoveDelta;
 		}
 		form::selal();
 	  }
@@ -901,8 +900,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
 	auto const adjustedPoint = thred::getAdjustedPoint(stitchPoint);
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  StitchBuffer->operator[](iStitch).x -= adjustedPoint.x;
-	  StitchBuffer->operator[](iStitch).y -= adjustedPoint.y;
+	  StitchBuffer->operator[](iStitch) -= adjustedPoint;
 	}
 	StateMap->set(StateFlag::RESTCH);
 	return true;
@@ -914,8 +912,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	thred::savdo();
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 
-	StitchBuffer->operator[](ClosestPointIndex).x = stitchPoint.x;
-	StitchBuffer->operator[](ClosestPointIndex).y = stitchPoint.y;
+	StitchBuffer->operator[](ClosestPointIndex) = stitchPoint;
 	StitchBuffer->operator[](ClosestPointIndex).attribute |= USMSK;
 	if (ZoomFactor < STCHBOX) {
 	  thred::drawCapturedStitchBox();

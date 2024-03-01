@@ -1332,8 +1332,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
                                          offsetDelta.y / wrap::toFloat(offsetCount)};
 		auto       offset       = innerPoint;
 		while (si::chkbak(satinBackup, offset)) {
-		  offset.x -= offsetStep.x;
-		  offset.y -= offsetStep.y;
+		  offset -= offsetStep;
 		}
 		si::filinsbw(satinBackup, offset, satinBackupIndex, stitchPoint);
 	  }
@@ -1350,8 +1349,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
                                          offsetDelta.y / wrap::toFloat(offsetCount)};
 		auto       offset       = outerPoint;
 		while (si::chkbak(satinBackup, offset)) {
-		  offset.x -= offsetStep.x;
-		  offset.y -= offsetStep.y;
+		  offset -= offsetStep;
 		}
 		si::filinsbw(satinBackup, offset, satinBackupIndex, stitchPoint);
 	  }

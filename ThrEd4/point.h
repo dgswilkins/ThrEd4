@@ -179,6 +179,25 @@ class F_POINT_ATTR
   // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
   //~F_POINT_ATTR() = default;
   inline constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
+
+  inline constexpr auto operator=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
+	x = rhs.x;
+	y = rhs.y;
+	return *this;
+  }
+
+  inline constexpr auto operator+=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
+	x += rhs.x;
+	y += rhs.y;
+	return *this;
+  }
+
+  inline constexpr auto operator-=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
+	x -= rhs.x;
+	y -= rhs.y;
+	return *this;
+  }
+
 };
 #pragma pack(pop)
 

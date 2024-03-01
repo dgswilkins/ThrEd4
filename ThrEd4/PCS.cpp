@@ -267,8 +267,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
   }
   if ((delta.x != 0.0F) || (delta.y != 0.0F)) {
 	for (auto& offsetStitch : stitches) {
-	  offsetStitch.x += delta.x;
-	  offsetStitch.y += delta.y;
+	  offsetStitch += delta;
 	}
   }
   return true;
