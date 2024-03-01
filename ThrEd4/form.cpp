@@ -931,8 +931,8 @@ void form::fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
   formOutline[2].y = formOutline[3].y = form.rectangle.bottom;
   auto iFormOutline                   = formOutline.begin();
   for (auto& point : line) {
-	point.x = std::lround((iFormOutline->x - ZoomRect.left) * HorizontalRatio);
-	point.y = std::lround((ZoomRect.top - iFormOutline->y) * VerticalRatio);
+	point = POINT {std::lround((iFormOutline->x - ZoomRect.left) * HorizontalRatio),
+	               std::lround((ZoomRect.top - iFormOutline->y) * VerticalRatio)};
 	if (point.x < SelectedFormsRect.left) {
 	  SelectedFormsRect.left = point.x;
 	}
@@ -5674,8 +5674,7 @@ void form::rstfrm() {
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & FRMSK) == attribute && ((stitch.attribute & ALTYPMSK) != 0U) &&
 	    ((stitch.attribute & NOTFRM) == 0U)) {
-	  stitch.x += offset.x;
-	  stitch.y += offset.y;
+	  stitch += offset;
 	}
   }
 }
@@ -7871,8 +7870,7 @@ void form::frmsadj() {
   }
   for (auto& stitch : *StitchBuffer) {
 	if (((stitch.attribute & ALTYPMSK) != 0U) && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
-	  stitch.x += FormMoveDelta.x;
-	  stitch.y -= FormMoveDelta.y;
+	  stitch += FormMoveDelta;
 	}
   }
 }
@@ -8037,8 +8035,7 @@ void form::fcntr() {
 	auto const codedForm = (selectedForm << FRMSHFT);
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & FRMSK) == codedForm && ((stitch.attribute & NOTFRM) == 0U)) {
-		stitch.x += delta.x;
-		stitch.y += delta.y;
+		stitch += delta;
 	  }
 	}
   }
@@ -8422,8 +8419,7 @@ void form::cntrx() {
 	frmadj(ClosestFormToCursor);
 	for (auto& stitch : *StitchBuffer) {
 	  if (((stitch.attribute & ALTYPMSK) != 0U) && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-		stitch.x += FormMoveDelta.x;
-		stitch.y -= FormMoveDelta.y;
+		stitch += FormMoveDelta;
 	  }
 	}
 	StateMap->set(StateFlag::RESTCH);
@@ -8459,8 +8455,7 @@ void form::cntrx() {
 	  FormMoveDelta.x = 0.0F;
 	}
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  StitchBuffer->operator[](iStitch).x += FormMoveDelta.x;
-	  StitchBuffer->operator[](iStitch).y -= FormMoveDelta.y;
+	  StitchBuffer->operator[](iStitch) += FormMoveDelta;
 	}
 	StateMap->set(StateFlag::RESTCH);
 	return;
@@ -8477,8 +8472,7 @@ void form::centir() {
       F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   auto const delta = F_POINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};
   for (auto& stitch : *StitchBuffer) {
-	stitch.x += delta.x;
-	stitch.y += delta.y;
+	stitch += delta;
   }
   for (auto& formVertice : *FormVertices) {
 	formVertice += delta;
