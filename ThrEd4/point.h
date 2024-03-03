@@ -60,14 +60,15 @@ class B_SEQ_PNT;
 
 class D_POINT
 {
-  private:
-  double m_xCoordinate {};
-  double m_yCoordinate {};
-
   public:
+  // NOLINTBEGIN (misc-non-private-member-variables-in-classes)
+  double x {};
+  double y {};
+  // NOLINTEND
+
   // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
-  inline D_POINT(double rhsX, double rhsY) noexcept : m_xCoordinate(rhsX), m_yCoordinate(rhsY) {}
+  inline D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {}
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   inline D_POINT(float rhsX, float rhsY) noexcept;
@@ -77,15 +78,6 @@ class D_POINT
   // D_POINT& operator=(D_POINT&&) = default;
   //~D_POINT() = default;
 
-  // Getter for x
-  [[nodiscard]] auto getX() const noexcept -> double {
-	return m_xCoordinate;
-  }
-
-  // Getter for y
-  [[nodiscard]] auto getY() const noexcept -> double {
-	return m_yCoordinate;
-  }
 };
 
 #pragma pack(push, 1)
@@ -267,12 +259,12 @@ inline constexpr F_POINT::F_POINT(double rhsX, double rhsY) :
 }
 
 inline constexpr F_POINT::F_POINT(D_POINT const& rhs) :
-    x(util::doubleToFloat(rhs.getX())), y(util::doubleToFloat(rhs.getY())) {
+    x(util::doubleToFloat(rhs.x)), y(util::doubleToFloat(rhs.y)) {
 }
 
 inline constexpr auto F_POINT::operator=(D_POINT const& rhs) -> F_POINT& {
-  x = util::doubleToFloat(rhs.getX());
-  y = util::doubleToFloat(rhs.getY());
+  x = util::doubleToFloat(rhs.x);
+  y = util::doubleToFloat(rhs.y);
   return *this;
 }
 
@@ -307,9 +299,9 @@ inline constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const no
 }
 
 inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
-    m_xCoordinate(gsl::narrow_cast<double>(rhs.x)), m_yCoordinate(gsl::narrow_cast<double>(rhs.y)) {
+    x(gsl::narrow_cast<double>(rhs.x)), y(gsl::narrow_cast<double>(rhs.y)) {
 }
 
 inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
-    m_xCoordinate(gsl::narrow_cast<double>(rhsX)), m_yCoordinate(gsl::narrow_cast<double>(rhsY)) {
+    x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
 }

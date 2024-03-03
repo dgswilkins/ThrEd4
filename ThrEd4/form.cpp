@@ -1957,36 +1957,36 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
     -> bool {
   auto const delta     = D_POINT {point1.x - point0.x, point1.y - point0.y};
   auto       intersect = D_POINT {intersectionPoint};
-  if (delta.getX() != 0.0) {
-	auto const sideSlope    = delta.getY() / delta.getX();
+  if (delta.x != 0.0) {
+	auto const sideSlope    = delta.y / delta.x;
 	auto const sideConstant = wrap::toDouble(point0.y) - sideSlope * wrap::toDouble(point0.x);
 	auto const pointConstant =
 	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
 	intersect = {((sideConstant - pointConstant) / (wrap::toDouble(slope) - sideSlope)),
-	             intersect.getX() * wrap::toDouble(slope) + pointConstant};
+	             intersect.x * wrap::toDouble(slope) + pointConstant};
   }
   else {
 	auto const pointConstant =
 	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
-	intersect = {wrap::toDouble(point0.x), intersect.getX() * wrap::toDouble(slope) + pointConstant};
+	intersect = {wrap::toDouble(point0.x), intersect.x * wrap::toDouble(slope) + pointConstant};
   }
   auto xMinimum = wrap::toDouble(point0.x);
   auto xMaximum = wrap::toDouble(point1.x);
   if (xMinimum > xMaximum) {
 	std::swap(xMinimum, xMaximum);
   }
-  if (delta.getY() != 0.0) {
+  if (delta.y != 0.0) {
 	auto yMinimum = wrap::toDouble(point0.y);
 	auto yMaximum = wrap::toDouble(point1.y);
 	if (yMinimum > yMaximum) {
 	  std::swap(yMinimum, yMaximum);
 	}
 	intersectionPoint = intersect;
-	return intersect.getX() > xMinimum && intersect.getX() <= xMaximum &&
-	       intersect.getY() >= yMinimum && intersect.getY() <= yMaximum;
+	return intersect.x > xMinimum && intersect.x <= xMaximum &&
+	       intersect.y >= yMinimum && intersect.y <= yMaximum;
   }
   intersectionPoint = intersect;
-  return intersect.getX() > xMinimum && intersect.getX() <= xMaximum;
+  return intersect.x > xMinimum && intersect.x <= xMaximum;
 }
 
 auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) noexcept
