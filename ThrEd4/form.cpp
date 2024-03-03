@@ -1962,13 +1962,13 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
 	auto const sideConstant = wrap::toDouble(point0.y) - sideSlope * wrap::toDouble(point0.x);
 	auto const pointConstant =
 	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
-	intersect = {((sideConstant - pointConstant) / (wrap::toDouble(slope) - sideSlope)),
+	intersect = D_POINT {((sideConstant - pointConstant) / (wrap::toDouble(slope) - sideSlope)),
 	             intersect.x * wrap::toDouble(slope) + pointConstant};
   }
   else {
 	auto const pointConstant =
 	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
-	intersect = {wrap::toDouble(point0.x), intersect.x * wrap::toDouble(slope) + pointConstant};
+	intersect = D_POINT {wrap::toDouble(point0.x), intersect.x * wrap::toDouble(slope) + pointConstant};
   }
   auto xMinimum = wrap::toDouble(point0.x);
   auto xMaximum = wrap::toDouble(point1.x);

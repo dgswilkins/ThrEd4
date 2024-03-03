@@ -68,10 +68,10 @@ class D_POINT
 
   // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
-  inline D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {}
+  explicit inline D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {}
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
-  inline D_POINT(float rhsX, float rhsY) noexcept;
+  explicit inline D_POINT(float rhsX, float rhsY) noexcept;
   // D_POINT(D_POINT const&) = default;
   // D_POINT(D_POINT&&) = default;
   // D_POINT& operator=(D_POINT const& rhs) = default;
