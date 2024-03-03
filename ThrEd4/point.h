@@ -228,13 +228,15 @@ inline constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, flo
 class B_SEQ_PNT
 {
   public:
+  // NOLINTBEGIN (misc-non-private-member-variables-in-classes)
   float  x {};
   float  y {};
   int8_t attribute {};
+  // NOLINTEND
 
-  inline B_SEQ_PNT() noexcept = default;
-  inline B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr);
-  inline B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr);
+  explicit inline constexpr B_SEQ_PNT() noexcept = default;
+  explicit inline constexpr B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr);
+  explicit inline constexpr B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr);
   // B_SEQ_PNT(B_SEQ_PNT const&) = default;
   // B_SEQ_PNT(B_SEQ_PNT&&) = default;
   // B_SEQ_PNT& operator=(B_SEQ_PNT const& rhs) = default;
@@ -243,11 +245,11 @@ class B_SEQ_PNT
 };
 
 // ToDo - This should use wrap::toFloat but there would be a circular dependency
-inline B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
+inline constexpr B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-inline B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
+inline constexpr B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
     x(rhsX), y(rhsY), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
