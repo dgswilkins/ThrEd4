@@ -491,7 +491,6 @@ constexpr auto shreg(float highValue, float reference, float eggRatio) noexcept 
 void shrnks();
 void snp(uint32_t start, uint32_t finish);
 void snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept;
-auto spComp(gsl::not_null<SMAL_PNT_L const*> arg1, gsl::not_null<SMAL_PNT_L const*> arg2) noexcept -> bool;
 void spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint);
 auto spltlin() -> bool;
 void sprct(std::vector<F_POINT> const& vertices,
@@ -3871,30 +3870,6 @@ void form::angclpfn(FRM_HEAD const&               form,
   fi::angout(angledForm);
   fi::clpcon(angledForm, textureSegments, angledFormVertices);
   fi::rotbak(-rotationAngle, rotationCenter);
-}
-
-auto fi::spComp(const gsl::not_null<SMAL_PNT_L const*> arg1,
-                const gsl::not_null<SMAL_PNT_L const*> arg2) noexcept -> bool {
-  // make sure the comparison obeys strict weak ordering for stable sorting
-  if (arg1->line < arg2->line) {
-	return true;
-  }
-  if (arg2->line < arg1->line) {
-	return false;
-  }
-  if (arg1->group < arg2->group) {
-	return true;
-  }
-  if (arg2->group < arg1->group) {
-	return false;
-  }
-  if (arg1->y < arg2->y) {
-	return true;
-  }
-  if (arg2->y < arg1->y) {
-	return false;
-  }
-  return false;
 }
 
 auto fi::isclos(std::vector<SMAL_PNT_L> const& lineEndpoints,
