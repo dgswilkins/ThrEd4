@@ -678,7 +678,7 @@ void txi::dutxrct(TXTR_RECT& textureRect) {
 }
 
 auto txi::ed2stch(F_POINT const& point) noexcept -> F_POINT {
-  return {(point.x - TextureScreen.xOffset), (point.y - TextureScreen.yOffset)};
+  return F_POINT {(point.x - TextureScreen.xOffset), (point.y - TextureScreen.yOffset)};
 }
 
 void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {

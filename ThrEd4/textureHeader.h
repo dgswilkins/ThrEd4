@@ -37,7 +37,7 @@ class TXTR_SCREEN
   float    spacing {};          // edit space between lines
   uint16_t lines {};            // number of lines
   float    editToPixelRatio {}; // edit to pixel ratio
-  F_POINT  formCenter;          // middle of the form
+  F_POINT  formCenter {};       // middle of the form
 
   // constexpr TXTR_SCREEN() noexcept = default;
   // TXTR_SCREEN(TXTR_SCREEN const&) = default;

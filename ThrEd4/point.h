@@ -84,15 +84,17 @@ class D_POINT
 class F_POINT
 {
   public:
+  // NOLINTBEGIN (misc-non-private-member-variables-in-classes)
   float x {};
   float y {};
+  // NOLINTEND
 
-  constexpr F_POINT() noexcept = default;
-  inline constexpr F_POINT(double rhsX, double rhsY);
-  inline constexpr F_POINT(float rhsX, float rhsY) noexcept;
-  inline constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
-  inline constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
-  inline constexpr explicit F_POINT(D_POINT const& rhs);
+  explicit inline constexpr F_POINT() noexcept = default;
+  explicit inline constexpr F_POINT(double rhsX, double rhsY);
+  explicit inline constexpr F_POINT(float rhsX, float rhsY) noexcept;
+  explicit inline constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
+  explicit inline constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
+  explicit inline constexpr F_POINT(D_POINT const& rhs);
   inline constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
   inline constexpr auto operator=(D_POINT const& rhs) -> F_POINT&;
   inline constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;

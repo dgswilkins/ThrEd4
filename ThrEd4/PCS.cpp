@@ -267,7 +267,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 	  boundingRect.top = stitch.y;
 	}
   }
-  F_POINT const boundingSize = {boundingRect.right - boundingRect.left,
+  auto const boundingSize = F_POINT {boundingRect.right - boundingRect.left,
                                 boundingRect.top - boundingRect.bottom};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L, false);
