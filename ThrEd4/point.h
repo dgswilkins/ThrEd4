@@ -160,13 +160,15 @@ class F_POINT
 class F_POINT_ATTR
 {
   public:
+  // NOLINTBEGIN (misc-non-private-member-variables-in-classes)
   float    x {};
   float    y {};
   uint32_t attribute {};
+  // NOLINTEND
 
-  constexpr F_POINT_ATTR() noexcept = default;
-  inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA);
-  inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
+  explicit inline constexpr F_POINT_ATTR() noexcept = default;
+  explicit inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA);
+  explicit inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
   // F_POINT_ATTR(F_POINT_ATTR const&) = default;
   // F_POINT_ATTR(F_POINT_ATTR&&) = default;
   // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
