@@ -204,18 +204,26 @@ inline auto F_POINT::operator+(F_POINT_ATTR const& rhs) const noexcept -> F_POIN
 class SMAL_PNT_L
 {
   public:
+  // NOLINTBEGIN (misc-non-private-member-variables-in-classes)
   uint32_t line {}; // line and group must remain in this order for sort to work
   uint32_t group {};
   float    x {};
   float    y {};
+  // NOLINTEND
 
-  // constexpr SMAL_PNT_L() noexcept = default;
+  explicit inline constexpr SMAL_PNT_L() noexcept = default;
+  explicit inline constexpr SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept;
   // SMAL_PNT_L(SMAL_PNT_L const&) = default;
   // SMAL_PNT_L(SMAL_PNT_L&&) = default;
   // SMAL_PNT_L& operator=(SMAL_PNT_L const& rhs) = default;
   // SMAL_PNT_L& operator=(SMAL_PNT_L&&) = default;
   //~SMAL_PNT_L() = default;
+
 };
+
+inline constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept :
+    line(rhsLine), group(rhsGroup), x(rhsX), y(rhsY) {
+}
 
 class B_SEQ_PNT
 {
