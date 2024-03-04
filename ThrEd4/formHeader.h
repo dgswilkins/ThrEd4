@@ -654,7 +654,7 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
 
 inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (vertexCount != 0U) {
-	const auto* formVertices = wrap::getFormVertices();
+	if (const auto* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
 	auto        itVertex     = wrap::next(formVertices->cbegin(), vertexIndex);
 	rectangle                = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
 	for (auto iVertex = 1U; iVertex < vertexCount; ++iVertex) {
@@ -682,6 +682,7 @@ inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
 	  rectangle.left -= offset;
 	  rectangle.right += offset;
 	}
+  }
   }
 }
 
