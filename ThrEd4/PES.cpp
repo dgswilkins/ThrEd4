@@ -180,17 +180,29 @@ class PESTCH
 
 class THREAD
 {
-  public:
+  private:
   PEC_COLOR   color {};
   char const* description {};
   char const* catalogNumber {};
 
+  public:
   // constexpr THREAD() noexcept = default;
+  explicit inline constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
+      color(color), description(description), catalogNumber(catalogNumber) {
+  }
   // THREAD(THREAD const&) = default;
   // THREAD(THREAD&&) = default;
   // THREAD& operator=(THREAD const& rhs) = default;
   // THREAD& operator=(THREAD&&) = default;
   //~THREAD() = default;
+
+  inline constexpr auto getColor() const noexcept -> PEC_COLOR const& {
+	return color;
+  }
+
+  inline constexpr auto getRGB() const noexcept -> COLORREF const {
+	return RGB(color.r, color.g, color.b);
+  }
 };
 
 constexpr auto BIT12    = uint32_t {0x800U}; // Set bit 12 if delta is negative
@@ -341,7 +353,7 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
-  auto translatedColor = PES_THREAD.at(colorIndex).color;
+  auto& translatedColor = PES_THREAD.at(colorIndex).getColor();
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
@@ -521,7 +533,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
   auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
-  auto const  color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+  auto const  color       = threadColor.getRGB();
   auto        iUserColor  = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
 	if (*iUserColor == color) {
@@ -606,7 +618,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		continue;
 	  }
 	  auto const& threadColor = PES_THREAD.at(pesColors[iColor]);
-	  auto const  color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+	  auto const  color       = threadColor.getRGB();
 	  *iUserColor             = color;
 	  ++iUserColor;
 	  if (iUserColor == UserColor.end()) {
@@ -614,9 +626,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  }
 	  continue;
 	}
-	auto constexpr COLOR = RGB(PES_THREAD[0].color.r,
-	                           PES_THREAD[0].color.g,
-	                           PES_THREAD[0].color.b); // color unknown
+	auto constexpr COLOR = PES_THREAD[0].getRGB(); // color unknown
 
 	*iUserColor = COLOR;
 	++iUserColor;
