@@ -1157,7 +1157,7 @@ auto thi::pxchk(float pixelSize) -> uint16_t {
 
 void thred::sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept {
   if (stitches.empty()) {
-	rectangle = {};
+	rectangle = F_RECTANGLE {};
 	return;
   }
   rectangle.bottom = rectangle.top = stitches[0].y;

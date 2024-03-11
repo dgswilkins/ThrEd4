@@ -132,10 +132,12 @@ class R_CON // PathMap: path map for sequencing
 class REGION // region for sequencing vertical fills
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint32_t start {};       // start line of region
   uint32_t end {};         // end line of region
   uint32_t regionBreak {}; // ToDo - Is this member needed?
   uint32_t breakCount {};
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   // constexpr REGION() noexcept = default;
   inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
@@ -438,7 +440,7 @@ void plfn(FRM_HEAD const&              form,
           float                        width,
           F_POINT&                     stitchPoint);
 void prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
-auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
+auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) 
     -> bool;
 auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept
     -> bool;
@@ -497,7 +499,7 @@ void sprct(std::vector<F_POINT> const& vertices,
            uint32_t                    vertexIndex,
            std::vector<V_RECT_2>&      fillVerticalRect,
            uint32_t                    start,
-           uint32_t                    finish) noexcept(!(std::is_same_v<ptrdiff_t, int>));
+           uint32_t                    finish) ;
 void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
             uint32_t                     iRect) noexcept;
@@ -1953,7 +1955,7 @@ auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> 
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
+auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) 
     -> bool {
   auto const delta     = D_POINT {point1.x - point0.x, point1.y - point0.y};
   auto       intersect = D_POINT {intersectionPoint};
@@ -1989,7 +1991,7 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
   return intersect.x > xMinimum && intersect.x <= xMaximum;
 }
 
-auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) noexcept
+auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) 
     -> bool {
   if (nullptr == OutsidePoints) {
 	return false;
@@ -2036,7 +2038,7 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
                uint32_t                    vertexIndex,
                std::vector<V_RECT_2>&      fillVerticalRect,
                uint32_t                    start,
-               uint32_t                    finish) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
+               uint32_t                    finish)  {
   auto const& opStart        = OutsidePoints->operator[](start);
   auto const& opFinish       = OutsidePoints->operator[](finish);
   auto const& ipStart        = InsidePoints->operator[](start);
@@ -2048,28 +2050,28 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
 	auto const slope        = -delta.x / delta.y;
 	auto       point        = *itFinishVertex;
 	auto&      verticalRect = fillVerticalRect[start];
-	proj(point, slope, opStart, opFinish, verticalRect.dopnt);
-	proj(point, slope, ipStart, ipFinish, verticalRect.dipnt);
+	fi::proj(point, slope, opStart, opFinish, verticalRect.dopnt);
+	fi::proj(point, slope, ipStart, ipFinish, verticalRect.dipnt);
 	point = *itStartVertex;
-	proj(point, slope, opStart, opFinish, verticalRect.aopnt);
-	proj(point, slope, ipStart, ipFinish, verticalRect.aipnt);
+	fi::proj(point, slope, opStart, opFinish, verticalRect.aopnt);
+	fi::proj(point, slope, ipStart, ipFinish, verticalRect.aipnt);
 	point = ipStart;
-	if (proj(point, slope, opStart, opFinish, verticalRect.bopnt)) {
+	if (fi::proj(point, slope, opStart, opFinish, verticalRect.bopnt)) {
 	  verticalRect.bipnt = ipStart;
 	}
 	else {
 	  verticalRect.bopnt = opStart;
 	  point              = opStart;
-	  proj(point, slope, ipStart, ipFinish, verticalRect.bipnt);
+	  fi::proj(point, slope, ipStart, ipFinish, verticalRect.bipnt);
 	}
 	point = ipFinish;
-	if (proj(point, slope, opStart, opFinish, verticalRect.copnt)) {
+	if (fi::proj(point, slope, opStart, opFinish, verticalRect.copnt)) {
 	  verticalRect.cipnt = ipFinish;
 	}
 	else {
 	  verticalRect.copnt = opFinish;
 	  point              = opFinish;
-	  proj(point, slope, ipStart, ipFinish, verticalRect.cipnt);
+	  fi::proj(point, slope, ipStart, ipFinish, verticalRect.cipnt);
 	}
 	return;
   }
@@ -2632,12 +2634,12 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  if (lineEndpoints.size() >= fillLineCount) {
 		continue;
 	  }
-	  lineEndpoints.push_back(SMAL_PNT_L {projectedPoints[iPoint].line,
+	  lineEndpoints.emplace_back(SMAL_PNT_L {projectedPoints[iPoint].line,
 	                                      lineGroupIndex,
 	                                      projectedPoints[iPoint].x,
 	                                      projectedPoints[iPoint].y});
 	  ++iPoint;
-	  lineEndpoints.push_back(SMAL_PNT_L {projectedPoints[iPoint].line,
+	  lineEndpoints.emplace_back(SMAL_PNT_L {projectedPoints[iPoint].line,
 	                                      lineGroupIndex,
 	                                      projectedPoints[iPoint].x,
 	                                      projectedPoints[iPoint].y});
