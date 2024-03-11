@@ -2634,15 +2634,15 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  if (lineEndpoints.size() >= fillLineCount) {
 		continue;
 	  }
-	  lineEndpoints.emplace_back(SMAL_PNT_L {projectedPoints[iPoint].line,
+	  lineEndpoints.emplace_back(projectedPoints[iPoint].line,
 	                                      lineGroupIndex,
 	                                      projectedPoints[iPoint].x,
-	                                      projectedPoints[iPoint].y});
+	                                      projectedPoints[iPoint].y);
 	  ++iPoint;
-	  lineEndpoints.emplace_back(SMAL_PNT_L {projectedPoints[iPoint].line,
+	  lineEndpoints.emplace_back(projectedPoints[iPoint].line,
 	                                      lineGroupIndex,
 	                                      projectedPoints[iPoint].x,
-	                                      projectedPoints[iPoint].y});
+	                                      projectedPoints[iPoint].y);
 	  ++iPoint;
 	}
 	if (lineEndpoints.size() != savedLineCount) {
