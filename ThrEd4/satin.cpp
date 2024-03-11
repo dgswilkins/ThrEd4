@@ -225,7 +225,7 @@ void si::satclos() {
 		StartPoint    = closestVertex - 2U;
 	  }
 	}
-	form.fillGuide = {StartPoint, closestVertex};
+	form.fillGuide = SAT_CON {StartPoint, closestVertex};
 	return;
   }
   auto closestVertex = StartPoint;

@@ -640,7 +640,7 @@ void form::chkcont() {
 	  satin::delsac(ClosestFormToCursor);
 	}
 	else {
-	  form.fillGuide = {1U, form.vertexCount - 2U};
+	  form.fillGuide = SAT_CON {1U, form.vertexCount - 2U};
 	}
   }
   form.attribute |= FRECONT;
