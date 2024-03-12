@@ -166,17 +166,26 @@ class PESSTCHLST
 #pragma pack(push, 1)
 class PESTCH
 {
-  public:
-  int16_t x {};
-  int16_t y {};
+  private:
+  int16_t m_x {};
+  int16_t m_y {};
 
-  constexpr PESTCH() noexcept = default;
+  public:
+  // PESTCH() noexcept = default;
   // PESTCH(PESTCH&&) = default;
   // PESTCH& operator=(PESTCH const& rhs) = default;
   // PESTCH& operator=(PESTCH&&) = default;
   //~PESTCH() = default;
+  inline auto operator=(F_POINT const& rhs) -> PESTCH&;
 };
 #pragma pack(pop)
+
+inline auto PESTCH::operator=(F_POINT const& rhs) -> PESTCH& {
+  m_x = wrap::round<int16_t>(rhs.x);
+  m_y = wrap::round<int16_t>(rhs.y);
+
+  return *this;
+}
 
 class THREAD
 {
@@ -355,7 +364,7 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
-  auto& translatedColor = PES_THREAD.at(colorIndex).getColor();
+  auto const& translatedColor = PES_THREAD.at(colorIndex).getColor();
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
@@ -371,9 +380,11 @@ void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POIN
   auto const oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(PESTCH));
   auto* pesStitch = convertFromPtr<PESTCH*>(&buffer[oldSize]);
+  if (nullptr == pesStitch){
+	throw;
+  }
   auto const scaledStitch = F_POINT {-stitch.x * IPECFACT + offset.x, stitch.y * IPECFACT - offset.y};
-  pesStitch->x = wrap::round<int16_t>(scaledStitch.x);
-  pesStitch->y = wrap::round<int16_t>(scaledStitch.y);
+  *pesStitch = scaledStitch;
 }
 
 void pi::ritpesCode(std::vector<uint8_t>& buffer) {
