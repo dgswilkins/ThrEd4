@@ -181,14 +181,16 @@ class PESTCH
 class THREAD
 {
   private:
-  PEC_COLOR   color {};
-  char const* description {};
-  char const* catalogNumber {};
+  PEC_COLOR   m_color {};
+  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
+  char const* m_description {};
+  char const* m_catalogNumber {};
+  // NOLINTEND(clang-diagnostic-unused-private-field)
 
   public:
   // constexpr THREAD() noexcept = default;
   explicit inline constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
-      color(color), description(description), catalogNumber(catalogNumber) {
+      m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
   }
   // THREAD(THREAD const&) = default;
   // THREAD(THREAD&&) = default;
@@ -196,12 +198,12 @@ class THREAD
   // THREAD& operator=(THREAD&&) = default;
   //~THREAD() = default;
 
-  inline constexpr auto getColor() const noexcept -> PEC_COLOR const& {
-	return color;
+  [[nodiscard]] inline constexpr auto getColor() const noexcept -> PEC_COLOR const& {
+	return m_color;
   }
 
-  inline constexpr auto getRGB() const noexcept -> COLORREF const {
-	return RGB(color.r, color.g, color.b);
+  [[nodiscard]] inline constexpr auto getRGB() const noexcept -> COLORREF {
+	return RGB(m_color.r, m_color.g, m_color.b);
   }
 };
 
