@@ -25,7 +25,8 @@ constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 class INI_FILE // ini file structure
 {
   public:
-  std::array<char, DPLEN>        defaultDirectory {};          // default directory
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  std::array<char, DPLEN> defaultDirectory {};          // default directory
   std::array<COLORREF, COLORCNT> stitchColors {};              // colors
   std::array<COLORREF, COLORCNT> stitchPreferredColors {};     // stitch preference colors
   std::array<COLORREF, COLORCNT> backgroundPreferredColors {}; // background preference colors
@@ -119,6 +120,7 @@ class INI_FILE // ini file structure
   float    clpspc {};            // clipboard fill spacing
 
   std::array<char, NAME_LEN> designerName {}; // designer name
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   // constexpr INI_FILE() noexcept = default;
   // INI_FILE(INI_FILE const&) = default;
