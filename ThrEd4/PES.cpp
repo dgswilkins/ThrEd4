@@ -15,11 +15,11 @@ static constexpr uint8_t THUMBWID = 48U;
 using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 #pragma pack(push, 1)
-// NOLINTBEGIN(readability-magic-numbers)
 // clang-format off
 class PECHDR
 {
   public:
+// NOLINTBEGIN(readability-magic-numbers, misc-non-private-member-variables-in-classes)
   std::array<char, 19>     label {}; // Label string prefixed with "LA:" and padded with space (0x20)
   int8_t                   labnd {}; // carriage return character
   std::array<uint8_t, 11>  ukn1 {};  // Unknown (' ')
@@ -31,21 +31,22 @@ class PECHDR
   std::array<uint8_t, 12>  ukn3 {};        // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
   uint8_t                  colorCount {};  // Number of colors minus one, 0xFF means 0 colors
   std::array<uint8_t, 463> pad {};         // Pad bytes up to 512.
+  // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
-  constexpr PECHDR() noexcept = default;
+  explicit inline constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;
   // PECHDR& operator=(PECHDR const& rhs) = default;
   // PECHDR& operator=(PECHDR&&) = default;
   //~PECHDR() = default;
 };
 // clang-format on
-// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 class PECHDR2
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint16_t unknown1 {}; // typical 0x0000
   uint16_t thumbnailOffset {}; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
   uint16_t unknown2 {}; // typical 0x3100
@@ -56,8 +57,9 @@ class PECHDR2
   uint16_t unknown5 {}; // typical 0x01b0
   uint16_t xMin {};     // starting X val (Bigendian)
   uint16_t yMin {};     // starting Y val (Bigendian)
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  constexpr PECHDR2() noexcept = default;
+  explicit inline constexpr PECHDR2() noexcept = default;
   // PECHDR2(PECHDR2&&) = default;
   // PECHDR2& operator=(PECHDR2 const& rhs) = default;
   // PECHDR2& operator=(PECHDR2&&) = default;
