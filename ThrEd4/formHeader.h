@@ -249,6 +249,7 @@ class FRM_HEAD_OUT;
 class FRM_HEAD
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint8_t     attribute {};           // attribute
   uint32_t    vertexCount {};         // number of sides
   uint8_t     type {};                // type
@@ -290,6 +291,7 @@ class FRM_HEAD
   float       txof {};                // gradient end density
   uint8_t     underlayColor {};       // underlay color
   uint8_t     cres {};                // reserved
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   FRM_HEAD() noexcept = default;
   // FRM_HEAD(FRM_HEAD const&) = default;
