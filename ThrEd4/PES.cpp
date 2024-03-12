@@ -67,16 +67,28 @@ class PECHDR2
 
 class PES_COLOR_LIST
 {
-  public:
+  private:
   uint16_t blockIndex {};
   uint16_t colorIndex {};
 
+  public:
   // constexpr PES_COLOR_LIST() noexcept = default;
+  explicit inline constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
+      blockIndex(bIndex), colorIndex(cIndex) {
+  }
   // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
   // PES_COLOR_LIST(PES_COLOR_LIST&&) = default;
   // PES_COLOR_LIST& operator=(PECCOLORLIST const& rhs) = default;
   // PES_COLOR_LIST& operator=(PES_COLOR_LIST&&) = default;
   //~PES_COLOR_LIST() = default;
+
+  [[nodiscard]] inline constexpr auto getBlockIndex() const noexcept -> uint16_t {
+	return blockIndex;
+  }
+
+  [[nodiscard]] inline constexpr auto getColorIndex() const noexcept -> uint16_t {
+	return colorIndex;
+  }
 };
 
 #pragma pack(push, 1)
@@ -884,8 +896,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  return false;
 	}
 	auto const colorEntries = gsl::span<uint16_t> {colorEntry, 2};
-	colorEntries[0]         = threadList[paletteIndex].blockIndex;
-	colorEntries[1]         = threadList[paletteIndex].colorIndex;
+	colorEntries[0]         = threadList[paletteIndex].getBlockIndex();
+	colorEntries[1]         = threadList[paletteIndex].getColorIndex();
   }
   pesHeader.off  = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
   pesHeader.blct = 1;
