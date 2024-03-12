@@ -816,7 +816,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   auto blockIndex      = uint16_t {}; // Index into the stitch blocks
   auto iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
   auto currentColor    = *iPESequivColors;
-  threadList.push_back(PES_COLOR_LIST {blockIndex, currentColor});
+  threadList.emplace_back(blockIndex, currentColor);
   pesBuffer.resize(sizeof(PESSTCHLST));
   // first block is a jump in place
   pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
@@ -859,7 +859,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  stitchColor     = StitchBuffer->operator[](iStitch).attribute & COLMSK;
 	  iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
 	  currentColor    = *iPESequivColors;
-	  threadList.push_back(PES_COLOR_LIST {blockIndex, currentColor});
+	  threadList.emplace_back(blockIndex, currentColor);
 	  // then create the jump block
 	  pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
 	  ++blockIndex;
