@@ -11,7 +11,6 @@ Checks:            "*,\
 -llvm-header-guard,\
 -llvm-include-order,\
 -llvm-qualified-auto,\
--misc-non-private-member-variables-in-classes,\
 -misc-include-cleaner,\
 -readability-function-cognitive-complexity
 "
