@@ -68,13 +68,13 @@ class PECHDR2
 class PES_COLOR_LIST
 {
   private:
-  uint16_t blockIndex {};
-  uint16_t colorIndex {};
+  uint16_t m_blockIndex {};
+  uint16_t m_colorIndex {};
 
   public:
   // constexpr PES_COLOR_LIST() noexcept = default;
   explicit inline constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
-      blockIndex(bIndex), colorIndex(cIndex) {
+      m_blockIndex(bIndex), m_colorIndex(cIndex) {
   }
   // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
   // PES_COLOR_LIST(PES_COLOR_LIST&&) = default;
@@ -83,11 +83,11 @@ class PES_COLOR_LIST
   //~PES_COLOR_LIST() = default;
 
   [[nodiscard]] inline constexpr auto getBlockIndex() const noexcept -> uint16_t {
-	return blockIndex;
+	return m_blockIndex;
   }
 
   [[nodiscard]] inline constexpr auto getColorIndex() const noexcept -> uint16_t {
-	return colorIndex;
+	return m_colorIndex;
   }
 };
 
