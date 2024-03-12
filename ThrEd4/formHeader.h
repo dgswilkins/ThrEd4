@@ -209,6 +209,7 @@ union SATINANGLEOUT {
 class FRM_HEAD_O // Original form header used prior to version 2
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint8_t  attribute {};   // attribute
   uint16_t vertexCount {}; // number of sides
   uint8_t  type {};        // type
@@ -232,6 +233,7 @@ class FRM_HEAD_O // Original form header used prior to version 2
   float       edgeSpacing {};     // edge spacing
   float       edgeStitchLen {};   // edge stitch length
   uint16_t    res {};             // pico length
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   FRM_HEAD_O() noexcept = default;
   // FRM_HEAD_O(FRM_HEAD_O const&) = default;
