@@ -92,10 +92,10 @@ class PES_COLOR_LIST
 };
 
 #pragma pack(push, 1)
-// NOLINTBEGIN(readability-magic-numbers)
 class PESHED
 {
   public:
+  // NOLINTBEGIN(readability-magic-numbers, misc-non-private-member-variables-in-classes)
   std::array<char, 4>    ledI {};  //   0-3  Identification (#PES)
   std::array<char, 4>    ledV {};  //   4-7  version (0001)
   uint32_t               off {};   //   8-b  Absolute PEC section byte offset
@@ -132,6 +132,8 @@ class PESHED
 
   //  uint16_t               styp1;    // 68,69  Stitch type (0)
   //  uint16_t               scol;     // 6a,6b  Stitch Palette thread index
+  
+  // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
   constexpr PESHED() noexcept = default;
   // PESHED(PESHED&&) = default;
@@ -139,7 +141,6 @@ class PESHED
   // PESHED& operator=(PESHED&&) = default;
   //~PESHED() = default;
 };
-// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
 #ifdef USE_PESLED 
