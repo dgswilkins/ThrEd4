@@ -153,16 +153,26 @@ class PESLED
 #pragma pack(push, 1)
 class PESSTCHLST
 {
-  public:
-  uint16_t stitchtype {};
-  uint16_t threadIndex {};
-  uint16_t stitchcount {};
+  private:
+  uint16_t m_stitchType {};
+  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
+  uint16_t m_threadIndex {};
+  uint16_t m_stitchCount {};
+  // NOLINTEND(clang-diagnostic-unused-private-field)
 
+  public:
   // constexpr PESSTCHLST() noexcept = default;
+  explicit inline constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
+      m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
+  }
   // PESSTCHLST(PESSTCHLST&&) = default;
   // PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
   // PESSTCHLST& operator=(PESSTCHLST&&) = default;
   //~PESSTCHLST() = default;
+
+  inline void setStitchType(uint32_t stype) {
+	m_stitchType = gsl::narrow<uint16_t>(stype);
+  }
 };
 #pragma pack(pop)
 
@@ -831,7 +841,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  pi::ritpesCode(pesBuffer);
 	  // close out the previous block
 	  auto* blockHeader        = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
-	  blockHeader->stitchcount = gsl::narrow<uint16_t>(stitchCount);
+	  blockHeader->setStitchType(stitchCount);
 	  // save the thread/color information
 	  ++pesThreadCount;
 	  stitchColor     = StitchBuffer->operator[](iStitch).attribute & COLMSK;
@@ -855,7 +865,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   // finalize the last stitch block
   auto* blockHeader        = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
-  blockHeader->stitchcount = gsl::narrow_cast<uint16_t>(stitchCount);
+  blockHeader->setStitchType(stitchCount);
   // write the color/thread table
   lastIndex = pesBuffer.size();
   pesBuffer.resize(lastIndex + sizeof(uint16_t));
