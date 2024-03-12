@@ -130,15 +130,17 @@ class PESHED
 // NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
+#ifdef USE_PESLED 
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
 // NOLINTBEGIN(readability-magic-numbers)
 class PESLED
 {
-  public:
-  std::array<int8_t, 8> ver {};
-  uint32_t              pec {};
+  private:
+  std::array<int8_t, 8> m_ver {};
+  uint32_t              m_pec {};
 
-  constexpr PESLED() noexcept = default;
+  public:
+  explicit inline constexpr PESLED() noexcept = default;
   // PESLED(PESLED&&) = default;
   // PESLED& operator=(PESLED const& rhs) = default;
   // PESLED& operator=(PESLED&&) = default;
@@ -146,6 +148,7 @@ class PESLED
 };
 // NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
+#endif
 
 #pragma pack(push, 1)
 class PESSTCHLST
