@@ -25,7 +25,7 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "boost/dynamic_bitset.hpp"
-#include "fmt/xchar.h"
+#include "fmt/format.h"
 #include "gsl/gsl"
 #pragma warning(pop)
 
@@ -47,12 +47,30 @@
 #include <ShlObj.h>
 
 // Standard Libraries
+#include <algorithm>
+#include <array>
 #include <bitset>
+#include <cctype>
+#include <climits>
+#include <cstring>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
+#include <cwchar>
+#include <cwctype>
 #include <filesystem>
+#include <iterator>
 #include <limits>
+#include <memory>
 #include <numeric>
+#include <ranges>
+#include <stdexcept>
 #include <string>
+#include <system_error>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 #include <vector>
+#include <xutility>
 
 #endif // DEBUG_PCH
