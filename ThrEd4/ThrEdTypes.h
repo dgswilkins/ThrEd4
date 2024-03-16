@@ -16,20 +16,37 @@
 // C RunTime Header Files
 #include <ShlObj.h>
 
+// Standard Libraries
+#include <source_location>
+
 #ifdef _DEBUG
-#define outDebugString(X, ...) traceLoc(std::source_location::current(), X, __VA_ARGS__)
-template <typename... Args>
-// this should not be neccessary as I think F.19 is satisfied but clang does not like it
-// NOLINTNEXTLINE (cppcoreguidelines-missing-std-forward)
-void traceLoc(std::source_location loc, const wchar_t* strX, Args&&... args) {
-  auto       name = utf::utf8ToUtf16(std::string(loc.file_name()));
-  auto       line = loc.line();
-  auto const strY = fmt::format(FMT_COMPILE(L" {}({}) : {}"), name, line, strX);
+class FMT_WITH_LOC
+{
+  public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  const wchar_t*       strX;
+  std::source_location loc;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+  inline constexpr FMT_WITH_LOC(const wchar_t* fmtString,
+                     const std::source_location& fileLoc = std::source_location::current()) noexcept :
+      strX(fmtString),
+      loc(fileLoc) {
+  }
+};
+
+template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, Args&&... args) {
+  auto       name = utf::utf8ToUtf16(std::string(fwl.loc.file_name()));
+  auto       line = fwl.loc.line();
+  auto const strY = fmt::format(FMT_COMPILE(L" {}({}) : {}"), name, line, fwl.strX);
   auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
   OutputDebugString(strZ.c_str());
 }
 #else
-#define outDebugString(X, ...)
+template <typename... Args>
+constexpr void outDebugString([[maybe_unused]] const wchar_t* value, [[maybe_unused]] Args... args) {
+}
 #endif
 
 constexpr float DEFUSPAC = 6.0F;        // default underlay stitch spacing
