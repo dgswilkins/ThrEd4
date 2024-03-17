@@ -1,7 +1,7 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by ThrEd4.rc
-//
+// NOLINTBEGIN(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
 #define IDS_FSELB                       1
 #define IDS_FSELF                       2
 #define IDS_FSELA                       3
@@ -670,3 +670,4 @@
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
+// NOLINTEND(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
