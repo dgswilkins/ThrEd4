@@ -11,7 +11,6 @@ Checks:            "*,\
 -llvm-header-guard,\
 -llvm-include-order,\
 -llvm-qualified-auto,\
--misc-include-cleaner,\
 -readability-function-cognitive-complexity
 "
 WarningsAsErrors:  ''
@@ -30,3 +29,4 @@ CheckOptions:
   - { key: readability-identifier-naming.PrivateMemberPrefix,   value: m_         }
   - { key: readability-identifier-naming.StructCase,            value: camelBack  }
   - { key: readability-identifier-naming.VariableCase,          value: camelBack  }
+  - { key: misc-include-cleaner.IgnoreHeaders,                  value: stdafx.*   }
