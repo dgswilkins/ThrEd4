@@ -20,7 +20,9 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
+#ifndef _DEBUG
 #include <cmath>
+#endif
 #include <vector>
 
 constexpr auto MINDBL = 4e-5; // small number for conversions

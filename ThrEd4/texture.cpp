@@ -515,13 +515,11 @@ void texture::drwtxtr() {
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
   auto const extraWidth = TextureScreen.spacing * wrap::toFloat(TextureScreen.lines + 2U);
   if (StateMap->testAndReset(StateFlag::CHKTX)) {
+#ifdef _DEBUG
 	auto const erased = std::erase_if(*TempTexturePoints, [&](auto const& point) -> bool {
 	  return !(point.line <= TextureScreen.lines && point.y <= TextureScreen.areaHeight);
 	});
-#ifdef _DEBUG
 	outDebugString(L"[{}] texture points erased\n", erased);
-#else
-	DBG_UNREFERENCED_LOCAL_VARIABLE(erased);
 #endif
   }
   auto const flag = (pixelSpace > editSpace);

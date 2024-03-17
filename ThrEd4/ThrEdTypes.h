@@ -6,18 +6,23 @@
 #include "utf8conv.h"
 
 // Open Source headers
+#ifdef _DEBUG
 #pragma warning(push)
 #pragma warning(disable : 4702) // supress warning for fmt library header
 #include "fmt/xchar.h"
 #include "fmt/compile.h"
 #pragma warning(pop)
+#endif
 
 // C RunTime Header Files
+#ifndef _DEBUG
 #include <ShlObj.h>
+#endif
 
 // Standard Libraries
-#include <source_location>
+#ifdef _DEBUG
 #include<source_location>
+#endif
 
 #ifdef _DEBUG
 class FMT_WITH_LOC
