@@ -611,8 +611,8 @@ void satin::satadj(FRM_HEAD& form) {
   }
   else {
 	// sort the guides
-	auto itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
-	auto itEndGuide   = wrap::next(itStartGuide, form.satinGuideCount);
+	auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+	auto const itEndGuide   = wrap::next(itStartGuide, form.satinGuideCount);
 	std::sort(itStartGuide, itEndGuide, satin::scomp);
   }
   if (form.satinGuideCount < savedGuideCount) {

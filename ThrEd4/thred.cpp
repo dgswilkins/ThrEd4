@@ -3192,7 +3192,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(TSSIZE);
   auto iBuffer = threadSizeBuffer.begin();
-  for (auto& iThread : ThreadSize) {
+  for (auto const& iThread : ThreadSize) {
 	*(iBuffer++) = gsl::narrow<char>(iThread);
   }
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
@@ -11934,8 +11934,8 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	      DrawItem->itemAction == ODA_DRAWENTIRE) {
 		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 		if (StateMap->test(StateFlag::HID)) {
-		  auto ucb         = wrap::next(UserColorBrush.begin(), ActiveColor);
-		  auto itUserColor = wrap::next(UserColor.begin(), ActiveColor);
+		  auto const ucb   = wrap::next(UserColorBrush.begin(), ActiveColor);
+		  auto const itUserColor = wrap::next(UserColor.begin(), ActiveColor);
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 		  SetBkColor(DrawItem->hDC, *itUserColor);
 		}
