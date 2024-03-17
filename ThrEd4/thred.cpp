@@ -12263,9 +12263,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		    0,                 // ItemData
 		    FormOnOff->data(), // TypeData
 		    1,                 // cch (dummy value since we use SetMenuItemInfo)
-#if (WINVER >= 0x0500)
-		    nullptr // bmpItem
-#endif              /* WINVER >= 0x0500 */
+		    nullptr            // bmpItem (available only on Windows 2000 and higher)
 	  };
 
 	  auto privateMsgBuffer                 = std::vector<wchar_t> {};
