@@ -156,7 +156,7 @@ union TF_INFO_OUT {
     return m_feather;
   }
   
-  void setFeather(FTHR_INFO value) noexcept {
+  void setFeather(FTHR_INFO const& value) noexcept {
     m_feather = value;
   }
 
@@ -165,7 +165,7 @@ union TF_INFO_OUT {
     return m_texture;
   }
   
-  void setTexture(TXTR_INFO value) noexcept {
+  void setTexture(TXTR_INFO const& value) noexcept {
 	m_texture = value;
   }
 };
