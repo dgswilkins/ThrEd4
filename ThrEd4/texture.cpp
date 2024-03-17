@@ -156,7 +156,7 @@ auto tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexcept -
 void txcntrv(FRM_HEAD const& textureForm);
 void txdelal();
 auto txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool;
-void txfn(uint32_t& textureType, uint32_t formIndex);
+void txfn(uint32_t textureType, uint32_t formIndex);
 void txgro(FRM_HEAD const& textureForm);
 void txhor(FRM_HEAD& form);
 auto txnam(std::wstring& name) -> bool;
@@ -1249,7 +1249,7 @@ void texture::txof() {
 
 enum TextureStyles { VRTYP, HORTYP, ANGTYP };
 
-void txi::txfn(uint32_t& textureType, uint32_t formIndex) {
+void txi::txfn(uint32_t textureType, uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   if (form.satinGuideCount != 0U) {
