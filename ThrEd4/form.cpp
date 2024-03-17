@@ -4837,7 +4837,7 @@ void fi::lcon(FRM_HEAD const&              form,
   auto sequencePathIndex = 1U;
   auto dontSkip          = true;
   auto inPath            = 0U;
-  for (inPath = 0U; inPath < pathMapIndex; ++inPath) {
+  for (; inPath < pathMapIndex; ++inPath) {
 	if (pathMap[inPath].node == leftRegion) {
 	  dontSkip = false;
 	  break;
