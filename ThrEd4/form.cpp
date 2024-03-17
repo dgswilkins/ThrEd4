@@ -4718,7 +4718,7 @@ void fi::lcon(FRM_HEAD const&              form,
   if (lineEndpoints.empty()) {
 	return;
   }
-  auto       sortedLineIndices = fi::getLineSortOrder(lineEndpoints);
+  auto const sortedLineIndices = fi::getLineSortOrder(lineEndpoints);
   auto const lineCount         = wrap::toUnsigned(sortedLineIndices.size());
   auto       regions           = std::vector<REGION> {};
   regions.emplace_back(0U, 0U, 0U, 0U);
@@ -6848,7 +6848,7 @@ void form::dustar(uint32_t starCount, float length) {
   newForm.type = FRMFPOLY;
   auto point   = thred::pxCor2stch(Msg.pt);
   StateMap->set(StateFlag::FILDIR);
-  auto itFirstVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
+  auto const itFirstVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   auto itVertex      = itFirstVertex;
   for (auto iVertex = 0U; iVertex < vertexCount; ++iVertex) {
 	itVertex->x = point.x;
@@ -6858,7 +6858,7 @@ void form::dustar(uint32_t starCount, float length) {
 	++itVertex;
   }
   itVertex               = itFirstVertex;
-  auto       itEndVertex = wrap::next(itVertex, starCount);
+  auto const itEndVertex = wrap::next(itVertex, starCount);
   auto const center      = F_POINT {wrap::midl(itEndVertex->x, itFirstVertex->x),
                                wrap::midl(itEndVertex->y, itFirstVertex->y)};
   ++itVertex;
@@ -6892,7 +6892,7 @@ void form::duspir(uint32_t stepCount) {
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto newForm        = FRM_HEAD {};
   newForm.type        = FRMLINE;
-  auto vertexCount    = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
+  auto const vertexCount    = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
