@@ -4,13 +4,68 @@
 #include "switches.h"
 #include "clip.h"
 #include "displayText.h"
+#include "EnumMap.h"
 #include "form.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "menu.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 #include "xt.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/compile.h"
+#include "gsl/narrow"
+#include "gsl/pointers"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <sysinfoapi.h>
+#include <windef.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cwchar>
+#include <filesystem>
+#include <iterator>
+#include <limits>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <xutility>
 
 class FEATHER
 {

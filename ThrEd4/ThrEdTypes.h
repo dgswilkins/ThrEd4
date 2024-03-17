@@ -4,7 +4,6 @@
 // Local Headers
 #include "Resources\resource.h"
 #include "utf8conv.h"
-#include "point.h"
 
 // Open Source headers
 #pragma warning(push)
@@ -18,6 +17,7 @@
 
 // Standard Libraries
 #include <source_location>
+#include<source_location>
 
 #ifdef _DEBUG
 class FMT_WITH_LOC

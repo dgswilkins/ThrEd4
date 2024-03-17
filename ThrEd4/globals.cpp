@@ -1,6 +1,46 @@
 // Local Headers
 #include "stdafx.h"
+#include "clipStitch.h"
+#include "EnumMap.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
+#include "point.h"
+#include "satCon.h"
+#include "textureHeader.h"
+#include "ThrEdTypes.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <windef.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <array>
+#include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
 // clang-format off
 uint8_t                        ActiveColor               = 0U;      // active color selector

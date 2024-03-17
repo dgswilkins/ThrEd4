@@ -3,12 +3,37 @@
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/util"
+#pragma warning(pop)
 
 // Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <ranges>
+// resharper disable CppUnusedIncludeDirective
+#include <type_traits>
+// ReSharper restore CppUnusedIncludeDirective
+#include <vector>
 
 // clip internal namespace
 namespace ci {

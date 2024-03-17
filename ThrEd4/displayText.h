@@ -2,12 +2,14 @@
 
 // Local Headers
 #include "textureHeader.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
 
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "fmt/xchar.h"
-#include "fmt/compile.h"
 #pragma warning(pop)
 
 // Standard Libraries

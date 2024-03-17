@@ -4,7 +4,46 @@
 #include "displayText.h"
 #include "form.h"
 #include "globals.h"
+#include "Resources/resource.h"
+#include "textureHeader.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <libloaderapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <cstdint>
+#include <filesystem>
+#include <ranges>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 // displayText internal namespace
 namespace di {

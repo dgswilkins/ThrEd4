@@ -3,11 +3,55 @@
 #include "bitmap.h"
 #include "displayText.h"
 #include "DST.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/core.h"
+#include "fmt/format.h"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
 
 // Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <limits>
+#include <string>
+#include <vector>
+
 #ifdef ALLOCFAILURE
 // #include <new.h>
 #endif

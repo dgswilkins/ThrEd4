@@ -6,24 +6,49 @@
 #include "balarad.h"
 #include "bitmap.h"
 #include "clip.h"
+#include "clipStitch.h"
 #include "displayText.h"
 #include "DST.h"
+#include "EnumMap.h"
 #include "form.h"
 #include "formClip.h"
 #include "formForms.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "keys.h"
 #include "menu.h"
 #include "mouse.h"
 #include "PCS.h"
 #include "PES.h"
+#include "point.h"
 #include "repair.h"
+#include "Resources/resource.h"
+#include "satCon.h"
 #include "satin.h"
 #include "texture.h"
+#include "textureHeader.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "trace.h"
 #include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 #include "xt.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "fmt/compile.h"
+#include "gsl/narrow"
+#include "gsl/pointers"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -34,8 +59,54 @@
 #endif
 
 // Windows Header Files:
+#include <basetsd.h>
+#include <combaseapi.h>
 #include <commdlg.h>
+#include <corecrt.h>
+#include <corecrt_wstring.h>
+#include <errhandlingapi.h>
+#include <fileapi.h>
+#include <handleapi.h>
+#include <KnownFolders.h>
+#include <minwinbase.h>
+#include <minwindef.h>
+#include <objbase.h>
+#include <processenv.h>
+#include <sal.h>
 #include <shellapi.h>
+#include <ShlObj_core.h>
+#include <ShObjIdl_core.h>
+#include <shtypes.h>
+#include <sysinfoapi.h>
+#include <WinBase.h>
+#include <windef.h>
+#include <winerror.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cctype>
+#include <cmath>
+#include <cstring>
+#include <cstddef>
+#include <cstdint>
+#include <cwchar>
+#include <cwctype>
+#include <filesystem>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <ranges>
+#include <string>
+#include <system_error>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <xutility>
 
 #ifdef ALLOCFAILURE
 // #include <new.h>
@@ -10377,7 +10448,7 @@ void thi::ducmd() {
 	return;
   }
   auto readBuffer = std::vector<char> {};
-  readBuffer.resize(_MAX_PATH + 1);
+  readBuffer.resize(MAX_PATH + 1);
   gsl::not_null<fs::path*> const balaradName1 = bal::getBN1();
   *balaradName1                               = balaradFileName;
   auto bytesRead                              = DWORD {};

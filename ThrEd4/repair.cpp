@@ -1,10 +1,36 @@
 // Local Headers
 #include "stdafx.h"
 #include "displayText.h"
+#include "EnumMap.h"
+#include "formHeader.h"
 #include "globals.h"
+#include "iniFile.h"
+#include "point.h"
 #include "repair.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#pragma warning(pop)
+
+// Standard Libraries
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <xutility>
 
 constexpr auto BADFLT = 1U;
 constexpr auto BADCLP = 1U << 1U;

@@ -2,11 +2,58 @@
 #include "stdafx.h"
 #include "clip.h"
 #include "displayText.h"
+#include "EnumMap.h"
 #include "ExtendedBitSet.h"
 #include "form.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
+#include "point.h"
+#include "Resources/resource.h"
+#include "satCon.h"
 #include "satin.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <windef.h>
+#include <wingdi.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <cstring>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cwchar>
+#include <iterator>
+#include <limits>
+#include <stdexcept>
+#include <type_traits>
+#include <vector>
+#include <xutility>
 
 // satin internal namespace
 namespace si {

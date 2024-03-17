@@ -3,22 +3,63 @@
 #include "stdafx.h"
 #include "switches.h"
 #include "backup.h"
-#include "balarad.h"
-#include "bitmap.h"
 #include "displayText.h"
+#include "EnumMap.h"
 #include "form.h"
 #include "formClip.h"
 #include "formForms.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
 #include "hlp.h"
+#include "iniFile.h"
 #include "keys.h"
 #include "menu.h"
 #include "mouse.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "trace.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 #include "xt.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <iterator>
+#include <string>
+#include <vector>
+#include <xutility>
 
 // keys
 namespace {

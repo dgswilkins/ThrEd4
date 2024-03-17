@@ -1,7 +1,6 @@
 #pragma once
 
 // Local Headers
-#include "clipStitch.h"
 #include "formHeader.h"
 
 // Standard Libraries

@@ -1,7 +1,43 @@
 // Local Headers
 #include "stdafx.h"
 #include "globals.h"
+#include "point.h"
+#include "ThrEdTypes.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <minwinbase.h>
+#include <minwindef.h>
+#include <WinBase.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <cstdint>
+#include <cwchar>
+#include <vector>
 
 auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   try {

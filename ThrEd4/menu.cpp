@@ -5,19 +5,60 @@
 #include "backup.h"
 #include "bitmap.h"
 #include "displayText.h"
+#include "EnumMap.h"
 #include "form.h"
 #include "formClip.h"
 #include "formForms.h"
 #include "globals.h"
 #include "hlp.h"
+#include "iniFile.h"
 #include "keys.h"
 #include "menu.h"
+#include "point.h"
 #include "repair.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "trace.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 #include "xt.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/pointers"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwinbase.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <array>
+#include <cstdint>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 // menus
 namespace {

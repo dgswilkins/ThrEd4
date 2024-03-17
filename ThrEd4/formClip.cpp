@@ -2,13 +2,64 @@
 // Local Headers
 #include "stdafx.h"
 #include "clip.h"
+#include "clipStitch.h"
 #include "displayText.h"
 #include "form.h"
 #include "formClip.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "point.h"
+#include "Resources/resource.h"
+#include "satCon.h"
 #include "satin.h"
 #include "texture.h"
+#include "textureHeader.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "gsl/narrow"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <WinBase.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <limits>
+#include <ranges>
+// resharper disable CppUnusedIncludeDirective
+#include <type_traits>
+// ReSharper restore CppUnusedIncludeDirective
+#include <vector>
 
 #pragma pack(push, 1)
 class FORM_CLIP // form data clipboard header

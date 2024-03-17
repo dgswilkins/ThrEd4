@@ -5,10 +5,59 @@
 #if PESACT
 // Local Headers
 #include "displayText.h"
+#include "EnumMap.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "PES.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "gsl/narrow"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cwchar>
+#include <filesystem>
+#include <iterator>
+#include <limits>
+#include <string>
+#include <vector>
 
 static constexpr uint8_t THUMBHGT = 38U;
 static constexpr uint8_t THUMBWID = 48U;

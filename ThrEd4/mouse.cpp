@@ -2,19 +2,35 @@
 // Local Headers
 #include "stdafx.h"
 #include "backup.h"
-#include "balarad.h"
-#include "bitmap.h"
 #include "displayText.h"
+#include "EnumMap.h"
 #include "form.h"
 #include "formClip.h"
 #include "formForms.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
 #include "mouse.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "trace.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 #include "xt.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/compile.h"
+#include "gsl/narrow"
+#include "gsl/util"
+#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -25,8 +41,17 @@
 #endif
 
 // Windows Header Files:
-#include <commdlg.h>
-#include <shellapi.h>
+#include <windef.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 namespace {
 // cursors

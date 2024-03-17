@@ -3,6 +3,7 @@
 // Local Headers
 #include "point.h"
 #include "reporting.h"
+#include "ThrEdTypes.h"
 
 // Open Source headers
 #include "gsl/gsl"
@@ -19,6 +20,7 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
+#include <cmath>
 #include <vector>
 
 constexpr auto MINDBL = 4e-5; // small number for conversions

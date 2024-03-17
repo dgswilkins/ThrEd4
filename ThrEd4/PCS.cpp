@@ -3,9 +3,53 @@
 #include "stdafx.h"
 #include "bitmap.h"
 #include "displayText.h"
+#include "EnumMap.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "PCS.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+#include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/span"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <winnt.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <cwctype>
+#include <filesystem>
+#include <string>
+#include <vector>
+#include <xutility>
 
 #pragma pack(push, 1)
 

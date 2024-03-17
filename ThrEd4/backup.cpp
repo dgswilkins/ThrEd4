@@ -2,9 +2,26 @@
 // Local Headers
 #include "stdafx.h"
 #include "backup.h"
+#include "formHeader.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "menu.h"
+#include "point.h"
+#include "satCon.h"
+#include "textureHeader.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/span"
+#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -13,6 +30,20 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
+// Windows Header Files:
+#include <windef.h> // Win32 header
+#include <WinUser.h>
+
+// Standard Libraries
+// resharper disable CppUnusedIncludeDirective
+#include <algorithm>
+// ReSharper restore CppUnusedIncludeDirective
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <xutility>
 
 class BACK_HEAD // Backup header
 {

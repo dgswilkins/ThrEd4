@@ -3,11 +3,30 @@
 #include "switches.h"
 #include "bitmap.h"
 #include "displayText.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
+#include "point.h"
 #include "reporting.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "trace.h"
 #include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/pointers"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -18,12 +37,34 @@
 #endif
 
 // Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// C RunTime Header Files
+#include <combaseapi.h>
 #include <commdlg.h>
+#include <errhandlingapi.h>
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <ShObjIdl_core.h>
+#include <shtypes.h>
+#include <windef.h> 
+#include <winerror.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
 
 // Standard Libraries
+// resharper disable CppUnusedIncludeDirective
+#include <algorithm>
+// ReSharper restore CppUnusedIncludeDirective
+#include <array>
+#include <bitset>
+#include <cmath>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 #include <vector>
 
 constexpr auto BITCOL  = uint32_t {0xffff00U}; // default bitmap color
