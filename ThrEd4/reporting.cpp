@@ -5,7 +5,9 @@
 #include "displayText.h"
 #endif
 #include "reporting.h"
+#ifdef _DEBUG
 #include "ThrEdTypes.h"
+#endif
 // resharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
@@ -14,7 +16,9 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#ifndef _DEBUG
 #include "fmt/xchar.h"
+#endif
 #include "gsl/span"
 #include "gsl/util"
 #pragma warning(pop)
