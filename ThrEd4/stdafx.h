@@ -7,20 +7,6 @@
 
 #ifndef DEBUG_PCH
 
-// Local Headers
-#include "clipStitch.h"
-#include "EnumMap.h"
-#include "ExtendedBitSet.h"
-#include "formHeader.h"
-#include "fRectangle.h"
-#include "point.h"
-#include "satCon.h"
-#include "textureHeader.h"
-#include "ThrEdTypes.h"
-#include "utf8conv.h"
-#include "warnings.h"
-#include "wrappers.h"
-
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
