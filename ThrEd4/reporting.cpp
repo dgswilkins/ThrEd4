@@ -2,7 +2,10 @@
 // Local Headers
 #include "stdafx.h"
 #ifndef _DEBUG
+#include "switches.h"
+#if SHOW_ERROR
 #include "displayText.h"
+#endif
 #endif
 #include "reporting.h"
 #ifdef _DEBUG
@@ -17,7 +20,9 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #ifndef _DEBUG
+#if SHOW_ERROR
 #include "fmt/xchar.h"
+#endif
 #endif
 #include "gsl/span"
 #include "gsl/util"
@@ -37,7 +42,7 @@
 #include <winnt.h>
 
 // report the system error from GetLastError
-void rpt::reportError(const wchar_t* prompt, DWORD& errorCode) {
+void rpt::reportError([[maybe_unused]]const wchar_t* prompt, DWORD& errorCode) {
   auto* lpMsgBuf = gsl::narrow_cast<LPVOID>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
   auto const res = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -55,10 +60,11 @@ void rpt::reportError(const wchar_t* prompt, DWORD& errorCode) {
 #ifdef _DEBUG
 	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 #else
-	auto info = std::wstring {};
-	info      = fmt::format(
-        fmt::runtime(L"{} failed with error [{}], {}\n"), prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
-	// displayText::shoMsg(info, false);
+#if SHOW_ERROR
+	auto const info = fmt::format(
+	    fmt::runtime(L"{} failed with error [{}], {}\n"), prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
+	displayText::shoMsg(info, false);
+#endif
 #endif
 	LocalFree(lpMsgBuf);
   }

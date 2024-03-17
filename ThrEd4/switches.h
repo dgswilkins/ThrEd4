@@ -13,4 +13,5 @@
 #define USE_SHORT_NAME 0 // use the 8.3 version of the BMP file name
 #define USE_DEFBDIR 1    // use the same directory for BMP as the file
 #define USE_DEFAULTDIR 0 // set the default directory rather than using the OS mechanism
+#define SHOW_ERROR 1     // show error messages
 // NOLINTEND(cppcoreguidelines-macro-usage)
