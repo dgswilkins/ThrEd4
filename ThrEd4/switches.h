@@ -1,7 +1,8 @@
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
+// resharper disable CppClangTidyModernizeMacroToEnum
 #pragma once
 
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+// NOLINTBEGIN(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
 // compile switches
 #define HIGHDPI 1 // allow for high DPI scaling
 #define PESACT 1  // compile pes code
@@ -14,4 +15,4 @@
 #define USE_DEFBDIR 1    // use the same directory for BMP as the file
 #define USE_DEFAULTDIR 0 // set the default directory rather than using the OS mechanism
 #define SHOW_ERROR 1     // show error messages
-// NOLINTEND(cppcoreguidelines-macro-usage)
+// NOLINTEND(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
