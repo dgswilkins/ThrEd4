@@ -10,11 +10,11 @@
   "overrides": [
     {
       "name": "boost-dynamic-bitset",
-      "version": "1.83.0"
+      "version": "1.84.0"
     },
     {
       "name": "fmt",
-      "version": "10.1.1"
+      "version": "10.2.1"
     },
     {
       "name": "ms-gsl",
