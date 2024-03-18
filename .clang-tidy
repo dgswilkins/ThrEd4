@@ -2,6 +2,7 @@
 Checks:            "*,\
 -altera-*,\
 -bugprone-easily-swappable-parameters,\
+-clang-diagnostic-nonportable-system-include-path,\
 -cppcoreguidelines-avoid-c-arrays,\
 -cppcoreguidelines-avoid-magic-numbers,\
 -cppcoreguidelines-avoid-non-const-global-variables,\
