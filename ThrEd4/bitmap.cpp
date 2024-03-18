@@ -64,7 +64,9 @@
 #include <filesystem>
 #include <stdexcept>
 #include <string>
+// resharper disable CppUnusedIncludeDirective
 #include <type_traits>
+// ReSharper restore CppUnusedIncludeDirective
 #include <vector>
 
 constexpr auto BITCOL  = uint32_t {0xffff00U}; // default bitmap color

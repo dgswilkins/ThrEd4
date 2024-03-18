@@ -18,7 +18,6 @@
 #include "textureHeader.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
-#include "utf8conv.h"
 // resharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
@@ -58,7 +57,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <cctype>
+#ifdef _WIN64 
 #include <cwchar>
+#endif
 #include <filesystem>
 #include <iterator>
 #include <ranges>

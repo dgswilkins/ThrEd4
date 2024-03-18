@@ -18,7 +18,6 @@
 #include "texture.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
-#include "utf8conv.h"
 // resharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
@@ -54,7 +53,6 @@
 // Standard Libraries
 #include <algorithm>
 #include <array>
-#include <cstring>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>

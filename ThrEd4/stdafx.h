@@ -7,6 +7,7 @@
 
 #ifndef DEBUG_PCH
 
+#include "warnings.h"
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
@@ -39,7 +40,9 @@
 #include <cctype>
 #include <climits>
 #include <cstring>
+#ifndef _DEBUG
 #include <cmath>
+#endif
 #include <cstddef>
 #include <cstdint>
 #include <cwchar>

@@ -22,7 +22,6 @@
 #include "thred.h"
 #include "ThrEdTypes.h"
 #include "trace.h"
-#include "utf8conv.h"
 // resharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective

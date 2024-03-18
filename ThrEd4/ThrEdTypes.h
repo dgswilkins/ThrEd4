@@ -14,11 +14,6 @@
 #pragma warning(pop)
 #endif
 
-// C RunTime Header Files
-#ifndef _DEBUG
-#include <ShlObj.h>
-#endif
-
 // Standard Libraries
 #ifdef _DEBUG
 #include<source_location>

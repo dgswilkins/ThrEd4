@@ -21,7 +21,9 @@
 
 // Standard Libraries
 #ifndef _DEBUG
+// resharper disable CppUnusedIncludeDirective
 #include <cmath>
+// resharper restore CppUnusedIncludeDirective
 #endif
 #include <vector>
 
