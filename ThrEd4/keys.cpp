@@ -75,6 +75,7 @@ auto           handleHomeKey(bool& retflag) -> bool;
 auto           handleLeftKey(bool& retflag) -> bool;
 auto           handleRightKey(bool& retflag) -> bool;
 void           handleShiftedLeftKey();
+void           handleShiftedRightKey();
 void           istch();
 void           mark();
 auto           movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool;
@@ -612,65 +613,69 @@ void kyi::selup() {
   }
 }
 
-auto kyi::handleRightKey(bool& retflag) -> bool {
-  retflag = true;
-  if (wrap::pressed(VK_SHIFT)) {
-	if (StateMap->test(StateFlag::FPSEL)) {
-	  auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-	  if (StateMap->test(StateFlag::PSELDIR)) {
-		++SelectedFormVertices.vertexCount %= vertexCount;
-		SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % vertexCount;
+void kyi::handleShiftedRightKey() {
+  if (StateMap->test(StateFlag::FPSEL)) {
+	auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
+	if (StateMap->test(StateFlag::PSELDIR)) {
+	  ++SelectedFormVertices.vertexCount %= vertexCount;
+	  SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % vertexCount;
+	}
+	else {
+	  if (SelectedFormVertices.vertexCount != 0U) {
+		--(SelectedFormVertices.vertexCount);
+		SelectedFormVertices.finish =
+		    (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
 	  }
 	  else {
-		if (SelectedFormVertices.vertexCount != 0U) {
-		  --(SelectedFormVertices.vertexCount);
-		  SelectedFormVertices.finish =
-		      (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
-		}
-		else {
-		  SelectedFormVertices.vertexCount = 1;
-		  StateMap->set(StateFlag::PSELDIR);
-		  SelectedFormVertices.finish = (SelectedFormVertices.start + 1U) % vertexCount;
-		}
+		SelectedFormVertices.vertexCount = 1;
+		StateMap->set(StateFlag::PSELDIR);
+		SelectedFormVertices.finish = (SelectedFormVertices.start + 1U) % vertexCount;
 	  }
+	}
+	thred::setpsel();
+  }
+  else {
+	if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
+	  auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
+	  form::unpsel();
+	  SelectedFormVertices.start       = ClosestVertexToCursor;
+	  SelectedFormVertices.form        = ClosestFormToCursor;
+	  SelectedFormVertices.vertexCount = 1;
+	  SelectedFormVertices.finish      = (SelectedFormVertices.start + 1U) % vertexCount;
+	  StateMap->set(StateFlag::PSELDIR);
 	  thred::setpsel();
 	}
 	else {
-	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
-		auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-		form::unpsel();
-		SelectedFormVertices.start       = ClosestVertexToCursor;
-		SelectedFormVertices.form        = ClosestFormToCursor;
-		SelectedFormVertices.vertexCount = 1;
-		SelectedFormVertices.finish      = (SelectedFormVertices.start + 1U) % vertexCount;
-		StateMap->set(StateFlag::PSELDIR);
-		thred::setpsel();
+	  StateMap->reset(StateFlag::LENSRCH);
+	  StateMap->reset(StateFlag::FORMSEL);
+	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
+		if (!StitchBuffer->empty()) {
+		  auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+		  if (ClosestPointIndex < lastStitch) {
+			StateMap->set(StateFlag::GRPSEL);
+			GroupStitchIndex = ClosestPointIndex + 1U;
+		  }
+		}
 	  }
 	  else {
-		StateMap->reset(StateFlag::LENSRCH);
-		StateMap->reset(StateFlag::FORMSEL);
-		if (StateMap->testAndReset(StateFlag::SELBOX)) {
-		  if (!StitchBuffer->empty()) {
-			auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-			if (ClosestPointIndex < lastStitch) {
-			  StateMap->set(StateFlag::GRPSEL);
-			  GroupStitchIndex = ClosestPointIndex + 1U;
-			}
+		if (!StitchBuffer->empty()) {
+		  auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+		  if (GroupStitchIndex < lastStitch) {
+			++GroupStitchIndex;
+			thred::nuAct(GroupStitchIndex);
 		  }
 		}
-		else {
-		  if (!StitchBuffer->empty()) {
-			auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-			if (GroupStitchIndex < lastStitch) {
-			  ++GroupStitchIndex;
-			  thred::nuAct(GroupStitchIndex);
-			}
-		  }
-		}
-		thred::grpAdj();
-		thred::redrawColorBar();
 	  }
+	  thred::grpAdj();
+	  thred::redrawColorBar();
 	}
+  }
+}
+
+auto kyi::handleRightKey(bool& retflag) -> bool {
+  retflag = true;
+  if (wrap::pressed(VK_SHIFT)) {
+	kyi::handleShiftedRightKey();
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
