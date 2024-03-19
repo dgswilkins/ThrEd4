@@ -192,6 +192,7 @@ static constexpr auto STITCH_TYPES = std::array<char, 13> {
 
 namespace xi {
 
+void addNewStitches(INT_INFO& ilData, const FRM_HEAD& form);
 void bcolfn(uint32_t formIndex, uint8_t color);
 void blenfn(uint32_t formIndex, float length);
 void bmaxfn(uint32_t formIndex, float length);
@@ -1653,6 +1654,53 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
   }
 }
 
+void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
+  auto code = 0U;
+  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
+	code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
+	       InterleaveSequenceIndices->operator[](iSequence).color;
+	if ((form.extendedAttribute & AT_STRT) != 0U) {
+	  if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
+		auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
+		ilData.output += xi::gucon(
+		    form,
+		    *StitchBuffer,
+		    *itVertex,
+		    InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+		    ilData.output,
+		    code);
+	  }
+	}
+	if (auto colpnt = F_POINT {}; xi::lastcol(iSequence, colpnt)) {
+	  ilData.output +=
+	      xi::gucon(form,
+	                *StitchBuffer,
+	                colpnt,
+	                InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
+	                ilData.output,
+	                code);
+	}
+	auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
+	auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
+	for (auto index = thisIndex; index < nextIndex; ++index) {
+	  if (ilData.output > 0) {
+		auto& interleave = InterleaveSequence->operator[](index);
+		if (auto const& stitch = StitchBuffer->operator[](ilData.output - 1U);
+		    !util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
+		  StitchBuffer->emplace_back(interleave.x, interleave.y, code);
+		  ++(ilData.output);
+		}
+	  }
+	  else {
+		auto& interleave = InterleaveSequence->operator[](index);
+		StitchBuffer->emplace_back(interleave.x, interleave.y, code);
+		++(ilData.output);
+	  }
+	}
+  }
+  xi::chkend(form, *StitchBuffer, code, ilData);
+}
+
 void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uint32_t fillStartsMap) {
   auto ilData = INT_INFO {};
   StateMap->reset(StateFlag::ISEND);
@@ -1734,50 +1782,7 @@ void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uin
 	StitchBuffer->insert(StitchBuffer->begin(), itStartStitch, itEndStitch);
   }
   else { // no stitches added so far
-	auto code = 0U;
-	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
-	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
-	         InterleaveSequenceIndices->operator[](iSequence).color;
-	  if ((form.extendedAttribute & AT_STRT) != 0U) {
-		if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
-		  auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
-		  ilData.output += xi::gucon(
-		      form,
-		      *StitchBuffer,
-		      *itVertex,
-		      InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
-		      ilData.output,
-		      code);
-		}
-	  }
-	  if (auto colpnt = F_POINT {}; xi::lastcol(iSequence, colpnt)) {
-		ilData.output += xi::gucon(
-		    form,
-		    *StitchBuffer,
-		    colpnt,
-		    InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
-		    ilData.output,
-		    code);
-	  }
-	  auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
-	  auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
-	  for (auto index = thisIndex; index < nextIndex; ++index) {
-		if (ilData.output > 0) {
-		  auto& interleave = InterleaveSequence->operator[](index);
-		  if (auto const& stitch = StitchBuffer->operator[](ilData.output - 1U);
-		      !util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
-			StitchBuffer->emplace_back(interleave.x, interleave.y, code);
-			++(ilData.output);
-		  }
-		}
-		else {
-		  auto& interleave = InterleaveSequence->operator[](index);
-		  StitchBuffer->emplace_back(interleave.x, interleave.y, code);
-		  ++(ilData.output);
-		}
-	  }
-	}
-	xi::chkend(form, *StitchBuffer, code, ilData);
+	xi::addNewStitches(ilData, form);
   }
   thred::coltab();
 }
