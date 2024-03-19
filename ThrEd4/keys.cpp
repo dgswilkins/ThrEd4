@@ -852,38 +852,35 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
 		thred::updateBackground();
 		StateMap->set(StateFlag::RESTCH);
+		break;
 	  }
-	  else {
 #if PESACT
-		//				IniFile.auxFileType=AUXPES;
-		//				strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
-		//				StateMap->set(StateFlag::REDOLD);
-		//				nuFil();
-		//				lodpes();
-		//				savpes();
+	  // IniFile.auxFileType=AUXPES;
+	  // strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
+	  // StateMap->set(StateFlag::REDOLD);
+	  // nuFil();
+	  // lodpes();
+	  // savpes();
 #endif
-		thred::tst();
-	  }
+	  thred::tst();
 	  break;
 	}
 	case VK_PRIOR: { // page up
 	  if (wrap::pressed(VK_SHIFT)) {
 		StateMap->reset(StateFlag::ROTCLOCK);
 		form::dupfn(IniFile.rotationAngle);
+		break;
 	  }
-	  else {
-		form::rotagain();
-	  }
+	  form::rotagain();
 	  break;
 	}
 	case VK_NEXT: { // page down
 	  if (wrap::pressed(VK_SHIFT)) {
 		StateMap->set(StateFlag::ROTCLOCK);
 		form::dupfn(IniFile.rotationAngle);
+		break;
 	  }
-	  else {
-		form::bakagain();
-	  }
+	  form::bakagain();
 	  break;
 	}
 	case VK_SUBTRACT: { // keypad -
@@ -915,20 +912,18 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case VK_OEM_COMMA: { // ',' any country
 	  if (wrap::pressed(VK_SHIFT)) {
 		xt::setfilstrt();
+		break;
 	  }
-	  else {
-		thred::savdo();
-		form::join();
-	  }
+	  thred::savdo();
+	  form::join();
 	  break;
 	}
 	case VK_OEM_PERIOD: { // '.' any country
 	  if (wrap::pressed(VK_SHIFT)) {
 		xt::setfilend();
+		break;
 	  }
-	  else {
-		keys::setmov();
-	  }
+	  keys::setmov();
 	  break;
 	}
 	case VK_OEM_2: { // '/?' for US
@@ -938,19 +933,17 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case VK_OEM_4: { //  '[{' for US
 	  if (wrap::pressed(VK_SHIFT)) {
 		kyi::selfrm0();
+		break;
 	  }
-	  else {
-		keys::ungrplo();
-	  }
+	  keys::ungrplo();
 	  break;
 	}
 	case VK_OEM_6: { //  ']}' for US
 	  if (wrap::pressed(VK_SHIFT)) {
 		kyi::selfrmx();
+		break;
 	  }
-	  else {
-		keys::ungrphi();
-	  }
+	  keys::ungrphi();
 	  break;
 	}
 	case VK_OEM_7: { //  ''"' for US
@@ -968,15 +961,13 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case VK_F3: {
 	  if (wrap::pressed(VK_CONTROL)) {
 		form::srtfrm();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  form::srtbyfrm();
-		}
-		else {
-		  xt::fsort();
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		form::srtbyfrm();
+		break;
 	  }
+	  xt::fsort();
 	  break;
 	}
 	case VK_F4: {
@@ -1006,38 +997,32 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case VK_F11: {
 	  if (wrap::pressed(VK_SHIFT)) {
 		thred::rembig();
+		break;
 	  }
-	  else {
-		thred::duzero();
-	  }
+	  thred::duzero();
 	  break;
 	}
 	case VK_F12: {
 	  if (wrap::pressed(VK_CONTROL)) {
 		if (wrap::pressed(VK_MENU)) {
 		  thred::reldun();
+		  break;
 		}
 #ifdef _DEBUG
-		else {
-		  if (OpenClipboard(ThrEdWindow) != 0) {
-			EmptyClipboard();
-		  }
-		  CloseClipboard();
+		if (OpenClipboard(ThrEdWindow) != 0) {
+		  EmptyClipboard();
 		}
+		CloseClipboard();
+		break;
 #endif
 	  }
-	  else {
 #ifdef _DEBUG
-		if (wrap::pressed(VK_SHIFT)) {
-		  xt::dmpat();
-		}
-		else {
-#endif
-		  thred::dun();
-#ifdef _DEBUG
-		}
-#endif
+	  if (wrap::pressed(VK_SHIFT)) {
+		xt::dmpat();
+		break;
 	  }
+#endif
+	  thred::dun();
 	  break;
 	}
 	case VK_INSERT: {
@@ -1088,19 +1073,17 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case VK_DOWN: {
 	  if (wrap::pressed(VK_CONTROL)) {
 		thred::nudgfn(0, -IniFile.cursorNudgeStep);
+		break;
 	  }
-	  else {
-		kyi::seldwn();
-	  }
+	  kyi::seldwn();
 	  break;
 	}
 	case VK_UP: {
 	  if (wrap::pressed(VK_CONTROL)) {
 		thred::nudgfn(0, IniFile.cursorNudgeStep);
+		break;
 	  }
-	  else {
-		kyi::selup();
-	  }
+	  kyi::selup();
 	  break;
 	}
 	case VK_RIGHT: {
@@ -1122,15 +1105,13 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case L'A': {
 	  if (wrap::pressed(VK_CONTROL)) {
 		thred::selalstch();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  form::selal();
-		}
-		else {
-		  thred::zumout();
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		form::selal();
+		break;
 	  }
+	  thred::zumout();
 	  break;
 	}
 	case L'B': {
@@ -1138,35 +1119,31 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
 		  backup::redo();
 		}
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  thred::bakmrk();
-		}
-		else {
-		  backup::bak();
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		thred::bakmrk();
+		break;
 	  }
+	  backup::bak();
 	  break;
 	}
 	case L'C': {
 	  if (wrap::pressed(VK_CONTROL)) {
 		tfc::duclip();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  StateMap->reset(StateFlag::CNV2FTH);
-		  satin::ribon();
-		}
-		else {
-		  if (!thred::unselectAll()) {
-			StateMap->reset(StateFlag::HIDSTCH);
-			StateMap->set(StateFlag::IGNTHR);
-			thred::rebox();
-			StateMap->reset(StateFlag::IGNTHR);
-			StateMap->set(StateFlag::RESTCH);
-		  }
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		StateMap->reset(StateFlag::CNV2FTH);
+		satin::ribon();
+		break;
+	  }
+	  if (!thred::unselectAll()) {
+		StateMap->reset(StateFlag::HIDSTCH);
+		StateMap->set(StateFlag::IGNTHR);
+		thred::rebox();
+		StateMap->reset(StateFlag::IGNTHR);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  break;
 	}
@@ -1176,41 +1153,36 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		  PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 		  keybd_event('F', 0, 0, 0);
 		}
+		break;
 	  }
-	  else {
-		satin::satsel();
-	  }
+	  satin::satsel();
 	  break;
 	}
 	case L'E': {
 	  if (wrap::pressed(VK_SHIFT)) {
 		texture::dutxtfil();
+		break;
 	  }
-	  else {
-		form::infrm();
-	  }
+	  form::infrm();
 	  break;
 	}
 	case L'F': {
 	  if (!SelectedFormList->empty()) {
 		PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 		keybd_event('F', 0, 0, 0);
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  StateMap->set(StateFlag::CNV2FTH);
-		  satin::ribon();
-		}
-		else {
-		  form::frmon();
-		  if (StateMap->test(StateFlag::FORMSEL)) {
-			formForms::refrm();
-		  }
-		  else {
-			form::form();
-		  }
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		StateMap->set(StateFlag::CNV2FTH);
+		satin::ribon();
+		break;
 	  }
+	  form::frmon();
+	  if (StateMap->test(StateFlag::FORMSEL)) {
+		formForms::refrm();
+		break;
+	  }
+	  form::form();
 	  break;
 	}
 	case L'G': {
@@ -1220,68 +1192,60 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case L'H': {
 	  if (wrap::pressed(VK_SHIFT)) {
 		thred::pglft();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_CONTROL)) {
-		  trace::trcsel();
-		}
-		else {
-		  trace::blak();
-		}
+	  if (wrap::pressed(VK_CONTROL)) {
+		trace::trcsel();
+		break;
 	  }
+	  trace::blak();
 	  break;
 	}
 	case L'J': {
 	  if (wrap::pressed(VK_SHIFT)) {
 		thred::pgrit();
+		break;
 	  }
-	  else {
-		form::refilal();
-	  }
+	  form::refilal();
 	  break;
 	}
 	case L'K': {
 	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
 		thred::setknots();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  thred::tglhid();
-		}
-		else {
-		  if (wrap::pressed(VK_CONTROL)) {
-			thred::set1knot();
-		  }
-		  else {
-			form::tglfrm();
-		  }
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		thred::tglhid();
+		break;
 	  }
+	  if (wrap::pressed(VK_CONTROL)) {
+		thred::set1knot();
+		break;
+	  }
+	  form::tglfrm();
 	  break;
 	}
 	case L'L': {
 	  if (wrap::pressed(VK_SHIFT)) {
 		thred::delstch();
+		break;
 	  }
-	  else {
-		form::fcntr();
-	  }
+	  form::fcntr();
 	  break;
 	}
 	case L'M': {
 	  if (wrap::pressed(VK_CONTROL)) {
 		thred::pntmrk();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * HALF, wrap::toFloat(UnzoomedRect.cy) * HALF);
-		}
-		else {
-		  if (thred::inStitchWin()) {
-			auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-			thred::dumrk(stitchPoint.x, stitchPoint.y);
-		  }
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * HALF, wrap::toFloat(UnzoomedRect.cy) * HALF);
+		StateMap->set(StateFlag::RESTCH);
+		break;
+	  }
+	  if (thred::inStitchWin()) {
+		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+		thred::dumrk(stitchPoint.x, stitchPoint.y);
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	  break;
@@ -1289,16 +1253,14 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	case L'N': {
 	  if (wrap::pressed(VK_CONTROL)) {
 		xt::nudsiz();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  thred::pgdwn();
-		}
-		else {
-		  StateMap->set(StateFlag::TRCUP);
-		  trace::trace();
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		thred::pgdwn();
+		break;
 	  }
+	  StateMap->set(StateFlag::TRCUP);
+	  trace::trace();
 	  break;
 	}
 	case L'O': {
@@ -1314,20 +1276,18 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		thred::movStch();
 		thred::unbox();
 		StateMap->set(StateFlag::RESTCH);
+		break;
 	  }
-	  else {
-		if (FormDataSheet == nullptr) {
-		  if (wrap::pressed(VK_CONTROL)) {
-			form::setrang();
-			return true;
-		  }
-		  if (wrap::pressed(VK_SHIFT)) {
-			thred::rotmrk();
-			return true;
-		  }
-
-		  thred::rotseg();
+	  if (FormDataSheet == nullptr) {
+		if (wrap::pressed(VK_CONTROL)) {
+		  form::setrang();
+		  return true;
 		}
+		if (wrap::pressed(VK_SHIFT)) {
+		  thred::rotmrk();
+		  return true;
+		}
+		thred::rotseg();
 	  }
 	  break;
 	}
@@ -1335,44 +1295,38 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	  if (wrap::pressed(VK_CONTROL)) {
 		thred::colchk();
 		thred::save();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  thred::gsnap();
-		}
-		else {
-		  thred::zumshft();
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		thred::gsnap();
+		break;
 	  }
+	  thred::zumshft();
 	  break;
 	}
 	case L'T': {
 	  if (wrap::pressed(VK_SHIFT)) {
 		thred::retrac();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_CONTROL)) {
-		  trace::trinit();
-		}
-		else {
-		  thred::thumnail();
-		}
+	  if (wrap::pressed(VK_CONTROL)) {
+		trace::trinit();
+		break;
 	  }
+	  thred::thumnail();
 	  break;
 	}
 	case L'U': {
 	  if (wrap::pressed(VK_SHIFT)) {
 		thred::pgup();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_CONTROL)) {
-		  trace::trdif();
-		}
-		else {
-		  StateMap->reset(StateFlag::TRCUP);
-		  trace::trace();
-		}
+	  if (wrap::pressed(VK_CONTROL)) {
+		trace::trdif();
+		break;
 	  }
+	  StateMap->reset(StateFlag::TRCUP);
+	  trace::trace();
 	  break;
 	}
 	case L'V': {
@@ -1382,50 +1336,42 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		if (pasteFlag) {
 		  return retval;
 		}
+		break;
 	  }
-	  else {
-		thred::closPnt();
-	  }
+	  thred::closPnt();
 	  break;
 	}
 	case L'W': {
 	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
 		thred::contract();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_CONTROL)) {
-		  thred::stretch();
-		}
-		else {
-		  if (wrap::pressed(VK_SHIFT)) {
-			form::crop();
-		  }
-		  else {
-			form::insat();
-		  }
-		}
+	  if (wrap::pressed(VK_CONTROL)) {
+		thred::stretch();
+		break;
 	  }
+	  if (wrap::pressed(VK_SHIFT)) {
+		form::crop();
+		break;
+	  }
+	  form::insat();
 	  break;
 	}
 	case L'X': {
 	  if (wrap::pressed(VK_CONTROL)) {
 		thred::cut();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_SHIFT)) {
-		  thred::hidbit();
-		}
-		else {
-		  thred::zumhom();
-		}
+	  if (wrap::pressed(VK_SHIFT)) {
+		thred::hidbit();
+		break;
 	  }
+	  thred::zumhom();
 	  break;
 	}
 	case L'Y': {
-	  if (form::closfrm()) {
-		if (!thred::unselectAll()) {
-		  thred::selfpnt();
-		}
+	  if (form::closfrm() && !thred::unselectAll()) {
+		thred::selfpnt();
 	  }
 	  break;
 	}
@@ -1433,15 +1379,13 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	  if (wrap::pressed(VK_SHIFT)) {
 		ZoomFactor = thred::getZoomMin();
 		thred::zumin();
+		break;
 	  }
-	  else {
-		if (wrap::pressed(VK_CONTROL)) {
-		  backup::bak();
-		}
-		else {
-		  thred::zumin();
-		}
+	  if (wrap::pressed(VK_CONTROL)) {
+		backup::bak();
+		break;
 	  }
+	  thred::zumin();
 	  break;
 	}
 	default: {
