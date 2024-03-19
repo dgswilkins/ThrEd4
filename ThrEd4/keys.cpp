@@ -74,6 +74,7 @@ auto           handleEndKey(int32_t& retflag) -> bool;
 auto           handleHomeKey(bool& retflag) -> bool;
 auto           handleLeftKey(bool& retflag) -> bool;
 auto           handleRightKey(bool& retflag) -> bool;
+void           handleShiftedLeftKey();
 void           istch();
 void           mark();
 auto           movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool;
@@ -714,53 +715,57 @@ auto kyi::handleRightKey(bool& retflag) -> bool {
   return {};
 }
 
-auto kyi::handleLeftKey(bool& retflag) -> bool {
-  retflag = true;
-  if (wrap::pressed(VK_SHIFT)) {
-	if (StateMap->test(StateFlag::FPSEL)) {
-	  auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-	  if (!StateMap->test(StateFlag::PSELDIR)) {
-		++SelectedFormVertices.vertexCount %= vertexCount;
+void kyi::handleShiftedLeftKey() {
+  if (StateMap->test(StateFlag::FPSEL)) {
+	auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
+	if (!StateMap->test(StateFlag::PSELDIR)) {
+	  ++SelectedFormVertices.vertexCount %= vertexCount;
+	  SelectedFormVertices.finish =
+	      (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
+	}
+	else {
+	  if (SelectedFormVertices.vertexCount != 0U) {
+		--(SelectedFormVertices.vertexCount);
 		SelectedFormVertices.finish =
 		    (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
 	  }
 	  else {
-		if (SelectedFormVertices.vertexCount != 0U) {
-		  --(SelectedFormVertices.vertexCount);
-		  SelectedFormVertices.finish =
-		      (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
-		}
-		else {
-		  SelectedFormVertices.vertexCount = 1;
-		  SelectedFormVertices.finish = (SelectedFormVertices.start + vertexCount - 1) % vertexCount;
-		  StateMap->reset(StateFlag::PSELDIR);
-		}
+		SelectedFormVertices.vertexCount = 1;
+		SelectedFormVertices.finish = (SelectedFormVertices.start + vertexCount - 1) % vertexCount;
+		StateMap->reset(StateFlag::PSELDIR);
 	  }
+	}
+	thred::setpsel();
+  }
+  else {
+	if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
+	  form::unpsel();
+	  SelectedFormVertices.start       = ClosestVertexToCursor;
+	  SelectedFormVertices.vertexCount = 1;
+	  StateMap->reset(StateFlag::PSELDIR);
 	  thred::setpsel();
 	}
 	else {
-	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
-		form::unpsel();
-		SelectedFormVertices.start       = ClosestVertexToCursor;
-		SelectedFormVertices.vertexCount = 1;
-		StateMap->reset(StateFlag::PSELDIR);
-		thred::setpsel();
+	  StateMap->reset(StateFlag::LENSRCH);
+	  StateMap->reset(StateFlag::FORMSEL);
+	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
+		StateMap->set(StateFlag::GRPSEL);
+		GroupStitchIndex = ClosestPointIndex - 1U;
 	  }
-	  else {
-		StateMap->reset(StateFlag::LENSRCH);
-		StateMap->reset(StateFlag::FORMSEL);
-		if (StateMap->testAndReset(StateFlag::SELBOX)) {
-		  StateMap->set(StateFlag::GRPSEL);
-		  GroupStitchIndex = ClosestPointIndex - 1U;
-		}
-		else if (GroupStitchIndex != 0U) {
-		  --GroupStitchIndex;
-		  thred::nuAct(GroupStitchIndex);
-		}
-		thred::grpAdj();
-		thred::redrawColorBar();
+	  else if (GroupStitchIndex != 0U) {
+		--GroupStitchIndex;
+		thred::nuAct(GroupStitchIndex);
 	  }
+	  thred::grpAdj();
+	  thred::redrawColorBar();
 	}
+  }
+}
+
+auto kyi::handleLeftKey(bool& retflag) -> bool {
+  retflag = true;
+  if (wrap::pressed(VK_SHIFT)) {
+	kyi::handleShiftedLeftKey();
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
