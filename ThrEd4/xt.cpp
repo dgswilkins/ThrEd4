@@ -262,6 +262,7 @@ auto orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> re
 void ritwlk(FRM_HEAD& form, uint32_t walkMask);
 void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
 void sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
+void setColorOrder() noexcept;
 
 auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
@@ -1230,6 +1231,18 @@ auto xi::srtchk(std::vector<O_REC*> const& stitchRegion,
   return true;
 }
 
+void xi::setColorOrder() noexcept {
+  auto itColorOrder = wrap::next(ColorOrder.begin(), AppliqueColor);
+  *itColorOrder     = 0;
+  itColorOrder      = ColorOrder.begin();
+  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
+	if (iColor != AppliqueColor) {
+	  *itColorOrder = iColor + 1U;
+	}
+	++itColorOrder;
+  }
+}
+
 void xt::fsort() {
   if (!StitchBuffer->empty()) {
 	auto attribute    = StitchBuffer->front().attribute & SRTMSK;
@@ -1242,23 +1255,13 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(O_REC {});
 	stitchRegion.back().startStitch = 0;
-	auto itColorOrder               = wrap::next(ColorOrder.begin(), AppliqueColor);
-	*itColorOrder                   = 0;
-	itColorOrder                    = ColorOrder.begin();
-	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	  if (iColor != AppliqueColor) {
-		*itColorOrder = iColor + 1U;
-	  }
-	  ++itColorOrder;
-	}
+	xi::setColorOrder();
 	for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  if ((StitchBuffer->operator[](iStitch).attribute & SRTMSK) != attribute) {
 		stitchRegion.back().finish    = iStitch;
 		stitchRegion.back().endStitch = iStitch - 1U;
-		stitchRegion.emplace_back(O_REC {});
-		stitchRegion.back().start       = iStitch;
-		stitchRegion.back().startStitch = iStitch;
-		attribute                       = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
+		stitchRegion.emplace_back(O_REC {iStitch, 0, iStitch, 0, 0, 0, 0, 0});
+		attribute = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
 	  }
 	}
 	stitchRegion.back().finish    = wrap::toUnsigned(StitchBuffer->size());
