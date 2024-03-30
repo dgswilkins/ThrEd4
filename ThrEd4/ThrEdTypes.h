@@ -15,6 +15,7 @@
 #endif
 
 // Standard Libraries
+#include <numbers>
 #ifdef _DEBUG
 #include<source_location>
 #endif
@@ -69,10 +70,10 @@ constexpr auto   MAXSIZ   = 9.0F;              // default maximum stitch size
 constexpr float  SHOPNTS  = 0.00F;             // show stitch points when zoom below this
 constexpr float  STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
 constexpr float  DEFSPACE = 0.45F;             // default stitch spacing
-constexpr float  PI_F     = 3.1415927F;        // PI to single precision
+constexpr float  PI_F     = std::numbers::pi_v<float>;        // PI to single precision
 constexpr float  PI_F2    = PI_F * 2.0F;       //
 constexpr float  PI_FHALF = PI_F / 2.0F;       //
-constexpr double PI_D     = 3.141592653589793; // PI to double precision
+constexpr double PI_D     = std::numbers::pi; // PI to double precision
 constexpr double PI_D2    = PI_D * 2.0;        //
 constexpr float  USPAC    = 15.0F;             // underlay fill spacing
 constexpr float  URAT     = 0.75F;             // ratio of underlay stitch to satin border size
