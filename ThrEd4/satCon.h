@@ -17,8 +17,8 @@ class SAT_CON
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   constexpr SAT_CON() noexcept = default;
-  explicit inline constexpr SAT_CON(SAT_CON_OUT const& rhs) noexcept;
-  explicit inline constexpr SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept;
+  explicit constexpr SAT_CON(SAT_CON_OUT const& rhs) noexcept;
+  explicit constexpr SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept;
   // SAT_CON(SAT_CON const&) = default;
   // SAT_CON(SAT_CON&&) = default;
   // SAT_CON& operator=(SAT_CON const& rhs) = default;
@@ -28,7 +28,7 @@ class SAT_CON
   inline auto operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON&;
 };
 
-inline constexpr SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept :
+constexpr SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept :
     start(rStart), finish(rFinish) {
 }
 
@@ -41,8 +41,8 @@ class SAT_CON_OUT
   uint16_t finish {};
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  explicit inline constexpr SAT_CON_OUT() noexcept = default;
-  explicit inline constexpr SAT_CON_OUT(SAT_CON const& rhs);
+  explicit constexpr SAT_CON_OUT() noexcept = default;
+  explicit constexpr SAT_CON_OUT(SAT_CON const& rhs);
   // SAT_CON_OUT(SAT_CON_OUT const&) = default;
   // SAT_CON_OUT(SAT_CON_OUT&&) = default;
   // SAT_CON_OUT& operator=(SAT_CON_OUT const& rhs) = default;
@@ -53,7 +53,7 @@ class SAT_CON_OUT
 };
 #pragma pack(pop)
 
-inline constexpr SAT_CON_OUT::SAT_CON_OUT(SAT_CON const& rhs) :
+constexpr SAT_CON_OUT::SAT_CON_OUT(SAT_CON const& rhs) :
     start(gsl::narrow<decltype(start)>(rhs.start)), finish(gsl::narrow<decltype(finish)>(rhs.finish)) {
 }
 
@@ -64,7 +64,7 @@ inline auto SAT_CON_OUT::operator=(SAT_CON const& rhs) -> SAT_CON_OUT& {
   return *this;
 }
 
-inline constexpr SAT_CON::SAT_CON(SAT_CON_OUT const& rhs) noexcept : start(rhs.start), finish(rhs.finish) {
+constexpr SAT_CON::SAT_CON(SAT_CON_OUT const& rhs) noexcept : start(rhs.start), finish(rhs.finish) {
 }
 
 inline auto SAT_CON::operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON& {

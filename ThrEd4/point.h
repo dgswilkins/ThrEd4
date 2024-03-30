@@ -68,7 +68,7 @@ class D_POINT
 
   // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
-  explicit inline D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {}
+  explicit D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {}
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   explicit inline D_POINT(float rhsX, float rhsY) noexcept;
@@ -89,17 +89,17 @@ class F_POINT
   float y {};
   // NOLINTEND
 
-  explicit inline constexpr F_POINT() noexcept = default;
-  explicit inline constexpr F_POINT(double rhsX, double rhsY);
-  explicit inline constexpr F_POINT(float rhsX, float rhsY) noexcept;
-  explicit inline constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
-  explicit inline constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
-  explicit inline constexpr F_POINT(D_POINT const& rhs);
-  inline constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
-  inline constexpr auto operator=(D_POINT const& rhs) -> F_POINT&;
-  inline constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
-  inline constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
-  inline constexpr auto operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT&;
+  explicit constexpr F_POINT() noexcept = default;
+  explicit constexpr F_POINT(double rhsX, double rhsY);
+  explicit constexpr F_POINT(float rhsX, float rhsY) noexcept;
+  explicit constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
+  explicit constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
+  explicit constexpr F_POINT(D_POINT const& rhs);
+  constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
+  constexpr auto operator=(D_POINT const& rhs) -> F_POINT&;
+  constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
+  constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
+  constexpr auto operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT&;
   // F_POINT(F_POINT const&) = default;
   // F_POINT(F_POINT&&) = default;
   // F_POINT& operator=(F_POINT const& rhs) = default;
@@ -108,49 +108,49 @@ class F_POINT
 
   inline auto operator+(F_POINT_ATTR const& rhs) const noexcept -> F_POINT;
 
-  inline auto operator+(F_POINT const& rhs) const noexcept -> F_POINT {
+  auto operator+(F_POINT const& rhs) const noexcept -> F_POINT {
 	return F_POINT {x + rhs.x, y + rhs.y};
   }
 
-  inline auto operator-(F_POINT const& rhs) const noexcept -> F_POINT {
+  auto operator-(F_POINT const& rhs) const noexcept -> F_POINT {
 	return F_POINT {x - rhs.x, y - rhs.y};
   }
 
-  inline auto operator-() const noexcept -> F_POINT {
+  auto operator-() const noexcept -> F_POINT {
 	return F_POINT {-x, -y};
   }
 
-  inline constexpr auto operator+=(F_POINT const& rhs) noexcept -> F_POINT& {
+  constexpr auto operator+=(F_POINT const& rhs) noexcept -> F_POINT& {
 	x += rhs.x;
 	y += rhs.y;
 	return *this;
   }
 
-  inline constexpr auto operator-=(F_POINT const& rhs) noexcept -> F_POINT& {
+  constexpr auto operator-=(F_POINT const& rhs) noexcept -> F_POINT& {
 	x -= rhs.x;
 	y -= rhs.y;
 	return *this;
   }
 
-  inline constexpr auto operator*=(float rhs) noexcept -> F_POINT& {
+  constexpr auto operator*=(float rhs) noexcept -> F_POINT& {
 	x *= rhs;
 	y *= rhs;
 	return *this;
   }
   
-  inline constexpr auto operator*(float rhs) const noexcept -> F_POINT {
+  constexpr auto operator*(float rhs) const noexcept -> F_POINT {
 	return F_POINT {x * rhs, y * rhs};
   }
 
-  inline constexpr auto operator*(F_POINT rhs) const noexcept -> F_POINT {
+  constexpr auto operator*(F_POINT rhs) const noexcept -> F_POINT {
 	return F_POINT {x * rhs.x, y * rhs.y};
   }
 
-  inline constexpr auto operator/(float rhs) const noexcept -> F_POINT {
+  constexpr auto operator/(float rhs) const noexcept -> F_POINT {
 	return F_POINT {x / rhs, y / rhs};
   }
 
-  inline constexpr auto operator/(F_POINT rhs) const noexcept -> F_POINT {
+  constexpr auto operator/(F_POINT rhs) const noexcept -> F_POINT {
 	return F_POINT {x / rhs.x, y / rhs.y};
   }
 };
@@ -166,7 +166,7 @@ class F_POINT_ATTR
   uint32_t attribute {};
   // NOLINTEND
 
-  explicit inline constexpr F_POINT_ATTR() noexcept = default;
+  explicit constexpr F_POINT_ATTR() noexcept = default;
   explicit inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA);
   explicit inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
   // F_POINT_ATTR(F_POINT_ATTR const&) = default;
@@ -174,21 +174,21 @@ class F_POINT_ATTR
   // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
   // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
   //~F_POINT_ATTR() = default;
-  inline constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
+  constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
 
-  inline constexpr auto operator=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
+  constexpr auto operator=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
   }
 
-  inline constexpr auto operator+=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
+  constexpr auto operator+=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
 	x += rhs.x;
 	y += rhs.y;
 	return *this;
   }
 
-  inline constexpr auto operator-=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
+  constexpr auto operator-=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
 	x -= rhs.x;
 	y -= rhs.y;
 	return *this;
@@ -211,8 +211,8 @@ class SMAL_PNT_L
   float    y {};
   // NOLINTEND
 
-  explicit inline constexpr SMAL_PNT_L() noexcept = default;
-  explicit inline constexpr SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept;
+  explicit constexpr SMAL_PNT_L() noexcept = default;
+  explicit constexpr SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept;
   // SMAL_PNT_L(SMAL_PNT_L const&) = default;
   // SMAL_PNT_L(SMAL_PNT_L&&) = default;
   // SMAL_PNT_L& operator=(SMAL_PNT_L const& rhs) = default;
@@ -221,7 +221,7 @@ class SMAL_PNT_L
 
 };
 
-inline constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept :
+constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept :
     line(rhsLine), group(rhsGroup), x(rhsX), y(rhsY) {
 }
 
@@ -234,9 +234,9 @@ class B_SEQ_PNT
   int8_t attribute {};
   // NOLINTEND
 
-  explicit inline constexpr B_SEQ_PNT() noexcept = default;
-  explicit inline constexpr B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr);
-  explicit inline constexpr B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr);
+  explicit constexpr B_SEQ_PNT() noexcept = default;
+  explicit constexpr B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr);
+  explicit constexpr B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr);
   // B_SEQ_PNT(B_SEQ_PNT const&) = default;
   // B_SEQ_PNT(B_SEQ_PNT&&) = default;
   // B_SEQ_PNT& operator=(B_SEQ_PNT const& rhs) = default;
@@ -245,56 +245,56 @@ class B_SEQ_PNT
 };
 
 // ToDo - This should use wrap::toFloat but there would be a circular dependency
-inline constexpr B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
+constexpr B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-inline constexpr B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
+constexpr B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
     x(rhsX), y(rhsY), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-inline constexpr auto F_POINT::operator==(F_POINT const& rhs) const noexcept -> bool {
+constexpr auto F_POINT::operator==(F_POINT const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
-inline constexpr F_POINT::F_POINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
+constexpr F_POINT::F_POINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 
-inline constexpr F_POINT::F_POINT(int32_t rhsX, int32_t rhsY) noexcept :
+constexpr F_POINT::F_POINT(int32_t rhsX, int32_t rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr F_POINT::F_POINT(LONG rhsX, LONG rhsY) noexcept :
+constexpr F_POINT::F_POINT(LONG rhsX, LONG rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr F_POINT::F_POINT(double rhsX, double rhsY) :
+constexpr F_POINT::F_POINT(double rhsX, double rhsY) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)) {
 }
 
-inline constexpr F_POINT::F_POINT(D_POINT const& rhs) :
+constexpr F_POINT::F_POINT(D_POINT const& rhs) :
     x(util::doubleToFloat(rhs.x)), y(util::doubleToFloat(rhs.y)) {
 }
 
-inline constexpr auto F_POINT::operator=(D_POINT const& rhs) -> F_POINT& {
+constexpr auto F_POINT::operator=(D_POINT const& rhs) -> F_POINT& {
   x = util::doubleToFloat(rhs.x);
   y = util::doubleToFloat(rhs.y);
   return *this;
 }
 
-inline constexpr auto F_POINT::operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT& {
+constexpr auto F_POINT::operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline constexpr auto F_POINT::operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT& {
+constexpr auto F_POINT::operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline constexpr auto F_POINT::operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT& {
+constexpr auto F_POINT::operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
@@ -308,7 +308,7 @@ inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(rhsA) {
 }
 
-inline constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {
+constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y) && attribute == rhs.attribute;
 }
 

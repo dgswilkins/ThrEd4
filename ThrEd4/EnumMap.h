@@ -27,65 +27,65 @@ template <typename EnumType> class ENUM_MAP
   public:
   constexpr explicit ENUM_MAP(uint32_t i_val) : m_mask(i_val) {
   }
-  [[nodiscard]] inline auto test(EnumType const i_key) const -> bool {
+  [[nodiscard]] auto test(EnumType const i_key) const -> bool {
 	return m_mask.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
   }
-  inline void set() {
+  void set() {
 	m_mask.set();
   }
-  inline void set(EnumType const i_key, bool i_val = true) {
+  void set(EnumType const i_key, bool i_val = true) {
 	m_mask.set(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key), i_val);
   }
-  inline auto testAndSet(EnumType const i_key, bool i_val = true) -> bool {
+  auto testAndSet(EnumType const i_key, bool i_val = true) -> bool {
 	bool const val = m_mask.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	m_mask.set(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key), i_val);
 	return val;
   }
-  inline void reset() noexcept {
+  void reset() noexcept {
 	m_mask.reset();
   }
-  inline void reset(EnumType const i_key) {
+  void reset(EnumType const i_key) {
 	m_mask.reset(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
   }
-  inline auto testAndReset(EnumType const i_key) -> bool {
+  auto testAndReset(EnumType const i_key) -> bool {
 	bool const val = m_mask.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	m_mask.reset(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	return val;
   }
-  inline void flip() {
+  void flip() {
 	m_mask.flip();
   }
-  inline void flip(EnumType const i_key) {
+  void flip(EnumType const i_key) {
 	m_mask.flip(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
   }
-  inline auto testAndFlip(EnumType const i_key) -> bool {
+  auto testAndFlip(EnumType const i_key) -> bool {
 	bool const val = m_mask.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	m_mask.flip(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	return val;
   }
-  inline auto to_ulong() noexcept -> uint32_t { // NOLINT(readability-identifier-naming)
+  auto to_ulong() noexcept -> uint32_t { // NOLINT(readability-identifier-naming)
 	return m_mask.to_ulong();
   }
-  [[nodiscard]] inline auto count() const -> size_t {
+  [[nodiscard]] auto count() const -> size_t {
 	return m_mask.count();
   } // number of set bits
-  [[nodiscard]] inline auto size() const -> size_t {
+  [[nodiscard]] auto size() const -> size_t {
 	return m_mask.size();
   } // number of bits in the entire set
-  [[nodiscard]] inline auto any() const -> bool {
+  [[nodiscard]] auto any() const -> bool {
 	return m_mask.any();
   }
-  [[nodiscard]] inline auto none() const -> bool {
+  [[nodiscard]] auto none() const -> bool {
 	return m_mask.none();
   }
-  [[nodiscard]] inline auto all() const -> bool {
+  [[nodiscard]] auto all() const -> bool {
 	return m_mask.all();
   }
-  [[nodiscard]] inline auto mask() const
+  [[nodiscard]] auto mask() const
       -> std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> {
 	return m_mask;
   }
-  inline void mask(std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> const& i_mask) {
+  void mask(std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> const& i_mask) {
 	m_mask = i_mask;
   }
 

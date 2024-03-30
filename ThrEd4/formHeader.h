@@ -25,7 +25,7 @@ union FANGCLPOUT {
   //~FANGCLPOUT() = default;
 
   // Getter and Setter for angle
-  [[nodiscard]] inline auto getAngle() const noexcept -> float {
+  [[nodiscard]] auto getAngle() const noexcept -> float {
 	return m_angle;
   }
   
@@ -34,7 +34,7 @@ union FANGCLPOUT {
   }
 
   // Getter and Setter for clip
-  [[nodiscard]] inline auto getClip() const noexcept -> DWORD {
+  [[nodiscard]] auto getClip() const noexcept -> DWORD {
 	return m_clip;
   }
   
@@ -43,7 +43,7 @@ union FANGCLPOUT {
   }
 
   // Getter and Setter for guide
-  [[nodiscard]] inline auto getGuide() const noexcept -> SAT_CON_OUT {
+  [[nodiscard]] auto getGuide() const noexcept -> SAT_CON_OUT {
 	return m_guide;
   }
 
@@ -77,7 +77,7 @@ union FLENCNTOUT {
   //~FLENCNTOUT() = default;
 
   // Getter and Setter for stitchLength
-  [[nodiscard]] inline auto getStitchLength() const noexcept -> float {
+  [[nodiscard]] auto getStitchLength() const noexcept -> float {
 	return m_stitchLength;
   }
   void setStitchLength(float value) noexcept {
@@ -85,7 +85,7 @@ union FLENCNTOUT {
   }
 
   // Getter and Setter for clipCount
-  [[nodiscard]] inline auto getClipCount() const noexcept -> uint32_t {
+  [[nodiscard]] auto getClipCount() const noexcept -> uint32_t {
 	return m_clipCount;
   }
   void setClipCount(uint32_t value) noexcept {
@@ -152,7 +152,7 @@ union TF_INFO_OUT {
   //~TF_INFO_OUT() = default;
 
   // Getter and Setter for feather
-  [[nodiscard]] inline auto getFeather() const noexcept -> FTHR_INFO {
+  [[nodiscard]] auto getFeather() const noexcept -> FTHR_INFO {
     return m_feather;
   }
   
@@ -161,7 +161,7 @@ union TF_INFO_OUT {
   }
 
   // Getter and Setter for texture
-  [[nodiscard]] inline auto getTexture() const noexcept -> TXTR_INFO {
+  [[nodiscard]] auto getTexture() const noexcept -> TXTR_INFO {
     return m_texture;
   }
   
@@ -186,7 +186,7 @@ union SATINANGLEOUT {
   //~SATINANGLEOUT() = default;
 
   // Getter and Setter for guide
-  [[nodiscard]] inline auto getGuide() const noexcept -> DWORD {
+  [[nodiscard]] auto getGuide() const noexcept -> DWORD {
     return m_guide;
   }
   
@@ -195,7 +195,7 @@ union SATINANGLEOUT {
   }
 
   // Getter and Setter for angle
-  [[nodiscard]] inline auto getAngle() const noexcept -> float {
+  [[nodiscard]] auto getAngle() const noexcept -> float {
     return m_angle;
   }
   

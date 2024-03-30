@@ -73,7 +73,7 @@ class PCSHEADER // pcs file header structure
   // PCSHEADER& operator=(PCSHEADER&&) = default;
   //~PCSHEADER() = default;
 
-  inline void writeHeader(std::array<COLORREF, COLORCNT> userColor) {
+  void writeHeader(std::array<COLORREF, COLORCNT> userColor) {
 	m_leadIn     = LEADIN;
 	m_colorCount = COLORCNT;
 	wrap::narrow(m_stitchCount, StitchBuffer->size());
@@ -81,23 +81,23 @@ class PCSHEADER // pcs file header structure
 	std::ranges::copy(userColor, spColors.begin());
   }
 
-  inline constexpr void readHeader(std::array<COLORREF, COLORCNT>& userColor) {
+  constexpr void readHeader(std::array<COLORREF, COLORCNT>& userColor) {
 	std::ranges::copy(m_colors, userColor.begin());
   }
 
-  [[nodiscard]]inline auto isValid() const noexcept -> bool {
+  [[nodiscard]]auto isValid() const noexcept -> bool {
 	return (m_leadIn == LEADIN && m_colorCount == COLORCNT);
   }
 
-  inline constexpr void setHoopType(bool flag) noexcept {
+  constexpr void setHoopType(bool flag) noexcept {
 	m_hoopType = flag ? LARGHUP : SMALHUP;
   }
 
-  [[nodiscard]]inline constexpr auto getStitchCount() const noexcept -> uint16_t {
+  [[nodiscard]]constexpr auto getStitchCount() const noexcept -> uint16_t {
 	return m_stitchCount;
   }
 
-  [[nodiscard]]inline constexpr auto getHoopType() const noexcept -> int8_t {
+  [[nodiscard]]constexpr auto getHoopType() const noexcept -> int8_t {
 	return m_hoopType;
   }
 };

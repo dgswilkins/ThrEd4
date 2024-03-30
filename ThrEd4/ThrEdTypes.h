@@ -29,7 +29,7 @@ class FMT_WITH_LOC
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
-  inline constexpr FMT_WITH_LOC(const wchar_t* fmtString,
+  constexpr FMT_WITH_LOC(const wchar_t* fmtString,
                      const std::source_location& fileLoc = std::source_location::current()) noexcept :
       strX(fmtString),
       loc(fileLoc) {

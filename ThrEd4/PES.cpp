@@ -84,7 +84,7 @@ class PECHDR
   std::array<uint8_t, 463> pad {};         // Pad bytes up to 512.
   // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
-  explicit inline constexpr PECHDR() noexcept = default;
+  explicit constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;
   // PECHDR& operator=(PECHDR const& rhs) = default;
   // PECHDR& operator=(PECHDR&&) = default;
@@ -110,7 +110,7 @@ class PECHDR2
   uint16_t yMin {};     // starting Y val (Bigendian)
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  explicit inline constexpr PECHDR2() noexcept = default;
+  explicit constexpr PECHDR2() noexcept = default;
   // PECHDR2(PECHDR2&&) = default;
   // PECHDR2& operator=(PECHDR2 const& rhs) = default;
   // PECHDR2& operator=(PECHDR2&&) = default;
@@ -126,7 +126,7 @@ class PES_COLOR_LIST
 
   public:
   // constexpr PES_COLOR_LIST() noexcept = default;
-  explicit inline constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
+  explicit constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
       m_blockIndex(bIndex), m_colorIndex(cIndex) {
   }
   // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
@@ -135,11 +135,11 @@ class PES_COLOR_LIST
   // PES_COLOR_LIST& operator=(PES_COLOR_LIST&&) = default;
   //~PES_COLOR_LIST() = default;
 
-  [[nodiscard]] inline constexpr auto getBlockIndex() const noexcept -> uint16_t {
+  [[nodiscard]] constexpr auto getBlockIndex() const noexcept -> uint16_t {
 	return m_blockIndex;
   }
 
-  [[nodiscard]] inline constexpr auto getColorIndex() const noexcept -> uint16_t {
+  [[nodiscard]] constexpr auto getColorIndex() const noexcept -> uint16_t {
 	return m_colorIndex;
   }
 };
@@ -228,7 +228,7 @@ class PESSTCHLST
 
   public:
   // constexpr PESSTCHLST() noexcept = default;
-  explicit inline constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
+  explicit constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
       m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
   }
   // PESSTCHLST(PESSTCHLST&&) = default;
@@ -236,7 +236,7 @@ class PESSTCHLST
   // PESSTCHLST& operator=(PESSTCHLST&&) = default;
   //~PESSTCHLST() = default;
 
-  inline void setStitchType(uint32_t stype) {
+  void setStitchType(uint32_t stype) {
 	m_stitchType = gsl::narrow<uint16_t>(stype);
   }
 };
@@ -277,7 +277,7 @@ class THREAD
 
   public:
   // constexpr THREAD() noexcept = default;
-  explicit inline constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
+  explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
       m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
   }
   // THREAD(THREAD const&) = default;
@@ -286,11 +286,11 @@ class THREAD
   // THREAD& operator=(THREAD&&) = default;
   //~THREAD() = default;
 
-  [[nodiscard]] inline constexpr auto getColor() const noexcept -> PEC_COLOR const& {
+  [[nodiscard]] constexpr auto getColor() const noexcept -> PEC_COLOR const& {
 	return m_color;
   }
 
-  [[nodiscard]] inline constexpr auto getRGB() const noexcept -> COLORREF {
+  [[nodiscard]] constexpr auto getRGB() const noexcept -> COLORREF {
 	return RGB(m_color.r, m_color.g, m_color.b);
   }
 };
