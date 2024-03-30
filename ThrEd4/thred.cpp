@@ -3480,6 +3480,11 @@ void thred::savAs() {
 	  menu::setdst();
 	  break;
 	}
+	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	default: { // NOLINT(clang-diagnostic-covered-switch-default)
+	  outDebugString(L"Unknown file type\n");
+	  throw;
+	}
   }
   StateMap->set(StateFlag::SAVAS);
   thi::nunams();
@@ -3851,6 +3856,11 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	      pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()), INSERT_FILE_TYPES.data());
 	  break;
 	}
+	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	default: { // NOLINT(clang-diagnostic-covered-switch-default)
+	  outDebugString(L"Unknown file style\n");
+	  throw;
+	}
   }
   switch (fileIndex) {
 	case FileIndices::THR: {
@@ -3871,6 +3881,11 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	  break;
 	}
 #endif
+	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	default: { // NOLINT(clang-diagnostic-covered-switch-default)
+	  outDebugString(L"Unknown file index\n");
+	  throw;
+	}
   }
   hResult += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFAULTDIR
