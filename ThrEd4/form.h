@@ -6,7 +6,7 @@
 constexpr auto SQRCORNS = 4U; // number of corners in a square
 
 // is intersection of line and cursor in, before or after the line
-enum class IntersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
+enum class IntersectionStyles : uint8_t { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
 
 namespace form {
 

@@ -1248,7 +1248,7 @@ void texture::txof() {
   StateMap->reset(StateFlag::TXTRED);
 }
 
-enum TextureStyles { VRTYP, HORTYP, ANGTYP };
+enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
 void txi::txfn(uint32_t textureType, uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);

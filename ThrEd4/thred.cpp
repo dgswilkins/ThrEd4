@@ -355,7 +355,7 @@ constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 } // namespace
 
 // file menu items
-enum FileMenuItems {
+enum FileMenuItems : uint8_t {
   FM_NEW,
   FM_OPEN,
   FM_CLOS,

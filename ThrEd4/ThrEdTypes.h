@@ -152,7 +152,7 @@ constexpr auto PLM  = 7; // left midpoint
 constexpr auto PTLE = 8; // top left endpoint
 
 // main menu items
-enum MainMenuItems {
+enum MainMenuItems : int8_t {
   M_FILE,
   M_VIEW,
   M_FORM,
@@ -175,7 +175,7 @@ enum MainMenuItems {
 };
 
 // fill menu items
-enum FillMenuItems {
+enum FillMenuItems : int8_t {
   MFIL_SAT,
   MFIL_FTH,
   MFIL_VERT,
@@ -189,7 +189,7 @@ enum FillMenuItems {
 };
 
 // view menu items
-enum ViewMenuItems {
+enum ViewMenuItems : int8_t {
   MVW_MOVIE,
   MVW_SET,
   MVW_BACK,
@@ -212,7 +212,7 @@ enum HoopSize : int8_t {
 };
 
 // bitmap
-enum class StateFlag : uint32_t {
+enum class StateFlag : uint16_t {
   SATIN,   // user is entering a satin stitch form
   SATPNT,  // user is entering points for a satin stitch form
   BOXZUM,  // box zoom select mode
@@ -476,7 +476,7 @@ enum class StateFlag : uint32_t {
 };
 
 // user bitmap
-enum class UserFlag : uint32_t {
+enum class UserFlag : uint8_t {
   SQRFIL,  // square ends on fills
   BLUNT,   // blunt ends on satin lines
   NEDOF,   // needle cursor off
@@ -578,7 +578,7 @@ enum EdgeFillStyles : uint8_t {
 constexpr auto EDGETMAX = uint32_t {13U}; // number of edge fill types
 
 // preference window entries
-enum PrefWin : uint32_t {
+enum PrefWin : uint8_t {
   PRFAPPCOL, // Applique color
   PRFAPSLEN, // Applique stitchLen
   PRFBRDWID, // Border width
@@ -689,7 +689,7 @@ constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCO
 // clang-format on
 
 // form types
-enum FormStyles {
+enum FormStyles : int8_t {
   FRMLINE = 1U, // Line form
   FRMFPOLY,     // Freehand polygon form
   FRMRPOLY,     // Regular polygon form
@@ -706,14 +706,14 @@ enum FormStyles {
 };
 
 // clipboard data types
-enum ClipDataType { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
+enum ClipDataType : uint8_t { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
 
 // edge underlay bit
 constexpr auto EGUND  = uint8_t {0x80U};
 constexpr auto NEGUND = uint8_t {0x7fU};
 
 // form data lines
-enum FormData {
+enum FormData : uint8_t {
   LFRM,       // form 0
   LLAYR,      // layer 1
   LFRMFIL,    // form fill 2
@@ -767,7 +767,7 @@ enum FormData {
 };
 
 // fill message codes
-enum FillMessageCodes {
+enum FillMessageCodes : uint16_t {
   FMM_FAN,
   FMM_VRT,
   FMM_HOR,
@@ -789,9 +789,9 @@ enum FillMessageCodes {
 };
 
 // button windows
-enum StitchButtons { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
+enum StitchButtons : uint8_t { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
 
-enum TextureButtons { // text button windows
+enum TextureButtons : uint8_t { // text button windows
   HTXCLR,
   HTXHI,
   HTXWID,
@@ -802,7 +802,7 @@ enum TextureButtons { // text button windows
   HTXMIR
 };
 
-enum MachineType { AUXPCS, AUXDST, AUXPES };
+enum MachineType : int8_t { AUXPCS, AUXDST, AUXPES };
 
 /*
 class D_RECTANGLE
@@ -967,7 +967,7 @@ class INS_REC
   //~INS_REC() = default;
 };
 
-enum InterleaveTypes { // interleave sequence identifiers
+enum InterleaveTypes : uint8_t { // interleave sequence identifiers
   I_AP,
   I_FIL,
   I_FTH,

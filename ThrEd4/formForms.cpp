@@ -93,7 +93,7 @@ constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
 
-enum DaisyStyles { // daisy form types
+enum DaisyStyles : uint8_t { // daisy form types
   DSIN,            // Sine shape
   DRAMP,           // Ramp shape
   DSAW,            // Sawtooth shape

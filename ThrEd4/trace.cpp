@@ -84,7 +84,7 @@ constexpr auto TRWINROW09 = int32_t {23};
 constexpr auto TRWINROW10 = int32_t {24};
 
 // edge tracing directions
-enum TraceDirection {
+enum TraceDirection : uint8_t {
   TRCU, // top edge
   TRCR, // right edge
   TRCD, // bottom edge

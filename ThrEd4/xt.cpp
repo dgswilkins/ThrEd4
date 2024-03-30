@@ -164,7 +164,7 @@ constexpr auto M_FCOL   = 1U << 9U;
 constexpr auto M_FTHCOL = 1U << 10U;
 constexpr auto M_ECOL   = 1U << 11U;
 
-enum StitchStyles {
+enum StitchStyles : char {
   TYPE_APPLIQUE = 1, // applique
   TYPE_CWALK,        // center walk
   TYPE_EWALK,        // edge walk
