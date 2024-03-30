@@ -12511,7 +12511,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
   }
   CoUninitialize();
-  LocalFree(ArgList);
+  LocalFree(ArgList); // NOLINT(bugprone-multi-level-implicit-pointer-conversion)
   if (flag) {
 	return 0;
   }
