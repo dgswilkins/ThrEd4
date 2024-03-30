@@ -377,9 +377,11 @@ void ri::repclp(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
+	// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
 	auto const clipDifference = (form.isClip())       ? form.clipIndex
 	                            : (form.isEdgeClip()) ? form.borderClipData
 	                                                  : 0U;
+	// NOLINTEND(readability-avoid-nested-conditional-operator)
 	if (form.isClip()) {
 	  checkClip(clipDifference, form, clipPoint, clipCount, badClipCount);
 	}

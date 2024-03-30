@@ -1501,13 +1501,12 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
   auto const dot     = varA * varC + varB * varD;
   auto const lenSqrd = varC * varC + varD * varD;
   auto const param   = dot / lenSqrd;
-  // param < 0 = before the first point
-  // param > 1 = after last point
-  // 0 < param < 1 = between endpoints
-  auto const diff = (param < 0)   ? F_POINT {point.x - lineStart.x, point.y - lineStart.y}
-                    : (param > 1) ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y}
+  // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
+  auto const diff = (param < 0)   ? F_POINT {point.x - lineStart.x, point.y - lineStart.y} // Before the first point
+                    : (param > 1) ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y}     // After the last point
                                   : F_POINT {point.x - (lineStart.x + param * varC),
-                                             point.y - (lineStart.y + param * varD)};
+                                             point.y - (lineStart.y + param * varD)}; // Between endpoints
+  // NOLINTEND(readability-avoid-nested-conditional-operator)
   // returning shortest distance
   distance = sqrt(diff.x * diff.x + diff.y * diff.y);
   return param;
@@ -3902,9 +3901,11 @@ void form::angclpfn(FRM_HEAD const&               form,
                     std::vector<RNG_COUNT> const& textureSegments,
                     std::vector<F_POINT>&         angledFormVertices) {
   auto angledForm = form;
+  // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
   auto const rotationAngle = StateMap->test(StateFlag::ISUND) ? PI_FHALF - angledForm.underlayStitchAngle
                              : StateMap->test(StateFlag::TXFIL) ? PI_FHALF - angledForm.fillAngle
                                                                 : PI_FHALF - angledForm.clipFillAngle;
+  // NOLINTEND(readability-avoid-nested-conditional-operator)
   auto const rotationCenter = F_POINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
                                        wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
   angledFormVertices.clear();

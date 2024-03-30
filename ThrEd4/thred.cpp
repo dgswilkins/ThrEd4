@@ -5046,9 +5046,11 @@ void thred::selCol() {
   if (StitchBuffer->empty()) {
 	return;
   }
+  // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
   auto iStitch = (StateMap->test(StateFlag::SELBOX))   ? ClosestPointIndex
                  : (StateMap->test(StateFlag::GRPSEL)) ? GroupStitchIndex
                                                        : 0;
+  // NOLINTEND(readability-avoid-nested-conditional-operator)
   if (iStitch > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	iStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
   }
