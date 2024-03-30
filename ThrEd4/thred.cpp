@@ -12199,8 +12199,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   UNREFERENCED_PARAMETER(lpCmdLine);
   UNREFERENCED_PARAMETER(nShowCmd);
 
-  constexpr auto ICONDIM = int {32}; // window icon x & y dimension in pixels
-
   auto flag = false;
   ArgList   = CommandLineToArgvW(GetCommandLine(), &ArgCount);
 
@@ -12213,7 +12211,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   auto const hResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
   if (SUCCEEDED(hResult)) {
 	ThrEdInstance = hInstance;
-	auto winClass =
+	constexpr auto ICONDIM = 32; // window icon x & y dimension in pixels
+	auto           winClass =
 	    WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 	winClass.cbSize      = sizeof(WNDCLASSEX);
 	winClass.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
