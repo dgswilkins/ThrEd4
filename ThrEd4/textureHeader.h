@@ -25,6 +25,7 @@ class TX_PNT // textured fill point
 class TXTR_SCREEN
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   int32_t  top {};              // pixel top line
   int32_t  bottom {};           // pixel bottom line
   int32_t  height {};           // pixel height of area
@@ -38,6 +39,7 @@ class TXTR_SCREEN
   uint16_t lines {};            // number of lines
   float    editToPixelRatio {}; // edit to pixel ratio
   F_POINT  formCenter {};       // middle of the form
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   // constexpr TXTR_SCREEN() noexcept = default;
   // TXTR_SCREEN(TXTR_SCREEN const&) = default;

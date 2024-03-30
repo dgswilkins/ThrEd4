@@ -100,6 +100,7 @@ constexpr auto MINRCT = 12.0F; // minimum dimension of a form select rectangle
 class FTHR_INFO
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint8_t  fillType {};      // feather fill type
   uint8_t  upCount {};       // feather up count
   uint8_t  downCount {};     // feather down count
@@ -107,6 +108,7 @@ class FTHR_INFO
   float    ratio {};         // feather ratio
   float    minStitchSize {}; // feather floor
   uint16_t count {};         // feather fill psg granularity
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   // FTHR_INFO() noexcept = default;
   // FTHR_INFO(FTHR_INFO const&) = default;
@@ -121,10 +123,12 @@ class FTHR_INFO
 class TXTR_INFO
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   int16_t  lines {};
   uint16_t index {};
   uint16_t count {};
   float    height {};
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   // TXTR_INFO() noexcept = default;
   // TXTR_INFO(TXTR_INFO const&) = default;
