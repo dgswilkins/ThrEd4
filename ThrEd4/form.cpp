@@ -1653,10 +1653,15 @@ void form::chkseq(bool border) {
   auto const savedIndex = InterleaveSequence->size();
   auto&      form       = FormList->operator[](ClosestFormToCursor);
 
-  auto userStitchLen =
-      border ? (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN : form.edgeStitchLen
-      : (form.isClip()) ? MaxStitchLen
-                        : form.stitchLength;
+  // resharper disable once CppInitializedValueIsAlwaysRewritten
+  auto userStitchLen = 0.0F;
+  if (border) {
+	userStitchLen = (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN
+	                                                                             : form.edgeStitchLen;
+  }
+  else {
+	userStitchLen = (form.isClip()) ? MaxStitchLen : form.stitchLength;
+  }
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {
 	if (form.maxBorderStitchLen == 0.0F) {

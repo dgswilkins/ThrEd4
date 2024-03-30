@@ -3603,21 +3603,22 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 	StateMap->set(StateFlag::SIDACT);
 	return;
   }
-  auto entryCount = (FormMenuChoice == LLAYR)     ? gsl::narrow<int32_t>(LAYRLIST.size())
-                    : (FormMenuChoice == LFTHTYP) ? gsl::narrow<int32_t>(FTHRLIST.size() - 1U)
-                                                  : gsl::narrow<int32_t>(FILLLIST.size());
+  auto entryCount = int32_t {0};
   switch (FormMenuChoice) {
 	case LLAYR: {
+	  entryCount      = gsl::narrow<int32_t>(LAYRLIST.size());
 	  auto const zero = displayText::loadStr(IDS_LAY03);
 	  formForms::maxtsiz(zero, sideWindowSize);
 	  break;
 	}
 	case LFTHTYP: {
+	  entryCount         = gsl::narrow<int32_t>(FTHRLIST.size() - 1U);
 	  auto const fthrWid = displayText::loadStr(IDS_FTH3);
 	  formForms::maxtsiz(fthrWid, sideWindowSize);
 	  break;
 	}
 	case LFRMFIL: {
+	  entryCount = gsl::narrow<int32_t>(FILLLIST.size());
 	  for (auto const& iEntry : FILLLIST) {
 		if (iEntry.value == form.fillType) {
 		  --entryCount;
