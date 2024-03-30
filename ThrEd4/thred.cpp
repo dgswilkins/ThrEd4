@@ -5926,7 +5926,7 @@ void thi::stchout() {
 
 void thi::setsped() {
   constexpr auto DEFET = uint32_t {100U}; // default elapsed time per frame. Units are millseconds
-  constexpr auto DEFUT = double {10.0};   // default user time per frame. Units are millseconds
+  constexpr auto DEFUT = 10.0;   // default user time per frame. Units are millseconds
 
   auto elapsedTimePerFrame = DEFET;
   if (MovieTimeStep == 0) {

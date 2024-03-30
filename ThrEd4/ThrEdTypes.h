@@ -139,7 +139,7 @@ constexpr auto STDDPI   = int32_t {96};         // Default DPI
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
 constexpr auto HALF   = 0.5F;     // factor for halving
 constexpr auto DBLF   = 2.0F;     // factor for doubling
-constexpr auto DECRAD = int {10}; // decimal radix
+constexpr auto DECRAD = 10; // decimal radix
 
 // rectangle position indices
 constexpr auto PTL  = 0; // top left corner       80-1-2
