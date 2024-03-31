@@ -274,7 +274,7 @@ class FRM_HEAD
   uint32_t    clipCount {};			  // number of points in fill clipboard data
   float       fillAngle {};           // fill angle
   uint32_t    clipIndex {};           // pointer to start of fill clipboard data
-  SAT_CON     fillGuide {};           // fill guide
+  SAT_CON     fillGuide;              // fill guide
   float       borderSize {};          // border size
   float       edgeSpacing {};         // edge spacing
   float       edgeStitchLen {};       // edge stitch length
