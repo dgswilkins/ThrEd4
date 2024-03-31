@@ -235,14 +235,14 @@ class V_CLP_X
 class V_RECT_2
 {
   public:
-  F_POINT aipnt {};
-  F_POINT aopnt {};
-  F_POINT bipnt {};
-  F_POINT bopnt {};
-  F_POINT cipnt {};
-  F_POINT copnt {};
-  F_POINT dipnt {};
-  F_POINT dopnt {};
+  F_POINT aipnt;
+  F_POINT aopnt;
+  F_POINT bipnt;
+  F_POINT bopnt;
+  F_POINT cipnt;
+  F_POINT copnt;
+  F_POINT dipnt;
+  F_POINT dopnt;
 
   // constexpr V_RECT_2() noexcept = default;
   // V_RECT_2(V_RECT_2 const&) = default;

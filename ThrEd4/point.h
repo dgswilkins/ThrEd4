@@ -84,10 +84,10 @@ class D_POINT
 class F_POINT
 {
   public:
-  // NOLINTBEGIN (misc-non-private-member-variables-in-classes)
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   float x {};
   float y {};
-  // NOLINTEND
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr F_POINT() noexcept = default;
   explicit constexpr F_POINT(double rhsX, double rhsY);
