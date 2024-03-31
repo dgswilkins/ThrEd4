@@ -222,7 +222,7 @@ class FRM_HEAD_O // Original form header used prior to version 2
   uint16_t clipEntries {}; // number of border clipboard entries
   DWORD    vertices {};    // points
 
-  SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
+  SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
 
   DWORD       borderClipData {};  // border clipboard data
   uint16_t    satinGuideCount {}; // number of satin guidelines
@@ -332,7 +332,7 @@ class FRM_HEAD_OUT
   uint16_t clipEntries {}; // number of border clipboard entries
   DWORD vertexIndex {}; // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
 
-  SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
+  SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
 
   DWORD borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
   uint16_t    satinGuideCount {}; // number of satin guidelines
