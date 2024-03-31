@@ -227,7 +227,7 @@ class FRM_HEAD_O // Original form header used prior to version 2
   DWORD       borderClipData {};  // border clipboard data
   uint16_t    satinGuideCount {}; // number of satin guidelines
   uint16_t    wordParam {};       // word parameter
-  F_RECTANGLE rectangle {};       // rectangle
+  F_RECTANGLE rectangle;          // rectangle
   uint8_t     fillType {};        // fill type
   uint8_t     edgeType {};        // edge type
   float       fillSpacing {};     // fill spacing
@@ -266,7 +266,7 @@ class FRM_HEAD
   uint32_t    borderClipData {};      // pointer to start of border clipboard data
   uint32_t    satinGuideCount {};     // number of satin guidelines
   uint32_t    wordParam {};           // clipboard/textured fill phase or satin end guide
-  F_RECTANGLE rectangle {};           // rectangle
+  F_RECTANGLE rectangle;              // rectangle
   uint8_t     fillType {};            // fill type
   uint8_t     edgeType {};            // edge type
   float       fillSpacing {};         // fill spacing
@@ -337,7 +337,7 @@ class FRM_HEAD_OUT
   DWORD borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
   uint16_t    satinGuideCount {}; // number of satin guidelines
   uint16_t    wordParam {};       // clipboard/textured fill phase or satin end guide
-  F_RECTANGLE rectangle {};       // rectangle
+  F_RECTANGLE rectangle;          // rectangle
   uint8_t     fillType {};        // fill type
   uint8_t     edgeType {};        // edge type
   float       fillSpacing {};     // fill spacing
