@@ -52,7 +52,7 @@ class TXTR_SCREEN
 class TX_HIST
 {
   public:
-  std::vector<TX_PNT> texturePoints {};
+  std::vector<TX_PNT> texturePoints;
 
   float height {};
   float width {};
