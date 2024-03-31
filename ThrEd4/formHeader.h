@@ -365,7 +365,7 @@ class FRM_HEAD_OUT
   uint8_t  cres {};                // reserved
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  explicit inline constexpr FRM_HEAD_OUT() noexcept = default;
+  explicit constexpr FRM_HEAD_OUT() noexcept = default;
   // FRM_HEAD_OUT(FRM_HEAD_OUT const&) = default;
   // FRM_HEAD_OUT(FRM_HEAD_OUT&&) = default;
   // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT const& rhs) = default;
