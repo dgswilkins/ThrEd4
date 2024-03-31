@@ -232,7 +232,7 @@ class FRM_HEAD_O // Original form header used prior to version 2
   uint8_t     edgeType {};        // edge type
   float       fillSpacing {};     // fill spacing
   FLENCNTOUT  lengthOrCount;      // fill stitch length or clipboard count
-  FANGCLPOUT  angleOrClipData {}; // fill angle or clipboard data pointer
+  FANGCLPOUT  angleOrClipData;    // fill angle or clipboard data pointer
   float       borderSize {};      // border size
   float       edgeSpacing {};     // edge spacing
   float       edgeStitchLen {};   // edge stitch length
