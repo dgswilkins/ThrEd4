@@ -41,7 +41,7 @@ class TXTR_SCREEN
   F_POINT  formCenter;          // middle of the form
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  // constexpr TXTR_SCREEN() noexcept = default;
+  explicit constexpr TXTR_SCREEN() noexcept = default;
   // TXTR_SCREEN(TXTR_SCREEN const&) = default;
   // TXTR_SCREEN(TXTR_SCREEN&&) = default;
   // TXTR_SCREEN& operator=(TXTR_SCREEN const& rhs) = default;
