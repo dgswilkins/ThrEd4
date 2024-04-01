@@ -279,7 +279,7 @@ class FRM_HEAD
   float       minFillStitchLen {};    // minimum fill stitch length
   float       maxBorderStitchLen {};  // maximum border stitch length
   float       minBorderStitchLen {};  // minimum border stitch length
-  FTHR_INFO   feather {};             // feather attributes
+  FTHR_INFO   feather;                // feather attributes
   TXTR_INFO   texture {};             // texture attributes
   uint32_t    fillStart {};           // fill start point
   uint32_t    fillEnd {};             // fill end point
