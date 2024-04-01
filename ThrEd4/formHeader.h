@@ -13,11 +13,11 @@
 union FANGCLPOUT {
   private:
   float m_angle;
-  DWORD m_clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-  SAT_CON_OUT m_guide;
+  DWORD m_clip; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  SAT_CON_OUT m_guide {};
 
   public:
-  inline FANGCLPOUT() noexcept;
+  explicit constexpr FANGCLPOUT() noexcept = default;
   // FANGCLPOUT(FANGCLPOUT const&) = default;
   // FANGCLPOUT(FANGCLPOUT&&) = default;
   // FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
@@ -57,11 +57,6 @@ union FANGCLPOUT {
 };
 #pragma pack(pop)
 
-inline FANGCLPOUT::FANGCLPOUT() noexcept {
-  m_guide.start  = gsl::narrow_cast<decltype(m_guide.start)>(0U);
-  m_guide.finish = gsl::narrow_cast<decltype(m_guide.finish)>(0U);
-}
-
 #pragma pack(push, 1)
 union FLENCNTOUT {
   private:
@@ -69,7 +64,7 @@ union FLENCNTOUT {
   uint32_t m_clipCount;
 
   public:
-  FLENCNTOUT() noexcept = default;
+  explicit constexpr FLENCNTOUT() noexcept = default;
   // FLENCNTOUT(FLENCNTOUT const&) = default;
   // FLENCNTOUT(FLENCNTOUT&&) = default;
   // FLENCNTOUT& operator=(FLENCNTOUT const& rhs) = default;
@@ -130,7 +125,7 @@ class TXTR_INFO
   float    height {};
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  // TXTR_INFO() noexcept = default;
+  explicit constexpr TXTR_INFO() noexcept = default;
   // TXTR_INFO(TXTR_INFO const&) = default;
   // TXTR_INFO(TXTR_INFO&&) = default;
   // TXTR_INFO& operator=(TXTR_INFO const& rhs) = default;
@@ -182,7 +177,7 @@ union SATINANGLEOUT {
   float m_angle;
 
   public:
-  SATINANGLEOUT() noexcept = default;
+  explicit constexpr SATINANGLEOUT() noexcept = default;
   // SATINANGLEOUT(SATINANGLEOUT const&) = default;
   // SATINANGLEOUT(SATINANGLEOUT&&) = default;
   // SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
@@ -342,7 +337,7 @@ class FRM_HEAD_OUT
   uint8_t     edgeType {};        // edge type
   float       fillSpacing {};     // fill spacing
   FLENCNTOUT  lengthOrCount;      // fill stitch length or clipboard count
-  FANGCLPOUT  angleOrClipData {}; // fill angle or clipboard data pointer
+  FANGCLPOUT  angleOrClipData;    // fill angle or clipboard data pointer
 
   float    borderSize {};          // border size
   float    edgeSpacing {};         // edge spacing
