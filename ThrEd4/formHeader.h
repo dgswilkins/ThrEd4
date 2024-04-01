@@ -105,7 +105,7 @@ class FTHR_INFO
   uint16_t count {};         // feather fill psg granularity
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  // FTHR_INFO() noexcept = default;
+  explicit constexpr FTHR_INFO() noexcept = default;
   // FTHR_INFO(FTHR_INFO const&) = default;
   // FTHR_INFO(FTHR_INFO&&) = default;
   // FTHR_INFO& operator=(FTHR_INFO const& rhs) = default;
@@ -143,7 +143,7 @@ union TF_INFO_OUT {
   TXTR_INFO m_texture;
 
   public:
-  TF_INFO_OUT() noexcept = default;
+  explicit constexpr TF_INFO_OUT() noexcept;
   // TF_INFO_OUT(TF_INFO_OUT const&) = default;
   // TF_INFO_OUT(TF_INFO_OUT&&) = default;
   // TF_INFO_OUT& operator=(TF_INFO_OUT const& rhs) = default;
@@ -169,6 +169,8 @@ union TF_INFO_OUT {
   }
 };
 #pragma pack(pop)
+
+constexpr TF_INFO_OUT::TF_INFO_OUT() noexcept : m_feather() {}
 
 #pragma pack(push, 1)
 union SATINANGLEOUT {
@@ -348,7 +350,7 @@ class FRM_HEAD_OUT
   float    minFillStitchLen {};    // minimum fill stitch length
   float    maxBorderStitchLen {};  // maximum border stitch length
   float    minBorderStitchLen {};  // minimum border stitch length
-  TF_INFO_OUT  fillInfo {};            // feather/texture info
+  TF_INFO_OUT fillInfo;            // feather/texture info
   uint16_t fillStart {};           // fill start point
   uint16_t fillEnd {};             // fill end point
   float    underlaySpacing {};     // underlay spacing
