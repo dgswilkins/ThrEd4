@@ -28,7 +28,7 @@ union FANGCLPOUT {
   [[nodiscard]] auto getAngle() const noexcept -> float {
 	return m_angle;
   }
-  
+
   void setAngle(float value) noexcept {
 	m_angle = value;
   }
@@ -37,7 +37,7 @@ union FANGCLPOUT {
   [[nodiscard]] auto getClip() const noexcept -> DWORD {
 	return m_clip;
   }
-  
+
   void setClip(DWORD value) noexcept {
 	m_clip = value;
   }
@@ -152,25 +152,26 @@ union TF_INFO_OUT {
 
   // Getter and Setter for feather
   [[nodiscard]] auto getFeather() const noexcept -> FTHR_INFO {
-    return m_feather;
+	return m_feather;
   }
-  
+
   void setFeather(FTHR_INFO const& value) noexcept {
-    m_feather = value;
+	m_feather = value;
   }
 
   // Getter and Setter for texture
   [[nodiscard]] auto getTexture() const noexcept -> TXTR_INFO {
-    return m_texture;
+	return m_texture;
   }
-  
+
   void setTexture(TXTR_INFO const& value) noexcept {
 	m_texture = value;
   }
 };
 #pragma pack(pop)
 
-constexpr TF_INFO_OUT::TF_INFO_OUT() noexcept : m_feather() {}
+constexpr TF_INFO_OUT::TF_INFO_OUT() noexcept : m_feather() {
+}
 
 #pragma pack(push, 1)
 union SATINANGLEOUT {
@@ -188,20 +189,20 @@ union SATINANGLEOUT {
 
   // Getter and Setter for guide
   [[nodiscard]] auto getGuide() const noexcept -> DWORD {
-    return m_guide;
+	return m_guide;
   }
-  
+
   void setGuide(DWORD value) noexcept {
-    m_guide = value;
+	m_guide = value;
   }
 
   // Getter and Setter for angle
   [[nodiscard]] auto getAngle() const noexcept -> float {
-    return m_angle;
+	return m_angle;
   }
-  
+
   void setAngle(float value) noexcept {
-    m_angle = value;
+	m_angle = value;
   }
 };
 #pragma pack(pop)
@@ -259,7 +260,7 @@ class FRM_HEAD
   uint32_t    clipEntries {};         // number of border clipboard entries
   uint32_t    vertexIndex {};         // index into FormVertices
   uint32_t    satinGuideIndex {};     // satin guidelines
-  float       clipFillAngle {};	      // clipboard fill angle
+  float       clipFillAngle {};       // clipboard fill angle
   uint32_t    borderClipData {};      // pointer to start of border clipboard data
   uint32_t    satinGuideCount {};     // number of satin guidelines
   uint32_t    wordParam {};           // clipboard/textured fill phase or satin end guide
@@ -268,7 +269,7 @@ class FRM_HEAD
   uint8_t     edgeType {};            // edge type
   float       fillSpacing {};         // fill spacing
   float       stitchLength {};        // fill stitch length
-  uint32_t    clipCount {};			  // number of points in fill clipboard data
+  uint32_t    clipCount {};           // number of points in fill clipboard data
   float       fillAngle {};           // fill angle
   uint32_t    clipIndex {};           // pointer to start of fill clipboard data
   SAT_CON     fillGuide;              // fill guide
@@ -341,25 +342,25 @@ class FRM_HEAD_OUT
   FLENCNTOUT  lengthOrCount;      // fill stitch length or clipboard count
   FANGCLPOUT  angleOrClipData;    // fill angle or clipboard data pointer
 
-  float    borderSize {};          // border size
-  float    edgeSpacing {};         // edge spacing
-  float    edgeStitchLen {};       // edge stitch length
-  uint16_t picoLength {};          // pico length
-  uint32_t extendedAttribute {};   // attribute extension
-  float    maxFillStitchLen {};    // maximum fill stitch length
-  float    minFillStitchLen {};    // minimum fill stitch length
-  float    maxBorderStitchLen {};  // maximum border stitch length
-  float    minBorderStitchLen {};  // minimum border stitch length
-  TF_INFO_OUT fillInfo;            // feather/texture info
-  uint16_t fillStart {};           // fill start point
-  uint16_t fillEnd {};             // fill end point
-  float    underlaySpacing {};     // underlay spacing
-  float    underlayStitchLen {};   // underlay stitch length
-  float    underlayStitchAngle {}; // underlay stitch angle
-  float    underlayIndent {};      // underlay/edge walk indent
-  float    txof {};                // gradient end density
-  uint8_t  underlayColor {};       // underlay color
-  uint8_t  cres {};                // reserved
+  float       borderSize {};          // border size
+  float       edgeSpacing {};         // edge spacing
+  float       edgeStitchLen {};       // edge stitch length
+  uint16_t    picoLength {};          // pico length
+  uint32_t    extendedAttribute {};   // attribute extension
+  float       maxFillStitchLen {};    // maximum fill stitch length
+  float       minFillStitchLen {};    // minimum fill stitch length
+  float       maxBorderStitchLen {};  // maximum border stitch length
+  float       minBorderStitchLen {};  // minimum border stitch length
+  TF_INFO_OUT fillInfo;               // feather/texture info
+  uint16_t    fillStart {};           // fill start point
+  uint16_t    fillEnd {};             // fill end point
+  float       underlaySpacing {};     // underlay spacing
+  float       underlayStitchLen {};   // underlay stitch length
+  float       underlayStitchAngle {}; // underlay stitch angle
+  float       underlayIndent {};      // underlay/edge walk indent
+  float       txof {};                // gradient end density
+  uint8_t     underlayColor {};       // underlay color
+  uint8_t     cres {};                // reserved
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr FRM_HEAD_OUT() noexcept = default;
@@ -378,8 +379,8 @@ class FRM_HEAD_OUT
 // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
-    attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
-    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
+    attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type),
+    fillColor(rhs.fillColor), borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
     borderClipData(rhs.borderClipData), // Todo - Should we be copying this value?
     satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam), rectangle(rhs.rectangle),
     fillType(rhs.fillType), edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing),
@@ -431,8 +432,8 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   else {
 	satinGuideIndex = rhs.satinOrAngle.getGuide();
   }
-  edgeType        = rhs.edgeType;
-  fillSpacing     = rhs.fillSpacing;
+  edgeType    = rhs.edgeType;
+  fillSpacing = rhs.fillSpacing;
   if (isClip()) {
 	clipCount = rhs.lengthOrCount.getClipCount();
   }
@@ -470,11 +471,10 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     edgeSpacing(rhs.edgeSpacing), edgeStitchLen(rhs.edgeStitchLen), picoLength(rhs.picoLength),
     extendedAttribute(rhs.extendedAttribute), maxFillStitchLen(rhs.maxFillStitchLen),
     minFillStitchLen(rhs.minFillStitchLen), maxBorderStitchLen(rhs.maxBorderStitchLen),
-    minBorderStitchLen(rhs.minBorderStitchLen),
-    fillStart(gsl::narrow<uint16_t>(rhs.fillStart)), fillEnd(gsl::narrow<uint16_t>(rhs.fillEnd)),
-    underlaySpacing(rhs.underlaySpacing), underlayStitchLen(rhs.underlayStitchLen),
-    underlayStitchAngle(rhs.underlayStitchAngle), underlayIndent(rhs.underlayIndent),
-    txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
+    minBorderStitchLen(rhs.minBorderStitchLen), fillStart(gsl::narrow<uint16_t>(rhs.fillStart)),
+    fillEnd(gsl::narrow<uint16_t>(rhs.fillEnd)), underlaySpacing(rhs.underlaySpacing),
+    underlayStitchLen(rhs.underlayStitchLen), underlayStitchAngle(rhs.underlayStitchAngle),
+    underlayIndent(rhs.underlayIndent), txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
   if (rhs.isClip()) {
 	lengthOrCount.setClipCount(rhs.clipCount);
   }
@@ -510,14 +510,13 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
-    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
-    satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam), rectangle(rhs.rectangle),
-    fillType(rhs.fillType), edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing),
-    borderSize(rhs.borderSize), edgeSpacing(rhs.edgeSpacing), edgeStitchLen(rhs.edgeStitchLen),
-    picoLength(rhs.picoLength), extendedAttribute(rhs.extendedAttribute),
-    maxFillStitchLen(rhs.maxFillStitchLen), minFillStitchLen(rhs.minFillStitchLen),
-    maxBorderStitchLen(rhs.maxBorderStitchLen), minBorderStitchLen(rhs.minBorderStitchLen),
-    fillStart(rhs.fillStart), fillEnd(rhs.fillEnd),
+    borderColor(rhs.borderColor), clipEntries(rhs.clipEntries), satinGuideCount(rhs.satinGuideCount),
+    wordParam(rhs.wordParam), rectangle(rhs.rectangle), fillType(rhs.fillType),
+    edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing), borderSize(rhs.borderSize),
+    edgeSpacing(rhs.edgeSpacing), edgeStitchLen(rhs.edgeStitchLen), picoLength(rhs.picoLength),
+    extendedAttribute(rhs.extendedAttribute), maxFillStitchLen(rhs.maxFillStitchLen),
+    minFillStitchLen(rhs.minFillStitchLen), maxBorderStitchLen(rhs.maxBorderStitchLen),
+    minBorderStitchLen(rhs.minBorderStitchLen), fillStart(rhs.fillStart), fillEnd(rhs.fillEnd),
     underlaySpacing(rhs.underlaySpacing), underlayStitchLen(rhs.underlayStitchLen),
     underlayStitchAngle(rhs.underlayStitchAngle), underlayIndent(rhs.underlayIndent),
     txof(rhs.txof), underlayColor(rhs.underlayColor), cres(rhs.cres) {
@@ -541,7 +540,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 	}
   }
   if (fillType == ANGCLPF) {
-	clipFillAngle  = rhs.satinOrAngle.getAngle();
+	clipFillAngle = rhs.satinOrAngle.getAngle();
   }
   else {
 	satinGuideIndex = rhs.satinOrAngle.getGuide();
@@ -573,8 +572,8 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   else {
 	satinGuideIndex = rhs.satinOrAngle.getGuide();
   }
-  edgeType        = rhs.edgeType;
-  fillSpacing     = rhs.fillSpacing;
+  edgeType    = rhs.edgeType;
+  fillSpacing = rhs.fillSpacing;
   if (isClip()) {
 	clipCount = rhs.lengthOrCount.getClipCount();
   }
@@ -600,11 +599,11 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   edgeStitchLen = rhs.edgeStitchLen;
   picoLength    = rhs.picoLength;
 
-  extendedAttribute   = rhs.extendedAttribute;
-  maxFillStitchLen    = rhs.maxFillStitchLen;
-  minFillStitchLen    = rhs.minFillStitchLen;
-  maxBorderStitchLen  = rhs.maxBorderStitchLen;
-  minBorderStitchLen  = rhs.minBorderStitchLen;
+  extendedAttribute  = rhs.extendedAttribute;
+  maxFillStitchLen   = rhs.maxFillStitchLen;
+  minFillStitchLen   = rhs.minFillStitchLen;
+  maxBorderStitchLen = rhs.maxBorderStitchLen;
+  minBorderStitchLen = rhs.minBorderStitchLen;
   if (isTexture()) {
 	texture = rhs.fillInfo.getTexture();
   }
@@ -662,34 +661,34 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
 inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (vertexCount != 0U) {
 	if (const auto* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
-	auto        itVertex     = wrap::next(formVertices->cbegin(), vertexIndex);
-	rectangle                = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
-	for (auto iVertex = 1U; iVertex < vertexCount; ++iVertex) {
-	  ++itVertex;
-	  if (itVertex->x < rectangle.left) {
-		rectangle.left = itVertex->x;
+	  auto itVertex = wrap::next(formVertices->cbegin(), vertexIndex);
+	  rectangle     = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
+	  for (auto iVertex = 1U; iVertex < vertexCount; ++iVertex) {
+		++itVertex;
+		if (itVertex->x < rectangle.left) {
+		  rectangle.left = itVertex->x;
+		}
+		if (itVertex->y > rectangle.top) {
+		  rectangle.top = itVertex->y;
+		}
+		if (itVertex->x > rectangle.right) {
+		  rectangle.right = itVertex->x;
+		}
+		if (itVertex->y < rectangle.bottom) {
+		  rectangle.bottom = itVertex->y;
+		}
 	  }
-	  if (itVertex->y > rectangle.top) {
-		rectangle.top = itVertex->y;
+	  if (rectangle.top - rectangle.bottom < MINRCT) {
+		auto const offset = (MINRCT - (rectangle.top - rectangle.bottom)) / 2;
+		rectangle.top += offset;
+		rectangle.bottom -= offset;
 	  }
-	  if (itVertex->x > rectangle.right) {
-		rectangle.right = itVertex->x;
-	  }
-	  if (itVertex->y < rectangle.bottom) {
-		rectangle.bottom = itVertex->y;
+	  if (rectangle.right - rectangle.left < MINRCT) {
+		auto const offset = (MINRCT - (rectangle.right - rectangle.left)) / 2;
+		rectangle.left -= offset;
+		rectangle.right += offset;
 	  }
 	}
-	if (rectangle.top - rectangle.bottom < MINRCT) {
-	  auto const offset = (MINRCT - (rectangle.top - rectangle.bottom)) / 2;
-	  rectangle.top += offset;
-	  rectangle.bottom -= offset;
-	}
-	if (rectangle.right - rectangle.left < MINRCT) {
-	  auto const offset = (MINRCT - (rectangle.right - rectangle.left)) / 2;
-	  rectangle.left -= offset;
-	  rectangle.right += offset;
-	}
-  }
   }
 }
 

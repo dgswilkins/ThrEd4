@@ -13,7 +13,6 @@
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
 
-
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)

@@ -491,7 +491,7 @@ void plfn(FRM_HEAD const&              form,
           float                        width,
           F_POINT&                     stitchPoint);
 void prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
-auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) 
+auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint)
     -> bool;
 auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept
     -> bool;
@@ -550,7 +550,7 @@ void sprct(std::vector<F_POINT> const& vertices,
            uint32_t                    vertexIndex,
            std::vector<V_RECT_2>&      fillVerticalRect,
            uint32_t                    start,
-           uint32_t                    finish) ;
+           uint32_t                    finish);
 void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
             uint32_t                     iRect) noexcept;
@@ -1502,10 +1502,11 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
   auto const lenSqrd = varC * varC + varD * varD;
   auto const param   = dot / lenSqrd;
   // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
-  auto const diff = (param < 0)   ? F_POINT {point.x - lineStart.x, point.y - lineStart.y} // Before the first point
-                    : (param > 1) ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y}     // After the last point
-                                  : F_POINT {point.x - (lineStart.x + param * varC),
-                                             point.y - (lineStart.y + param * varD)}; // Between endpoints
+  auto const diff =
+      (param < 0) ? F_POINT {point.x - lineStart.x, point.y - lineStart.y} // Before the first point
+      : (param > 1)
+          ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y} // After the last point
+          : F_POINT {point.x - (lineStart.x + param * varC), point.y - (lineStart.y + param * varD)}; // Between endpoints
   // NOLINTEND(readability-avoid-nested-conditional-operator)
   // returning shortest distance
   distance = sqrt(diff.x * diff.x + diff.y * diff.y);
@@ -2010,7 +2011,7 @@ auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> 
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) 
+auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint)
     -> bool {
   auto const delta     = D_POINT {point1.x - point0.x, point1.y - point0.y};
   auto       intersect = D_POINT {intersectionPoint};
@@ -2020,7 +2021,7 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
 	auto const pointConstant =
 	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
 	intersect = D_POINT {((sideConstant - pointConstant) / (wrap::toDouble(slope) - sideSlope)),
-	             intersect.x * wrap::toDouble(slope) + pointConstant};
+	                     intersect.x * wrap::toDouble(slope) + pointConstant};
   }
   else {
 	auto const pointConstant =
@@ -2039,14 +2040,13 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
 	  std::swap(yMinimum, yMaximum);
 	}
 	intersectionPoint = intersect;
-	return intersect.x > xMinimum && intersect.x <= xMaximum &&
-	       intersect.y >= yMinimum && intersect.y <= yMaximum;
+	return intersect.x > xMinimum && intersect.x <= xMaximum && intersect.y >= yMinimum && intersect.y <= yMaximum;
   }
   intersectionPoint = intersect;
   return intersect.x > xMinimum && intersect.x <= xMaximum;
 }
 
-auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) 
+auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection)
     -> bool {
   if (nullptr == OutsidePoints) {
 	return false;
@@ -2093,7 +2093,7 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
                uint32_t                    vertexIndex,
                std::vector<V_RECT_2>&      fillVerticalRect,
                uint32_t                    start,
-               uint32_t                    finish)  {
+               uint32_t                    finish) {
   auto const& opStart        = OutsidePoints->operator[](start);
   auto const& opFinish       = OutsidePoints->operator[](finish);
   auto const& ipStart        = InsidePoints->operator[](start);
@@ -2690,14 +2690,14 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 		continue;
 	  }
 	  lineEndpoints.emplace_back(projectedPoints[iPoint].line,
-	                                      lineGroupIndex,
-	                                      projectedPoints[iPoint].x,
-	                                      projectedPoints[iPoint].y);
+	                             lineGroupIndex,
+	                             projectedPoints[iPoint].x,
+	                             projectedPoints[iPoint].y);
 	  ++iPoint;
 	  lineEndpoints.emplace_back(projectedPoints[iPoint].line,
-	                                      lineGroupIndex,
-	                                      projectedPoints[iPoint].x,
-	                                      projectedPoints[iPoint].y);
+	                             lineGroupIndex,
+	                             projectedPoints[iPoint].x,
+	                             projectedPoints[iPoint].y);
 	  ++iPoint;
 	}
 	if (lineEndpoints.size() != savedLineCount) {
@@ -5947,7 +5947,7 @@ void form::insat() { // insert a point in a form
 	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
 	  break;
 	}
-    // resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
 	  outDebugString(L"default hit in insat: inOutFlag [{}]\n", gsl::narrow_cast<int>(inOutFlag));
 	  throw;
@@ -6863,7 +6863,7 @@ void form::dustar(uint32_t starCount, float length) {
   auto point   = thred::pxCor2stch(Msg.pt);
   StateMap->set(StateFlag::FILDIR);
   auto const itFirstVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
-  auto itVertex      = itFirstVertex;
+  auto       itVertex      = itFirstVertex;
   for (auto iVertex = 0U; iVertex < vertexCount; ++iVertex) {
 	itVertex->x = point.x;
 	itVertex->y = point.y;
@@ -6904,11 +6904,11 @@ void form::duspir(uint32_t stepCount) {
   auto const stepAngle = PI_F2 / wrap::toFloat(stepCount);
   auto const length    = 800.0F / wrap::toFloat(stepCount) * ZoomFactor *
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
-  auto newForm        = FRM_HEAD {};
-  newForm.type        = FRMLINE;
-  auto const vertexCount    = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
-  newForm.vertexIndex = thred::adflt(vertexCount);
-  newForm.vertexCount = vertexCount;
+  auto newForm           = FRM_HEAD {};
+  newForm.type           = FRMLINE;
+  auto const vertexCount = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
+  newForm.vertexIndex    = thred::adflt(vertexCount);
+  newForm.vertexCount    = vertexCount;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
   auto firstSpiral = std::vector<F_POINT> {};
   firstSpiral.resize(stepCount);

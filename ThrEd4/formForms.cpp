@@ -94,12 +94,12 @@ constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
 
 enum DaisyStyles : uint8_t { // daisy form types
-  DSIN,            // Sine shape
-  DRAMP,           // Ramp shape
-  DSAW,            // Sawtooth shape
-  DRAG,            // Ragged shape
-  DCOG,            // Cog shape
-  DHART            // Heart shape
+  DSIN,                      // Sine shape
+  DRAMP,                     // Ramp shape
+  DSAW,                      // Sawtooth shape
+  DRAG,                      // Ragged shape
+  DCOG,                      // Cog shape
+  DHART                      // Heart shape
 };
 
 // formForms Internal namespace

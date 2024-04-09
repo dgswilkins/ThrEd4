@@ -68,7 +68,8 @@ class D_POINT
 
   // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
-  explicit D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {}
+  explicit D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
+  }
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   explicit inline D_POINT(float rhsX, float rhsY) noexcept;
@@ -77,7 +78,6 @@ class D_POINT
   // D_POINT& operator=(D_POINT const& rhs) = default;
   // D_POINT& operator=(D_POINT&&) = default;
   //~D_POINT() = default;
-
 };
 
 #pragma pack(push, 1)
@@ -137,7 +137,7 @@ class F_POINT
 	y *= rhs;
 	return *this;
   }
-  
+
   constexpr auto operator*(float rhs) const noexcept -> F_POINT {
 	return F_POINT {x * rhs, y * rhs};
   }
@@ -193,7 +193,6 @@ class F_POINT_ATTR
 	y -= rhs.y;
 	return *this;
   }
-
 };
 #pragma pack(pop)
 
@@ -218,7 +217,6 @@ class SMAL_PNT_L
   // SMAL_PNT_L& operator=(SMAL_PNT_L const& rhs) = default;
   // SMAL_PNT_L& operator=(SMAL_PNT_L&&) = default;
   //~SMAL_PNT_L() = default;
-
 };
 
 constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept :

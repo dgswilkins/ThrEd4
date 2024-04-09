@@ -42,7 +42,7 @@
 #include <winnt.h>
 
 // report the system error from GetLastError
-void rpt::reportError([[maybe_unused]]const wchar_t* prompt, DWORD& errorCode) {
+void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode) {
   auto* lpMsgBuf = gsl::narrow_cast<LPVOID>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
   auto const res = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,

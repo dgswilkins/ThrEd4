@@ -17,7 +17,7 @@
 // Standard Libraries
 #include <numbers>
 #ifdef _DEBUG
-#include<source_location>
+#include <source_location>
 #endif
 
 #ifdef _DEBUG
@@ -31,7 +31,7 @@ class FMT_WITH_LOC
 
   // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
   constexpr FMT_WITH_LOC(const wchar_t* fmtString,
-                     const std::source_location& fileLoc = std::source_location::current()) noexcept :
+                         const std::source_location& fileLoc = std::source_location::current()) noexcept :
       strX(fmtString),
       loc(fileLoc) {
   }
@@ -63,20 +63,20 @@ constexpr float IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
 // ToDo - Should this be a configurable parameter?
 constexpr double CLOSENUF = 15.0; // mouse click region for select
 constexpr auto   FCLOSNUF = float {CLOSENUF};
-constexpr float  SMALSIZ  = 0.25F;             // default small stitch size
-constexpr float  MINSIZ   = 0.1F;              // default minimum stitch size
-constexpr float  USESIZ   = 3.5F;              // user preferred size
-constexpr auto   MAXSIZ   = 9.0F;              // default maximum stitch size
-constexpr float  SHOPNTS  = 0.00F;             // show stitch points when zoom below this
-constexpr float  STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
-constexpr float  DEFSPACE = 0.45F;             // default stitch spacing
-constexpr float  PI_F     = std::numbers::pi_v<float>;        // PI to single precision
-constexpr float  PI_F2    = PI_F * 2.0F;       //
-constexpr float  PI_FHALF = PI_F / 2.0F;       //
-constexpr double PI_D     = std::numbers::pi; // PI to double precision
-constexpr double PI_D2    = PI_D * 2.0;        //
-constexpr float  USPAC    = 15.0F;             // underlay fill spacing
-constexpr float  URAT     = 0.75F;             // ratio of underlay stitch to satin border size
+constexpr float  SMALSIZ  = 0.25F;                     // default small stitch size
+constexpr float  MINSIZ   = 0.1F;                      // default minimum stitch size
+constexpr float  USESIZ   = 3.5F;                      // user preferred size
+constexpr auto   MAXSIZ   = 9.0F;                      // default maximum stitch size
+constexpr float  SHOPNTS  = 0.00F;                     // show stitch points when zoom below this
+constexpr float  STCHBOX  = 0.4226F;                   // show stitch boxes when zoom below this
+constexpr float  DEFSPACE = 0.45F;                     // default stitch spacing
+constexpr float  PI_F     = std::numbers::pi_v<float>; // PI to single precision
+constexpr float  PI_F2    = PI_F * 2.0F;               //
+constexpr float  PI_FHALF = PI_F / 2.0F;               //
+constexpr double PI_D     = std::numbers::pi;          // PI to double precision
+constexpr double PI_D2    = PI_D * 2.0;                //
+constexpr float  USPAC    = 15.0F;                     // underlay fill spacing
+constexpr float  URAT     = 0.75F; // ratio of underlay stitch to satin border size
 
 constexpr float    TNYFLOAT = 1e-9F;           // tiny number for single precision float stuff
 constexpr float    BIGFLOAT = 1e9F;            // large number for single precision float stuff
@@ -139,7 +139,7 @@ constexpr auto STDDPI   = int32_t {96};         // Default DPI
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
 constexpr auto HALF   = 0.5F;     // factor for halving
 constexpr auto DBLF   = 2.0F;     // factor for doubling
-constexpr auto DECRAD = 10; // decimal radix
+constexpr auto DECRAD = 10;       // decimal radix
 
 // rectangle position indices
 constexpr auto PTL  = 0; // top left corner       80-1-2

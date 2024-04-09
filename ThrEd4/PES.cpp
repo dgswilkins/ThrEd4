@@ -185,7 +185,7 @@ class PESHED
 
   //  uint16_t               styp1;    // 68,69  Stitch type (0)
   //  uint16_t               scol;     // 6a,6b  Stitch Palette thread index
-  
+
   // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
   constexpr PESHED() noexcept = default;
@@ -196,7 +196,7 @@ class PESHED
 };
 #pragma pack(pop)
 
-#ifdef USE_PESLED 
+#ifdef USE_PESLED
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
 // NOLINTBEGIN(readability-magic-numbers)
 class PESLED
@@ -269,7 +269,7 @@ inline auto PESTCH::operator=(F_POINT const& rhs) -> PESTCH& {
 class THREAD
 {
   private:
-  PEC_COLOR   m_color {};
+  PEC_COLOR m_color {};
   // NOLINTBEGIN(clang-diagnostic-unused-private-field)
   char const* m_description {};
   char const* m_catalogNumber {};
@@ -459,7 +459,7 @@ void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POIN
   auto const oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(PESTCH));
   auto* pesStitch = convertFromPtr<PESTCH*>(&buffer[oldSize]);
-  if (nullptr == pesStitch){
+  if (nullptr == pesStitch) {
 	throw;
   }
   auto const scaledStitch = F_POINT {-stitch.x * IPECFACT + offset.x, stitch.y * IPECFACT - offset.y};
@@ -906,7 +906,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  // write stitch
 	  pi::ritpesCode(pesBuffer);
 	  // close out the previous block
-	  auto* blockHeader        = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+	  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 	  blockHeader->setStitchType(stitchCount);
 	  // save the thread/color information
 	  ++pesThreadCount;
@@ -930,7 +930,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	}
   }
   // finalize the last stitch block
-  auto* blockHeader        = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
   blockHeader->setStitchType(stitchCount);
   // write the color/thread table
   lastIndex = pesBuffer.size();

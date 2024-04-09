@@ -85,7 +85,7 @@ class PCSHEADER // pcs file header structure
 	std::ranges::copy(m_colors, userColor.begin());
   }
 
-  [[nodiscard]]auto isValid() const noexcept -> bool {
+  [[nodiscard]] auto isValid() const noexcept -> bool {
 	return (m_leadIn == LEADIN && m_colorCount == COLORCNT);
   }
 
@@ -93,11 +93,11 @@ class PCSHEADER // pcs file header structure
 	m_hoopType = flag ? LARGHUP : SMALHUP;
   }
 
-  [[nodiscard]]constexpr auto getStitchCount() const noexcept -> uint16_t {
+  [[nodiscard]] constexpr auto getStitchCount() const noexcept -> uint16_t {
 	return m_stitchCount;
   }
 
-  [[nodiscard]]constexpr auto getHoopType() const noexcept -> int8_t {
+  [[nodiscard]] constexpr auto getHoopType() const noexcept -> int8_t {
 	return m_hoopType;
   }
 };
@@ -260,7 +260,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   IniFile.auxFileType = AUXPCS;
-  auto hoopSize = PCSHeader.getHoopType();
+  auto hoopSize       = PCSHeader.getHoopType();
   if (hoopSize != LARGHUP && hoopSize != SMALHUP) {
 	hoopSize = LARGHUP;
   }
@@ -310,8 +310,8 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 	  boundingRect.top = stitch.y;
 	}
   }
-  auto const boundingSize = F_POINT {boundingRect.right - boundingRect.left,
-                                boundingRect.top - boundingRect.bottom};
+  auto const boundingSize =
+      F_POINT {boundingRect.right - boundingRect.left, boundingRect.top - boundingRect.bottom};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L, false);
 	return false;
@@ -321,7 +321,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
       (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
   auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
   PCSHeader.setHoopType(largeFlag);
-  auto delta          = F_POINT {};
+  auto delta = F_POINT {};
   if (boundingRect.right > hoopSize.x) {
 	delta.x = hoopSize.x - boundingRect.right;
   }

@@ -6,8 +6,8 @@
 // Standard Libraries
 #include <vector>
 
-enum FSI : uint8_t {  // fill starts index values
-  applique, 
+enum FSI : uint8_t { // fill starts index values
+  applique,
   fill,
   feather,
   border,

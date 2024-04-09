@@ -45,7 +45,7 @@
 #include <minwindef.h>
 #include <ShObjIdl_core.h>
 #include <shtypes.h>
-#include <windef.h> 
+#include <windef.h>
 #include <winerror.h>
 #include <wingdi.h>
 #include <winnt.h>

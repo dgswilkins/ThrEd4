@@ -26,7 +26,7 @@ class INI_FILE // ini file structure
 {
   public:
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  std::array<char, DPLEN> defaultDirectory {};          // default directory
+  std::array<char, DPLEN>        defaultDirectory {};          // default directory
   std::array<COLORREF, COLORCNT> stitchColors {};              // colors
   std::array<COLORREF, COLORCNT> stitchPreferredColors {};     // stitch preference colors
   std::array<COLORREF, COLORCNT> backgroundPreferredColors {}; // background preference colors

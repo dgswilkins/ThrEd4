@@ -5929,7 +5929,7 @@ void thi::stchout() {
 
 void thi::setsped() {
   constexpr auto DEFET = uint32_t {100U}; // default elapsed time per frame. Units are millseconds
-  constexpr auto DEFUT = 10.0;   // default user time per frame. Units are millseconds
+  constexpr auto DEFUT = 10.0;            // default user time per frame. Units are millseconds
 
   auto elapsedTimePerFrame = DEFET;
   if (MovieTimeStep == 0) {
@@ -11952,7 +11952,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	      DrawItem->itemAction == ODA_DRAWENTIRE) {
 		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 		if (StateMap->test(StateFlag::HID)) {
-		  auto const ucb   = wrap::next(UserColorBrush.begin(), ActiveColor);
+		  auto const ucb         = wrap::next(UserColorBrush.begin(), ActiveColor);
 		  auto const itUserColor = wrap::next(UserColor.begin(), ActiveColor);
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 		  SetBkColor(DrawItem->hDC, *itUserColor);
@@ -12210,7 +12210,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto const hResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
   if (SUCCEEDED(hResult)) {
-	ThrEdInstance = hInstance;
+	ThrEdInstance          = hInstance;
 	constexpr auto ICONDIM = 32; // window icon x & y dimension in pixels
 	auto           winClass =
 	    WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
@@ -12269,18 +12269,18 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  FormOnOff                             = &privateFormOnOff;
 
 	  auto privateMenuInfo = MENUITEMINFO {
-		sizeof(MENUITEMINFO),  // Size
-		    MIIM_TYPE,         // Mask
-		    MFT_STRING,        // Type
-		    0,                 // State
-		    0,                 // ID
-		    nullptr,           // SubMenu
-		    nullptr,           // bmpChecked
-		    nullptr,           // bmpUnchecked
-		    0,                 // ItemData
-		    FormOnOff->data(), // TypeData
-		    1,                 // cch (dummy value since we use SetMenuItemInfo)
-		    nullptr            // bmpItem (available only on Windows 2000 and higher)
+	      sizeof(MENUITEMINFO), // Size
+	      MIIM_TYPE,            // Mask
+	      MFT_STRING,           // Type
+	      0,                    // State
+	      0,                    // ID
+	      nullptr,              // SubMenu
+	      nullptr,              // bmpChecked
+	      nullptr,              // bmpUnchecked
+	      0,                    // ItemData
+	      FormOnOff->data(),    // TypeData
+	      1,                    // cch (dummy value since we use SetMenuItemInfo)
+	      nullptr               // bmpItem (available only on Windows 2000 and higher)
 	  };
 
 	  auto privateMsgBuffer                 = std::vector<wchar_t> {};

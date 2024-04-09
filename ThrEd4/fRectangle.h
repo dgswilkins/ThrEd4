@@ -18,7 +18,6 @@ class F_RECTANGLE
   // F_RECTANGLE& operator=(F_RECTANGLE const& rhs) = default;
   // F_RECTANGLE& operator=(F_RECTANGLE&&) = default;
   //~F_RECTANGLE() = default;
-
 };
 #pragma pack(pop)
 
