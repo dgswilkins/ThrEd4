@@ -6481,6 +6481,7 @@ void form::setstrtch() {
 		itVertex->x = (itVertex->x - reference) * ratio + reference;
 		++itVertex;
 	  }
+	  refil(ClosestFormToCursor);
 	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
