@@ -491,7 +491,7 @@ void plfn(FRM_HEAD const&              form,
           float                        width,
           F_POINT&                     stitchPoint);
 void prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
-auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint)
+auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
     -> bool;
 auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept
     -> bool;
@@ -2011,43 +2011,35 @@ auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> 
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint)
+auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
     -> bool {
-  auto const delta     = D_POINT {point1.x - point0.x, point1.y - point0.y};
-  auto       intersect = D_POINT {intersectionPoint};
-  if (delta.x != 0.0) {
+  auto const delta     = F_POINT {point1.x - point0.x, point1.y - point0.y};
+  if (delta.x != 0.0F) {
 	auto const sideSlope    = delta.y / delta.x;
-	auto const sideConstant = wrap::toDouble(point0.y) - sideSlope * wrap::toDouble(point0.x);
+	auto const sideConstant = point0.y - sideSlope * point0.x;
 	auto const pointConstant =
-	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
-	auto const newX = (sideConstant - pointConstant) / (wrap::toDouble(slope) - sideSlope);
-	intersect       = D_POINT {newX, newX * wrap::toDouble(slope) + pointConstant};
+	    point.y - slope * point.x;
+	auto const newX = (sideConstant - pointConstant) / (slope - sideSlope);
+	intersectionPoint = F_POINT {newX, newX * slope + pointConstant};
   }
   else {
 	auto const pointConstant =
-	    wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
-	auto const newX = wrap::toDouble(point0.x);
-	intersect       = D_POINT {newX, newX * wrap::toDouble(slope) + pointConstant};
+	    point.y - slope * point.x;
+	auto const newX = point0.x;
+	intersectionPoint = F_POINT {newX, newX * slope + pointConstant};
   }
-  auto xMinimum = wrap::toDouble(point0.x);
-  auto xMaximum = wrap::toDouble(point1.x);
-  if (xMinimum > xMaximum) {
-	std::swap(xMinimum, xMaximum);
+  auto const xMinimum = std::min(point0.x, point1.x);
+  auto const xMaximum = std::max(point0.x, point1.x);
+  if (delta.y != 0.0F) {
+	auto const yMinimum = std::min(point0.y, point1.y);
+	auto const yMaximum = std::max(point0.y, point1.y);
+	return intersectionPoint.x > xMinimum && intersectionPoint.x <= xMaximum &&
+	       intersectionPoint.y >= yMinimum && intersectionPoint.y <= yMaximum;
   }
-  if (delta.y != 0.0) {
-	auto yMinimum = wrap::toDouble(point0.y);
-	auto yMaximum = wrap::toDouble(point1.y);
-	if (yMinimum > yMaximum) {
-	  std::swap(yMinimum, yMaximum);
-	}
-	intersectionPoint = intersect;
-	return intersect.x > xMinimum && intersect.x <= xMaximum && intersect.y >= yMinimum && intersect.y <= yMaximum;
-  }
-  intersectionPoint = intersect;
-  return intersect.x > xMinimum && intersect.x <= xMaximum;
+  return intersectionPoint.x > xMinimum && intersectionPoint.x <= xMaximum;
 }
 
-auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection)
+auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) noexcept
     -> bool {
   if (nullptr == OutsidePoints) {
 	return false;
