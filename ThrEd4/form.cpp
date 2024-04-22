@@ -3211,16 +3211,18 @@ auto fi::isect(uint32_t                    vertex0,
 	  }
 	}
   }
-  if (tempIntersection.x < TNYFLOAT) {
-	tempIntersection.x = 0.0F;
+  if (flag) {
+	if (abs(tempIntersection.x) < TNYFLOAT) {
+	  tempIntersection.x = 0.0F;
+	}
+	if (abs(tempIntersection.y) < TNYFLOAT) {
+	  tempIntersection.y = 0.0F;
+	}
+	intersection = tempIntersection;
+	length = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
+	// ToDo - should length be determined from start or end?
+	//	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
   }
-  if (tempIntersection.y < TNYFLOAT) {
-	tempIntersection.y = 0.0F;
-  }
-  intersection = tempIntersection;
-  length = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
-  // ToDo - should length be determined from start or end?
-  //	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
   return flag;
 }
 
