@@ -9,6 +9,12 @@
 // Standard Libraries
 #include <cstdint>
 
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/gsl"
+#pragma warning(pop)
+
 #pragma pack(push, 1)
 union FANGCLPOUT {
   private:
