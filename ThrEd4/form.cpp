@@ -6467,6 +6467,11 @@ void form::setstrtch() {
 		  ++itVertex;
 		}
 	  }
+	  for (auto selectedForm : (*SelectedFormList)) {
+		FormList->operator[](selectedForm).outline();
+		ClosestFormToCursor = selectedForm;
+		refil(ClosestFormToCursor);
+	  }
 	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
