@@ -1757,19 +1757,8 @@ void texture::rtrtx(FRM_HEAD const& form) {
 }
 
 auto txi::inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool {
-  if (stitch.x < rectangle.left) {
-	return false;
-  }
-  if (stitch.x > rectangle.right) {
-	return false;
-  }
-  if (stitch.y < rectangle.bottom) {
-	return false;
-  }
-  if (stitch.y > rectangle.top) {
-	return false;
-  }
-  return true;
+  return (stitch.x >= rectangle.left && stitch.x <= rectangle.right &&
+          stitch.y >= rectangle.bottom && stitch.y <= rectangle.top);
 }
 
 void texture::setshft() {

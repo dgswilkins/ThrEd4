@@ -1955,16 +1955,8 @@ auto fi::projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& uppe
 
 auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool {
   auto const& rectangle = form.rectangle;
-  if (xCoordinate >= rectangle.right) {
-	return false;
-  }
-  if (xCoordinate <= rectangle.left) {
-	return false;
-  }
-  if (yCoordinate >= rectangle.top) {
-	return false;
-  }
-  if (yCoordinate <= rectangle.bottom) {
+  if (xCoordinate < rectangle.left || xCoordinate > rectangle.right ||
+      yCoordinate < rectangle.bottom || yCoordinate > rectangle.top) {
 	return false;
   }
   auto count        = 0U;
