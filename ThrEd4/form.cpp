@@ -8054,7 +8054,7 @@ void form::bhol() {
 }
 
 void form::fcntr() {
-  if (!SelectedFormList->empty()) {
+  if (SelectedFormList->empty()) {
 	displayText::tabmsg(IDS_SELC, false);
 	return;
   }
