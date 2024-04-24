@@ -6411,7 +6411,10 @@ auto thi::gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount)
 
 void thred::insfil(fs::path& insertedFile) {
   auto successFlag       = false;
-  auto insertedRectangle = F_RECTANGLE {BIGFLOAT, TNYFLOAT, TNYFLOAT, BIGFLOAT};
+  auto insertedRectangle = F_RECTANGLE {std::numeric_limits<float>::max(),
+                                        std::numeric_limits<float>::lowest(),
+                                        std::numeric_limits<float>::lowest(),
+                                        std::numeric_limits<float>::max()};
   if (insertedFile.empty()) {
 	thi::getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
   }
@@ -6627,49 +6630,40 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  StateMap->set(StateFlag::BADFIL);
 	}
 	if (fileHeader.formCount != 0U) {
-	  auto const& insertedVertex = FormVertices->operator[](InsertedVertexIndex);
-	  insertedRectangle.left     = insertedVertex.x;
-	  insertedRectangle.right    = insertedVertex.x;
-	  insertedRectangle.bottom   = insertedVertex.y;
-	  insertedRectangle.top      = insertedVertex.y;
-	  for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size()); ++iVertex) {
-		auto const& vertex = FormVertices->operator[](iVertex);
-		if (vertex.x < insertedRectangle.left) {
-		  insertedRectangle.left = vertex.x;
-		}
-		if (vertex.x > insertedRectangle.right) {
-		  insertedRectangle.right = vertex.x;
-		}
-		if (vertex.y < insertedRectangle.bottom) {
-		  insertedRectangle.bottom = vertex.y;
-		}
-		if (vertex.y > insertedRectangle.top) {
-		  insertedRectangle.top = vertex.y;
-		}
+	  auto spVertices = gsl::span(*FormVertices).subspan(InsertedVertexIndex, fileHeader.vertexCount);
+
+	  auto minX = std::numeric_limits<float>::max();
+	  auto minY = std::numeric_limits<float>::max();
+	  auto maxX = std::numeric_limits<float>::lowest();
+	  auto maxY = std::numeric_limits<float>::lowest();
+	  for (auto const& vertex : spVertices) {
+		minX = std::min(minX, vertex.x);
+		maxX = std::max(maxX, vertex.x);
+		maxY = std::max(maxY, vertex.y);
+		minY = std::min(minY, vertex.y);
 	  }
+	  insertedRectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 	}
   }
   if (fileHeader.stitchCount != 0U) {
 	auto const encodedFormIndex = (InsertedFormIndex << FRMSHFT);
-	for (auto iStitch = uint16_t {}; iStitch < fileHeader.stitchCount; ++iStitch) {
-	  if ((fileStitchBuffer[iStitch].attribute & ALTYPMSK) != 0U) {
-		auto const newAttribute = (fileStitchBuffer[iStitch].attribute & FRMSK) + encodedFormIndex;
-		fileStitchBuffer[iStitch].attribute &= NFRMSK;
-		fileStitchBuffer[iStitch].attribute |= newAttribute;
+
+	auto minX = insertedRectangle.left;
+	auto minY = insertedRectangle.top;
+	auto maxX = insertedRectangle.right;
+	auto maxY = insertedRectangle.bottom;
+	for (auto &stitch: fileStitchBuffer) {
+	  if ((stitch.attribute & ALTYPMSK) != 0U) {
+		auto const newAttribute = (stitch.attribute & FRMSK) + encodedFormIndex;
+		stitch.attribute &= NFRMSK;
+		stitch.attribute |= newAttribute;
 	  }
-	  if (fileStitchBuffer[iStitch].x < insertedRectangle.left) {
-		insertedRectangle.left = fileStitchBuffer[iStitch].x;
-	  }
-	  if (fileStitchBuffer[iStitch].x > insertedRectangle.right) {
-		insertedRectangle.right = fileStitchBuffer[iStitch].x;
-	  }
-	  if (fileStitchBuffer[iStitch].y < insertedRectangle.bottom) {
-		insertedRectangle.bottom = fileStitchBuffer[iStitch].y;
-	  }
-	  if (fileStitchBuffer[iStitch].y > insertedRectangle.top) {
-		insertedRectangle.top = fileStitchBuffer[iStitch].y;
-	  }
+	  minX = std::min(minX, stitch.x);
+	  maxX = std::max(maxX, stitch.x);
+	  minY = std::min(minY, stitch.y);
+	  maxY = std::max(maxY, stitch.y);
 	}
+	insertedRectangle = F_RECTANGLE {minX, maxY, maxX, minY};
   }
   constexpr auto VERSION1 = (0x01U << TBYTSHFT); // ThrEd version 1 signature
   if ((fileHeader.headerType & VERSION1) != 0U) {
@@ -7695,43 +7689,42 @@ auto thi::dunum(wchar_t code) noexcept -> bool {
 
 void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
   if (StitchBuffer->empty()) {
+	rectangle = F_RECTANGLE {};
 	return;
   }
-  rectangle.bottom = rectangle.left = BIGFLOAT;
-  rectangle.top = rectangle.right = 0;
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
+
   for (auto const& stitch : *StitchBuffer) {
-	if (stitch.x < rectangle.left) {
-	  rectangle.left = stitch.x;
-	}
-	if (stitch.x > rectangle.right) {
-	  rectangle.right = stitch.x;
-	}
-	if (stitch.y < rectangle.bottom) {
-	  rectangle.bottom = stitch.y;
-	}
-	if (stitch.y > rectangle.top) {
-	  rectangle.top = stitch.y;
-	}
+	minX = std::min(minX, stitch.x);
+	maxX = std::max(maxX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxY = std::max(maxY, stitch.y);
   }
+
+  rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 }
 
 void thred::frmrct(F_RECTANGLE& rectangle) noexcept {
-  rectangle.left = rectangle.right = FormVertices->front().x;
-  rectangle.top = rectangle.bottom = FormVertices->front().y;
-  for (auto const& formVertice : *FormVertices) {
-	if (formVertice.x < rectangle.left) {
-	  rectangle.left = formVertice.x;
-	}
-	if (formVertice.x > rectangle.right) {
-	  rectangle.right = formVertice.x;
-	}
-	if (formVertice.y > rectangle.top) {
-	  rectangle.top = formVertice.y;
-	}
-	if (formVertice.y < rectangle.bottom) {
-	  rectangle.bottom = formVertice.y;
-	}
+  if (FormVertices->empty()) {
+	rectangle = F_RECTANGLE {};
+	return;
   }
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
+
+  for (auto const& formVertice : *FormVertices) {
+	minX = std::min(minX, formVertice.x);
+	minY = std::min(minY, formVertice.y);
+	maxX = std::max(maxX, formVertice.x);
+	maxY = std::max(maxY, formVertice.y);
+  }
+
+  rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 }
 
 void thi::sidhup() {

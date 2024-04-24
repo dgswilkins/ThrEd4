@@ -46,6 +46,7 @@
 #include <cstdint>
 #include <cwctype>
 #include <filesystem>
+#include <limits>
 #include <string>
 #include <vector>
 #include <xutility>
@@ -385,9 +386,13 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	return false;
   }
   thred::savdo();
-  auto insertIndex = StitchBuffer->size();
   StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
   auto newAttribute = 0U;
+
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
   for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; ++iPCSStitch) {
 	if (pcsStitchBuffer[iPCSStitch].tag == 3) {
 	  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
@@ -397,24 +402,13 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT;
 	auto yVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
 	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT;
+	minX = std::min(minX, xVal);
+	minY = std::min(minY, yVal);
+	maxX = std::max(maxX, xVal);
+	maxY = std::max(maxY, yVal);
 	StitchBuffer->emplace_back(xVal, yVal, newAttribute);
   }
-  auto const newStitchCount = StitchBuffer->size();
-  for (; insertIndex < newStitchCount; ++insertIndex) {
-	auto const& stitch = StitchBuffer->operator[](insertIndex);
-	if (stitch.x < insertedRectangle.left) {
-	  insertedRectangle.left = stitch.x;
-	}
-	if (stitch.x > insertedRectangle.right) {
-	  insertedRectangle.right = stitch.x;
-	}
-	if (stitch.y < insertedRectangle.bottom) {
-	  insertedRectangle.bottom = stitch.y;
-	}
-	if (stitch.y > insertedRectangle.top) {
-	  insertedRectangle.top = stitch.y;
-	}
-  }
+  insertedRectangle = F_RECTANGLE {minX, maxY, maxX, minY};
   CloseHandle(fileHandle);
   return true;
 }

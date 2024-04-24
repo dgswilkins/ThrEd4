@@ -810,28 +810,24 @@ void form::setfrm() {
 	return;
   }
   fi::rats();
-  ClosestFormToCursor  = wrap::toUnsigned(FormList->size() - 1U);
-  auto const point     = fi::px2stchf(FormLines->front());
-  auto       itVertex  = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
-  auto const delta     = F_POINT {point.x - itVertex->x, point.y - itVertex->y};
-  auto&      rectangle = FormList->back().rectangle;
-  rectangle            = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
-  for (auto iVertex = 0U; iVertex < NewFormVertexCount - 1U; ++iVertex) {
-	*itVertex += delta;
-	if (itVertex->x < rectangle.left) {
-	  rectangle.left = itVertex->x;
-	}
-	if (itVertex->x > rectangle.right) {
-	  rectangle.right = itVertex->x;
-	}
-	if (itVertex->y > rectangle.top) {
-	  rectangle.top = itVertex->y;
-	}
-	if (itVertex->y < rectangle.bottom) {
-	  rectangle.bottom = itVertex->y;
-	}
-	++itVertex;
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+  auto const point    = fi::px2stchf(FormLines->front());
+  auto const spVertices =
+      gsl::span(*FormVertices).subspan(FormList->back().vertexIndex, NewFormVertexCount - 1U);
+  auto const delta = F_POINT {point.x - spVertices.front().x, point.y - spVertices.front().y};
+
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
+  for (auto& vertex : spVertices) {
+	vertex += delta;
+	minX = std::min(minX, vertex.x);
+	minY = std::min(minY, vertex.y);
+	maxX = std::max(maxX, vertex.x);
+	maxY = std::max(maxY, vertex.y);
   }
+  FormList->back().rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
   StateMap->reset(StateFlag::FORMIN);
   StateMap->set(StateFlag::INIT);
   StateMap->set(StateFlag::RESTCH);
@@ -981,38 +977,31 @@ void form::fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
   formOutline[0].y = formOutline[1].y = formOutline[4].y = form.rectangle.top;
   formOutline[1].x = formOutline[2].x = form.rectangle.right;
   formOutline[2].y = formOutline[3].y = form.rectangle.bottom;
-  auto iFormOutline                   = formOutline.begin();
+
+  auto iFormOutline = formOutline.begin();
+
+  auto minX = SelectedFormsRect.left;
+  auto maxY = SelectedFormsRect.top;
+  auto maxX = SelectedFormsRect.right;
+  auto minY = SelectedFormsRect.bottom;
   for (auto& point : line) {
-	point = POINT {std::lround((iFormOutline->x - ZoomRect.left) * HorizontalRatio),
-	               std::lround((ZoomRect.top - iFormOutline->y) * VerticalRatio)};
-	if (point.x < SelectedFormsRect.left) {
-	  SelectedFormsRect.left = point.x;
-	}
-	if (point.y < SelectedFormsRect.top) {
-	  SelectedFormsRect.top = point.y;
-	}
-	if (point.x > SelectedFormsRect.right) {
-	  SelectedFormsRect.right = point.x;
-	}
-	if (point.y > SelectedFormsRect.bottom) {
-	  SelectedFormsRect.bottom = point.y;
-	}
+	point.x = std::lround((iFormOutline->x - ZoomRect.left) * HorizontalRatio);
+	point.y = std::lround((ZoomRect.top - iFormOutline->y) * VerticalRatio);
+	minX    = std::min(minX, point.x);
+	minY    = std::min(minY, point.y);
+	maxX    = std::max(maxX, point.x);
+	maxY    = std::max(maxY, point.y);
 	++iFormOutline;
   }
   auto const last = POINT {std::lround((formOutline[0].x - ZoomRect.left) * HorizontalRatio),
                            std::lround((ZoomRect.top - formOutline[0].y) * VerticalRatio)};
-  if (last.x < SelectedFormsRect.left) {
-	SelectedFormsRect.left = last.x;
-  }
-  if (last.y < SelectedFormsRect.top) {
-	SelectedFormsRect.top = last.y;
-  }
-  if (last.x > SelectedFormsRect.right) {
-	SelectedFormsRect.right = last.x;
-  }
-  if (last.y > SelectedFormsRect.bottom) {
-	SelectedFormsRect.bottom = last.y;
-  }
+
+  minX = std::min(minX, last.x);
+  minY = std::min(minY, last.y);
+  maxX = std::max(maxX, last.x);
+  maxY = std::max(maxY, last.y);
+
+  SelectedFormsRect = RECT {minX, maxY, maxX, minY};
   if (OutLineEverySelectedForm) {
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
@@ -1169,9 +1158,10 @@ void form::drwfrm() {
   if (!SelectedFormList->empty()) {
 	SelectObject(StitchWindowMemDC, MultiFormPen);
 	ratsr();
-	SelectedFormsRect.top = SelectedFormsRect.left =
-	    std::numeric_limits<decltype(SelectedFormsRect.top)>::max();
-	SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
+	SelectedFormsRect = RECT {std::numeric_limits<LONG>::max(),
+	                          std::numeric_limits<LONG>::lowest(),
+	                          std::numeric_limits<LONG>::lowest(),
+	                          std::numeric_limits<LONG>::max()};
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  fselrct(selectedForm);
 	}

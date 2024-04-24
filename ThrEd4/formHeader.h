@@ -666,34 +666,31 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
 
 inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (vertexCount != 0U) {
-	if (const auto* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
-	  auto itVertex = wrap::next(formVertices->cbegin(), vertexIndex);
-	  rectangle     = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
-	  for (auto iVertex = 1U; iVertex < vertexCount; ++iVertex) {
-		++itVertex;
-		if (itVertex->x < rectangle.left) {
-		  rectangle.left = itVertex->x;
-		}
-		if (itVertex->y > rectangle.top) {
-		  rectangle.top = itVertex->y;
-		}
-		if (itVertex->x > rectangle.right) {
-		  rectangle.right = itVertex->x;
-		}
-		if (itVertex->y < rectangle.bottom) {
-		  rectangle.bottom = itVertex->y;
-		}
+	if (auto const* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
+	  auto minX = std::numeric_limits<float>::max();
+	  auto minY = std::numeric_limits<float>::max();
+	  auto maxX = std::numeric_limits<float>::lowest();
+	  auto maxY = std::numeric_limits<float>::lowest();
+
+	  auto const spVertices = gsl::span(*formVertices).subspan(vertexIndex, vertexCount);
+	  for (auto const& vertex : spVertices) {
+		minX = std::min(minX, vertex.x);
+		maxX = std::max(maxX, vertex.x);
+		minY = std::min(minY, vertex.y);
+		maxY = std::max(maxY, vertex.y);
 	  }
-	  if (rectangle.top - rectangle.bottom < MINRCT) {
-		auto const offset = (MINRCT - (rectangle.top - rectangle.bottom)) / 2;
-		rectangle.top += offset;
-		rectangle.bottom -= offset;
+
+	  if (auto const height = maxY - minY; height < MINRCT) {
+		auto const offset = (MINRCT - height) / 2;
+		maxY += offset;
+		minY -= offset;
 	  }
-	  if (rectangle.right - rectangle.left < MINRCT) {
-		auto const offset = (MINRCT - (rectangle.right - rectangle.left)) / 2;
-		rectangle.left -= offset;
-		rectangle.right += offset;
+	  if (auto const width = maxX - minX; width < MINRCT) {
+		auto const offset = (MINRCT - width) / 2;
+		minX -= offset;
+		maxX += offset;
 	  }
+	  this->rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 	}
   }
 }

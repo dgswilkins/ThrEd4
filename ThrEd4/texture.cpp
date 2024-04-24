@@ -62,6 +62,7 @@
 #endif
 #include <filesystem>
 #include <iterator>
+#include <limits>
 #include <ranges>
 #include <string>
 #include <type_traits>
@@ -898,24 +899,18 @@ void texture::txtrup() {
 
 void txi::angrct(F_RECTANGLE& rectangle) noexcept {
   auto const& angledFormVertices = *AngledFormVertices;
-  rectangle.left                 = angledFormVertices[0].x;
-  rectangle.right                = angledFormVertices[0].x;
-  rectangle.bottom               = angledFormVertices[0].y;
-  rectangle.top                  = angledFormVertices[0].y;
+
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
   for (auto const& vertex : angledFormVertices) {
-	if (vertex.x < rectangle.left) {
-	  rectangle.left = vertex.x;
-	}
-	if (vertex.x > rectangle.right) {
-	  rectangle.right = vertex.x;
-	}
-	if (vertex.y > rectangle.top) {
-	  rectangle.top = vertex.y;
-	}
-	if (vertex.y < rectangle.bottom) {
-	  rectangle.bottom = vertex.y;
-	}
+	minX = std::min(minX, vertex.x);
+	minY = std::min(minY, vertex.y);
+	maxX = std::max(maxX, vertex.x);
+	maxY = std::max(maxY, vertex.y);
   }
+  rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 }
 
 void txi::ritxfrm(FRM_HEAD const& textureForm) {
