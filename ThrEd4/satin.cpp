@@ -811,7 +811,7 @@ void satin::ribon() {
 	displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
 	return;
   }
-  if (FormList->operator[](ClosestFormToCursor).vertexCount > 2) {
+  if (FormList->operator[](ClosestFormToCursor).vertexCount < 2) {
 	displayText::tabmsg(IDS_FRM2, false);
 	return;
   }
