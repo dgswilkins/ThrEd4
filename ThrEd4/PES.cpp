@@ -849,7 +849,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   auto stitchColor  = StitchBuffer->front().attribute & COLMSK;
   auto boundingRect = F_RECTANGLE {};
-  thred::sizstch(boundingRect, *StitchBuffer);
+  thred::stchrct(boundingRect);
   auto const offset      = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
                                wrap::midl(boundingRect.top, boundingRect.bottom)};
   pesHeader.atfm1        = 1.0F;

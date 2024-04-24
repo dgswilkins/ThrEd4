@@ -266,7 +266,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	hoopSize = LARGHUP;
   }
   auto stitchRect = F_RECTANGLE {};
-  thred::sizstch(stitchRect, *StitchBuffer);
+  thred::stchrct(stitchRect);
   if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 || stitchRect.top > LHUPY) {
 	IniFile.hoopSizeX = LHUPX;
 	IniFile.hoopSizeY = LHUPY;

@@ -195,7 +195,6 @@ void shftflt(F_POINT const& point) noexcept;
 void shorter();
 void showColorWin() noexcept;
 void showOnlyLayer(uint8_t play);
-void sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept;
 auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
 auto stch2px1(uint32_t iStitch) -> POINT;
 auto stch2pxr(F_POINT const& stitchCoordinate) -> POINT;

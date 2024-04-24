@@ -1227,29 +1227,6 @@ auto thi::pxchk(float pixelSize) -> uint16_t {
   return wrap::round<uint16_t>(pixelSize);
 }
 
-void thred::sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept {
-  if (stitches.empty()) {
-	rectangle = F_RECTANGLE {};
-	return;
-  }
-  rectangle.bottom = rectangle.top = stitches[0].y;
-  rectangle.left = rectangle.right = stitches[0].x;
-  for (auto const& stitch : stitches) {
-	if (stitch.x < rectangle.left) {
-	  rectangle.left = stitch.x;
-	}
-	if (stitch.x > rectangle.right) {
-	  rectangle.right = stitch.x;
-	}
-	if (stitch.y < rectangle.bottom) {
-	  rectangle.bottom = stitch.y;
-	}
-	if (stitch.y > rectangle.top) {
-	  rectangle.top = stitch.y;
-	}
-  }
-}
-
 void thi::zRctAdj() noexcept {
   auto const unzoomedY = wrap::toFloat(UnzoomedRect.cy);
   if (ZoomRect.top > unzoomedY) {
@@ -1404,7 +1381,7 @@ void thred::zumhom() {
 void thred::hupfn() {
   auto checkHoopRect = F_RECTANGLE {}; // for checking the hoop size
   StateMap->reset(StateFlag::HUPCHNG);
-  sizstch(checkHoopRect, *StitchBuffer);
+  thred::stchrct(checkHoopRect);
   if (!FormList->empty()) {
 	if (StitchBuffer->empty()) {
 	  auto const itVertex  = FormVertices->cbegin();
@@ -1460,8 +1437,8 @@ void thred::hupfn() {
   }
   for (auto& form : *FormList) {
 	form.rectangle.left += delta.x;
-	form.rectangle.right += delta.x;
 	form.rectangle.top += delta.y;
+	form.rectangle.right += delta.x;
 	form.rectangle.bottom += delta.y;
   }
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
@@ -6282,7 +6259,7 @@ void thred::redclp() {
   if (clipPointer == nullptr) {
 	return;
   }
-  const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(clipPointer);
+  auto const* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(clipPointer);
   auto const        clipSize         = clipStitchPtr->led;
   auto const        spClipStitchData = gsl::span<const CLIP_STITCH> {clipStitchPtr, clipSize};
   ClipBuffer->clear();
@@ -8452,10 +8429,10 @@ void thi::frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!(std::is_
 	*itVertex += F_POINT {deltaX, deltaY};
 	++itVertex;
   }
-  form.rectangle.bottom += deltaY;
-  form.rectangle.top += deltaY;
   form.rectangle.left += deltaX;
+  form.rectangle.top += deltaY;
   form.rectangle.right += deltaX;
+  form.rectangle.bottom += deltaY;
 }
 
 void thred::nudgfn(float deltaX, float deltaY) {
