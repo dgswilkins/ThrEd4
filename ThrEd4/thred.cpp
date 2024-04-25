@@ -6097,7 +6097,7 @@ void thred::delet() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StateMap->test(StateFlag::FRMPSEL) || form::closfrm()) {
+  if (StateMap->test(StateFlag::FRMPSEL) || form::closfrm(ClosestFormToCursor)) {
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	switch (form.type) {
 	  case FRMLINE: {

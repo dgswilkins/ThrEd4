@@ -1503,7 +1503,7 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
   return param;
 }
 
-auto form::closfrm() -> bool {
+auto form::closfrm(uint32_t& formIndex) -> bool {
   if (FormList->empty()) {
 	return false;
   }
@@ -1517,7 +1517,7 @@ auto form::closfrm() -> bool {
   auto const layerCoded    = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   auto const maxForm       = wrap::toUnsigned(FormList->size());
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
-	if (StateMap->test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
+	if (StateMap->test(StateFlag::FRMSAM) && iForm == formIndex) {
 	  continue;
 	}
 	auto&      currentForm = FormList->operator[](iForm);
@@ -1556,7 +1556,7 @@ auto form::closfrm() -> bool {
   minimumLength = std::hypot(wrap::toFloat(stitchCoordsInPixels.x - screenCoordinate.x),
                              wrap::toFloat(stitchCoordsInPixels.y - screenCoordinate.y));
   if (minimumLength < FCLOSNUF) {
-	ClosestFormToCursor   = closestForm;
+	formIndex   = closestForm;
 	ClosestVertexToCursor = closestVertex;
 	StateMap->set(StateFlag::RELAYR);
 	return true;
@@ -6520,7 +6520,7 @@ void form::setstrtch() {
 	  for (auto selectedForm : (*SelectedFormList)) {
 		FormList->operator[](selectedForm).outline();
 		ClosestFormToCursor = selectedForm;
-		refil(ClosestFormToCursor);
+		refil(selectedForm);
 	  }
 	  StateMap->set(StateFlag::RESTCH);
 	  return;
@@ -7812,7 +7812,7 @@ void form::join() {
   auto const  lastVertex =
       wrap::next(FormVertices->cbegin(), savedform.vertexIndex + savedform.vertexCount - 1U);
   StateMap->set(StateFlag::FRMSAM);
-  if (FormList->size() <= 1 || !StateMap->test(StateFlag::FORMSEL) || !form::closfrm()) {
+  if (FormList->size() <= 1 || !StateMap->test(StateFlag::FORMSEL) || !form::closfrm(ClosestFormToCursor)) {
 	StateMap->reset(StateFlag::FRMSAM);
 	return;
   }

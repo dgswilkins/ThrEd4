@@ -641,7 +641,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 		  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
 		}
-		if (form::closfrm()) {
+		if (form::closfrm(ClosestFormToCursor)) {
 		  StateMap->set(StateFlag::FRMPMOV);
 		  form::frmovlin();
 		  return true;
@@ -1402,7 +1402,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	return true;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	if (form::closfrm()) {
+	if (form::closfrm(ClosestFormToCursor)) {
 	  if ((StateMap->test(StateFlag::FRMPSEL) || StateMap->test(StateFlag::FPSEL)) &&
 	      SelectedFormVertices.form == ClosestFormToCursor) {
 		auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
@@ -1439,7 +1439,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
 		auto tempIndex = ClosestFormToCursor;
-		if (form::closfrm()) {
+		if (form::closfrm(ClosestFormToCursor)) {
 		  // ToDo - I don't think this can ever be hit with closfrm
 		  if (!SelectedFormList->empty()) {
 			thred::nuslst(ClosestFormToCursor);
@@ -1465,7 +1465,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		  StateMap->set(StateFlag::WASEL);
 		  PreviousFormIndex = ClosestFormToCursor;
 		}
-		if (form::closfrm()) {
+		if (form::closfrm(ClosestFormToCursor)) {
 		  form::nufsel();
 		}
 		if (SelectedFormList->size() > 1) {
@@ -1477,7 +1477,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	  if (StateMap->test(StateFlag::FORMSEL)) {
 		thred::handleFormSelected();
 	  }
-	  if (form::closfrm()) {
+	  if (form::closfrm(ClosestFormToCursor)) {
 		StateMap->set(StateFlag::FORMSEL);
 		StateMap->reset(StateFlag::FPSEL);
 		form::unpsel();

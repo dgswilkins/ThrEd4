@@ -1370,7 +1370,7 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 	  break;
 	}
 	case L'Y': {
-	  if (form::closfrm() && !thred::unselectAll()) {
+	  if (form::closfrm(ClosestFormToCursor) && !thred::unselectAll()) {
 		thred::selfpnt();
 	  }
 	  break;

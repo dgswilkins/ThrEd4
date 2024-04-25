@@ -37,7 +37,7 @@ auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool;
 auto closflt(FRM_HEAD const& form,
              float           xCoordinate,
              float           yCoordinate) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;
-auto closfrm() -> bool;
+auto closfrm(uint32_t& formIndex) -> bool;
 void clpfil();
 void clpspac(uint32_t insertPoint, uint32_t count);
 void clrfills() noexcept;
