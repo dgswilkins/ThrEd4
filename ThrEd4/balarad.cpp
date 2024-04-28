@@ -229,8 +229,9 @@ void bal::ritbal() {
 	auto const bhcEnd = std::next(spBHC.begin(), UserColor.size());
 	*iBHC             = UserColor.at(color);
 	for (auto const& stitch : *StitchBuffer) {
-	  if (color != (stitch.attribute & COLMSK)) {
-		color     = stitch.attribute & COLMSK;
+	  auto const stitchColor = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK);
+	  if (color != stitchColor) {
+		color     = stitchColor;
 		*(iBHC++) = UserColor.at(color);
 		if (iBHC == bhcEnd) {
 		  break;
