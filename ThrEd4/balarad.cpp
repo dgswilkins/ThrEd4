@@ -249,21 +249,16 @@ void bal::ritbal() {
 	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color        = StitchBuffer->front().attribute & COLMSK;
-	auto iOutput = 0U;
 	bali::thr2bal(balaradStitch, 0, BALJUMP, 0);
-	++iOutput;
-	auto stitch = StitchBuffer->begin();
-	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
+	for (auto iStitch = 0U; const auto& stitch : *StitchBuffer) {
 	  bali::thr2bal(balaradStitch, iStitch, BALNORM, 0);
-	  ++iOutput;
-	  if ((stitch->attribute & COLMSK) != color) {
-		color = stitch->attribute & COLMSK;
+	  if ((stitch.attribute & COLMSK) != color) {
+		color = stitch.attribute & COLMSK;
 		bali::thr2bal(balaradStitch, iStitch, BALSTOP, color);
-		++iOutput;
 	  }
-	  ++stitch;
+	  ++iStitch;
 	}
-	WriteFile(balaradFile, balaradStitch.data(), iOutput * wrap::sizeofType(balaradStitch), &bytesWritten, nullptr);
+	WriteFile(balaradFile, balaradStitch.data(), wrap::sizeofVector(balaradStitch), &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
 	balaradFile =
 	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
