@@ -8415,7 +8415,7 @@ void form::cntrx() {
 	thred::savdo();
 	auto selectedCenter = F_POINT {};
 	fi::dufcntr(selectedCenter);
-	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
+	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, markCenter.y - selectedCenter.y};
 	if (StateMap->test(StateFlag::CNTRV)) {
 	  FormMoveDelta.y = 0.0F;
 	}
@@ -8436,7 +8436,7 @@ void form::cntrx() {
 	  auto const  selectedCenter = F_POINT {wrap::midl(formRect.right, formRect.left), 
 										    wrap::midl(formRect.top, formRect.bottom)};
 	// clang-format on
-	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
+	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, markCenter.y - selectedCenter.y};
 	if (StateMap->test(StateFlag::CNTRV)) {
 	  FormMoveDelta.y = 0.0F;
 	}
@@ -8474,7 +8474,7 @@ void form::cntrx() {
 	}
 	auto const selectedCenter = F_POINT {wrap::midl(groupRect.right, groupRect.left),
 	                                     wrap::midl(groupRect.top, groupRect.bottom)};
-	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
+	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, markCenter.y - selectedCenter.y};
 	if (StateMap->test(StateFlag::CNTRV)) {
 	  FormMoveDelta.y = 0.0F;
 	}
