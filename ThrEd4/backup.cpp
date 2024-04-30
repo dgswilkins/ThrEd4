@@ -164,6 +164,7 @@ void bui::redbak() {
   if (undoData->stitchCount != 0U) {
 	auto const span = gsl::span<F_POINT_ATTR> {undoData->stitches, undoData->stitchCount};
 	StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
+	StateMap->set(StateFlag::INIT);
   }
   else {
 	StateMap->reset(StateFlag::INIT);
