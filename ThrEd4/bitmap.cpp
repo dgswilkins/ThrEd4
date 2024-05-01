@@ -257,7 +257,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 // Get a rough estimate of whether black or white
 // is dominant in the monochrome bitmap
 auto bi::binv(const std::vector<uint8_t>& monoBitmapData) noexcept -> bool {
-  auto whiteBits = gsl::narrow_cast<size_t>(std::count(monoBitmapData.begin(), monoBitmapData.end(), UCHAR_MAX));
+  auto const whiteBits = gsl::narrow_cast<size_t>(std::ranges::count(monoBitmapData, UCHAR_MAX));
   return (whiteBits > (monoBitmapData.size() >> 1));
 }
 
