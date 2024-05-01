@@ -550,7 +550,7 @@ void sprct(std::vector<F_POINT> const& vertices,
            uint32_t                    vertexIndex,
            std::vector<V_RECT_2>&      fillVerticalRect,
            uint32_t                    start,
-           uint32_t                    finish);
+           uint32_t                    finish) noexcept(!(std::is_same_v<uint32_t, size_t>));
 void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
             uint32_t                     iRect) noexcept;
@@ -2061,7 +2061,7 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
                uint32_t                    vertexIndex,
                std::vector<V_RECT_2>&      fillVerticalRect,
                uint32_t                    start,
-               uint32_t                    finish) {
+               uint32_t                    finish) noexcept(!(std::is_same_v<uint32_t, size_t>)) {
   auto const& opStart        = OutsidePoints->operator[](start);
   auto const& opFinish       = OutsidePoints->operator[](finish);
   auto const& ipStart        = InsidePoints->operator[](start);
