@@ -970,7 +970,7 @@ void form::delfrms() {
 void form::fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
   // clang-format off
   auto const& form = FormList->operator[](iForm);
-  std::array<F_POINT, OUTPNTS> formOutline;
+  std::array<F_POINT, SQPNTS> formOutline;
   auto line        = std::array<POINT, SQPNTS> {};
   // clang-format on
   formOutline[0].x = formOutline[3].x = formOutline[4].x = form.rectangle.left;
@@ -993,13 +993,6 @@ void form::fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
 	maxY    = std::max(maxY, point.y);
 	++iFormOutline;
   }
-  auto const last = POINT {std::lround((formOutline[0].x - ZoomRect.left) * HorizontalRatio),
-                           std::lround((ZoomRect.top - formOutline[0].y) * VerticalRatio)};
-
-  minX = std::min(minX, last.x);
-  minY = std::min(minY, last.y);
-  maxX = std::max(maxX, last.x);
-  maxY = std::max(maxY, last.y);
 
   SelectedFormsRect = RECT {minX, maxY, maxX, minY};
   if (OutLineEverySelectedForm) {
