@@ -6388,10 +6388,10 @@ auto thi::gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount)
 
 void thred::insfil(fs::path& insertedFile) {
   auto successFlag       = false;
-  auto insertedRectangle = F_RECTANGLE {std::numeric_limits<float>::max(),
-                                        std::numeric_limits<float>::lowest(),
-                                        std::numeric_limits<float>::lowest(),
-                                        std::numeric_limits<float>::max()};
+  auto insertedRectangle = F_RECTANGLE {BIGFLOAT,
+                                        LOWFLOAT,
+                                        LOWFLOAT,
+                                        BIGFLOAT};
   if (insertedFile.empty()) {
 	thi::getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
   }
@@ -6609,10 +6609,10 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	if (fileHeader.formCount != 0U) {
 	  auto spVertices = gsl::span(*FormVertices).subspan(InsertedVertexIndex, fileHeader.vertexCount);
 
-	  auto minX = std::numeric_limits<float>::max();
-	  auto minY = std::numeric_limits<float>::max();
-	  auto maxX = std::numeric_limits<float>::lowest();
-	  auto maxY = std::numeric_limits<float>::lowest();
+	  auto minX = BIGFLOAT;
+	  auto minY = BIGFLOAT;
+	  auto maxX = LOWFLOAT;
+	  auto maxY = LOWFLOAT;
 	  for (auto const& vertex : spVertices) {
 		minX = std::min(minX, vertex.x);
 		maxX = std::max(maxX, vertex.x);
@@ -7669,10 +7669,10 @@ void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
 	rectangle = F_RECTANGLE {};
 	return;
   }
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
 
   for (auto const& stitch : *StitchBuffer) {
 	minX = std::min(minX, stitch.x);
@@ -7689,10 +7689,10 @@ void thred::frmrct(F_RECTANGLE& rectangle) noexcept {
 	rectangle = F_RECTANGLE {};
 	return;
   }
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
 
   for (auto const& formVertice : *FormVertices) {
 	minX = std::min(minX, formVertice.x);

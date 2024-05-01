@@ -667,10 +667,10 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
 inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   if (vertexCount != 0U) {
 	if (auto const* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
-	  auto minX = std::numeric_limits<float>::max();
-	  auto minY = std::numeric_limits<float>::max();
-	  auto maxX = std::numeric_limits<float>::lowest();
-	  auto maxY = std::numeric_limits<float>::lowest();
+	  auto minX = BIGFLOAT;
+	  auto minY = BIGFLOAT;
+	  auto maxX = LOWFLOAT;
+	  auto maxY = LOWFLOAT;
 
 	  auto const spVertices = gsl::span(*formVertices).subspan(vertexIndex, vertexCount);
 	  for (auto const& vertex : spVertices) {

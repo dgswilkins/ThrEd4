@@ -993,7 +993,7 @@ void xi::fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments
   auto& form = FormList->operator[](formIndex);
 
   auto const savedStitchSize = UserStitchLength;
-  UserStitchLength           = std::numeric_limits<float>::max();
+  UserStitchLength           = BIGFLOAT;
   if (form.underlaySpacing == 0.0F) {
 	form.underlaySpacing = IniFile.underlaySpacing;
   }
@@ -1117,7 +1117,7 @@ auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> c
   formFillCounter.resize((FormList->size() + 2U) << 2U);
   auto totalJumps = 0U;
   while (chkrdun(formFillCounter, pRecs, sortRecord)) {
-	auto       minimumLength = std::numeric_limits<float>::max();
+	auto       minimumLength = BIGFLOAT;
 	auto const stitchIt      = (direction)
 	                               ? wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
 	                               : wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->start);

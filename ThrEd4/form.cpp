@@ -816,10 +816,10 @@ void form::setfrm() {
       gsl::span(*FormVertices).subspan(FormList->back().vertexIndex, NewFormVertexCount - 1U);
   auto const delta = F_POINT {point.x - spVertices.front().x, point.y - spVertices.front().y};
 
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto& vertex : spVertices) {
 	vertex += delta;
 	minX = std::min(minX, vertex.x);
@@ -4905,7 +4905,7 @@ void fi::bakseq() {
 	auto&       bCurrent       = BSequence->operator[](iSequence);
 	auto const& bNext          = BSequence->operator[](iSequence + 1U);
 	auto        delta          = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
-	auto        slope          = std::numeric_limits<float>::max(); // initialize to the max value i.e. slope when y is zero
+	auto        slope          = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
 	// clang-format on
 	if (delta.y != 0.0F) {
 	  slope = delta.x / delta.y;

@@ -46,7 +46,6 @@
 #include <cstdint>
 #include <cwctype>
 #include <filesystem>
-#include <limits>
 #include <string>
 #include <vector>
 #include <xutility>
@@ -389,10 +388,10 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
   auto newAttribute = 0U;
 
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; ++iPCSStitch) {
 	if (pcsStitchBuffer[iPCSStitch].tag == 3) {
 	  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;

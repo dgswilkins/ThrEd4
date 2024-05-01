@@ -79,8 +79,9 @@ constexpr float  USPAC    = 15.0F;                     // underlay fill spacing
 constexpr float  URAT     = 0.75F; // ratio of underlay stitch to satin border size
 
 constexpr float    TNYFLOAT = 1e-9F;           // tiny number for single precision float stuff
-constexpr float    BIGFLOAT = 1e9F;            // large number for single precision float stuff
-constexpr double   BIGDBL   = 1e99;            // large number for double precision float stuff
+constexpr float    BIGFLOAT = std::numeric_limits<float>::max();            // large number for single precision float stuff
+constexpr float    LOWFLOAT = std::numeric_limits<float>::lowest(); // smallest number for single precision float stuff
+constexpr double   BIGDBL   = std::numeric_limits<double>::max();            // large number for double precision float stuff
 constexpr float    IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner length
 constexpr float    IPICSPAC = 6.0F;            // initial picot border space
 constexpr int32_t  PRFLINS  = 30;              // number of lines on the preference menu

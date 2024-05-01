@@ -62,7 +62,6 @@
 #endif
 #include <filesystem>
 #include <iterator>
-#include <limits>
 #include <ranges>
 #include <string>
 #include <type_traits>
@@ -900,10 +899,10 @@ void texture::txtrup() {
 void txi::angrct(F_RECTANGLE& rectangle) noexcept {
   auto const& angledFormVertices = *AngledFormVertices;
 
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto const& vertex : angledFormVertices) {
 	minX = std::min(minX, vertex.x);
 	minY = std::min(minY, vertex.y);
