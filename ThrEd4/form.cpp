@@ -1001,7 +1001,7 @@ void form::fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
   maxX = std::max(maxX, last.x);
   maxY = std::max(maxY, last.y);
 
-  SelectedFormsRect = RECT {minX, minY, maxX, maxY};
+  SelectedFormsRect = RECT {minX, maxY, maxX, minY};
   if (OutLineEverySelectedForm) {
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }

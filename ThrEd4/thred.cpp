@@ -7116,7 +7116,7 @@ auto thred::isLine(std::vector<POINT> const& boxOutline) noexcept -> bool {
 
 // Is the point inside the box?
 auto thi::isInBox(POINT const& point, RECT const& box) noexcept -> bool {
-  return (point.x >= box.left && point.x <= box.right && point.y >= box.top && point.y <= box.bottom);
+  return (point.x >= box.left && point.x <= box.right && point.y <= box.top && point.y >= box.bottom);
 }
 
 auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
