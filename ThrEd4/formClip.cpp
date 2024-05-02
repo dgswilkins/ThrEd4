@@ -856,9 +856,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		formLines[2].y = formLines[3].y = SelectedFormsRect.bottom;
 		StateMap->set(StateFlag::SHOSTRTCH);
 		thred::strtchbox(stretchBoxLine);
-		FormMoveDelta =
-		    F_POINT {gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
-		             gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2)};
+		FormMoveDelta = F_POINT {wrap::toFloat((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
+		                         wrap::toFloat((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2)};
 		StateMap->set(StateFlag::MOVFRMS);
 		StateMap->set(StateFlag::FUNSCLP);
 	  }
