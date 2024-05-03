@@ -145,7 +145,7 @@ void ci::clpsub(uint32_t formIndex, uint32_t cnt) {
   for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
        auto& form : spForms) {
 	if (form.isClipX()) {
-	  form.clipCount -= cnt;
+	  form.clipIndex -= cnt;
 	}
 	if (form.isEdgeClipX()) {
 	  form.borderClipData -= cnt;
@@ -216,7 +216,7 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
 	  form.borderClipData += count;
 	}
 	if (form.isClip()) {
-	  form.clipCount += count;
+	  form.clipIndex += count;
 	}
   }
   return find;
@@ -236,7 +236,7 @@ auto clip::numclp(uint32_t formIndex) -> uint32_t {
   ++itStart;
   for (auto spForms = std::ranges::subrange(itStart, FormList->end()); auto& form : spForms) {
 	if (form.isClipX()) {
-	  form.clipCount += clipSize;
+	  form.clipIndex += clipSize;
 	}
 	if (form.isEdgeClipX()) {
 	  form.borderClipData += clipSize;
