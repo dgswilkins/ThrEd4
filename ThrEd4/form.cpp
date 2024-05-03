@@ -2008,10 +2008,13 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
   if (delta.y != 0.0F) {
 	auto const yMinimum = std::min(point0.y, point1.y);
 	auto const yMaximum = std::max(point0.y, point1.y);
-	return intersectionPoint.x > xMinimum && intersectionPoint.x <= xMaximum &&
+	return intersectionPoint.x >= xMinimum && intersectionPoint.x <= xMaximum &&
 	       intersectionPoint.y >= yMinimum && intersectionPoint.y <= yMaximum;
   }
-  return intersectionPoint.x > xMinimum && intersectionPoint.x <= xMaximum;
+  if (delta.x == 0.0F) {
+	return false;
+  }
+  return intersectionPoint.x >= xMinimum && intersectionPoint.x <= xMaximum;
 }
 
 auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) noexcept
