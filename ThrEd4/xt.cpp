@@ -2526,8 +2526,8 @@ void xt::nudsiz() {
 	displayText::hsizmsg();
   }
   form::centir();
-  for (auto& form : *FormList) {
-	form.outline();
+  for (auto& iForm : *FormList) {
+	iForm.outline();
   }
 }
 

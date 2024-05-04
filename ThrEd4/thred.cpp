@@ -1435,11 +1435,11 @@ void thred::hupfn() {
   for (auto& formVertice : *FormVertices) {
 	formVertice += delta;
   }
-  for (auto& form : *FormList) {
-	form.rectangle.left += delta.x;
-	form.rectangle.top += delta.y;
-	form.rectangle.right += delta.x;
-	form.rectangle.bottom += delta.y;
+  for (auto& iForm : *FormList) {
+	iForm.rectangle.left += delta.x;
+	iForm.rectangle.top += delta.y;
+	iForm.rectangle.right += delta.x;
+	iForm.rectangle.bottom += delta.y;
   }
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.cx);
@@ -3123,16 +3123,16 @@ void thi::dubuf(std::vector<char>& buffer) {
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   if (!FormList->empty()) {
-	for (auto& form : (*FormList)) {
-	  vertexCount += form.vertexCount;
-	  if (form.type == SAT) {
-		guideCount += form.satinGuideCount;
+	for (auto& iForm : (*FormList)) {
+	  vertexCount += iForm.vertexCount;
+	  if (iForm.type == SAT && (iForm.satinGuideCount != 0)) {
+		guideCount += iForm.satinGuideCount;
 	  }
-	  if (form.isClip()) {
-		clipDataCount += form.clipCount;
+	  if (iForm.isClip()) {
+		clipDataCount += iForm.clipCount;
 	  }
-	  if (form.isEdgeClip()) {
-		clipDataCount += form.clipEntries;
+	  if (iForm.isEdgeClip()) {
+		clipDataCount += iForm.clipEntries;
 	  }
 	}
   }
@@ -4136,24 +4136,24 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   auto clipOffset   = 0U;
   auto vertexOffset = 0U;
   auto guideOffset  = 0U;
-  for (auto& form : *FormList) {
-	form.vertexIndex = vertexOffset;
-	vertexOffset += form.vertexCount;
-	if (form.type == SAT) {
-	  if (form.satinGuideCount != 0U) {
-		form.satinGuideIndex = guideOffset;
-		guideOffset += form.satinGuideCount;
+  for (auto& iForm : *FormList) {
+	iForm.vertexIndex = vertexOffset;
+	vertexOffset += iForm.vertexCount;
+	if (iForm.type == SAT) {
+	  if (iForm.satinGuideCount != 0U) {
+		iForm.satinGuideIndex = guideOffset;
+		guideOffset += iForm.satinGuideCount;
 	  }
 	}
 	// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
 	// where we could not store the pointer in v2)
-	if (form.isClip()) {
-	  form.clipIndex = clipOffset;
-	  clipOffset += form.clipCount;
+	if (iForm.isClip()) {
+	  iForm.clipIndex = clipOffset;
+	  clipOffset += iForm.clipCount;
 	}
-	if (form.isEdgeClipX()) {
-	  form.borderClipData = clipOffset;
-	  clipOffset += form.clipEntries;
+	if (iForm.isEdgeClipX()) {
+	  iForm.borderClipData = clipOffset;
+	  clipOffset += iForm.clipEntries;
 	}
   }
   xt::setfchk();
@@ -7006,8 +7006,8 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	for (auto& stitch : *StitchBuffer) {
 	  thi::rotstch(stitch, rotationAngle, rotationCenter);
 	}
-	for (auto& form : *FormList) {
-	  form.outline();
+	for (auto& iForm : *FormList) {
+	  iForm.outline();
 	}
 	form::selal();
 	return;
@@ -8441,8 +8441,8 @@ void thred::nudgfn(float deltaX, float deltaY) {
 	thred::savdo();
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
-	for (auto& formIt : *FormList) {
-	  thi::frmpos(formIt, deltaX, deltaY);
+	for (auto& iForm : *FormList) {
+	  thi::frmpos(iForm, deltaX, deltaY);
 	}
 	for (auto& stitch : *StitchBuffer) {
 	  stitch += F_POINT {deltaX, deltaY};
@@ -8575,34 +8575,34 @@ void thred::movchk() {
 	  }
 	}
   }
-  for (auto& formIter : *FormList) {
-	if (formIter.fillType != 0U) {
-	  if (formIter.fillColor == VerticalIndex) {
-		formIter.fillColor = draggedColor;
+  for (auto& iForm : *FormList) {
+	if (iForm.fillType != 0U) {
+	  if (iForm.fillColor == VerticalIndex) {
+		iForm.fillColor = draggedColor;
 	  }
 	  else {
-		if (!key && formIter.fillColor == draggedColor) {
-		  formIter.fillColor = VerticalIndex;
+		if (!key && iForm.fillColor == draggedColor) {
+		  iForm.fillColor = VerticalIndex;
 		}
 	  }
 	}
-	if (formIter.fillType == FTHF) {
-	  if (formIter.feather.color == VerticalIndex) {
-		formIter.feather.color = draggedColor;
+	if (iForm.fillType == FTHF) {
+	  if (iForm.feather.color == VerticalIndex) {
+		iForm.feather.color = draggedColor;
 	  }
 	  else {
-		if (!key && formIter.feather.color == draggedColor) {
-		  formIter.feather.color = VerticalIndex;
+		if (!key && iForm.feather.color == draggedColor) {
+		  iForm.feather.color = VerticalIndex;
 		}
 	  }
 	}
-	if (formIter.edgeType != 0U) {
-	  if (formIter.borderColor == VerticalIndex) {
-		formIter.borderColor = draggedColor;
+	if (iForm.edgeType != 0U) {
+	  if (iForm.borderColor == VerticalIndex) {
+		iForm.borderColor = draggedColor;
 	  }
 	  else {
-		if (!key && formIter.borderColor == draggedColor) {
-		  formIter.borderColor = VerticalIndex;
+		if (!key && iForm.borderColor == draggedColor) {
+		  iForm.borderColor = VerticalIndex;
 		}
 	  }
 	}
@@ -8642,17 +8642,17 @@ void thi::inscol() {
 	stitch.attribute &= NCOLMSK;
 	stitch.attribute |= color + 1U;
   }
-  for (auto& formIter : *FormList) {
-	if ((formIter.fillType != 0U) && (formIter.fillColor >= VerticalIndex) && (formIter.fillColor < nextColor)) {
-	  ++(formIter.fillColor);
+  for (auto& iForm : *FormList) {
+	if ((iForm.fillType != 0U) && (iForm.fillColor >= VerticalIndex) && (iForm.fillColor < nextColor)) {
+	  ++(iForm.fillColor);
 	}
-	if ((formIter.fillType == FTHF) && (formIter.feather.color >= VerticalIndex) &&
-	    (formIter.feather.color < nextColor)) {
-	  ++(formIter.feather.color);
+	if ((iForm.fillType == FTHF) && (iForm.feather.color >= VerticalIndex) &&
+	    (iForm.feather.color < nextColor)) {
+	  ++(iForm.feather.color);
 	}
-	if ((formIter.edgeType != 0U) && (formIter.borderColor >= VerticalIndex) &&
-	    (formIter.borderColor < nextColor)) {
-	  ++(formIter.borderColor);
+	if ((iForm.edgeType != 0U) && (iForm.borderColor >= VerticalIndex) &&
+	    (iForm.borderColor < nextColor)) {
+	  ++(iForm.borderColor);
 	}
   }
   for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
@@ -8684,15 +8684,15 @@ void thi::delcol() {
 	stitch.attribute &= NCOLMSK;
 	stitch.attribute |= color - 1U;
   }
-  for (auto& formIter : *FormList) {
-	if ((formIter.fillType != 0U) && (formIter.fillColor > VerticalIndex)) {
-	  --(formIter.fillColor);
+  for (auto& iForm : *FormList) {
+	if ((iForm.fillType != 0U) && (iForm.fillColor > VerticalIndex)) {
+	  --(iForm.fillColor);
 	}
-	if (formIter.fillType == FTHF && formIter.feather.color > VerticalIndex) {
-	  --(formIter.feather.color);
+	if (iForm.fillType == FTHF && iForm.feather.color > VerticalIndex) {
+	  --(iForm.feather.color);
 	}
-	if ((formIter.edgeType != 0U) && (formIter.borderColor > VerticalIndex)) {
-	  --(formIter.borderColor);
+	if ((iForm.edgeType != 0U) && (iForm.borderColor > VerticalIndex)) {
+	  --(iForm.borderColor);
 	}
   }
   for (auto iColor = VerticalIndex; iColor < COLORMAX; ++iColor) {

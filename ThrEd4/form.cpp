@@ -5687,13 +5687,13 @@ void form::rstfrm() {
 }
 
 void form::clrfills() noexcept {
-  for (auto& formIter : *FormList) {
-	formIter.clipEntries = 0;
-	formIter.clipCount   = 0;
-	formIter.edgeType    = 0;
-	formIter.fillType    = 0;
-	formIter.attribute &= NFRECONT;
-	formIter.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
+  for (auto& iForm : *FormList) {
+	iForm.clipEntries = 0;
+	iForm.clipCount   = 0;
+	iForm.edgeType    = 0;
+	iForm.fillType    = 0;
+	iForm.attribute &= NFRECONT;
+	iForm.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
   }
   ClipPoints->clear();
 }
@@ -8500,8 +8500,8 @@ void form::centir() {
   for (auto& formVertice : *FormVertices) {
 	formVertice += delta;
   }
-  for (auto& form : *FormList) {
-	form.outline();
+  for (auto& iForm : *FormList) {
+	iForm.outline();
   }
   xt::setfchk();
   StateMap->set(StateFlag::RESTCH);
@@ -9015,8 +9015,8 @@ void form::col2frm() {
   }
   auto startColorOffset = 0U;
   auto endColorOffset   = COLORCNT;
-  for (auto& formIter : *FormList) {
-	if (formIter.fillType != 0U) {
+  for (auto& iForm : *FormList) {
+	if (iForm.fillType != 0U) {
 	  auto count         = 0U;
 	  auto majorityColor = 0U;
 	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
@@ -9026,11 +9026,11 @@ void form::col2frm() {
 		}
 	  }
 	  majorityColor &= COLMSK;
-	  if (formIter.fillColor != majorityColor) {
+	  if (iForm.fillColor != majorityColor) {
 		++colorChangedCount;
-		wrap::narrow(formIter.fillColor, majorityColor);
+		wrap::narrow(iForm.fillColor, majorityColor);
 	  }
-	  if (formIter.fillType == FTHF && ((formIter.extendedAttribute & AT_FTHBLND) != 0U)) {
+	  if (iForm.fillType == FTHF && ((iForm.extendedAttribute & AT_FTHBLND) != 0U)) {
 		count = majorityColor = 0;
 		for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
 		  if (featherColorHistogram[iColor] > count) {
@@ -9039,13 +9039,13 @@ void form::col2frm() {
 		  }
 		}
 		majorityColor &= COLMSK;
-		if (formIter.feather.color != majorityColor) {
+		if (iForm.feather.color != majorityColor) {
 		  ++colorChangedCount;
-		  wrap::narrow(formIter.feather.color, majorityColor);
+		  wrap::narrow(iForm.feather.color, majorityColor);
 		}
 	  }
 	}
-	if (formIter.edgeType != 0U) {
+	if (iForm.edgeType != 0U) {
 	  auto count         = 0U;
 	  auto majorityColor = 0U;
 	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
@@ -9055,12 +9055,12 @@ void form::col2frm() {
 		}
 	  }
 	  majorityColor &= COLMSK;
-	  if (formIter.borderColor != majorityColor) {
+	  if (iForm.borderColor != majorityColor) {
 		++colorChangedCount;
-		wrap::narrow(formIter.borderColor, majorityColor);
+		wrap::narrow(iForm.borderColor, majorityColor);
 	  }
 	}
-	if ((formIter.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) {
+	if ((iForm.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) {
 	  auto count         = 0U;
 	  auto majorityColor = 0U;
 	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
@@ -9070,9 +9070,9 @@ void form::col2frm() {
 		}
 	  }
 	  majorityColor &= COLMSK;
-	  if (formIter.underlayColor != majorityColor) {
+	  if (iForm.underlayColor != majorityColor) {
 		++colorChangedCount;
-		wrap::narrow(formIter.underlayColor, majorityColor);
+		wrap::narrow(iForm.underlayColor, majorityColor);
 	  }
 	}
 	startColorOffset += COLORCNT;

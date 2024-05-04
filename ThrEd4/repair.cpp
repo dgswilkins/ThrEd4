@@ -432,33 +432,33 @@ void ri::repsat() {
 void ri::reptx() {
   auto textureCount = 0U;
   auto badData      = BAD_COUNTS {};
-  for (auto& formIter : *FormList) {
-	if (!formIter.isTexture()) {
+  for (auto& iForm : *FormList) {
+	if (!iForm.isTexture()) {
 	  continue;
 	}
 	if (wrap::toUnsigned(TexturePointsBuffer->size()) >
-	    wrap::toUnsigned(formIter.texture.index) + formIter.texture.count) {
-	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter.texture.index);
-	  auto const endTexture   = wrap::next(startTexture, formIter.texture.count);
+	    wrap::toUnsigned(iForm.texture.index) + iForm.texture.count) {
+	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), iForm.texture.index);
+	  auto const endTexture   = wrap::next(startTexture, iForm.texture.count);
 	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
-	  wrap::narrow(formIter.texture.index, textureCount);
-	  textureCount += formIter.texture.count;
-	  ri::bcup(formIter, badData);
+	  wrap::narrow(iForm.texture.index, textureCount);
+	  textureCount += iForm.texture.count;
+	  ri::bcup(iForm, badData);
 	  continue;
 	}
-	if (TexturePointsBuffer->size() > formIter.texture.index) {
-	  wrap::narrow(formIter.texture.count, TexturePointsBuffer->size() - formIter.texture.index);
-	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter.texture.index);
-	  auto const endTexture   = wrap::next(startTexture, formIter.texture.count);
+	if (TexturePointsBuffer->size() > iForm.texture.index) {
+	  wrap::narrow(iForm.texture.count, TexturePointsBuffer->size() - iForm.texture.index);
+	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), iForm.texture.index);
+	  auto const endTexture   = wrap::next(startTexture, iForm.texture.count);
 	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
-	  wrap::narrow(formIter.texture.index, textureCount);
-	  ri::bcup(formIter, badData);
+	  wrap::narrow(iForm.texture.index, textureCount);
+	  ri::bcup(iForm, badData);
 	  textureCount = badData.tx;
 	  continue;
 	}
-	formIter.fillType = 0;
+	iForm.fillType = 0;
   }
   TexturePointsBuffer->resize(textureCount);
 }
