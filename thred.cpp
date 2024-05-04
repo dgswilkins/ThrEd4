@@ -22077,7 +22077,7 @@ void init(){
 	ritfnam(ini.desnam);
 	strcpy(hedx.modnam,ini.desnam);
 	hedx.stgran=0;
-	for(ind=0;ind<31;ind++)
+	for(ind=0;ind<26;ind++)
 		hedx.res[ind]=0;
 	chkhup();
 	nedmen();
