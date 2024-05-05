@@ -577,7 +577,7 @@ auto fci::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uin
   auto       stitchCount    = 0U;
   auto       flag           = true;
   for (; iStitch != StitchBuffer->end(); ++iStitch) {
-	if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & TYPMSK) != 0U)) {
+	if (((iStitch->attribute & FRMSK) == codedAttribute) && ((iStitch->attribute & ALTYPMSK) != 0U)) {
 	  flag = false;
 	  break;
 	}
@@ -590,7 +590,7 @@ auto fci::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uin
   stitchCount          = 0U;
   LowerLeftStitch      = F_POINT {BIGFLOAT, BIGFLOAT};
   for (; iStitch != StitchBuffer->end(); ++iStitch) {
-	if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & TYPMSK) != 0U)) {
+	if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & ALTYPMSK) != 0U)) {
 	  if (iStitch->x < LowerLeftStitch.x) {
 		LowerLeftStitch.x = iStitch->x;
 	  }
