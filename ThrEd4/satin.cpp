@@ -146,8 +146,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	FormList->operator[](iForm).vertexIndex += 2;
   }
   auto        iOldVertex    = 0U;
-  auto        itGuide       = wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex);
-  auto const& currentGuide  = *(wrap::next(itGuide, guideIndex));
+  auto const& currentGuide = *(wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex));
   auto const oldLastVertex = currentGuide.start + (firstForm.vertexCount - currentGuide.finish) + 1U;
   auto        iNewVertex    = oldLastVertex + 1U;
   auto const  itFirstVertex  = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
@@ -187,6 +186,7 @@ void satin::spltsat(uint32_t guideIndex) {
   nextForm.vertexIndex  = firstForm.vertexIndex + iOldVertex;
   firstForm.outline();
   nextForm.outline();
+  auto       itGuide   = wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex);
   auto const finishOffset = currentGuide.finish - 1U - currentGuide.start;
   for (auto iGuide = 0U; iGuide < guideIndex; ++iGuide) {
 	(itGuide++)->finish -= finishOffset;
