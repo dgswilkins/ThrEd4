@@ -392,6 +392,9 @@ auto satin::scomp(SAT_CON const& arg1, SAT_CON const& arg2) noexcept -> bool {
 }
 
 void satin::satadj(FRM_HEAD& form) {
+  if (form.satinGuideCount == 0U) { // no guides so return
+	return;
+  }
   auto& currentGuidesCount = form.satinGuideCount;
   auto  interiorGuides     = std::vector<SAT_CON> {};
   interiorGuides.reserve(currentGuidesCount);
