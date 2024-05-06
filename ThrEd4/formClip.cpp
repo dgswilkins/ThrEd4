@@ -165,7 +165,7 @@ auto fci::getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
 
 auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
-  if (form.type == SAT) {
+  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
   if (form.isEdgeClip()) {
@@ -187,7 +187,7 @@ void fci::sizclp(FRM_HEAD const& form,
                  uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>) {
   fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   length = fileSize;
-  if (form.type == SAT) {
+  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	fileSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
   if ((form.fillType != 0U) || (form.edgeType != 0U)) {
@@ -355,7 +355,7 @@ void fci::clipSelectedForms() {
   auto  guidesSize = 0U;
   for (auto& selectedForm : (*SelectedFormList)) {
 	auto& form = FormList->operator[](selectedForm);
-	if (form.type == SAT) {
+	if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	  guidesSize += form.satinGuideCount;
 	}
   }

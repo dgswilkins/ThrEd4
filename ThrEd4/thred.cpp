@@ -3125,7 +3125,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   if (!FormList->empty()) {
 	for (auto& iForm : (*FormList)) {
 	  vertexCount += iForm.vertexCount;
-	  if (iForm.type == SAT && (iForm.satinGuideCount != 0)) {
+	  if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
 		guideCount += iForm.satinGuideCount;
 	  }
 	  if (iForm.isClip()) {

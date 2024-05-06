@@ -250,7 +250,7 @@ void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.isEdgeClip()) {
 	badData.clip += form.clipEntries;
   }
-  if (form.type == SAT) {
+  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	badData.guideCount += form.satinGuideCount;
   }
   if (form.isTexture()) {
