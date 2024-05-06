@@ -4141,11 +4141,9 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   for (auto& iForm : *FormList) {
 	iForm.vertexIndex = vertexOffset;
 	vertexOffset += iForm.vertexCount;
-	if (iForm.type == SAT) {
-	  if (iForm.satinGuideCount != 0U) {
+	if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
 		iForm.satinGuideIndex = guideOffset;
 		guideOffset += iForm.satinGuideCount;
-	  }
 	}
 	// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
 	// where we could not store the pointer in v2)
