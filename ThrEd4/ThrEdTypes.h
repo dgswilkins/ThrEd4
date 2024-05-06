@@ -541,7 +541,7 @@ enum FillStyles : uint8_t {
   VRTF = 1, // Vertical fill
   HORF,     // Horizontal fill
   ANGF,     // Angle fill
-  SATF,     // Fan fill ?
+  SATF,     // Fan fill
   CLPF,     // Fan clip Fill
   CONTF,    // Contour fill
   VCLPF,    // Vertical clip fill
