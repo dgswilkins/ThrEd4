@@ -658,7 +658,7 @@ void satin::delspnt() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (currentForm.type == SAT) {
+  if (currentForm.type == SAT && currentForm.fillType == SATF) {
 	if (ClosestVertexToCursor < currentForm.wordParam) {
 	  --(currentForm.wordParam);
 	}
