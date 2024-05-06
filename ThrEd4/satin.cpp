@@ -89,22 +89,23 @@ auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-l
 
 void satin::delsac(uint32_t formIndex) {
   auto& formList = *FormList;
-  if (SatinGuides->empty() || formList[formIndex].type != SAT || (formList[formIndex].satinGuideCount == 0U)) {
+  auto& currentForm = formList[formIndex];
+  if (SatinGuides->empty() || currentForm.type != SAT || (currentForm.satinGuideCount == 0U)) {
 	formList[formIndex].satinGuideCount = 0;
 	return;
   }
-  auto const startGuide = wrap::next(SatinGuides->cbegin(), formList[formIndex].satinGuideIndex);
-  auto const endGuide   = wrap::next(startGuide, formList[formIndex].satinGuideCount);
+  auto const startGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinGuideIndex);
+  auto const endGuide   = wrap::next(startGuide, currentForm.satinGuideCount);
   SatinGuides->erase(startGuide, endGuide);
   for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U) &&
-	    (formList[iForm].satinGuideIndex >= formList[formIndex].satinGuideCount)) {
-	  formList[iForm].satinGuideIndex -= formList[formIndex].satinGuideCount;
+	    (formList[iForm].satinGuideIndex >= currentForm.satinGuideCount)) {
+	  formList[iForm].satinGuideIndex -= currentForm.satinGuideCount;
 	}
   }
-  formList[formIndex].satinGuideCount = 0;
-  formList[formIndex].wordParam       = 0;
-  formList[formIndex].attribute &= NFRMEND;
+  currentForm.satinGuideCount = 0;
+  currentForm.wordParam       = 0;
+  currentForm.attribute &= NFRMEND;
 }
 
 void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
