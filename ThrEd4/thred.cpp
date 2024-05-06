@@ -3194,10 +3194,12 @@ void thi::dubuf(std::vector<char>& buffer) {
 	}
 	if (srcForm.type == SAT) {
 	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
-	  auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinGuideIndex);
-	  for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
-		guides.emplace_back(*itGuide);
-		++itGuide;
+	  if (srcForm.satinGuideCount != 0U) {
+		auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinGuideIndex);
+		for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
+		  guides.emplace_back(*itGuide);
+		  ++itGuide;
+		}
 	  }
 	}
 	if (srcForm.isClip()) {
