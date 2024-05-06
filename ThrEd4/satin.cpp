@@ -122,12 +122,11 @@ void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
 auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
   auto        guideIndex = 0U;
   auto const& formList   = *FormList;
-  for (auto iForm = 0U; iForm < formIndex; ++iForm) {
-	auto const& form = formList[iForm];
-	if (form.type == SAT) {
-	  guideIndex += form.satinGuideCount;
+  std::for_each(formList.begin(), wrap::next(formList.begin(), formIndex), [&guideIndex](auto& iForm) {
+	if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
+	  guideIndex += iForm.satinGuideCount;
 	}
-  }
+  });
   si::sacspac(guideIndex, guideCount);
   return guideIndex;
 }
