@@ -5745,28 +5745,32 @@ void form::rotfrm(FRM_HEAD& form, uint32_t newStartVertex) {
 	iRotated  = form::nxt(form, iRotated);
 	++itVertex;
   }
-  auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
-  auto       rotatedIt    = itStartGuide; // intended copy
-  if (form.type == SAT && form.vertexCount != 0U) {
-	if (form.wordParam != 0U) {
-	  form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
-	}
-	auto itGuide = itStartGuide; // intended copy
-	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-	  if (itGuide->start != newStartVertex && itGuide->finish != newStartVertex) {
-		rotatedIt->start = (itGuide->start + form.vertexCount - newStartVertex) % form.vertexCount;
-		rotatedIt->finish = (itGuide->finish + form.vertexCount - newStartVertex) % form.vertexCount;
-		if (rotatedIt->start > rotatedIt->finish) {
-		  std::swap(rotatedIt->start, rotatedIt->finish);
-		}
-		++rotatedIt;
+  if (form.type == SAT) {
+	if (form.vertexCount != 0U) {
+	  if (form.wordParam != 0U) {
+		form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
 	  }
-	  ++itGuide;
+	  if (form.satinGuideCount != 0U) {
+		auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+		auto       rotatedIt    = itStartGuide; // intended copy
+		auto       itGuide      = itStartGuide; // intended copy
+		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+		  if (itGuide->start != newStartVertex && itGuide->finish != newStartVertex) {
+			rotatedIt->start = (itGuide->start + form.vertexCount - newStartVertex) % form.vertexCount;
+			rotatedIt->finish = (itGuide->finish + form.vertexCount - newStartVertex) % form.vertexCount;
+			if (rotatedIt->start > rotatedIt->finish) {
+			  std::swap(rotatedIt->start, rotatedIt->finish);
+			}
+			++rotatedIt;
+		  }
+		  ++itGuide;
+		}
+		if (rotatedIt != itStartGuide) {
+		  form.satinGuideCount = wrap::distance<uint32_t>(itStartGuide, rotatedIt);
+		  std::sort(itStartGuide, rotatedIt, satin::scomp);
+		}
+	  }
 	}
-  }
-  if (rotatedIt != itStartGuide) {
-	form.satinGuideCount = wrap::distance<uint32_t>(itStartGuide, rotatedIt);
-	std::sort(itStartGuide, rotatedIt, satin::scomp);
   }
   if (form.vertexCount == 0U) {
 	return;
