@@ -621,12 +621,11 @@ void satin::satadj(FRM_HEAD& form) {
   if (form.satinGuideCount < savedGuideCount) {
 	auto const iGuide = savedGuideCount - currentGuidesCount;
 	outDebugString(L"Guides adjusted by {}, so updating forms\n", iGuide);
-	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto& afterForm = FormList->operator[](iForm);
-	  if ((afterForm.type == SAT) && (afterForm.satinGuideIndex >= iGuide)) {
-		afterForm.satinGuideIndex -= iGuide;
+	std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 1U), FormList->end(), [iGuide](auto& iForm) {
+	  if ((iForm.type == SAT) && (iForm.satinGuideIndex >= iGuide)) {
+		iForm.satinGuideIndex -= iGuide;
 	  }
-	}
+	});
   }
 }
 
