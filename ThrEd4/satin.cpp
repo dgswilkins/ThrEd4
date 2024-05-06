@@ -209,12 +209,11 @@ void satin::spltsat(uint32_t guideIndex) {
   nextForm.satinGuideIndex = firstForm.satinGuideIndex + guideIndex;
   nextForm.satinGuideCount = firstForm.satinGuideCount - guideIndex - 1U;
   firstForm.satinGuideCount = guideIndex;
-  for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
-	auto& formIter = FormList->operator[](iForm);
-	if ((formIter.type == SAT) && (formIter.satinGuideCount != 0U) && formIter.satinGuideIndex != 0U) {
-	  --formIter.satinGuideIndex;
+  std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 2U), FormList->end(), [](auto& iForm) {
+	if ((iForm.type == SAT) && (iForm.satinGuideCount != 0U) && iForm.satinGuideIndex != 0U) {
+	  --iForm.satinGuideIndex;
 	}
-  }
+  });
   if (firstForm.isEdgeClip()) {
 	form::clpspac(firstForm.borderClipData, firstForm.clipEntries);
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; ++iForm) {
