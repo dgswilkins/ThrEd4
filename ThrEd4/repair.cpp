@@ -400,7 +400,7 @@ void ri::repsat() {
   auto badData    = BAD_COUNTS {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
-	if (form.type != SAT) {
+	if (form.type != SAT || (form.satinGuideCount == 0U)) {
 	  continue;
 	}
 	auto const guideDifference = form.satinGuideIndex;
