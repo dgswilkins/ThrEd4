@@ -97,12 +97,12 @@ void satin::delsac(uint32_t formIndex) {
   auto const startGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinGuideIndex);
   auto const endGuide   = wrap::next(startGuide, currentForm.satinGuideCount);
   SatinGuides->erase(startGuide, endGuide);
-  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U) &&
-	    (formList[iForm].satinGuideIndex >= currentForm.satinGuideCount)) {
-	  formList[iForm].satinGuideIndex -= currentForm.satinGuideCount;
+  auto const sgCount = currentForm.satinGuideCount;
+  std::for_each(std::next(formList.begin(), wrap::toPtrdiff(formIndex + 1U)), formList.end(), [sgCount](auto& iForm) {
+	if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex >= sgCount) {
+	  iForm.satinGuideIndex -= sgCount;
 	}
-  }
+  });
   currentForm.satinGuideCount = 0;
   currentForm.wordParam       = 0;
   currentForm.attribute &= NFRMEND;
