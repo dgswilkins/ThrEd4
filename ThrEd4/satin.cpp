@@ -681,12 +681,11 @@ void satin::delspnt() {
 		  ++iGuide;
 		}
 		--(currentForm.satinGuideCount);
-		for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		  auto& form = FormList->operator[](iForm);
-		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
-			++form.satinGuideIndex;
+		std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 1U), FormList->end(), [](auto& iForm) {
+		  if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
+			++iForm.satinGuideIndex;
 		  }
-		}
+		});
 	  }
 	  itGuide = itStartGuide;
 	  for (iGuide = 0; iGuide < currentForm.satinGuideCount; ++iGuide) {
