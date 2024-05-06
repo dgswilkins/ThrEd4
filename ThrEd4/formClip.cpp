@@ -235,7 +235,7 @@ void fci::clipSelectedForm() {
   std::copy(startVertex, endVertex, vertices.begin());
   auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, form.vertexCount));
   auto  iGuide    = 0U;
-  if (form.type == SAT) {
+  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	iGuide                = form.satinGuideCount;
 	auto const startGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 	auto const endGuide   = wrap::next(startGuide, iGuide);
