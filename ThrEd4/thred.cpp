@@ -6582,11 +6582,9 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  auto& formIter       = FormList->operator[](iFormList);
 	  formIter.vertexIndex = vertexOffset;
 	  vertexOffset += formIter.vertexCount;
-	  if (formIter.type == SAT) {
-		if (formIter.satinGuideCount != 0U) {
-		  formIter.satinGuideIndex = guideOffset;
-		  guideOffset += formIter.satinGuideCount;
-		}
+	  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
+		formIter.satinGuideIndex = guideOffset;
+		guideOffset += formIter.satinGuideCount;
 	  }
 	  if (formIter.isClip()) {
 		formIter.clipIndex = clipOffset;
