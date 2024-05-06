@@ -112,12 +112,11 @@ void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
   auto constexpr VAL = SAT_CON {};
   auto const itGuide = wrap::next(SatinGuides->cbegin(), startGuide);
   SatinGuides->insert(itGuide, VAL);
-  for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
-	if (form.type == SAT) {
-	  form.satinGuideIndex += guideCount;
+  std::for_each(std::next(FormList->begin(), wrap::toPtrdiff(ClosestFormToCursor + 1U)), FormList->end(), [guideCount](auto& iForm) {
+	if (iForm.type == SAT && iForm.fillType == SATF) {
+	  iForm.satinGuideIndex += guideCount;
 	}
-  }
+  });
 }
 
 auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
