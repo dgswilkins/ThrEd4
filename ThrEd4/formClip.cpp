@@ -364,13 +364,12 @@ void fci::clipSelectedForms() {
 	auto const guides = gsl::span<SAT_CON> {ptrGuides, guidesSize};
 	for (auto& selectedForm : (*SelectedFormList)) {
 	  auto& form = FormList->operator[](selectedForm);
-	  if (form.type != SAT) {
-		continue;
-	  }
-	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
-	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-		guides[guideCount++] = *itGuide;
-		++itGuide;
+	  if (form.type == SAT && (form.satinGuideCount != 0U)) {
+		auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+		  guides[guideCount++] = *itGuide;
+		  ++itGuide;
+		}
 	  }
 	}
   }
