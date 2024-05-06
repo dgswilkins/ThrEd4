@@ -103,6 +103,8 @@ void satin::delsac(uint32_t formIndex) {
 	}
   }
   formList[formIndex].satinGuideCount = 0;
+  formList[formIndex].wordParam       = 0;
+  formList[formIndex].attribute &= NFRMEND;
 }
 
 void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
