@@ -187,9 +187,9 @@ void satin::spltsat(uint32_t guideIndex) {
   nextForm.vertexIndex  = firstForm.vertexIndex + iOldVertex;
   firstForm.outline();
   nextForm.outline();
-  auto const iNewGuide = 1U + currentGuide.start - currentGuide.finish;
+  auto const finishOffset = currentGuide.finish - 1U - currentGuide.start;
   for (auto iGuide = 0U; iGuide < guideIndex; ++iGuide) {
-	(itGuide++)->finish += iNewGuide;
+	(itGuide++)->finish -= finishOffset;
   }
   if (firstForm.wordParam != 0U) {
 	firstForm.wordParam = currentGuide.start;
