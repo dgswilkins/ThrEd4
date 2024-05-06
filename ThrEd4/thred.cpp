@@ -6005,32 +6005,34 @@ void thred::delet() {
 		form.wordParam = 0;
 	  }
 
-	  // ToDo - Is there a better way to do this than iterating through?
-	  auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
-	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-		auto newGuideVal = 0U;
-		for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		  if (vertexMap.test(iVertex)) {
-			if (itGuide->finish == iVertex) {
-			  itGuide->finish = itGuide->start;
+	  if (form.satinGuideCount == 0U) {
+		// ToDo - Is there a better way to do this than iterating through?
+		auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+		  auto newGuideVal = 0U;
+		  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+			if (vertexMap.test(iVertex)) {
+			  if (itGuide->finish == iVertex) {
+				itGuide->finish = itGuide->start;
+			  }
+			  if (itGuide->start == iVertex) {
+				itGuide->start = itGuide->finish;
+			  }
 			}
-			if (itGuide->start == iVertex) {
-			  itGuide->start = itGuide->finish;
+			else {
+			  if (itGuide->finish == iVertex) {
+				itGuide->finish = newGuideVal;
+			  }
+			  if (itGuide->start == iVertex) {
+				itGuide->start = newGuideVal;
+			  }
+			  ++newGuideVal;
 			}
 		  }
-		  else {
-			if (itGuide->finish == iVertex) {
-			  itGuide->finish = newGuideVal;
-			}
-			if (itGuide->start == iVertex) {
-			  itGuide->start = newGuideVal;
-			}
-			++newGuideVal;
-		  }
+		  ++itGuide;
 		}
-		++itGuide;
+		satin::satadj(form);
 	  }
-	  satin::satadj(form);
 	}
 	form::refil(ClosestFormToCursor);
 	thi::fndknt();
@@ -6141,14 +6143,16 @@ void thred::delet() {
 			  break;
 			}
 		  }
-		  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
-		  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-			if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
-			  satin::delcon(form, iGuide);
-			  satinFlag = true;
-			  break;
+		  if (form.satinGuideCount != 0U) {
+			auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+			  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
+				satin::delcon(form, iGuide);
+				satinFlag = true;
+				break;
+			  }
+			  ++itGuide;
 			}
-			++itGuide;
 		  }
 		  break;
 		}
