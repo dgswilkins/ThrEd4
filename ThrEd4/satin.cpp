@@ -633,12 +633,11 @@ void satin::delcon(FRM_HEAD& form, uint32_t GuideIndex) {
   auto const offset  = form.satinGuideIndex + GuideIndex;
   auto const itGuide = wrap::next(SatinGuides->cbegin(), offset);
   SatinGuides->erase(itGuide);
-  for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& afterForm = FormList->operator[](iForm);
-	if ((afterForm.type == SAT) && (afterForm.satinGuideCount != 0U) && (afterForm.satinGuideIndex != 0U)) {
-	  --afterForm.satinGuideIndex;
+  std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 1U), FormList->end(), [](auto& iForm) {
+	if ((iForm.type == SAT) && (iForm.satinGuideCount != 0U) && (iForm.satinGuideIndex != 0U)) {
+	  --iForm.satinGuideIndex;
 	}
-  }
+  });
   --(form.satinGuideCount);
   if (form.fillType == SATF) {
 	form::refil(ClosestFormToCursor);
