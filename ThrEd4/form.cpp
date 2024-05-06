@@ -1085,16 +1085,18 @@ void form::drwfrm() {
 		lastPoint = form.wordParam + 1U;
 	  }
 	  auto const maxGuide      = FormList->operator[](iForm).satinGuideCount;
-	  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
-	  for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
-		auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
-		auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
-		line[0]                   = form::sfCor2px(*itStartVertex);
-		line[1]                   = form::sfCor2px(*itFinishVertex);
-		SelectObject(StitchWindowMemDC, FormPen);
-		wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-		++itGuide;
+	  if (maxGuide != 0U) {
+		auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+		for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
+		  auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
+		  auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
+		  line[0]                   = form::sfCor2px(*itStartVertex);
+		  line[1]                   = form::sfCor2px(*itFinishVertex);
+		  SelectObject(StitchWindowMemDC, FormPen);
+		  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+		  ++itGuide;
+		}
 	  }
 	}
 	SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
