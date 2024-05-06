@@ -140,8 +140,8 @@ void satin::spltsat(uint32_t guideIndex) {
   auto vertexBuffer = std::vector<F_POINT> {};
   vertexBuffer.resize(wrap::toSize(firstForm.vertexCount) + 2U);
   auto const maxForm = FormList->size();
-  auto const lastFormGuide = wrap::next(FormVertices->cbegin(), firstForm.vertexIndex + firstForm.vertexCount);
-  FormVertices->insert(lastFormGuide, 2, F_POINT {});
+  auto const lastFormVertex = wrap::next(FormVertices->cbegin(), firstForm.vertexIndex + firstForm.vertexCount);
+  FormVertices->insert(lastFormVertex, 2, F_POINT {});
   for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
 	FormList->operator[](iForm).vertexIndex += 2;
   }
@@ -150,8 +150,8 @@ void satin::spltsat(uint32_t guideIndex) {
   auto const& currentGuide  = *(wrap::next(itGuide, guideIndex));
   auto const oldLastVertex = currentGuide.start + (firstForm.vertexCount - currentGuide.finish) + 1U;
   auto        iNewVertex    = oldLastVertex + 1U;
-  auto const  itFirstGuide  = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
-  auto        itVertex      = itFirstGuide;
+  auto const  itFirstVertex  = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
+  auto        itVertex      = itFirstVertex; // copy is intended
   for (auto iVertex = 0U; iVertex < firstForm.vertexCount; ++iVertex) {
 	if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
 	  vertexBuffer[iOldVertex++] = *itVertex;
@@ -177,7 +177,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	}
 	++itVertex;
   }
-  itVertex = itFirstGuide;
+  itVertex = itFirstVertex;
   for (auto iVertex = 0U; iVertex < iNewVertex; ++iVertex) {
 	*(itVertex++) = vertexBuffer[iVertex];
   }
