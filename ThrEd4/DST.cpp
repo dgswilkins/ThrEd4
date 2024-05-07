@@ -319,18 +319,10 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	}
 	auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
 	StitchBuffer->push_back(stitch);
-	if (stitch.x > maximumCoordinate.x) {
-	  maximumCoordinate.x = stitch.x;
-	}
-	if (stitch.y > maximumCoordinate.y) {
-	  maximumCoordinate.y = stitch.y;
-	}
-	if (stitch.x < mimimumCoordinate.x) {
-	  mimimumCoordinate.x = stitch.x;
-	}
-	if (stitch.y < mimimumCoordinate.y) {
-	  mimimumCoordinate.y = stitch.y;
-	}
+	maximumCoordinate.x = std::max(maximumCoordinate.x, stitch.x);
+	maximumCoordinate.y = std::max(maximumCoordinate.y, stitch.y);
+	mimimumCoordinate.x = std::min(mimimumCoordinate.x, stitch.x);
+	mimimumCoordinate.y = std::min(mimimumCoordinate.y, stitch.y);
   }
   auto const dstSize =
       F_POINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
