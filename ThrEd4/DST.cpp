@@ -364,29 +364,27 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   for (auto const& stitch : stitches) {
 	*destination++ = F_POINT_ATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
   }
-  auto boundingRect = F_RECTANGLE {
-      dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y};
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
   for (auto const& stitch : dstStitchBuffer) {
-	constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
-	if (stitch.x > boundingRect.right) {
-	  boundingRect.right = stitch.x + MARGIN;
-	}
-	if (stitch.x < boundingRect.left) {
-	  boundingRect.left = stitch.x - MARGIN;
-	}
-	if (stitch.y > boundingRect.top) {
-	  boundingRect.top = stitch.y + MARGIN;
-	}
-	if (stitch.y < boundingRect.bottom) {
-	  boundingRect.bottom = stitch.y - MARGIN;
-	}
+	minX = std::min(minX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxX = std::max(maxX, stitch.x);
+	maxY = std::max(maxY, stitch.y);
   }
-  auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
-                                 std::lround(wrap::midl(boundingRect.top, boundingRect.bottom))};
-  DSTOffsetData.setPositive({std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1)),
-                             std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1))});
-  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left),
-                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom)});
+  constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
+  minX -= MARGIN;
+  maxX += MARGIN;
+  minY -= MARGIN;
+  maxY += MARGIN;
+  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)),
+                                 std::lround(wrap::midl(maxY, minY))};
+  DSTOffsetData.setPositive({std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
+                             std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
+  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),
+                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - minY)});
   auto color = dstStitchBuffer[0].attribute & COLMSK;
   for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
