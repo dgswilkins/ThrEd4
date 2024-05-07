@@ -3490,28 +3490,21 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	totalLength += clipSideLengths[vertex];
 	vertex = nextVertex;
   }
-  auto itVertex     = itFirstVertex; // intentional copy
-  auto boundingRect = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
-  ++itVertex;
-  for (auto iVertex = 1U; iVertex < currentVertexCount; ++iVertex) {
-	if (itVertex->x < boundingRect.left) {
-	  boundingRect.left = itVertex->x;
-	}
-	if (itVertex->y > boundingRect.top) {
-	  boundingRect.top = itVertex->y;
-	}
-	if (itVertex->x > boundingRect.right) {
-	  boundingRect.right = itVertex->x;
-	}
-	if (itVertex->y < boundingRect.bottom) {
-	  boundingRect.bottom = itVertex->y;
-	}
-	++itVertex;
+  auto minX = std::numeric_limits<float>::max();
+  auto minY = std::numeric_limits<float>::max();
+  auto maxX = std::numeric_limits<float>::lowest();
+  auto maxY = std::numeric_limits<float>::lowest();
+  for (auto const& itVertex :currentFormVertices) {
+	minX = std::min(minX, itVertex.x);
+	minY = std::min(minY, itVertex.y);
+	maxX = std::max(maxX, itVertex.x);
+	maxY = std::max(maxY, itVertex.y);
   }
-  auto clipGrid = RECT {wrap::floor<int32_t>(boundingRect.left / clipWidth),
-                        wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1.0F) + 2,
-                        wrap::ceil<int32_t>(boundingRect.right / clipWidth),
-                        wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1.0F)};
+  auto clipGrid = RECT {wrap::floor<int32_t>(minX / clipWidth),
+                        wrap::ceil<int32_t>(maxY / ClipRectSize.cy + 1.0F) + 2,
+                        wrap::ceil<int32_t>(maxX / clipWidth),
+                        wrap::floor<int32_t>(minY / ClipRectSize.cy - 1.0F)};
+  auto boundingRect = F_RECTANGLE {minX, maxY, maxX, minY};
 
   auto negativeOffset = 0L;
   auto clipGridOffset = 0U;
