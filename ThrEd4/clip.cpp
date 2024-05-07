@@ -587,9 +587,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 	  flag = false;
 	  break;
 	}
-	if (length > adjustedSpace) {
-	  adjustedSpace = length;
-	}
+	adjustedSpace = std::max(adjustedSpace, length);
   }
   if (flag) {
 	chainEndPoints.push_back(*itFirstVertex);
