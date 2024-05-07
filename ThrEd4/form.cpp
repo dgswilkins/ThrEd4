@@ -3551,9 +3551,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	if (form.fillSpacing < 0) {
 	  finish += wrap::round<decltype(finish)>(ClipRectSize.cx / clipWidth);
 	}
-	if (auto const right = gsl::narrow<uint32_t>(clipGrid.right); finish > right) {
-	  finish = right;
-	}
+	finish = std::min(finish, gsl::narrow<uint32_t>(clipGrid.right));
 	if (clipNegative) {
 	  start -= wrap::round<uint32_t>(ClipRectSize.cx / clipWidth);
 	}
