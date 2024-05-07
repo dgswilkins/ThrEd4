@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <limits>
 #include <ranges>
 // resharper disable CppUnusedIncludeDirective
 #include <type_traits>
@@ -257,22 +258,17 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	     auto const& iClip : clipPoints) {
 	  ClipBuffer->emplace_back(iClip.x, iClip.y, 0);
 	}
-	clipRect.left = clipRect.right = ClipBuffer->front().x;
-	clipRect.bottom = clipRect.top = ClipBuffer->front().y;
+	auto minX     = std::numeric_limits<float>::max();
+	auto minY     = std::numeric_limits<float>::max();
+	auto maxX     = std::numeric_limits<float>::lowest();
+	auto maxY     = std::numeric_limits<float>::lowest();
 	for (auto const& clip : *ClipBuffer) {
-	  if (clip.x < clipRect.left) {
-		clipRect.left = clip.x;
-	  }
-	  if (clip.x > clipRect.right) {
-		clipRect.right = clip.x;
-	  }
-	  if (clip.y < clipRect.bottom) {
-		clipRect.bottom = clip.y;
-	  }
-	  if (clip.y > clipRect.top) {
-		clipRect.top = clip.y;
-	  }
+	  minX = std::min(minX, clip.x);
+	  minY = std::min(minY, clip.y);
+	  maxX = std::max(maxX, clip.x);
+	  maxY = std::max(maxY, clip.y);
 	}
+	clipRect = F_RECTANGLE {minX, maxY, maxX, minY};
   }
   else {
 	clipRect = F_RECTANGLE {};
