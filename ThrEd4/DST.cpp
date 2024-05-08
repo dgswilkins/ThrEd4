@@ -3,7 +3,6 @@
 #include "bitmap.h"
 #include "displayText.h"
 #include "DST.h"
-#include "fRectangle.h"
 #include "globals.h"
 #include "point.h"
 #include "Resources/resource.h"
@@ -364,10 +363,10 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   for (auto const& stitch : stitches) {
 	*destination++ = F_POINT_ATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
   }
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto const& stitch : dstStitchBuffer) {
 	minX = std::min(minX, stitch.x);
 	minY = std::min(minY, stitch.y);

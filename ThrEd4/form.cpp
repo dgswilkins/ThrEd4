@@ -3490,10 +3490,10 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	totalLength += clipSideLengths[vertex];
 	vertex = nextVertex;
   }
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto const& itVertex :currentFormVertices) {
 	minX = std::min(minX, itVertex.x);
 	minY = std::min(minY, itVertex.y);
@@ -3822,10 +3822,10 @@ void fi::angout(FRM_HEAD& angledForm) noexcept(!(std::is_same_v<ptrdiff_t, int>)
 	return;
   }
   auto const spVertices = gsl::span(*FormVertices).subspan(angledForm.vertexIndex, angledForm.vertexCount);
-  auto minX = std::numeric_limits<float>::max();
-  auto minY = std::numeric_limits<float>::max();
-  auto maxX = std::numeric_limits<float>::lowest();
-  auto maxY = std::numeric_limits<float>::lowest();
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto const& itVertex : spVertices) {
 	minX = std::min(minX, itVertex.x);
 	minY = std::min(minY, itVertex.y);

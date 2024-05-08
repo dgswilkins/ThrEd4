@@ -29,7 +29,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
 #include <ranges>
 // resharper disable CppUnusedIncludeDirective
 #include <type_traits>
@@ -258,10 +257,10 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	     auto const& iClip : clipPoints) {
 	  ClipBuffer->emplace_back(iClip.x, iClip.y, 0);
 	}
-	auto minX     = std::numeric_limits<float>::max();
-	auto minY     = std::numeric_limits<float>::max();
-	auto maxX     = std::numeric_limits<float>::lowest();
-	auto maxY     = std::numeric_limits<float>::lowest();
+	auto minX     = BIGFLOAT;
+	auto minY     = BIGFLOAT;
+	auto maxX     = LOWFLOAT;
+	auto maxY     = LOWFLOAT;
 	for (auto const& clip : *ClipBuffer) {
 	  minX = std::min(minX, clip.x);
 	  minY = std::min(minY, clip.y);
