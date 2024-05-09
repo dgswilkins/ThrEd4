@@ -687,7 +687,7 @@ void thred::getdes() noexcept {
 auto thi::stlen(uint32_t iStitch) -> float {
   auto const currStitch = wrap::next(StitchBuffer->begin(), iStitch);
   auto const nextStitch = std::next(currStitch);
-  return hypot(nextStitch->x - currStitch->x, nextStitch->y - currStitch->y);
+  return std::hypot(nextStitch->x - currStitch->x, nextStitch->y - currStitch->y);
 }
 
 void thred::undat() noexcept {
@@ -2392,7 +2392,7 @@ void thred::lenCalc() {
   if (StateMap->test(StateFlag::LENSRCH)) {
 	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
-	auto const lenMax     = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
+	auto const lenMax     = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), lenMax));
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
 	return;
@@ -2452,7 +2452,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		continue;
 	  }
 	  auto const delta = F_POINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
-	  stitchSize       = hypot(delta.x, delta.y);
+	  stitchSize       = std::hypot(delta.x, delta.y);
 	  if (stitchSize > SmallStitchLength) {
 		++iPrevStitch;
 		++iStitch;
@@ -2480,7 +2480,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		  }
 		  else {
 			auto const delta = F_POINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
-			stitchSize       = hypot(delta.x, delta.y);
+			stitchSize       = std::hypot(delta.x, delta.y);
 			if (stitchSize > SmallStitchLength) {
 			  outStitch = stitch;
 			  prevPoint = stitch;
@@ -2516,7 +2516,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	  }
 	  else {
 		auto const delta = F_POINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
-		stitchSize       = hypot(delta.x, delta.y);
+		stitchSize       = std::hypot(delta.x, delta.y);
 		if (stitchSize > SmallStitchLength) {
 		  StitchBuffer->operator[](iNextStitch++) = stitch;
 		  prevPoint                               = stitch;
@@ -2556,7 +2556,7 @@ void thred::duzero() {
 		currentStitch = iStitch;
 		continue;
 	  }
-	  auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
+	  auto const stitchLength = std::hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
 	  if (stitchLength <= MinStitchLength) {
 		continue;
 	  }
@@ -2887,8 +2887,8 @@ void thi::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& 
   // won't handle vertical lines
   auto const deltaX           = wrap::toFloat(unrotatedPoint.x - rotationCenterPixels.x);
   auto const deltaY           = wrap::toFloat(unrotatedPoint.y - rotationCenterPixels.y);
-  auto const distanceToCenter = hypotf(deltaX, deltaY);
-  auto const newAngle         = atan2f(deltaY, deltaX) - RotateAngle;
+  auto const distanceToCenter = std::hypotf(deltaX, deltaY);
+  auto const newAngle         = std::atan2f(deltaY, deltaX) - RotateAngle;
   rotatedPoint = {std::lround(wrap::toFloat(rotationCenterPixels.x) + distanceToCenter * cos(newAngle)),
                   std::lround(wrap::toFloat(rotationCenterPixels.y) + distanceToCenter * sin(newAngle))};
 }
@@ -2918,11 +2918,11 @@ void thred::dubox(POINT const& stitchCoordsInPixels) {
   if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
 	// if the selected point is not at the end then aim at the next point
 	auto const stitchFwd1 = std::next(stitch);
-	RotateAngle           = atan2f(stitchFwd1->y - stitch->y, stitchFwd1->x - stitch->x);
+	RotateAngle           = std::atan2f(stitchFwd1->y - stitch->y, stitchFwd1->x - stitch->x);
   }
   else { // otherwise aim in the same direction
 	auto const stitchBck1 = std::next(stitch, -1);
-	RotateAngle           = atan2f(stitch->y - stitchBck1->y, stitch->x - stitchBck1->x);
+	RotateAngle           = std::atan2f(stitch->y - stitchBck1->y, stitch->x - stitchBck1->x);
   }
   thi::duar(stitchCoordsInPixels);
   StateMap->reset(StateFlag::ELIN);
@@ -4557,7 +4557,7 @@ void thi::duClos(uint32_t            startStitch,
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
 	auto const xCoord = std::abs(stitch->x - stitchPoint.x);
 	auto const yCoord = std::abs(stitch->y - stitchPoint.y);
-	auto       sum    = hypot(xCoord, yCoord);
+	auto       sum    = std::hypot(xCoord, yCoord);
 	auto       tind0  = iStitch;
 	auto       gap    = gapToNearest.begin();
 	for (auto& point : *NearestPoint) {
@@ -4613,7 +4613,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   auto const pointToCheck = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
   auto stitchCoordsInPixels = POINT {};
   if (StateMap->test(StateFlag::SELBOX) && thred::stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
-	if (hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
+	if (std::hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
 	  closestStitch = ClosestPointIndex;
 	  return true;
 	}
@@ -4649,7 +4649,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 		  ++stitch;
 		  continue;
 		}
-		auto const distance = hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
+		auto const distance = std::hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
 		if (distance < distanceToClick) {
 		  distanceToClick = distance;
 		  closestIndex    = iStitch;
@@ -4671,7 +4671,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 		++currentStitch;
 		continue;
 	  }
-	  auto const distance = hypot(stitch.x - stitchPoint.x, stitch.y - stitchPoint.y);
+	  auto const distance = std::hypot(stitch.x - stitchPoint.x, stitch.y - stitchPoint.y);
 	  if (distance < distanceToClick) {
 		distanceToClick = distance;
 		closestIndex    = currentStitch;
@@ -4687,7 +4687,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 	closestStitch = closestIndex;
 	return true;
   }
-  if (hypot(pointToCheck.x - stitchCoordsInPixels.x, pointToCheck.y - stitchCoordsInPixels.y) < CLOSENUF) {
+  if (std::hypot(pointToCheck.x - stitchCoordsInPixels.x, pointToCheck.y - stitchCoordsInPixels.y) < CLOSENUF) {
 	closestStitch = closestIndex;
 	return true;
   }
@@ -4959,12 +4959,12 @@ auto thred::closlin() -> uint32_t {
 			bottom += tolerance;
 			if (offsetY > top) {
 			  deltaY = offsetY - top;
-			  tsum   = hypot(deltaX, deltaY);
+			  tsum   = std::hypot(deltaX, deltaY);
 			  break;
 			}
 			if (offsetY < bottom) {
 			  deltaY = offsetY - bottom;
-			  tsum   = hypot(deltaX, deltaY);
+			  tsum   = std::hypot(deltaX, deltaY);
 			  break;
 			}
 			tsum = fabs(deltaX);
@@ -5325,10 +5325,10 @@ auto thred::rotangf(F_POINT const& unrotatedPoint, float const rotationAngle, F_
     -> F_POINT {
   auto const deltaX           = unrotatedPoint.x - rotationCenter.x;
   auto const deltaY           = unrotatedPoint.y - rotationCenter.y;
-  auto const distanceToCenter = (deltaX != 0.0F) ? hypot(deltaX, deltaY) : std::abs(deltaY);
+  auto const distanceToCenter = (deltaX != 0.0F) ? std::hypot(deltaX, deltaY) : std::abs(deltaY);
   auto       newAngle         = rotationAngle;
   if (deltaX != 0.0F) {
-	newAngle += atan2(deltaY, deltaX);
+	newAngle += std::atan2(deltaY, deltaX);
   }
   else {
 	if (deltaY > 0.0F) {
@@ -5652,10 +5652,10 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
   auto       startIt       = (finish != 0) ? std::next(finishIt, -1) : finishIt;
   auto const knotAttribute = startIt->attribute | KNOTMSK;
   auto       delta         = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto       length        = hypot(delta.x, delta.y);
+  auto       length        = std::hypot(delta.x, delta.y);
   while (length == 0.0F && startIt != StitchBuffer->begin()) {
 	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	length = hypot(delta.x, delta.y);
+	length = std::hypot(delta.x, delta.y);
 	--startIt;
   }
   delta               = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
@@ -5676,11 +5676,11 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
   auto const     startIt  = wrap::next(StitchBuffer->begin(), start);
   auto           finishIt = std::next(startIt);
   auto           delta    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto           length   = hypot(delta.x, delta.y);
+  auto           length   = std::hypot(delta.x, delta.y);
   ++finishIt;
   while (length < KNL && finishIt != StitchBuffer->end()) {
 	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	length = hypot(delta.x, delta.y);
+	length = std::hypot(delta.x, delta.y);
 	++finishIt;
   }
   if (finishIt == StitchBuffer->end()) {
@@ -7214,7 +7214,7 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
   auto nextStitchIt = stitchIt + 1U;
   for (auto iSource = start; iSource < finish; ++iSource) {
 	auto const delta = F_POINT {nextStitchIt->x - nextStitchIt->x, nextStitchIt->y - nextStitchIt->y};
-	auto const length = hypot(delta.x, delta.y);
+	auto const length = std::hypot(delta.x, delta.y);
 	newStitches.push_back(*stitchIt);
 	if (length > IniFile.maxStitchLength) {
 	  auto const stitchCount = std::ceil(length / UserStitchLength);
@@ -7319,7 +7319,7 @@ void thred::longer() {
   }
   auto const& start         = StitchBuffer->operator[](ClosestPointIndex);
   auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  auto const  currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
+  auto const  currentLength = std::hypot(startFwd1.x - start.x, startFwd1.y - start.y);
   auto const  rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
                                   ? SelectedRange.finish
                                   : SelectedRange.finish - 1U;
@@ -7327,7 +7327,7 @@ void thred::longer() {
   for (; iStitch < rangeEnd; ++iStitch) {
 	auto const& stitch     = StitchBuffer->operator[](iStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	auto const  length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	auto const  length     = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (util::closeEnough(length, currentLength)) {
 	  flag = false;
 	  break;
@@ -7338,7 +7338,7 @@ void thred::longer() {
 	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; ++currentStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
-	  auto const  length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	  auto const  length     = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length > currentLength && length < minimumLength) {
 		minimumLength = length;
 		iStitch       = currentStitch;
@@ -7360,12 +7360,12 @@ void thred::shorter() {
   }
   auto const& start         = StitchBuffer->operator[](ClosestPointIndex);
   auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  auto const  currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
+  auto const  currentLength = std::hypot(startFwd1.x - start.x, startFwd1.y - start.y);
   auto        currentStitch = ClosestPointIndex;
   for (; currentStitch != 0; --currentStitch) {
 	auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
-	auto const  length     = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
+	auto const  length     = std::hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
 	if (util::closeEnough(length, currentLength)) {
 	  --currentStitch;
 	  flag = false;
@@ -7378,14 +7378,14 @@ void thred::shorter() {
 	for (; iStitch < SelectedRange.finish - 1U; ++iStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](iStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	  auto const  length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	  auto const  length     = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length < currentLength && length > maximumLength) {
 		maximumLength = length;
 		currentStitch = iStitch;
 	  }
 	}
 	// ToDo - Is this right?
-	auto const minLength = hypot(
+	auto const minLength = std::hypot(
 	    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).x - StitchBuffer->operator[](iStitch).x,
 	    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y - StitchBuffer->operator[](iStitch).y);
 	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), minLength));
@@ -7957,7 +7957,7 @@ void thi::gselrng() noexcept {
 }
 
 auto thi::nuang(float originalAngle, float xDelta, float yDelta) noexcept -> float {
-  auto const angle         = atan2(yDelta, xDelta);
+  auto const angle         = std::atan2(yDelta, xDelta);
   auto       relativeAngle = angle - originalAngle;
   if (fabs(relativeAngle) > PI_F) {
 	if (relativeAngle > 0.0F) {
@@ -7994,7 +7994,7 @@ void thred::rotmrk() {
 	  auto const& form     = FormList->operator[](ClosestFormToCursor);
 	  auto        itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	// clang-format on
-	auto const originalAngle = atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
+	auto const originalAngle = std::atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
 	++itVertex;
 	for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 	  thi::angdif(
@@ -8013,7 +8013,7 @@ void thred::rotmrk() {
   }
   else {
 	thred::rngadj();
-	auto const originalAngle = atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
+	auto const originalAngle = std::atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
 	                                 StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
 	  thi::angdif(lowestAngle,
@@ -10963,7 +10963,7 @@ void thi::dumov() {
 	return;
   }
   auto const sNext          = std::next(sCurr);
-  RotateAngle               = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
+  RotateAngle               = std::atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
   auto       arrowBox       = std::array<POINT, ABPOINTS> {};
   auto const abCenterPixels = sdCor2px(StitchBuffer->operator[](keys::getMoveAnchor()));
   arrowBox[ABP0]            = abCenterPixels;
@@ -12814,7 +12814,7 @@ void thred::setRotateCapture() {
   auto const adjustedPoint =
       F_POINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
                gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
-  if (hypot(adjustedPoint.x, adjustedPoint.y) < FCLOSNUF) {
+  if (std::hypot(adjustedPoint.x, adjustedPoint.y) < FCLOSNUF) {
 	StateMap->set(StateFlag::MOVCNTR);
 	thred::unrot();
 	thred::ritrot(0, thred::pxCor2stch(Msg.pt));

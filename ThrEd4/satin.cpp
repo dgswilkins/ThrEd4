@@ -1177,14 +1177,14 @@ void satin::satfil(FRM_HEAD& form) {
   for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 	auto const delta =
 	    F_POINT {itCurrentVertex->x - itPreviousVertex->x, itCurrentVertex->y - itPreviousVertex->y};
-	length += hypot(delta.x, delta.y);
+	length += std::hypot(delta.x, delta.y);
 	lengths.push_back(length);
 	++itPreviousVertex;
 	++itCurrentVertex;
   }
   auto const lastDelta =
       F_POINT {itFirstVertex->x - itPreviousVertex->x, itFirstVertex->y - itPreviousVertex->y};
-  length += hypot(lastDelta.x, lastDelta.y);
+  length += std::hypot(lastDelta.x, lastDelta.y);
   lengths.push_back(length);
   while (true) {
 	auto const& endGuide = form.wordParam;
@@ -1327,8 +1327,8 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
   auto        outerDelta    = F_POINT {(outsidePoints[finish].x - outsidePoints[start].x),
                              (outsidePoints[finish].y - outsidePoints[start].y)};
 
-  auto const innerLength = hypot(innerDelta.x, innerDelta.y);
-  auto const outerLength = hypot(outerDelta.x, outerDelta.y);
+  auto const innerLength = std::hypot(innerDelta.x, innerDelta.y);
+  auto const outerLength = std::hypot(outerDelta.x, outerDelta.y);
   auto       innerPoint  = F_POINT {insidePoints[start].x, insidePoints[start].y};
   auto       outerPoint  = F_POINT {outsidePoints[start].x, outsidePoints[start].y};
   auto       innerFlag   = false;
@@ -1373,7 +1373,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
 	if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 	  if (innerFlag) {
 		auto const offsetDelta = F_POINT {innerPoint.x - stitchPoint.x, innerPoint.y - stitchPoint.y};
-		auto const offsetLength = hypot(offsetDelta.x, offsetDelta.y);
+		auto const offsetLength = std::hypot(offsetDelta.x, offsetDelta.y);
 		auto const offsetCount  = wrap::round<uint32_t>(offsetLength / LineSpacing);
 		auto const offsetStep   = F_POINT {offsetDelta.x / wrap::toFloat(offsetCount),
                                          offsetDelta.y / wrap::toFloat(offsetCount)};
@@ -1390,7 +1390,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
 	else {
 	  if (outerFlag) {
 		auto const offsetDelta = F_POINT {outerPoint.x - stitchPoint.x, outerPoint.y - stitchPoint.y};
-		auto const offsetLength = hypot(offsetDelta.x, offsetDelta.y);
+		auto const offsetLength = std::hypot(offsetDelta.x, offsetDelta.y);
 		auto const offsetCount  = wrap::round<uint32_t>(offsetLength / LineSpacing);
 		auto const offsetStep   = F_POINT {offsetDelta.x / wrap::toFloat(offsetCount),
                                          offsetDelta.y / wrap::toFloat(offsetCount)};
@@ -1522,7 +1522,7 @@ void si::outfn(FRM_HEAD const& form,
 auto si::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool {
   auto const maxSB = satinBackup.size();
   for (auto iBackup = 0U; iBackup < maxSB; ++iBackup) {
-	auto const length = hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);
+	auto const length = std::hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);
 	if (length < LineSpacing) {
 	  return true;
 	}

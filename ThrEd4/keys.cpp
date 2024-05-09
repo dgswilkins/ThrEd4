@@ -102,11 +102,11 @@ void kyi::istch() {
 	if ((ClosestPointIndex != 0U) && ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	  auto const prvStitch   = wrap::next(StitchBuffer->begin(), ClosestPointIndex - 1U);
 	  auto const stitch      = std::next(prvStitch);
-	  auto const angb        = atan2(stitch->y - prvStitch->y, stitch->x - prvStitch->x);
+	  auto const angb        = std::atan2(stitch->y - prvStitch->y, stitch->x - prvStitch->x);
 	  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-	  auto const angt        = atan2(stitch->y - stitchPoint.y, stitch->x - stitchPoint.x);
+	  auto const angt        = std::atan2(stitch->y - stitchPoint.y, stitch->x - stitchPoint.x);
 	  auto const nxtStitch   = std::next(stitch);
-	  auto const angf        = atan2(stitch->y - nxtStitch->y, stitch->x - nxtStitch->x);
+	  auto const angf        = std::atan2(stitch->y - nxtStitch->y, stitch->x - nxtStitch->x);
 	  if (fabs(angf - angt) > fabs(angb - angt)) {
 		--ClosestPointIndex;
 	  }

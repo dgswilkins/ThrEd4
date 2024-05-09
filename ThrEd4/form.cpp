@@ -851,12 +851,12 @@ void fi::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto           length = (ZoomRect.right - ZoomRect.left) * ratio * DFACT;
   auto const     delta =
       F_POINT {itPreviousVertex->x - itCurrentVertex->x, itPreviousVertex->y - itCurrentVertex->y};
-  auto       angle  = atan2(delta.y, delta.x);
+  auto       angle  = std::atan2(delta.y, delta.x);
   auto       xVal   = length * cos(angle);
   auto       yVal   = length * sin(angle);
   auto       offset = F_POINT {xVal, yVal};
   auto const point  = F_POINT {itCurrentVertex->x + offset.x, itCurrentVertex->y + offset.y};
-  angle             = atan2(-delta.x, delta.y);
+  angle             = std::atan2(-delta.x, delta.y);
   length *= HALF;
   xVal               = length * cos(angle);
   yVal               = length * sin(angle);
@@ -1479,7 +1479,7 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
   auto const varC = lineEnd.x - lineStart.x;
   auto const varD = lineEnd.y - lineStart.y;
   if ((varC == 0.0F) && (varD == 0.0F)) {
-	distance = sqrt(varA * varB);
+	distance = std::sqrt(varA * varB);
 	constexpr auto FIRST = -0.1F; // Arbitrarily choose the first point since start and end are the same
 	return FIRST;
   }
@@ -1494,7 +1494,7 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
           : F_POINT {point.x - (lineStart.x + param * varC), point.y - (lineStart.y + param * varD)}; // Between endpoints
   // NOLINTEND(readability-avoid-nested-conditional-operator)
   // returning shortest distance
-  distance = sqrt(diff.x * diff.x + diff.y * diff.y);
+  distance = std::sqrt(diff.x * diff.x + diff.y * diff.y);
   return param;
 }
 
@@ -1580,7 +1580,7 @@ void form::frmovlin() {
 
 auto fi::ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen) -> bool {
   auto const delta  = F_POINT {finish.x - start.x, finish.y - start.y};
-  auto       length = hypot(delta.x, delta.y);
+  auto       length = std::hypot(delta.x, delta.y);
   // This clamp is temporary to avoid overflow when BH corner value is too large. Find a better fix
   if (constexpr auto CLAMP = 200.0F; length > CLAMP) {
 	length = CLAMP;
@@ -1754,7 +1754,7 @@ auto form::getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, in
 void form::filinsb(F_POINT const& point, F_POINT& stitchPoint) {
   constexpr auto MAXSTCH = 54.0F; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
   auto const delta  = F_POINT {(point.x - stitchPoint.x), (point.y - stitchPoint.y)};
-  auto const length = hypot(delta.x, delta.y);
+  auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / MAXSTCH + 1.0F);
   auto const step   = F_POINT {(delta.x / wrap::toFloat(count)), (delta.y / wrap::toFloat(count))};
   if (length > MAXSTCH) {
@@ -1812,7 +1812,7 @@ void fi::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float sti
   auto const itFinishVertex = wrap::next(FormVertices->cbegin(), vertexIndex + finish);
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
-  auto const length      = hypot(delta.x, delta.y);
+  auto const length      = std::hypot(delta.x, delta.y);
   auto       stitchCount = (UserFlagMap->test(UserFlag::LINSPAC))
                                ? wrap::ceil<uint32_t>(length / stitchSize)
                                : wrap::round<uint32_t>((length - stitchSize * HALF) / stitchSize + 1.0F);
@@ -1824,7 +1824,7 @@ void fi::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float sti
   }
   else {
 	// ToDo - Is this calculation correct?
-	auto const angle = atan2(delta.y, delta.x);
+	auto const angle = std::atan2(delta.y, delta.x);
 
 	step = F_POINT {cos(angle) * stitchSize, sin(angle) * stitchSize};
   }
@@ -1861,7 +1861,7 @@ void fi::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float si
   auto const itFinishVertex = wrap::next(FormVertices->cbegin(), vertexIndex + finish);
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
-  auto const length = hypot(delta.x, delta.y);
+  auto const length = std::hypot(delta.x, delta.y);
 
   if (constexpr auto ESCLAMP = 1e-1F; // edge stitch minimum length clamp
       size < ESCLAMP) {
@@ -1926,9 +1926,9 @@ void form::duangs(FRM_HEAD const& form) {
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto const& thisVertex = itVertex[iVertex];
 	auto const& nextVertex = itVertex[iVertex + 1];
-	FormAngles->push_back(atan2(nextVertex.y - thisVertex.y, nextVertex.x - thisVertex.x));
+	FormAngles->push_back(std::atan2(nextVertex.y - thisVertex.y, nextVertex.x - thisVertex.x));
   }
-  FormAngles->push_back(atan2(itVertex[0].y - itVertex[vMax].y, itVertex[0].x - itVertex[vMax].x));
+  FormAngles->push_back(std::atan2(itVertex[0].y - itVertex[vMax].y, itVertex[0].x - itVertex[vMax].x));
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
@@ -2175,8 +2175,8 @@ void fi::spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
 
 void fi::duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1, F_POINT const& finish1, F_POINT& stitchPoint) {
   if (!StateMap->test(StateFlag::UND)) {
-	auto const length0 = hypot(stitchPoint.x - start0.x, stitchPoint.y - start0.y);
-	if (auto const length1 = hypot(stitchPoint.x - start1.x, stitchPoint.y - start1.y); length0 > length1) {
+	auto const length0 = std::hypot(stitchPoint.x - start0.x, stitchPoint.y - start0.y);
+	if (auto const length1 = std::hypot(stitchPoint.x - start1.x, stitchPoint.y - start1.y); length0 > length1) {
 	  StateMap->set(StateFlag::FILDIR);
 	}
 	else {
@@ -2185,7 +2185,7 @@ void fi::duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& st
   }
   auto const delta0  = F_POINT {finish0.x - start0.x, finish0.y - start0.y};
   auto const delta1  = F_POINT {finish1.x - start1.x, finish1.y - start1.y};
-  auto const length0 = hypot(delta0.x, delta0.y);
+  auto const length0 = std::hypot(delta0.x, delta0.y);
   auto       count   = wrap::round<uint32_t>(length0 / (LineSpacing * HALF));
   if (count == 0U) {
 	++count;
@@ -2270,10 +2270,10 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
 
   auto const innerDelta = F_POINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                    (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
-  auto const innerLength = hypot(innerDelta.x, innerDelta.y);
+  auto const innerLength = std::hypot(innerDelta.x, innerDelta.y);
   auto const outerDelta = F_POINT {(fillVerticalRect[finish].copnt.x - fillVerticalRect[start].bopnt.x),
                                    (fillVerticalRect[finish].copnt.y - fillVerticalRect[start].bopnt.y)};
-  auto const outerLength = hypot(outerDelta.x, outerDelta.y);
+  auto const outerLength = std::hypot(outerDelta.x, outerDelta.y);
   auto const flag        = (outerLength > innerLength);
   auto const pivot       = flag ? fillVerticalRect[start].cipnt : fillVerticalRect[start].copnt;
 
@@ -2286,10 +2286,11 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
                                 : F_POINT {fillVerticalRect[finish].bipnt.x - pivot.x,
                                            fillVerticalRect[finish].bipnt.y - pivot.y};
   if (hypot(stitchPoint.x - pivot.x, stitchPoint.y - pivot.y) > PI_F2) {
+  if (std::hypot(stitchPoint.x - pivot.x, stitchPoint.y - pivot.y) > PI_F2) {
 	form::filinsb(pivot, stitchPoint);
   }
-  auto       startAngle  = atan2(startDelta.y, startDelta.x);
-  auto const finishAngle = atan2(finishDelta.y, finishDelta.x);
+  auto       startAngle  = std::atan2(startDelta.y, startDelta.x);
+  auto const finishAngle = std::atan2(finishDelta.y, finishDelta.x);
   auto       deltaAngle  = finishAngle - startAngle;
   if (deltaAngle > PI_F) {
 	deltaAngle -= PI_F2;
@@ -2297,7 +2298,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
   if (deltaAngle < -PI_F) {
 	deltaAngle += PI_F2;
   }
-  auto const radius    = hypot(startDelta.x, startDelta.y);
+  auto const radius    = std::hypot(startDelta.x, startDelta.y);
   auto const arc       = fabs(radius * deltaAngle);
   auto       count     = wrap::round<uint32_t>(arc / LineSpacing);
   auto const stepAngle = deltaAngle / wrap::toFloat(count);
@@ -2336,9 +2337,9 @@ void fi::duspnd(float                        stitchLen,
 	auto const delta =
 	    F_POINT {underlayVerticalRect[finish].bipnt.x - underlayVerticalRect[start].cipnt.x,
 	             underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y};
-	if (auto const length = hypot(delta.x, delta.y); length > stitchLen) {
+	if (auto const length = std::hypot(delta.x, delta.y); length > stitchLen) {
 	  auto const angle =
-	      atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
+	      std::atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
 	            InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
 	  auto const point = F_POINT {underlayVerticalRect[finish].bopnt.x + cos(angle) * width,
 	                              underlayVerticalRect[finish].bopnt.y + sin(angle) * width};
@@ -2353,8 +2354,8 @@ void fi::duspnd(float                        stitchLen,
   auto const delta =
       F_POINT {underlayVerticalRect[finish].bopnt.x - underlayVerticalRect[start].copnt.x,
                underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y};
-  if (auto const length = hypot(delta.x, delta.y); length > stitchLen) {
-	auto const angle = atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
+  if (auto const length = std::hypot(delta.x, delta.y); length > stitchLen) {
+	auto const angle = std::atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
 	                         OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
 	auto const point = F_POINT {underlayVerticalRect[finish].bipnt.x + cos(angle) * width,
 	                            underlayVerticalRect[finish].bipnt.y + sin(angle) * width};
@@ -2462,11 +2463,11 @@ void fi::bhfn(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
   auto const itFinishVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
-  auto const length = hypot(delta.x, delta.y);
+  auto const length = std::hypot(delta.x, delta.y);
   auto const count  = wrap::round<uint32_t>(length / form.edgeSpacing);
   auto const step   = F_POINT {(delta.x / wrap::toFloat(count)), (delta.y / wrap::toFloat(count))};
   auto       innerPoint    = F_POINT {itStartVertex->x, itStartVertex->y};
-  auto const rotationAngle = atan2(-delta.x, delta.y);
+  auto const rotationAngle = std::atan2(-delta.x, delta.y);
   auto const outerStep = F_POINT {form.borderSize * cos(rotationAngle), form.borderSize * sin(rotationAngle)};
   if (count == 0U) {
 	return;
@@ -2497,7 +2498,7 @@ void fi::bhcrnr(FRM_HEAD const& form, uint32_t vertex) {
   }
   auto delta =
       F_POINT {ptr->operator[](nextVertex).x - itVertex->x, ptr->operator[](nextVertex).y - itVertex->y};
-  auto const length = hypot(delta.x, delta.y);
+  auto const length = std::hypot(delta.x, delta.y);
   auto const ratio  = ButtonholeCornerLength / length;
   delta *= ratio;
   auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
@@ -2917,7 +2918,7 @@ public:
 	  auto itPreviousVertex = wrap::next(itVertex, -1);
 	  lowDeltas[lowIndex] =
 	      F_POINT {itPreviousVertex->x - itVertex->x, itPreviousVertex->y - itVertex->y};
-	  lowLengths[lowIndex] = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
+	  lowLengths[lowIndex] = std::hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
 	  lowLength += lowLengths[lowIndex];
 	  ++lowIndex;
 	  --itVertex;
@@ -2931,7 +2932,7 @@ public:
 	auto itVertex = wrap::next(itFirstVertex, start + 1);
 	for (auto iVertex = start + 1U; iVertex <= finish; ++iVertex) {
 	  auto const delta = F_POINT {itVertex->x - itSelectedVertex->x, itVertex->y - itSelectedVertex->y};
-	  polyLines[selind] = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
+	  polyLines[selind] = P_VEC {atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
 	  ++selind;
 	  ++itVertex;
 	}
@@ -2945,7 +2946,7 @@ public:
 	  highVertices[highIndex] = *itFinishVertex;
 	  highDeltas[highIndex] =
 	      F_POINT {itNextVertex->x - itFinishVertex->x, itNextVertex->y - itFinishVertex->y};
-	  highLengths[highIndex] = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
+	  highLengths[highIndex] = std::hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
 	  highLength += highLengths[highIndex];
 	  ++highIndex;
 	  ++itFinishVertex;
@@ -2977,7 +2978,7 @@ public:
   auto itFinishVertex = wrap::next(itFirstVertex, finish);
   auto itStartVertex  = wrap::next(itFirstVertex, start);
   auto delta = F_POINT {itFinishVertex->x - itStartVertex->x, itFinishVertex->y - itStartVertex->y};
-  auto const reference = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
+  auto const reference = P_VEC {std::atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
   auto       lowStep   = F_POINT {};
   auto       lowPoint  = F_POINT {};
   auto       highStep  = F_POINT {};
@@ -3009,7 +3010,7 @@ public:
 
 	if (constexpr auto REFFACT = 0.9F; // reduction factor for the reference
 	    reference.length > REFFACT * LineSpacing) {
-	  auto const polyLine = P_VEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
+	  auto const polyLine = P_VEC {std::atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
 	  if (auto const polyDiff = P_VEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
 	      StateMap->testAndFlip(StateFlag::FILDIR)) {
 		OSequence->emplace_back(lowPoint);
@@ -3199,7 +3200,7 @@ auto fi::isect(uint32_t                    vertex0,
 	  tempIntersection.y = 0.0F;
 	}
 	intersection = tempIntersection;
-	length = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
+	length = std::hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
 	// ToDo - should length be determined from start or end?
 	//	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
   }
@@ -3258,7 +3259,7 @@ auto fi::insect(FRM_HEAD const&             form,
 	      intersection.x >= left && intersection.x <= right && intersection.y >= bottom &&
 	      intersection.y <= top) {
 		clipIntersectData[iIntersection].segmentLength =
-		    hypot(clipIntersectData[iIntersection].point.x - lineSegmentStart.x,
+		    std::hypot(clipIntersectData[iIntersection].point.x - lineSegmentStart.x,
 		          clipIntersectData[iIntersection].point.y - lineSegmentStart.y);
 		clipIntersectData[iIntersection].vertexIndex = currentVertex;
 		arrayOfClipIntersectData.push_back(&clipIntersectData[iIntersection]);
@@ -3289,7 +3290,7 @@ auto fi::getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
   clipStitchPoints[iPoint].vertexIndex %= currentFormVertices.size();
   auto const itVertex = wrap::next(currentFormVertices.cbegin(), clipStitchPoints[iPoint].vertexIndex);
   return lengths[clipStitchPoints[iPoint].vertexIndex] +
-         hypot(itVertex->x - clipStitchPoints[iPoint].x, itVertex->y - clipStitchPoints[iPoint].y);
+         std::hypot(itVertex->x - clipStitchPoints[iPoint].x, itVertex->y - clipStitchPoints[iPoint].y);
 }
 
 auto fi::clpnseg(std::vector<CLIP_PNT>&      clipStitchPoints,
@@ -3486,7 +3487,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	auto const nextVertex   = form::nxt(form, vertex);
 	auto const itNextVertex = wrap::next(itFirstVertex, nextVertex);
 	lengths[vertex]         = totalLength;
-	clipSideLengths[vertex] = hypot(itNextVertex->x - itVertex->x, itNextVertex->y - itVertex->y);
+	clipSideLengths[vertex] = std::hypot(itNextVertex->x - itVertex->x, itNextVertex->y - itVertex->y);
 	totalLength += clipSideLengths[vertex];
 	vertex = nextVertex;
   }
@@ -4969,7 +4970,7 @@ void fi::bakseq() {
 	  case 0: {
 		delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 		StateMap->reset(StateFlag::FILDIR);
-		auto const length = hypot(delta.x, delta.y);
+		auto const length = std::hypot(delta.x, delta.y);
 		if (length == 0.0F) {
 		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		  break;
@@ -5009,7 +5010,7 @@ void fi::bakseq() {
 void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
   auto       point  = stitchPoint;
   auto const delta  = F_POINT {(inPoint.x - stitchPoint.x), (inPoint.y - stitchPoint.y)};
-  auto const length = hypot(delta.x, delta.y);
+  auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
 	OSequence->push_back(inPoint);
@@ -5031,7 +5032,7 @@ void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
 void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
   auto const delta  = F_POINT {(currentPoint.x - stitchPoint.x), (currentPoint.y - stitchPoint.y)};
   auto       point  = stitchPoint;
-  auto const length = hypot(delta.x, delta.y);
+  auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
 	OSequence->push_back(currentPoint);
@@ -5078,8 +5079,8 @@ void fi::clpfm() {
 	auto const& bSeq2 = BSequence->operator[](wrap::toSize(iSequence) + 2U);
 	auto const& bSeq3 = BSequence->operator[](wrap::toSize(iSequence) + 3U);
 
-	auto const leftLength  = hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
-	auto const rightLength = hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);
+	auto const leftLength  = std::hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
+	auto const rightLength = std::hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);
 	auto const leftDelta   = F_POINT {bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y};
 	auto const rightDelta  = F_POINT {bSeq2.x - bSeq3.x, bSeq2.y - bSeq3.y};
 
@@ -8202,7 +8203,7 @@ void fi::shrnks() {
 	auto const& thisVertex = itVertex[iVertex];
 	auto const& nextVertex = itVertex[iVertex + 1];
 	deltas.emplace_back(nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y);
-	lengths.emplace_back(hypot(deltas.back().x, deltas.back().y));
+	lengths.emplace_back(std::hypot(deltas.back().x, deltas.back().y));
   }
   auto length = lengths.begin();
   auto delta  = deltas.begin();

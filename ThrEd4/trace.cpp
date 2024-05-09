@@ -768,9 +768,9 @@ void ti::decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
 	landscapeOffset1  = wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
   }
   for (auto itTP1 = std::next(itTP); itTP1 < src.end(); ++itTP1) {
-	traceLengthSum1 += hypotf(wrap::toFloat(itTP1->x - itTP->x), wrap::toFloat(itTP1->y - itTP->y));
+	traceLengthSum1 += std::hypotf(wrap::toFloat(itTP1->x - itTP->x), wrap::toFloat(itTP1->y - itTP->y));
 	auto const traceLength =
-	    hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
+	    std::hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
 	if (traceLengthSum1 > traceLength * IniFile.traceRatio) {
 	  dst.emplace_back(wrap::toFloat(itTP->x) * StitchBmpRatio.x,
 	                   wrap::toFloat(itTP->y) * StitchBmpRatio.y + landscapeOffset1);
