@@ -334,7 +334,7 @@ auto si::satselfn() -> bool {
 	  auto const deltaX = stitchPoint.x - itVertex->x;
 	  auto const deltaY = stitchPoint.y - itVertex->y;
 	  ++itVertex;
-	  auto const length = hypot(deltaX, deltaY);
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length < minimumLength) {
 		minimumLength         = length;
 		ClosestFormToCursor   = iForm;
