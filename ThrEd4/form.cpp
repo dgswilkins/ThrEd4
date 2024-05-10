@@ -2296,7 +2296,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
                                            fillVerticalRect[finish].bopnt.y - pivot.y}
                                 : F_POINT {fillVerticalRect[finish].bipnt.x - pivot.x,
                                            fillVerticalRect[finish].bipnt.y - pivot.y};
-  if (hypot(stitchPoint.x - pivot.x, stitchPoint.y - pivot.y) > PI_F2) {
+  // ToDo is this correct? hypot rather than tan ?
   if (std::hypot(stitchPoint.x - pivot.x, stitchPoint.y - pivot.y) > PI_F2) {
 	form::filinsb(pivot, stitchPoint);
   }
