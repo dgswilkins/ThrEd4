@@ -4470,9 +4470,11 @@ void fi::durgn(FRM_HEAD const&                form,
 	auto        mindif        = 0U;
 	// clang-format on
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  if (auto const length = hypot(bpnt.x - workingFormVertices.operator[](iVertex).x,
-	                                bpnt.y - workingFormVertices.operator[](iVertex).y);
-	      length < minimumLength) {
+	  auto const deltaX = bpnt.x - workingFormVertices.operator[](iVertex).x;
+	  auto const deltaY = bpnt.y - workingFormVertices.operator[](iVertex).y;
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
+
+	  if (length < minimumLength) {
 		minimumLength = length;
 		mindif        = iVertex;
 	  }
