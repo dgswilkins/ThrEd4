@@ -2410,10 +2410,14 @@ void fi::prsmal(float width) {
 	minimumLength          = width * WIDFACT;
   }
   auto iReference = 0U;
+  auto const lengthCheck = minimumLength * minimumLength;
   for (auto iSequence = 1U; iSequence < wrap::toUnsigned(OSequence->size()); ++iSequence) {
 	auto const& seq    = OSequence->operator[](iSequence);
 	auto const& seqRef = OSequence->operator[](iReference);
-	if (auto const length = hypot(seq.x - seqRef.x, seq.y - seqRef.y); length > minimumLength) {
+	auto const  deltaX     = seq.x - seqRef.x;
+	auto const  deltaY     = seq.y - seqRef.y;
+	auto const  length = deltaX * deltaX + deltaY * deltaY;
+	if (length > lengthCheck) {
 	  OSequence->operator[](iOutput++) = seq;
 	  iReference                       = iSequence;
 	}
