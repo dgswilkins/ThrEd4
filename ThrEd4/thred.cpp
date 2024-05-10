@@ -7094,14 +7094,16 @@ auto thred::iselpnt() noexcept -> bool {
   auto minimumLength       = BIGDBL;
   auto iControlPoint       = 0U;
   for (auto const& controlPoint : *FormControlPoints) {
-	auto const length = hypot(pointToTest.x - controlPoint.x, pointToTest.y - controlPoint.y);
+	auto const deltaX = pointToTest.x - controlPoint.x;
+	auto const deltaY = pointToTest.y - controlPoint.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length < minimumLength) {
 	  minimumLength       = length;
 	  closestControlPoint = iControlPoint;
 	}
 	++iControlPoint;
   }
-  if (minimumLength < CLOSENUF) {
+  if (std::sqrt(minimumLength) < CLOSENUF) {
 	SelectedFormControlVertex = closestControlPoint;
 	return true;
   }
