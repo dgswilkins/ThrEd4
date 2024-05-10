@@ -659,7 +659,7 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
   if (closestTexturePoint == 0U) {
 	return false;
   }
-  auto minimumLength = BIGDBL;
+  auto minimumLength = BIGLONG;
   auto reference     = POINT {};
   auto point         = POINT {};
   txi::deorg(reference);
@@ -667,13 +667,15 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
   auto const end      = wrap::toUnsigned(TextureHistory->size());
   for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
 	txi::txt2pix(TempTexturePoints->operator[](iPoint), point);
-	auto const length = hypot(point.x - reference.x, point.y - reference.y);
+	auto const deltaX     = point.x - reference.x;
+	auto const deltaY     = point.y - reference.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length < minimumLength) {
 	  minimumLength       = length;
 	  closestTexturePoint = iPoint;
 	}
   }
-  return (minimumLength < CLOSENUF);
+  return (std::sqrtf(wrap::toFloat(minimumLength)) < FCLOSNUF);
 }
 
 void txi::setxmov() {
