@@ -5015,7 +5015,7 @@ auto thred::closlin() -> uint32_t {
 			}
 		  }
 		}
-		tsum = sqrt(deltaX * deltaX + deltaY * deltaY);
+		tsum = std::hypot(deltaX, deltaY);
 		break;
 	  }
 	  if (tsum < sum) {
