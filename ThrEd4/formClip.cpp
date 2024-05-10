@@ -44,7 +44,6 @@
 #include <WinBase.h>
 #include <windef.h>
 #include <wingdi.h>
-#include <winnt.h>
 #include <WinUser.h>
 
 // Standard Libraries
@@ -53,9 +52,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
-#include <ranges>
 // resharper disable CppUnusedIncludeDirective
+#include <ranges>
 #include <type_traits>
 // ReSharper restore CppUnusedIncludeDirective
 #include <vector>
@@ -835,8 +833,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const textureSource = gsl::span<TX_PNT> {ptrTextureSource, textureCount};
 		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSource.begin(), textureSource.end());
 		GlobalUnlock(ClipMemory);
-		SelectedFormsRect.top = SelectedFormsRect.right = 0;
-		SelectedFormsRect.bottom = SelectedFormsRect.left = std::numeric_limits<LONG>::max();
+		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
+		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;
 		form::ratsr();
 		SelectedFormList->clear();
 		SelectedFormList->reserve(ClipFormsCount);

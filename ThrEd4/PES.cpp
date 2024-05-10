@@ -57,7 +57,6 @@
 #endif
 #include <filesystem>
 #include <iterator>
-#include <limits>
 #include <string>
 #include <vector>
 
@@ -633,7 +632,7 @@ auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint3
 	}
 	++iUserColor;
   }
-  auto minimumDistance = std::numeric_limits<uint32_t>::max();
+  auto minimumDistance = BIGUINT;
   auto matchIndex      = 0U;
   for (auto iColor = 1U; iColor < activeColor; ++iColor) {
 	auto const matchDistance = pesmtch(color, pesColors[iColor]);
@@ -835,7 +834,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	auto iPEC = PESequivColors.begin();
 	for (auto const& color : UserColor) {
 	  auto matchIndex = 0U;
-	  auto matchMin   = std::numeric_limits<uint32_t>::max();
+	  auto matchMin   = BIGUINT;
 	  for (auto iColorMatch = 1U; iColorMatch < THTYPCNT; ++iColorMatch) {
 		auto const match = pi::pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch));
 		if (match < matchMin) {

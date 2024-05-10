@@ -27,7 +27,7 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
 	  super::reset(foundBit);
 	}
 	else {
-	  return std::numeric_limits<size_t>::max();
+	  return BIGSIZE;
 	}
 	return foundBit;
   }
@@ -45,7 +45,7 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
 	  super::reset(foundBit);
 	}
 	else {
-	  return std::numeric_limits<size_t>::max();
+	  return BIGSIZE;
 	}
 	return foundBit;
   }

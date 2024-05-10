@@ -57,7 +57,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
 #include <memory>
 #include <numeric>
 #include <stdexcept>
@@ -1153,10 +1152,10 @@ void form::drwfrm() {
   if (!SelectedFormList->empty()) {
 	SelectObject(StitchWindowMemDC, MultiFormPen);
 	ratsr();
-	SelectedFormsRect = RECT {std::numeric_limits<LONG>::max(),
-	                          std::numeric_limits<LONG>::lowest(),
-	                          std::numeric_limits<LONG>::lowest(),
-	                          std::numeric_limits<LONG>::max()};
+	SelectedFormsRect = RECT {BIGLONG,
+	                          LOWLONG,
+	                          LOWLONG,
+	                          BIGLONG};
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  fselrct(selectedForm);
 	}
@@ -4551,7 +4550,7 @@ void fi::durgn(FRM_HEAD const&                form,
 		--seql;
 	  }
 	  else {
-		auto mindif = std::numeric_limits<uint32_t>::max();
+		auto mindif = BIGUINT;
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  if (auto const gdif = ((lineEndpoints[sortedLineIndices[ind]].group > lastGroup)
 		                             ? (lineEndpoints[sortedLineIndices[ind]].group - lastGroup)
@@ -4573,7 +4572,7 @@ void fi::durgn(FRM_HEAD const&                form,
 		--seqn;
 	  }
 	  else {
-		auto mindif = std::numeric_limits<uint32_t>::max();
+		auto mindif = BIGUINT;
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  if (auto const gdif = ((lineEndpoints[sortedLineIndices[ind]].group > nextGroup)
 		                             ? (lineEndpoints[sortedLineIndices[ind]].group - nextGroup)
@@ -4803,7 +4802,7 @@ void fi::lcon(FRM_HEAD const&              form,
   }
   mapIndexSequence.push_back(pathMapIndex);
   // find the leftmost region
-  auto startGroup = std::numeric_limits<uint32_t>::max();
+  auto startGroup = BIGUINT;
   auto leftRegion = 0U;
   for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 	if (auto const& lineGroupPoint = lineEndpoints[sortedLineIndices[regions[iRegion].start]];
@@ -4838,12 +4837,12 @@ void fi::lcon(FRM_HEAD const&              form,
   while (unvis(visitedRegions, visitedIndex)) {
 	nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, lineEndpoints, sortedLineIndices, regions, doneRegion, pathMapIndex, sequencePathIndex, visitedIndex);
   }
-  auto count = std::numeric_limits<uint32_t>::max();
+  auto count = BIGUINT;
   sequencePath.reserve(sequencePathIndex);
   for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
 	bool const tmpSkip = tempPath[iPath].skp;
 	uint16_t   tmpNode = 0U;
-	if (tempPath[iPath].pcon == std::numeric_limits<uint32_t>::max()) {
+	if (tempPath[iPath].pcon == BIGUINT) {
 	  wrap::narrow(tmpNode, tempPath[iPath].count);
 	  count = wrap::toUnsigned(tempPath[iPath].count);
 	}
@@ -5623,7 +5622,7 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
   auto&      formControls = *formControlPoints;
   form::rct2sel(rectangle, formControls);
 
-  auto minimumLength    = std::numeric_limits<LONG>::max();
+  auto minimumLength    = BIGLONG;
   auto constexpr LENCHECK = ICLOSNUF * ICLOSNUF;
   auto formControlIndex = 0U;
   for (auto const& iControl : formControls) {

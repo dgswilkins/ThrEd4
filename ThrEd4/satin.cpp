@@ -45,11 +45,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#ifdef _WIN64
-#include <cwchar>
-#endif
 #include <iterator>
-#include <limits>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
@@ -530,7 +526,7 @@ void satin::satadj(FRM_HEAD& form) {
 	  auto iVertex = 0U;
 	  auto itGuide = itFirstGuide; // intentional copy
 	  while (iVertex < form.vertexCount) {
-		if (auto const bitpos = satinMap.getFirst(); bitpos != std::numeric_limits<size_t>::max()) {
+		if (auto const bitpos = satinMap.getFirst(); bitpos != BIGSIZE) {
 		  iVertex = wrap::toUnsigned(bitpos);
 		  if (iVertex < form.vertexCount) {
 			(itGuide++)->start = iVertex;
@@ -588,7 +584,7 @@ void satin::satadj(FRM_HEAD& form) {
 	auto iReverse = 0U;
 	itGuide       = itFirstGuide;
 	while (iReverse < form.vertexCount) {
-	  if (auto const bitpos = satinMap.getLast(); bitpos != std::numeric_limits<size_t>::max()) {
+	  if (auto const bitpos = satinMap.getLast(); bitpos != BIGSIZE) {
 		iReverse = wrap::toUnsigned(bitpos);
 		if (iReverse < form.vertexCount) {
 		  (itGuide++)->finish = iReverse;

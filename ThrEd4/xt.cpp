@@ -58,7 +58,6 @@
 #include <cwchar>
 #include <filesystem>
 #include <iterator>
-#include <limits>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -1289,7 +1288,7 @@ void xt::fsort() {
 	  stitchRange.resize(lastRegion);
 	  stitchRange[0].start = 0;
 	  attribute            = pRecs[0]->color;
-	  auto currentForm     = std::numeric_limits<uint32_t>::max();
+	  auto currentForm     = BIGUINT;
 	  auto typeCount       = 0U;
 	  auto iRange          = 0U;
 	  for (auto iRegion = 0U; iRegion < lastRegion; ++iRegion) {
@@ -1323,7 +1322,7 @@ void xt::fsort() {
 		sortRecord.start  = stitchRange[iRange].start;
 		sortRecord.finish = stitchRange[iRange].finish;
 		sortRecord.count  = sortRecord.finish - sortRecord.start;
-		auto minimumJumps = std::numeric_limits<uint32_t>::max();
+		auto minimumJumps = BIGUINT;
 		// timeout used to put an upper bound on the number of sorting permutations checked
 		auto fileTime = FILETIME {};
 		GetSystemTimeAsFileTime(&fileTime);

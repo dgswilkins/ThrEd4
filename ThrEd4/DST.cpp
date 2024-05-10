@@ -47,7 +47,6 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <limits>
 #include <string>
 #include <vector>
 
@@ -507,7 +506,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 	*iUserColor = color;
 	return wrap::toUnsigned(colorChanges);
   }
-  auto minDistance = std::numeric_limits<DWORD>::max();
+  auto minDistance = BIGDWORD;
   auto iDistance   = uint32_t {};
   auto iUserColor  = UserColor.begin();
   for (auto iColor = 0U; iColor < UserColor.size(); ++iColor) {

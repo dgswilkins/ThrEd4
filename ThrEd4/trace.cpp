@@ -49,7 +49,6 @@
 #include <cstdint>
 #include <cwchar>
 #include <iterator>
-#include <limits>
 #include <numeric>
 #include <stdexcept>
 #include <string>
@@ -385,7 +384,7 @@ void trace::trdif() {
   auto differenceBitmap = std::vector<uint32_t> {};
   differenceBitmap.resize(wrap::toSize(bitmapSize));
   auto colorSumMaximum = 0U;
-  auto colorSumMinimum = std::numeric_limits<uint32_t>::max();
+  auto colorSumMinimum = BIGUINT;
   if (!StateMap->test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
@@ -840,7 +839,7 @@ void ti::dutrac() {
 	}
 	auto const top = (point < limit) ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
 	auto       flag                = 0U;
-	auto       minimumEdgeDistance = std::numeric_limits<int32_t>::max();
+	auto       minimumEdgeDistance = BIGINT32;
 	if (left != 0) {
 	  minimumEdgeDistance = CurrentTracePoint.x - left;
 	  flag                = TRCL;

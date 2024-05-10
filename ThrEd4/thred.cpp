@@ -2843,7 +2843,7 @@ void thi::lensadj() {
 }
 
 void thi::ritlayr() {
-  auto layer = std::numeric_limits<uint32_t>::max();
+  auto layer = BIGUINT;
 
   if (StateMap->test(StateFlag::SELBOX)) {
 	if (!StitchBuffer->empty()) {
@@ -4581,7 +4581,7 @@ void thred::closPnt() {
   thi::unboxs();
   std::vector<float> gapToNearest;                     // distances of the closest points
   gapToNearest.resize(NearestPoint->size(), BIGFLOAT); // to a mouse click
-  NearestPoint->assign(NearestPoint->size(), std::numeric_limits<uint32_t>::max());
+  NearestPoint->assign(NearestPoint->size(), BIGUINT);
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	auto const iStitch0 = ColorChangeTable->operator[](iColor).stitchIndex;
@@ -4903,7 +4903,7 @@ the distance from the point to the line is given by
 
 auto thred::closlin() -> uint32_t {
   // ToDo - This function needs to be thoroughly checked and compared to findDistanceToSide
-  auto           closestPoint = std::numeric_limits<uint32_t>::max();
+  auto           closestPoint = BIGUINT;
   constexpr auto TLFACTOR     = 20.0F; // tolerance ratio
   thi::unboxs();
   auto offset = wrap::toFloat(Msg.pt.x - StitchWindowAbsRect.left) /
@@ -5015,7 +5015,7 @@ auto thred::closlin() -> uint32_t {
 	}
   }
   if (sum > tolerance) {
-	return std::numeric_limits<uint32_t>::max();
+	return BIGUINT;
   }
   return closestPoint;
 }
@@ -8297,7 +8297,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	  auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
-		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
+		constexpr auto NROMASK = BIGDWORD ^
 		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
 		auto& spFileInfo = *fileInfo;
 		switch (LOWORD(wparam)) {
