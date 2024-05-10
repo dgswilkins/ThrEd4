@@ -1749,7 +1749,10 @@ auto form::getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, in
   auto closestVertex = 0U;
   auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	if (auto const length = hypot(LastPoint.x - itVertex->x, LastPoint.y - itVertex->y); length < minimumLength) {
+	auto const deltaX = LastPoint.x - itVertex->x;
+	auto const deltaY = LastPoint.y - itVertex->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length < minimumLength) {
 	  minimumLength = length;
 	  closestVertex = iVertex;
 	}
