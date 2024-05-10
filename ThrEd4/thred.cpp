@@ -2329,7 +2329,7 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   }
   auto const code      = ClosestFormToCursor << FRMSHFT;
   auto const endStitch = StitchBuffer->size() - 1U;
-  auto       maxLength = 0.0F;
+  auto       maxLength = LOWFLOAT;
   auto       minLength = BIGFLOAT;
   if (!StitchBuffer->empty()) {
 	auto stitch     = StitchBuffer->begin();
