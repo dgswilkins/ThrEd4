@@ -4565,22 +4565,17 @@ void thi::duClos(uint32_t            startStitch,
                  uint32_t            stitchCount,
                  F_POINT const&      stitchPoint,
                  std::vector<float>& gapToNearest) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
-  auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
+  auto stitch       = wrap::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
-	auto const xCoord = std::abs(stitch->x - stitchPoint.x);
-	auto const yCoord = std::abs(stitch->y - stitchPoint.y);
-	auto       sum    = std::hypot(xCoord, yCoord);
-	auto       tind0  = iStitch;
+	auto const deltaX = stitch->x - stitchPoint.x;
+	auto const deltaY = stitch->y - stitchPoint.y;
+	auto       sum    = deltaX * deltaX + deltaY * deltaY;
+	auto       tempPoint  = iStitch;
 	auto       gap    = gapToNearest.begin();
 	for (auto& point : *NearestPoint) {
 	  if (sum < *gap) {
-		auto const lowestSum = *gap;
-		auto const tind1     = point;
-
-		*gap  = sum;
-		point = tind0;
-		sum   = lowestSum;
-		tind0 = tind1;
+		std::swap(*gap, sum);
+		std::swap(point, tempPoint);
 	  }
 	  ++gap;
 	}
@@ -4591,7 +4586,7 @@ void thi::duClos(uint32_t            startStitch,
 void thred::closPnt() {
   unbox();
   thi::unboxs();
-  std::vector<float> gapToNearest;                     // distances of the closest points
+  auto gapToNearest = std::vector<float> {};           // distances of the closest points
   gapToNearest.resize(NearestPoint->size(), BIGFLOAT); // to a mouse click
   NearestPoint->assign(NearestPoint->size(), BIGUINT);
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
