@@ -5623,14 +5623,18 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
   auto&      formControls = *formControlPoints;
   form::rct2sel(rectangle, formControls);
 
-  auto minimumLength    = BIGDBL;
+  auto minimumLength    = std::numeric_limits<LONG>::max();
+  auto constexpr LENCHECK = ICLOSNUF * ICLOSNUF;
   auto formControlIndex = 0U;
   for (auto const& iControl : formControls) {
-	if (auto const length = hypot(iControl.x - point.x, iControl.y - point.y); length < minimumLength) {
+	auto const deltaX = iControl.x - point.x;
+	auto const deltaY = iControl.y - point.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length < minimumLength) {
 	  minimumLength             = length;
 	  SelectedFormControlVertex = formControlIndex;
 	}
-	if (minimumLength < CLOSENUF) {
+	if (minimumLength < LENCHECK) {
 	  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
 	  for (auto iCorner = 0U; iCorner < wrap::toUnsigned(stretchBoxLine.size()); ++iCorner) {
 		stretchBoxLine[iCorner] = formControls[wrap::toSize(iCorner) * 2U];
