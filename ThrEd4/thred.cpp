@@ -915,6 +915,7 @@ void thred::coltab() {
   lastStitch->attribute &= NCOLMSK;
   lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
   auto currentColor = StitchBuffer->front().attribute & COLMSK;
+
   auto const pEnd = std::prev(StitchBuffer->end());
   for (auto stitchIt = std::next(StitchBuffer->begin()); stitchIt < pEnd; ++stitchIt) {
 	if ((stitchIt->attribute & COLMSK) == currentColor) {
@@ -2339,8 +2340,8 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
 		continue;
 	  }
-	  auto const deltaX     = stitchFwd1->x - stitch->x;
-	  auto const deltaY     = stitchFwd1->y - stitch->y;
+	  auto const deltaX = stitchFwd1->x - stitch->x;
+	  auto const deltaY = stitchFwd1->y - stitch->y;
 	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length > maxLength) {
 		maxLength          = length;
@@ -2356,6 +2357,7 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   }
   maxLength = std::sqrt(maxLength);
   minLength = std::sqrt(minLength);
+
   constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
   if (fabs(maxLength) < DIGITLIM) {
 	auto const strMax = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
@@ -2402,7 +2404,7 @@ void thred::lenCalc() {
   if (StateMap->test(StateFlag::LENSRCH)) {
 	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
-	auto const lenMax     = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
+	auto const lenMax = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), lenMax));
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
 	return;
@@ -4152,8 +4154,8 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	iForm.vertexIndex = vertexOffset;
 	vertexOffset += iForm.vertexCount;
 	if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
-		iForm.satinGuideIndex = guideOffset;
-		guideOffset += iForm.satinGuideCount;
+	  iForm.satinGuideIndex = guideOffset;
+	  guideOffset += iForm.satinGuideCount;
 	}
 	// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
 	// where we could not store the pointer in v2)
@@ -6402,10 +6404,7 @@ auto thi::gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount)
 
 void thred::insfil(fs::path& insertedFile) {
   auto successFlag       = false;
-  auto insertedRectangle = F_RECTANGLE {BIGFLOAT,
-                                        LOWFLOAT,
-                                        LOWFLOAT,
-                                        BIGFLOAT};
+  auto insertedRectangle = F_RECTANGLE {BIGFLOAT, LOWFLOAT, LOWFLOAT, BIGFLOAT};
   if (insertedFile.empty()) {
 	thi::getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
   }
@@ -6641,7 +6640,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	auto minY = insertedRectangle.top;
 	auto maxX = insertedRectangle.right;
 	auto maxY = insertedRectangle.bottom;
-	for (auto &stitch: fileStitchBuffer) {
+	for (auto& stitch : fileStitchBuffer) {
 	  if ((stitch.attribute & ALTYPMSK) != 0U) {
 		auto const newAttribute = (stitch.attribute & FRMSK) + encodedFormIndex;
 		stitch.attribute &= NFRMSK;
@@ -7137,18 +7136,20 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto minLength = BIGDBL;
   auto const pointToTest = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
   auto controlPoint = SelectedFormsLine->begin();
+
   auto const endPoint = SelectedFormsLine->size();
   for (auto iControlPoint = 0U; iControlPoint < endPoint; ++iControlPoint) {
 	auto const deltaX = pointToTest.x - controlPoint->x;
 	auto const deltaY = pointToTest.y - controlPoint->y;
 	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length < minLength) {
-	  minLength             = length;
+	  minLength                 = length;
 	  SelectedFormControlVertex = iControlPoint;
 	}
 	++controlPoint;
   }
   auto const minimumLength = std::sqrt(minLength);
+
   auto& formLines = *FormLines;
   formLines.resize(SQPNTS);
   for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
@@ -8030,8 +8031,9 @@ void thred::rotmrk() {
   }
   else {
 	thred::rngadj();
-	auto const originalAngle = std::atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
-	                                 StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
+	auto const originalAngle =
+	    std::atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
+	               StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
 	  thi::angdif(lowestAngle,
 	              highestAngle,
@@ -8314,8 +8316,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	  auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
-		constexpr auto NROMASK = BIGDWORD ^
-		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
+		constexpr auto NROMASK = BIGDWORD ^ FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
 		auto& spFileInfo = *fileInfo;
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
@@ -8665,12 +8666,10 @@ void thi::inscol() {
 	if ((iForm.fillType != 0U) && (iForm.fillColor >= VerticalIndex) && (iForm.fillColor < nextColor)) {
 	  ++(iForm.fillColor);
 	}
-	if ((iForm.fillType == FTHF) && (iForm.feather.color >= VerticalIndex) &&
-	    (iForm.feather.color < nextColor)) {
+	if ((iForm.fillType == FTHF) && (iForm.feather.color >= VerticalIndex) && (iForm.feather.color < nextColor)) {
 	  ++(iForm.feather.color);
 	}
-	if ((iForm.edgeType != 0U) && (iForm.borderColor >= VerticalIndex) &&
-	    (iForm.borderColor < nextColor)) {
+	if ((iForm.edgeType != 0U) && (iForm.borderColor >= VerticalIndex) && (iForm.borderColor < nextColor)) {
 	  ++(iForm.borderColor);
 	}
   }

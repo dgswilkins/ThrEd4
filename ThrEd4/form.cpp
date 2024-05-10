@@ -1083,7 +1083,7 @@ void form::drwfrm() {
 		SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
 		lastPoint = form.wordParam + 1U;
 	  }
-	  auto const maxGuide      = FormList->operator[](iForm).satinGuideCount;
+	  auto const maxGuide = FormList->operator[](iForm).satinGuideCount;
 	  if (maxGuide != 0U) {
 		auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
@@ -1152,10 +1152,7 @@ void form::drwfrm() {
   if (!SelectedFormList->empty()) {
 	SelectObject(StitchWindowMemDC, MultiFormPen);
 	ratsr();
-	SelectedFormsRect = RECT {BIGLONG,
-	                          LOWLONG,
-	                          LOWLONG,
-	                          BIGLONG};
+	SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  fselrct(selectedForm);
 	}
@@ -1550,7 +1547,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
   minimumLength = std::hypot(wrap::toFloat(stitchCoordsInPixels.x - screenCoordinate.x),
                              wrap::toFloat(stitchCoordsInPixels.y - screenCoordinate.y));
   if (minimumLength < FCLOSNUF) {
-	formIndex   = closestForm;
+	formIndex             = closestForm;
 	ClosestVertexToCursor = closestVertex;
 	StateMap->set(StateFlag::RELAYR);
 	return true;
@@ -1618,8 +1615,8 @@ auto form::closflt(FRM_HEAD const& form,
   auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const deltaX = xCoordinate - itVertex->x;
-	auto const deltaY     = yCoordinate - itVertex->y;
-	auto const length = deltaX * deltaX + deltaY * deltaY; 
+	auto const deltaY = yCoordinate - itVertex->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length < minimumLength) {
 	  closestVertex = iVertex;
 	  minimumLength = length;
@@ -1682,14 +1679,14 @@ void form::chkseq(bool border) {
   if (minimumStitchLength == 0.0F) {
 	return;
   }
-  auto destination = wrap::toUnsigned(savedIndex + 1U);
+  auto       destination = wrap::toUnsigned(savedIndex + 1U);
   auto const lengthCheck = minimumStitchLength * minimumStitchLength;
   for (auto iSequence = savedIndex + 1U; iSequence < InterleaveSequence->size(); ++iSequence) {
 	auto const& seq      = InterleaveSequence->operator[](iSequence);
 	auto const& seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
-	auto const  deltaX       = seq.x - seqBack1.x;
-	auto const  deltaY       = seq.y - seqBack1.y;
-	auto const  length      = deltaX * deltaX + deltaY * deltaY;
+	auto const  deltaX   = seq.x - seqBack1.x;
+	auto const  deltaY   = seq.y - seqBack1.y;
+	auto const  length   = deltaX * deltaX + deltaY * deltaY;
 	if (length > lengthCheck) {
 	  InterleaveSequence->operator[](destination) = seq;
 	  ++destination;
@@ -1873,6 +1870,7 @@ void fi::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float si
   auto const length = std::hypot(delta.x, delta.y);
 
   constexpr auto ESCLAMP = 1e-1F; // edge stitch minimum length clamp
+
   size       = std::max(size, ESCLAMP);
   auto count = wrap::round<uint32_t>(length / size);
   if (count == 0U) {
@@ -1914,9 +1912,9 @@ void fi::bold(FRM_HEAD const& form) {
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size() - 1U); ++iSequence) {
 	auto const& sequence     = OSequence->operator[](iSequence);
 	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
-	auto const deltaX = sequenceFwd1.x - sequence.x;
-	auto const deltaY = sequenceFwd1.y - sequence.y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
+	auto const  deltaX       = sequenceFwd1.x - sequence.x;
+	auto const  deltaY       = sequenceFwd1.y - sequence.y;
+	auto const  length       = deltaX * deltaX + deltaY * deltaY;
 	if (length > TNYFLOAT) {
 	  OSequence->operator[](iOutput++) = sequence;
 	}
@@ -2000,20 +1998,18 @@ auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> 
    of the endpoints. */
 auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
     -> bool {
-  auto const delta     = F_POINT {point1.x - point0.x, point1.y - point0.y};
+  auto const delta = F_POINT {point1.x - point0.x, point1.y - point0.y};
   if (delta.x != 0.0F) {
-	auto const sideSlope    = delta.y / delta.x;
-	auto const sideConstant = point0.y - sideSlope * point0.x;
-	auto const pointConstant =
-	    point.y - slope * point.x;
-	auto const newX = (sideConstant - pointConstant) / (slope - sideSlope);
-	intersectionPoint = F_POINT {newX, newX * slope + pointConstant};
+	auto const sideSlope     = delta.y / delta.x;
+	auto const sideConstant  = point0.y - sideSlope * point0.x;
+	auto const pointConstant = point.y - slope * point.x;
+	auto const newX          = (sideConstant - pointConstant) / (slope - sideSlope);
+	intersectionPoint        = F_POINT {newX, newX * slope + pointConstant};
   }
   else {
-	auto const pointConstant =
-	    point.y - slope * point.x;
-	auto const newX = point0.x;
-	intersectionPoint = F_POINT {newX, newX * slope + pointConstant};
+	auto const pointConstant = point.y - slope * point.x;
+	auto const newX          = point0.x;
+	intersectionPoint        = F_POINT {newX, newX * slope + pointConstant};
   }
   auto const xMinimum = std::min(point0.x, point1.x);
   auto const xMaximum = std::max(point0.x, point1.x);
@@ -2350,7 +2346,7 @@ void fi::duspnd(float                        stitchLen,
 	if (auto const length = std::hypot(delta.x, delta.y); length > stitchLen) {
 	  auto const angle =
 	      std::atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
-	            InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
+	                 InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
 	  auto const point = F_POINT {underlayVerticalRect[finish].bopnt.x + cos(angle) * width,
 	                              underlayVerticalRect[finish].bopnt.y + sin(angle) * width};
 	  form::filinsb(point, stitchPoint);
@@ -2365,8 +2361,9 @@ void fi::duspnd(float                        stitchLen,
       F_POINT {underlayVerticalRect[finish].bopnt.x - underlayVerticalRect[start].copnt.x,
                underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y};
   if (auto const length = std::hypot(delta.x, delta.y); length > stitchLen) {
-	auto const angle = std::atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
-	                         OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
+	auto const angle =
+	    std::atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
+	               OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
 	auto const point = F_POINT {underlayVerticalRect[finish].bipnt.x + cos(angle) * width,
 	                            underlayVerticalRect[finish].bipnt.y + sin(angle) * width};
 	form::filinsb(point, stitchPoint);
@@ -2408,13 +2405,13 @@ void fi::prsmal(float width) {
 	constexpr auto WIDFACT = 0.9F; // or 90% of the actual width
 	minimumLength          = width * WIDFACT;
   }
-  auto iReference = 0U;
+  auto       iReference  = 0U;
   auto const lengthCheck = minimumLength * minimumLength;
   for (auto iSequence = 1U; iSequence < wrap::toUnsigned(OSequence->size()); ++iSequence) {
 	auto const& seq    = OSequence->operator[](iSequence);
 	auto const& seqRef = OSequence->operator[](iReference);
-	auto const  deltaX     = seq.x - seqRef.x;
-	auto const  deltaY     = seq.y - seqRef.y;
+	auto const  deltaX = seq.x - seqRef.x;
+	auto const  deltaY = seq.y - seqRef.y;
 	auto const  length = deltaX * deltaX + deltaY * deltaY;
 	if (length > lengthCheck) {
 	  OSequence->operator[](iOutput++) = seq;
@@ -3214,7 +3211,8 @@ auto fi::isect(uint32_t                    vertex0,
 	  tempIntersection.y = 0.0F;
 	}
 	intersection = tempIntersection;
-	length = std::hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
+	length =
+	    std::hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
 	// ToDo - should length be determined from start or end?
 	//	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
   }
@@ -3274,7 +3272,7 @@ auto fi::insect(FRM_HEAD const&             form,
 	      intersection.y <= top) {
 		clipIntersectData[iIntersection].segmentLength =
 		    std::hypot(clipIntersectData[iIntersection].point.x - lineSegmentStart.x,
-		          clipIntersectData[iIntersection].point.y - lineSegmentStart.y);
+		               clipIntersectData[iIntersection].point.y - lineSegmentStart.y);
 		clipIntersectData[iIntersection].vertexIndex = currentVertex;
 		arrayOfClipIntersectData.push_back(&clipIntersectData[iIntersection]);
 		++iIntersection;
@@ -3509,13 +3507,13 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   auto minY = BIGFLOAT;
   auto maxX = LOWFLOAT;
   auto maxY = LOWFLOAT;
-  for (auto const& itVertex :currentFormVertices) {
+  for (auto const& itVertex : currentFormVertices) {
 	minX = std::min(minX, itVertex.x);
 	minY = std::min(minY, itVertex.y);
 	maxX = std::max(maxX, itVertex.x);
 	maxY = std::max(maxY, itVertex.y);
   }
-  auto clipGrid = RECT {wrap::floor<int32_t>(minX / clipWidth),
+  auto clipGrid     = RECT {wrap::floor<int32_t>(minX / clipWidth),
                         wrap::ceil<int32_t>(maxY / ClipRectSize.cy + 1.0F) + 2,
                         wrap::ceil<int32_t>(maxX / clipWidth),
                         wrap::floor<int32_t>(minY / ClipRectSize.cy - 1.0F)};
@@ -3847,7 +3845,7 @@ void fi::angout(FRM_HEAD& angledForm) noexcept(!(std::is_same_v<ptrdiff_t, int>)
 	maxX = std::max(maxX, itVertex.x);
 	maxY = std::max(maxY, itVertex.y);
   }
-  angledForm.rectangle = F_RECTANGLE {minX, maxY, maxX, minY};	
+  angledForm.rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 }
 
 void fi::horclpfn(std::vector<RNG_COUNT> const& textureSegments,
@@ -5622,9 +5620,9 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
   auto&      formControls = *formControlPoints;
   form::rct2sel(rectangle, formControls);
 
-  auto minimumLength    = BIGLONG;
+  auto minimumLength      = BIGLONG;
   auto constexpr LENCHECK = ICLOSNUF * ICLOSNUF;
-  auto formControlIndex = 0U;
+  auto formControlIndex   = 0U;
   for (auto const& iControl : formControls) {
 	auto const deltaX = iControl.x - point.x;
 	auto const deltaY = iControl.y - point.y;

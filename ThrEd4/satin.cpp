@@ -84,7 +84,7 @@ auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-l
 } // namespace
 
 void satin::delsac(uint32_t formIndex) {
-  auto& formList = *FormList;
+  auto& formList    = *FormList;
   auto& currentForm = formList[formIndex];
   if (SatinGuides->empty() || currentForm.type != SAT || (currentForm.satinGuideCount == 0U)) {
 	formList[formIndex].satinGuideCount = 0;
@@ -108,11 +108,13 @@ void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
   auto constexpr VAL = SAT_CON {};
   auto const itGuide = wrap::next(SatinGuides->cbegin(), startGuide);
   SatinGuides->insert(itGuide, VAL);
-  std::for_each(std::next(FormList->begin(), wrap::toPtrdiff(ClosestFormToCursor + 1U)), FormList->end(), [guideCount](auto& iForm) {
-	if (iForm.type == SAT && iForm.fillType == SATF) {
-	  iForm.satinGuideIndex += guideCount;
-	}
-  });
+  std::for_each(std::next(FormList->begin(), wrap::toPtrdiff(ClosestFormToCursor + 1U)),
+                FormList->end(),
+                [guideCount](auto& iForm) {
+	              if (iForm.type == SAT && iForm.fillType == SATF) {
+	                iForm.satinGuideIndex += guideCount;
+	              }
+                });
 }
 
 auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
@@ -142,12 +144,12 @@ void satin::spltsat(uint32_t guideIndex) {
   for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
 	FormList->operator[](iForm).vertexIndex += 2;
   }
-  auto        iOldVertex    = 0U;
-  auto const  currentGuide = *(wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex));
+  auto iOldVertex = 0U;
+  auto const currentGuide = *(wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex));
   auto const oldLastVertex = currentGuide.start + (firstForm.vertexCount - currentGuide.finish) + 1U;
-  auto        iNewVertex    = oldLastVertex + 1U;
-  auto const  itFirstVertex  = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
-  auto        itVertex      = itFirstVertex; // copy is intended
+  auto       iNewVertex    = oldLastVertex + 1U;
+  auto const itFirstVertex = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
+  auto       itVertex      = itFirstVertex; // copy is intended
   for (auto iVertex = 0U; iVertex < firstForm.vertexCount; ++iVertex) {
 	if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
 	  vertexBuffer[iOldVertex++] = *itVertex;
@@ -178,12 +180,12 @@ void satin::spltsat(uint32_t guideIndex) {
 	*(itVertex++) = vertexBuffer[iVertex];
   }
   firstForm.vertexCount = iOldVertex;
-  auto& nextForm       = FormList->operator[](wrap::toSize(ClosestFormToCursor) + 1U);
-  nextForm.vertexCount = iNewVertex - iOldVertex;
+  auto& nextForm        = FormList->operator[](wrap::toSize(ClosestFormToCursor) + 1U);
+  nextForm.vertexCount  = iNewVertex - iOldVertex;
   nextForm.vertexIndex  = firstForm.vertexIndex + iOldVertex;
   firstForm.outline();
   nextForm.outline();
-  auto       itGuide   = wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex);
+  auto       itGuide      = wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex);
   auto const finishOffset = currentGuide.finish - 1U - currentGuide.start;
   for (auto iGuide = 0U; iGuide < guideIndex; ++iGuide) {
 	(itGuide++)->finish -= finishOffset;
@@ -202,8 +204,8 @@ void satin::spltsat(uint32_t guideIndex) {
   auto const offset      = firstForm.satinGuideIndex + guideIndex;
   auto const itThisGuide = wrap::next(SatinGuides->cbegin(), offset);
   SatinGuides->erase(itThisGuide);
-  nextForm.satinGuideIndex = firstForm.satinGuideIndex + guideIndex;
-  nextForm.satinGuideCount = firstForm.satinGuideCount - guideIndex - 1U;
+  nextForm.satinGuideIndex  = firstForm.satinGuideIndex + guideIndex;
+  nextForm.satinGuideCount  = firstForm.satinGuideCount - guideIndex - 1U;
   firstForm.satinGuideCount = guideIndex;
   std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 2U), FormList->end(), [](auto& iForm) {
 	if ((iForm.type == SAT) && (iForm.satinGuideCount != 0U) && iForm.satinGuideIndex != 0U) {
@@ -229,7 +231,7 @@ void si::satclos() {
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   {
 	auto minimumLength = BIGFLOAT;
-	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  auto const deltaX = stitchPoint.x - itVertex->x;
 	  auto const deltaY = stitchPoint.y - itVertex->y;

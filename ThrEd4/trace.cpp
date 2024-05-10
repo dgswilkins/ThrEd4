@@ -745,7 +745,8 @@ void ti::decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
   auto itDL = src.begin();
   dst.push_back(*itDL);
   for (auto itDL1 = std::next(itDL); itDL1 != src.end(); ++itDL1) {
-	auto const traceLength = std::hypotf(wrap::toFloat(itDL1->x - itDL->x), wrap::toFloat(itDL1->y - itDL->y));
+	auto const traceLength =
+	    std::hypotf(wrap::toFloat(itDL1->x - itDL->x), wrap::toFloat(itDL1->y - itDL->y));
 	if (traceLength > IniFile.traceLength) {
 	  dst.push_back(*itDL1);
 	}

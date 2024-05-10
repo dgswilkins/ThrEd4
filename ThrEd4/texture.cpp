@@ -667,8 +667,8 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
   auto const end      = wrap::toUnsigned(TextureHistory->size());
   for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
 	txi::txt2pix(TempTexturePoints->operator[](iPoint), point);
-	auto const deltaX     = point.x - reference.x;
-	auto const deltaY     = point.y - reference.y;
+	auto const deltaX = point.x - reference.x;
+	auto const deltaY = point.y - reference.y;
 	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length < minimumLength) {
 	  minimumLength       = length;

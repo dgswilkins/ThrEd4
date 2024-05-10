@@ -257,10 +257,10 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	     auto const& iClip : clipPoints) {
 	  ClipBuffer->emplace_back(iClip.x, iClip.y, 0);
 	}
-	auto minX     = BIGFLOAT;
-	auto minY     = BIGFLOAT;
-	auto maxX     = LOWFLOAT;
-	auto maxY     = LOWFLOAT;
+	auto minX = BIGFLOAT;
+	auto minY = BIGFLOAT;
+	auto maxX = LOWFLOAT;
+	auto maxY = LOWFLOAT;
 	for (auto const& clip : *ClipBuffer) {
 	  minX = std::min(minX, clip.x);
 	  minY = std::min(minY, clip.y);
@@ -306,7 +306,7 @@ void ci::setvct(uint32_t vertexIndex,
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);
   clipAngle = std::atan2(itFinishVertex->y - itStartVertex->y, itFinishVertex->x - itStartVertex->x);
-  vector0   = F_POINT {ClipRectSize.cx * cos(clipAngle), ClipRectSize.cx * sin(clipAngle)};
+  vector0 = F_POINT {ClipRectSize.cx * cos(clipAngle), ClipRectSize.cx * sin(clipAngle)};
 }
 
 auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoint) noexcept -> bool {
@@ -578,7 +578,7 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto       flag          = true;
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const vNext         = std::next(itFirstVertex);
-  auto const minimumLength   = form.edgeSpacing * form.edgeSpacing;
+  auto const minimumLength = form.edgeSpacing * form.edgeSpacing;
   for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(itFirstVertex, form.vertexCount));
        auto const& iVertex : spVertices) {
 	auto const deltaX = iVertex.x - itFirstVertex->x;
@@ -596,14 +596,14 @@ void ci::fxlen(FRM_HEAD const&           form,
   }
   auto const halfSpacing = form.edgeSpacing / 2.0F;
 
-  auto adjustedSpace         = form.edgeSpacing;
-  auto       minimumSpacing  = form.edgeSpacing;
-  auto       minimumInterval = BIGFLOAT;
-  auto       loopCount       = 0U;
-  auto       initialCount    = 0U;
-  auto       smallestSpacing = 0.0F;
-  auto       largestSpacing  = 1.0F;
-  auto       nextStart       = 0U;
+  auto adjustedSpace   = form.edgeSpacing;
+  auto minimumSpacing  = form.edgeSpacing;
+  auto minimumInterval = BIGFLOAT;
+  auto loopCount       = 0U;
+  auto initialCount    = 0U;
+  auto smallestSpacing = 0.0F;
+  auto largestSpacing  = 1.0F;
+  auto nextStart       = 0U;
 
   constexpr auto ITLIMIT = 50U; // Iterate at most 50 times to try to guarantee convergence
   while (loopCount < ITLIMIT && (largestSpacing - smallestSpacing) > TNYFLOAT) {
@@ -703,10 +703,10 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   auto minimumLength = BIGFLOAT;
   auto minimumIndex  = 0U;
   for (auto index = 0U; auto const& iPoint : chainEndPoints) {
-	auto const deltaX     = LastPoint.x - iPoint.x;
-	auto const deltaY     = LastPoint.y - iPoint.y;
+	auto const deltaX = LastPoint.x - iPoint.x;
+	auto const deltaY = LastPoint.y - iPoint.y;
 	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if ( length < minimumLength) {
+	if (length < minimumLength) {
 	  minimumLength = length;
 	  minimumIndex  = index;
 	}

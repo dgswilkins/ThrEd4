@@ -377,8 +377,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   maxX += MARGIN;
   minY -= MARGIN;
   maxY += MARGIN;
-  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)),
-                                 std::lround(wrap::midl(maxY, minY))};
+  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)), std::lround(wrap::midl(maxY, minY))};
   DSTOffsetData.setPositive({std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
                              std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
   DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),

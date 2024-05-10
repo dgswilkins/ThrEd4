@@ -744,8 +744,9 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const formOffset = wrap::toUnsigned(FormList->size());
 		for (auto& cForm : forms) {
 		  FormList->push_back(cForm);
-		  FormList->back().attribute = (gsl::narrow_cast<decltype(cForm.attribute)>(cForm.attribute & NFRMLMSK) |
-		                                gsl::narrow_cast<decltype(cForm.attribute)>(ActiveLayer << 1U));
+		  FormList->back().attribute =
+		      (gsl::narrow_cast<decltype(cForm.attribute)>(cForm.attribute & NFRMLMSK) |
+		       gsl::narrow_cast<decltype(cForm.attribute)>(ActiveLayer << 1U));
 		}
 		auto* ptrFormVertices = convertFromPtr<F_POINT*>(wrap::next(ptrForms, ClipFormsCount));
 		auto  currentVertex   = 0U;

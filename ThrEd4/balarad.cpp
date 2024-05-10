@@ -248,7 +248,7 @@ void bal::ritbal() {
 	BalaradOffset      = F_POINT {IniFile.hoopSizeX * HALF, IniFile.hoopSizeY * HALF};
 	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
-	color        = StitchBuffer->front().attribute & COLMSK;
+	color = StitchBuffer->front().attribute & COLMSK;
 	bali::thr2bal(balaradStitch, 0, BALJUMP, 0);
 	for (auto iStitch = 0U; const auto& stitch : *StitchBuffer) {
 	  bali::thr2bal(balaradStitch, iStitch, BALNORM, 0);
