@@ -7416,15 +7416,17 @@ void fi::snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t en
   if (finish == start) {
 	return;
   }
+  auto const checkLength = SnapLength * SnapLength;
   for (auto current = start; current < end; ++current) {
-	auto const reference = xPoints[current];
+	auto const referencePoint = StitchBuffer->operator[](xPoints[current]);
 	for (auto iPoint = current + 1U; iPoint < finish; ++iPoint) {
-	  auto const check = xPoints[iPoint];
-	  if (auto const checkLength =
-	          hypot(StitchBuffer->operator[](check).x - StitchBuffer->operator[](reference).x,
-	                StitchBuffer->operator[](check).y - StitchBuffer->operator[](reference).y);
-	      checkLength < SnapLength) {
-		StitchBuffer->operator[](check) = StitchBuffer->operator[](reference);
+	  auto& checkPoint = StitchBuffer->operator[](xPoints[iPoint]);
+
+	  auto const deltaX = checkPoint.x - referencePoint.x;
+	  auto const deltaY = checkPoint.y - referencePoint.y;
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
+	  if (length < checkLength) {
+		checkPoint = referencePoint;
 	  }
 	}
   }
