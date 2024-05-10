@@ -2368,14 +2368,16 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 }
 
 void thi::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
-  auto maxLength      = 0.0F;
+  auto maxLength      = LOWFLOAT;
   auto minLength      = BIGFLOAT;
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
   auto stitch         = wrap::next(StitchBuffer->begin(), start);
   auto stitchFwd1     = std::next(stitch);
   for (auto iStitch = start; iStitch < end; ++iStitch) {
-	auto const length = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
+	auto const deltaX = stitchFwd1->x - stitch->x;
+	auto const deltaY = stitchFwd1->y - stitch->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length > maxLength) {
 	  maxLength          = length;
 	  largestStitchIndex = iStitch;
@@ -2387,6 +2389,8 @@ void thi::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint
 	++stitch;
 	++stitchFwd1;
   }
+  maxLength         = std::sqrt(maxLength);
+  minLength         = std::sqrt(minLength);
   auto const maxStr = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
   displayText::butxt(HMAXLEN, maxStr);
   auto const minStr = displayText::format(IDS_LENMIN, (minLength * IPFGRAN));
