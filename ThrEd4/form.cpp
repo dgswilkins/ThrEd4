@@ -4110,12 +4110,13 @@ auto fi::reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
   auto minimumLength = BIGFLOAT;
   for (auto const& corner : lastRegionCorners) {
 	for (auto const& point : corners) {
-	  if (auto const length = hypot(corner.x - point.x, corner.y - point.y); length < minimumLength) {
-		minimumLength = length;
-	  }
+	  auto const deltaX = corner.x - point.x;
+	  auto const deltaY = corner.y - point.y;
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
+	  minimumLength     = std::min(minimumLength, length);
 	}
   }
-  return minimumLength;
+  return std::sqrtf(minimumLength);
 }
 
 void fi::nxtrgn(std::vector<RG_SEQ>&           tempPath,
