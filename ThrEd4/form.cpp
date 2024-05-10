@@ -1618,7 +1618,10 @@ auto form::closflt(FRM_HEAD const& form,
   auto minimumLength = BIGFLOAT;
   auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	if (auto const length = hypot(xCoordinate - itVertex->x, yCoordinate - itVertex->y); length < minimumLength) {
+	auto const deltaX = xCoordinate - itVertex->x;
+	auto const deltaY     = yCoordinate - itVertex->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY; 
+	if (length < minimumLength) {
 	  closestVertex = iVertex;
 	  minimumLength = length;
 	}
