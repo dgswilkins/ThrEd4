@@ -1915,7 +1915,10 @@ void fi::bold(FRM_HEAD const& form) {
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size() - 1U); ++iSequence) {
 	auto const& sequence     = OSequence->operator[](iSequence);
 	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
-	if (auto const length = hypot(sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y); length > TNYFLOAT) {
+	auto const deltaX = sequenceFwd1.x - sequence.x;
+	auto const deltaY = sequenceFwd1.y - sequence.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length > TNYFLOAT) {
 	  OSequence->operator[](iOutput++) = sequence;
 	}
   }
