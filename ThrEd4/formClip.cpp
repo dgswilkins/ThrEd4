@@ -835,8 +835,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const textureSource = gsl::span<TX_PNT> {ptrTextureSource, textureCount};
 		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSource.begin(), textureSource.end());
 		GlobalUnlock(ClipMemory);
-		SelectedFormsRect.top = SelectedFormsRect.left = std::numeric_limits<LONG>::max();
-		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
+		SelectedFormsRect.top = SelectedFormsRect.right = 0;
+		SelectedFormsRect.bottom = SelectedFormsRect.left = std::numeric_limits<LONG>::max();
 		form::ratsr();
 		SelectedFormList->clear();
 		SelectedFormList->reserve(ClipFormsCount);
