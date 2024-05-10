@@ -703,7 +703,10 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   auto minimumLength = BIGFLOAT;
   auto minimumIndex  = 0U;
   for (auto index = 0U; auto const& iPoint : chainEndPoints) {
-	if (auto const length = hypot(LastPoint.x - iPoint.x, LastPoint.y - iPoint.y); length < minimumLength) {
+	auto const deltaX     = LastPoint.x - iPoint.x;
+	auto const deltaY     = LastPoint.y - iPoint.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if ( length < minimumLength) {
 	  minimumLength = length;
 	  minimumIndex  = index;
 	}
