@@ -1684,10 +1684,14 @@ void form::chkseq(bool border) {
 	return;
   }
   auto destination = wrap::toUnsigned(savedIndex + 1U);
+  auto const lengthCheck = minimumStitchLength * minimumStitchLength;
   for (auto iSequence = savedIndex + 1U; iSequence < InterleaveSequence->size(); ++iSequence) {
 	auto const& seq      = InterleaveSequence->operator[](iSequence);
 	auto const& seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
-	if (auto const len = hypot(seq.x - seqBack1.x, seq.y - seqBack1.y); len > minimumStitchLength) {
+	auto const  deltaX       = seq.x - seqBack1.x;
+	auto const  deltaY       = seq.y - seqBack1.y;
+	auto const  length      = deltaX * deltaX + deltaY * deltaY;
+	if (length > lengthCheck) {
 	  InterleaveSequence->operator[](destination) = seq;
 	  ++destination;
 	}
