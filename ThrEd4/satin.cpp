@@ -224,16 +224,16 @@ void si::satclos() {
   // clang-format off
   auto&      form              = FormList->operator[](ClosestFormToCursor);
   auto const initialGuideCount = form.satinGuideCount;
-  auto       minimumLength     = BIGFLOAT;
   // clang-format on
   form::uninsf();
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   {
+	auto minimumLength = BIGFLOAT;
 	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  auto const deltaX = stitchPoint.x - itVertex->x;
 	  auto const deltaY = stitchPoint.y - itVertex->y;
-	  auto const length = hypot(deltaX, deltaY);
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length < minimumLength) {
 		minimumLength         = length;
 		ClosestVertexToCursor = iVertex;
