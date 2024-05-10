@@ -1873,10 +1873,8 @@ void fi::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float si
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
   auto const length = std::hypot(delta.x, delta.y);
 
-  if (constexpr auto ESCLAMP = 1e-1F; // edge stitch minimum length clamp
-      size < ESCLAMP) {
-	size = ESCLAMP;
-  }
+  constexpr auto ESCLAMP = 1e-1F; // edge stitch minimum length clamp
+  size       = std::max(size, ESCLAMP);
   auto count = wrap::round<uint32_t>(length / size);
   if (count == 0U) {
 	OSequence->push_back(*itFinishVertex);
