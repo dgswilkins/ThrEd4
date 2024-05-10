@@ -2339,7 +2339,9 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
 		continue;
 	  }
-	  auto const length = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
+	  auto const deltaX     = stitchFwd1->x - stitch->x;
+	  auto const deltaY     = stitchFwd1->y - stitch->y;
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length > maxLength) {
 		maxLength          = length;
 		largestStitchIndex = iStitch;
@@ -2352,6 +2354,8 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	  ++stitchFwd1;
 	}
   }
+  maxLength = std::sqrt(maxLength);
+  minLength = std::sqrt(minLength);
   constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
   if (fabs(maxLength) < DIGITLIM) {
 	auto const strMax = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
