@@ -575,27 +575,29 @@ void ci::fxlen(FRM_HEAD const&           form,
                std::vector<float> const& listSINEs,
                std::vector<float> const& listCOSINEs) {
   auto       moveToCoords  = F_POINT {}; // moving formOrigin for clipboard fill
-  auto       adjustedSpace = 0.0F;
   auto       flag          = true;
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const vNext         = std::next(itFirstVertex);
+  auto const minimumLength   = form.edgeSpacing * form.edgeSpacing;
   for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(itFirstVertex, form.vertexCount));
        auto const& iVertex : spVertices) {
-	auto const length = hypot(iVertex.x - itFirstVertex->x, iVertex.y - itFirstVertex->y);
-	if (length > form.edgeSpacing) {
+	auto const deltaX = iVertex.x - itFirstVertex->x;
+	auto const deltaY = iVertex.y - itFirstVertex->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length > minimumLength) {
 	  flag = false;
 	  break;
 	}
-	adjustedSpace = std::max(adjustedSpace, length);
   }
   if (flag) {
 	chainEndPoints.push_back(*itFirstVertex);
 	chainEndPoints.push_back(*vNext);
 	return;
   }
-  adjustedSpace              = form.edgeSpacing;
+  auto const halfSpacing = form.edgeSpacing / 2.0F;
+
+  auto adjustedSpace         = form.edgeSpacing;
   auto       minimumSpacing  = form.edgeSpacing;
-  auto const halfSpacing     = adjustedSpace / 2.0F;
   auto       minimumInterval = BIGFLOAT;
   auto       loopCount       = 0U;
   auto       initialCount    = 0U;
