@@ -7134,16 +7134,21 @@ auto thi::isInBox(POINT const& point, RECT const& box) noexcept -> bool {
 }
 
 auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
-  auto minimumLength = BIGDBL;
+  auto minLength = BIGDBL;
   auto const pointToTest = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-  for (auto iControlPoint = 0U; iControlPoint < SelectedFormsLine->size(); ++iControlPoint) {
-	auto const length = hypot(pointToTest.x - SelectedFormsLine->operator[](iControlPoint).x,
-	                          pointToTest.y - SelectedFormsLine->operator[](iControlPoint).y);
-	if (length < minimumLength) {
-	  minimumLength             = length;
+  auto controlPoint = SelectedFormsLine->begin();
+  auto const endPoint = SelectedFormsLine->size();
+  for (auto iControlPoint = 0U; iControlPoint < endPoint; ++iControlPoint) {
+	auto const deltaX = pointToTest.x - controlPoint->x;
+	auto const deltaY = pointToTest.y - controlPoint->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length < minLength) {
+	  minLength             = length;
 	  SelectedFormControlVertex = iControlPoint;
 	}
+	++controlPoint;
   }
+  auto const minimumLength = std::sqrt(minLength);
   auto& formLines = *FormLines;
   formLines.resize(SQPNTS);
   for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
