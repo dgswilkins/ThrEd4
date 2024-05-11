@@ -7420,8 +7420,8 @@ void thred::shorter() {
 	}
 	// ToDo - Is this right?
 	auto const minLength = std::hypot(
-	    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).x - StitchBuffer->operator[](iStitch).x,
-	    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y - StitchBuffer->operator[](iStitch).y);
+	    StitchBuffer->operator[](wrap::toSize(iStitch)).x - StitchBuffer->operator[](iStitch - 1U).x,
+	    StitchBuffer->operator[](wrap::toSize(iStitch)).y - StitchBuffer->operator[](iStitch - 1U).y);
 	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), minLength));
   }
   CurrentStitchIndex = currentStitch;
