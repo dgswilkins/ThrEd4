@@ -2569,7 +2569,7 @@ void thred::duzero() {
 		continue;
 	  }
 	  auto const stitchLength = std::hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
-	  if (stitchLength <= MinStitchLength) {
+	  if (stitchLength <= SmallStitchLength) {
 		continue;
 	  }
 	  currentStitch   = iStitch;
