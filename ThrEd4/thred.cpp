@@ -2565,7 +2565,7 @@ void thred::duzero() {
 		continue;
 	  }
 	  if (!StateMap->testAndSet(StateFlag::CONTIG)) {
-		currentStitch = iStitch;
+		++iDestination;
 		continue;
 	  }
 	  auto const stitchLength = std::hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
