@@ -61,7 +61,7 @@ constexpr auto HUP100XY = 600.0F;       // 100 millimeter hoop size
 constexpr auto PFGRAN   = 6.0F;         // pfaf stitch points per millimeter
 constexpr auto IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
 // ToDo - Should this be a configurable parameter?
-constexpr LONG ICLOSNUF = 15L; // mouse click region for select
+constexpr LONG ICLOSNUF = 8L; // mouse click region for select
 constexpr auto CLOSENUF = double {ICLOSNUF};
 constexpr auto FCLOSNUF = float {CLOSENUF};
 constexpr auto SMALSIZ  = 0.25F;                     // default small stitch size
