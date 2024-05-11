@@ -5698,21 +5698,26 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
   constexpr auto KNL      = 2.0F; // knot length
   auto const     startIt  = wrap::next(StitchBuffer->begin(), start);
   auto           finishIt = std::next(startIt);
-  auto           delta    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto           length   = std::hypot(delta.x, delta.y);
+  auto           deltaX   = finishIt->x - startIt->x;
+  auto           deltaY   = finishIt->y - startIt->y;
+  auto           length   = deltaX * deltaX + deltaY * deltaY;
   ++finishIt;
   while (length < KNL && finishIt != StitchBuffer->end()) {
-	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	length = std::hypot(delta.x, delta.y);
+	deltaX = finishIt->x - startIt->x;
+	deltaY = finishIt->y - startIt->y;
+	length = deltaX * deltaX + deltaY * deltaY;
 	++finishIt;
   }
   if (finishIt == StitchBuffer->end()) {
 	return;
   }
   --finishIt;
-  delta = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  length = std::sqrt(length);
+  deltaX = finishIt->x - startIt->x;
+  deltaY = finishIt->y - startIt->y;
+
   auto const            knotAttribute = startIt->attribute | KNOTMSK;
-  auto const            knotStep      = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+  auto const            knotStep      = F_POINT {2.0F / length * deltaX, 2.0F / length * deltaY};
   static constexpr auto KNOT_AT_START_ORDER = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
   for (char const iKnot : KNOT_AT_START_ORDER) {
 	ofstch(buffer, start, iKnot, knotStep, knotAttribute);
