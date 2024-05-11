@@ -4663,7 +4663,9 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 		  ++stitch;
 		  continue;
 		}
-		auto const distance = std::hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
+		auto const deltaX   = stitch->x - stitchPoint.x;
+		auto const deltaY   = stitch->y - stitchPoint.y;
+		auto const distance = deltaX * deltaX + deltaY * deltaY;
 		if (distance < distanceToClick) {
 		  distanceToClick = distance;
 		  closestIndex    = iStitch;
@@ -4685,7 +4687,9 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 		++currentStitch;
 		continue;
 	  }
-	  auto const distance = std::hypot(stitch.x - stitchPoint.x, stitch.y - stitchPoint.y);
+	  auto const deltaX   = stitch.x - stitchPoint.x;
+	  auto const deltaY   = stitch.y - stitchPoint.y;
+	  auto const distance = deltaX * deltaX + deltaY * deltaY;
 	  if (distance < distanceToClick) {
 		distanceToClick = distance;
 		closestIndex    = currentStitch;
