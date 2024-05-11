@@ -5669,15 +5669,20 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
   auto const finishIt      = wrap::next(StitchBuffer->begin(), finish);
   auto       startIt       = (finish != 0) ? std::next(finishIt, -1) : finishIt;
   auto const knotAttribute = startIt->attribute | KNOTMSK;
-  auto       delta         = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto       length        = std::hypot(delta.x, delta.y);
+  auto deltaX = finishIt->x - startIt->x;
+  auto deltaY = finishIt->y - startIt->y;
+  auto length = deltaX * deltaX + deltaY * deltaY;
   while (length == 0.0F && startIt != StitchBuffer->begin()) {
-	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	length = std::hypot(delta.x, delta.y);
+	deltaX = finishIt->x - startIt->x;
+	deltaY = finishIt->y - startIt->y;
+	length = deltaX * deltaX + deltaY * deltaY;
 	--startIt;
   }
-  delta               = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto const knotStep = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+  length = std::sqrt(length);
+  deltaX = finishIt->x - startIt->x;
+  deltaY = finishIt->y - startIt->y;
+
+  auto const knotStep = F_POINT {2.0F / length * deltaX, 2.0F / length * deltaY};
   constexpr auto KNOT_AT_END_ORDER = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
   constexpr auto KNOT_AT_LAST_ORDER = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
   auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? KNOT_AT_LAST_ORDER : KNOT_AT_END_ORDER;
