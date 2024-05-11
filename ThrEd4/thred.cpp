@@ -4977,15 +4977,15 @@ auto thred::closlin() -> uint32_t {
 			bottom += tolerance;
 			if (offsetY > top) {
 			  deltaY = offsetY - top;
-			  tsum   = std::hypot(deltaX, deltaY);
+			  tsum   = deltaX * deltaX + deltaY * deltaY;
 			  break;
 			}
 			if (offsetY < bottom) {
 			  deltaY = offsetY - bottom;
-			  tsum   = std::hypot(deltaX, deltaY);
+			  tsum   = deltaX * deltaX + deltaY * deltaY;
 			  break;
 			}
-			tsum = fabs(deltaX);
+			tsum = deltaX * deltaX;
 			break;
 		  }
 		  auto const slope = wrap::toFloat(xba) / wrap::toFloat(yab);
@@ -5023,7 +5023,7 @@ auto thred::closlin() -> uint32_t {
 			}
 		  }
 		}
-		tsum = std::hypot(deltaX, deltaY);
+		tsum = deltaX * deltaX + deltaY * deltaY;
 		break;
 	  }
 	  if (tsum < sum) {
@@ -5032,7 +5032,7 @@ auto thred::closlin() -> uint32_t {
 	  }
 	}
   }
-  if (sum > tolerance) {
+  if (sum > (tolerance * tolerance)) {
 	return BIGUINT;
   }
   return closestPoint;
