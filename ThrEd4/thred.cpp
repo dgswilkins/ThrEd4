@@ -2448,13 +2448,14 @@ auto thi::find1st() -> uint32_t {
 void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
   auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
   auto stitchSize = BIGFLOAT; // to ensure that it is larger than SmallStitchLength first time through
+  auto const minStitchLength = SmallStitchLength * SmallStitchLength;
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	auto iPrevStitch = thi::find1st();
 	auto iStitch     = iPrevStitch + 1U;
 	auto lastStitch  = StitchBuffer->size();
 	--lastStitch;
-	while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
+	while (iStitch < lastStitch && stitchSize > minStitchLength) {
 	  auto const& stitch     = StitchBuffer->operator[](iStitch);
 	  auto const& prevStitch = StitchBuffer->operator[](iPrevStitch);
 	  if (((stitch.attribute & NOTFRM) != 0U) || (stitch.attribute & FRMSK) != codedAttribute) { // are we still in the selected form?
@@ -2463,9 +2464,10 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a normal stitch?
 		continue;
 	  }
-	  auto const delta = F_POINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
-	  stitchSize       = std::hypot(delta.x, delta.y);
-	  if (stitchSize > SmallStitchLength) {
+	  auto const deltaX = stitch.x - prevStitch.x;
+	  auto const deltaY = stitch.y - prevStitch.y;
+	  stitchSize        = deltaX * deltaX + deltaY * deltaY;
+	  if (stitchSize > minStitchLength) {
 		++iPrevStitch;
 		++iStitch;
 	  }
@@ -2491,9 +2493,10 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 			++iOutputStitch;
 		  }
 		  else {
-			auto const delta = F_POINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
-			stitchSize       = std::hypot(delta.x, delta.y);
-			if (stitchSize > SmallStitchLength) {
+			auto const deltaX = stitch.x - prevPoint.x;
+			auto const deltaY = stitch.y - prevPoint.y;
+			stitchSize        = deltaX * deltaX + deltaY * deltaY;
+			if (stitchSize > minStitchLength) {
 			  outStitch = stitch;
 			  prevPoint = stitch;
 			  ++iOutputStitch;
@@ -2527,9 +2530,10 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		StitchBuffer->operator[](iNextStitch++) = stitch;
 	  }
 	  else {
-		auto const delta = F_POINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
-		stitchSize       = std::hypot(delta.x, delta.y);
-		if (stitchSize > SmallStitchLength) {
+		auto const deltaX = stitch.x - prevPoint.x;
+		auto const deltaY = stitch.y - prevPoint.y;
+		stitchSize        = deltaX * deltaX + deltaY * deltaY;
+		if (stitchSize > minStitchLength) {
 		  StitchBuffer->operator[](iNextStitch++) = stitch;
 		  prevPoint                               = stitch;
 		}
@@ -2549,6 +2553,7 @@ void thred::duzero() {
   if (StitchBuffer->empty()) {
 	return;
   }
+  auto const minStitch = SmallStitchLength * SmallStitchLength;
   if (!SelectedFormList->empty()) {
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto const selectedForm : (*SelectedFormList)) {
@@ -2568,8 +2573,10 @@ void thred::duzero() {
 		++iDestination;
 		continue;
 	  }
-	  auto const stitchLength = std::hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
-	  if (stitchLength <= SmallStitchLength) {
+	  auto const deltaX = iStitch.x - currentStitch.x;
+	  auto const deltaY = iStitch.y - currentStitch.y;
+	  auto const stitchLength = deltaX * deltaX + deltaY * deltaY;
+	  if (stitchLength <= minStitch) {
 		continue;
 	  }
 	  currentStitch   = iStitch;
