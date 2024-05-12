@@ -19,16 +19,14 @@
 #include <cstdint>
 
 namespace util {
-auto constexpr closeEnough(float first, float second) -> bool {
+auto inline closeEnough(float first, float second) noexcept -> bool {
   // test if the floats are so close together that they can be considered equal
-  auto const val = (first > second) ? (first - second) : (second - first);
-  return (val < FLT_EPSILON);
+  return std::abs(first - second) < FLT_EPSILON;
 }
 
-auto constexpr closeEnough(double first, double second) -> bool {
+auto inline closeEnough(double first, double second) noexcept -> bool {
   // test if the doubles are so close together that they can be considered equal
-  auto const val = (first > second) ? (first - second) : (second - first);
-  return (val < DBL_EPSILON);
+  return std::abs(first - second) < DBL_EPSILON;
 }
 
 auto constexpr doubleToFloat(double value) -> float {
@@ -95,7 +93,7 @@ class F_POINT
   explicit constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
   explicit constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
   explicit constexpr F_POINT(D_POINT const& rhs);
-  constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
+  inline auto operator==(F_POINT const& rhs) const noexcept -> bool;
   constexpr auto operator=(D_POINT const& rhs) -> F_POINT&;
   constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
   constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
@@ -174,7 +172,7 @@ class F_POINT_ATTR
   // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
   // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
   //~F_POINT_ATTR() = default;
-  constexpr auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
+  inline auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
 
   constexpr auto operator=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
 	x = rhs.x;
@@ -251,7 +249,7 @@ constexpr B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
     x(rhsX), y(rhsY), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-constexpr auto F_POINT::operator==(F_POINT const& rhs) const noexcept -> bool {
+inline auto F_POINT::operator==(F_POINT const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
@@ -306,7 +304,7 @@ inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(rhsA) {
 }
 
-constexpr auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {
+inline auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y) && attribute == rhs.attribute;
 }
 
