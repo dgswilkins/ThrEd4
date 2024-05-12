@@ -683,7 +683,7 @@ auto kyi::handleRightKey(bool& retflag) -> bool {
 	}
 	else {
 	  if (StateMap->test(StateFlag::LENSRCH)) {
-		thred::longer();
+		thred::nextSortedStitch(true);
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
@@ -778,7 +778,7 @@ auto kyi::handleLeftKey(bool& retflag) -> bool {
 	}
 	else {
 	  if (StateMap->test(StateFlag::LENSRCH)) {
-		thred::shorter();
+		thred::nextSortedStitch(false);
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {

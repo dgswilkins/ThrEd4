@@ -7347,85 +7347,24 @@ void thi::duselrng(RANGE& selectedRange) {
   selectedRange.finish = wrap::toUnsigned(StitchBuffer->size());
 }
 
-void thred::longer() {
-  auto flag = true;
-  if (ClosestPointIndex == LargestStitchIndex) {
-	return;
-  }
-  auto const& start         = StitchBuffer->operator[](ClosestPointIndex);
-  auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  auto const  currentLength = std::hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  auto const  rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
-                                  ? SelectedRange.finish
-                                  : SelectedRange.finish - 1U;
-  auto        iStitch       = ClosestPointIndex + 1U;
-  for (; iStitch < rangeEnd; ++iStitch) {
-	auto const& stitch     = StitchBuffer->operator[](iStitch);
-	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	auto const  length     = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
-	if (util::closeEnough(length, currentLength)) {
-	  flag = false;
-	  break;
-	}
-  }
-  if (flag) {
-	auto minimumLength = BIGFLOAT;
-	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; ++currentStitch) {
-	  auto const& stitch     = StitchBuffer->operator[](currentStitch);
-	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
-	  auto const  length     = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
-	  if (length > currentLength && length < minimumLength) {
-		minimumLength = length;
-		iStitch       = currentStitch;
-	  }
-	}
-	if (util::closeEnough(minimumLength, BIGFLOAT)) {
+void thred::nextSortedStitch(bool direction) {
+  if (direction) {
+	if (ClosestPointIndex == LargestStitchIndex) {
 	  return;
 	}
+	++SortIndex;
   }
-  CurrentStitchIndex = iStitch;
-  thi::lensadj();
-  displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
-}
-
-void thred::shorter() {
-  auto flag = true;
-  if (ClosestPointIndex == SmallestStitchIndex) {
-	return;
-  }
-  auto const& start         = StitchBuffer->operator[](ClosestPointIndex);
-  auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  auto const  currentLength = std::hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  auto        currentStitch = ClosestPointIndex;
-  for (; currentStitch != 0; --currentStitch) {
-	auto const& stitch     = StitchBuffer->operator[](currentStitch);
-	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
-	auto const  length     = std::hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
-	if (util::closeEnough(length, currentLength)) {
-	  --currentStitch;
-	  flag = false;
-	  break;
+  else {
+	if (ClosestPointIndex == SmallestStitchIndex) {
+	  return;
 	}
+	--SortIndex;
   }
-  if (flag) {
-	auto maximumLength = 0.0F;
-	auto iStitch       = SelectedRange.start;
-	for (; iStitch < SelectedRange.finish - 1U; ++iStitch) {
-	  auto const& stitch     = StitchBuffer->operator[](iStitch);
-	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	  auto const  length     = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
-	  if (length < currentLength && length > maximumLength) {
-		maximumLength = length;
-		currentStitch = iStitch;
-	  }
-	}
-	// ToDo - Is this right?
-	auto const minLength = std::hypot(
-	    StitchBuffer->operator[](wrap::toSize(iStitch)).x - StitchBuffer->operator[](iStitch - 1U).x,
-	    StitchBuffer->operator[](wrap::toSize(iStitch)).y - StitchBuffer->operator[](iStitch - 1U).y);
-	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), minLength));
-  }
-  CurrentStitchIndex = currentStitch;
+  auto const nextStitch = wrap::next(SortBuffer->begin(), SortIndex);
+  outDebugString(L"SortIndex [{}]\n", SortIndex);
+  CurrentStitchIndex    = nextStitch->index;
+  auto const minLength  = std::sqrt(nextStitch->length) * IPFGRAN;
+  displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), minLength));
   thi::lensadj();
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
