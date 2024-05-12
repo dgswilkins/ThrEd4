@@ -226,7 +226,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
 auto isthr(fs::path const& thredPath) -> bool;
 auto kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t;
-void lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
+void lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
 void lensadj();
 void loadColors() noexcept;
 
@@ -2311,14 +2311,17 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	displayText::butxt(HMINLEN, blank);
 	return;
   }
-  auto const code      = ClosestFormToCursor << FRMSHFT;
-  auto const endStitch = StitchBuffer->size() - 1U;
-  auto       maxLength = LOWFLOAT;
-  auto       minLength = BIGFLOAT;
+  auto const code        = ClosestFormToCursor << FRMSHFT;
+  auto const startStitch = 0U;
+  auto const endStitch   = StitchBuffer->size() - 2U;
   if (!StitchBuffer->empty()) {
-	auto stitch     = StitchBuffer->begin();
-	auto stitchFwd1 = std::next(stitch);
-	for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
+	auto maxLength      = LOWFLOAT;
+	auto minLength      = BIGFLOAT;
+	smallestStitchIndex = 0U;
+	largestStitchIndex  = 0U;
+	auto stitch         = wrap::next(StitchBuffer->begin(), startStitch);
+	auto stitchFwd1     = std::next(stitch);
+	for (auto iStitch = startStitch; iStitch < endStitch; ++iStitch) {
 	  if ((stitch->attribute & FRMSK) != code || ((stitch->attribute & NOTFRM) != 0U) ||
 	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
 		continue;
@@ -2337,49 +2340,57 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	  ++stitch;
 	  ++stitchFwd1;
 	}
-  }
-  maxLength = std::sqrt(maxLength);
-  minLength = std::sqrt(minLength);
+	maxLength = std::sqrt(maxLength) * IPFGRAN;
+	minLength = std::sqrt(minLength) * IPFGRAN;
 
-  constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
-  if (fabs(maxLength) < DIGITLIM) {
-	auto const strMax = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
-	displayText::butxt(HMAXLEN, strMax);
-  }
-  if (fabs(minLength) < DIGITLIM) {
-	auto const strMin = displayText::format(IDS_LENMIN, (minLength * IPFGRAN));
-	displayText::butxt(HMINLEN, strMin);
+	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
+	if (fabs(maxLength) < DIGITLIM) {
+	  auto const strMax = displayText::format(IDS_LENMAX, maxLength);
+	  displayText::butxt(HMAXLEN, strMax);
+	}
+	if (fabs(minLength) < DIGITLIM) {
+	  auto const strMin = displayText::format(IDS_LENMIN, minLength);
+	  displayText::butxt(HMINLEN, strMin);
+	}
   }
 }
 
-void thi::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
-  auto maxLength      = LOWFLOAT;
-  auto minLength      = BIGFLOAT;
-  smallestStitchIndex = 0U;
-  largestStitchIndex  = 0U;
-  auto stitch         = wrap::next(StitchBuffer->begin(), start);
-  auto stitchFwd1     = std::next(stitch);
-  for (auto iStitch = start; iStitch < end; ++iStitch) {
-	auto const deltaX = stitchFwd1->x - stitch->x;
-	auto const deltaY = stitchFwd1->y - stitch->y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length > maxLength) {
-	  maxLength          = length;
-	  largestStitchIndex = iStitch;
+void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
+  if (!StitchBuffer->empty()) {
+	auto maxLength      = LOWFLOAT;
+	auto minLength      = BIGFLOAT;
+	smallestStitchIndex = 0U;
+	largestStitchIndex  = 0U;
+	auto stitch         = wrap::next(StitchBuffer->begin(), startStitch);
+	auto stitchFwd1     = std::next(stitch);
+	for (auto iStitch = startStitch; iStitch < endStitch; ++iStitch) {
+	  auto const deltaX = stitchFwd1->x - stitch->x;
+	  auto const deltaY = stitchFwd1->y - stitch->y;
+	  auto const length = deltaX * deltaX + deltaY * deltaY;
+	  if (length > maxLength) {
+		maxLength          = length;
+		largestStitchIndex = iStitch;
+	  }
+	  if (length < minLength) {
+		minLength           = length;
+		smallestStitchIndex = iStitch;
+	  }
+	  ++stitch;
+	  ++stitchFwd1;
 	}
-	if (length < minLength) {
-	  minLength           = length;
-	  smallestStitchIndex = iStitch;
+	maxLength = std::sqrt(maxLength) * IPFGRAN;
+	minLength = std::sqrt(minLength) * IPFGRAN;
+
+	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
+	if (fabs(maxLength) < DIGITLIM) {
+	  auto const strMax = displayText::format(IDS_LENMAX, maxLength);
+	  displayText::butxt(HMAXLEN, strMax);
 	}
-	++stitch;
-	++stitchFwd1;
+	if (fabs(minLength) < DIGITLIM) {
+	  auto const strMin = displayText::format(IDS_LENMIN, minLength);
+	  displayText::butxt(HMINLEN, strMin);
+	}
   }
-  maxLength         = std::sqrt(maxLength);
-  minLength         = std::sqrt(minLength);
-  auto const maxStr = displayText::format(IDS_LENMAX, (maxLength * IPFGRAN));
-  displayText::butxt(HMAXLEN, maxStr);
-  auto const minStr = displayText::format(IDS_LENMIN, (minLength * IPFGRAN));
-  displayText::butxt(HMINLEN, minStr);
 }
 
 void thred::lenCalc() {
