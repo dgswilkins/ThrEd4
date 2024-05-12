@@ -193,7 +193,11 @@ extern float ShowStitchThreshold;
 extern HWND  SideMessageWindow;
 extern float SmallStitchLength;
 extern float SnapLength;
-extern float SpiralWrap;
+
+extern std::vector<SEARCH_REC>* SortBuffer;
+
+extern uint32_t SortIndex;
+extern float    SpiralWrap;
 extern float StarRatio;
 
 extern ENUM_MAP<StateFlag>* StateMap;

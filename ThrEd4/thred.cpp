@@ -12308,6 +12308,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto privateSelectedTexturePointsList = std::vector<uint32_t> {};
 	  auto privateSideWindow                = std::vector<HWND> {};
 	  auto privateSideWindowEntryBuffer     = std::vector<wchar_t> {};
+	  auto privateSortBuffer                = std::vector<SEARCH_REC> {};
 	  auto privateStateMap                  = ENUM_MAP<StateFlag> {0};
 	  auto privateStitchBuffer              = std::vector<F_POINT_ATTR> {};
 	  auto privateTempPolygon               = std::vector<F_POINT> {};
@@ -12400,6 +12401,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SelectedPointsLine        = &privateSelectedPointsLine;
 	  SideWindow                = &privateSideWindow;
 	  SideWindowEntryBuffer     = &privateSideWindowEntryBuffer;
+	  SortBuffer                = &privateSortBuffer;
 	  StateMap                  = &privateStateMap;
 	  StitchBuffer              = &privateStitchBuffer;
 	  TempPolygon               = &privateTempPolygon;
