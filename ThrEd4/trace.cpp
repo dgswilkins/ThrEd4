@@ -398,12 +398,8 @@ void trace::trdif() {
 		differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
 
 		auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
-		if (colorSum > colorSumMaximum) {
-		  colorSumMaximum = colorSum;
-		}
-		if (colorSum < colorSumMinimum) {
-		  colorSumMinimum = colorSum;
-		}
+		colorSumMaximum = std::max(colorSumMaximum, colorSum);
+		colorSumMinimum = std::min(colorSumMinimum, colorSum);
 	  }
 	}
 	auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
