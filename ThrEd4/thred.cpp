@@ -1511,9 +1511,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  auto           upcnt    = value * IPFGRAN;
 		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
-		  if (upcnt > FUPCLAMP) {
-			upcnt = FUPCLAMP;
-		  }
+		  upcnt = std::min(upcnt, FUPCLAMP);
 		  form.feather.upCount = wrap::round<uint8_t>(upcnt);
 		  break;
 		}
@@ -1663,9 +1661,7 @@ void thi::chknum() {
 			  thred::savdo();
 			  auto           dncnt    = value * IPFGRAN;
 			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
-			  if (dncnt > FDNCLAMP) {
-				dncnt = FDNCLAMP;
-			  }
+			  dncnt = std::min(dncnt, FDNCLAMP);
 			  form.feather.downCount = wrap::round<uint8_t>(dncnt);
 			  break;
 			}
@@ -1848,12 +1844,7 @@ void thi::chknum() {
 
 				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
 				  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
-				  if (StarRatio > SRMAXLIM) {
-					StarRatio = SRMAXLIM;
-				  }
-				  if (StarRatio < SRMINLIM) {
-					StarRatio = SRMINLIM;
-				  }
+				  StarRatio = std::clamp(StarRatio, SRMINLIM, SRMAXLIM);
 				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), StarRatio);
 				  hWnd   = ValueWindow->operator[](PRFSTRRAT);
 				  break;
@@ -1863,12 +1854,7 @@ void thi::chknum() {
 
 				  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
 				  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
-				  if (IniFile.lensRatio > LRMAXLIM) {
-					IniFile.lensRatio = LRMAXLIM;
-				  }
-				  if (IniFile.lensRatio < LRMINLIM) {
-					IniFile.lensRatio = LRMINLIM;
-				  }
+				  IniFile.lensRatio = std::clamp(IniFile.lensRatio, LRMINLIM, LRMAXLIM);
 				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio);
 				  hWnd   = ValueWindow->operator[](PRFLENRAT);
 				  break;
@@ -1878,12 +1864,7 @@ void thi::chknum() {
 				  // ToDo - Are these limits correct?
 				  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
 				  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
-				  if (SpiralWrap > SRMAXLIM) {
-					SpiralWrap = SRMINLIM;
-				  }
-				  if (SpiralWrap < SRMINLIM) {
-					SpiralWrap = SRMINLIM;
-				  }
+				  SpiralWrap = std::clamp(SpiralWrap, SRMINLIM, SRMAXLIM);
 				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), SpiralWrap);
 				  hWnd   = ValueWindow->operator[](PRFSPLWRP);
 				  break;
