@@ -2792,9 +2792,8 @@ void thred::grpAdj() {
   auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
                           std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
   if (newSize.x < MINZUMF) {
-	if (newSize.x < 1.0F) {
-	  newSize.x = 1.0F;
-	}
+	newSize.x = std::max(newSize.x, 1.0F);
+
 	auto const coordinate = MINZUMF / newSize.x;
 	newSize = F_POINT {MINZUMF, std::round(coordinate * newSize.y)};
   }
