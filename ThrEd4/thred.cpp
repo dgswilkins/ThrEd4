@@ -341,6 +341,7 @@ constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in s
 constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
 constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
 constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
+constexpr auto MINZUMF  = float {MINZUM};         // minimum zoom in stitch points
 constexpr auto NERCNT   = 4U;                     // number of entries in the near array;
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
@@ -1444,7 +1445,7 @@ void thred::hupfn() {
 	iForm.rectangle.bottom += delta.y;
   }
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.cx);
+  ZoomMin      = MINZUMF / wrap::toFloat(UnzoomedRect.cx);
   thred::zumhom();
 }
 
@@ -2790,12 +2791,12 @@ void thred::grpAdj() {
   }
   auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
                           std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
-  if (newSize.x < MINZUM) {
+  if (newSize.x < MINZUMF) {
 	if (newSize.x < 1.0F) {
 	  newSize.x = 1.0F;
 	}
-	auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
-	newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+	auto const coordinate = MINZUMF / newSize.x;
+	newSize = F_POINT {MINZUMF, std::round(coordinate * newSize.y)};
   }
   constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
   if (newSize.x > newSize.y) {
