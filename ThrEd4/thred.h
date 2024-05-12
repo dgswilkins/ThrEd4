@@ -174,7 +174,7 @@ void savAs();
 void savdo();
 void save();
 void selCol();
-void selRct(F_RECTANGLE& sourceRect);
+void selRct(F_RECTANGLE& sourceRect) noexcept;
 void selalstch();
 void selfpnt();
 void set1knot();

@@ -2709,27 +2709,23 @@ void thi::ducros(HDC hDC) {
   selin(GroupStartStitch, GroupEndStitch, hDC);
 }
 
-void thred::selRct(F_RECTANGLE& sourceRect) {
+void thred::selRct(F_RECTANGLE& sourceRect) noexcept {
   if (!StitchBuffer->empty()) {
-	auto stitch     = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-	sourceRect.left = sourceRect.right = stitch->x;
-	sourceRect.top = sourceRect.bottom = stitch->y;
-	++stitch;
-	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
-	  if (stitch->x > sourceRect.right) {
-		sourceRect.right = stitch->x;
-	  }
-	  if (stitch->x < sourceRect.left) {
-		sourceRect.left = stitch->x;
-	  }
-	  if (stitch->y < sourceRect.bottom) {
-		sourceRect.bottom = stitch->y;
-	  }
-	  if (stitch->y > sourceRect.top) {
-		sourceRect.top = stitch->y;
-	  }
-	  ++stitch;
+	auto minX = BIGFLOAT;
+	auto minY = BIGFLOAT;
+	auto maxX = LOWFLOAT;
+	auto maxY = LOWFLOAT;
+
+	auto groupStitches =
+	    gsl::span<F_POINT_ATTR>(std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
+	                            GroupEndStitch - GroupStartStitch);
+	for (auto const& stitch : groupStitches) {
+	  minX = std::min(minX, stitch.x);
+	  minY = std::min(minY, stitch.y);
+	  maxX = std::max(maxX, stitch.x);
+	  maxY = std::max(maxY, stitch.y);
 	}
+	sourceRect = F_RECTANGLE {minX, maxY, maxX, minY};
   }
   if (util::closeEnough(sourceRect.right, sourceRect.left)) {
 	++sourceRect.right;
