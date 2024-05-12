@@ -2400,12 +2400,16 @@ void thi::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint
 }
 
 void thred::lenCalc() {
+  auto static chkVal = 0.0F;
   auto const blank = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
 	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
 	auto const lenMax = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
-	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), lenMax));
+	if (!util::closeEnough(lenMax, chkVal)) {
+	  chkVal = lenMax;
+	  displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), lenMax));
+	}
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
 	return;
   }
