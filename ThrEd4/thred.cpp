@@ -197,6 +197,7 @@ void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
 auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
 void f1del(uint32_t formIndex);
+void fillSortBuffer();
 auto find1st() -> uint32_t;
 void fnamtabs();
 void fndknt();
@@ -12904,14 +12905,38 @@ void thred::updateMoveLine() {
   thi::dulin(MoveLine0, MoveLine1);
 }
 
+void thi::fillSortBuffer() {
+  SortBuffer->clear();
+  SortBuffer->reserve(StitchBuffer->size());
+  auto stitch     = wrap::next(StitchBuffer->begin(), SelectedRange.start);
+  auto nextStitch = wrap::next(stitch, 1);
+  auto index      = SelectedRange.start;
+
+  auto const endStitch = wrap::next(StitchBuffer->begin(), SelectedRange.finish);
+  while (nextStitch != endStitch) {
+	auto const deltaX = nextStitch->x - stitch->x;
+	auto const deltaY = nextStitch->y - stitch->y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	SortBuffer->push_back(SEARCH_REC {index, length});
+	++index;
+	++stitch;
+	++nextStitch;
+  }
+  std::ranges::stable_sort(*SortBuffer, {}, &SEARCH_REC::length);
+}
+
 void thred::setSmallestStitchVal() {
   thi::srchk();
+  thi::fillSortBuffer();
+  SortIndex = 0U;
   thred::setSrchSmallest();
   thi::lensadj();
 }
 
 void thred::setLargestStitchVal() {
   thi::srchk();
+  thi::fillSortBuffer();
+  SortIndex = wrap::toUnsigned(SortBuffer->size() - 1U);
   thred::setSrchLargest();
   thi::lensadj();
 }
