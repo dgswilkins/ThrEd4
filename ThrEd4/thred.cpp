@@ -288,7 +288,7 @@ void setbak(int32_t penWidth) noexcept;
 void setknt();
 void setPrefs();
 void setsped();
-void setsrch(uint32_t stitch);
+void setsrch(bool end);
 void shft2box();
 void shownd(HWND hwnd) noexcept;
 auto sidclp() -> bool;
@@ -7369,8 +7369,15 @@ void thred::nextSortedStitch(bool direction) {
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
 
-void thi::setsrch(uint32_t stitch) {
-  CurrentStitchIndex = stitch;
+void thi::setsrch(bool end) {
+  if (end) {
+	CurrentStitchIndex = LargestStitchIndex;
+	SortIndex = wrap::toUnsigned(SortBuffer->size() - 1U);
+  }
+  else {
+	CurrentStitchIndex = SmallestStitchIndex;
+	SortIndex          = 0U;
+  }
   thi::lensadj();
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
@@ -12533,11 +12540,11 @@ void thred::chkDelCol() {
 }
 
 void thred::setSrchLargest() {
-  thi::setsrch(LargestStitchIndex);
+  thi::setsrch(true);
 }
 
 void thred::setSrchSmallest() {
-  thi::setsrch(SmallestStitchIndex);
+  thi::setsrch(false);
 }
 
 auto thred::getZoomMin() noexcept -> float {
