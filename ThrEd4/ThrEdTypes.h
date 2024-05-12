@@ -964,6 +964,20 @@ class RANGE
   //~RANGE() = default;
 };
 
+class SEARCH_REC
+{
+  public:
+  uint32_t index {};
+  float    length {};
+
+  // constexpr SORT_REC() noexcept = default;
+  // SORT_REC(SORT_REC const&) = default;
+  // SORT_REC(SORT_REC&&) = default;
+  // SORT_REC& operator=(SORT_REC const& rhs) = default;
+  // SORT_REC& operator=(SORT_REC&&) = default;
+  //~SORT_REC() = default;
+};
+
 class INS_REC
 {
   public:
