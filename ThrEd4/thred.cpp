@@ -2311,10 +2311,11 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	displayText::butxt(HMINLEN, blank);
 	return;
   }
-  auto const code        = ClosestFormToCursor << FRMSHFT;
-  auto const startStitch = 0U;
-  auto const endStitch   = StitchBuffer->size() - 2U;
   if (!StitchBuffer->empty()) {
+	auto const     code        = ClosestFormToCursor << FRMSHFT;
+	constexpr auto startStitch = 0U;
+	auto const     endStitch   = StitchBuffer->size() - 2U;
+
 	auto maxLength      = LOWFLOAT;
 	auto minLength      = BIGFLOAT;
 	smallestStitchIndex = 0U;
