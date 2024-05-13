@@ -422,21 +422,21 @@ void trace::trdif() {
 
 #if TRCMTH == 0
 unsigned ti::colsum(COLORREF col) {
-  ti::trcols(col);
+  auto colors = ti::trcols(col);
   auto colorSum = 0U;
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	if (StateMap->test(TraceRGBFlag[iRGB]))
-	  colorSum += PixelColors[iRGB];
+	  colorSum += colors[iRGB];
   }
   return colorSum;
 }
 
 unsigned ti::icolsum(COLORREF col) {
-  ti::trcols(col);
+  auto colors = ti::trcols(col);
   auto colorSum = 0U;
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	if (StateMap->test(TraceRGBFlag[iRGB]))
-	  colorSum += 255 - PixelColors[iRGB];
+	  colorSum += 255 - colors[iRGB];
   }
   return colorSum;
 }
@@ -492,17 +492,20 @@ void trace::trace() {
   }
 
 #if TRCMTH == 0
-  auto upBrightness   = ti::icolsum(UpPixelColor);
-  auto downBrightness = ti::icolsum(DownPixelColor);
+  auto const upBrightness   = ti::icolsum(UpPixelColor);
+  auto const downBrightness = ti::icolsum(DownPixelColor);
   if (TracedMap->empty()) {
 	TracedMap->resize(TraceDataSize, false);
   }
-  for (auto index = 0U; index < BitmapWidth * BitmapHeight; ++index) {
-	auto pointBrightness = ti::colsum(TraceBitmapData[index]);
+  auto const lastIndex = wrap::toUnsigned(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
+  auto itTBD = spTBD.begin();
+  for (auto index = 0U; index < lastIndex; ++index) {
+	auto const pointBrightness = ti::colsum(*itTBD);
 	if (upBrightness > pointBrightness && downBrightness < pointBrightness)
 	  TracedMap->set(index);
 	else
-	  TraceBitmapData[index] = 0;
+	  *itTBD = 0;
+	++itTBD;
   }
 #endif
 
