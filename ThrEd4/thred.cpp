@@ -2313,16 +2313,16 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   }
   if (!StitchBuffer->empty()) {
 	auto const     code        = ClosestFormToCursor << FRMSHFT;
-	constexpr auto startStitch = 0U;
+	constexpr auto START = 0U;
 	auto const     endStitch   = StitchBuffer->size() - 2U;
 
 	auto maxLength      = LOWFLOAT;
 	auto minLength      = BIGFLOAT;
 	smallestStitchIndex = 0U;
 	largestStitchIndex  = 0U;
-	auto stitch         = wrap::next(StitchBuffer->begin(), startStitch);
+	auto stitch         = wrap::next(StitchBuffer->begin(), START);
 	auto stitchFwd1     = std::next(stitch);
-	for (auto iStitch = startStitch; iStitch < endStitch; ++iStitch) {
+	for (auto iStitch = START; iStitch < endStitch; ++iStitch) {
 	  if ((stitch->attribute & FRMSK) != code || ((stitch->attribute & NOTFRM) != 0U) ||
 	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
 		continue;
