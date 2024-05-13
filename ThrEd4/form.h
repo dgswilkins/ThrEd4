@@ -33,7 +33,8 @@ auto chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints, std::vector<PO
     -> bool;
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
-auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool;
+auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) noexcept(!std::is_same_v<size_t, uint32_t>)
+    -> bool;
 auto closflt(FRM_HEAD const& form,
              float           xCoordinate,
              float           yCoordinate) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;

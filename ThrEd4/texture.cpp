@@ -125,7 +125,7 @@ void altx();
 void angrct(F_RECTANGLE& rectangle) noexcept;
 void butsid(uint32_t windowId);
 auto chkbut() -> bool;
-auto chktxh(_In_ TX_HIST const& historyItem) -> bool;
+auto chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t, uint32_t>) -> bool;
 void chktxnum();
 void deorg(POINT& point) noexcept;
 void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer);
@@ -344,7 +344,7 @@ void txi::txrfor() noexcept {
   ++TextureHistoryIndex;
 }
 
-auto txi::chktxh(_In_ TX_HIST const& historyItem) -> bool {
+auto txi::chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t, uint32_t>) -> bool {
   if (historyItem.texturePoints.size() != TempTexturePoints->size()) {
 	return true;
   }

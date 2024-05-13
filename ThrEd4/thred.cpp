@@ -2703,7 +2703,7 @@ void thi::ducros(HDC hDC) {
   selin(GroupStartStitch, GroupEndStitch, hDC);
 }
 
-void thred::selRct(F_RECTANGLE& sourceRect) noexcept {
+void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uint32_t>) {
   if (!StitchBuffer->empty()) {
 	auto minX = BIGFLOAT;
 	auto minY = BIGFLOAT;
@@ -12769,7 +12769,7 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
   displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 }
 
-void thred::setFormControls() {
+void thred::setFormControls() noexcept(!std::is_same_v<size_t, uint32_t>) {
   auto formsRect = F_RECTANGLE {};
   thred::selRct(formsRect);
   auto& frmCtrls = *FormControlPoints;

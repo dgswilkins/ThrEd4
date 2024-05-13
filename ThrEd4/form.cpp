@@ -423,7 +423,7 @@ auto isect(uint32_t                    vertex0,
            float&                      length,
            F_POINT const&              lineSegmentStart,
            F_POINT const&              lineSegmentEnd,
-           std::vector<F_POINT> const& currentFormVertices) -> bool;
+           std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool;
 auto isin(FRM_HEAD const&             form,
           std::vector<V_CLP_X> const& regionCrossingData,
           float                       xCoordinate,
@@ -431,7 +431,7 @@ auto isin(FRM_HEAD const&             form,
           uint32_t                    regionCrossingStart,
           uint32_t                    regionCrossingEnd,
           F_RECTANGLE const&          boundingRect,
-          std::vector<F_POINT> const& currentFormVertices) -> bool;
+          std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool;
 void lapbrd(FRM_HEAD const& form);
 void lcon(FRM_HEAD const&              form,
           std::vector<uint32_t> const& groupIndexSequence,
@@ -1956,7 +1956,9 @@ auto fi::projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& uppe
   return xCoordinate >= lower && xCoordinate <= upper;
 }
 
-auto form::cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool {
+auto form::cisin(FRM_HEAD const& form,
+                 float           xCoordinate,
+                 float           yCoordinate) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool {
   auto const& rectangle = form.rectangle;
   if (xCoordinate < rectangle.left || xCoordinate > rectangle.right ||
       yCoordinate < rectangle.bottom || yCoordinate > rectangle.top) {
@@ -3113,7 +3115,8 @@ auto fi::isin(FRM_HEAD const&             form,
               uint32_t                    regionCrossingStart,
               uint32_t                    regionCrossingEnd,
               F_RECTANGLE const&          boundingRect,
-              std::vector<F_POINT> const& currentFormVertices) -> bool {
+              std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>)
+    -> bool {
   auto count = 0U;
   auto point = F_POINT {};
   if (xCoordinate < boundingRect.left) {
@@ -3171,7 +3174,8 @@ auto fi::isect(uint32_t                    vertex0,
                float&                      length,
                F_POINT const&              lineSegmentStart,
                F_POINT const&              lineSegmentEnd,
-               std::vector<F_POINT> const& currentFormVertices) -> bool {
+               std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>)
+    -> bool {
   auto const delta =
       F_POINT {(lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y)};
   auto       tempIntersection = F_POINT {};
