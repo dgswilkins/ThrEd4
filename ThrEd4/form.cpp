@@ -3721,9 +3721,10 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	}
   }
 
-#if CLPVU == 0
-  StateMap->reset(StateFlag::FILDIR);
   auto clipSegments = std::vector<CLIP_SEG> {};
+
+#if (CLPVU == 0) || (CLPVU == 2)
+  StateMap->reset(StateFlag::FILDIR);
   if (auto endPoint = wrap::toUnsigned(clipStitchPoints.size()); endPoint != 0U) {
 	--endPoint;
 	// reserve a reasonable amount but not the full amount potentially required
@@ -3756,12 +3757,11 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	  }
 	}
   }
-
-#endif
-
   if (clipSegments.empty()) {
 	return;
   }
+#endif
+
   auto sortedLengths = std::vector<LEN_INFO> {};
   sortedLengths.reserve(clipSegments.size() * 2);
   for (auto iSegment = 0U; iSegment < wrap::toUnsigned(clipSegments.size()); ++iSegment) {
@@ -3780,23 +3780,19 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 
 #if CLPVU == 1
 
-  for (uint32_t iStitch = 0; iStitch < ActivePointIndex; ++iStitch) {
-	StitchBuffer->operator[](iStitch) =
-	    F_POINT_ATTR {ClipStitchPoints[iStitch].x, ClipStitchPoints[iStitch].y, 0};
+  for (uint32_t iStitch = 0; iStitch < clipStitchPoints.size(); ++iStitch) {
+	StitchBuffer->emplace_back(F_POINT_ATTR {clipStitchPoints[iStitch].x, clipStitchPoints[iStitch].y, 0});
   }
-  PCSHeader.stitchCount = ActivePointIndex;
 #endif
 
 #if CLPVU == 2
 
   auto iStitch = 0;
-  for (iSegment = 0; iSegment < ClipSegmentIndex; ++iSegment) {
-	for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; ++iStitchPoint) {
-	  StitchBuffer->operator[](iStitch) =
-	      F_POINT_ATTR {ClipStitchPoints[iStitchPoint].x, ClipStitchPoints[iStitchPoint].y, iSegment & 0xf};
+  for (auto iSegment = 0U; iSegment < clipSegments.size(); ++iSegment) {
+	for (auto iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; ++iStitchPoint) {
+	  StitchBuffer->emplace_back(F_POINT_ATTR {clipStitchPoints[iStitchPoint].x, clipStitchPoints[iStitchPoint].y, iSegment & 0xf});
 	}
   }
-  PCSHeader.stitchCount = iStitch;
 
 #endif
 
