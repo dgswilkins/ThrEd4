@@ -4737,7 +4737,7 @@ void fi::lcon(FRM_HEAD const&              form,
   auto bugColor = 0U;
   for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 	for (auto iLine = regions[iRegion].start; iLine <= regions[iRegion].end; ++iLine) {
-	  auto const* lineGroupPoint = &*sortedLines[iLine];
+	  auto const* lineGroupPoint = &lineEndpoints[sortedLineIndices[iLine]];
 	  StitchBuffer->push_back(F_POINT_ATTR {lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor});
 	  StitchBuffer->push_back(F_POINT_ATTR {lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor});
 	}
