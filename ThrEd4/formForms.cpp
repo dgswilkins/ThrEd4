@@ -712,18 +712,11 @@ void formForms::frmnum() {
 }
 
 void ffi::chkdaz() {
-  if (IniFile.daisyPetalPoints == 0U) {
-	IniFile.daisyPetalPoints = 1U;
-  }
-  if (IniFile.daisyInnerCount == 0U) {
-	IniFile.daisyInnerCount = 1U;
-  }
-  if (IniFile.daisyPetalCount == 0U) {
-	IniFile.daisyPetalCount = 1U;
-  }
-  if (IniFile.daisyHeartCount > gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints)) {
-	IniFile.daisyHeartCount = gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints);
-  }
+  IniFile.daisyPetalPoints = std::max(IniFile.daisyPetalPoints, 1U);
+  IniFile.daisyInnerCount  = std::max(IniFile.daisyInnerCount, 1U);
+  IniFile.daisyPetalCount  = std::max(IniFile.daisyPetalCount, 1U);
+  IniFile.daisyHeartCount =
+      std::min(IniFile.daisyHeartCount, gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints));
 }
 
 void ffi::initdaz(HWND hWinDialog) {
