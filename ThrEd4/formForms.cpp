@@ -1151,13 +1151,9 @@ void formForms::setear() {
   auto const size =
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
   auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
-  if (horizontalRatio > 1.0F) {
-	horizontalRatio = 1.0F;
-  }
+  horizontalRatio      = std::min(horizontalRatio, 1.0F);
   auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / TWSTFACT / size.y;
-  if (verticalRatio < horizontalRatio) {
-	horizontalRatio = verticalRatio;
-  }
+  horizontalRatio          = std::min(horizontalRatio, verticalRatio);
   if (horizontalRatio < 1.0F) {
 	auto       scaledVertex = firstVertex;
 	auto const vertexMax    = form.vertexCount;
