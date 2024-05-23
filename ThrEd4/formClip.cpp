@@ -584,12 +584,8 @@ auto fci::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uin
   LowerLeftStitch      = F_POINT {BIGFLOAT, BIGFLOAT};
   for (; iStitch != StitchBuffer->end(); ++iStitch) {
 	if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & ALTYPMSK) != 0U)) {
-	  if (iStitch->x < LowerLeftStitch.x) {
-		LowerLeftStitch.x = iStitch->x;
-	  }
-	  if (iStitch->y < LowerLeftStitch.y) {
-		LowerLeftStitch.y = iStitch->y;
-	  }
+	  LowerLeftStitch.x = std::min(LowerLeftStitch.x, iStitch->x);
+	  LowerLeftStitch.y = std::min(LowerLeftStitch.y, iStitch->y);
 	  ++stitchCount;
 	}
   }
