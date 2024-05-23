@@ -147,10 +147,8 @@ auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
 void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto labelSize = SIZE {};
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
-  textSize.cy = labelSize.cy;
-  if (labelSize.cx > textSize.cx) {
-	textSize.cx = labelSize.cx;
-  }
+  textSize.cx = std::max(textSize.cx, labelSize.cx);
+  textSize.cy = std::max(textSize.cy, labelSize.cy);
 }
 
 auto ffi::maxwid() -> SIZE {
