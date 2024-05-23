@@ -1319,13 +1319,9 @@ void formForms::wavfrm() {
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
   constexpr auto WAVSIZE         = 4.0F; // wave size factor
   auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
-  if (horizontalRatio > 1) {
-	horizontalRatio = 1.0F;
-  }
+  horizontalRatio                = std::min(horizontalRatio, 1.0F);
   auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
-  if (verticalRatio < horizontalRatio) {
-	horizontalRatio = verticalRatio;
-  }
+  horizontalRatio                = std::min(horizontalRatio, verticalRatio);
   if (horizontalRatio < 1.0F) {
 	auto vScaled = firstVertex; // copy intended
 	for (auto index = 0U; index < vertexCount; ++index) {
