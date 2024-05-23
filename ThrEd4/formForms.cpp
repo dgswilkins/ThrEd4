@@ -862,9 +862,7 @@ void formForms::dasyfrm() {
   form.attribute          = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
   auto const maximumYsize = ZoomRect.top - ZoomRect.bottom;
-  if (maximumYsize > maximumXsize) {
-	maximumXsize = maximumYsize;
-  }
+  maximumXsize            = std::max(maximumXsize, maximumYsize);
   maximumXsize /= DASYSIZE;
   auto       diameter     = IniFile.daisyDiameter;
   auto       petalLength  = IniFile.daisyPetalLen;
