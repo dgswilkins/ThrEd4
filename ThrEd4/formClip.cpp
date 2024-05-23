@@ -437,12 +437,8 @@ void fci::clipSelectedForms() {
 	if (((stitch.attribute & NOTFRM) != 0U) || !formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 	  continue;
 	}
-	if (stitch.x < LowerLeftStitch.x) {
-	  LowerLeftStitch.x = stitch.x;
-	}
-	if (stitch.y < LowerLeftStitch.y) {
-	  LowerLeftStitch.y = stitch.y;
-	}
+	LowerLeftStitch.x = std::min(LowerLeftStitch.x, stitch.x);
+	LowerLeftStitch.y = std::min(LowerLeftStitch.y, stitch.y);
 	astch.push_back(stitch);
   }
   auto const stitchCount = wrap::toUnsigned(astch.size());
