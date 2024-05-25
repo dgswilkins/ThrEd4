@@ -924,8 +924,12 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	thred::unsel();
 	auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
 	auto const adjustedPoint = thred::getAdjustedPoint(stitchPoint);
-	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  StitchBuffer->operator[](iStitch) -= adjustedPoint;
+
+	auto spGroupStitch =
+	    gsl::span<F_POINT_ATTR> {std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
+	                             GroupEndStitch - GroupStartStitch};
+	for (auto & stitch : spGroupStitch) {
+	  stitch -= adjustedPoint;
 	}
 	StateMap->set(StateFlag::RESTCH);
 	return true;
