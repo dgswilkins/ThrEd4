@@ -295,23 +295,19 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 }
 
 auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
-  auto boundingRect = F_RECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
-  for (auto const& stitch : stitches) {
-	if (stitch.x < boundingRect.left) {
-	  boundingRect.left = stitch.x;
-	}
-	if (stitch.x > boundingRect.right) {
-	  boundingRect.right = stitch.x;
-	}
-	if (stitch.y < boundingRect.bottom) {
-	  boundingRect.bottom = stitch.y;
-	}
-	if (stitch.y > boundingRect.top) {
-	  boundingRect.top = stitch.y;
-	}
+  auto minX = stitches[0].x;
+  auto minY = stitches[0].y;
+  auto maxX = stitches[0].x;
+  auto maxY = stitches[0].y;
+
+  for (const auto& stitch : stitches) {
+	minX = std::min(minX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxX = std::max(maxX, stitch.x);
+	maxY = std::max(maxY, stitch.y);
   }
-  auto const boundingSize =
-      F_POINT {boundingRect.right - boundingRect.left, boundingRect.top - boundingRect.bottom};
+
+  auto const boundingSize = F_POINT {maxX - minX, maxY - minY};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L, false);
 	return false;
@@ -322,17 +318,17 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
   auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
   PCSHeader.setHoopType(largeFlag);
   auto delta = F_POINT {};
-  if (boundingRect.right > hoopSize.x) {
-	delta.x = hoopSize.x - boundingRect.right;
+  if (maxX > hoopSize.x) {
+	delta.x = hoopSize.x - maxX;
   }
-  if (boundingRect.top > hoopSize.y) {
-	delta.y = hoopSize.y - boundingRect.top;
+  if (maxY > hoopSize.y) {
+	delta.y = hoopSize.y - maxY;
   }
-  if (boundingRect.left < 0) {
-	delta.x = -boundingRect.left;
+  if (minX < 0) {
+	delta.x = -minX;
   }
-  if (boundingRect.bottom < 0) {
-	delta.y = -boundingRect.bottom;
+  if (minY < 0) {
+	delta.y = -minY;
   }
   if ((delta.x != 0.0F) || (delta.y != 0.0F)) {
 	for (auto& offsetStitch : stitches) {
