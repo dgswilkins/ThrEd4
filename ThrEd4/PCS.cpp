@@ -388,15 +388,18 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   auto minY = BIGFLOAT;
   auto maxX = LOWFLOAT;
   auto maxY = LOWFLOAT;
-  for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; ++iPCSStitch) {
-	if (pcsStitchBuffer[iPCSStitch].tag == 3) {
-	  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
+  for (auto skipStitch = false; auto& stitch : pcsStitchBuffer) {
+	if (skipStitch) {
+	  skipStitch = false;
 	  continue;
 	}
-	auto xVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
-	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT;
-	auto yVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
-	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT;
+	if (stitch.tag == 3) {
+	  newAttribute = stitch.fx | NOTFRM;
+	  skipStitch         = true;
+	  continue;
+	}
+	auto xVal = wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT;
+	auto yVal = wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT;
 	minX = std::min(minX, xVal);
 	minY = std::min(minY, yVal);
 	maxX = std::max(maxX, xVal);
