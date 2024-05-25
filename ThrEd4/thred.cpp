@@ -1018,9 +1018,7 @@ void thred::rngadj() noexcept(std::is_same_v<size_t, uint32_t>) {
   auto lastStitch = wrap::toUnsigned(StitchBuffer->size());
   if (lastStitch != 0U) {
 	--lastStitch;
-	if (ClosestPointIndex > lastStitch) {
-	  ClosestPointIndex = lastStitch;
-	}
+	ClosestPointIndex  = std::min(ClosestPointIndex, lastStitch);
   }
   if (GroupStitchIndex > StitchBuffer->size()) {
 	GroupStitchIndex = ClosestPointIndex;
