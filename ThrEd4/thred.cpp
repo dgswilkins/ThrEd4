@@ -2711,16 +2711,22 @@ void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uin
 	auto maxX = LOWFLOAT;
 	auto maxY = LOWFLOAT;
 
-	auto groupStitches =
-	    gsl::span<F_POINT_ATTR>(std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
-	                            GroupEndStitch - GroupStartStitch);
-	for (auto const& stitch : groupStitches) {
-	  minX = std::min(minX, stitch.x);
-	  minY = std::min(minY, stitch.y);
-	  maxX = std::max(maxX, stitch.x);
-	  maxY = std::max(maxY, stitch.y);
+	if (GroupEndStitch != GroupStartStitch) {
+	  auto groupStitches =
+	      gsl::span<F_POINT_ATTR>(std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
+	                              GroupEndStitch - GroupStartStitch);
+	  for (auto const& stitch : groupStitches) {
+		minX = std::min(minX, stitch.x);
+		minY = std::min(minY, stitch.y);
+		maxX = std::max(maxX, stitch.x);
+		maxY = std::max(maxY, stitch.y);
+	  }
+	  sourceRect = F_RECTANGLE {minX, maxY, maxX, minY};
 	}
-	sourceRect = F_RECTANGLE {minX, maxY, maxX, minY};
+	else {
+      auto const& stitch = StitchBuffer->at(GroupStartStitch);
+      sourceRect = F_RECTANGLE {stitch.x, stitch.y, stitch.x, stitch.y};
+	}
   }
   if (util::closeEnough(sourceRect.right, sourceRect.left)) {
 	++sourceRect.right;
