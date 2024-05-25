@@ -504,41 +504,48 @@ void fci::clipSelectedPoints() {
 
 void fci::clipSelectedStitches() {
   thred::rngadj();
-  LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
-  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	auto const& stitch = StitchBuffer->operator[](iStitch);
-	if (stitch.x < LowerLeftStitch.x) {
-	  LowerLeftStitch.x = stitch.x;
+  if (GroupStartStitch != GroupEndStitch) {
+	LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
+	auto groupStitches =
+	    gsl::span<F_POINT_ATTR>(std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
+	                            GroupEndStitch - GroupStartStitch);
+	for (auto const& stitch : groupStitches) {
+	  LowerLeftStitch.x = std::min(LowerLeftStitch.x, stitch.x);
+	  LowerLeftStitch.y = std::min(LowerLeftStitch.y, stitch.y);
 	}
-	if (stitch.y < LowerLeftStitch.y) {
-	  LowerLeftStitch.y = stitch.y;
+	auto const length  = GroupEndStitch - GroupStartStitch;
+	auto       iSource = GroupStartStitch;
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto const clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
+	if (clipHandle == nullptr) {
+	  return;
 	}
-  }
-  auto const length  = GroupEndStitch - GroupStartStitch + 1U;
-  auto       iSource = GroupStartStitch;
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
-  if (clipHandle == nullptr) {
-	return;
-  }
-  if (OpenClipboard(ThrEdWindow) == 0) {
-	return;
-  }
-  EmptyClipboard();
-  Clip                      = RegisterClipboardFormat(PcdClipFormat);
-  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-  auto const spData         = gsl::span<CLIP_STITCH> {clipStitchData, length};
-  fci::savclp(spData[0], StitchBuffer->operator[](iSource), length);
-  ++iSource;
-  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
-	fci::savclp(spData[iStitch],
-	            StitchBuffer->operator[](iSource),
-	            (StitchBuffer->operator[](iSource).attribute & COLMSK));
+	if (OpenClipboard(ThrEdWindow) == 0) {
+	  return;
+	}
+	EmptyClipboard();
+	Clip                      = RegisterClipboardFormat(PcdClipFormat);
+	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+	auto const spData         = gsl::span<CLIP_STITCH> {clipStitchData, length};
+	fci::savclp(spData[0], StitchBuffer->operator[](iSource), length);
 	++iSource;
+	for (auto iStitch = 1U; iStitch < length; ++iStitch) {
+	  fci::savclp(spData[iStitch],
+	              StitchBuffer->operator[](iSource),
+	              (StitchBuffer->operator[](iSource).attribute & COLMSK));
+	  ++iSource;
+	}
+	GlobalUnlock(clipHandle);
+	SetClipboardData(Clip, clipHandle);
+	CloseClipboard();
   }
-  GlobalUnlock(clipHandle);
-  SetClipboardData(Clip, clipHandle);
-  CloseClipboard();
+  else {
+	if (OpenClipboard(ThrEdWindow) == 0) {
+	  return;
+	}
+	EmptyClipboard();
+	CloseClipboard();
+  }
 }
 
 void tfc::duclip() {
