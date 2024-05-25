@@ -801,12 +801,19 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		else {
 		  if (StateMap->test(StateFlag::GRPSEL)) {
 			thred::savdo();
-			for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
-			  StitchBuffer->operator[](iStitch).attribute &= NCOLMSK;
-			  StitchBuffer->operator[](iStitch).attribute |= ActiveColor;
+			if (GroupStartStitch != GroupEndStitch) {
+			  for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
+				StitchBuffer->operator[](iStitch).attribute &= NCOLMSK;
+				StitchBuffer->operator[](iStitch).attribute |= ActiveColor;
+			  }
+			  thred::coltab();
+			  StateMap->set(StateFlag::RESTCH);
 			}
-			thred::coltab();
-			StateMap->set(StateFlag::RESTCH);
+			else {
+			  auto& stitch = StitchBuffer->operator[](GroupStartStitch);
+			  stitch.attribute &= NCOLMSK;
+			  stitch.attribute |= ActiveColor;
+			}
 		  }
 		  else {
 			if (StateMap->test(StateFlag::COL)) {
