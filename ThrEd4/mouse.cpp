@@ -986,7 +986,8 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 		// small amount overallocated
 		SelectedFormList->reserve(FormList->size());
 		StateMap->reset(StateFlag::FORMSEL);
-		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+		auto const maxForm = wrap::toUnsigned(FormList->size());
+		for (auto iForm = 0U; iForm < maxForm; ++iForm) {
 		  if (mi::finrng(iForm)) {
 			SelectedFormList->push_back(iForm);
 		  }
