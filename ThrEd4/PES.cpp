@@ -552,17 +552,17 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto iPEC       = wrap::next(PESequivColors.begin(), color);
   auto iPesColors = pecHeader->pad.begin();
   *iPesColors++   = *iPEC;
-  for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
-	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	if ((stitchFwd1.attribute & COLMSK) != color) {
-	  color = stitchFwd1.attribute & COLMSK;
+  auto stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
+  for (auto &stitch : stitchRange) {
+	if ((stitch.attribute & COLMSK) != color) {
+	  color = stitch.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
 	  iPEC          = wrap::next(PESequivColors.begin(), color);
 	  *iPesColors++ = *iPEC;
 	  ++iColor;
 	}
-	auto const xDelta = stitchFwd1.x - thisStitch.x;
-	auto const yDelta = stitchFwd1.y - thisStitch.y;
+	auto const xDelta = stitch.x - thisStitch.x;
+	auto const yDelta = stitch.y - thisStitch.y;
 	rpcrd(buffer, thisStitch, xDelta, yDelta);
   }
   // add the end marker
