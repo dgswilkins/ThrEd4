@@ -127,11 +127,11 @@ void repair::lodchk() {
 	  }
 	}
   }
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
+  for (auto iForm = 0U; auto& form : *FormList) {
 	if (!formMap.test(iForm)) {
 	  form.fillType = 0;
 	}
+	++iForm;
   }
   formMap.reset();
   for (auto const& stitch : *StitchBuffer) {
@@ -140,11 +140,11 @@ void repair::lodchk() {
 	  formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
   }
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
+  for (auto iForm = 0U; auto& form : *FormList) {
 	if (!formMap.test(iForm)) {
 	  form.edgeType = 0;
 	}
+	++iForm;
   }
 }
 
