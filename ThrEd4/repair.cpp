@@ -196,8 +196,7 @@ void ri::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto badData = BAD_COUNTS {};
   if (!FormList->empty()) {
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto& form = FormList->operator[](iForm);
+	for (auto& form : *FormList) {
 	  if ((badData.attribute & BADFLT) == 0U) {
 		if (form.vertexCount == 0U) {
 		  badData.attribute |= BADFLT;
