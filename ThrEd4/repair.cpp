@@ -373,9 +373,7 @@ void ri::repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
   auto clipPoint    = std::vector<F_POINT> {};
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
-
+  for (auto& form : *FormList) {
 	// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
 	auto const clipDifference = (form.isClip())       ? form.clipIndex
 	                            : (form.isEdgeClip()) ? form.borderClipData
