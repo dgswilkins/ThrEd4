@@ -93,8 +93,7 @@ void repair::lodchk() {
   if (FormList->empty()) {
 	return;
   }
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
+  for (auto& form : *FormList) {
 	if (form.type == 0U) {
 	  form.type = FRMFPOLY;
 	}
