@@ -395,8 +395,7 @@ void ri::repclp(std::wstring& repairMessage) {
 void ri::repsat() {
   auto guideCount = 0U;
   auto badData    = BAD_COUNTS {};
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
+  for (auto& form : *FormList) {
 	if (form.type != SAT || (form.satinGuideCount == 0U)) {
 	  continue;
 	}
