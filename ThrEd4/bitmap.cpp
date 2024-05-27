@@ -52,9 +52,6 @@
 #include <WinUser.h>
 
 // Standard Libraries
-// resharper disable CppUnusedIncludeDirective
-#include <algorithm>
-// ReSharper restore CppUnusedIncludeDirective
 #include <array>
 #include <bitset>
 #include <cmath>

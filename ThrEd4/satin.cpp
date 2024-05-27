@@ -49,7 +49,6 @@
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
-#include <xutility>
 
 // satin internal namespace
 namespace si {

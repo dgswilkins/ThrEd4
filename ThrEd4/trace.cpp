@@ -54,7 +54,6 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <xutility>
 
 constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are 9 pixels immediately adjacent
 constexpr auto BLUCOL   = uint32_t {0xff0000U}; // code for the color blue

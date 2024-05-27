@@ -64,7 +64,6 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
-#include <xutility>
 
 class CLIP_SEG
 {

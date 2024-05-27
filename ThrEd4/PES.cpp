@@ -57,6 +57,10 @@
 #endif
 #include <filesystem>
 #include <iterator>
+// resharper disable CppUnusedIncludeDirective
+#include <ranges>
+// ReSharper restore CppUnusedIncludeDirective
+#include <stdexcept>
 #include <string>
 #include <vector>
 

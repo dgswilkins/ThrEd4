@@ -53,6 +53,7 @@
 #include <cstdint>
 #include <iterator>
 // resharper disable CppUnusedIncludeDirective
+#include <memory>
 #include <ranges>
 #include <type_traits>
 // ReSharper restore CppUnusedIncludeDirective

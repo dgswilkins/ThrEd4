@@ -1,7 +1,9 @@
 #pragma once
 
 // Local Headers
+// resharper disable CppUnusedIncludeDirective
 #include "warnings.h"
+// resharper restore CppUnusedIncludeDirective
 #include "fRectangle.h"
 #include "satCon.h"
 #include "ThrEdTypes.h"

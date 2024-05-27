@@ -49,7 +49,6 @@
 #include <WinUser.h>
 
 // Standard Libraries
-#include <algorithm>
 #include <array>
 #include <cstring>
 #include <cmath>
@@ -63,7 +62,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <xutility>
 
 class FEATHER
 {
