@@ -2710,10 +2710,10 @@ void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uin
 	auto maxY = LOWFLOAT;
 
 	if (GroupEndStitch != GroupStartStitch) {
-	  auto groupStitches =
-	      gsl::span<F_POINT_ATTR>(std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
-	                              GroupEndStitch - GroupStartStitch);
-	  for (auto const& stitch : groupStitches) {
+	  auto const groupStitchRange =
+	      std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	                            wrap::next(StitchBuffer->begin(), GroupEndStitch));
+	  for (auto& stitch : groupStitchRange) {
 		minX = std::min(minX, stitch.x);
 		minY = std::min(minY, stitch.y);
 		maxX = std::max(maxX, stitch.x);
