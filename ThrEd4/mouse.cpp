@@ -803,10 +803,9 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  if (StateMap->test(StateFlag::GRPSEL)) {
 			thred::savdo();
 			if (GroupStartStitch != GroupEndStitch) {
-			  auto const spGroupStitch = gsl::span<F_POINT_ATTR> {
-			      std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
-			      GroupEndStitch - GroupStartStitch};
-			  for (auto& stitch : spGroupStitch) {
+			  auto const groupStitchRange = std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+                                                                  wrap::next(StitchBuffer->begin(), GroupEndStitch));
+			  for (auto& stitch : groupStitchRange) {
 				stitch.attribute &= NCOLMSK;
 				stitch.attribute |= ActiveColor;
 			  }
