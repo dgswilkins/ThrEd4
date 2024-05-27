@@ -507,10 +507,10 @@ void fci::clipSelectedStitches() {
   thred::rngadj();
   if (GroupStartStitch != GroupEndStitch) {
 	LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
-	auto groupStitches =
-	    gsl::span<F_POINT_ATTR>(std::to_address(wrap::next(StitchBuffer->begin(), GroupStartStitch)),
-	                            GroupEndStitch - GroupStartStitch);
-	for (auto const& stitch : groupStitches) {
+	auto const groupStitchRange =
+	    std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	                          wrap::next(StitchBuffer->begin(), GroupEndStitch));
+	for (auto& stitch : groupStitchRange) {
 	  LowerLeftStitch.x = std::min(LowerLeftStitch.x, stitch.x);
 	  LowerLeftStitch.y = std::min(LowerLeftStitch.y, stitch.y);
 	}
