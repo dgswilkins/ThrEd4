@@ -139,11 +139,12 @@ void satin::spltsat(uint32_t guideIndex) {
   // We are adding two additional vertices when splitting the form
   auto vertexBuffer = std::vector<F_POINT> {};
   vertexBuffer.resize(wrap::toSize(firstForm.vertexCount) + 2U);
-  auto const maxForm = FormList->size();
   auto const lastFormVertex = wrap::next(FormVertices->cbegin(), firstForm.vertexIndex + firstForm.vertexCount);
   FormVertices->insert(lastFormVertex, 2, F_POINT {});
-  for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
-	FormList->operator[](iForm).vertexIndex += 2;
+  for (auto formRange = std::ranges::subrange(wrap::next(FormList->begin(), ClosestFormToCursor + 2U),
+                                              FormList->end());
+       auto& form : formRange) {
+	form.vertexIndex += 2;
   }
   auto iOldVertex = 0U;
   auto const currentGuide = *(wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex));
@@ -208,16 +209,19 @@ void satin::spltsat(uint32_t guideIndex) {
   nextForm.satinGuideIndex  = firstForm.satinGuideIndex + guideIndex;
   nextForm.satinGuideCount  = firstForm.satinGuideCount - guideIndex - 1U;
   firstForm.satinGuideCount = guideIndex;
-  std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 2U), FormList->end(), [](auto& iForm) {
-	if ((iForm.type == SAT) && (iForm.satinGuideCount != 0U) && iForm.satinGuideIndex != 0U) {
-	  --iForm.satinGuideIndex;
+  for (auto formRange = std::ranges::subrange(wrap::next(FormList->begin(), ClosestFormToCursor + 2U),
+                                              FormList->end());
+       auto& form : formRange) {
+	if ((form.type == SAT) && (form.satinGuideCount != 0U) && form.satinGuideIndex != 0U) {
+	  --form.satinGuideIndex;
 	}
-  });
+  };
   if (firstForm.isEdgeClip()) {
 	form::clpspac(firstForm.borderClipData, firstForm.clipEntries);
-	for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; ++iForm) {
-	  auto& formIter = FormList->operator[](iForm);
-	  formIter.borderClipData += firstForm.clipEntries;
+	for (auto formRange = std::ranges::subrange(wrap::next(FormList->begin(), ClosestFormToCursor + 1U),
+	                                            FormList->end());
+	     auto& form : formRange) {
+	  form.borderClipData += firstForm.clipEntries;
 	}
   }
   form::stchadj();
