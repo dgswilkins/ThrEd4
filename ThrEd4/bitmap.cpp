@@ -469,7 +469,7 @@ void bitmap::lodbmp(fs::path const& directory) {
   bitmap::resetBmpFile(false);
   trace::untrace();
 #if USE_SHORT_NAME
-  auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), NULL, 0);
+  auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), nullptr, 0);
   auto       dest  = std::vector<wchar_t> {};
   dest.resize(pleng);
   GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
