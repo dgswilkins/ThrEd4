@@ -1,6 +1,7 @@
 #pragma once
 
 // Local Headers
+#include "warnings.h"
 #include "fRectangle.h"
 #include "satCon.h"
 #include "ThrEdTypes.h"
