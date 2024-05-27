@@ -906,6 +906,9 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  pi::ritpesCode(pesBuffer);
 	  // close out the previous block
 	  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+	  if (nullptr == blockHeader) {
+		throw std::runtime_error("blockHeader is null");
+	  }
 	  blockHeader->setStitchType(stitchCount);
 	  // save the thread/color information
 	  ++pesThreadCount;
@@ -930,6 +933,9 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   // finalize the last stitch block
   auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+  if (nullptr == blockHeader) {
+	throw std::runtime_error("blockHeader is null");
+  }
   blockHeader->setStitchType(stitchCount);
   // write the color/thread table
   lastIndex = pesBuffer.size();
