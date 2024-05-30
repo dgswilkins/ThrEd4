@@ -454,13 +454,10 @@ void satin::satadj(FRM_HEAD& form) {
 	// remove any guides that start after the end guide
 	if (endGuide != 0U) {
 	  interiorGuides.clear();
-	  auto itGuide = itFirstGuide;
-	  for (auto iSource = 0U; iSource < currentGuidesCount; ++iSource) {
-		if (itGuide->start < endGuide) {
-		  interiorGuides.push_back(*itGuide);
-		}
-		++itGuide;
-	  }
+	  std::copy_if(itFirstGuide,
+	               std::next(itFirstGuide, currentGuidesCount),
+	               std::back_inserter(interiorGuides),
+	               [endGuide](const auto& guide) { return guide.start < endGuide; });
 	  iDestination = wrap::toUnsigned(interiorGuides.size());
 	  if (currentGuidesCount > iDestination) {
 		outDebugString(L"Removed {} reversed guides\n", (currentGuidesCount - iDestination));
