@@ -46,6 +46,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <ranges>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
