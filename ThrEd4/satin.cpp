@@ -330,9 +330,7 @@ void satin::satknkt() {
 auto si::satselfn() -> bool {
   auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto const& form = FormList->operator[](iForm);
-
+  for (auto& form : *FormList) {
 	auto const layerCode =
 	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
 	if ((ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
@@ -346,7 +344,7 @@ auto si::satselfn() -> bool {
 	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length < minimumLength) {
 		minimumLength         = length;
-		ClosestFormToCursor   = iForm;
+		ClosestFormToCursor   = wrap::toUnsigned(&form - FormList->data()); // index of the form. Possible with vectors
 		ClosestVertexToCursor = iVertex;
 	  }
 	}
