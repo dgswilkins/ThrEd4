@@ -424,7 +424,7 @@ void satin::satadj(FRM_HEAD& form) {
 	itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 	currentGuidesCount = iDestination;
   }
-  auto const& endGuide = form.wordParam;
+  auto const endGuide = form.wordParam;
   if ((endGuide != 0U) || ((form.attribute & FRMEND) != 0U)) {
 	// there are end guides so set the satinMap for the next step
 	satinMap.reset();
