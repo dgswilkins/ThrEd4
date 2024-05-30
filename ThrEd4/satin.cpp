@@ -238,15 +238,16 @@ void si::satclos() {
   {
 	auto minimumLength = BIGFLOAT;
 	auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  auto const deltaX = stitchPoint.x - itVertex->x;
-	  auto const deltaY = stitchPoint.y - itVertex->y;
+	auto vertexRange   = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
+	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
+	  auto const deltaX = stitchPoint.x - vertex.x;
+	  auto const deltaY = stitchPoint.y - vertex.y;
 	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length < minimumLength) {
 		minimumLength         = length;
 		ClosestVertexToCursor = iVertex;
 	  }
-	  ++itVertex;
+	  ++iVertex;
 	}
   }
   StateMap->reset(StateFlag::SATCNKT);
