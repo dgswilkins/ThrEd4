@@ -122,7 +122,7 @@ auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
   auto        guideIndex = 0U;
   auto const& formList   = *FormList;
   auto formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
-  for (auto& form : formRange) {
+  for (auto const& form : formRange) {
 	if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	  guideIndex += form.satinGuideCount;
 	}
