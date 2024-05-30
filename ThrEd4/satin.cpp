@@ -438,15 +438,12 @@ void satin::satadj(FRM_HEAD& form) {
 	}
 	// check to see if any of the current guides are end guides and add to interiorGuides if not
 	interiorGuides.clear();
-	{
-	  auto itGuide = itFirstGuide;
-	  for (auto iSource = 0U; iSource < currentGuidesCount; ++iSource) {
-		if (!satinMap.test(itGuide->start) && !satinMap.test(itGuide->finish)) {
-		  interiorGuides.push_back(*itGuide);
-		}
-		++itGuide;
-	  }
-	}
+	std::copy_if(itFirstGuide,
+	             std::next(itFirstGuide, currentGuidesCount),
+	             std::back_inserter(interiorGuides),
+	             [&satinMap](const auto& guide) {
+	               return !satinMap.test(guide.start) && !satinMap.test(guide.finish);
+	             });
 	iDestination = wrap::toUnsigned(interiorGuides.size());
 	if (currentGuidesCount > iDestination) {
 	  outDebugString(L"Removed {} end guides\n", (currentGuidesCount - iDestination));
