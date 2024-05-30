@@ -406,18 +406,11 @@ void satin::satadj(FRM_HEAD& form) {
   auto       satinMap        = BIT_SET_EX<>(form.vertexCount);
   // ensure all guide endpoints are on valid vertices
   auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
-  {
-	auto itGuide = itFirstGuide; // copy is intended
-	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-	  auto const endCount = (form.vertexCount - 1);
-	  if (itGuide->finish > endCount) {
-		itGuide->finish = endCount;
-	  }
-	  if (itGuide->start > endCount) {
-		itGuide->start = endCount;
-	  }
-	  ++itGuide;
-	}
+  for (auto vertexRange = std::ranges::subrange(itFirstGuide, wrap::next(itFirstGuide, form.satinGuideCount));
+       auto& guide : vertexRange) {
+	auto const endCount = (form.vertexCount - 1);
+	guide.finish = std::min(guide.finish, endCount);
+	guide.start  = std::min(guide.start, endCount);
   }
   // remove any guides of 0 length
   {
