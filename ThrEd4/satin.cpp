@@ -336,17 +336,18 @@ auto si::satselfn() -> bool {
 	if ((ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
 	  continue;
 	}
-	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  auto const deltaX = stitchPoint.x - itVertex->x;
-	  auto const deltaY = stitchPoint.y - itVertex->y;
-	  ++itVertex;
+	auto itVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto vertexRange = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
+	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
+	  auto const deltaX = stitchPoint.x - vertex.x;
+	  auto const deltaY = stitchPoint.y - vertex.y;
 	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length < minimumLength) {
 		minimumLength         = length;
 		ClosestFormToCursor   = wrap::toUnsigned(&form - FormList->data()); // index of the form. Possible with vectors
 		ClosestVertexToCursor = iVertex;
 	  }
+	  ++iVertex;
 	}
   }
   return minimumLength < FCLOSNUF;
