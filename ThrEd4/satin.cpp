@@ -216,7 +216,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	if ((form.type == SAT) && (form.satinGuideCount != 0U) && form.satinGuideIndex != 0U) {
 	  --form.satinGuideIndex;
 	}
-  };
+  }
   if (firstForm.isEdgeClip()) {
 	form::clpspac(firstForm.borderClipData, firstForm.clipEntries);
 	for (auto formRange = std::ranges::subrange(wrap::next(FormList->begin(), ClosestFormToCursor + 1U),
