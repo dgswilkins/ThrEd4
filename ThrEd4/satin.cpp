@@ -413,15 +413,10 @@ void satin::satadj(FRM_HEAD& form) {
 	guide.start  = std::min(guide.start, endCount);
   }
   // remove any guides of 0 length
-  {
-	auto itGuide = itFirstGuide; // copy is intended
-	for (auto iSource = 0U; iSource < currentGuidesCount; ++iSource) {
-	  if (itGuide->start != itGuide->finish) {
-		interiorGuides.push_back(*itGuide);
-		++itGuide;
-	  }
-	}
-  }
+  std::copy_if(itFirstGuide,
+               std::next(itFirstGuide, currentGuidesCount),
+               std::back_inserter(interiorGuides),
+               [](const SAT_CON& guide) { return guide.start != guide.finish; });
   auto iDestination = wrap::toUnsigned(interiorGuides.size());
   if (currentGuidesCount > iDestination) {
 	outDebugString(L"Removed {} zero distance guides\n", (currentGuidesCount - iDestination));
