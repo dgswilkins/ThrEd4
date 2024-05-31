@@ -1460,15 +1460,8 @@ auto si::satOffset(const uint32_t& finish, const uint32_t& start, float satinWid
   constexpr auto SATHRESH = 10.0F;
 
   auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) * HALF;
-  auto factor = 1.0F / cos(angle);
-  if (factor < -SATHRESH) {
-	factor = -SATHRESH;
-  }
-  else {
-	if (factor > SATHRESH) {
-	  factor = SATHRESH;
-	}
-  }
+  auto factor = std::clamp(1.0F / cos(angle), -SATHRESH, SATHRESH);
+
   auto const length = satinWidth * factor;
 
   angle += FormAngles->operator[](start) + PI_FHALF;
