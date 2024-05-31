@@ -833,16 +833,16 @@ void satin::ribon() {
 	newForm.underlayIndent = IniFile.underlayIndent;
   }
   itVertex = std::copy(OutsidePoints->rbegin(), wrap::next(OutsidePoints->rend(), -1), itVertex);
-  auto const iNewVertex = wrap::distance<uint32_t>(startVertex, itVertex);
+  auto const newVertexCount = wrap::distance<uint32_t>(startVertex, itVertex);
   newForm.type          = SAT;
   newForm.fillColor     = ActiveColor;
   newForm.fillSpacing   = LineSpacing;
   newForm.stitchLength  = IniFile.maxStitchLength;
-  newForm.vertexCount   = iNewVertex;
+  newForm.vertexCount   = newVertexCount;
   newForm.attribute     = FormList->operator[](ClosestFormToCursor).attribute;
   newForm.attribute &= FRMLMSK;
   newForm.attribute |= FRMEND;
-  newForm.wordParam       = iNewVertex / 2;
+  newForm.wordParam       = newVertexCount / 2;
   newForm.satinGuideCount = newForm.wordParam - 2U;
   newForm.satinGuideIndex = adsatk(newForm.satinGuideCount);
   if (StateMap->test(StateFlag::CNV2FTH)) {
