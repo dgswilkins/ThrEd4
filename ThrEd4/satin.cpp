@@ -826,25 +826,13 @@ void satin::ribon() {
   auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   auto       itVertex    = startVertex;
   *(itVertex++)          = OutsidePoints->front();
-  if (currentType == FRMLINE) {
-	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
-	  *(itVertex++) = InsidePoints->operator[](iVertex);
-	}
-	for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
-	  *(itVertex++) = OutsidePoints->operator[](iVertex);
-	}
-  }
-  else {
-	newForm.underlayIndent = IniFile.underlayIndent;
-	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
-	  *(itVertex++) = InsidePoints->operator[](iVertex);
-	}
+  itVertex               = std::copy(InsidePoints->begin(), InsidePoints->end(), itVertex);
+  if (currentType != FRMLINE) {
 	*(itVertex++) = InsidePoints->front();
 	*(itVertex++) = OutsidePoints->front();
-	for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
-	  *(itVertex++) = OutsidePoints->operator[](iVertex);
-	}
+	newForm.underlayIndent = IniFile.underlayIndent;
   }
+  itVertex = std::copy(OutsidePoints->rbegin(), wrap::next(OutsidePoints->rend(), -1), itVertex);
   auto const iNewVertex = wrap::distance<uint32_t>(startVertex, itVertex);
   newForm.type          = SAT;
   newForm.fillColor     = ActiveColor;
