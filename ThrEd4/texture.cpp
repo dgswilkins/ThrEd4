@@ -357,15 +357,12 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t
   if (!util::closeEnough(historyItem.width, TextureScreen.width)) {
 	return true;
   }
-  auto const end = wrap::toUnsigned(TempTexturePoints->size());
-  for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
-	if (TempTexturePoints->operator[](iPoint).line != historyItem.texturePoints[iPoint].line) {
+  
+  for (auto itHITP = historyItem.texturePoints.cbegin(); auto& point : *TempTexturePoints) {
+	if ((point.line != itHITP->line) || !util::closeEnough(point.y, itHITP->y)) {
 	  return true;
 	}
-	if (!util::closeEnough(TempTexturePoints->operator[](iPoint).y,
-	                       historyItem.texturePoints[iPoint].y)) {
-	  return true;
-	}
+	++itHITP;
   }
   return false;
 }
