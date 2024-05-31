@@ -1487,17 +1487,14 @@ void si::outfn(FRM_HEAD const& form,
 }
 
 auto si::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool {
-  auto itSatinBackup = satinBackup.begin();
-  auto const maxSB = satinBackup.size();
   auto const lenCheck      = LineSpacing * LineSpacing;
-  for (auto iBackup = 0U; iBackup < maxSB; ++iBackup) {
-	auto const deltaX = itSatinBackup->x - pnt.x;
-	auto const deltaY = itSatinBackup->y - pnt.y;
+  for (auto& backup : satinBackup) {
+	auto const deltaX = backup.x - pnt.x;
+	auto const deltaY = backup.y - pnt.y;
 	auto const length = deltaX * deltaX + deltaY * deltaY;
 	if (length < lenCheck) {
 	  return true;
 	}
-	++itSatinBackup;
   }
   return false;
 }
