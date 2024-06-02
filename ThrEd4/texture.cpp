@@ -132,7 +132,7 @@ void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t
 void dutxfn(uint32_t textureType);
 void dutxlin(F_POINT const& point0in, F_POINT const& point1in);
 void dutxmir();
-void dutxrct(TXTR_RECT& textureRect);
+void dutxrct(TXTR_RECT& textureRect) noexcept;
 void dutxtlin() noexcept;
 void dutxtx(uint32_t index, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>);
 void ed2px(F_POINT const& editPoint, POINT& point) noexcept;
@@ -700,7 +700,7 @@ void txi::ritxrct() noexcept(std::is_same_v<size_t, uint32_t>) {
   wrap::polyline(StitchWindowDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
-void txi::dutxrct(TXTR_RECT& textureRect) {
+void txi::dutxrct(TXTR_RECT& textureRect) noexcept {
   if (SelectedTexturePointsList->empty()) {
 	textureRect.left = textureRect.right = 0U;
 	textureRect.top = textureRect.bottom = 0.0F;
