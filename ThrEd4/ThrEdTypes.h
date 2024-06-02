@@ -126,6 +126,7 @@ constexpr auto LOWLONG  = std::numeric_limits<LONG>::lowest();
 constexpr auto BIGDWORD = std::numeric_limits<DWORD>::max();
 constexpr auto LOWDWORD = std::numeric_limits<DWORD>::lowest();
 constexpr auto BIGUINT  = std::numeric_limits<uint32_t>::max();
+constexpr auto BGUINT16 = std::numeric_limits<uint16_t>::max();
 constexpr auto BIGINT32 = std::numeric_limits<int32_t>::max();
 constexpr auto BIGSIZE  = std::numeric_limits<size_t>::max();
 
