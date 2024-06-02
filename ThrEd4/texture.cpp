@@ -913,14 +913,14 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
   auto const& angledFormVertices = *AngledFormVertices;
-  auto const  maxVertex          = wrap::toUnsigned(angledFormVertices.size());
-  for (auto iVertex = uint32_t {0U}; iVertex < maxVertex; ++iVertex) {
-	txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
-	formLines[iVertex].x += offset.x;
-	formLines[iVertex].y += offset.y;
+  for (auto formLine = formLines.begin(); auto& vertex : angledFormVertices) {
+	txi::ed2px(vertex, *formLine);
+	formLine->x += offset.x;
+	formLine->y += offset.y;
+	++formLine;
   }
-  formLines[maxVertex] = formLines[0];
-  auto vertexCount     = maxVertex;
+  formLines.back() = formLines.front();
+  auto vertexCount = wrap::toUnsigned(angledFormVertices.size());
   if (textureForm.type != FRMLINE) {
 	++vertexCount;
   }
