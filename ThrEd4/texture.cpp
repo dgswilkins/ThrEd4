@@ -787,9 +787,8 @@ void txi::setxclp(FRM_HEAD const& form) {
   }
   editorOffset.y -= TextureScreen.formCenter.y;
   auto& angledFormVertices = *AngledFormVertices;
-  for (auto& vertex : angledFormVertices) {
-	vertex += editorOffset;
-  }
+  std::ranges::transform(angledFormVertices, angledFormVertices.begin(),
+                 [editorOffset](auto& vertex) { return vertex + editorOffset; });
   auto lineCount = form.vertexCount - 1U;
   if (form.type != FRMLINE) {
 	++lineCount;
