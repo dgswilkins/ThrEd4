@@ -706,26 +706,20 @@ void txi::dutxrct(TXTR_RECT& textureRect) {
 	textureRect.top = textureRect.bottom = 0.0F;
 	return;
   }
-  auto const& firstPoint = TempTexturePoints->operator[](SelectedTexturePointsList->front());
-  textureRect.left = textureRect.right = firstPoint.line;
-  textureRect.top = textureRect.bottom = firstPoint.y;
-  auto const spList = std::ranges::subrange(std::next(SelectedTexturePointsList->begin()),
-                                            SelectedTexturePointsList->end());
-  for (auto const& iPoint : spList) {
+
+  auto minX = BGUINT16;
+  auto maxX = uint16_t {0U};
+  auto maxY = LOWFLOAT;
+  auto minY = BIGFLOAT;
+  for (auto const& iPoint : *SelectedTexturePointsList) {
 	auto const& texturePoint = TempTexturePoints->operator[](iPoint);
-	if (texturePoint.y > textureRect.top) {
-	  textureRect.top = texturePoint.y;
-	}
-	if (texturePoint.y < textureRect.bottom) {
-	  textureRect.bottom = texturePoint.y;
-	}
-	if (texturePoint.line < textureRect.left) {
-	  textureRect.left = texturePoint.line;
-	}
-	if (texturePoint.line > textureRect.right) {
-	  textureRect.right = texturePoint.line;
-	}
+
+	minX = std::min(minX, texturePoint.line);
+	maxX = std::max(maxX, texturePoint.line);
+	minY = std::min(minY, texturePoint.y);
+	maxY = std::max(maxY, texturePoint.y);
   }
+  textureRect = TXTR_RECT {minX, maxX, maxY, minY};
 }
 
 auto txi::ed2stch(F_POINT const& point) noexcept -> F_POINT {
