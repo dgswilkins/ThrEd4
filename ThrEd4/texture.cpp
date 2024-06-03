@@ -913,7 +913,7 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
   auto const& angledFormVertices = *AngledFormVertices;
-  for (auto formLine = formLines.begin(); auto& vertex : angledFormVertices) {
+  for (auto formLine = formLines.begin(); auto const& vertex : angledFormVertices) {
 	txi::ed2px(vertex, *formLine);
 	formLine->x += offset.x;
 	formLine->y += offset.y;
