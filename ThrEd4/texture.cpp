@@ -1120,27 +1120,18 @@ void texture::deltx(uint32_t formIndex) {
   if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->texture.count == 0U)) {
 	return;
   }
-  auto        flagShared   = false;
   auto const& currentIndex = itForm->texture.index;
   // First check to see if the texture is shared between forms
-  // check forms before current
-  for (auto const spForms = std::ranges::subrange(FormList->begin(), itForm); auto const& current : spForms) {
-	if (!current.isTexture()) {
-	  continue;
-	}
-	if (current.texture.index == currentIndex) {
-	  flagShared = true;
-	}
-  }
-  // check forms after current
-  for (auto const spForms = std::ranges::subrange(itNext, FormList->end()); auto const& current : spForms) {
-	if (!current.isTexture()) {
-	  continue;
-	}
-	if (current.texture.index == currentIndex) {
-	  flagShared = true;
-	}
-  }
+  // check forms before and after current
+  auto const flagShared =
+      std::any_of(FormList->begin(),
+                  itForm,
+                  [currentIndex](const auto& current) {
+	                return current.isTexture() && current.texture.index == currentIndex;
+                  }) ||
+      std::any_of(std::next(itForm), FormList->end(), [currentIndex](const auto& current) {
+	    return current.isTexture() && current.texture.index == currentIndex;
+      });
   // clear the texture info from the form
   itForm->texture = TXTR_INFO {};
   // if it is shared, do not delete texture
