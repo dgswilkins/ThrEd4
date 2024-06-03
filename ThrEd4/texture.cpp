@@ -1141,6 +1141,8 @@ void texture::deltx(uint32_t formIndex) {
 	  flagShared = true;
 	}
   }
+  // clear the texture info from the form
+  itForm->texture = TXTR_INFO {};
   // if it is shared, do not delete texture
   if (flagShared) {
 	return;
