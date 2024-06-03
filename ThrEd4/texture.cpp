@@ -1117,7 +1117,6 @@ void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uin
 void texture::deltx(uint32_t formIndex) {
   auto const itForm = wrap::next(FormList->begin(), formIndex);
   auto const itNext = std::next(itForm);
-  itForm->fillType  = 0;
   if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->texture.count == 0U)) {
 	return;
   }
