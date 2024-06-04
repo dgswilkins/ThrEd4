@@ -519,7 +519,9 @@ void texture::drwtxtr() {
 #ifdef _DEBUG
 	outDebugString(L"[{}] texture points erased\n", erased);
 #else
+	// resharper disable CppClangTidyClangDiagnosticUnusedValue
 	DBG_UNREFERENCED_LOCAL_VARIABLE(erased);
+	// resharper restore CppClangTidyClangDiagnosticUnusedValue
 #endif
   }
   auto const flag = (pixelSpace > editSpace);
