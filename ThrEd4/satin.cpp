@@ -826,7 +826,7 @@ void satin::ribon() {
   auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   auto       itVertex    = startVertex;
   *(itVertex++)          = OutsidePoints->front();
-  itVertex               = std::copy(InsidePoints->begin(), InsidePoints->end(), itVertex);
+  itVertex               = (std::ranges::copy(*InsidePoints, itVertex)).out;
   if (currentType != FRMLINE) {
 	*(itVertex++) = InsidePoints->front();
 	*(itVertex++) = OutsidePoints->front();
