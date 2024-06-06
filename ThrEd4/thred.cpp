@@ -155,6 +155,7 @@ void delfstchs();
 void delknt();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
+void destroyBV();
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
@@ -1164,13 +1165,18 @@ void thred::movStch() {
   thred::redrawColorBar();
 }
 
+void thi::destroyBV() {
+  for (auto& iBackup : BackupViewer) {
+	DestroyWindow(iBackup);
+	iBackup = nullptr;
+  }
+}
+
 void thred::unbsho() {
   if (!StateMap->testAndReset(StateFlag::BAKSHO)) {
 	return;
   }
-  for (auto const& iBackup : BackupViewer) {
-	DestroyWindow(iBackup);
-  }
+  thi::destroyBV();
 }
 
 void thred::unsid() noexcept {
@@ -3784,9 +3790,7 @@ void thi::unthum() {
   if (!StateMap->testAndReset(StateFlag::THUMSHO)) {
 	return;
   }
-  for (auto const& iBackup : BackupViewer) {
-	DestroyWindow(iBackup);
-  }
+  thi::destroyBV();
   if (StateMap->test(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
@@ -6693,9 +6697,7 @@ void thi::getbak() {
 }
 
 void thi::rebak() {
-  for (auto const& iVersion : BackupViewer) {
-	DestroyWindow(iVersion);
-  }
+  thi::destroyBV();
   auto newFileName    = *ThrName;
   auto safetyFileName = newFileName; // initialise from local variable
   auto ext            = newFileName.extension().wstring();
@@ -6715,9 +6717,7 @@ void thi::rebak() {
 }
 
 void thred::thumbak() {
-  for (auto const& iVersion : BackupViewer) {
-	DestroyWindow(iVersion);
-  }
+  thi::destroyBV();
   thi::getbak();
 }
 
