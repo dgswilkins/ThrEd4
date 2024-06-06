@@ -357,7 +357,7 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t
   if (!util::closeEnough(historyItem.width, TextureScreen.width)) {
 	return true;
   }
-  
+
   for (auto itHITP = historyItem.texturePoints.cbegin(); auto& point : *TempTexturePoints) {
 	if ((point.line != itHITP->line) || !util::closeEnough(point.y, itHITP->y)) {
 	  return true;
@@ -789,8 +789,9 @@ void txi::setxclp(FRM_HEAD const& form) {
   }
   editorOffset.y -= TextureScreen.formCenter.y;
   auto& angledFormVertices = *AngledFormVertices;
-  std::ranges::transform(angledFormVertices, angledFormVertices.begin(),
-                 [editorOffset](auto& vertex) { return vertex + editorOffset; });
+  std::ranges::transform(angledFormVertices, angledFormVertices.begin(), [editorOffset](auto& vertex) {
+	return vertex + editorOffset;
+  });
   auto lineCount = form.vertexCount - 1U;
   if (form.type != FRMLINE) {
 	++lineCount;

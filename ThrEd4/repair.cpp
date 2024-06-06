@@ -276,7 +276,7 @@ void ri::repflt(std::wstring& repairMessage) {
   formList.resize(iDestination);
   auto vertexPoint = std::vector<F_POINT> {};
   auto iVertex     = 0U;
-  for (auto iForm = 0U;  auto& form : formList) {
+  for (auto iForm = 0U; auto& form : formList) {
 	if (FormVertices->size() >= wrap::toSize(form.vertexIndex) + form.vertexCount) {
 	  auto const startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	  auto const endVertex   = wrap::next(startVertex, form.vertexCount);

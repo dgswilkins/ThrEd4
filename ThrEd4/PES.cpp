@@ -551,13 +551,13 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
   auto  thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
-  auto iColor     = 1U;
-  auto color      = StitchBuffer->front().attribute & COLMSK;
-  auto iPEC       = wrap::next(PESequivColors.begin(), color);
-  auto iPesColors = pecHeader->pad.begin();
-  *iPesColors++   = *iPEC;
+  auto iColor      = 1U;
+  auto color       = StitchBuffer->front().attribute & COLMSK;
+  auto iPEC        = wrap::next(PESequivColors.begin(), color);
+  auto iPesColors  = pecHeader->pad.begin();
+  *iPesColors++    = *iPEC;
   auto stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
-  for (auto &stitch : stitchRange) {
+  for (auto& stitch : stitchRange) {
 	if ((stitch.attribute & COLMSK) != color) {
 	  color = stitch.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);

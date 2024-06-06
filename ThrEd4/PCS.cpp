@@ -394,11 +394,12 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	}
 	if (stitch.tag == 3) {
 	  newAttribute = stitch.fx | NOTFRM;
-	  skipStitch         = true;
+	  skipStitch   = true;
 	  continue;
 	}
 	auto xVal = wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT;
 	auto yVal = wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT;
+
 	minX = std::min(minX, xVal);
 	minY = std::min(minY, yVal);
 	maxX = std::max(maxX, xVal);

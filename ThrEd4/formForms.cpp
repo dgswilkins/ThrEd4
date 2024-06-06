@@ -1151,8 +1151,8 @@ void formForms::setear() {
   StateMap->reset(StateFlag::FORMSEL);
   auto const size =
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-  auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
-  horizontalRatio      = std::min(horizontalRatio, 1.0F);
+  auto horizontalRatio     = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
+  horizontalRatio          = std::min(horizontalRatio, 1.0F);
   auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / TWSTFACT / size.y;
   horizontalRatio          = std::min(horizontalRatio, verticalRatio);
   if (horizontalRatio < 1.0F) {
@@ -1321,7 +1321,7 @@ void formForms::wavfrm() {
   constexpr auto WAVSIZE         = 4.0F; // wave size factor
   auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
   horizontalRatio                = std::min(horizontalRatio, 1.0F);
-  auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
+  auto const verticalRatio       = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
   horizontalRatio                = std::min(horizontalRatio, verticalRatio);
   if (horizontalRatio < 1.0F) {
 	auto vScaled = firstVertex; // copy intended

@@ -719,12 +719,12 @@ auto thi::rsed() noexcept -> uint32_t {
 }
 
 void thi::fnamtabs() {
-  constexpr auto NORDSED    = uint32_t {0x5a5a5a5aU}; // name order seed
-  constexpr auto NCODSED    = uint32_t {0x73ef5a7eU}; // name encoding seed
-  constexpr auto NCODOF     = uint8_t {80U};          // name encoding offset
-  constexpr auto MAX8B      = uint8_t {127};          // max value of a signed byte
-  constexpr auto NDXOFF     = uint8_t {32U};          // index offset
-  constexpr auto NAMELEN    = NameOrder.size();
+  constexpr auto NORDSED = uint32_t {0x5a5a5a5aU}; // name order seed
+  constexpr auto NCODSED = uint32_t {0x73ef5a7eU}; // name encoding seed
+  constexpr auto NCODOF  = uint8_t {80U};          // name encoding offset
+  constexpr auto MAX8B   = uint8_t {127};          // max value of a signed byte
+  constexpr auto NDXOFF  = uint8_t {32U};          // index offset
+  constexpr auto NAMELEN = NameOrder.size();
   std::iota(NameOrder.begin(), NameOrder.end(), 0);
   PseudoRandomValue = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
@@ -876,7 +876,7 @@ void thi::fndknt() {
   }
   endStitch -= 4U;
   Knots->clear();
-  auto spStitch = std::ranges::subrange(StitchBuffer->begin(),wrap::next(StitchBuffer->begin(), endStitch));
+  auto spStitch = std::ranges::subrange(StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), endStitch));
   for (auto iStitch = 0; const auto& stitch : spStitch) {
 	if ((stitch.attribute & KNOTMSK) != 0U) {
 	  Knots->emplace_back(iStitch);
@@ -897,8 +897,9 @@ void thred::resetColorChanges() noexcept {
 }
 
 void thred::addColor(uint32_t stitch, uint32_t color) {
-  ColorChangeTable->emplace_back(COL_CHANGE {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
-                                          gsl::narrow<decltype(ColorChangeTable->back().colorIndex)>(color)});
+  ColorChangeTable->emplace_back(
+      COL_CHANGE {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
+                  gsl::narrow<decltype(ColorChangeTable->back().colorIndex)>(color)});
 }
 
 void thred::coltab() {
@@ -906,7 +907,7 @@ void thred::coltab() {
   if (StitchBuffer->size() <= 1) {
 	return;
   }
-  auto const firstStitch = StitchBuffer->begin();
+  auto const firstStitch  = StitchBuffer->begin();
   auto       currentColor = (firstStitch + 1)->attribute & COLMSK;
   firstStitch->attribute &= NCOLMSK;
   firstStitch->attribute |= currentColor;
@@ -1002,7 +1003,7 @@ void thred::rngadj() noexcept(std::is_same_v<size_t, uint32_t>) {
   auto lastStitch = wrap::toUnsigned(StitchBuffer->size());
   if (lastStitch != 0U) {
 	--lastStitch;
-	ClosestPointIndex  = std::min(ClosestPointIndex, lastStitch);
+	ClosestPointIndex = std::min(ClosestPointIndex, lastStitch);
   }
   if (GroupStitchIndex > lastStitch) {
 	GroupStitchIndex = ClosestPointIndex;
@@ -1494,7 +1495,8 @@ void thi::chknum() {
 		  thred::savdo();
 		  auto           upcnt    = value * IPFGRAN;
 		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
-		  upcnt = std::min(upcnt, FUPCLAMP);
+
+		  upcnt                = std::min(upcnt, FUPCLAMP);
 		  form.feather.upCount = wrap::round<uint8_t>(upcnt);
 		  break;
 		}
@@ -1644,7 +1646,8 @@ void thi::chknum() {
 			  thred::savdo();
 			  auto           dncnt    = value * IPFGRAN;
 			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
-			  dncnt = std::min(dncnt, FDNCLAMP);
+
+			  dncnt                  = std::min(dncnt, FDNCLAMP);
 			  form.feather.downCount = wrap::round<uint8_t>(dncnt);
 			  break;
 			}
@@ -1827,9 +1830,10 @@ void thi::chknum() {
 
 				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
 				  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
+
 				  StarRatio = std::clamp(StarRatio, SRMINLIM, SRMAXLIM);
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), StarRatio);
-				  hWnd   = ValueWindow->operator[](PRFSTRRAT);
+				  fmtStr    = fmt::format(FMT_COMPILE(L"{:.2f}"), StarRatio);
+				  hWnd      = ValueWindow->operator[](PRFSTRRAT);
 				  break;
 				}
 				case PRFLENRAT: {
@@ -1837,9 +1841,10 @@ void thi::chknum() {
 
 				  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
 				  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
+
 				  IniFile.lensRatio = std::clamp(IniFile.lensRatio, LRMINLIM, LRMAXLIM);
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio);
-				  hWnd   = ValueWindow->operator[](PRFLENRAT);
+				  fmtStr            = fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio);
+				  hWnd              = ValueWindow->operator[](PRFLENRAT);
 				  break;
 				}
 				case PRFSPLWRP: {
@@ -1847,9 +1852,10 @@ void thi::chknum() {
 				  // ToDo - Are these limits correct?
 				  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
 				  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
+
 				  SpiralWrap = std::clamp(SpiralWrap, SRMINLIM, SRMAXLIM);
-				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), SpiralWrap);
-				  hWnd   = ValueWindow->operator[](PRFSPLWRP);
+				  fmtStr     = fmt::format(FMT_COMPILE(L"{:.2f}"), SpiralWrap);
+				  hWnd       = ValueWindow->operator[](PRFSPLWRP);
 				  break;
 				}
 				case PRFBCNLEN: {
@@ -2295,9 +2301,9 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	return;
   }
   if (!StitchBuffer->empty()) {
-	auto const     code        = ClosestFormToCursor << FRMSHFT;
-	constexpr auto START = 0U;
-	auto const     endStitch   = StitchBuffer->size() - 2U;
+	auto const     code      = ClosestFormToCursor << FRMSHFT;
+	constexpr auto START     = 0U;
+	auto const     endStitch = StitchBuffer->size() - 2U;
 
 	auto maxLength      = LOWFLOAT;
 	auto minLength      = BIGFLOAT;
@@ -2379,7 +2385,7 @@ void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitc
 
 void thred::lenCalc() {
   auto static chkVal = 0.0F;
-  auto const blank = std::wstring {};
+  auto const blank   = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
 	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
@@ -2503,7 +2509,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
   }
   else {
 	auto iNextStitch = startStitch + 1U;
-	auto prevPoint   = StitchBuffer->operator[](startStitch); //intentional copy
+	auto prevPoint   = StitchBuffer->operator[](startStitch); // intentional copy
 	for (auto iStitch = iNextStitch; iStitch < endStitch; ++iStitch) {
 	  auto const& stitch = StitchBuffer->operator[](iStitch);
 	  if ((StitchBuffer->operator[](iNextStitch).attribute & KNOTMSK) != 0U) {
@@ -2555,8 +2561,8 @@ void thred::duzero() {
 		++iDestination;
 		continue;
 	  }
-	  auto const deltaX = iStitch.x - currentStitch.x;
-	  auto const deltaY = iStitch.y - currentStitch.y;
+	  auto const deltaX       = iStitch.x - currentStitch.x;
+	  auto const deltaY       = iStitch.y - currentStitch.y;
 	  auto const stitchLength = deltaX * deltaX + deltaY * deltaY;
 	  if (stitchLength <= minStitch) {
 		continue;
@@ -2707,8 +2713,8 @@ void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uin
 	  sourceRect = F_RECTANGLE {minX, maxY, maxX, minY};
 	}
 	else {
-      auto const& stitch = StitchBuffer->at(GroupStartStitch);
-      sourceRect = F_RECTANGLE {stitch.x, stitch.y, stitch.x, stitch.y};
+	  auto const& stitch = StitchBuffer->at(GroupStartStitch);
+	  sourceRect         = F_RECTANGLE {stitch.x, stitch.y, stitch.x, stitch.y};
 	}
   }
   if (util::closeEnough(sourceRect.right, sourceRect.left)) {
@@ -2777,7 +2783,7 @@ void thred::grpAdj() {
 	newSize.x = std::max(newSize.x, 1.0F);
 
 	auto const coordinate = MINZUMF / newSize.x;
-	newSize = F_POINT {MINZUMF, std::round(coordinate * newSize.y)};
+	newSize               = F_POINT {MINZUMF, std::round(coordinate * newSize.y)};
   }
   constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
   if (newSize.x > newSize.y) {
@@ -3243,7 +3249,7 @@ void thi::thrsav() {
   }
   if (!StateMap->testAndReset(StateFlag::IGNAM)) {
 	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-	auto geName   = *WorkingFileName;  //intentional copy
+	auto geName   = *WorkingFileName; // intentional copy
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const file = FindFirstFile(geName.wstring().c_str(), &fileData);
@@ -4553,13 +4559,14 @@ void thi::duClos(uint32_t            startStitch,
                  uint32_t            stitchCount,
                  F_POINT const&      stitchPoint,
                  std::vector<float>& gapToNearest) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
-  auto stitch       = wrap::next(StitchBuffer->begin(), startStitch);
+  auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
 	auto const deltaX = stitch->x - stitchPoint.x;
 	auto const deltaY = stitch->y - stitchPoint.y;
-	auto       sum    = deltaX * deltaX + deltaY * deltaY;
-	auto       tempPoint  = iStitch;
-	auto       gap    = gapToNearest.begin();
+
+	auto sum       = deltaX * deltaX + deltaY * deltaY;
+	auto tempPoint = iStitch;
+	auto gap       = gapToNearest.begin();
 	for (auto& point : *NearestPoint) {
 	  if (sum < *gap) {
 		std::swap(*gap, sum);
@@ -5650,6 +5657,7 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
   auto const finishIt      = wrap::next(StitchBuffer->begin(), finish);
   auto       startIt       = (finish != 0) ? std::next(finishIt, -1) : finishIt;
   auto const knotAttribute = startIt->attribute | KNOTMSK;
+
   auto deltaX = finishIt->x - startIt->x;
   auto deltaY = finishIt->y - startIt->y;
   auto length = deltaX * deltaX + deltaY * deltaY;
@@ -7338,8 +7346,8 @@ void thred::nextSortedStitch(bool direction) {
   }
   auto const nextStitch = wrap::next(SortBuffer->begin(), SortIndex);
   outDebugString(L"SortIndex [{}]\n", SortIndex);
-  CurrentStitchIndex    = nextStitch->index;
-  auto const minLength  = std::sqrt(nextStitch->length) * IPFGRAN;
+  CurrentStitchIndex   = nextStitch->index;
+  auto const minLength = std::sqrt(nextStitch->length) * IPFGRAN;
   displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), minLength));
   thi::lensadj();
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
@@ -7348,7 +7356,7 @@ void thred::nextSortedStitch(bool direction) {
 void thi::setsrch(bool end) {
   if (end) {
 	CurrentStitchIndex = LargestStitchIndex;
-	SortIndex = wrap::toUnsigned(SortBuffer->size() - 1U);
+	SortIndex          = wrap::toUnsigned(SortBuffer->size() - 1U);
   }
   else {
 	CurrentStitchIndex = SmallestStitchIndex;

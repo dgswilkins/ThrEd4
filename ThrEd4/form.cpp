@@ -416,12 +416,12 @@ auto insect(FRM_HEAD const&             form,
 void inspnt(std::vector<CLIP_PNT>& clipStitchPoints);
 auto isclos(std::vector<SMAL_PNT_L> const& lineEndpoints, uint32_t line0Index, uint32_t line1Index, float gapToClosestRegion) noexcept
     -> bool;
-auto isect(uint32_t                    vertex0,
-           uint32_t                    vertex1,
-           F_POINT&                    intersection,
-           float&                      length,
-           F_POINT const&              lineSegmentStart,
-           F_POINT const&              lineSegmentEnd,
+auto isect(uint32_t       vertex0,
+           uint32_t       vertex1,
+           F_POINT&       intersection,
+           float&         length,
+           F_POINT const& lineSegmentStart,
+           F_POINT const& lineSegmentEnd,
            std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool;
 auto isin(FRM_HEAD const&             form,
           std::vector<V_CLP_X> const& regionCrossingData,
@@ -3167,12 +3167,12 @@ void fi::inspnt(std::vector<CLIP_PNT>& clipStitchPoints) {
   clipStitchPoints.push_back(clipStitchPoint);
 }
 
-auto fi::isect(uint32_t                    vertex0,
-               uint32_t                    vertex1,
-               F_POINT&                    intersection,
-               float&                      length,
-               F_POINT const&              lineSegmentStart,
-               F_POINT const&              lineSegmentEnd,
+auto fi::isect(uint32_t       vertex0,
+               uint32_t       vertex1,
+               F_POINT&       intersection,
+               float&         length,
+               F_POINT const& lineSegmentStart,
+               F_POINT const& lineSegmentEnd,
                std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>)
     -> bool {
   auto const delta =
@@ -3788,8 +3788,10 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 
   auto iStitch = 0;
   for (auto iSegment = 0U; iSegment < clipSegments.size(); ++iSegment) {
-	for (auto iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; ++iStitchPoint) {
-	  StitchBuffer->emplace_back(F_POINT_ATTR {clipStitchPoints[iStitchPoint].x, clipStitchPoints[iStitchPoint].y, iSegment & 0xf});
+	for (auto iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish;
+	     ++iStitchPoint) {
+	  StitchBuffer->emplace_back(F_POINT_ATTR {
+	      clipStitchPoints[iStitchPoint].x, clipStitchPoints[iStitchPoint].y, iSegment & 0xf});
 	}
   }
 

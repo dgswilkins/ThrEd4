@@ -397,6 +397,7 @@ void trace::trdif() {
 		differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
 
 		auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
+
 		colorSumMaximum = std::max(colorSumMaximum, colorSum);
 		colorSumMinimum = std::min(colorSumMinimum, colorSum);
 	  }
@@ -421,8 +422,8 @@ void trace::trdif() {
 
 #if TRCMTH == 0
 auto ti::colsum(COLORREF col) -> uint32_t {
-  auto colors = ti::trcols(col);
-  auto itColor = colors.begin();
+  auto colors   = ti::trcols(col);
+  auto itColor  = colors.begin();
   auto colorSum = 0U;
   for (auto iRGB : TraceRGBFlag) {
 	if (StateMap->test(iRGB)) {
@@ -505,7 +506,7 @@ void trace::trace() {
 	TracedMap->resize(TraceDataSize, false);
   }
   auto const lastIndex = wrap::toUnsigned(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
-  auto itTBD = spTBD.begin();
+  auto       itTBD     = spTBD.begin();
   for (auto index = 0U; index < lastIndex; ++index) {
 	auto const pointBrightness = ti::colsum(*itTBD);
 	if (upBrightness > pointBrightness && downBrightness < pointBrightness) {

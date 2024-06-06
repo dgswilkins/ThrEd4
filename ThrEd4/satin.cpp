@@ -345,8 +345,9 @@ auto si::satselfn() -> bool {
 	  auto const deltaY = stitchPoint.y - vertex.y;
 	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length < minimumLength) {
-		minimumLength         = length;
-		ClosestFormToCursor   = wrap::toUnsigned(&form - FormList->data()); // index of the form. Possible with vectors
+		minimumLength = length;
+		ClosestFormToCursor =
+		    wrap::toUnsigned(&form - FormList->data()); // index of the form. Possible with vectors
 		ClosestVertexToCursor = iVertex;
 	  }
 	  ++iVertex;
@@ -411,6 +412,7 @@ void satin::satadj(FRM_HEAD& form) {
   for (auto vertexRange = std::ranges::subrange(itFirstGuide, wrap::next(itFirstGuide, form.satinGuideCount));
        auto& guide : vertexRange) {
 	auto const endCount = (form.vertexCount - 1);
+
 	guide.finish = std::min(guide.finish, endCount);
 	guide.start  = std::min(guide.start, endCount);
   }
@@ -832,16 +834,18 @@ void satin::ribon() {
   if (currentType != FRMLINE) {
 	*(itVertex++) = InsidePoints->front();
 	*(itVertex++) = OutsidePoints->front();
+
 	newForm.underlayIndent = IniFile.underlayIndent;
   }
   itVertex = std::copy(OutsidePoints->rbegin(), wrap::next(OutsidePoints->rend(), -1), itVertex);
   auto const newVertexCount = wrap::distance<uint32_t>(startVertex, itVertex);
-  newForm.type          = SAT;
-  newForm.fillColor     = ActiveColor;
-  newForm.fillSpacing   = LineSpacing;
-  newForm.stitchLength  = IniFile.maxStitchLength;
-  newForm.vertexCount   = newVertexCount;
-  newForm.attribute     = FormList->operator[](ClosestFormToCursor).attribute;
+
+  newForm.type         = SAT;
+  newForm.fillColor    = ActiveColor;
+  newForm.fillSpacing  = LineSpacing;
+  newForm.stitchLength = IniFile.maxStitchLength;
+  newForm.vertexCount  = newVertexCount;
+  newForm.attribute    = FormList->operator[](ClosestFormToCursor).attribute;
   newForm.attribute &= FRMLMSK;
   newForm.attribute |= FRMEND;
   newForm.wordParam       = newVertexCount / 2;
@@ -1489,12 +1493,12 @@ void si::outfn(FRM_HEAD const& form,
 }
 
 auto si::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool {
-  auto const lenCheck      = LineSpacing * LineSpacing;
+  auto const lenCheck = LineSpacing * LineSpacing;
   return std::ranges::any_of(satinBackup, [&](auto const& backup) {
-	    auto const deltaX = backup.x - pnt.x;
-	    auto const deltaY = backup.y - pnt.y;
-	    auto const length = deltaX * deltaX + deltaY * deltaY;
-	    return length < lenCheck;
+	auto const deltaX = backup.x - pnt.x;
+	auto const deltaY = backup.y - pnt.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	return length < lenCheck;
   });
 }
 
