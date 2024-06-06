@@ -901,7 +901,7 @@ void thred::addColor(uint32_t stitch, uint32_t color) {
 
 void thred::coltab() {
   thred::resetColorChanges();
-  if (StitchBuffer->size() <= 1 || StitchBuffer->empty()) {
+  if (StitchBuffer->size() <= 1) {
 	return;
   }
   auto const firstStitch = StitchBuffer->begin();
