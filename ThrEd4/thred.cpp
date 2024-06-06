@@ -895,7 +895,7 @@ void thred::resetColorChanges() noexcept {
 }
 
 void thred::addColor(uint32_t stitch, uint32_t color) {
-  ColorChangeTable->push_back(COL_CHANGE {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
+  ColorChangeTable->emplace_back(COL_CHANGE {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
                                           gsl::narrow<decltype(ColorChangeTable->back().colorIndex)>(color)});
 }
 
