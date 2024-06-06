@@ -923,25 +923,15 @@ void thred::coltab() {
 	}
 	currentColor = stitchIt->attribute & COLMSK;
   }
-  auto iStitch     = 0U;
-  currentColor     = std::numeric_limits<decltype(currentColor)>::max();
-  auto const range = F_RECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
-                                  wrap::toFloat(UnzoomedRect.cy) * 2.0F,
-                                  wrap::toFloat(UnzoomedRect.cx) * 2.0F,
-                                  wrap::toFloat(UnzoomedRect.cy) * -1.0F};
-  for (auto& stitch : *StitchBuffer) {
-	if (stitch.x < range.left) {
-	  stitch.x = range.left;
-	}
-	if (stitch.x > range.right) {
-	  stitch.x = range.right;
-	}
-	if (stitch.y > range.top) {
-	  stitch.y = range.top;
-	}
-	if (stitch.y < range.bottom) {
-	  stitch.y = range.bottom;
-	}
+  currentColor    = std::numeric_limits<decltype(currentColor)>::max();
+  auto const minX = wrap::toFloat(UnzoomedRect.cx) * -1.0F;
+  auto const minY = wrap::toFloat(UnzoomedRect.cy) * -1.0F;
+  auto const maxX = wrap::toFloat(UnzoomedRect.cx) * 2.0F;
+  auto const maxY = wrap::toFloat(UnzoomedRect.cy) * 2.0F;
+  for (auto iStitch = 0U; auto& stitch : *StitchBuffer) {
+	stitch.x = std::clamp(stitch.x, minX, maxX);
+	stitch.y = std::clamp(stitch.y, minY, maxY);
+
 	auto const nextColor = stitch.attribute & COLMSK;
 	if (currentColor != nextColor) {
 	  addColor(iStitch, nextColor);
@@ -950,9 +940,7 @@ void thred::coltab() {
 	++iStitch;
   }
   addColor(wrap::toUnsigned(StitchBuffer->size()), 0);
-  if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
-  }
+  ClosestPointIndex = std::min(ClosestPointIndex, wrap::toUnsigned(StitchBuffer->size() - 1U));
   thi::fndknt();
 }
 
