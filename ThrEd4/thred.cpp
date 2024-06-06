@@ -723,20 +723,14 @@ void thi::fnamtabs() {
   constexpr auto MAX8B      = uint8_t {127};          // max value of a signed byte
   constexpr auto NDXOFF     = uint8_t {32U};          // index offset
   constexpr auto NAMELEN    = NameOrder.size();
-  auto           iNameOrder = NameOrder.begin();
-  for (auto iName = 0U; iName < NAMELEN; ++iName) {
-	*(iNameOrder++) = iName;
-  }
+  std::iota(NameOrder.begin(), NameOrder.end(), 0);
   PseudoRandomValue = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
 	auto const source      = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
 	auto const destination = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
 	std::swap(*destination, *source);
   }
-  auto iNameEncoder = NameEncoder.begin();
-  for (auto iName = uint8_t {}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
-	*(iNameEncoder++) = iName + NCODOF;
-  }
+  std::iota(NameEncoder.begin(), NameEncoder.end(), NCODOF);
   PseudoRandomValue = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
 	auto const source      = wrap::next(NameEncoder.begin(), form::psg() & MSK7BITS);
