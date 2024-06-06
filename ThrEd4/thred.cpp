@@ -155,7 +155,7 @@ void delfstchs();
 void delknt();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
-void destroyBV();
+void destroyBV() noexcept;
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
@@ -1165,7 +1165,7 @@ void thred::movStch() {
   thred::redrawColorBar();
 }
 
-void thi::destroyBV() {
+void thi::destroyBV() noexcept {
   for (auto& iBackup : BackupViewer) {
 	DestroyWindow(iBackup);
 	iBackup = nullptr;
@@ -2464,7 +2464,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	  return; // we reached the last stitch without seeing a small stitch so don't do anything
 	}
 	auto iOutputStitch = iStitch;
-	auto prevPoint     = StitchBuffer->operator[](startStitch);
+	auto prevPoint     = StitchBuffer->operator[](startStitch); // intentional copy
 	lastStitch         = StitchBuffer->size();
 	if (lastStitch != 0U) {
 	  --lastStitch;
@@ -2506,7 +2506,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
   }
   else {
 	auto iNextStitch = startStitch + 1U;
-	auto prevPoint   = StitchBuffer->operator[](startStitch);
+	auto prevPoint   = StitchBuffer->operator[](startStitch); //intentional copy
 	for (auto iStitch = iNextStitch; iStitch < endStitch; ++iStitch) {
 	  auto const& stitch = StitchBuffer->operator[](iStitch);
 	  if ((StitchBuffer->operator[](iNextStitch).attribute & KNOTMSK) != 0U) {
@@ -3246,7 +3246,7 @@ void thi::thrsav() {
   }
   if (!StateMap->testAndReset(StateFlag::IGNAM)) {
 	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-	auto geName   = *WorkingFileName;
+	auto geName   = *WorkingFileName;  //intentional copy
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const file = FindFirstFile(geName.wstring().c_str(), &fileData);
@@ -4225,7 +4225,7 @@ void thi::resetState() {
 
 void thi::nuFil(FileIndices fileIndex) {
   // Todo - check filename for validity before using it
-  auto newFileName = *WorkingFileName;
+  auto newFileName = *WorkingFileName; // intentional copy
   if (!StateMap->testAndReset(StateFlag::REDOLD) &&
       !getNewFileName(newFileName, FileStyles::ALL_FILES, fileIndex)) {
 	return;
@@ -5987,8 +5987,8 @@ void thred::delet() {
 	  currentFormVertex = form::pdir(form, currentFormVertex);
 	}
 	auto const vBegin   = wrap::next(FormVertices->begin(), form.vertexIndex);
-	auto       vCurr    = vBegin;
-	auto       itVertex = vBegin;
+	auto       vCurr    = vBegin; // intentional copy
+	auto       itVertex = vBegin; // intentional copy
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  if (!vertexMap.test(iVertex)) {
 		*vCurr = *itVertex;
@@ -6698,7 +6698,7 @@ void thi::getbak() {
 
 void thi::rebak() {
   thi::destroyBV();
-  auto newFileName    = *ThrName;
+  auto newFileName    = *ThrName;    // intentional copy
   auto safetyFileName = newFileName; // initialise from local variable
   auto ext            = newFileName.extension().wstring();
   ext.back()          = FileVersionIndex + L's';
@@ -6725,7 +6725,7 @@ void thred::purg() {
   if (ThrName->empty()) {
 	return;
   }
-  auto fileName = *ThrName;
+  auto fileName = *ThrName; // intentional copy
   auto ext      = ThrName->extension().wstring();
   for (auto iLast = wchar_t {}; iLast < OLDVER; ++iLast) {
 	ext.back() = iLast + 's';
@@ -10455,7 +10455,7 @@ void thi::redini() {
 	}
 	CloseHandle(iniFileHandle);
 	if (bytesRead < sizeof(IniFile)) {
-	  auto newFileName = *IniFileName;
+	  auto newFileName = *IniFileName; // intentional copy
 	  newFileName.replace_filename("thred-ini.bak");
 	  fs::rename(*IniFileName, newFileName);
 	  setPrefs();
@@ -11958,7 +11958,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  auto itHWndBV = BackupViewer.begin();
 		  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
 			if (DrawItem->hwndItem == *itHWndBV) {
-			  auto fileName = *ThrName;
+			  auto fileName = *ThrName; // intentional copy
 			  auto ext      = fileName.extension().wstring();
 			  ext.back()    = iVersion + 's';
 			  fileName.replace_extension(ext);
