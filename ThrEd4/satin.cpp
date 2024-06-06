@@ -46,7 +46,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+// resharper disable CppUnusedIncludeDirective
 #include <ranges>
+// ReSharper restore CppUnusedIncludeDirective
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
