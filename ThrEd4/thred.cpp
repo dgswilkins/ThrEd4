@@ -1208,12 +1208,8 @@ void thi::patdun() {
 auto thi::pxchk(float pixelSize) -> uint16_t {
   constexpr auto MINLIMIT = 1.0F;
   constexpr auto MAXLIMIT = 20.0F;
-  if (pixelSize < MINLIMIT) {
-	pixelSize = MINLIMIT;
-  }
-  else if (pixelSize > MAXLIMIT) {
-	pixelSize = MAXLIMIT;
-  }
+
+  pixelSize = std::clamp(pixelSize, MINLIMIT, MAXLIMIT);
   return wrap::round<uint16_t>(pixelSize);
 }
 
