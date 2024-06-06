@@ -905,12 +905,12 @@ void thred::coltab() {
 	return;
   }
   auto const firstStitch = StitchBuffer->begin();
+  auto       currentColor = (firstStitch + 1)->attribute & COLMSK;
   firstStitch->attribute &= NCOLMSK;
-  firstStitch->attribute |= (firstStitch + 1)->attribute & COLMSK;
+  firstStitch->attribute |= currentColor;
   auto const lastStitch = StitchBuffer->rbegin();
   lastStitch->attribute &= NCOLMSK;
   lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
-  auto currentColor = StitchBuffer->front().attribute & COLMSK;
 
   auto const pEnd = std::prev(StitchBuffer->end());
   for (auto stitchIt = std::next(StitchBuffer->begin()); stitchIt < pEnd; ++stitchIt) {
