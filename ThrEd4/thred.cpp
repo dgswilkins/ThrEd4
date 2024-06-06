@@ -874,12 +874,12 @@ void thi::fndknt() {
   }
   endStitch -= 4U;
   Knots->clear();
-  auto iterStitch = StitchBuffer->begin();
-  for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-	if ((iterStitch->attribute & KNOTMSK) != 0U) {
-	  Knots->push_back(iStitch);
+  auto spStitch = std::ranges::subrange(StitchBuffer->begin(),wrap::next(StitchBuffer->begin(), endStitch));
+  for (auto iStitch = 0; const auto& stitch : spStitch) {
+	if ((stitch.attribute & KNOTMSK) != 0U) {
+	  Knots->emplace_back(iStitch);
 	}
-	++iterStitch;
+	iStitch++;
   }
 }
 
