@@ -2306,6 +2306,8 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	for (auto iStitch = START; iStitch < endStitch; ++iStitch) {
 	  if ((stitch->attribute & FRMSK) != code || ((stitch->attribute & NOTFRM) != 0U) ||
 	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
+		++stitch;
+		++stitchFwd1;
 		continue;
 	  }
 	  auto const deltaX = stitchFwd1->x - stitch->x;
