@@ -1378,18 +1378,10 @@ void thred::hupfn() {
 	  checkHoopRect.left   = itVertex->x;
 	}
 	for (auto const& formVertice : *FormVertices) {
-	  if (formVertice.x < checkHoopRect.left) {
-		checkHoopRect.left = formVertice.x;
-	  }
-	  if (formVertice.x > checkHoopRect.right) {
-		checkHoopRect.right = formVertice.x;
-	  }
-	  if (formVertice.y < checkHoopRect.bottom) {
-		checkHoopRect.bottom = formVertice.y;
-	  }
-	  if (formVertice.y > checkHoopRect.top) {
-		checkHoopRect.top = formVertice.y;
-	  }
+	  checkHoopRect.left   = std::min(checkHoopRect.left, formVertice.x);
+	  checkHoopRect.right  = std::max(checkHoopRect.right, formVertice.x);
+	  checkHoopRect.bottom = std::min(checkHoopRect.bottom, formVertice.y);
+	  checkHoopRect.top    = std::max(checkHoopRect.top, formVertice.y);
 	}
   }
   if (StitchBuffer->empty() && FormVertices->empty() && !StateMap->test(StateFlag::HUPEX)) {
