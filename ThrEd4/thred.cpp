@@ -2336,7 +2336,9 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 }
 
 void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
-  if (!StitchBuffer->empty()) {
+  if (StitchBuffer->empty()) {
+	return;
+  }
 	auto maxLength      = LOWFLOAT;
 	auto minLength      = BIGFLOAT;
 	smallestStitchIndex = 0U;
@@ -2370,7 +2372,6 @@ void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitc
 	  auto const strMin = displayText::format(IDS_LENMIN, minLength);
 	  displayText::butxt(HMINLEN, strMin);
 	}
-  }
 }
 
 void thred::lenCalc() {
