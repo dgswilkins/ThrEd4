@@ -10881,7 +10881,9 @@ auto thi::defTxt(uint32_t iColor) -> COLORREF {
 }
 
 void thi::relin() {
-  MoveLine0[0] = thred::stch2px1(ClosestPointIndex - 1);
+  if (ClosestPointIndex != 0U) {
+	MoveLine0[0] = thred::stch2px1(ClosestPointIndex - 1);
+  }
   MoveLine1[1] = thred::stch2px1(ClosestPointIndex + 1U);
   StateMap->reset(StateFlag::WASLIN);
   thi::dulin(MoveLine0, MoveLine1);
