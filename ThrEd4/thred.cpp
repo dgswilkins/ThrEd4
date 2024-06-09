@@ -5268,7 +5268,9 @@ void thi::stchbox(uint32_t iStitch, HDC hDC) {
 void thred::drawCapturedStitchBox() {
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
   SelectObject(StitchWindowMemDC, LinePen);
-  thi::stchbox(ClosestPointIndex - 1, StitchWindowDC);
+  if (ClosestPointIndex != 0U) {
+	thi::stchbox(ClosestPointIndex - 1, StitchWindowDC);
+  }
   thi::stchbox(ClosestPointIndex, StitchWindowDC);
   if (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	thi::stchbox(ClosestPointIndex + 1, StitchWindowDC);
