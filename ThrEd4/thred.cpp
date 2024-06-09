@@ -2293,35 +2293,33 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	return;
   }
 	auto const     code      = ClosestFormToCursor << FRMSHFT;
-	constexpr auto START     = 0U;
-	auto const     endStitch = StitchBuffer->size() - 2U;
 
 	auto maxLength      = LOWFLOAT;
 	auto minLength      = BIGFLOAT;
 	smallestStitchIndex = 0U;
 	largestStitchIndex  = 0U;
-	auto stitch         = wrap::next(StitchBuffer->begin(), START);
-	auto stitchFwd1     = std::next(stitch);
-	for (auto iStitch = START; iStitch < endStitch; ++iStitch) {
-	  if ((stitch->attribute & FRMSK) != code || ((stitch->attribute & NOTFRM) != 0U) ||
+	auto stitchFwd1     = std::next(StitchBuffer->begin());
+	auto spStitches = std::ranges::subrange(StitchBuffer->begin(), StitchBuffer->end() - 2U);
+	for (auto index = 0U; auto const& stitch:spStitches) {
+	  if ((stitch.attribute & FRMSK) != code || ((stitch.attribute & NOTFRM) != 0U) ||
 	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
-		++stitch;
 		++stitchFwd1;
+		++index;
 		continue;
 	  }
-	  auto const deltaX = stitchFwd1->x - stitch->x;
-	  auto const deltaY = stitchFwd1->y - stitch->y;
+	  auto const deltaX = stitchFwd1->x - stitch.x;
+	  auto const deltaY = stitchFwd1->y - stitch.y;
 	  auto const length = deltaX * deltaX + deltaY * deltaY;
 	  if (length > maxLength) {
 		maxLength          = length;
-		largestStitchIndex = iStitch;
+		largestStitchIndex = index;
 	  }
 	  if (length < minLength) {
 		minLength           = length;
-		smallestStitchIndex = iStitch;
+		smallestStitchIndex = index;
 	  }
-	  ++stitch;
 	  ++stitchFwd1;
+	  ++index;
 	}
 	maxLength = std::sqrt(maxLength) * IPFGRAN;
 	minLength = std::sqrt(minLength) * IPFGRAN;
