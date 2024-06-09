@@ -2286,13 +2286,12 @@ void thred::ritot(uint32_t number) {
 
 void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   auto const& form = FormList->operator[](ClosestFormToCursor);
-  if ((form.fillType == 0U) && (form.edgeType == 0U)) {
+  if (StitchBuffer->empty() || ((form.fillType == 0U) && (form.edgeType == 0U))) {
 	auto const blank = std::wstring {};
 	displayText::butxt(HMAXLEN, blank);
 	displayText::butxt(HMINLEN, blank);
 	return;
   }
-  if (!StitchBuffer->empty()) {
 	auto const     code      = ClosestFormToCursor << FRMSHFT;
 	constexpr auto START     = 0U;
 	auto const     endStitch = StitchBuffer->size() - 2U;
@@ -2336,7 +2335,6 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	  auto const strMin = displayText::format(IDS_LENMIN, minLength);
 	  displayText::butxt(HMINLEN, strMin);
 	}
-  }
 }
 
 void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
