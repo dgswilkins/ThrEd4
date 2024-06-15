@@ -239,6 +239,7 @@
     <None Include="..\vcpkg.json" />
     <None Include="..\vcpkg-configuration.json" />
     <None Include="..\.clang-tidy" />
+    <None Include="..\.github\workflows\build.yml" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico">
