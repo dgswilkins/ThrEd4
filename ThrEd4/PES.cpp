@@ -5,43 +5,102 @@
 #if PESACT
 // Local Headers
 #include "displayText.h"
+#include "EnumMap.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "PES.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "gsl/narrow"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#ifdef _WIN64
+#include <cwchar>
+#endif
+#include <filesystem>
+#include <iterator>
+// resharper disable CppUnusedIncludeDirective
+#include <ranges>
+// ReSharper restore CppUnusedIncludeDirective
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 static constexpr uint8_t THUMBHGT = 38U;
 static constexpr uint8_t THUMBWID = 48U;
 using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 #pragma pack(push, 1)
+// clang-format off
 class PECHDR
 {
   public:
-  char     label[19] {};  // Label string prefixed with "LA:" and padded with space (0x20)
-  int8_t   labnd {};      // carriage return character
-  uint8_t  ukn1[11] {};   // Unknown (' ')
-  uint8_t  ukn2 {};       // Unknown
-  uint16_t hnd1 {};       // Unknown (0x00ff)
-  uint8_t  thumbWidth {}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
-                          // Thus, 6 would mean 6x8 = 48 pixels per line
-  uint8_t thumbHeight {}; // Thumbnail image height in pixels (38)
-  uint8_t ukn3[12] {};    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
-  uint8_t colorCount {};  // Number of colors minus one, 0xFF means 0 colors
-  uint8_t pad[463] {};    // Pad bytes up to 512.
+// NOLINTBEGIN(readability-magic-numbers, misc-non-private-member-variables-in-classes)
+  std::array<char, 19>     label {}; // Label string prefixed with "LA:" and padded with space (0x20)
+  int8_t                   labnd {}; // carriage return character
+  std::array<uint8_t, 11>  ukn1 {};  // Unknown (' ')
+  uint8_t                  ukn2 {};  // Unknown
+  uint16_t                 hnd1 {};  // Unknown (0x00ff)
+  uint8_t                  thumbWidth {};  // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
+                                           // So, 6 would mean 6x8 = 48 pixels per line
+  uint8_t                  thumbHeight {}; // Thumbnail image height in pixels (38)
+  std::array<uint8_t, 12>  ukn3 {};        // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
+  uint8_t                  colorCount {};  // Number of colors minus one, 0xFF means 0 colors
+  std::array<uint8_t, 463> pad {};         // Pad bytes up to 512.
+  // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
-  constexpr PECHDR() noexcept = default;
+  explicit constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;
   // PECHDR& operator=(PECHDR const& rhs) = default;
   // PECHDR& operator=(PECHDR&&) = default;
   //~PECHDR() = default;
 };
+// clang-format on
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 class PECHDR2
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint16_t unknown1 {}; // typical 0x0000
   uint16_t thumbnailOffset {}; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
   uint16_t unknown2 {}; // typical 0x3100
@@ -52,8 +111,9 @@ class PECHDR2
   uint16_t unknown5 {}; // typical 0x01b0
   uint16_t xMin {};     // starting X val (Bigendian)
   uint16_t yMin {};     // starting Y val (Bigendian)
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  constexpr PECHDR2() noexcept = default;
+  explicit constexpr PECHDR2() noexcept = default;
   // PECHDR2(PECHDR2&&) = default;
   // PECHDR2& operator=(PECHDR2 const& rhs) = default;
   // PECHDR2& operator=(PECHDR2&&) = default;
@@ -63,58 +123,73 @@ class PECHDR2
 
 class PES_COLOR_LIST
 {
-  public:
-  uint16_t blockIndex {};
-  uint16_t colorIndex {};
+  private:
+  uint16_t m_blockIndex {};
+  uint16_t m_colorIndex {};
 
+  public:
   // constexpr PES_COLOR_LIST() noexcept = default;
+  explicit constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
+      m_blockIndex(bIndex), m_colorIndex(cIndex) {
+  }
   // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
   // PES_COLOR_LIST(PES_COLOR_LIST&&) = default;
   // PES_COLOR_LIST& operator=(PECCOLORLIST const& rhs) = default;
   // PES_COLOR_LIST& operator=(PES_COLOR_LIST&&) = default;
   //~PES_COLOR_LIST() = default;
+
+  [[nodiscard]] constexpr auto getBlockIndex() const noexcept -> uint16_t {
+	return m_blockIndex;
+  }
+
+  [[nodiscard]] constexpr auto getColorIndex() const noexcept -> uint16_t {
+	return m_colorIndex;
+  }
 };
 
 #pragma pack(push, 1)
-// clang-format off
 class PESHED
 {
   public:
-  char     ledI[4] {}; //   0-3  Identification (#PES)         
-  char     ledV[4] {}; //   4-7  version (0001)         
-  uint32_t off     {}; //   8-b  Absolute PEC section byte offset
-  uint16_t hpsz    {}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-  uint16_t usdn    {}; //   e,f  Use existing design area (1)
-  uint16_t blct    {}; // 10,11  CSewSeg segment block count (1)
-  uint8_t  hnd1[4] {}; // 12-15  header end (FF FF 00 00)                      
-  uint16_t celn    {}; // 16,17  Length of following string (7)
-  char     ce[7]   {}; // 18-1e  CEmbOne identification (CEmbOne)              
-  int16_t  xlft    {}; // 1f,20  Extent left
-  int16_t  xtop    {}; // 21,22  Extent top
-  int16_t  xrht    {}; // 23,24  Extent right
-  int16_t  xbot    {}; // 25,26  Extent bottom
-  int16_t  plft    {}; // 27,28  Extent left position
-  int16_t  ptop    {}; // 29,2a  Extent top position
-  int16_t  prht    {}; // 2b,2c  Extent right position
-  int16_t  pbot    {}; // 2d,2e  Extent bottom position
-  float    atfm1   {}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
-  float    atfm2   {}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
-  float    atfm3   {}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
-  float    atfm4   {}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
-  float    atfm5   {}; // 3f-42  Affine transform Left_Pos
-  float    atfm6   {}; // 43-46  Affine transform Bottom_Pos
-  uint16_t ukn1    {}; // 47,48  unknown (1)
-  int16_t  xtrn    {}; // 49,4a  CSewSeg x coordinate translation (0)
-  int16_t  ytrn    {}; // 4b,4c  CSewSeg y coordinate translation (0)
-  int16_t  xsiz    {}; // 4d,4e  CSewSeg width
-  int16_t  ysiz    {}; // 4f,50  CSewSeg height
-  int8_t   ukn2[8] {}; // 51,58  unknown (0)                                   
-  uint16_t bcnt    {}; // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-  uint8_t  hnd2[4] {}; // 5b-5e  header end (FF FF 00 00)                      
-  uint16_t cslen   {}; // 5f,60  CSewSeg length (7)
-  char     cs[7]   {}; // 61-67  CSewSeg identification (CSewSeg)              
-// uint16_t styp1;     // 68,69  Stitch type (0)
-// uint16_t scol;      // 6a,6b  Stitch Palette thread index
+  // NOLINTBEGIN(readability-magic-numbers, misc-non-private-member-variables-in-classes)
+  std::array<char, 4>    ledI {};  //   0-3  Identification (#PES)
+  std::array<char, 4>    ledV {};  //   4-7  version (0001)
+  uint32_t               off {};   //   8-b  Absolute PEC section byte offset
+  uint16_t               hpsz {};  //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+  uint16_t               usdn {};  //   e,f  Use existing design area (1)
+  uint16_t               blct {};  // 10,11  CSewSeg segment block count (1)
+  std::array<uint8_t, 4> hnd1 {};  // 12-15  header end (FF FF 00 00)
+  uint16_t               celn {};  // 16,17  Length of following string (7)
+  std::array<char, 7>    ce {};    // 18-1e  CEmbOne identification (CEmbOne)
+  int16_t                xlft {};  // 1f,20  Extent left
+  int16_t                xtop {};  // 21,22  Extent top
+  int16_t                xrht {};  // 23,24  Extent right
+  int16_t                xbot {};  // 25,26  Extent bottom
+  int16_t                plft {};  // 27,28  Extent left position
+  int16_t                ptop {};  // 29,2a  Extent top position
+  int16_t                prht {};  // 2b,2c  Extent right position
+  int16_t                pbot {};  // 2d,2e  Extent bottom position
+  float                  atfm1 {}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
+  float                  atfm2 {}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
+  float                  atfm3 {}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
+  float                  atfm4 {}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
+  float                  atfm5 {}; // 3f-42  Affine transform Left_Pos
+  float                  atfm6 {}; // 43-46  Affine transform Bottom_Pos
+  uint16_t               ukn1 {};  // 47,48  unknown (1)
+  int16_t                xtrn {};  // 49,4a  CSewSeg x coordinate translation (0)
+  int16_t                ytrn {};  // 4b,4c  CSewSeg y coordinate translation (0)
+  int16_t                xsiz {};  // 4d,4e  CSewSeg width
+  int16_t                ysiz {};  // 4f,50  CSewSeg height
+  std::array<int8_t, 8>  ukn2 {};  // 51,58  unknown (0)
+  uint16_t               bcnt {};  // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+  std::array<uint8_t, 4> hnd2 {};  // 5b-5e  header end (FF FF 00 00)
+  uint16_t               cslen {}; // 5f,60  CSewSeg length (7)
+  std::array<char, 7>    cs {};    // 61-67  CSewSeg identification (CSewSeg)
+
+  //  uint16_t               styp1;    // 68,69  Stitch type (0)
+  //  uint16_t               scol;     // 6a,6b  Stitch Palette thread index
+
+  // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
   constexpr PESHED() noexcept = default;
   // PESHED(PESHED&&) = default;
@@ -122,68 +197,105 @@ class PESHED
   // PESHED& operator=(PESHED&&) = default;
   //~PESHED() = default;
 };
-// clang-format on
 #pragma pack(pop)
 
+#ifdef USE_PESLED
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
+// NOLINTBEGIN(readability-magic-numbers)
 class PESLED
 {
-  public:
-  int8_t   ver[8] {};
-  uint32_t pec {};
+  private:
+  std::array<int8_t, 8> m_ver {};
+  uint32_t              m_pec {};
 
-  constexpr PESLED() noexcept = default;
+  public:
+  explicit inline constexpr PESLED() noexcept = default;
   // PESLED(PESLED&&) = default;
   // PESLED& operator=(PESLED const& rhs) = default;
   // PESLED& operator=(PESLED&&) = default;
   //~PESLED() = default;
 };
+// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
+#endif
 
 #pragma pack(push, 1)
 class PESSTCHLST
 {
-  public:
-  uint16_t stitchtype {};
-  uint16_t threadIndex {};
-  uint16_t stitchcount {};
+  private:
+  uint16_t m_stitchType {};
+  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
+  uint16_t m_threadIndex {};
+  uint16_t m_stitchCount {};
+  // NOLINTEND(clang-diagnostic-unused-private-field)
 
+  public:
   // constexpr PESSTCHLST() noexcept = default;
+  explicit constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
+      m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
+  }
   // PESSTCHLST(PESSTCHLST&&) = default;
   // PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
   // PESSTCHLST& operator=(PESSTCHLST&&) = default;
   //~PESSTCHLST() = default;
+
+  void setStitchType(uint32_t stype) {
+	m_stitchType = gsl::narrow<uint16_t>(stype);
+  }
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 class PESTCH
 {
-  public:
-  int16_t x {};
-  int16_t y {};
+  private:
+  int16_t m_x {};
+  int16_t m_y {};
 
-  constexpr PESTCH() noexcept = default;
+  public:
+  // PESTCH() noexcept = default;
   // PESTCH(PESTCH&&) = default;
   // PESTCH& operator=(PESTCH const& rhs) = default;
   // PESTCH& operator=(PESTCH&&) = default;
   //~PESTCH() = default;
+  inline auto operator=(F_POINT const& rhs) -> PESTCH&;
 };
 #pragma pack(pop)
 
+inline auto PESTCH::operator=(F_POINT const& rhs) -> PESTCH& {
+  m_x = wrap::round<int16_t>(rhs.x);
+  m_y = wrap::round<int16_t>(rhs.y);
+
+  return *this;
+}
+
 class THREAD
 {
-  public:
-  PEC_COLOR   color {};
-  char const* description {};
-  char const* catalogNumber {};
+  private:
+  PEC_COLOR m_color {};
+  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
+  char const* m_description {};
+  char const* m_catalogNumber {};
+  // NOLINTEND(clang-diagnostic-unused-private-field)
 
+  public:
   // constexpr THREAD() noexcept = default;
+  explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
+      m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
+  }
   // THREAD(THREAD const&) = default;
   // THREAD(THREAD&&) = default;
   // THREAD& operator=(THREAD const& rhs) = default;
   // THREAD& operator=(THREAD&&) = default;
   //~THREAD() = default;
+
+  [[nodiscard]] constexpr auto getColor() const noexcept -> PEC_COLOR const& {
+	return m_color;
+  }
+
+  [[nodiscard]] constexpr auto getRGB() const noexcept -> COLORREF {
+	return RGB(m_color.r, m_color.g, m_color.b);
+  }
 };
 
 constexpr auto BIT12    = uint32_t {0x800U}; // Set bit 12 if delta is negative
@@ -208,7 +320,9 @@ void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float 
 void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace pi
 
-static auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
+namespace {
+auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
+} // namespace
 
 static constexpr auto INDEX00 = THREAD {{0x00, 0x00, 0x00}, "Unknown", ""};
 static constexpr auto INDEX01 = THREAD {{0x1a, 0x0a, 0x94}, "Prussian Blue", "ETP007"};
@@ -331,25 +445,28 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 // clang-format on
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
-  auto translatedColor = PES_THREAD[colorIndex].color;
+  auto const& translatedColor = PES_THREAD.at(colorIndex).getColor();
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color.b) - gsl::narrow_cast<int32_t>(translatedColor.b);
-  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
+  // NOLINTBEGIN(readability-magic-numbers)
+  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NO LINTNEXTLINE(readability-magic-numbers)
   return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
                                          (((767 - meanR) * deltaB * deltaB) / 256)));
+  // NOLINTEND(readability-magic-numbers)
 }
 
 void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset) {
   auto const oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(PESTCH));
   auto* pesStitch = convertFromPtr<PESTCH*>(&buffer[oldSize]);
+  if (nullptr == pesStitch) {
+	throw;
+  }
   auto const scaledStitch = F_POINT {-stitch.x * IPECFACT + offset.x, stitch.y * IPECFACT - offset.y};
-  pesStitch->x = wrap::round<int16_t>(scaledStitch.x);
-  pesStitch->y = wrap::round<int16_t>(scaledStitch.y);
+  *pesStitch = scaledStitch;
 }
 
 void pi::ritpesCode(std::vector<uint8_t>& buffer) {
@@ -372,18 +489,18 @@ void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
+// ReSharper disable CppDeprecatedEntity
 void pi::pecnam(gsl::span<char> const& label) {
-  // ReSharper disable once CppDeprecatedEntity
-  strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(label.data(), "LA:", 3);
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
   auto* ptr = std::next(label.data(), 3U);
-  // ReSharper disable once CppDeprecatedEntity
-  strncpy(ptr, fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(ptr, fileStem.c_str(), lblSize);
 }
+// ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
 
 void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta) {
@@ -419,41 +536,44 @@ void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, fl
 	pecEncodeInt(buffer, deltaX);
 	pecEncodeInt(buffer, deltaY);
   }
-  thisStitch.x += wrap::toFloat(deltaX) * IPECFACT;
-  thisStitch.y += -wrap::toFloat(deltaY) * IPECFACT;
+  thisStitch += F_POINT {deltaX, -deltaY} * IPECFACT;
 }
 
 void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
+  // NOLINTBEGIN(readability-magic-numbers)
   buffer.push_back(0xfe);
   buffer.push_back(0xb0);
   buffer.push_back(val);
+  // NOLINTEND(readability-magic-numbers)
 }
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
-  auto*      pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
-  auto&      pad        = pecHeader->pad;
-  auto const pesColors  = gsl::span(std::begin(pad), sizeof(pad));
-  auto       thisStitch = F_POINT {};
+  auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
+  auto  thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
-  auto iColor  = 1U;
-  auto color   = StitchBuffer->front().attribute & COLMSK;
-  auto iPEC    = wrap::next(PESequivColors.begin(), color);
-  pesColors[0] = *iPEC;
-  for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
-	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	if ((stitchFwd1.attribute & COLMSK) != color) {
-	  color = stitchFwd1.attribute & COLMSK;
+  auto iColor      = 1U;
+  auto color       = StitchBuffer->front().attribute & COLMSK;
+  auto iPEC        = wrap::next(PESequivColors.begin(), color);
+  auto iPesColors  = pecHeader->pad.begin();
+  *iPesColors++    = *iPEC;
+  auto stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
+  for (auto& stitch : stitchRange) {
+	if ((stitch.attribute & COLMSK) != color) {
+	  color = stitch.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
-	  iPEC              = wrap::next(PESequivColors.begin(), color);
-	  pesColors[iColor] = *iPEC;
+	  iPEC          = wrap::next(PESequivColors.begin(), color);
+	  *iPesColors++ = *iPEC;
 	  ++iColor;
 	}
-	auto const xDelta = stitchFwd1.x - thisStitch.x;
-	auto const yDelta = stitchFwd1.y - thisStitch.y;
+	auto const xDelta = stitch.x - thisStitch.x;
+	auto const yDelta = stitch.y - thisStitch.y;
 	rpcrd(buffer, thisStitch, xDelta, yDelta);
   }
+  // add the end marker
+  // NOLINTBEGIN(readability-magic-numbers)
   buffer.push_back(0xffU);
-  buffer.push_back(0x0U);
+  buffer.push_back(0x00U);
+  // NOLINTEND(readability-magic-numbers)
 }
 
 void pi::writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image) {
@@ -478,10 +598,10 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
   for (auto const& stitch : *StitchBuffer) {
-	auto const xCoord = wrap::to_ptrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
-	auto const yCoord = wrap::to_ptrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
+	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
-	auto const iRow       = std::next((*iThumbnail).begin(), xCoord);
+	auto const iRow       = std::next(iThumbnail->begin(), xCoord);
 	*iRow                 = 1U;
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
@@ -489,10 +609,10 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   thumbnail        = IMAGE_WITH_FRAME;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
   for (auto const& stitch : *StitchBuffer) {
-	auto const xCoord = wrap::to_ptrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
-	auto const yCoord = wrap::to_ptrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
+	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
-	auto const iRow       = std::next((*iThumbnail).begin(), xCoord);
+	auto const iRow       = std::next(iThumbnail->begin(), xCoord);
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  *iRow = 1U;
 	}
@@ -507,17 +627,16 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 }
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
-  auto const& threadColor = PES_THREAD[pesColors[index++] % THTYPCNT];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-  auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-  auto       iUserColor = UserColor.cbegin();
+  auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
+  auto const  color       = threadColor.getRGB();
+  auto        iUserColor  = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
 	if (*iUserColor == color) {
 	  return iColor;
 	}
 	++iUserColor;
   }
-  auto minimumDistance = std::numeric_limits<uint32_t>::max();
+  auto minimumDistance = BIGUINT;
   auto matchIndex      = 0U;
   for (auto iColor = 1U; iColor < activeColor; ++iColor) {
 	auto const matchDistance = pesmtch(color, pesColors[iColor]);
@@ -556,16 +675,19 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());
 
   constexpr auto PESSTR = "#PES"; // PES lead in value
-  if (strncmp(static_cast<const char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) != 0) {
+  if (strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
   }
-  auto        contFlag      = false;
-  const char* verStrArray[] = {
+  constexpr auto VERLEN = 13; // number of version strings in the array
+
+  constexpr std::array<const char*, VERLEN> VER_STRINGS = {
       "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
-  for (auto const& version : verStrArray) {
-	if (strncmp(static_cast<const char*>(pesHeader->ledV), version, strlen(version)) == 0) {
+
+  auto contFlag = false;
+  for (auto const& version : VER_STRINGS) {
+	if (strncmp(pesHeader->ledV.data(), version, pesHeader->ledV.size()) == 0) {
 	  contFlag = true;
 	  break;
 	}
@@ -582,8 +704,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   auto const pesColorCount = pecHeader->colorCount + 1U;
-  auto&      pad           = pecHeader->pad;
-  auto const pesColors     = gsl::span(std::begin(pad), pesColorCount);
+  auto const pesColors     = gsl::span<uint8_t> {pecHeader->pad.data(), pesColorCount};
   auto       colorMap      = boost::dynamic_bitset<>(THTYPCNT);
   auto       iUserColor    = UserColor.begin();
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
@@ -591,22 +712,18 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  if (colorMap.test_set(pesColors[iColor])) {
 		continue;
 	  }
-	  auto const& threadColor = PES_THREAD[pesColors[iColor]];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-	  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-	  *iUserColor      = color;
+	  auto const& threadColor = PES_THREAD.at(pesColors[iColor]);
+	  auto const  color       = threadColor.getRGB();
+	  *iUserColor             = color;
 	  ++iUserColor;
 	  if (iUserColor == UserColor.end()) {
 		break;
 	  }
 	  continue;
 	}
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-	auto const color = RGB(PES_THREAD[0].color.r,
-	                       PES_THREAD[0].color.g,
-	                       PES_THREAD[0].color.b); // color unknown
+	auto constexpr COLOR = PES_THREAD[0].getRGB(); // color unknown
 
-	*iUserColor = color;
+	*iUserColor = COLOR;
 	++iUserColor;
   }
   auto loc = F_POINT {};
@@ -621,15 +738,17 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto const pecCount   = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
   StitchBuffer->clear();
   StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
-  StitchBuffer->push_back(F_POINT_ATTR {});
+  StitchBuffer->emplace_back();
   constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
   auto       pesColorIndex = uint32_t {1U};
-  auto const pesStitches   = gsl::span(pesStitch, pecCount);
+  auto const pesStitches   = gsl::span<const uint8_t> {pesStitch, pecCount};
   while (iPESstitch < pecCount) {
+	// check for end marker NOLINTNEXTLINE(readability-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xff && pesStitches[iPESstitch + 1U] == 0) {
 	  break;
 	}
+	// check for color change NOLINTNEXTLINE(readability-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xfe && pesStitches[iPESstitch + 1U] == 0xb0) {
 	  color = pi::dupcol(pesColors, wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
 	  iPESstitch += 2;
@@ -648,18 +767,20 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		++iPESstitch;
 	  }
 	  else {
-		if (pesStitches[iPESstitch] > 0x3f) {
+		// NOLINTBEGIN(readability-magic-numbers)
+		if (pesStitches[iPESstitch] > 0x3f) { // if the value is more than 63 flip sign
 		  locof = wrap::toFloat(pesStitches[iPESstitch]) - 128.0F;
 		}
 		else {
 		  locof = pesStitches[iPESstitch];
 		}
+		// NOLINTEND(readability-magic-numbers)
 	  }
 	  locof *= IPECFACT;
 	  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 	  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 		loc.y -= locof;
-		StitchBuffer->push_back(F_POINT_ATTR {loc.x, loc.y, color});
+		StitchBuffer->emplace_back(loc.x, loc.y, color);
 	  }
 	  else {
 		loc.x += locof;
@@ -678,8 +799,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
@@ -703,21 +823,22 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto PESVSTR = "0001";    // PES version
   constexpr auto EMBSTR  = "CEmbOne"; // emb section lead in
   constexpr auto SEWSTR  = "CSewSeg"; // sewing segment leadin
-  // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.ledI), PESISTR, strlen(PESISTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
-  // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.ledV), PESVSTR, strlen(PESVSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
+  constexpr auto AT5OFF  = 350.0F;    // Affine transform offset 5
+  constexpr auto AT6OFF  = 100.0F;    // Affine transform offset 6
+
+  // ReSharper disable CppDeprecatedEntity
+  strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.celn, strlen(EMBSTR));
-  // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.ce), EMBSTR, pesHeader.celn); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.ce.data(), EMBSTR, pesHeader.celn); // NO LINT(clang-diagnostic-deprecated-declarations)
   wrap::narrow(pesHeader.cslen, strlen(SEWSTR));
-  // ReSharper disable once CppDeprecatedEntity
-  strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.cs.data(), SEWSTR, pesHeader.cslen); // NO LINT(clang-diagnostic-deprecated-declarations)
+  // ReSharper restore CppDeprecatedEntity
   {
 	auto iPEC = PESequivColors.begin();
 	for (auto const& color : UserColor) {
 	  auto matchIndex = 0U;
-	  auto matchMin   = std::numeric_limits<uint32_t>::max();
+	  auto matchMin   = BIGUINT;
 	  for (auto iColorMatch = 1U; iColorMatch < THTYPCNT; ++iColorMatch) {
 		auto const match = pi::pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch));
 		if (match < matchMin) {
@@ -731,7 +852,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   auto stitchColor  = StitchBuffer->front().attribute & COLMSK;
   auto boundingRect = F_RECTANGLE {};
-  thred::sizstch(boundingRect, *StitchBuffer);
+  thred::stchrct(boundingRect);
   auto const offset      = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
                                wrap::midl(boundingRect.top, boundingRect.bottom)};
   pesHeader.atfm1        = 1.0F;
@@ -742,8 +863,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.ysiz         = wrap::round<int16_t>(designSizeY);
   auto const hoopSizeX   = IniFile.hoopSizeX * PECFACT;
   auto const hoopSizeY   = IniFile.hoopSizeY * PECFACT;
-  pesHeader.atfm5        = 350.0F + (hoopSizeX / 2.0F) - (designSizeX / 2.0F);
-  pesHeader.atfm6        = 100.0F + (designSizeY) + (hoopSizeY / 2.0F) - (designSizeY / 2.0F);
+  pesHeader.atfm5        = AT5OFF + (hoopSizeX * HALF) - (designSizeX * HALF);
+  pesHeader.atfm6        = AT6OFF + (designSizeY) + (hoopSizeY * HALF) - (designSizeY * HALF);
   auto pesBuffer         = std::vector<uint8_t> {};
   // ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
   auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
@@ -752,7 +873,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   auto blockIndex      = uint16_t {}; // Index into the stitch blocks
   auto iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
   auto currentColor    = *iPESequivColors;
-  threadList.push_back(PES_COLOR_LIST {blockIndex, currentColor});
+  threadList.emplace_back(blockIndex, currentColor);
   pesBuffer.resize(sizeof(PESSTCHLST));
   // first block is a jump in place
   pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
@@ -788,14 +909,17 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  // write stitch
 	  pi::ritpesCode(pesBuffer);
 	  // close out the previous block
-	  auto* blockHeader        = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
-	  blockHeader->stitchcount = gsl::narrow<uint16_t>(stitchCount);
+	  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+	  if (nullptr == blockHeader) {
+		throw std::runtime_error("blockHeader is null");
+	  }
+	  blockHeader->setStitchType(stitchCount);
 	  // save the thread/color information
 	  ++pesThreadCount;
 	  stitchColor     = StitchBuffer->operator[](iStitch).attribute & COLMSK;
 	  iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
 	  currentColor    = *iPESequivColors;
-	  threadList.push_back(PES_COLOR_LIST {blockIndex, currentColor});
+	  threadList.emplace_back(blockIndex, currentColor);
 	  // then create the jump block
 	  pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
 	  ++blockIndex;
@@ -812,8 +936,11 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	}
   }
   // finalize the last stitch block
-  auto* blockHeader        = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
-  blockHeader->stitchcount = gsl::narrow_cast<uint16_t>(stitchCount);
+  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+  if (nullptr == blockHeader) {
+	throw std::runtime_error("blockHeader is null");
+  }
+  blockHeader->setStitchType(stitchCount);
   // write the color/thread table
   lastIndex = pesBuffer.size();
   pesBuffer.resize(lastIndex + sizeof(uint16_t));
@@ -831,12 +958,14 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  CloseHandle(fileHandle);
 	  return false;
 	}
-	auto const colorEntries = gsl::span(colorEntry, 2);
-	colorEntries[0]         = threadList[paletteIndex].blockIndex;
-	colorEntries[1]         = threadList[paletteIndex].colorIndex;
+	auto const colorEntries = gsl::span<uint16_t> {colorEntry, 2};
+	colorEntries[0]         = threadList[paletteIndex].getBlockIndex();
+	colorEntries[1]         = threadList[paletteIndex].getColorIndex();
   }
-  pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
-  pesHeader.blct    = 1;
+  pesHeader.off  = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
+  pesHeader.blct = 1;
+  // NOLINTBEGIN(readability-magic-numbers)
+  // write the header end markers
   pesHeader.hnd1[0] = 0xff;
   pesHeader.hnd1[1] = 0xff;
   pesHeader.hnd1[2] = 0x00;
@@ -846,6 +975,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.hnd2[1] = 0xff;
   pesHeader.hnd2[2] = 0x00;
   pesHeader.hnd2[3] = 0x00;
+  // NOLINTEND(readability-magic-numbers)
   GroupStartStitch  = 0;
   GroupEndStitch    = wrap::toUnsigned(StitchBuffer->size() - 1U);
   auto bytesWritten = DWORD {};
@@ -876,6 +1006,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   std::fill(fstart, fend, ' ');
   pecHeader->labnd = '\r'; // 13 = carriage return
   wrap::narrow(pecHeader->colorCount, pesThreadCount);
+  // write the remainder of the header with magic numbers
+  // NOLINTBEGIN(readability-magic-numbers)
   pecHeader->hnd1        = 0x00ff;
   pecHeader->thumbHeight = THUMBHGT;
   pecHeader->thumbWidth  = THUMBWID / BTSPBYTE;
@@ -889,6 +1021,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pecHeader2->height          = pesHeader.ysiz;
   pecHeader2->unknown4        = 0x01e0;
   pecHeader2->unknown5        = 0x01b0;
+  // NOLINTEND(readability-magic-numbers)
 
   constexpr auto PECMASK1 = uint16_t {0x9000U}; //
   constexpr auto LOWBMASK = uint16_t {0x00ffU}; // low byte mask

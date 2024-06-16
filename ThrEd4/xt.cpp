@@ -4,13 +4,64 @@
 #include "switches.h"
 #include "clip.h"
 #include "displayText.h"
+#include "EnumMap.h"
 #include "form.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "menu.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 #include "xt.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/compile.h"
+#include "gsl/narrow"
+#include "gsl/pointers"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <sysinfoapi.h>
+#include <windef.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <array>
+#include <cstring>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cwchar>
+#include <filesystem>
+#include <iterator>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 class FEATHER
 {
@@ -110,7 +161,7 @@ constexpr auto M_FCOL   = 1U << 9U;
 constexpr auto M_FTHCOL = 1U << 10U;
 constexpr auto M_ECOL   = 1U << 11U;
 
-enum StitchStyles {
+enum StitchStyles : char {
   TYPE_APPLIQUE = 1, // applique
   TYPE_CWALK,        // center walk
   TYPE_EWALK,        // edge walk
@@ -138,6 +189,7 @@ static constexpr auto STITCH_TYPES = std::array<char, 13> {
 
 namespace xi {
 
+void addNewStitches(INT_INFO& ilData, const FRM_HEAD& form);
 void bcolfn(uint32_t formIndex, uint8_t color);
 void blenfn(uint32_t formIndex, float length);
 void bmaxfn(uint32_t formIndex, float length);
@@ -204,10 +256,10 @@ auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> c
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
 auto orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool;
 auto orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool;
-void rtrclpfn(FRM_HEAD const& form);
 void ritwlk(FRM_HEAD& form, uint32_t walkMask);
 void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
 void sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
+void setColorOrder() noexcept;
 
 auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
@@ -227,8 +279,10 @@ void uspacfn(uint32_t formIndex, float spacing);
 void xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept;
 } // namespace xi
 
-static auto DesignSize = F_POINT {};                        // design size
-static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
+namespace {
+auto DesignSize = F_POINT {};                        // design size
+auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
+} // namespace
 
 void xt::setfchk() {
   if (IniFile.dataCheck != 0U) {
@@ -239,14 +293,14 @@ void xt::setfchk() {
 void xi::fthvars(FRM_HEAD const& form, FEATHER& feather) {
   StateMap->reset(StateFlag::BARSAT);
   StateMap->reset(StateFlag::FTHR);
-  feather.fillType          = form.fillInfo.feather.fillType;
-  feather.formRatio         = form.fillInfo.feather.ratio;
-  feather.minStitch         = form.fillInfo.feather.minStitchSize;
-  feather.totalCount        = form.fillInfo.feather.count;
+  feather.fillType          = form.feather.fillType;
+  feather.formRatio         = form.feather.ratio;
+  feather.minStitch         = form.feather.minStitchSize;
+  feather.totalCount        = form.feather.count;
   feather.extendedAttribute = form.extendedAttribute;
-  feather.countUp           = form.fillInfo.feather.upCount;
+  feather.countUp           = form.feather.upCount;
   feather.upCount           = feather.countUp;
-  feather.countDown         = form.fillInfo.feather.downCount;
+  feather.countDown         = form.feather.downCount;
   feather.downCount         = feather.countDown;
   feather.phaseIndex        = feather.upCount + feather.downCount;
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -262,8 +316,8 @@ constexpr auto xi::durat(float start, float finish, float featherRatio) -> float
 }
 
 void xi::duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept {
-  point.x = durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal);
-  point.y = durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal);
+  point = F_POINT {durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal),
+                   durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal)};
 }
 
 void xi::durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather) {
@@ -341,10 +395,10 @@ void xi::nurat(FEATHER& feather) noexcept {
 	}
 	case FTHSIN: {
 	  if (remainder > feather.globalRatio) {
-		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F + PI_F) * 0.5F + 0.5F;
+		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F + PI_F) * HALF + HALF;
 	  }
 	  else {
-		feather.ratio = sin(remainder / feather.globalRatio * PI_F) * 0.5F + 0.5F;
+		feather.ratio = sin(remainder / feather.globalRatio * PI_F) * HALF + HALF;
 	  }
 	  feather.ratio *= feather.formRatio;
 	  break;
@@ -387,8 +441,8 @@ void xi::fthfn(uint32_t iSequence, FEATHER& feather) {
 void xi::ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept {
   auto const& bPoint = BSequence->operator[](iPoint);
 
-  point.x = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
-  point.y = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
+  point = F_POINT {((BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x),
+                   ((BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y)};
 }
 
 auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
@@ -396,8 +450,8 @@ auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> 
 }
 
 void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept {
-  point.x = (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x;
-  point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
+  point = F_POINT {((endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x),
+                   ((endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y)};
 }
 
 void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
@@ -405,12 +459,12 @@ void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& fea
   auto nextPoint    = F_POINT {};
 
   auto const& bCurrent = BSequence->operator[](iSequence);
-  auto& bNext          = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+  auto&       bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
-  if (length < (2.0F * feather.minStitch)) {
-	feather.ratio = 0.5F;
+  if (length < (DBLF * feather.minStitch)) {
+	feather.ratio = HALF;
 	ratpnt(iSequence, iSequence + 1, currentPoint, feather.ratio);
 	ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
   }
@@ -430,7 +484,7 @@ void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& fea
 	xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal); // NOLINT(readability-suspicious-call-argument)
   }
   auto const midPoint = midpnt(currentPoint, nextPoint);
-  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
+  OSequence->emplace_back(bCurrent.x, bCurrent.y);
   OSequence->push_back(midPoint);
   featherSequence.emplace_back(bNext.x, bNext.y);
   featherSequence.push_back(midPoint);
@@ -442,15 +496,15 @@ void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
-  OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
-  OSequence->push_back(F_POINT {bNext.x, bNext.y});
+  OSequence->emplace_back(bCurrent.x, bCurrent.y);
+  OSequence->emplace_back(bNext.x, bNext.y);
   if (length <= feather.minStitch) {
 	return;
   }
   auto adjustedPoint = F_POINT {};
   auto currentPoint  = F_POINT {};
   auto nextPoint     = F_POINT {};
-  feather.ratioLocal = 0.5F;
+  feather.ratioLocal = HALF;
   duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
   feather.ratioLocal       = feather.minStitch / length / 2;
   auto const& sequence     = OSequence->operator[](iSequence);
@@ -474,7 +528,7 @@ void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequen
 	return;
   }
   InterleaveSequenceIndices->emplace_back(
-      INS_REC {FTHMSK, form.fillInfo.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
+      INS_REC {FTHMSK, form.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
@@ -504,14 +558,15 @@ void xt::fthrfn(FRM_HEAD& form) {
   if (res > (feather.phaseIndex << 1U)) {
 	++ind;
   }
+  constexpr auto FSTEPSZ = 4.0F;
   feather.globalPosition = 0.0F;
-  feather.globalStep     = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
-  feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
-  feather.globalRatio    = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
-  feather.globalUp       = feather.globalPhase * feather.globalRatio;
-  feather.globalDown     = feather.globalPhase - feather.globalUp;
-  form.fillType          = FTHF;
-  feather.phase          = 1U;
+  feather.globalStep  = (FSTEPSZ / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
+  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
+  feather.globalRatio = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
+  feather.globalUp    = feather.globalPhase * feather.globalRatio;
+  feather.globalDown  = feather.globalPhase - feather.globalUp;
+  form.fillType       = FTHF;
+  feather.phase       = 1U;
   BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
   BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -536,12 +591,12 @@ void xt::fthrfn(FRM_HEAD& form) {
 			xi::fthfn(ind, feather);
 		  }
 		  else {
-			OSequence->push_back(F_POINT {BSequence->operator[](ind).x, BSequence->operator[](ind).y});
+			OSequence->emplace_back(BSequence->operator[](ind).x, BSequence->operator[](ind).y);
 		  }
 		}
 		else {
 		  if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
-			OSequence->push_back(F_POINT {BSequence->operator[](ind).x, BSequence->operator[](ind).y});
+			OSequence->emplace_back(BSequence->operator[](ind).x, BSequence->operator[](ind).y);
 		  }
 		  else {
 			xi::fthfn(ind, feather);
@@ -563,20 +618,20 @@ void xt::fethrf(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.type                           = SAT;
-  form.fillInfo.feather.ratio         = IniFile.featherRatio;
-  form.fillInfo.feather.upCount       = IniFile.featherUpCount;
-  form.fillInfo.feather.downCount     = IniFile.featherDownCount;
-  form.fillInfo.feather.fillType      = IniFile.featherFillType;
-  form.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+  form.type                  = SAT;
+  form.feather.ratio         = IniFile.featherRatio;
+  form.feather.upCount       = IniFile.featherUpCount;
+  form.feather.downCount     = IniFile.featherDownCount;
+  form.feather.fillType      = IniFile.featherFillType;
+  form.feather.minStitchSize = IniFile.featherMinStitchSize;
   form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
   form.extendedAttribute |= IniFile.featherType;
-  form.fillInfo.feather.count     = IniFile.featherCount;
-  form.lengthOrCount.stitchLength = UserStitchLength;
-  form.fillSpacing                = LineSpacing;
-  form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
-  form.fillInfo.feather.color     = (ActiveColor + 1U) & COLMSK;
-  form.fillType                   = FTHF;
+  form.feather.count = IniFile.featherCount;
+  form.stitchLength  = UserStitchLength;
+  form.fillSpacing   = LineSpacing;
+  form.fillColor     = gsl::narrow<uint8_t>(ActiveColor);
+  form.feather.color = (ActiveColor + 1U) & COLMSK;
+  form.fillType      = FTHF;
   form::refilfn(formIndex);
 }
 
@@ -667,8 +722,7 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 		auto point = *sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
 		  InterleaveSequence->push_back(point);
-		  point.x += step.x;
-		  point.y += step.y;
+		  point += step;
 		}
 	  }
 	  else {
@@ -693,7 +747,9 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto       length      = hypot(finish.x - start.x, finish.y - start.y);
   auto       startVertex = form::closflt(form, start.x, start.y);
   auto const endVertex   = form::closflt(form, finish.x, finish.y);
-  if (length < 5.0F) {
+
+  constexpr auto MINCONN = 5.0F; // if connector is less than this, don't bother
+  if (length < MINCONN) {
 	return 0;
   }
   if (startVertex == endVertex) {
@@ -702,7 +758,7 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto const& indentedPoint = xt::insid(form);
   auto        upDir         = startVertex;
   auto        downDir       = startVertex;
-  do {
+  while (true) {
 	if (upDir == endVertex) {
 	  StateMap->reset(StateFlag::WLKDIR);
 	  break;
@@ -713,7 +769,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	}
 	upDir   = form::nxt(form, upDir);
 	downDir = form::prv(form, downDir);
-  } while (true);
+  }
   auto iStitch = destination;
   while (startVertex != endVertex) {
 	if (iStitch != 0U) {
@@ -741,8 +797,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	  for (auto iStep = 0U; iStep < stitchCount - 1U; ++iStep) {
 		buffer.emplace_back(localPoint.x, localPoint.y, code);
 		++iStitch;
-		localPoint.x += step.x;
-		localPoint.y += step.y;
+		localPoint += step;
 	  }
 	}
 	if (StateMap->test(StateFlag::WLKDIR)) {
@@ -795,21 +850,21 @@ void xi::fncwlk(FRM_HEAD& form) {
 	if (form.wordParam != 0U) {
 	  auto const thisVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
-	  OSequence->push_back(F_POINT {wrap::midl(thisVertex->x, nextVertex->x),
-	                                wrap::midl(thisVertex->y, nextVertex->y)});
+	  OSequence->emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
+	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
-	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + form.satinGuideCount - 1U);
+	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
-	  OSequence->push_back(F_POINT {wrap::midl(finishVertex->x, startVertex->x),
-	                                wrap::midl(finishVertex->y, startVertex->y)});
+	  OSequence->emplace_back(wrap::midl(finishVertex->x, startVertex->x),
+	                          wrap::midl(finishVertex->y, startVertex->y));
 	  --itGuide;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
-	  OSequence->push_back(F_POINT {wrap::midl(itVertex[0].x, itVertex[1].x),
-	                                wrap::midl(itVertex[0].y, itVertex[1].y)});
+	  OSequence->emplace_back(wrap::midl(itVertex[0].x, itVertex[1].x),
+	                          wrap::midl(itVertex[0].y, itVertex[1].y));
 	}
   }
   else {
@@ -935,7 +990,7 @@ void xi::fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments
   auto& form = FormList->operator[](formIndex);
 
   auto const savedStitchSize = UserStitchLength;
-  UserStitchLength           = std::numeric_limits<float>::max();
+  UserStitchLength           = BIGFLOAT;
   if (form.underlaySpacing == 0.0F) {
 	form.underlaySpacing = IniFile.underlaySpacing;
   }
@@ -974,16 +1029,18 @@ auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
   if (bit == 0) {
 	return 0U;
   }
-  auto const result = gsl::narrow_cast<uint8_t>((bit & B1MASK) - 18U);
-  if ((result != 12U) || ((maskedAttribute & TYPATMSK) == 0)) {
+  auto const     result  = gsl::narrow_cast<uint8_t>((bit & B1MASK) - STSHFT);
+  constexpr auto USRSTCH = 12U;
+  if ((result != USRSTCH) ||                 // check if bit 31 is set (user edited stitch)
+      ((maskedAttribute & TYPATMSK) == 0)) { // check if the stitch is a form stitch
 	return result & NIBMASK;
   }
-  return 1U;
+  return 1U; // must be an applique stitch
 }
 
 void xi::durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   auto const itStitch = wrap::next(StitchBuffer->begin(), record.start);
-  record.type = gsl::narrow_cast<decltype(record.type)>(STITCH_TYPES[dutyp(itStitch->attribute)]);
+  record.type = gsl::narrow_cast<decltype(record.type)>(STITCH_TYPES.at(dutyp(itStitch->attribute)));
   auto const attribute = itStitch->attribute & SRTMSK;
   record.color         = attribute & COLMSK;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
@@ -1057,14 +1114,14 @@ auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> c
   formFillCounter.resize((FormList->size() + 2U) << 2U);
   auto totalJumps = 0U;
   while (chkrdun(formFillCounter, pRecs, sortRecord)) {
-	auto       minimumLength = std::numeric_limits<float>::max();
+	auto       minimumLength = BIGFLOAT;
 	auto const stitchIt      = (direction)
 	                               ? wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
 	                               : wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
 	  if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 		auto const& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
-		auto length             = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
+		auto        length      = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
 		if (length < minimumLength) {
 		  minimumLength = length;
 		  direction     = false;
@@ -1126,7 +1183,6 @@ auto xi::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> co
 
 void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
   for (auto iRegion = 0U; iRegion < count; ++iRegion) {
-	// NOLINTNEXTLINE
 	outDebugString(
 	    L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 	    iRegion,
@@ -1172,6 +1228,18 @@ auto xi::srtchk(std::vector<O_REC*> const& stitchRegion,
   return true;
 }
 
+void xi::setColorOrder() noexcept {
+  auto itColorOrder = wrap::next(ColorOrder.begin(), AppliqueColor);
+  *itColorOrder     = 0;
+  itColorOrder      = ColorOrder.begin();
+  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
+	if (iColor != AppliqueColor) {
+	  *itColorOrder = iColor + 1U;
+	}
+	++itColorOrder;
+  }
+}
+
 void xt::fsort() {
   if (!StitchBuffer->empty()) {
 	auto attribute    = StitchBuffer->front().attribute & SRTMSK;
@@ -1184,23 +1252,13 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(O_REC {});
 	stitchRegion.back().startStitch = 0;
-	auto itColorOrder               = wrap::next(ColorOrder.begin(), AppliqueColor);
-	*itColorOrder                   = 0;
-	itColorOrder                    = ColorOrder.begin();
-	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	  if (iColor != AppliqueColor) {
-		*itColorOrder = iColor + 1U;
-	  }
-	  ++itColorOrder;
-	}
+	xi::setColorOrder();
 	for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  if ((StitchBuffer->operator[](iStitch).attribute & SRTMSK) != attribute) {
 		stitchRegion.back().finish    = iStitch;
 		stitchRegion.back().endStitch = iStitch - 1U;
-		stitchRegion.emplace_back(O_REC {});
-		stitchRegion.back().start       = iStitch;
-		stitchRegion.back().startStitch = iStitch;
-		attribute                       = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
+		stitchRegion.emplace_back(O_REC {iStitch, 0, iStitch, 0, 0, 0, 0, 0});
+		attribute = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
 	  }
 	}
 	stitchRegion.back().finish    = wrap::toUnsigned(StitchBuffer->size());
@@ -1228,7 +1286,7 @@ void xt::fsort() {
 	  stitchRange.resize(lastRegion);
 	  stitchRange[0].start = 0;
 	  attribute            = pRecs[0]->color;
-	  auto currentForm     = std::numeric_limits<uint32_t>::max();
+	  auto currentForm     = BIGUINT;
 	  auto typeCount       = 0U;
 	  auto iRange          = 0U;
 	  for (auto iRegion = 0U; iRegion < lastRegion; ++iRegion) {
@@ -1262,7 +1320,7 @@ void xt::fsort() {
 		sortRecord.start  = stitchRange[iRange].start;
 		sortRecord.finish = stitchRange[iRange].finish;
 		sortRecord.count  = sortRecord.finish - sortRecord.start;
-		auto minimumJumps = std::numeric_limits<uint32_t>::max();
+		auto minimumJumps = BIGUINT;
 		// timeout used to put an upper bound on the number of sorting permutations checked
 		auto fileTime = FILETIME {};
 		GetSystemTimeAsFileTime(&fileTime);
@@ -1322,7 +1380,7 @@ void xi::duatf(uint32_t ind) {
   auto const attribute       = StitchBuffer->operator[](ind).attribute;
   auto       attributeFields = ATFLD {(attribute & COLMSK),
 									  ((attribute & FRMSK) >> FRMSHFT),
-									  gsl::narrow_cast<uint32_t>(STITCH_TYPES[dutyp(attribute)]),
+									  gsl::narrow_cast<uint32_t>(STITCH_TYPES.at(dutyp(attribute))),
 									  ((attribute >> LAYSHFT) & MSK3BITS),
 									  0};
   // clang-format on
@@ -1357,7 +1415,7 @@ void xt::dmpat() {
 }
 #endif
 
-void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fillStartsMap) {
+void xt::fdelstch(uint32_t formIndex, FillStartsDataType& fillStartsData, uint32_t& fillStartsMap) {
   auto const& form = FormList->operator[](formIndex);
 
   auto iDestinationStitch = 0U;
@@ -1375,39 +1433,39 @@ void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fil
 	}
 	if (auto const attribute = StitchBuffer->operator[](iSourceStitch).attribute;
 	    codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
-	  switch (auto const type = STITCH_TYPES[xi::dutyp(attribute)]; type) {
+	  switch (auto const type = STITCH_TYPES.at(xi::dutyp(attribute)); type) {
 		case TYPE_APPLIQUE: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;
-			fillStartsData.fillNamed.applique = iDestinationStitch;
+			fillStartsData[FSI::applique] = iDestinationStitch;
 		  }
 		  break;
 		}
 		case TYPE_FTHR: {
 		  if ((tmap & M_FTH) == 0U) {
 			tmap |= M_FTH;
-			fillStartsData.fillNamed.feather = iDestinationStitch;
+			fillStartsData[FSI::feather] = iDestinationStitch;
 		  }
 		  break;
 		}
 		case TYPE_FILL: {
 		  if ((tmap & M_FIL) == 0U) {
 			tmap |= M_FIL;
-			fillStartsData.fillNamed.fill = iDestinationStitch;
+			fillStartsData[FSI::fill] = iDestinationStitch;
 		  }
 		  break;
 		}
 		case TYPE_BORDER: {
 		  if ((tmap & M_BRD) == 0U) {
 			tmap |= M_BRD;
-			fillStartsData.fillNamed.border = iDestinationStitch;
+			fillStartsData[FSI::border] = iDestinationStitch;
 		  }
 		  break;
 		}
 		default: {
 		  if ((form.fillType != 0U) && ((tmap & M_FIL) == 0U)) {
 			tmap |= M_FIL;
-			fillStartsData.fillNamed.fill = iDestinationStitch;
+			fillStartsData[FSI::fill] = iDestinationStitch;
 		  }
 		  break;
 		}
@@ -1420,81 +1478,81 @@ void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fil
 	  auto const color = attribute & COLMSK;
 	  if (color == form.fillColor) {
 		tmap |= M_FCOL;
-		fillStartsData.fillNamed.fillColor = iDestinationStitch;
+		fillStartsData[FSI::fillColor] = iDestinationStitch;
 	  }
-	  if (color == form.fillInfo.feather.color) {
+	  if (color == form.feather.color) {
 		tmap |= M_FTHCOL;
-		fillStartsData.fillNamed.featherColor = iDestinationStitch;
+		fillStartsData[FSI::featherColor] = iDestinationStitch;
 	  }
 	  if (color == bordercolor) {
 		tmap |= M_ECOL;
-		fillStartsData.fillNamed.borderColor = iDestinationStitch;
+		fillStartsData[FSI::borderColor] = iDestinationStitch;
 	  }
 	  if (color == appliqueColor) {
 		tmap |= M_APCOL;
-		fillStartsData.fillNamed.appliqueColor = iDestinationStitch;
+		fillStartsData[FSI::appliqueColor] = iDestinationStitch;
 	  }
 	  StitchBuffer->operator[](iDestinationStitch) = StitchBuffer->operator[](iSourceStitch);
 	  ++iDestinationStitch;
 	}
   }
-  ++(fillStartsData.fillNamed.fillColor);
-  ++(fillStartsData.fillNamed.featherColor);
-  ++(fillStartsData.fillNamed.borderColor);
-  ++(fillStartsData.fillNamed.appliqueColor);
+  ++(fillStartsData[FSI::fillColor]);
+  ++(fillStartsData[FSI::featherColor]);
+  ++(fillStartsData[FSI::borderColor]);
+  ++(fillStartsData[FSI::appliqueColor]);
   fillStartsMap = tmap;
   StitchBuffer->resize(iDestinationStitch);
   if ((tmap & M_ECOL) == 0U) {
-	fillStartsData.fillNamed.borderColor = wrap::toUnsigned(StitchBuffer->size());
+	fillStartsData[FSI::borderColor] = wrap::toUnsigned(StitchBuffer->size());
   }
   if ((tmap & M_FTHCOL) == 0U) {
-	fillStartsData.fillNamed.featherColor = wrap::toUnsigned(StitchBuffer->size());
+	fillStartsData[FSI::featherColor] = wrap::toUnsigned(StitchBuffer->size());
   }
   if ((tmap & M_FCOL) == 0U) {
-	fillStartsData.fillNamed.fillColor = wrap::toUnsigned(StitchBuffer->size());
+	fillStartsData[FSI::fillColor] = wrap::toUnsigned(StitchBuffer->size());
   }
   if (form.edgeType != 0U) {
 	if (form.edgeType == EDGEAPPL) {
 	  if ((tmap & M_AP) == 0U) {
 		if ((tmap & M_APCOL) != 0U) {
-		  fillStartsData.fillNamed.applique = fillStartsData.fillNamed.appliqueColor + 1U;
+		  fillStartsData[FSI::applique] = fillStartsData[FSI::appliqueColor] + 1U;
 		}
 		else {
-		  fillStartsData.fillNamed.applique = wrap::toUnsigned(StitchBuffer->size());
+		  fillStartsData[FSI::applique] = wrap::toUnsigned(StitchBuffer->size());
 		}
 	  }
 	}
 	if ((tmap & M_BRD) == 0U) {
 	  if ((tmap & M_ECOL) != 0U) {
-		fillStartsData.fillNamed.border = fillStartsData.fillNamed.borderColor + 1U;
+		fillStartsData[FSI::border] = fillStartsData[FSI::borderColor] + 1U;
 	  }
 	  else {
-		fillStartsData.fillNamed.border = wrap::toUnsigned(StitchBuffer->size());
+		fillStartsData[FSI::border] = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
   if ((form.fillType != 0U) || ((tmap & (M_WALK | M_UND | M_CWLK)) != 0U)) {
 	if ((tmap & M_FIL) == 0U) {
 	  if ((tmap & M_FCOL) != 0U) {
-		fillStartsData.fillNamed.fill = fillStartsData.fillNamed.fillColor + 1U;
+		fillStartsData[FSI::fill] = fillStartsData[FSI::fillColor] + 1U;
 	  }
 	  else {
-		fillStartsData.fillNamed.fill = wrap::toUnsigned(StitchBuffer->size());
+		fillStartsData[FSI::fill] = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
   if (form.fillType == FTHF) {
 	if ((tmap & M_FTH) == 0U) {
 	  if ((tmap & M_FTHCOL) != 0U) {
-		fillStartsData.fillNamed.feather = fillStartsData.fillNamed.featherColor + 1U;
+		fillStartsData[FSI::feather] = fillStartsData[FSI::featherColor] + 1U;
 	  }
 	  else {
-		fillStartsData.fillNamed.feather = wrap::toUnsigned(StitchBuffer->size());
+		fillStartsData[FSI::feather] = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
-	auto const spFillArray = gsl::span {fillStartsData.fillArray};
+	auto const spFillArray = gsl::span {fillStartsData};
 	iDestinationStitch     = ind - 1U;
 	while (iDestinationStitch < ind) {
 	  if (spFillArray[iDestinationStitch] > spFillArray[ind]) {
@@ -1504,8 +1562,7 @@ void xt::fdelstch(uint32_t formIndex, FILL_STARTS& fillStartsData, uint32_t& fil
 	}
   }
   if (!UserFlagMap->test(UserFlag::FIL2OF) && StateMap->test(StateFlag::SELBOX)) {
-	auto& fillArray = fillStartsData.fillArray;
-	std::ranges::fill(fillArray, ClosestPointIndex);
+	std::ranges::fill(fillStartsData, ClosestPointIndex);
   }
 }
 
@@ -1556,7 +1613,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	          code);
   }
   for (auto iSequence = InterleaveSequenceIndices->operator[](ilData.pins).index;
-       iSequence < InterleaveSequenceIndices->     operator[](wrap::toSize(ilData.pins) + 1U).index;
+       iSequence < InterleaveSequenceIndices->operator[](wrap::toSize(ilData.pins) + 1U).index;
        ++iSequence) {
 	if (ilData.output > 0) {
 	  if (auto const& interleave = InterleaveSequence->operator[](iSequence);
@@ -1597,7 +1654,54 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
   }
 }
 
-void xt::intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t fillStartsMap) {
+void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
+  auto code = 0U;
+  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
+	code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
+	       InterleaveSequenceIndices->operator[](iSequence).color;
+	if ((form.extendedAttribute & AT_STRT) != 0U) {
+	  if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
+		auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
+		ilData.output += xi::gucon(
+		    form,
+		    *StitchBuffer,
+		    *itVertex,
+		    InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+		    ilData.output,
+		    code);
+	  }
+	}
+	if (auto colpnt = F_POINT {}; xi::lastcol(iSequence, colpnt)) {
+	  ilData.output +=
+	      xi::gucon(form,
+	                *StitchBuffer,
+	                colpnt,
+	                InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
+	                ilData.output,
+	                code);
+	}
+	auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
+	auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
+	for (auto index = thisIndex; index < nextIndex; ++index) {
+	  if (ilData.output > 0) {
+		auto& interleave = InterleaveSequence->operator[](index);
+		if (auto const& stitch = StitchBuffer->operator[](ilData.output - 1U);
+		    !util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
+		  StitchBuffer->emplace_back(interleave.x, interleave.y, code);
+		  ++(ilData.output);
+		}
+	  }
+	  else {
+		auto& interleave = InterleaveSequence->operator[](index);
+		StitchBuffer->emplace_back(interleave.x, interleave.y, code);
+		++(ilData.output);
+	  }
+	}
+  }
+  xi::chkend(form, *StitchBuffer, code, ilData);
+}
+
+void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uint32_t fillStartsMap) {
   auto ilData = INT_INFO {};
   StateMap->reset(StateFlag::ISEND);
   auto const& form = FormList->operator[](formIndex);
@@ -1612,11 +1716,11 @@ void xt::intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t f
 	  ilData.pins = iSequence;
 	  switch (InterleaveSequenceIndices->operator[](iSequence).seq) {
 		case I_AP: {
-		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData.fillNamed.applique >= ilData.coloc) {
-			ilData.coloc = fillStartsData.fillNamed.applique;
+		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[FSI::applique] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[FSI::applique];
 		  }
 		  else {
-			ilData.coloc = fillStartsData.fillNamed.appliqueColor;
+			ilData.coloc = fillStartsData[FSI::appliqueColor];
 			if (ilData.coloc == 1) {
 			  ilData.coloc = 0;
 			}
@@ -1624,29 +1728,29 @@ void xt::intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t f
 		  break;
 		}
 		case I_FIL: {
-		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData.fillNamed.fill >= ilData.coloc) {
-			ilData.coloc = fillStartsData.fillNamed.fill;
+		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[FSI::fill] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[FSI::fill];
 		  }
 		  else {
-			ilData.coloc = fillStartsData.fillNamed.fillColor;
+			ilData.coloc = fillStartsData[FSI::fillColor];
 		  }
 		  break;
 		}
 		case I_FTH: {
-		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData.fillNamed.feather >= ilData.coloc) {
-			ilData.coloc = fillStartsData.fillNamed.feather;
+		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[FSI::feather] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[FSI::feather];
 		  }
 		  else {
-			ilData.coloc = fillStartsData.fillNamed.featherColor;
+			ilData.coloc = fillStartsData[FSI::featherColor];
 		  }
 		  break;
 		}
 		case I_BRD: {
-		  if (((fillStartsMap & M_BRD) != 0U) && fillStartsData.fillNamed.border >= ilData.coloc) {
-			ilData.coloc = fillStartsData.fillNamed.border;
+		  if (((fillStartsMap & M_BRD) != 0U) && fillStartsData[FSI::border] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[FSI::border];
 		  }
 		  else {
-			ilData.coloc = fillStartsData.fillNamed.borderColor;
+			ilData.coloc = fillStartsData[FSI::borderColor];
 		  }
 		  break;
 		}
@@ -1678,50 +1782,7 @@ void xt::intlv(uint32_t formIndex, FILL_STARTS const& fillStartsData, uint32_t f
 	StitchBuffer->insert(StitchBuffer->begin(), itStartStitch, itEndStitch);
   }
   else { // no stitches added so far
-	auto code = 0U;
-	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
-	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
-	         InterleaveSequenceIndices->                    operator[](iSequence).color;
-	  if ((form.extendedAttribute & AT_STRT) != 0U) {
-		if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
-		  auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
-		  ilData.output += xi::gucon(
-		      form,
-		      *StitchBuffer,
-		      *itVertex,
-		      InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
-		      ilData.output,
-		      code);
-		}
-	  }
-	  if (auto colpnt = F_POINT {}; xi::lastcol(iSequence, colpnt)) {
-		ilData.output += xi::gucon(
-		    form,
-		    *StitchBuffer,
-		    colpnt,
-		    InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
-		    ilData.output,
-		    code);
-	  }
-	  auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
-	  auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
-	  for (auto index = thisIndex; index < nextIndex; ++index) {
-		if (ilData.output > 0) {
-		  auto& interleave = InterleaveSequence->operator[](index);
-		  if (auto const& stitch = StitchBuffer->operator[](ilData.output - 1U);
-		      !util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
-			StitchBuffer->push_back({interleave.x, interleave.y, code});
-			++(ilData.output);
-		  }
-		}
-		else {
-		  auto& interleave = InterleaveSequence->operator[](index);
-		  StitchBuffer->push_back({interleave.x, interleave.y, code});
-		  ++(ilData.output);
-		}
-	  }
-	}
-	xi::chkend(form, *StitchBuffer, code, ilData);
+	xi::addNewStitches(ilData, form);
   }
   thred::coltab();
 }
@@ -1881,7 +1942,7 @@ void xt::dufang(float angle) {
 
 void xi::flenfn(uint32_t formIndex, float length) {
   if (auto& form = FormList->operator[](formIndex); (form.fillType != 0U) && !form.isClip()) {
-	form.lengthOrCount.stitchLength = length;
+	form.stitchLength = length;
 	form::refilfn(formIndex);
   }
 }
@@ -1955,22 +2016,22 @@ void xi::fangfn(uint32_t formIndex, float angle) {
 	  case VRTF:
 	  case HORF:
 	  case ANGF: {
-		form.fillType              = ANGF;
-		form.angleOrClipData.angle = angle;
+		form.fillType  = ANGF;
+		form.fillAngle = angle;
 		break;
 	  }
 	  case VCLPF:
 	  case HCLPF:
 	  case ANGCLPF: {
-		form.fillType           = ANGCLPF;
-		form.satinOrAngle.angle = angle;
+		form.fillType      = ANGCLPF;
+		form.clipFillAngle = angle;
 		break;
 	  }
 	  case TXVRTF:
 	  case TXHORF:
 	  case TXANGF: {
-		form.fillType              = TXANGF;
-		form.angleOrClipData.angle = angle;
+		form.fillType  = TXANGF;
+		form.fillAngle = angle;
 		break;
 	  }
 	  default: {
@@ -2080,7 +2141,7 @@ void xi::blenfn(uint32_t formIndex, float length) {
   if (form.isClip()) {
 	return;
   }
-  form.lengthOrCount.stitchLength = length;
+  form.stitchLength = length;
   form::refilfn(formIndex);
 }
 
@@ -2304,62 +2365,6 @@ void xt::duauxnam(fs::path& auxName) {
   }
 }
 
-void xi::rtrclpfn(FRM_HEAD const& form) {
-  if (OpenClipboard(ThrEdWindow) == 0) {
-	return;
-  }
-  auto count = 0U;
-  if (auto clipRect = F_RECTANGLE {}; form.isEdgeClip()) {
-	count = form.clipEntries;
-	clip::oclp(clipRect, form.borderClipData, count);
-  }
-  else {
-	if (form.isClip()) {
-	  count = form.lengthOrCount.clipCount;
-	  clip::oclp(clipRect, form.angleOrClipData.clip, count);
-	}
-  }
-  if (count == 0U) {
-	CloseClipboard();
-	return;
-  }
-  LowerLeftStitch.x = 0.0F;
-  LowerLeftStitch.y = 0.0F;
-  EmptyClipboard();
-  Clip = RegisterClipboardFormat(PcdClipFormat);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
-  if (nullptr == clipHandle) {
-	CloseClipboard();
-	return;
-  }
-  auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-  if (nullptr == clipStitchData) {
-	CloseClipboard();
-	return;
-  }
-  auto const spClipData = gsl::span(clipStitchData, count);
-  thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
-  for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-	thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
-  }
-  GlobalUnlock(clipHandle);
-  SetClipboardData(Clip, clipHandle);
-  CloseClipboard();
-}
-
-void xt::rtrclp() {
-  if (!StateMap->test(StateFlag::FORMSEL)) {
-	return;
-  }
-  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.isTexture()) {
-	texture::rtrtx(form);
-  }
-  else {
-	xi::rtrclpfn(form);
-  }
-}
-
 void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
   SetWindowText(GetDlgItem(dialog, stringIndex),
                 fmt::format(FMT_COMPILE(L"{:.2f}"), (value * IPFGRAN)).c_str());
@@ -2375,8 +2380,7 @@ auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
 }
 
 auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
-  point.x = getstxt(IDC_DESWID, dialog);
-  point.y = getstxt(IDC_DESHI, dialog);
+  point = F_POINT {getstxt(IDC_DESWID, dialog), getstxt(IDC_DESHI, dialog)};
   // ToDo - should this have a range? aspectRatio +/- %
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
@@ -2392,15 +2396,13 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
 		}
 		case IDOK: {
-		  DesignSize.x = getstxt(IDC_DESWID, hwndlg);
-		  DesignSize.y = getstxt(IDC_DESHI, hwndlg);
+		  DesignSize = F_POINT {getstxt(IDC_DESWID, hwndlg), getstxt(IDC_DESHI, hwndlg)};
 		  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
 			UserFlagMap->set(UserFlag::CHREF);
 		  }
@@ -2435,7 +2437,6 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  break;
 		}
 		default: {
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		  outDebugString(L"default hit in fangfn: wparam [{}]\n", LOWORD(wparam));
 		  break;
 		}
@@ -2489,13 +2490,12 @@ void xt::nudsiz() {
   if (flag == 0) {
 	return;
   }
-  DesignSize.x = designSizeRect.right - designSizeRect.left;
-  DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType CppClangTidyPerformanceNoIntToPtr
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
+  DesignSize =
+      F_POINT {designSizeRect.right - designSizeRect.left, designSizeRect.top - designSizeRect.bottom};
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
   auto const nResult = DialogBox(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType CppClangTidyPerformanceNoIntToPtr
+      ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
 
   if (nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
 	return;
@@ -2523,8 +2523,8 @@ void xt::nudsiz() {
 	displayText::hsizmsg();
   }
   form::centir();
-  for (auto& form : *FormList) {
-	form.outline();
+  for (auto& iForm : *FormList) {
+	iForm.outline();
   }
 }
 
@@ -2547,7 +2547,6 @@ void xt::mvshft() {
   if (!StateMap->test(StateFlag::BZUMIN)) {
 	return;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) == 0U) {
 	return;
   }

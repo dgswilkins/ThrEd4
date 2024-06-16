@@ -51,9 +51,6 @@
     <ClCompile Include="formForms.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="clip.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="satin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -73,6 +70,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="balarad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="reporting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="formClip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="keys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -179,6 +194,21 @@
     <ClInclude Include="menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="balarad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reporting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="formClip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">
@@ -207,6 +237,9 @@
     </None>
     <None Include="cpp.hint" />
     <None Include="..\vcpkg.json" />
+    <None Include="..\vcpkg-configuration.json" />
+    <None Include="..\.clang-tidy" />
+    <None Include="..\.github\workflows\build.yml" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico">

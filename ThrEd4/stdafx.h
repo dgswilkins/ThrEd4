@@ -7,30 +7,12 @@
 
 #ifndef DEBUG_PCH
 
-// Local Headers
-#include "clipStitch.h"
-#include "EnumMap.h"
-#include "ExtendedBitSet.h"
-#include "formHeader.h"
-#include "fRectangle.h"
-#include "point.h"
-#include "satCon.h"
-#include "textureHeader.h"
-#include "ThrEdTypes.h"
-#include "utf8conv.h"
 #include "warnings.h"
-#include "wrappers.h"
-
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26812) // supress warning for fmt library header
-#pragma warning(disable : 26814) // supress warning for boost library header
 #include "boost/dynamic_bitset.hpp"
-#include "fmt/xchar.h"
+#include "fmt/format.h"
 #include "gsl/gsl"
 #pragma warning(pop)
 
@@ -52,12 +34,32 @@
 #include <ShlObj.h>
 
 // Standard Libraries
+#include <algorithm>
+#include <array>
 #include <bitset>
+#include <cctype>
+#include <climits>
+#include <cstring>
+#ifndef _DEBUG
+#include <cmath>
+#endif
+#include <cstddef>
 #include <cstdint>
+#include <cwchar>
+#include <cwctype>
 #include <filesystem>
+#include <iterator>
 #include <limits>
+#include <memory>
 #include <numeric>
+#include <ranges>
+#include <stdexcept>
 #include <string>
+#include <system_error>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 #include <vector>
+#include <xutility>
 
 #endif // DEBUG_PCH

@@ -1,0 +1,32 @@
+﻿Offset,Data,Field,Data Type,Bytes
+0,Header,header type,uint32,4
+4,,file length,uint32,4
+8,,stitch count,uint16,2
+10,,hoop type,uint16,2
+12,,form count,uint16,2
+14,,vertex length,uint16,2
+16,,vertex count,uint16,2
+18,,D-line length,uint16,2
+20,,D-Line count,uint16,2
+22,,clip data length,uint16,2
+24,,clip data count,uint16,2
+26,Extended Header,hoop size X dimension,float,4
+30,,hoop size Y dimension,float,4
+34,,stitches per mm,float,4
+38,,creator name,char[50],50
+88,,modifier name,char[50],50
+138,,Auxilliary file format,int8,1
+139,,reserved,int8,1
+140,,texture point count,uint32,4
+144,,reserved,int8[26],26
+170,Stitch data,,F_POINT_ATTR[stitchcount],12 * stitchcount
+,bitmap name,,char[16],16
+,background color,,COLORREF,4
+,user colors,,COLORREF[16],64
+,custom colors,,COLORREF[16],64
+,thread sizes,,char[16],16
+,forms,,FRM_HEAD_OUT[form count],128 * form count
+,form vertices,,F_POINT[vertex count],8 * vertex count
+,D-lines,,SAT_CON_OUT[D-Line count],4 * D-line count
+,clip points,,F_POINT[clip data count,8 * clip data count
+,texture points,,TX_PNT[texture point count],6 * texture point count

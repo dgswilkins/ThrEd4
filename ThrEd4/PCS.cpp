@@ -3,26 +3,102 @@
 #include "stdafx.h"
 #include "bitmap.h"
 #include "displayText.h"
+#include "EnumMap.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
 #include "PCS.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/span"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <winnt.h>
+
+// Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <cwctype>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 #pragma pack(push, 1)
 
+constexpr auto PCSBMPNSZ = 14;            // Bitmap filename maximum length in PCS spec
+constexpr auto LEADIN    = int8_t {0x32}; // LEADIN marker for PCS file
+
 class PCSHEADER // pcs file header structure
 {
-  public:
-  int8_t   leadIn {};
-  int8_t   hoopType {};
-  uint16_t colorCount {};
-  COLORREF colors[COLORCNT] {}; // NOLINT(modernize-avoid-c-arrays)
-  uint16_t stitchCount {};
+  private:
+  int8_t   m_leadIn {};
+  int8_t   m_hoopType {};
+  uint16_t m_colorCount {};
 
+  std::array<COLORREF, COLORCNT> m_colors {};
+
+  uint16_t m_stitchCount {};
+
+  public:
   constexpr PCSHEADER() noexcept = default;
   // PCSHEADER(PCSHEADER&&) = default;
   // PCSHEADER& operator=(PCSHEADER const& rhs) = default;
   // PCSHEADER& operator=(PCSHEADER&&) = default;
   //~PCSHEADER() = default;
+
+  void writeHeader(std::array<COLORREF, COLORCNT> userColor) {
+	m_leadIn     = LEADIN;
+	m_colorCount = COLORCNT;
+	wrap::narrow(m_stitchCount, StitchBuffer->size());
+	auto const spColors = gsl::span {m_colors};
+	std::ranges::copy(userColor, spColors.begin());
+  }
+
+  constexpr void readHeader(std::array<COLORREF, COLORCNT>& userColor) {
+	std::ranges::copy(m_colors, userColor.begin());
+  }
+
+  [[nodiscard]] auto isValid() const noexcept -> bool {
+	return (m_leadIn == LEADIN && m_colorCount == COLORCNT);
+  }
+
+  constexpr void setHoopType(bool flag) noexcept {
+	m_hoopType = flag ? LARGHUP : SMALHUP;
+  }
+
+  [[nodiscard]] constexpr auto getStitchCount() const noexcept -> uint16_t {
+	return m_stitchCount;
+  }
+
+  [[nodiscard]] constexpr auto getHoopType() const noexcept -> int8_t {
+	return m_hoopType;
+  }
 };
 #pragma pack(pop)
 
@@ -55,23 +131,20 @@ namespace pci {
 auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
 } // namespace pci
 
-static auto PCSHeader = PCSHEADER {}; // pcs file header
+namespace {
+auto PCSHeader = PCSHEADER {}; // pcs file header
+} // namespace
 
 auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
   }
-  PCSHeader.leadIn     = 0x32;
-  PCSHeader.colorCount = COLORCNT;
   auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
-  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
-  auto const spColors = gsl::span {PCSHeader.colors};
-  std::ranges::copy(UserColor, spColors.begin());
+  PCSHeader.writeHeader(UserColor);
   if (!pci::pcshup(saveStitches)) {
 	CloseHandle(fileHandle);
 	return false;
@@ -108,7 +181,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	return false;
   }
   if (UserFlagMap->test(UserFlag::BSAVOF)) {
-	constexpr auto BLANK = std::array<char, 14> {};
+	constexpr auto BLANK = std::array<char, PCSBMPNSZ> {};
 	if (FALSE == WriteFile(fileHandle, BLANK.data(), wrap::toUnsigned(BLANK.size()), &bytesWritten, nullptr)) {
 	  displayText::riter();
 	  CloseHandle(fileHandle);
@@ -117,7 +190,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	CloseHandle(fileHandle);
 	return true;
   }
-  if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
+  if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), PCSBMPNSZ, &bytesWritten, nullptr)) {
 	displayText::riter();
 	CloseHandle(fileHandle);
 	return false;
@@ -144,12 +217,12 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  if (PCSHeader.leadIn != '2' || PCSHeader.colorCount != COLORCNT) {
+  if (!PCSHeader.isValid()) {
 	CloseHandle(fileHandle);
 	return false;
   }
-  std::ranges::copy(PCSHeader.colors, UserColor.begin());
-  fileSize -= uintmax_t {14U} + sizeof(PCSHeader);
+  PCSHeader.readHeader(UserColor);
+  fileSize -= uintmax_t {PCSBMPNSZ} + sizeof(PCSHeader);
   auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
   auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
   pcsDataBuffer.resize(pcsStitchCount);
@@ -163,35 +236,35 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
   auto iStitch = uint16_t {};
   auto color   = 0U;
   StitchBuffer->clear();
-  StitchBuffer->reserve(PCSHeader.stitchCount);
+  StitchBuffer->reserve(PCSHeader.getStitchCount());
   for (auto const& stitch : pcsDataBuffer) {
 	if (stitch.tag == 3) {
 	  thred::addColor(iStitch, stitch.fx);
 	  color = NOTFRM | stitch.fx;
 	  continue;
 	}
-	StitchBuffer->push_back(F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
-	                                      wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
-	                                      color});
-	if (iStitch++ >= PCSHeader.stitchCount) {
+	StitchBuffer->emplace_back(wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+	                           wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
+	                           color);
+	if (iStitch++ >= PCSHeader.getStitchCount()) {
 	  break;
 	}
   }
   // Grab the bitmap filename
-  if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, L"ReadFile for getBmpNameData in readPCSFile")) {
+  if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), PCSBMPNSZ, &bytesRead, L"ReadFile for getBmpNameData in readPCSFile")) {
 	return false;
   }
-  if (bytesRead != 14) {
-	// NOLINTNEXTLINE
+  if (bytesRead != PCSBMPNSZ) {
 	outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 	return false;
   }
   IniFile.auxFileType = AUXPCS;
-  if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
-	PCSHeader.hoopType = LARGHUP;
+  auto hoopSize       = PCSHeader.getHoopType();
+  if (hoopSize != LARGHUP && hoopSize != SMALHUP) {
+	hoopSize = LARGHUP;
   }
   auto stitchRect = F_RECTANGLE {};
-  thred::sizstch(stitchRect, *StitchBuffer);
+  thred::stchrct(stitchRect);
   if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 || stitchRect.top > LHUPY) {
 	IniFile.hoopSizeX = LHUPX;
 	IniFile.hoopSizeY = LHUPY;
@@ -199,7 +272,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return true;
   }
-  if (PCSHeader.hoopType == LARGHUP) {
+  if (hoopSize == LARGHUP) {
 	IniFile.hoopType  = LARGHUP;
 	IniFile.hoopSizeX = LHUPX;
 	IniFile.hoopSizeY = LHUPY;
@@ -221,23 +294,19 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 }
 
 auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
-  auto boundingRect = F_RECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
-  for (auto const& stitch : stitches) {
-	if (stitch.x < boundingRect.left) {
-	  boundingRect.left = stitch.x;
-	}
-	if (stitch.x > boundingRect.right) {
-	  boundingRect.right = stitch.x;
-	}
-	if (stitch.y < boundingRect.bottom) {
-	  boundingRect.bottom = stitch.y;
-	}
-	if (stitch.y > boundingRect.top) {
-	  boundingRect.top = stitch.y;
-	}
+  auto minX = stitches[0].x;
+  auto minY = stitches[0].y;
+  auto maxX = stitches[0].x;
+  auto maxY = stitches[0].y;
+
+  for (const auto& stitch : stitches) {
+	minX = std::min(minX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxX = std::max(maxX, stitch.x);
+	maxY = std::max(maxY, stitch.y);
   }
-  F_POINT const boundingSize = {boundingRect.right - boundingRect.left,
-                                boundingRect.top - boundingRect.bottom};
+
+  auto const boundingSize = F_POINT {maxX - minX, maxY - minY};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L, false);
 	return false;
@@ -246,24 +315,23 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
       (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
       (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
   auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
-  PCSHeader.hoopType  = largeFlag ? LARGHUP : SMALHUP;
-  auto delta          = F_POINT {};
-  if (boundingRect.right > hoopSize.x) {
-	delta.x = hoopSize.x - boundingRect.right;
+  PCSHeader.setHoopType(largeFlag);
+  auto delta = F_POINT {};
+  if (maxX > hoopSize.x) {
+	delta.x = hoopSize.x - maxX;
   }
-  if (boundingRect.top > hoopSize.y) {
-	delta.y = hoopSize.y - boundingRect.top;
+  if (maxY > hoopSize.y) {
+	delta.y = hoopSize.y - maxY;
   }
-  if (boundingRect.left < 0) {
-	delta.x = -boundingRect.left;
+  if (minX < 0) {
+	delta.x = -minX;
   }
-  if (boundingRect.bottom < 0) {
-	delta.y = -boundingRect.bottom;
+  if (minY < 0) {
+	delta.y = -minY;
   }
   if ((delta.x != 0.0F) || (delta.y != 0.0F)) {
 	for (auto& offsetStitch : stitches) {
-	  offsetStitch.x += delta.x;
-	  offsetStitch.y += delta.y;
+	  offsetStitch += delta;
 	}
   }
   return true;
@@ -279,7 +347,6 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
 	return false;
@@ -290,21 +357,21 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   if (!wrap::readFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, L"ReadFile for pcsFileHeader in insPCS")) {
 	return false;
   }
-  if (pcsFileHeader.leadIn != 0x32 || pcsFileHeader.colorCount != COLORCNT) {
+  if (!pcsFileHeader.isValid()) {
 	// ToDo - Add error message
 	CloseHandle(fileHandle);
 	return false;
   }
   auto fileSize = uintmax_t {};
   thred::getFileSize(insertedFile, fileSize);
-  fileSize -= sizeof(pcsFileHeader) + 14;
+  fileSize -= sizeof(pcsFileHeader) + PCSBMPNSZ;
   auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
   auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
   pcsStitchBuffer.resize(pcsStitchCount);
   if (!wrap::readFile(fileHandle, pcsStitchBuffer.data(), fileSize, &bytesRead, L"ReadFile for pcsStitchBuffer in insPCS")) {
 	return false;
   }
-  if (bytesRead == fileSize) {
+  if (bytesRead != fileSize) {
 	StateMap->reset(StateFlag::INIT);
 	displayText::tabmsg(IDS_SHRTF, false);
 	thred::coltab();
@@ -313,36 +380,33 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	return false;
   }
   thred::savdo();
-  auto insertIndex = StitchBuffer->size();
   StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
   auto newAttribute = 0U;
-  for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; ++iPCSStitch) {
-	if (pcsStitchBuffer[iPCSStitch].tag == 3) {
-	  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
+
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
+  for (auto skipStitch = false; auto& stitch : pcsStitchBuffer) {
+	if (skipStitch) {
+	  skipStitch = false;
 	  continue;
 	}
-	auto xVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
-	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT;
-	auto yVal = wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
-	            wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT;
-	(*StitchBuffer).emplace_back(xVal, yVal, newAttribute);
+	if (stitch.tag == 3) {
+	  newAttribute = stitch.fx | NOTFRM;
+	  skipStitch   = true;
+	  continue;
+	}
+	auto xVal = wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT;
+	auto yVal = wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT;
+
+	minX = std::min(minX, xVal);
+	minY = std::min(minY, yVal);
+	maxX = std::max(maxX, xVal);
+	maxY = std::max(maxY, yVal);
+	StitchBuffer->emplace_back(xVal, yVal, newAttribute);
   }
-  auto const newStitchCount = StitchBuffer->size();
-  for (; insertIndex < newStitchCount; ++insertIndex) {
-	auto const& stitch = StitchBuffer->operator[](insertIndex);
-	if (stitch.x < insertedRectangle.left) {
-	  insertedRectangle.left = stitch.x;
-	}
-	if (stitch.x > insertedRectangle.right) {
-	  insertedRectangle.right = stitch.x;
-	}
-	if (stitch.y < insertedRectangle.bottom) {
-	  insertedRectangle.bottom = stitch.y;
-	}
-	if (stitch.y > insertedRectangle.top) {
-	  insertedRectangle.top = stitch.y;
-	}
-  }
+  insertedRectangle = F_RECTANGLE {minX, maxY, maxX, minY};
   CloseHandle(fileHandle);
   return true;
 }

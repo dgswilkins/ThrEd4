@@ -2,16 +2,14 @@
 
 // Local Headers
 #include "textureHeader.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
 
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26812) // supress warning for fmt library header
 #include "fmt/xchar.h"
-#include "fmt/compile.h"
 #pragma warning(pop)
 
 // Standard Libraries
@@ -26,7 +24,6 @@ void alrotmsg();
 void bfilmsg();
 void butxt(uint32_t iButton, std::wstring const& buttonText);
 void clrhbut(uint32_t startButton);
-auto clpmsgs(uint32_t code) -> bool;
 void crmsg(fs::path const& fileName);
 void drwtxbut(TXTR_SCREEN const& textureScreen);
 auto filmsgs(uint32_t code) -> bool;

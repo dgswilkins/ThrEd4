@@ -4,14 +4,54 @@
 #include "form.h"
 #include "formForms.h"
 #include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "satin.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
 
 // Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/compile.h"
+#include "gsl/narrow"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <windef.h>
+#include <winnt.h>
+#include <WinUser.h>
 
 // Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
+#include <cwchar>
+#include <iterator>
+#include <string>
+// resharper disable CppUnusedIncludeDirective
+#include <type_traits>
+// ReSharper restore CppUnusedIncludeDirective>
+#include <vector>
 
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
@@ -54,13 +94,13 @@ constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
 
-enum DaisyStyles { // daisy form types
-  DSIN,            // Sine shape
-  DRAMP,           // Ramp shape
-  DSAW,            // Sawtooth shape
-  DRAG,            // Ragged shape
-  DCOG,            // Cog shape
-  DHART            // Heart shape
+enum DaisyStyles : uint8_t { // daisy form types
+  DSIN,                      // Sine shape
+  DRAMP,                     // Ramp shape
+  DSAW,                      // Sawtooth shape
+  DRAG,                      // Ragged shape
+  DCOG,                      // Cog shape
+  DHART                      // Heart shape
 };
 
 // formForms Internal namespace
@@ -89,12 +129,14 @@ void wavinit(HWND hwndlg);
 auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 } // namespace ffi
 
-static auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
-static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
-static auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
-static auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
+namespace {
+auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
+auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
+auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
+auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
+} // namespace
 
-auto const DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
+auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZCRV,
     IDS_DAZSAW,
     IDS_DAZRMP,
@@ -106,10 +148,8 @@ auto const DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
 void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto labelSize = SIZE {};
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
-  textSize.cy = labelSize.cy;
-  if (labelSize.cx > textSize.cx) {
-	textSize.cx = labelSize.cx;
-  }
+  textSize.cx = std::max(textSize.cx, labelSize.cx);
+  textSize.cy = std::max(textSize.cy, labelSize.cy);
 }
 
 auto ffi::maxwid() -> SIZE {
@@ -125,7 +165,6 @@ auto ffi::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       windowName.c_str(),
                       SS_NOTIFY | WS_CHILD | WS_VISIBLE,
@@ -144,7 +183,6 @@ auto ffi::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -163,7 +201,6 @@ auto ffi::numwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -263,10 +300,10 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == FTHF) {
 	  labelWindow[LFTHCOL] = ffi::txtwin(displayText::loadStr(IDS_FTHCOL), LabelWindowCoords);
 	  valueWindow[LFTHCOL] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.color + 1U)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.color + 1U)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHTYP] = ffi::txtwin(displayText::loadStr(IDS_FTHTYP), LabelWindowCoords);
-	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.fillInfo.feather.fillType - 1U);
+	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.feather.fillType - 1U);
 	  valueWindow[LFTHTYP] = ffi::numwin(displayText::loadStr(itFeather->stringID), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHBLND] = ffi::txtwin(displayText::loadStr(IDS_FTHBLND), LabelWindowCoords);
@@ -287,26 +324,25 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  }
 	  labelWindow[LFTHUPCNT] = ffi::txtwin(displayText::loadStr(IDS_FTHUPCNT), LabelWindowCoords);
 	  valueWindow[LFTHUPCNT] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.upCount)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.upCount)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHDWNCNT] = ffi::txtwin(displayText::loadStr(IDS_FTHDWNCNT), LabelWindowCoords);
 	  valueWindow[LFTHDWNCNT] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.downCount)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.downCount)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHSIZ] = ffi::txtwin(displayText::loadStr(IDS_FTHSIZ), LabelWindowCoords);
 	  valueWindow[LFTHSIZ] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillInfo.feather.ratio)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.ratio)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
-	  if (form.fillInfo.feather.fillType == FTHPSG) {
+	  if (form.feather.fillType == FTHPSG) {
 		labelWindow[LFTHNUM] = ffi::txtwin(displayText::loadStr(IDS_FTHNUM), LabelWindowCoords);
 		valueWindow[LFTHNUM] =
-		    ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillInfo.feather.count)), ValueWindowCoords);
+		    ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.count)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 	  }
 	  labelWindow[LFTHFLR] = ffi::txtwin(displayText::loadStr(IDS_FTHFLR), LabelWindowCoords);
 	  valueWindow[LFTHFLR] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillInfo.feather.minStitchSize * IPFGRAN)),
-	                  ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.minStitchSize * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType != CLPF) {
@@ -328,8 +364,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (!form.isClip() && !form.isTexture()) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(displayText::loadStr(IDS_TXT5), LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.lengthOrCount.stitchLength * IPFGRAN)),
-	                  ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.stitchLength * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMINFIL] = ffi::txtwin(displayText::loadStr(IDS_TXT21), LabelWindowCoords);
@@ -339,13 +374,13 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LFRMANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.angleOrClipData.angle * RADDEGF)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillAngle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == ANGCLPF) {
 	  labelWindow[LSACANG] = ffi::txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LSACANG] =
-	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.satinOrAngle.angle * RADDEGF)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.clipFillAngle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
@@ -395,7 +430,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   valueWindow[LBRDCOL] =
       ffi::numwin(fmt::format(FMT_COMPILE(L"{}"), ((form.borderColor & COLMSK) + 1U)), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
-  if ((EDGE_ARRAY[edgeIdx] & BESPAC) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BESPAC) != 0) {
 	labelWindow[LBRDSPAC] = ffi::txtwin(displayText::loadStr(IDS_TXT9), LabelWindowCoords);
 	choice = (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 	             ? fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeSpacing * IPFGRAN))
@@ -403,43 +438,43 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	valueWindow[LBRDSPAC] = ffi::numwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BPICSPAC) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BPICSPAC) != 0) {
 	labelWindow[LBRDPIC] = ffi::txtwin(displayText::loadStr(IDS_TXT16), LabelWindowCoords);
 	valueWindow[LBRDPIC] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeSpacing * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BEMAX) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BEMAX) != 0) {
 	labelWindow[LMAXBRD] = ffi::txtwin(displayText::loadStr(IDS_TXT22), LabelWindowCoords);
 	valueWindow[LMAXBRD] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.maxBorderStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BELEN) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BELEN) != 0) {
 	labelWindow[LBRDLEN] = ffi::txtwin(displayText::loadStr(IDS_TXT10), LabelWindowCoords);
 	valueWindow[LBRDLEN] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BEMIN) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BEMIN) != 0) {
 	labelWindow[LMINBRD] = ffi::txtwin(displayText::loadStr(IDS_TXT23), LabelWindowCoords);
 	valueWindow[LMINBRD] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.minBorderStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BESIZ) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BESIZ) != 0) {
 	labelWindow[LBRDSIZ] = ffi::txtwin(displayText::loadStr(IDS_TXT11), LabelWindowCoords);
 	valueWindow[LBRDSIZ] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.borderSize * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BRDPOS) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BRDPOS) != 0) {
 	labelWindow[LBRDPOS] = ffi::txtwin(displayText::loadStr(IDS_TXT18), LabelWindowCoords);
 	valueWindow[LBRDPOS] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & CHNPOS) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & CHNPOS) != 0) {
 	labelWindow[LBRDPOS] = ffi::txtwin(displayText::loadStr(IDS_TXT19), LabelWindowCoords);
 	valueWindow[LBRDPOS] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
@@ -457,7 +492,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	valueWindow[LBRDUND] = ffi::numwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if ((EDGE_ARRAY[edgeIdx] & BCNRSIZ) != 0) {
+  if ((EDGE_ARRAY.at(edgeIdx) & BCNRSIZ) != 0) {
 	choice              = (form.edgeType == EDGEBHOL)
 	                          ? fmt::format(FMT_COMPILE(L"{:.2f}"), (form::getblen() * IPFGRAN))
 	                          : fmt::format(FMT_COMPILE(L"{:.2f}"), (form::getplen() * IPFGRAN));
@@ -465,7 +500,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
   }
-  if (form.type == FRMLINE && ((EDGE_ARRAY[edgeIdx] & BRDEND) != 0)) {
+  if (form.type == FRMLINE && ((EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0)) {
 	labelWindow[LBSTRT] = ffi::txtwin(displayText::loadStr(IDS_TXT14), LabelWindowCoords);
 	choice              = ((form.attribute & SBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT)
 	                                                       : displayText::loadStr(IDS_TAPR);
@@ -492,7 +527,6 @@ void formForms::refrm() {
   if (FormDataSheet != nullptr) {
 	DestroyWindow(FormDataSheet);
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   FormDataSheet = CreateWindow(L"STATIC",
                                nullptr,
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -516,7 +550,6 @@ void formForms::sidwnd(HWND wnd) {
   FormMenuChoice = savedChoice;
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -536,7 +569,6 @@ void formForms::prfsid(HWND wnd) {
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -551,7 +583,6 @@ void formForms::prfsid(HWND wnd) {
 }
 
 void ffi::prftwin(std::wstring const& text) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CreateWindow(L"STATIC",
                text.c_str(),
                WS_CHILD | WS_VISIBLE,
@@ -566,7 +597,6 @@ void ffi::prftwin(std::wstring const& text) noexcept {
 }
 
 auto ffi::prfnwin(std::wstring const& text) noexcept -> HWND {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       text.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -607,8 +637,7 @@ void formForms::prfmsg() {
   formForms::maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  PreferencesWindow = CreateWindow(L"STATIC",
+  PreferencesWindow      = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    ButtonWidthX3 + 3,
@@ -684,18 +713,11 @@ void formForms::frmnum() {
 }
 
 void ffi::chkdaz() {
-  if (IniFile.daisyPetalPoints == 0U) {
-	IniFile.daisyPetalPoints = 1U;
-  }
-  if (IniFile.daisyInnerCount == 0U) {
-	IniFile.daisyInnerCount = 1U;
-  }
-  if (IniFile.daisyPetalCount == 0U) {
-	IniFile.daisyPetalCount = 1U;
-  }
-  if (IniFile.daisyHeartCount > gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints)) {
-	IniFile.daisyHeartCount = gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints);
-  }
+  IniFile.daisyPetalPoints = std::max(IniFile.daisyPetalPoints, 1U);
+  IniFile.daisyInnerCount  = std::max(IniFile.daisyInnerCount, 1U);
+  IniFile.daisyPetalCount  = std::max(IniFile.daisyPetalCount, 1U);
+  IniFile.daisyHeartCount =
+      std::min(IniFile.daisyHeartCount, gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints));
 }
 
 void ffi::initdaz(HWND hWinDialog) {
@@ -743,7 +765,6 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -779,7 +800,7 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
 		  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
-			auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS[iType]);
+			auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
 			if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
 			  IniFile.daisyBorderType = iType;
 			  break;
@@ -809,7 +830,6 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
 		  break;
 		}
@@ -828,10 +848,9 @@ void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
   // clang-format off
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult < 1) {
 	StateMap->reset(StateFlag::FORMIN);
@@ -844,9 +863,7 @@ void formForms::dasyfrm() {
   form.attribute          = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
   auto const maximumYsize = ZoomRect.top - ZoomRect.bottom;
-  if (maximumYsize > maximumXsize) {
-	maximumXsize = maximumYsize;
-  }
+  maximumXsize            = std::max(maximumXsize, maximumYsize);
   maximumXsize /= DASYSIZE;
   auto       diameter     = IniFile.daisyDiameter;
   auto       petalLength  = IniFile.daisyPetalLen;
@@ -862,12 +879,12 @@ void formForms::dasyfrm() {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
-	FormVertices->push_back(F_POINT {referencePoint.x + diameter * cos(angle),
-	                                 referencePoint.y + diameter * sin(angle)});
+	FormVertices->emplace_back(referencePoint.x + diameter * cos(angle),
+	                           referencePoint.y + diameter * sin(angle));
 	++iVertex;
 	for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; ++iSegment) {
-	  FormVertices->push_back(F_POINT {referencePoint.x + holeDiameter * cos(angle),
-	                                   referencePoint.y + holeDiameter * sin(angle)});
+	  FormVertices->emplace_back(referencePoint.x + holeDiameter * cos(angle),
+	                             referencePoint.y + holeDiameter * sin(angle));
 	  ++iVertex;
 	  angle -= holeSegmentAngle;
 	}
@@ -883,9 +900,9 @@ void formForms::dasyfrm() {
   auto const petalSegmentAngle = PI_F2 / wrap::toFloat(petalVertexCount);
   auto const deltaPetalAngle   = PI_F / wrap::toFloat(IniFile.daisyPetalPoints);
   if (UserFlagMap->test(UserFlag::DAZD)) {
-	form.satinGuideCount    = IniFile.daisyPetalCount - 1U;
-	form.wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
-	form.satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
+	form.satinGuideCount = IniFile.daisyPetalCount - 1U;
+	form.wordParam       = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
+	form.satinGuideIndex = satin::adsatk(IniFile.daisyPetalCount - 1);
   }
   auto const halfPetalPointCount = IniFile.daisyPetalPoints / 2;
   auto       angle               = 0.0F;
@@ -939,12 +956,12 @@ void formForms::dasyfrm() {
 		  break;
 		}
 	  }
-	  FormVertices->push_back(F_POINT {referencePoint.x + cos(angle) * distanceFromDaisyCenter,
-	                                   referencePoint.y + sin(angle) * distanceFromDaisyCenter});
+	  FormVertices->emplace_back(referencePoint.x + cos(angle) * distanceFromDaisyCenter,
+	                             referencePoint.y + sin(angle) * distanceFromDaisyCenter);
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
+		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex + iMacroPetal);
 		itGuide->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		itGuide->finish = iVertex;
 	  }
@@ -1018,7 +1035,6 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1038,23 +1054,29 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  break;
 		}
 		case IDC_DEFTEAR: {
-		  IniFile.formSides      = 20;
-		  IniFile.tearTailLength = 1.1F;
-		  IniFile.tearTwistStep  = 0.0F;
-		  IniFile.tearTwistRatio = 1.6F;
+		  constexpr auto TEARSIDES    = uint16_t {20U};
+		  constexpr auto TEARTAILFACT = 1.1F;
+		  constexpr auto TEARTWIST    = 1.6F;
+		  IniFile.formSides           = TEARSIDES;
+		  IniFile.tearTailLength      = TEARTAILFACT;
+		  IniFile.tearTwistStep       = 0.0F;
+		  IniFile.tearTwistRatio      = TEARTWIST;
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}
 		case IDC_DEFPAIS: {
-		  IniFile.formSides      = 24U;
-		  IniFile.tearTailLength = 1.15F;
-		  IniFile.tearTwistStep  = 0.3F * PFGRAN;
-		  IniFile.tearTwistRatio = 1.8F;
+		  constexpr auto PAISSIDES    = uint16_t {24U};
+		  constexpr auto PAISTAILFACT = 1.15F;
+		  constexpr auto PAISSTEP     = 0.3F;
+		  constexpr auto PAISTWIST    = 1.8F;
+		  IniFile.formSides           = PAISSIDES;
+		  IniFile.tearTailLength      = PAISTAILFACT;
+		  IniFile.tearTwistStep       = PAISSTEP * PFGRAN;
+		  IniFile.tearTwistRatio      = PAISTWIST;
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1072,10 +1094,9 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 void formForms::setear() {
   thred::unmsg();
   // clang-format off
-  // resharper disable CppClangTidyClangDiagnosticCastFunctionType
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  // resharper restore CppClangTidyClangDiagnosticCastFunctionType
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
 	return;
@@ -1090,13 +1111,13 @@ void formForms::setear() {
   auto const formVertexCount  = form.vertexCount;
   auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
   auto       nextVertex       = std::next(firstVertex);
-  auto const count            = wrap::to_ptrdiff(formVertexCount) / 4;
+  auto const count            = wrap::toPtrdiff(formVertexCount) / 4;
   auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
   auto       lastVertex       = std::next(firstVertex, count + 1);
   auto       verticalPosition = lastVertex->y;
   --lastVertex;
   auto step        = verticalPosition - lastVertex->y;
-  auto leftVertex  = std::next(firstVertex, wrap::to_ptrdiff(formVertexCount) - count);
+  auto leftVertex  = std::next(firstVertex, wrap::toPtrdiff(formVertexCount) - count);
   auto rightVertex = std::next(firstVertex, count + 1);
   for (auto iStep = 0; iStep < count; ++iStep) {
 	leftVertex->y  = verticalPosition;
@@ -1112,7 +1133,7 @@ void formForms::setear() {
   firstVertex->y = nextVertex->y = verticalPosition;
   firstVertex->x += twistStep;
   nextVertex->x += twistStep;
-  verticalPosition -= step / 2.0F;
+  verticalPosition -= step * HALF;
   FormVertices->push_back(*firstVertex);
   firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
   nextVertex = std::next(firstVertex);
@@ -1130,14 +1151,10 @@ void formForms::setear() {
   StateMap->reset(StateFlag::FORMSEL);
   auto const size =
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-  auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
-  if (horizontalRatio > 1.0F) {
-	horizontalRatio = 1.0F;
-  }
+  auto horizontalRatio     = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
+  horizontalRatio          = std::min(horizontalRatio, 1.0F);
   auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / TWSTFACT / size.y;
-  if (verticalRatio < horizontalRatio) {
-	horizontalRatio = verticalRatio;
-  }
+  horizontalRatio          = std::min(horizontalRatio, verticalRatio);
   if (horizontalRatio < 1.0F) {
 	auto       scaledVertex = firstVertex;
 	auto const vertexMax    = form.vertexCount;
@@ -1178,7 +1195,6 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1219,7 +1235,6 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  break;
 		}
 		default: {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1237,10 +1252,9 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 void formForms::wavfrm() {
   thred::unmsg();
   // clang-format off
-  // resharper disable CppClangTidyClangDiagnosticCastFunctionType
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  // resharper restore CppClangTidyClangDiagnosticCastFunctionType
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   // clang-format on
   if (nResult <= 0) {
 	return;
@@ -1277,16 +1291,14 @@ void formForms::wavfrm() {
 	  for (auto index = 0U; index < count; ++index) {
 		*itVertex = currentPosition;
 		++itVertex;
-		currentPosition.x += points[index].x;
-		currentPosition.y += points[index].y;
+		currentPosition += points[index];
 	  }
 	}
 	else {
 	  for (auto index = count; index != 0; --index) {
 		*itVertex = currentPosition;
 		++itVertex;
-		currentPosition.x += points[index - 1U].x;
-		currentPosition.y += points[index - 1U].y;
+		currentPosition += points[index - 1U];
 	  }
 	}
   }
@@ -1308,13 +1320,9 @@ void formForms::wavfrm() {
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
   constexpr auto WAVSIZE         = 4.0F; // wave size factor
   auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
-  if (horizontalRatio > 1) {
-	horizontalRatio = 1.0F;
-  }
-  auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
-  if (verticalRatio < horizontalRatio) {
-	horizontalRatio = verticalRatio;
-  }
+  horizontalRatio                = std::min(horizontalRatio, 1.0F);
+  auto const verticalRatio       = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
+  horizontalRatio                = std::min(horizontalRatio, verticalRatio);
   if (horizontalRatio < 1.0F) {
 	auto vScaled = firstVertex; // copy intended
 	for (auto index = 0U; index < vertexCount; ++index) {

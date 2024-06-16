@@ -3,82 +3,94 @@
 
 // Local Headers
 #include "Resources\resource.h"
-#include "point.h"
+#include "utf8conv.h"
 
 // Open Source headers
+#ifdef _DEBUG
 #pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26812) // supress warning for fmt library header
+#pragma warning(disable : 4702) // supress warning for fmt library header
 #include "fmt/xchar.h"
 #include "fmt/compile.h"
 #pragma warning(pop)
+#endif
 
-// C RunTime Header Files
-#include <ShlObj.h>
+// Standard Libraries
+#include <numbers>
+#ifdef _DEBUG
+#include <source_location>
+#endif
 
 #ifdef _DEBUG
-#define WIDEN2(x) L##x
-#define WIDEN(x) WIDEN2(x)
-#define WFILE WIDEN(__FILE__)
-#define outDebugString(X, ...) makeDebugString(__LINE__, WFILE, X, __VA_ARGS__)
-template <typename... Args>
-void makeDebugString(int line, const wchar_t* fileName, const wchar_t* strX, Args&&... args) {
-  auto const strY = fmt::format(FMT_COMPILE(L"{}({}) : {}"), fileName, line, strX);
+class FMT_WITH_LOC
+{
+  public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  const wchar_t*       strX;
+  std::source_location loc;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+  constexpr FMT_WITH_LOC(const wchar_t* fmtString,
+                         const std::source_location& fileLoc = std::source_location::current()) noexcept :
+      strX(fmtString),
+      loc(fileLoc) {
+  }
+};
+
+template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, Args&&... args) {
+  auto       name = utf::utf8ToUtf16(std::string(fwl.loc.file_name()));
+  auto       line = fwl.loc.line();
+  auto const strY = fmt::format(FMT_COMPILE(L" {}({}) : {}"), name, line, fwl.strX);
   auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
   OutputDebugString(strZ.c_str());
 }
-
 #else
-#define outDebugString(X, ...)
+template <typename... Args>
+constexpr void outDebugString([[maybe_unused]] const wchar_t* value, [[maybe_unused]] Args... args) {
+}
 #endif
 
-constexpr float DEFUSPAC = 6.0F;        // default underlay stitch spacing
-constexpr float DEFLRAT  = 0.8F;        // default lens form aspect ratio
+constexpr auto DEFUSPAC = 6.0F;         // default underlay stitch spacing
+constexpr auto DEFLRAT  = 0.8F;         // default lens form aspect ratio
 constexpr uint32_t MAXITEMS = 0x10000U; // maximum number of stitches, sequence items & clipboard points
-constexpr float SHUPX    = 480.0F;      // small hoop x size
-constexpr float SHUPY    = 480.0F;      // small hoop y size
-constexpr float LHUPX    = 719.0F;      // large hoop x size
-constexpr float LHUPY    = 690.0F;      // large hoop y size
-constexpr float HUP100XY = 600.0F;      // 100 millimeter hoop size
-constexpr float PFGRAN   = 6.0F;        // pfaf stitch points per millimeter
-constexpr float IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
+constexpr auto SHUPX    = 480.0F;       // small hoop x size
+constexpr auto SHUPY    = 480.0F;       // small hoop y size
+constexpr auto LHUPX    = 719.0F;       // large hoop x size
+constexpr auto LHUPY    = 690.0F;       // large hoop y size
+constexpr auto HUP100XY = 600.0F;       // 100 millimeter hoop size
+constexpr auto PFGRAN   = 6.0F;         // pfaf stitch points per millimeter
+constexpr auto IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
 // ToDo - Should this be a configurable parameter?
-constexpr double  CLOSENUF = 15.0; // mouse click region for select
-constexpr auto    FCLOSNUF = float {CLOSENUF};
-constexpr float   SMALSIZ  = 0.25F;             // default small stitch size
-constexpr float   MINSIZ   = 0.1F;              // default minimum stitch size
-constexpr float   USESIZ   = 3.5F;              // user preferred size
-constexpr auto    MAXSIZ   = 9.0F;              // default maximum stitch size
-constexpr float   SHOPNTS  = 0.00F;             // show stitch points when zoom below this
-constexpr float   STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
-constexpr int32_t MOVITIM  = 12;                // default movie time
-constexpr float   DEFSPACE = 0.45F;             // default stitch spacing
-constexpr float   PI_F     = 3.1415927F;        // PI to single precision
-constexpr float   PI_F2    = PI_F * 2.0F;       //
-constexpr float   PI_FHALF = PI_F / 2.0F;       //
-constexpr double  PI_D     = 3.141592653589793; // PI to double precision
-constexpr double  PI_D2    = PI_D * 2.0;        //
-constexpr float   USPAC    = 15.0F;             // underlay fill spacing
-constexpr float   URAT     = 0.75F;             // ratio of underlay stitch to satin border size
+constexpr LONG ICLOSNUF = 8L; // mouse click region for select
+constexpr auto CLOSENUF = double {ICLOSNUF};
+constexpr auto FCLOSNUF = float {CLOSENUF};
+constexpr auto SMALSIZ  = 0.25F;                     // default small stitch size
+constexpr auto MINSIZ   = 0.1F;                      // default minimum stitch size
+constexpr auto USESIZ   = 3.5F;                      // user preferred size
+constexpr auto MAXSIZ   = 9.0F;                      // default maximum stitch size
+constexpr auto SHOPNTS  = 0.00F;                     // show stitch points when zoom below this
+constexpr auto STCHBOX  = 0.4226F;                   // show stitch boxes when zoom below this
+constexpr auto DEFSPACE = 0.45F;                     // default stitch spacing
+constexpr auto PI_F     = std::numbers::pi_v<float>; // PI to single precision
+constexpr auto PI_F2    = PI_F * 2.0F;               //
+constexpr auto PI_FHALF = PI_F / 2.0F;               //
+constexpr auto PI_D     = std::numbers::pi;          // PI to double precision
+constexpr auto PI_D2    = PI_D * 2.0;                //
+constexpr auto USPAC    = 15.0F;                     // underlay fill spacing
+constexpr auto URAT     = 0.75F; // ratio of underlay stitch to satin border size
 
-constexpr float    TNYFLOAT = 1e-9F;           // tiny number for single precision float stuff
-constexpr float    BIGFLOAT = 1e9F;            // large number for single precision float stuff
-constexpr double   BIGDBL   = 1e99;            // large number for double precision float stuff
-constexpr float    IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner length
-constexpr float    IPICSPAC = 6.0F;            // initial picot border space
+constexpr auto     IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner length
+constexpr auto     IPICSPAC = 6.0F;            // initial picot border space
 constexpr int32_t  PRFLINS  = 30;              // number of lines on the preference menu
 constexpr uint32_t SEED     = 3037000499U;     // pseudo-random-sequence seed
-constexpr float    BRDWID   = 18.0F;           // default satin border size
-constexpr float    SNPLEN   = 0.15F;           // default snap together length size
-constexpr float    STARAT   = 0.4F;            // default star ratio
-constexpr float    SPIRWRAP = 1.52F;           // default spiral wrap
+constexpr auto     BRDWID   = 18.0F;           // default satin border size
+constexpr auto     SNPLEN   = 0.15F;           // default snap together length size
+constexpr auto     STARAT   = 0.4F;            // default star ratio
+constexpr auto     SPIRWRAP = 1.52F;           // default spiral wrap
 constexpr int32_t  HBUFSIZ  = 1024;            // help buffer size
-constexpr float    ITXHI    = (9.0F * PFGRAN); // default texture editor height
-constexpr float    ITXWID   = (9.0F * PFGRAN); // default texture editor width
-constexpr float    ITXSPAC  = (0.4F * PFGRAN); // default texture editor spacing
+constexpr auto     ITXHI    = (9.0F * PFGRAN); // default texture editor height
+constexpr auto     ITXWID   = (9.0F * PFGRAN); // default texture editor width
+constexpr auto     ITXSPAC  = (0.4F * PFGRAN); // default texture editor spacing
 constexpr uint16_t ITXPIX   = 5U;              // default texture editor cross pixels
 constexpr uint32_t BTNCOUNT = 9U;              // Maximum number of buttons
 constexpr int32_t  FONTSIZE = 400;             // default font size
@@ -103,6 +115,21 @@ constexpr uint32_t OUTPNTS = 9U;            // number of points required to draw
 constexpr auto     RADDEGF = 180.0F / PI_F; // float factor to convert radians to degrees
 constexpr auto     DEGRADF = PI_F / 180.0F; // float factor to convert degrees to radians
 
+constexpr auto TNYFLOAT = 1e-9F; // tiny number for single precision float stuff
+// large and small constants for multiple types
+constexpr auto BIGFLOAT = std::numeric_limits<float>::max();
+constexpr auto LOWFLOAT = std::numeric_limits<float>::lowest();
+constexpr auto BIGDBL   = std::numeric_limits<double>::max();
+constexpr auto LOWDBL   = std::numeric_limits<double>::lowest();
+constexpr auto BIGLONG  = std::numeric_limits<LONG>::max();
+constexpr auto LOWLONG  = std::numeric_limits<LONG>::lowest();
+constexpr auto BIGDWORD = std::numeric_limits<DWORD>::max();
+constexpr auto LOWDWORD = std::numeric_limits<DWORD>::lowest();
+constexpr auto BIGUINT  = std::numeric_limits<uint32_t>::max();
+constexpr auto BGUINT16 = std::numeric_limits<uint16_t>::max();
+constexpr auto BIGINT32 = std::numeric_limits<int32_t>::max();
+constexpr auto BIGSIZE  = std::numeric_limits<size_t>::max();
+
 constexpr auto PENBLK   = COLORREF {0x000000U}; // Black Pen
 constexpr auto PENCHCL  = COLORREF {0x404040U}; // Charcoal pen
 constexpr auto PENGRAY  = COLORREF {0x808080U}; // Gray pen
@@ -123,9 +150,23 @@ constexpr auto PENWWID  = 5;                    // Wide pen width
 constexpr auto STDDPI   = int32_t {96};         // Default DPI
 
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
+constexpr auto HALF   = 0.5F;     // factor for halving
+constexpr auto DBLF   = 2.0F;     // factor for doubling
+constexpr auto DECRAD = 10;       // decimal radix
+
+// rectangle position indices
+constexpr auto PTL  = 0; // top left corner       80-1-2
+constexpr auto PTM  = 1; // top midpoint           |   |
+constexpr auto PTR  = 2; // top right corner       7   3
+constexpr auto PRM  = 3; // right midpoint         |   |
+constexpr auto PBR  = 4; // bottom right corner    6-5-4
+constexpr auto PBM  = 5; // bottom midpoint
+constexpr auto PBL  = 6; // bottom left corner
+constexpr auto PLM  = 7; // left midpoint
+constexpr auto PTLE = 8; // top left endpoint
 
 // main menu items
-enum MainMenuItems {
+enum MainMenuItems : int8_t {
   M_FILE,
   M_VIEW,
   M_FORM,
@@ -148,7 +189,7 @@ enum MainMenuItems {
 };
 
 // fill menu items
-enum FillMenuItems {
+enum FillMenuItems : int8_t {
   MFIL_SAT,
   MFIL_FTH,
   MFIL_VERT,
@@ -162,7 +203,7 @@ enum FillMenuItems {
 };
 
 // view menu items
-enum ViewMenuItems {
+enum ViewMenuItems : int8_t {
   MVW_MOVIE,
   MVW_SET,
   MVW_BACK,
@@ -185,7 +226,7 @@ enum HoopSize : int8_t {
 };
 
 // bitmap
-enum class StateFlag : uint32_t {
+enum class StateFlag : uint16_t {
   SATIN,   // user is entering a satin stitch form
   SATPNT,  // user is entering points for a satin stitch form
   BOXZUM,  // box zoom select mode
@@ -449,7 +490,7 @@ enum class StateFlag : uint32_t {
 };
 
 // user bitmap
-enum class UserFlag : uint32_t {
+enum class UserFlag : uint8_t {
   SQRFIL,  // square ends on fills
   BLUNT,   // blunt ends on satin lines
   NEDOF,   // needle cursor off
@@ -512,7 +553,7 @@ enum FillStyles : uint8_t {
   VRTF = 1, // Vertical fill
   HORF,     // Horizontal fill
   ANGF,     // Angle fill
-  SATF,     // Fan fill ?
+  SATF,     // Fan fill
   CLPF,     // Fan clip Fill
   CONTF,    // Contour fill
   VCLPF,    // Vertical clip fill
@@ -551,7 +592,7 @@ enum EdgeFillStyles : uint8_t {
 constexpr auto EDGETMAX = uint32_t {13U}; // number of edge fill types
 
 // preference window entries
-enum PrefWin : uint32_t {
+enum PrefWin : uint8_t {
   PRFAPPCOL, // Applique color
   PRFAPSLEN, // Applique stitchLen
   PRFBRDWID, // Border width
@@ -662,7 +703,7 @@ constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCO
 // clang-format on
 
 // form types
-enum FormStyles {
+enum FormStyles : int8_t {
   FRMLINE = 1U, // Line form
   FRMFPOLY,     // Freehand polygon form
   FRMRPOLY,     // Regular polygon form
@@ -679,14 +720,14 @@ enum FormStyles {
 };
 
 // clipboard data types
-enum ClipDataType { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
+enum ClipDataType : uint8_t { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
 
 // edge underlay bit
 constexpr auto EGUND  = uint8_t {0x80U};
 constexpr auto NEGUND = uint8_t {0x7fU};
 
 // form data lines
-enum FormData {
+enum FormData : uint8_t {
   LFRM,       // form 0
   LLAYR,      // layer 1
   LFRMFIL,    // form fill 2
@@ -740,7 +781,7 @@ enum FormData {
 };
 
 // fill message codes
-enum FillMessageCodes {
+enum FillMessageCodes : uint16_t {
   FMM_FAN,
   FMM_VRT,
   FMM_HOR,
@@ -762,9 +803,9 @@ enum FillMessageCodes {
 };
 
 // button windows
-enum StitchButtons { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
+enum StitchButtons : uint8_t { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
 
-enum TextureButtons { // text button windows
+enum TextureButtons : uint8_t { // text button windows
   HTXCLR,
   HTXHI,
   HTXWID,
@@ -775,7 +816,7 @@ enum TextureButtons { // text button windows
   HTXMIR
 };
 
-enum MachineType { AUXPCS, AUXDST, AUXPES };
+enum MachineType : int8_t { AUXPCS, AUXDST, AUXPES };
 
 /*
 class D_RECTANGLE
@@ -833,8 +874,9 @@ constexpr uint32_t NOTFRM    = 0x00080000U; // 0000 0000 0000 1000 0000 0000 000
 constexpr uint32_t FRMSHFT   = 4U;
 constexpr uint32_t LAYSHFT   = 25U; // shift layer data in stitch attribute
 constexpr uint32_t FLAYSHFT  = 1U;  // shift layer data in form attribute
-constexpr uint32_t TYPSHFT   = 29U;
+constexpr uint32_t TYPSHFT   = 29U; // stitch type if it is not special
 constexpr uint32_t USHFT     = 31U; // user edited stitches shift
+constexpr uint32_t STSHFT    = 18U; // stitch type definitions begin at 19
 
 /*
 bit definitions for F_POINT_ATTR.attribute
@@ -923,6 +965,20 @@ class RANGE
   //~RANGE() = default;
 };
 
+class SEARCH_REC
+{
+  public:
+  uint32_t index {};
+  float    length {};
+
+  // constexpr SORT_REC() noexcept = default;
+  // SORT_REC(SORT_REC const&) = default;
+  // SORT_REC(SORT_REC&&) = default;
+  // SORT_REC& operator=(SORT_REC const& rhs) = default;
+  // SORT_REC& operator=(SORT_REC&&) = default;
+  //~SORT_REC() = default;
+};
+
 class INS_REC
 {
   public:
@@ -939,7 +995,7 @@ class INS_REC
   //~INS_REC() = default;
 };
 
-enum InterleaveTypes { // interleave sequence identifiers
+enum InterleaveTypes : uint8_t { // interleave sequence identifiers
   I_AP,
   I_FIL,
   I_FTH,

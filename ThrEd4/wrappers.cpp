@@ -1,14 +1,48 @@
 // Local Headers
 #include "stdafx.h"
 #include "globals.h"
+#include "point.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <minwinbase.h>
+#include <minwindef.h>
+#include <WinBase.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <cstdint>
+#include <cwchar>
+#include <vector>
 
 auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   try {
 	return std::wcstof(buffer, nullptr);
   }
   catch (...) {
-	// NOLINTNEXTLINE
 	outDebugString(L"wcstof failed trying to convert '{}'\n", buffer);
 	return 0.0F;
   }
@@ -19,7 +53,8 @@ void wrap::polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
 }
 
 auto wrap::pressed(int virtKey) noexcept -> bool {
-  return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & 0x8000U) != 0U;
+  constexpr auto HIGHBIT = 0x8000U;
+  return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & HIGHBIT) != 0U;
 }
 
 void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {

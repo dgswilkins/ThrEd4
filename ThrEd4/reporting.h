@@ -17,5 +17,5 @@
 
 namespace rpt {
 
-void reportError(const wchar_t* prompt, DWORD& errorCode);
+void reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode);
 } // namespace rpt

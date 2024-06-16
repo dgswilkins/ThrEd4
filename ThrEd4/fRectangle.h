@@ -4,22 +4,23 @@
 class F_RECTANGLE
 {
   public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   float left {};
   float top {};
   float right {};
   float bottom {};
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  constexpr F_RECTANGLE() noexcept = default;
+  explicit constexpr F_RECTANGLE() noexcept = default;
+  explicit constexpr F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
   // F_RECTANGLE(F_RECTANGLE const&) = default;
   // F_RECTANGLE(F_RECTANGLE&&) = default;
   // F_RECTANGLE& operator=(F_RECTANGLE const& rhs) = default;
   // F_RECTANGLE& operator=(F_RECTANGLE&&) = default;
   //~F_RECTANGLE() = default;
-
-  inline F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
 };
 #pragma pack(pop)
 
-inline F_RECTANGLE::F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept :
+constexpr F_RECTANGLE::F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept :
     left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
 }

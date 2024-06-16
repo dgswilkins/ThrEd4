@@ -12,12 +12,7 @@
 #include "textureHeader.h"
 
 // Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26814)
 #include "boost/dynamic_bitset.hpp"
-#pragma warning(pop)
 
 // Standard Libraries
 #include <filesystem>
@@ -198,8 +193,12 @@ extern float ShowStitchThreshold;
 extern HWND  SideMessageWindow;
 extern float SmallStitchLength;
 extern float SnapLength;
-extern float SpiralWrap;
-extern float StarRatio;
+
+extern std::vector<SEARCH_REC>* SortBuffer;
+
+extern uint32_t SortIndex;
+extern float    SpiralWrap;
+extern float    StarRatio;
 
 extern ENUM_MAP<StateFlag>* StateMap;
 
@@ -231,7 +230,7 @@ extern boost::dynamic_bitset<>* TracedMap;
 
 extern SIZE UnzoomedRect;
 
-extern std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer;
+extern std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer; // NOLINT(modernize-avoid-c-arrays)
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 

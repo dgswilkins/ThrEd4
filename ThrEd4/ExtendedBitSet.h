@@ -1,16 +1,7 @@
 #pragma once
 
-// Local Headers
-//  ReSharper disable CppUnusedIncludeDirective
-#include "warnings.h"
-
 // Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26814)
 #include "boost/dynamic_bitset.hpp"
-#pragma warning(pop)
 
 template <typename Block = uint32_t, typename Allocator = std::allocator<uint32_t>>
 class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
@@ -36,7 +27,7 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
 	  super::reset(foundBit);
 	}
 	else {
-	  return 0xFFFFFFFF;
+	  return BIGSIZE;
 	}
 	return foundBit;
   }
@@ -44,17 +35,17 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
   auto getLast() -> size_t {
 	size_t foundBit = super::find_first();
 	if (foundBit != super::npos) {
-	  do {
-		if (super::find_next(foundBit) != super::npos) {
-		  foundBit = super::find_next(foundBit);
-		}
-	  } while (super::find_next(foundBit) != super::npos);
+	  auto nextFoundBit = super::find_next(foundBit);
+	  while (nextFoundBit != super::npos) {
+		foundBit     = nextFoundBit;
+		nextFoundBit = super::find_next(foundBit);
+	  }
 	}
 	if (foundBit != super::npos) {
 	  super::reset(foundBit);
 	}
 	else {
-	  return 0xFFFFFFFF;
+	  return BIGSIZE;
 	}
 	return foundBit;
   }

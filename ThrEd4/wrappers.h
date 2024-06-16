@@ -3,12 +3,10 @@
 // Local Headers
 #include "point.h"
 #include "reporting.h"
+#include "ThrEdTypes.h"
 
 // Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "gsl/gsl"
-#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -22,8 +20,14 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
-#include <vector>
+#ifndef _DEBUG
+// resharper disable CppUnusedIncludeDirective
 #include <cmath>
+// resharper restore CppUnusedIncludeDirective
+#endif
+#include <vector>
+
+constexpr auto MINDBL = 4e-5; // small number for conversions
 
 namespace wrap {
 
@@ -37,21 +41,7 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
                  std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint64_t>),
                 "cannot use wrap::toFloat here.");
   if constexpr (std::is_same_v<inType, double>) {
-	try {
-	  return gsl::narrow<float>(invar);
-	}
-	catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
-	  UNREFERENCED_PARAMETER(e);
-	  auto const var  = gsl::narrow_cast<float>(invar);
-	  auto const diff = abs(invar - gsl::narrow_cast<double>(var));
-	  if (diff > 4e-5) {
-		throw std::runtime_error("conversion error above limit");
-	  }
-	  return var;
-	}
-	catch (...) { // otherwise throw
-	  throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
-	}
+	return util::doubleToFloat(invar);
   }
   else {
 	if constexpr (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>) {
@@ -63,9 +53,14 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
   }
 }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
+
 template <class T>
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>)
-    -> uint32_t {
+#pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape, misc-unused-parameters)
+constexpr auto sizeofType(std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -75,8 +70,8 @@ constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(s
 }
 
 template <class T>
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>)
-    -> uint32_t {
+#pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape, misc-unused-parameters)
+constexpr auto sizeofType(std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -84,6 +79,10 @@ constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(s
 	return gsl::narrow<uint32_t>(sizeof(T));
   }
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 template <class T>
 auto sizeofVector(std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
@@ -122,10 +121,10 @@ auto ceil(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same_
   }
   else {
 	if constexpr (std::is_same_v<outType, float>) {
-	  return std::ceilf(gsl::narrow<float>(invar));
+	  return std::ceilf(wrap::toFloat(invar));
 	}
 	else {
-	  return gsl::narrow<outType>(std::ceilf(gsl::narrow<float>(invar)));
+	  return gsl::narrow<outType>(std::ceilf(wrap::toFloat(invar)));
 	}
   }
 }
@@ -147,10 +146,10 @@ auto floor(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same
   }
   else {
 	if constexpr (std::is_same_v<outType, float>) {
-	  return std::floorf(gsl::narrow<float>(invar));
+	  return std::floorf(wrap::toFloat(invar));
 	}
 	else {
-	  return gsl::narrow<outType>(std::floorf(gsl::narrow<float>(invar)));
+	  return gsl::narrow<outType>(std::floorf(wrap::toFloat(invar)));
 	}
   }
 }
@@ -163,10 +162,10 @@ template <class inType>
 auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> float {
   // static_assert(!std::is_same_v<inType, float>, "no need to use wrap::midl here.");
   if constexpr (std::is_same_v<inType, float>) {
-	return (high - low) / 2.0F + low;
+	return (high - low) * HALF + low;
   }
   else {
-	return (gsl::narrow<float>(high) - gsl::narrow<float>(low)) / 2.0F + gsl::narrow<float>(low);
+	return (wrap::toFloat(high) - wrap::toFloat(low)) * HALF + wrap::toFloat(low);
   }
 }
 
@@ -284,22 +283,25 @@ void setCursor(HCURSOR hCursor) noexcept;
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 
 template <class inType>
-auto to_ptrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
+auto toPtrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
     -> ptrdiff_t {
   static_assert(std::is_same_v<inType, ptrdiff_t> || std::is_same_v<inType, uint32_t> ||
-                    std::is_same_v<inType, int>,
-                "to_ptrdiff cannot be used here.");
+                    std::is_same_v<inType, int> || std::is_same_v<inType, size_t>,
+                "toPtrdiff cannot be used here.");
   if constexpr (std::is_same_v<inType, ptrdiff_t>) {
 	return invar;
   }
   else {
 	if constexpr (std::is_same_v<ptrdiff_t, int>) {
 	  if constexpr (std::is_same_v<inType, uint32_t>) {
-		return gsl::narrow<ptrdiff_t>(invar);
+		return gsl::narrow<ptrdiff_t>(invar); // uint32_t -> ptrdiff (32 bit)
+	  }
+	  else {
+		return invar; // int -> ptrdiff
 	  }
 	}
 	else {
-	  return gsl::narrow_cast<ptrdiff_t>(invar);
+	  return gsl::narrow_cast<ptrdiff_t>(invar); // any -> ptrdiff (64 bit)
 	}
   }
 }
@@ -356,24 +358,24 @@ auto toUnsigned(inType invar) noexcept(std::is_same_v<inType, uint32_t> || std::
 auto wcsToFloat(wchar_t const* buffer) -> float;
 
 template <class outType>
-void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<outType, unsigned long>) {
+void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<outType, unsigned long>) { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, unsigned long>, "no need to use wrap::wcstoULong here.");
-  if constexpr (std::is_same_v<outType, unsigned long>) {
-	outvar = std::wcstoul(invar, nullptr, 10);
+  if constexpr (std::is_same_v<outType, unsigned long>) { // NOLINT(google-runtime-int)
+	outvar = std::wcstoul(invar, nullptr, DECRAD);
   }
   else {
-	outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
+	outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, DECRAD));
   }
 }
 
 template <class outType>
-auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType {
+auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, long>, "no need to use wrap::wcstoLong here.");
-  if constexpr (std::is_same_v<outType, long>) {
-	return std::wcstol(buffer, nullptr, 10);
+  if constexpr (std::is_same_v<outType, long>) { // NOLINT(google-runtime-int)
+	return std::wcstol(buffer, nullptr, DECRAD);
   }
   else {
-	return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
+	return gsl::narrow<outType>(std::wcstol(buffer, nullptr, DECRAD));
   }
 }
 

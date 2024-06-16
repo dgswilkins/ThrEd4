@@ -1,6 +1,45 @@
 // Local Headers
 #include "stdafx.h"
+#include "clipStitch.h"
+#include "EnumMap.h"
+#include "formHeader.h"
+#include "fRectangle.h"
 #include "globals.h"
+#include "iniFile.h"
+#include "point.h"
+#include "satCon.h"
+#include "textureHeader.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <minwindef.h>
+#include <windef.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <array>
+#include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
 // clang-format off
 uint8_t                        ActiveColor               = 0U;      // active color selector
@@ -37,7 +76,7 @@ HWND                           FormDataSheet             = nullptr; // form data
 std::vector<POINT>*            FormLines                 = nullptr; // used in the form drawing routines
 std::vector<FRM_HEAD>*         FormList                  = nullptr; // a list of form headers
 uint32_t                       FormMenuChoice            = 0U;      // data type for form data form numerical entry
-F_POINT                        FormMoveDelta             = {};      // offset for moving forms
+F_POINT                        FormMoveDelta             = F_POINT {}; // offset for moving forms
 std::wstring*                  FormOnOff                 = nullptr;
 HPEN                           FormPen                   = nullptr; // form pen
 HPEN                           FormPen3px                = nullptr; // three-pixel form pen
@@ -57,9 +96,9 @@ std::vector<F_POINT>*          InsidePoints              = nullptr; // pointer t
 std::vector<INS_REC>*          InterleaveSequenceIndices = nullptr; // indices into interleave points
 std::vector<F_POINT>*          InterleaveSequence        = nullptr; // storage for interleave points
 std::vector<HWND>*             LabelWindow               = nullptr; // text handles for the form data sheet
-F_POINT                        LastPoint                 = {};      // last formOrigin written by line connect routine
+F_POINT                        LastPoint                 = F_POINT {}; // last formOrigin written by line connect routine
 float                          LineSpacing               = DEFSPACE * PFGRAN; // stitch spacing in stitch units
-F_POINT                        LowerLeftStitch           = {};      // lower left formOrigin in a form
+F_POINT                        LowerLeftStitch           = F_POINT {}; // lower left formOrigin in a form
 std::array<uint32_t, OLDNUM>*  LRUPtr                    = nullptr; // pointer to LRU list
 HMENU                          MainMenu                  = nullptr; // main menu
 HWND                           MainStitchWin             = nullptr; // stitch window
@@ -84,7 +123,7 @@ int32_t                        PreferenceWindowWidth     = {};      // width of 
 HWND                           PreferencesWindow         = nullptr; // preferences window
 uint32_t                       PreviousFormIndex         = 0U;      // previously selected form
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
-F_RECTANGLE                    RotationRect              = {};      // rotation rectangle
+F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle
 std::vector<POINT>*            RubberBandLine            = nullptr; // points to form points to be moved
 std::vector<SAT_CON>*          SatinGuides               = nullptr; // satin form connects
 int32_t*                       ScreenDPI                 = nullptr; // screen DPI
@@ -96,21 +135,23 @@ std::vector<uint32_t>*         SelectedFormList          = nullptr; // a list of
 FORM_VERTICES                  SelectedFormVertices      = {};      // selected form vertices
 std::vector<POINT>*            SelectedFormsLine         = nullptr; // line derived from the big rectangle
 RECT                           SelectedFormsRect         = {};      // for multiple selections;
-F_POINT                        SelectedFormsSize         = {};      // size of multiple select rectangle
+F_POINT                        SelectedFormsSize         = F_POINT {}; // size of multiple select rectangle
 RECT                           SelectedPixelsRect        = {};      // display form vertex select rectangle
 std::vector<POINT>*            SelectedPointsLine        = nullptr; // line derived from the formOrigin select rectangle
-F_RECTANGLE                    SelectedVerticesRect      = {};      // rectangle enclosing selected form verticess
+F_RECTANGLE                    SelectedVerticesRect      = F_RECTANGLE {}; // rectangle enclosing selected form verticess
 float                          ShowStitchThreshold       = SHOPNTS; // show stitch grid below this zoom level
 HWND                           SideMessageWindow         = nullptr; // main side message window
 float                          SmallStitchLength         = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 float                          SnapLength                = SNPLEN * PFGRAN;  // snap together length
+std::vector<SEARCH_REC>*       SortBuffer                = nullptr; // sort buffer for stitch search
+uint32_t                       SortIndex                 = 0U;      // index for stitch search
 float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral
 float                          StarRatio                 = STARAT;  // star formOrigin to body ratio
 ENUM_MAP<StateFlag>*           StateMap                  = nullptr; // Flags indicating current run state
-F_POINT                        StitchBmpRatio            = {};      // stitch hoop to bitmap ratios
+F_POINT                        StitchBmpRatio            = F_POINT {}; // stitch hoop to bitmap ratios
 float                          StitchBoxesThreshold      = STCHBOX; // threshold for drawing stitch boxes
 std::vector<F_POINT_ATTR>*     StitchBuffer              = nullptr; // main stitch buffer
-F_RECTANGLE                    StitchRangeRect           = {};      // stitch range rectangle
+F_RECTANGLE                    StitchRangeRect           = F_RECTANGLE {}; // stitch range rectangle
 RECT                           StitchWindowClientRect    = {};      // stitch window size,client
 HDC                            StitchWindowDC            = nullptr; // stitch window device context
 HDC                            StitchWindowMemDC         = nullptr; // stitch window memory device context
@@ -139,9 +180,9 @@ float                          VerticalRatio             = 0.0F;    // vertical 
 HWND                           VerticalScrollBar         = nullptr; // vertical scroll bar
 fs::path*                      WorkingFileName           = nullptr; //
 std::array<POINT, SQPNTS>      ZoomBoxLine               = {};      // the zoom box
-F_POINT                        ZoomBoxOrigin             = {};      // zoom box origin
+F_POINT                        ZoomBoxOrigin             = F_POINT {}; // zoom box origin
 float                          ZoomFactor                = 1.0F;    // zoom factor
-F_POINT                        ZoomMarkPoint             = {};      // stitch coordinates of the zoom mark
-F_POINT                        ZoomRatio                 = {};      // zoom ratio used to draw stitch window
-F_RECTANGLE                    ZoomRect                  = {};      // zoom rectangle
+F_POINT                        ZoomMarkPoint             = F_POINT {}; // stitch coordinates of the zoom mark
+F_POINT                        ZoomRatio                 = F_POINT {}; // zoom ratio used to draw stitch window
+F_RECTANGLE                    ZoomRect                  = F_RECTANGLE {}; // zoom rectangle
 // clang-format on

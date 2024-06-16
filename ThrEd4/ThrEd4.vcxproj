@@ -20,15 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="backup.cpp" />
+    <ClCompile Include="balarad.cpp" />
     <ClCompile Include="bitmap.cpp" />
+    <ClCompile Include="clip.cpp" />
     <ClCompile Include="displayText.cpp" />
     <ClCompile Include="DST.cpp" />
     <ClCompile Include="form.cpp" />
+    <ClCompile Include="formClip.cpp" />
     <ClCompile Include="formForms.cpp" />
-    <ClCompile Include="clip.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
+    <ClCompile Include="keys.cpp" />
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="mouse.cpp" />
     <ClCompile Include="PCS.cpp" />
     <ClCompile Include="PES.cpp" />
     <ClCompile Include="repair.cpp" />
@@ -48,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backup.h" />
+    <ClInclude Include="balarad.h" />
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="clipStitch.h" />
     <ClInclude Include="displayText.h" />
@@ -55,13 +60,16 @@
     <ClInclude Include="EnumMap.h" />
     <ClInclude Include="ExtendedBitSet.h" />
     <ClInclude Include="form.h" />
+    <ClInclude Include="formClip.h" />
     <ClInclude Include="formForms.h" />
     <ClInclude Include="clip.h" />
     <ClInclude Include="formHeader.h" />
     <ClInclude Include="fRectangle.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="iniFile.h" />
+    <ClInclude Include="keys.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="mouse.h" />
     <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />
     <ClInclude Include="point.h" />
@@ -84,6 +92,10 @@
     <ClInclude Include="xt.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.clang-tidy" />
+    <None Include="..\.github\workflows\build.yml" />
+    <None Include="..\.github\workflows\codeql.yml" />
+    <None Include="..\vcpkg-configuration.json" />
     <None Include="..\vcpkg.json" />
     <None Include="cpp.hint" />
     <None Include="Resources\dlin.cur" />
@@ -106,7 +118,7 @@
     <ProjectGuid>{46F5142A-E908-4797-908D-EC76CB6157CF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ThrEd4</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -158,23 +170,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CAExcludePath>$(VcpkgRoot)\installed\x86-windows-static\include;$(CAExcludePath)</CAExcludePath>
     <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x86-windows-static\x86-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CAExcludePath>$(VcpkgRoot)\installed\x64-windows-static\include;$(CAExcludePath)</CAExcludePath>
     <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x64-windows-static\x64-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x86-windows-static\x86-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(VcpkgManifestRoot)\vcpkg_installed\x64-windows-static\x64-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -205,14 +213,16 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)vcpkg_installed\x86-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
-      <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmtd.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg_installed\x86-windows-static\debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -235,12 +245,15 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)vcpkg_installed\x64-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
-      <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmtd.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg_installed\x64-windows-static\debug\lib</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -261,14 +274,18 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalIncludeDirectories>$(SolutionDir)vcpkg_installed\x86-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
-      <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmt.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg_installed\x86-windows-static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest />
     <Manifest />
@@ -292,14 +309,18 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalIncludeDirectories>$(SolutionDir)vcpkg_installed\x64-windows-static\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
-      <AdditionalDependencies>htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmt.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg_installed\x64-windows-static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest />
     <Manifest />

@@ -4,11 +4,53 @@
 #include "displayText.h"
 #include "form.h"
 #include "globals.h"
+#include "Resources/resource.h"
+#include "textureHeader.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/narrow"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <libloaderapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
+#include <WinUser.h>
+
+// Standard Libraries
+#include <cstdint>
+#include <filesystem>
+// resharper disable CppUnusedIncludeDirective
+#include <ranges>
+// ReSharper restore CppUnusedIncludeDirective
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 // displayText internal namespace
 namespace di {
 void bxtxt(uint32_t iButton, uint32_t iMessage);
+auto clpmsgs(uint32_t code) -> bool;
 void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
 void sdmsg();
 } // namespace di
@@ -18,7 +60,7 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
   auto  sDest = std::wstring {};
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) {
-	auto const span = gsl::span {pBuf, wrap::toSize(len)};
+	auto const span = gsl::span<wchar_t> {pBuf, wrap::toSize(len)};
 	sDest.insert(sDest.end(), span.begin(), span.end());
   }
   return sDest;
@@ -61,9 +103,10 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
   auto const xOffset = mainRect.left - thredRect.left;
   auto       yOffset = 3;
   if (!top) {
-	yOffset = (mainRect.bottom - mainRect.top) - 12 - messageSize.cy;
+	constexpr auto PXOFFSET = 12; // pixel offset
+
+	yOffset = (mainRect.bottom - mainRect.top) - PXOFFSET - messageSize.cy;
   }
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   MsgWindow = CreateWindow(L"STATIC",
                            message.c_str(),
                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -97,7 +140,6 @@ void displayText::numWnd() {
   GetWindowRect(ThrEdWindow, &wRect);
   xOffset -= wRect.left;
   if (nullptr == GeneralNumberInputBox) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	GeneralNumberInputBox = CreateWindow(L"STATIC",
 	                                     nullptr,
 	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -187,7 +229,7 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
   displayText::shoMsg(displayText::format2(IDS_SHOSEL, msg0, msg1), false);
 }
 
-auto displayText::clpmsgs(uint32_t code) -> bool {
+auto di::clpmsgs(uint32_t code) -> bool {
   form::ispcdclp();
   if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS, false);
@@ -205,7 +247,7 @@ void displayText::frm1pnt() {
 
 auto displayText::filmsgs(uint32_t code) -> bool {
   if (!SelectedFormList->empty()) {
-	return displayText::clpmsgs(code);
+	return di::clpmsgs(code);
   }
   if (!FormList->empty()) {
 	displayText::frm1pnt();
@@ -221,7 +263,7 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 		  return false;
 		}
 	  }
-	  return displayText::clpmsgs(code);
+	  return di::clpmsgs(code);
 	}
 
 	displayText::tabmsg(IDS_FILSEL, false);
@@ -257,8 +299,7 @@ void displayText::spltmsg() {
 
 void displayText::okcan() {
   GetClientRect(MsgWindow, &MsgRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  OKButton = CreateWindow(L"STATIC",
+  OKButton     = CreateWindow(L"STATIC",
                           displayText::loadStr(IDS_OKENT).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -269,7 +310,6 @@ void displayText::okcan() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CancelButton = CreateWindow(L"STATIC",
                               displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -287,8 +327,7 @@ void displayText::savdisc() {
   di::sdmsg();
   StateMap->reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  OKButton = CreateWindow(L"STATIC",
+  OKButton      = CreateWindow(L"STATIC",
                           displayText::loadStr(IDS_SAV).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -299,7 +338,6 @@ void displayText::savdisc() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   DiscardButton = CreateWindow(L"STATIC",
                                displayText::loadStr(IDS_DISC).c_str(),
                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -311,8 +349,7 @@ void displayText::savdisc() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  CancelButton = CreateWindow(L"STATIC",
+  CancelButton  = CreateWindow(L"STATIC",
                               displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               2 * ButtonWidthX3 + 25,
@@ -325,11 +362,12 @@ void displayText::savdisc() {
                               nullptr);
 }
 
-static auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+namespace {
+auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
 }
+} // namespace
 
 void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = displayText::getThrEdFont(FONTSIZE);
@@ -343,7 +381,6 @@ void displayText::tomsg() {
   GetWindowRect(OKButton, &okRect);
   auto const winName = displayText::loadStr(IDS_DELST2);
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   DeleteStitchesDialog = CreateWindow(L"STATIC",
                                       winName.c_str(),
                                       SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -396,6 +433,6 @@ auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 
 #pragma warning(suppress : 26461) // con.3 The pointer argument can be marked as a pointer to const
 void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }

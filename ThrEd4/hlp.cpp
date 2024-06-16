@@ -3,6 +3,7 @@
 #include "displayText.h"
 #include "globals.h"
 #include "hlp.h"
+#include "Resources/resource.h"
 #include "thred.h"
 
 // Windows Header Files:

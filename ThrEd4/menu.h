@@ -1,11 +1,10 @@
 #pragma once
 
-constexpr auto GRDHI  = uint32_t {0xffffffU}; // grid high color
-constexpr auto GRDMED = uint32_t {0x404040U}; // grid medium color
-constexpr auto GRDDEF = uint32_t {0x202020U}; // grid default color
-constexpr auto GRDRED = uint32_t {0xff2020U}; // grid red color
-constexpr auto GRDBLU = uint32_t {0x20ff20U}; // grid green color
-constexpr auto GRDGRN = uint32_t {0x2020ffU}; // grid blue color
+// Local Headers
+#include "stdafx.h"
+#include "switches.h"
+
+namespace fs = std::filesystem;
 
 namespace menu {
 void auxmen();
@@ -20,6 +19,12 @@ void fil2men();
 void flipFormOnOff();
 void flipHideBitmap();
 void frmcurmen();
+auto getGridDefColor() noexcept -> uint32_t;
+auto handleEditMenu(WORD const& wParameter) -> bool;
+auto handleFileMenu(WORD const& wParameter) -> bool;
+auto handleFillMenu(WORD const& wParameter) -> bool;
+auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
+auto handleViewMenu(WORD const& wParameter) -> bool;
 void init() noexcept;
 void knotmen();
 void ladj();
@@ -32,7 +37,11 @@ void resetFormOnOff();
 void resetThreadView();
 void rotauxmen();
 void setGridCols(const COLORREF& color);
-void vuselthr();
+void setdst();
+#if PESACT
+void setpes();
+#endif
+void setpcs();
 void vuthrds();
 void wrnmen();
 } // namespace menu

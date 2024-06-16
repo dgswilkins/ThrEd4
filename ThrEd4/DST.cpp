@@ -4,63 +4,205 @@
 #include "displayText.h"
 #include "DST.h"
 #include "globals.h"
+#include "point.h"
+#include "Resources/resource.h"
 #include "thred.h"
+#include "ThrEdTypes.h"
 #include "utf8conv.h"
+// resharper disable CppUnusedIncludeDirective
+#include "warnings.h"
+// ReSharper restore CppUnusedIncludeDirective
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/core.h"
+#include "fmt/format.h"
+#include "gsl/span"
+#include "gsl/util"
+#pragma warning(pop)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+#include <fileapi.h>
+#include <handleapi.h>
+#include <minwindef.h>
+#include <windef.h>
+#include <wingdi.h>
+#include <winnt.h>
 
 // Standard Libraries
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
+#include <string>
+#include <vector>
+
 #ifdef ALLOCFAILURE
 // #include <new.h>
 #endif
 
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
-// clang-format off
+class DST_OFFSETS
+{
+  private:
+  POINT m_Positive {}; // plus offset written into the destination file header
+  POINT m_Negative {}; // minus offset written into the destination file header
+
+  public:
+  constexpr DST_OFFSETS() noexcept = default;
+
+  // Getter for Positive
+  [[nodiscard]] auto getPositive() const noexcept -> POINT {
+	return m_Positive;
+  }
+
+  // Setter for Positive
+  void setPositive(const POINT& positive) noexcept {
+	m_Positive = positive;
+  }
+
+  // Getter for Negative
+  [[nodiscard]] auto getNegative() const noexcept -> POINT {
+	return m_Negative;
+  }
+
+  // Setter for Negative
+  void setNegative(const POINT& negative) noexcept {
+	m_Negative = negative;
+  }
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
+// NOLINTBEGIN(readability-magic-numbers)
 class DSTHED // dst file header
 {
-  public:
-  char desched[3]  {}; // 00  00	description
-  char desc[17]    {}; // 03  03
-  char recshed[3]  {}; // 20  14	record count
-  char recs[8]     {}; // 23  17
-  char cohed[3]    {}; // 31  1F
-  char co[4]       {}; // 34  22
-  char xplushed[3] {}; // 38  26	x+ size
-  char xplus[6]    {}; // 41  29
-  char xminhed[3]  {}; // 47  2F	x- size
-  char xmin[6]     {}; // 50  32
-  char yplushed[3] {}; // 56  38
-  char yplus[6]    {}; // 59  3B	y+ size
-  char yminhed[3]  {}; // 65  41
-  char ymin[6]     {}; // 68  44	y- size
-  char axhed[3]    {}; // 74  4A
-  char ax[7]       {}; // 77  4D
-  char ayhed[3]    {}; // 84  54
-  char ay[7]       {}; // 87  57
-  char mxhed[3]    {}; // 94  5E
-  char mx[7]       {}; // 97  61
-  char myhed[3]    {}; // 104 68
-  char my[7]       {}; // 107 6B
-  char pdhed[2]    {}; // 114 72
-  char pd[7]       {}; // 116 74
-  char eof[1]      {}; // 123 7B
-  char res[388]    {}; // 124 7C
+  private:
+  std::array<char, 3>   m_desched {};  // 00  00	description
+  std::array<char, 17>  m_desc {};     // 03  03
+  std::array<char, 3>   m_recshed {};  // 20  14	record count
+  std::array<char, 8>   m_recs {};     // 23  17
+  std::array<char, 3>   m_cohed {};    // 31  1F
+  std::array<char, 4>   m_co {};       // 34  22
+  std::array<char, 3>   m_xplushed {}; // 38  26	x+ size
+  std::array<char, 6>   m_xplus {};    // 41  29
+  std::array<char, 3>   m_xminhed {};  // 47  2F	x- size
+  std::array<char, 6>   m_xmin {};     // 50  32
+  std::array<char, 3>   m_yplushed {}; // 56  38
+  std::array<char, 6>   m_yplus {};    // 59  3B	y+ size
+  std::array<char, 3>   m_yminhed {};  // 65  41
+  std::array<char, 6>   m_ymin {};     // 68  44	y- size
+  std::array<char, 3>   m_axhed {};    // 74  4A
+  std::array<char, 7>   m_ax {};       // 77  4D
+  std::array<char, 3>   m_ayhed {};    // 84  54
+  std::array<char, 7>   m_ay {};       // 87  57
+  std::array<char, 3>   m_mxhed {};    // 94  5E
+  std::array<char, 7>   m_mx {};       // 97  61
+  std::array<char, 3>   m_myhed {};    // 104 68
+  std::array<char, 7>   m_my {};       // 107 6B
+  std::array<char, 2>   m_pdhed {};    // 114 72
+  std::array<char, 7>   m_pd {};       // 116 74
+  std::array<char, 1>   m_eof {};      // 123 7B
+  std::array<char, 388> m_res {};      // 124 7C
 
+  public:
   constexpr DSTHED() noexcept = default;
   // DSTHED(DSTHED&&) = default;
   // DSTHED& operator=(DSTHED const& rhs) = default;
   // DSTHED& operator=(DSTHED&&) = default;
   //~DSTHED() = default;
+
+  void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset);
+  [[nodiscard]] auto chkdst() const noexcept -> bool {
+	return strncmp(m_desched.data(), "LA:", 3) == 0;
+  }
 };
-// clang-format on
+// NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
+// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
+#pragma warning(push)
+#pragma warning(disable : 4996)
+// ReSharper disable CppDeprecatedEntity
+void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset) {
+  // dstHeader fields are fixed width, so use strncpy in its intended way.
+  // Use sizeof to ensure no overrun if the format string is wrong length
+  strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
+  std::ranges::fill(m_desc, ' ');
+  auto const convAuxName  = utf::utf16ToUtf8(auxName);
+  auto const spDstHdrDesc = gsl::span {m_desc};
+  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
+	auto const name   = convAuxName.substr(pos + 1);
+	auto       itChar = spDstHdrDesc.begin();
+	for (auto const& iDHD : name) {
+	  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
+		*itChar = iDHD;
+	  }
+	  else {
+		break;
+	  }
+	  ++itChar;
+	}
+  }
+  constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
+  spDstHdrDesc.back() = CAR;
+
+  auto const recs   = fmt::format(FMT_STRING("{:7d}\r"), dstRecSize);
+  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().x);
+  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().x);
+  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().y);
+  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().y);
+  // clang-format off
+  strncpy(m_recshed.data(),  "ST:",          m_recshed.size());
+  strncpy(m_recs.data(),     recs.c_str(),   m_recs.size());
+  strncpy(m_cohed.data(),    "CO:",          m_cohed.size());
+  strncpy(m_co.data(),       "  0\xd",       m_co.size());
+  strncpy(m_xplushed.data(), "+X:",          m_xplushed.size());
+  strncpy(m_xplus.data(),    xplus.c_str(),  m_xplus.size());
+  strncpy(m_xminhed.data(),  "-X:",          m_xminhed.size());
+  strncpy(m_xmin.data(),     xminus.c_str(), m_xmin.size());
+  strncpy(m_yplushed.data(), "+Y:",          m_yplushed.size());
+  strncpy(m_yplus.data(),    yplus.c_str(),  m_yplus.size());
+  strncpy(m_yminhed.data(),  "-Y:",          m_yminhed.size());
+  strncpy(m_ymin.data(),     yminus.c_str(), m_ymin.size());
+  strncpy(m_axhed.data(),    "AX:",          m_axhed.size());
+  strncpy(m_ax.data(),       "-    0\r",     m_ax.size());
+  strncpy(m_ayhed.data(),    "AY:",          m_ayhed.size());
+  strncpy(m_ay.data(),       "+    0\r",     m_ay.size());
+  strncpy(m_mxhed.data(),    "MX:",          m_mxhed.size());
+  strncpy(m_mx.data(),       "+    0\r",     m_mx.size());
+  strncpy(m_myhed.data(),    "MY:",          m_myhed.size());
+  strncpy(m_my.data(),       "+    0\r",     m_my.size());
+  strncpy(m_pdhed.data(),    "PD",           m_pdhed.size());
+  strncpy(m_pd.data(),       "******\r",     m_pd.size());
+  strncpy(m_eof.data(),      "\x1a",         m_eof.size());
+  // clang-format on
+  std::ranges::fill(m_res, ' ');
+}
+// ReSharper restore CppDeprecatedEntity
+#pragma warning(pop)
+
 namespace di {
-auto chkdst(DSTHED const* dstHeader) noexcept -> bool;
 auto coldis(COLORREF colorA, COLORREF colorB) -> DWORD;
 auto colfil() -> bool;
 void dstin(uint32_t number, POINT& pout) noexcept;
 void dstran(std::vector<DSTREC>& DSTData);
 auto dtrn(DSTREC* dpnt) -> uint32_t;
 auto dudbits(SIZE const& dif) -> uint32_t;
+void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
 void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace di
 
@@ -72,8 +214,10 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling f
 constexpr auto TYPJMP = 0x830000U; // dst jump stitch mask
 constexpr auto TYPREG = 0x030000U; // dst regular stitch mask
 
-static auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
-static auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
+namespace {
+auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
+auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
+} // namespace
 
 class DSTDAT
 {
@@ -121,7 +265,6 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (colorFile != INVALID_HANDLE_VALUE) {
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
@@ -167,26 +310,17 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	}
 	auto dstStitch = POINT {};
 	di::dstin(di::dtrn(&record), dstStitch);
-	localStitch.x += wrap::toFloat(dstStitch.x);
-	localStitch.y += wrap::toFloat(dstStitch.y);
+	localStitch += F_POINT {dstStitch.x, dstStitch.y};
 	constexpr auto C0MASK = 0x80U;
 	if ((record.nd & C0MASK) != 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
 	  continue;
 	}
 	auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
 	StitchBuffer->push_back(stitch);
-	if (stitch.x > maximumCoordinate.x) {
-	  maximumCoordinate.x = stitch.x;
-	}
-	if (stitch.y > maximumCoordinate.y) {
-	  maximumCoordinate.y = stitch.y;
-	}
-	if (stitch.x < mimimumCoordinate.x) {
-	  mimimumCoordinate.x = stitch.x;
-	}
-	if (stitch.y < mimimumCoordinate.y) {
-	  mimimumCoordinate.y = stitch.y;
-	}
+	maximumCoordinate.x = std::max(maximumCoordinate.x, stitch.x);
+	maximumCoordinate.y = std::max(maximumCoordinate.y, stitch.y);
+	mimimumCoordinate.x = std::min(mimimumCoordinate.x, stitch.x);
+	mimimumCoordinate.y = std::min(mimimumCoordinate.y, stitch.y);
   }
   auto const dstSize =
       F_POINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
@@ -203,8 +337,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
       F_POINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
                (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
-	iStitch.x += delta.x;
-	iStitch.y += delta.y;
+	iStitch += delta;
   }
 }
 
@@ -212,13 +345,14 @@ auto di::dtrn(DSTREC* dpnt) -> uint32_t {
   return *(convertFromPtr<uint32_t*>(dpnt));
 }
 
-void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
+void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
   auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number
-  colorData.reserve(32);
+  constexpr auto DSTRES = size_t {32U}; // testing shows this to be a good value
+  colorData.reserve(DSTRES);
   colorData.push_back(COLVER);
   colorData.push_back(BackgroundColor);
   auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
@@ -228,29 +362,26 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
   for (auto const& stitch : stitches) {
 	*destination++ = F_POINT_ATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
   }
-  auto boundingRect = F_RECTANGLE {
-      dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y};
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
   for (auto const& stitch : dstStitchBuffer) {
-	constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
-	if (stitch.x > boundingRect.right) {
-	  boundingRect.right = stitch.x + MARGIN;
-	}
-	if (stitch.x < boundingRect.left) {
-	  boundingRect.left = stitch.x - MARGIN;
-	}
-	if (stitch.y > boundingRect.top) {
-	  boundingRect.top = stitch.y + MARGIN;
-	}
-	if (stitch.y < boundingRect.bottom) {
-	  boundingRect.bottom = stitch.y - MARGIN;
-	}
+	minX = std::min(minX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxX = std::max(maxX, stitch.x);
+	maxY = std::max(maxY, stitch.y);
   }
-  auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
-                                 std::lround(wrap::midl(boundingRect.top, boundingRect.bottom))};
-  DSTOffsetData.Positive.x = std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1));
-  DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
-  DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
-  DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
+  constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
+  minX -= MARGIN;
+  maxX += MARGIN;
+  minY -= MARGIN;
+  maxY += MARGIN;
+  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)), std::lround(wrap::midl(maxY, minY))};
+  DSTOffsetData.setPositive({std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
+                             std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
+  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),
+                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - minY)});
   auto color = dstStitchBuffer[0].attribute & COLMSK;
   for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
@@ -310,7 +441,6 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto colorFile =
       CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                colorData.data(),
@@ -320,7 +450,6 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
   }
   CloseHandle(colorFile);
   colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                &colorData[2],
@@ -351,17 +480,17 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
 }
 
 auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
+  // NOLINTBEGIN(readability-magic-numbers)
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
   return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
                                                      (((767 - meanR) * deltaB * deltaB) / 256))));
+  // NOLINTEND(readability-magic-numbers)
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
@@ -376,7 +505,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 	*iUserColor = color;
 	return wrap::toUnsigned(colorChanges);
   }
-  auto minDistance = std::numeric_limits<DWORD>::max();
+  auto minDistance = BIGDWORD;
   auto iDistance   = uint32_t {};
   auto iUserColor  = UserColor.begin();
   for (auto iColor = 0U; iColor < UserColor.size(); ++iColor) {
@@ -889,17 +1018,13 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
   };
   auto const xOffset = DSTMAX + dif.cx;
   auto const yOffset = DSTMAX + dif.cy;
-  return X_DST[wrap::toSize(xOffset)] | Y_DST[wrap::toSize(yOffset)];
+  return X_DST.at(wrap::toSize(xOffset)) | Y_DST.at(wrap::toSize(yOffset));
 }
 
 void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
   DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & B1MASK),
                                gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
                                gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
-}
-
-auto di::chkdst(DSTHED const* dstHeader) noexcept -> bool {
-  return strncmp(static_cast<const char*>(dstHeader->desched), "LA:", 3) == 0;
 }
 
 auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
@@ -922,7 +1047,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  if (!di::chkdst(&dstHeader)) {
+  if (!dstHeader.chkdst()) {
 	CloseHandle(fileHandle);
 	return false;
   }
@@ -939,76 +1064,23 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   return true;
 }
 
-// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
-#pragma warning(push)
-#pragma warning(disable : 4996)
-// ReSharper disable CppDeprecatedEntity
 auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
   }
   auto dstRecords = std::vector<DSTREC> {};
+  auto dstRecSize = dstRecords.size();
   // There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
-  dstRecords.reserve(StitchBuffer->size() + 128U);
+  constexpr auto RECRES = size_t {128U}; // testing shows this to be a good value
+  dstRecords.reserve(StitchBuffer->size() + RECRES);
   auto dstOffset = DST_OFFSETS {};
+  di::ritdst(dstOffset, dstRecords, saveStitches);
   auto dstHeader = DSTHED {};
-  DST::ritdst(dstOffset, dstRecords, saveStitches);
-  // dstHeader fields are fixed width, so use strncpy in its intended way.
-  // Use sizeof to ensure no overrun if the format string is wrong length
-  strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
-  std::ranges::fill(dstHeader.desc, ' ');
-  auto const convAuxName  = utf::utf16ToUtf8(auxName);
-  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
-  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
-	auto const name   = convAuxName.substr(pos + 1);
-	auto       itChar = spDstHdrDesc.begin();
-	for (auto const& iDHD : name) {
-	  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
-		*itChar = iDHD;
-	  }
-	  else {
-		break;
-	  }
-	  ++itChar;
-	}
-  }
-// clang-format off
-  // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
-  #pragma warning(push)
-  #pragma warning(disable : 26481)
-  spDstHdrDesc.back() = 0xd;
-  strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
-  strncpy(static_cast<char *>(dstHeader.recs),  fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
-  strncpy(static_cast<char *>(dstHeader.cohed),      "CO:",      sizeof(dstHeader.cohed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)                                            
-  strncpy(static_cast<char *>(dstHeader.co),         "  0\xd",   sizeof(dstHeader.co));                                           // NOLINT(clang-diagnostic-deprecated-declarations)                                            
-  strncpy(static_cast<char *>(dstHeader.xplushed),   "+X:",      sizeof(dstHeader.xplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)                                        
-  strncpy(static_cast<char *>(dstHeader.xplus), fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x).c_str(), sizeof(dstHeader.xplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.xminhed),    "-X:",      sizeof(dstHeader.xminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.xmin),  fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x).c_str(), sizeof(dstHeader.xmin));  // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.yplushed),   "+Y:",      sizeof(dstHeader.yplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.yplus), fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y).c_str(), sizeof(dstHeader.yplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.yminhed),    "-Y:",      sizeof(dstHeader.yminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.ymin),  fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y).c_str(), sizeof(dstHeader.ymin));  // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.axhed),      "AX:",      sizeof(dstHeader.axhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.ax),         "-    0\r", sizeof(dstHeader.ax));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.ayhed),      "AY:",      sizeof(dstHeader.ayhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.ay),         "+    0\r", sizeof(dstHeader.ay));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.mxhed),      "MX:",      sizeof(dstHeader.mxhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.mx),         "+    0\r", sizeof(dstHeader.mx));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.myhed),      "MY:",      sizeof(dstHeader.myhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.my),         "+    0\r", sizeof(dstHeader.my));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.pdhed),      "PD",       sizeof(dstHeader.pdhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.pd),         "******\r", sizeof(dstHeader.pd));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-  strncpy(static_cast<char *>(dstHeader.eof),        "\x1a",     sizeof(dstHeader.eof));                                          // NOLINT(clang-diagnostic-deprecated-declarations)
-  #pragma warning(pop)
-  // clang-format on
-  auto& res = dstHeader.res;
-  std::ranges::fill(res, ' ');
+  dstHeader.writeDSTHeader(auxName, dstRecSize, dstOffset);
   auto bytesWritten = DWORD {};
   if (FALSE == WriteFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr)) {
 	displayText::riter();
@@ -1023,5 +1095,3 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   CloseHandle(fileHandle);
   return true;
 }
-// ReSharper restore CppDeprecatedEntity
-#pragma warning(pop)

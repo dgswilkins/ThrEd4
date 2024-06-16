@@ -3,10 +3,16 @@
 // Local Headers
 #include "formHeader.h"
 
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "gsl/gsl"
+#pragma warning(pop)
+
 constexpr auto SQRCORNS = 4U; // number of corners in a square
 
 // is intersection of line and cursor in, before or after the line
-enum class IntersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
+enum class IntersectionStyles : uint8_t { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
 
 namespace form {
 
@@ -21,18 +27,18 @@ void bord();
 void bsizpar(FRM_HEAD& currentForm) noexcept;
 void centir();
 void chain();
-void chan(uint32_t formIndex);
 void chkcont();
 auto chkdel(FRM_HEAD const& currentForm) noexcept -> bool;
 auto chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
     -> bool;
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
-auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool;
+auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) noexcept(!std::is_same_v<size_t, uint32_t>)
+    -> bool;
 auto closflt(FRM_HEAD const& form,
              float           xCoordinate,
              float           yCoordinate) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;
-auto closfrm() -> bool;
+auto closfrm(uint32_t& formIndex) -> bool;
 void clpfil();
 void clpspac(uint32_t insertPoint, uint32_t count);
 void clrfills() noexcept;
@@ -60,7 +66,6 @@ void duhart(uint32_t sideCount);
 void dulens(uint32_t sides);
 void duinsf() noexcept;
 void dupfn(float rotationAngle);
-void duprot(float rotationAngle);
 void dupsel(HDC hDC);
 void durpoli(uint32_t vertexCount);
 void duspir(uint32_t stepCount);
@@ -83,14 +88,13 @@ void fltspac(uint32_t vertexOffset, uint32_t count);
 void form();
 void frm0();
 void frmadj(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>));
-void frmlin(FRM_HEAD const& form);
 void frmlin(std::vector<F_POINT> const& vertices);
 void frmnumfn(uint32_t& oldFormIndex, uint32_t newFormIndex);
 void frmon();
 void frmovlin();
 auto frmrng(uint32_t iForm, RANGE& range) -> bool;
 void frmsadj();
-void fselrct(uint32_t iForm);
+void fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>);
 void fsizpar(FRM_HEAD& form) noexcept;
 auto getblen() noexcept -> float;
 auto getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> uint32_t;
@@ -139,6 +143,7 @@ void selal();
 void selalfil();
 void selfil(uint32_t type);
 void selsqr(POINT const& controlPoint, HDC hDC);
+void setLayerPens() noexcept;
 void setap();
 void setexpand(float xyRatio);
 void setfpnt();
