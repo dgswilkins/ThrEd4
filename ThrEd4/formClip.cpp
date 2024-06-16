@@ -958,7 +958,7 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   StateMap->set(StateFlag::TXTCLP);
   StateMap->set(StateFlag::TXTMOV);
   texture::setxfrm();
-  texture::setTxtCurLoc(POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y});
+  texture::setTxtCurLoc(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
   GlobalUnlock(clipMemory);
   StateMap->set(StateFlag::RESTCH);
   StateMap->reset(StateFlag::WASWROT);
@@ -972,7 +972,7 @@ void fci::setpclp() {
   FormVerticesAsLine->push_back(point);
   point = form::sfCor2px(*itIntlvSeq);
   auto const offset =
-      POINT {Msg.pt.x - StitchWindowOrigin.x - point.x, Msg.pt.y - StitchWindowOrigin.y - point.y};
+      POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x, WinMsg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(InterleaveSequence->size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;

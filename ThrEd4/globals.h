@@ -140,7 +140,7 @@ extern float MaxStitchLen;
 extern MENUITEMINFO* MenuInfo;
 
 extern float MinStitchLength;
-extern MSG   Msg;
+extern MSG   WinMsg;
 
 extern RECT     MsgRect;
 extern HWND     MsgWindow;

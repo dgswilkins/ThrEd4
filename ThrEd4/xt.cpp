@@ -2534,10 +2534,10 @@ void xt::dushft() {
   //	StateMap->set(StateFlag::NOSEL);
   ZoomBoxLine[1].x = ZoomBoxLine[2].x = 0L;
   ZoomBoxLine[2].y = ZoomBoxLine[3].y = 0L;
-  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
-  ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
+  ZoomBoxLine[0].y = ZoomBoxLine[1].y = WinMsg.pt.y - StitchWindowOrigin.y;
   ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-  ZoomBoxOrigin                       = thred::pxCor2stch(Msg.pt);
+  ZoomBoxOrigin                       = thred::pxCor2stch(WinMsg.pt);
 }
 
 void xt::mvshft() {
@@ -2547,15 +2547,15 @@ void xt::mvshft() {
   if (!StateMap->test(StateFlag::BZUMIN)) {
 	return;
   }
-  if ((Msg.wParam & MK_LBUTTON) == 0U) {
+  if ((WinMsg.wParam & MK_LBUTTON) == 0U) {
 	return;
   }
   if (StateMap->testAndSet(StateFlag::VCAPT)) {
 	SetCapture(ThrEdWindow);
   }
   thred::unbBox();
-  ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
-  ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
+  ZoomBoxLine[1].x = ZoomBoxLine[2].x = WinMsg.pt.x - StitchWindowOrigin.x;
+  ZoomBoxLine[2].y = ZoomBoxLine[3].y = WinMsg.pt.y - StitchWindowOrigin.y;
   StateMap->set(StateFlag::BZUM);
   thred::bBox();
 }

@@ -102,7 +102,7 @@ void kyi::istch() {
 	  auto const prvStitch   = wrap::next(StitchBuffer->begin(), ClosestPointIndex - 1U);
 	  auto const stitch      = std::next(prvStitch);
 	  auto const angb        = std::atan2(stitch->y - prvStitch->y, stitch->x - prvStitch->x);
-	  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+	  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	  auto const angt        = std::atan2(stitch->y - stitchPoint.y, stitch->x - stitchPoint.x);
 	  auto const nxtStitch   = std::next(stitch);
 	  auto const angf        = std::atan2(stitch->y - nxtStitch->y, stitch->x - nxtStitch->x);
@@ -1243,7 +1243,7 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		break;
 	  }
 	  if (thred::inStitchWin()) {
-		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 		thred::dumrk(stitchPoint.x, stitchPoint.y);
 		StateMap->set(StateFlag::RESTCH);
 	  }

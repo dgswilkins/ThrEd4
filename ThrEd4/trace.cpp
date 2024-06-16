@@ -461,7 +461,7 @@ void trace::trace() {
   auto const spTBD = gsl::span<uint32_t>(
       TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
   if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
-	auto stitchPoint = thred::pxCor2stch(Msg.pt);
+	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	if (StateMap->test(StateFlag::LANDSCAP)) {
 	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
 	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
@@ -798,7 +798,7 @@ void ti::dutrac() {
   if (!thred::inStitchWin()) {
 	return;
   }
-  auto stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
   if (!StateMap->test(StateFlag::WASEDG)) {
 	trace::tracedg();
 	return;
@@ -1162,7 +1162,7 @@ void ti::getColors() {
 	DownPixelColor |= tracePosition;
 	return;
   }
-  if (Msg.message == WM_LBUTTONDOWN) {
+  if (WinMsg.message == WM_LBUTTONDOWN) {
 	UpPixelColor &= TraceRGBMask.at(ColumnColor);
 	UpPixelColor |= position << TraceShift.at(ColumnColor);
   }
@@ -1179,7 +1179,7 @@ void trace::tracpar() {
   if (StateMap->test(StateFlag::TRNIN1)) {
 	trace::dutrnum1();
   }
-  TraceMsgPoint = POINT {Msg.pt.x - ThredWindowOrigin.x, Msg.pt.y - ThredWindowOrigin.y};
+  TraceMsgPoint = POINT {WinMsg.pt.x - ThredWindowOrigin.x, WinMsg.pt.y - ThredWindowOrigin.y};
   if (TraceMsgPoint.x > ButtonWidthX3) {
 	ti::dutrac();
   }
