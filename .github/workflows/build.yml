@@ -13,7 +13,6 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
   build:
@@ -23,7 +22,6 @@ jobs:
         # Add additional configuration types to build here.
         # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
         #configuration: [Debug, Release]
-        #platform: [x86, x64]
         configuration: [Release]
         platform: [x86, x64]
         include:
@@ -61,22 +59,12 @@ jobs:
 
     #- name: Check Installed Packages
     #  run: Get-ChildItem -Recurse -Path ${{env.VCPKG_INSTALLED_DIR}}
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: c-cpp
-        build-mode: manual
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:c-cpp"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
