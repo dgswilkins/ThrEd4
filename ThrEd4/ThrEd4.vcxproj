@@ -94,6 +94,7 @@
   <ItemGroup>
     <None Include="..\.clang-tidy" />
     <None Include="..\.github\workflows\build.yml" />
+    <None Include="..\.github\workflows\codeql.yml" />
     <None Include="..\vcpkg-configuration.json" />
     <None Include="..\vcpkg.json" />
     <None Include="cpp.hint" />
