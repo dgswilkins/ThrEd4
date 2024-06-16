@@ -8612,9 +8612,7 @@ void thi::inscol() {
 	}
   }
   for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
-	if (iColor != 0U) {
 	  UserColor.at(iColor) = UserColor.at(iColor - 1U);
-	}
 	thred::nuscol(iColor);
   }
   thred::coltab();
