@@ -25,7 +25,7 @@ jobs:
         #configuration: [Debug, Release]
         #platform: [x86, x64]
         configuration: [Release]
-        platform: [x64]
+        platform: [x86, x64]
         include:
            - platform: x86
              triplet: x86-windows-static
