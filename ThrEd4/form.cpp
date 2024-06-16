@@ -4429,11 +4429,9 @@ void fi::duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	movseq(lineEndpoints, sortedLineIndices, iLine);
   }
   if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-	if (iLine != 0U) {
 	  flag = true;
 	  duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 	  sequenceIndex = iLine - 1U;
-	}
   }
   if (flag) {
 	lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
