@@ -3462,8 +3462,7 @@ void thred::savAs() {
 	}
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"Unknown file type\n");
-	  throw;
+	  throw std::runtime_error("Unknown file type");
 	}
   }
   StateMap->set(StateFlag::SAVAS);
