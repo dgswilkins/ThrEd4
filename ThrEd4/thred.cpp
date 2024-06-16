@@ -3836,8 +3836,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	}
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"Unknown file style\n");
-	  throw;
+	  throw std::runtime_error("Unknown file style");
 	}
   }
   switch (fileIndex) {
@@ -3861,8 +3860,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 #endif
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"Unknown file index\n");
-	  throw;
+	  throw std::runtime_error("Unknown file index");
 	}
   }
   hResult += pFileOpen->SetTitle(L"Open Thred File");

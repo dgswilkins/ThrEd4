@@ -5932,8 +5932,7 @@ void form::insat() { // insert a point in a form
 	}
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"default hit in insat: inOutFlag [{}]\n", gsl::narrow_cast<int>(inOutFlag));
-	  throw;
+	  throw std::runtime_error("Invalid Intersection Flag in insat");
 	}
   }
   form::refil(ClosestFormToCursor);
@@ -6062,8 +6061,7 @@ void form::infrm() { // insert multiple points into a form
 	}
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"default hit in infrm: inOutFlag [{}]\n", gsl::narrow_cast<int>(inOutFlag));
-	  throw;
+	  throw std::runtime_error("Invalid Intersection Flag in infrm");
 	}
   }
   StateMap->set(StateFlag::INSFRM);

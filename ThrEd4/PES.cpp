@@ -463,7 +463,7 @@ void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POIN
   buffer.resize(oldSize + sizeof(PESTCH));
   auto* pesStitch = convertFromPtr<PESTCH*>(&buffer[oldSize]);
   if (nullptr == pesStitch) {
-	throw;
+	throw std::runtime_error("Failed to convert PESTCH pointer");
   }
   auto const scaledStitch = F_POINT {-stitch.x * IPECFACT + offset.x, stitch.y * IPECFACT - offset.y};
   *pesStitch = scaledStitch;
