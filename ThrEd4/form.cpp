@@ -2654,7 +2654,8 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	projectedPoints.reserve(currentVertexCount);
 	currentX += step;
 	auto iPoint = 0U;
-	for (auto iVertex = uint16_t {}; iVertex < currentVertexCount; ++iVertex) {
+	auto vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
+	for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
 	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
 	  if (auto point = F_POINT {};
 	      projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
