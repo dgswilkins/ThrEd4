@@ -110,7 +110,10 @@ void chkdaz();
 auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
 void handle_IDOK(HWND hwndlg);
-void initdaz(HWND hWinDialog);
+void handlePaisleyDefault(HWND hwndlg);
+void handleTearDefault(HWND hwndlg);
+void handleTearIDOK(HWND hwndlg);
+void handleTearInit(HWND hwndlg);
 void handleWaveIDOK(HWND hwndlg);
 void initTearDlg(HWND hwndlg);
 auto maxwid() -> SIZE;
@@ -1010,74 +1013,86 @@ void ffi::initTearDlg(HWND hwndlg) {
                 fmt::format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTwistRatio).c_str());
 }
 
+void ffi::handleTearIDOK(HWND hwndlg) {
+  auto buffer = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.formSides, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
+  IniFile.tearTailLength = wrap::wcsToFloat(buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
+  IniFile.tearTwistStep = wrap::wcsToFloat(buffer.data()) * PFGRAN;
+  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
+  IniFile.tearTwistRatio = wrap::wcsToFloat(buffer.data());
+}
+
+void ffi::handleTearDefault(HWND hwndlg) {
+  constexpr auto TEARSIDES    = uint16_t {20U};
+  constexpr auto TEARTAILFACT = 1.1F;
+  constexpr auto TEARTWIST    = 1.6F;
+  IniFile.formSides           = TEARSIDES;
+  IniFile.tearTailLength      = TEARTAILFACT;
+  IniFile.tearTwistStep       = 0.0F;
+  IniFile.tearTwistRatio      = TEARTWIST;
+  ffi::initTearDlg(hwndlg);
+}
+
+void ffi::handlePaisleyDefault(HWND hwndlg) {
+  constexpr auto PAISSIDES    = uint16_t {24U};
+  constexpr auto PAISTAILFACT = 1.15F;
+  constexpr auto PAISSTEP     = 0.3F;
+  constexpr auto PAISTWIST    = 1.8F;
+  IniFile.formSides           = PAISSIDES;
+  IniFile.tearTailLength      = PAISTAILFACT;
+  IniFile.tearTwistStep       = PAISSTEP * PFGRAN;
+  IniFile.tearTwistRatio      = PAISTWIST;
+  ffi::initTearDlg(hwndlg);
+}
+
+void ffi::handleTearInit(HWND hwndlg) {
+  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+#ifdef TESTCODE
+  auto const uDpi     = GetDpiForWindow(hwndlg);
+  RECT       rcClient = {};
+  GetWindowRect(hwndlg, &rcClient);
+  auto uWidth  = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
+  auto uHeight = MulDiv((rcClient.bottom - rcClient.top), uDpi, 96);
+  SetWindowPos(hwndlg, nullptr, rcClient.left, rcClient.top, uWidth, uHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+
+  auto hFont = displayText::getThrEdFont(400);
+  // SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
+  EnumChildWindows(
+      hwndlg,
+      [](HWND p_hWnd, LPARAM lParam) -> BOOL {
+	    SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+	    return TRUE;
+      },
+      (LPARAM)hFont);
+#endif // !TESTCODE
+  ffi::initTearDlg(hwndlg);
+}
+
 auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
-	case WM_INITDIALOG: {
-	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-#ifdef TESTCODE
-	  auto const uDpi     = GetDpiForWindow(hwndlg);
-	  RECT       rcClient = {};
-	  GetWindowRect(hwndlg, &rcClient);
-	  auto uWidth  = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
-	  auto uHeight = MulDiv((rcClient.bottom - rcClient.top), uDpi, 96);
-	  SetWindowPos(hwndlg, nullptr, rcClient.left, rcClient.top, uWidth, uHeight, SWP_NOZORDER | SWP_NOACTIVATE);
-
-	  auto hFont = displayText::getThrEdFont(400);
-	  // SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
-	  EnumChildWindows(
-	      hwndlg,
-	      [](HWND p_hWnd, LPARAM lParam) -> BOOL {
-		    SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
-		    return TRUE;
-	      },
-	      (LPARAM)hFont);
-#endif // !TESTCODE
-	  ffi::initTearDlg(hwndlg);
+	case WM_INITDIALOG: 
+	  handleTearInit(hwndlg);
 	  break;
-	}
 	case WM_COMMAND: {
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
 		}
-		case IDOK: {
-		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.formSides, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
-		  IniFile.tearTailLength = wrap::wcsToFloat(buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
-		  IniFile.tearTwistStep = wrap::wcsToFloat(buffer.data()) * PFGRAN;
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
-		  IniFile.tearTwistRatio = wrap::wcsToFloat(buffer.data());
+		case IDOK:
+		  handleTearIDOK(hwndlg);
 		  EndDialog(hwndlg, 1);
 		  break;
-		}
-		case IDC_DEFTEAR: {
-		  constexpr auto TEARSIDES    = uint16_t {20U};
-		  constexpr auto TEARTAILFACT = 1.1F;
-		  constexpr auto TEARTWIST    = 1.6F;
-		  IniFile.formSides           = TEARSIDES;
-		  IniFile.tearTailLength      = TEARTAILFACT;
-		  IniFile.tearTwistStep       = 0.0F;
-		  IniFile.tearTwistRatio      = TEARTWIST;
-		  ffi::initTearDlg(hwndlg);
+		case IDC_DEFTEAR:
+		  handleTearDefault(hwndlg);
 		  break;
-		}
-		case IDC_DEFPAIS: {
-		  constexpr auto PAISSIDES    = uint16_t {24U};
-		  constexpr auto PAISTAILFACT = 1.15F;
-		  constexpr auto PAISSTEP     = 0.3F;
-		  constexpr auto PAISTWIST    = 1.8F;
-		  IniFile.formSides           = PAISSIDES;
-		  IniFile.tearTailLength      = PAISTAILFACT;
-		  IniFile.tearTwistStep       = PAISSTEP * PFGRAN;
-		  IniFile.tearTwistRatio      = PAISTWIST;
-		  ffi::initTearDlg(hwndlg);
+		case IDC_DEFPAIS:
+		  handlePaisleyDefault(hwndlg);
 		  break;
-		}
 		default: {
 		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
 		  break;
