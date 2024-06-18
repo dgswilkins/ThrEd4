@@ -111,6 +111,7 @@ auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> 
 
 void handle_IDOK(HWND hwndlg);
 void initdaz(HWND hWinDialog);
+void handleWaveIDOK(HWND hwndlg);
 void initTearDlg(HWND hwndlg);
 auto maxwid() -> SIZE;
 auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
@@ -1187,7 +1188,7 @@ void ffi::wavinit(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveLobes).c_str());
 }
 
-void ffi::handle_IDOK(HWND hwndlg) {
+void ffi::handleWaveIDOK(HWND hwndlg) {
   auto buffer = std::array<wchar_t, HBUFSIZ> {};
   GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
   wrap::wcsToULong(IniFile.wavePoints, buffer.data());
@@ -1227,7 +1228,7 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  return TRUE;
 		}
 		case IDOK:
-		  handle_IDOK(hwndlg);
+		  handleWaveIDOK(hwndlg);
 		  EndDialog(hwndlg, 1);
 		  break;
 		case IDC_DEFWAV: {
