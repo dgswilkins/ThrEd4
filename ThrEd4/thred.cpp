@@ -2444,7 +2444,7 @@ void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitc
 	auto minLength      = BIGFLOAT;
 	smallestStitchIndex = 0U;
 	largestStitchIndex  = 0U;
-    auto firstStitch    = std::next(StitchBuffer->begin(), startStitch);
+    auto firstStitch    = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
     auto spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
     auto stitchFwd1 = std::next(firstStitch);
     for (auto index = startStitch; auto& stitch : spStitches) {
