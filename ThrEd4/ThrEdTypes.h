@@ -220,9 +220,9 @@ enum ViewMenuItems : int8_t {
 enum HoopSize : int8_t {
   SETCUST = 1, // set the custom hoop
   SMALHUP = 2, // pfaf code for small hoop
-  LARGHUP,     // pfaf code for large hoop
-  HUP100,      // 100 millimeter hoop
-  CUSTHUP      // user defined hoop size
+  LARGHUP = 3,     // pfaf code for large hoop
+  HUP100 = 4,      // 100 millimeter hoop
+  CUSTHUP = 5      // user defined hoop size
 };
 
 // bitmap
@@ -782,24 +782,24 @@ enum FormData : uint8_t {
 
 // fill message codes
 enum FillMessageCodes : uint16_t {
-  FMM_FAN,
-  FMM_VRT,
-  FMM_HOR,
-  FMM_TXTR,
-  FMM_ANG,
-  FMM_CLP,
-  FMM_FTH,
+  FMM_FAN = 0U,
+  FMM_VRT = 1U,
+  FMM_HOR = 2U,
+  FMM_TXTR = 3U,
+  FMM_ANG  = 4U,
+  FMM_CLP  = 5U,
+  FMM_FTH  = 6U,
   FML_LIN = 0x100,
-  FML_BLD,
-  FML_ANGS,
-  FML_PRPS,
-  FML_APLQ,
-  FML_BHOL,
-  FML_CLP,
-  FML_PIC,
-  FMX_UNF,
-  FML_CONT,
-  FML_CHAIN
+  FML_BLD  = 0x101,
+  FML_ANGS = 0x102,
+  FML_PRPS = 0x103,
+  FML_APLQ = 0x104,
+  FML_BHOL = 0x105,
+  FML_CLP  = 0x106,
+  FML_PIC  = 0x107,
+  FMX_UNF  = 0x108,
+  FML_CONT = 0x109,
+  FML_CHAIN = 0x10A
 };
 
 // button windows
