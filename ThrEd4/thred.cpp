@@ -102,6 +102,7 @@
 #include <memory>
 #include <numeric>
 #include <ranges>
+#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <type_traits>
