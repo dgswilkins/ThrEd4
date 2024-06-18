@@ -31,10 +31,7 @@
 #include <utility>
 #include <vector>
 
-constexpr auto BADFLT = 1U;
-constexpr auto BADCLP = 1U << 1U;
-constexpr auto BADSAT = 1U << 2U;
-constexpr auto BADTX  = 1U << 3U;
+enum Repair : uint32_t { BADFLT = 1U, BADCLP = 1U << 1U, BADSAT = 1U << 2U, BADTX = 1U << 3U };
 
 class BAD_COUNTS
 {

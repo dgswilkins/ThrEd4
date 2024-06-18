@@ -70,16 +70,18 @@ constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
 constexpr auto TRBASE   = 0.1F;                 // Trace ratio base
 constexpr auto TROFF    = 1.0F;                 // Trace ratio offset
 
-constexpr auto TRWINROW01 = int32_t {15};
-constexpr auto TRWINROW02 = int32_t {16};
-constexpr auto TRWINROW03 = int32_t {17};
-constexpr auto TRWINROW04 = int32_t {18};
-constexpr auto TRWINROW05 = int32_t {19};
-constexpr auto TRWINROW06 = int32_t {20};
-constexpr auto TRWINROW07 = int32_t {21};
-constexpr auto TRWINROW08 = int32_t {22};
-constexpr auto TRWINROW09 = int32_t {23};
-constexpr auto TRWINROW10 = int32_t {24};
+enum TraceWin : int32_t {
+  TRWINROW01 = 15,
+  TRWINROW02,
+  TRWINROW03,
+  TRWINROW04,
+  TRWINROW05,
+  TRWINROW06,
+  TRWINROW07,
+  TRWINROW08,
+  TRWINROW09,
+  TRWINROW10
+};
 
 // edge tracing directions
 enum TraceDirection : uint8_t {
