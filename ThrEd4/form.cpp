@@ -8599,12 +8599,16 @@ void fi::unbean(uint32_t start, uint32_t& finish) {
 	lastStitch = wrap::toUnsigned(StitchBuffer->size()) - 3U;
   }
   auto iSourceStitch = start;
-  for (; iSourceStitch <= lastStitch; ++iSourceStitch) {
+  for (auto skip = 0U; iSourceStitch <= lastStitch; ++iSourceStitch) {
+	if (skip != 0U) {
+      --skip;
+      continue;
+    }
 	auto const& stitch     = StitchBuffer->operator[](iSourceStitch);
 	auto const& stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	highStitchBuffer.push_back(stitch);
 	if (util::closeEnough(stitch.x, stitchFwd2.x) && util::closeEnough(stitch.y, stitchFwd2.y)) {
-	  iSourceStitch += 2;
+	  skip = 2U; // skip the next two stitches
 	}
   }
   if (finish != lastStitch) {
