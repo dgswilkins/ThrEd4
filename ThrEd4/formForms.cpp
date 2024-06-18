@@ -109,13 +109,14 @@ void chkdaz();
 
 auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-void handle_IDOK(HWND hwndlg);
+void handleDaisyIDOK(HWND hwndlg);
 void handlePaisleyDefault(HWND hwndlg);
 void handleTearDefault(HWND hwndlg);
 void handleTearIDOK(HWND hwndlg);
 void handleTearInit(HWND hwndlg);
 void handleWaveIDOK(HWND hwndlg);
 void initTearDlg(HWND hwndlg);
+void initdaz(HWND hWinDialog);
 auto maxwid() -> SIZE;
 auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
 void nxtlin(uint32_t& formMenuEntryCount) noexcept;
@@ -761,6 +762,45 @@ void ffi::initdaz(HWND hWinDialog) {
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
 
+void ffi::handleDaisyIDOK(HWND hwndlg) {
+  auto buffer = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyPetalPoints, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyHeartCount, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
+  IniFile.daisyDiameter = wrap::wcsToFloat(buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
+  IniFile.daisyHoleDiameter = wrap::wcsToFloat(buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyInnerCount, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyPetalCount, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
+  IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
+  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
+	UserFlagMap->set(UserFlag::DAZHOL);
+  }
+  else {
+	UserFlagMap->reset(UserFlag::DAZHOL);
+  }
+  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
+	UserFlagMap->set(UserFlag::DAZD);
+  }
+  else {
+	UserFlagMap->reset(UserFlag::DAZD);
+  }
+  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
+  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
+	auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
+	if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
+	  IniFile.daisyBorderType = iType;
+	  break;
+	}
+  }
+  ffi::chkdaz();
+}
+
 auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -775,46 +815,10 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
 		}
-		case IDOK: {
-		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.daisyPetalPoints, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.daisyHeartCount, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
-		  IniFile.daisyDiameter = wrap::wcsToFloat(buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
-		  IniFile.daisyHoleDiameter = wrap::wcsToFloat(buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.daisyInnerCount, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.daisyPetalCount, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
-		  IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
-		  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
-			UserFlagMap->set(UserFlag::DAZHOL);
-		  }
-		  else {
-			UserFlagMap->reset(UserFlag::DAZHOL);
-		  }
-		  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
-			UserFlagMap->set(UserFlag::DAZD);
-		  }
-		  else {
-			UserFlagMap->reset(UserFlag::DAZD);
-		  }
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
-		  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
-			auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
-			if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
-			  IniFile.daisyBorderType = iType;
-			  break;
-			}
-		  }
-		  ffi::chkdaz();
+		case IDOK: 
+		  handleDaisyIDOK(hwndlg);
 		  EndDialog(hwndlg, 1);
 		  break;
-		}
 		case IDC_DAZRST: {
 		  IniFile.dazdef();
 		  UserFlagMap->set(UserFlag::DAZHOL);
