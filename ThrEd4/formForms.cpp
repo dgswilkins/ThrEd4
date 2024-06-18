@@ -109,6 +109,7 @@ void chkdaz();
 
 auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
+void handle_IDOK(HWND hwndlg);
 void initdaz(HWND hWinDialog);
 void initTearDlg(HWND hwndlg);
 auto maxwid() -> SIZE;
@@ -1186,6 +1187,31 @@ void ffi::wavinit(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveLobes).c_str());
 }
 
+void ffi::handle_IDOK(HWND hwndlg) {
+  auto buffer = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.wavePoints, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.waveStart, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.waveEnd, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.waveLobes, buffer.data());
+
+  constexpr auto WPCLAMP = 100U; // max number of points in a wave form
+  if (IniFile.wavePoints > WPCLAMP) {
+	IniFile.wavePoints = WPCLAMP;
+  }
+  if (IniFile.wavePoints < 3) {
+	IniFile.wavePoints = 3;
+  }
+  if (IniFile.waveStart == IniFile.waveEnd) {
+	IniFile.waveEnd += (IniFile.wavePoints >> 2U);
+  }
+  IniFile.waveStart %= IniFile.wavePoints;
+  IniFile.waveEnd %= IniFile.wavePoints;
+}
+
 auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -1200,32 +1226,10 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
 		}
-		case IDOK: {
-		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.wavePoints, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.waveStart, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.waveEnd, buffer.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.waveLobes, buffer.data());
-
-		  constexpr auto WPCLAMP = 100U; // max number of points in a wave form
-		  if (IniFile.wavePoints > WPCLAMP) {
-			IniFile.wavePoints = WPCLAMP;
-		  }
-		  if (IniFile.wavePoints < 3) {
-			IniFile.wavePoints = 3;
-		  }
-		  if (IniFile.waveStart == IniFile.waveEnd) {
-			IniFile.waveEnd += (IniFile.wavePoints >> 2U);
-		  }
-		  IniFile.waveStart %= IniFile.wavePoints;
-		  IniFile.waveEnd %= IniFile.wavePoints;
+		case IDOK:
+		  handle_IDOK(hwndlg);
 		  EndDialog(hwndlg, 1);
 		  break;
-		}
 		case IDC_DEFWAV: {
 		  IniFile.wavePoints = IWAVPNTS;
 		  IniFile.waveStart  = IWAVSTRT;
