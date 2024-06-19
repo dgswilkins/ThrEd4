@@ -101,11 +101,11 @@ jobs:
     # Filter out rules with low severity or high false positve rate
     # see https://github.com/marketplace/actions/filter-sarif for pattern definitions
     # Also filter out warnings in third-party code
+    # typical pattern for filtering out a rule: -**:cpp/poorly-documented-function
     - name: Filter out unwanted errors and warnings
       uses: advanced-security/filter-sarif@v1
       with:
         patterns: |
-          -**:cpp/poorly-documented-function
           -**/vcpkg_installed/**
         input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
         output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
