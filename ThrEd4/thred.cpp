@@ -218,6 +218,9 @@ auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noex
 auto getMaxCount() -> uint32_t;
 auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
 void gselrng() noexcept;
+void handleFeatherIDOK(HWND hwndlg);
+auto handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool;
+void handleFeatherWMINITDIALOG(HWND hwndlg);
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
 void handleSizeRestored(HWND p_hWnd);
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
@@ -9001,88 +9004,102 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_
                                     (firstStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
 }
 
+void thi::handleFeatherWMINITDIALOG(HWND hwndlg) {
+  auto const featherType = IniFile.featherType;
+  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT),
+                fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.featherRatio).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT),
+                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherUpCount).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT),
+                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherDownCount).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFLR),
+                fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(FMT_COMPILE(L"{}"), IniFile.featherCount).c_str());
+  auto featherStyle = std::wstring {};
+  for (auto const& iFeatherStyle : FTHRLIST) {
+	featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
+	SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
+	            CB_ADDSTRING,
+	            0,
+	            reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  }
+  SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
+  auto state = wrap::toUnsigned(((featherType & AT_FTHBLND) != 0) ? BST_CHECKED : BST_UNCHECKED);
+  CheckDlgButton(hwndlg, IDC_FDBLND, state);
+  state = ((featherType & AT_FTHUP) != 0) ? BST_CHECKED : BST_UNCHECKED;
+  CheckDlgButton(hwndlg, IDC_FDUP, state);
+  state = ((featherType & AT_FTHBTH) != 0) ? BST_CHECKED : BST_UNCHECKED;
+  CheckDlgButton(hwndlg, IDC_FBTH, state);
+}
+
+void thi::handleFeatherIDOK(HWND hwndlg) {
+  IniFile.featherType = 0;
+  if (IsDlgButtonChecked(hwndlg, IDC_FDBLND) != 0U) {
+	IniFile.featherType = AT_FTHBLND;
+  }
+  if (IsDlgButtonChecked(hwndlg, IDC_FDUP) != 0U) {
+	IniFile.featherType |= AT_FTHUP;
+  }
+  if (IsDlgButtonChecked(hwndlg, IDC_FBTH) != 0U) {
+	IniFile.featherType |= AT_FTHBTH;
+  }
+  auto buf = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
+  IniFile.initFeatherType();
+  auto buffer = std::wstring {};
+  for (auto const& iFeatherStyle : FTHRLIST) {
+	buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
+	if (wcscmp(buf.data(), buffer.c_str()) == 0) {
+	  IniFile.featherFillType = iFeatherStyle.value;
+	  break;
+	}
+  }
+  GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf.data(), HBUFSIZ);
+  IniFile.featherRatio = wrap::wcsToFloat(buf.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.featherUpCount, buf.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.featherDownCount, buf.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf.data(), HBUFSIZ);
+  IniFile.featherMinStitchSize = wrap::wcsToFloat(buf.data()) * PFGRAN;
+  GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.featherCount, buf.data());
+  if (IniFile.featherCount < 1) {
+	IniFile.featherCount = 1;
+  }
+  EndDialog(hwndlg, 1);
+}
+
+auto thi::handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
+  switch (LOWORD(wparam)) {
+	case IDCANCEL: {
+	  EndDialog(hwndlg, 0);
+	  return true;
+	}
+	case IDOK: {
+	  handleFeatherIDOK(hwndlg);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in fthdefprc 1: wparam [{}]\n", LOWORD(wparam));
+	  break;
+	}
+  }
+  return false;
+}
+
 auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
-	  auto const featherType = IniFile.featherType;
-	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT),
-	                fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.featherRatio).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT),
-	                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherUpCount).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT),
-	                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherDownCount).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFLR),
-	                fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM),
-	                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherCount).c_str());
-	  auto featherStyle = std::wstring {};
-	  for (auto const& iFeatherStyle : FTHRLIST) {
-		featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
-		            CB_ADDSTRING,
-		            0,
-		            reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-	  }
-	  SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
-	  auto state = wrap::toUnsigned(((featherType & AT_FTHBLND) != 0) ? BST_CHECKED : BST_UNCHECKED);
-	  CheckDlgButton(hwndlg, IDC_FDBLND, state);
-	  state = ((featherType & AT_FTHUP) != 0) ? BST_CHECKED : BST_UNCHECKED;
-	  CheckDlgButton(hwndlg, IDC_FDUP, state);
-	  state = ((featherType & AT_FTHBTH) != 0) ? BST_CHECKED : BST_UNCHECKED;
-	  CheckDlgButton(hwndlg, IDC_FBTH, state);
+	  handleFeatherWMINITDIALOG(hwndlg);
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) {
-		case IDCANCEL: {
-		  EndDialog(hwndlg, 0);
-		  return TRUE;
-		}
-		case IDOK: {
-		  IniFile.featherType = 0;
-		  if (IsDlgButtonChecked(hwndlg, IDC_FDBLND) != 0U) {
-			IniFile.featherType = AT_FTHBLND;
-		  }
-		  if (IsDlgButtonChecked(hwndlg, IDC_FDUP) != 0U) {
-			IniFile.featherType |= AT_FTHUP;
-		  }
-		  if (IsDlgButtonChecked(hwndlg, IDC_FBTH) != 0U) {
-			IniFile.featherType |= AT_FTHBTH;
-		  }
-		  auto buf = std::array<wchar_t, HBUFSIZ> {};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
-		  IniFile.initFeatherType();
-		  auto buffer = std::wstring {};
-		  for (auto const& iFeatherStyle : FTHRLIST) {
-			buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
-			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
-			  IniFile.featherFillType = iFeatherStyle.value;
-			  break;
-			}
-		  }
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf.data(), HBUFSIZ);
-		  IniFile.featherRatio = wrap::wcsToFloat(buf.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.featherUpCount, buf.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.featherDownCount, buf.data());
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf.data(), HBUFSIZ);
-		  IniFile.featherMinStitchSize = wrap::wcsToFloat(buf.data()) * PFGRAN;
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf.data(), HBUFSIZ);
-		  wrap::wcsToULong(IniFile.featherCount, buf.data());
-		  if (IniFile.featherCount < 1) {
-			IniFile.featherCount = 1;
-		  }
-		  EndDialog(hwndlg, 1);
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in fthdefprc 1: wparam [{}]\n", LOWORD(wparam));
-		  break;
-		}
+	  if (handleFeatherWMCOMMAND(wparam, hwndlg)) {
+		return TRUE;
 	  }
 	  break;
 	}
