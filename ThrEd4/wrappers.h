@@ -110,7 +110,6 @@ auto sizeofVector(std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, s
 template <class outType, class inType>
 auto ceil(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same_v<outType, float>))
     -> outType {
-  // static_assert(!std::is_same_v<outType, float>, "no need to use wrap::ceil here.");
   if constexpr (std::is_same_v<inType, float>) {
 	if constexpr (std::is_same_v<outType, float>) {
 	  return std::ceilf(invar);
@@ -134,8 +133,6 @@ auto createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
 template <class outType, class inType>
 auto floor(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same_v<outType, float>))
     -> outType {
-  // static_assert(!std::is_same_v<outType, float>, "no need to use wrap::floor here.");
-  // static_assert(std::is_same_v<inType, float>, "cannot use wrap::floor here.");
   if constexpr (std::is_same_v<inType, float>) {
 	if constexpr (std::is_same_v<outType, float>) {
 	  return std::floorf(invar);
@@ -160,7 +157,6 @@ auto getFormVertices() noexcept -> std::vector<F_POINT>*;
 
 template <class inType>
 auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> float {
-  // static_assert(!std::is_same_v<inType, float>, "no need to use wrap::midl here.");
   if constexpr (std::is_same_v<inType, float>) {
 	return (high - low) * HALF + low;
   }
@@ -171,7 +167,6 @@ auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> fl
 
 template <class outType, class inType>
 auto distance(inType start, inType end) noexcept(std::is_same_v<outType, ptrdiff_t>) -> outType {
-  // static_assert(!std::is_same_v<outType, ptrdiff_t>, "no need to use wrap::distance here.");
   if constexpr (std::is_same_v<outType, ptrdiff_t>) {
 	return std::distance(start, end);
   }
@@ -185,7 +180,6 @@ auto next(itType iterator,
           inType index) noexcept(!(std::is_same_v<inType, size_t> ||
                                    (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>)))
     -> itType {
-  // static_assert(!std::is_same_v<inType, ptrdiff_t>, "no need to use wrap::next here.");
   static_assert((std::is_same_v<inType, size_t> || std::is_same_v<inType, uint32_t> ||
                  std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint8_t> ||
                  std::is_same_v<inType, int> || std::is_same_v<inType, char>),
@@ -210,7 +204,6 @@ auto next(itType iterator,
 
 template <class outType, class inType>
 void narrow(outType& outvar, inType invar) noexcept(std::is_same_v<inType, outType>) {
-  // static_assert(!std::is_same_v<inType, outType>, "no need to use wrap::narrow here.");
   if constexpr (std::is_same_v<inType, outType>) {
 	outvar = invar;
   }
@@ -221,7 +214,6 @@ void narrow(outType& outvar, inType invar) noexcept(std::is_same_v<inType, outTy
 
 template <class outType, class inType>
 void narrow_cast(outType& outvar, inType invar) noexcept { // NOLINT(readability-identifier-naming)
-  // static_assert(!std::is_same_v<inType, outType>, "no need to use wrap::narrow_cast here.");
   if constexpr (std::is_same_v<inType, outType>) {
 	outvar = invar;
   }
@@ -259,8 +251,6 @@ auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD by
 template <class outType, class inType>
 auto round(inType invar) noexcept((std::is_same_v<inType, float>)&&(std::is_same_v<outType, float>))
     -> outType {
-  // static_assert(!std::is_same_v<outType, float>, "no need to use wrap::round here.");
-  // static_assert(std::is_same_v<inType, float>, "cannot use wrap::round here.");
   if constexpr (std::is_same_v<inType, float>) {
 	if constexpr (std::is_same_v<outType, float>) {
 	  return std::roundf(invar);

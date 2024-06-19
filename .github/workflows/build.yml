@@ -7,9 +7,9 @@ name: Build
 
 on:
   push:
-    branches: [ "Develop" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "Develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read

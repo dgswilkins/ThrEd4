@@ -625,7 +625,7 @@ auto txi::px2txt(POINT const& offset) -> bool {
 }
 
 void txi::deorg(POINT& point) noexcept {
-  point = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  point = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 }
 
 auto txi::txbutfn() -> bool {
@@ -681,8 +681,8 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
 
 void txi::setxmov() {
   StateMap->set(StateFlag::TXTMOV);
-  TextureCursorLocation.x = SelectTexturePointsOrigin.x = Msg.pt.x - StitchWindowOrigin.x;
-  TextureCursorLocation.y = SelectTexturePointsOrigin.y = Msg.pt.y - StitchWindowOrigin.y;
+  TextureCursorLocation.x = SelectTexturePointsOrigin.x = WinMsg.pt.x - StitchWindowOrigin.x;
+  TextureCursorLocation.y = SelectTexturePointsOrigin.y = WinMsg.pt.y - StitchWindowOrigin.y;
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
 }
 
@@ -968,7 +968,7 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	if (StateMap->testAndSet(StateFlag::WASWROT)) {
 	  txi::ritxfrm(textureForm);
 	}
-	TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	TextureCursorLocation = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	txi::ritxfrm(textureForm);
 	return;
   }
@@ -976,7 +976,7 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	return;
   }
   txi::ritxrct();
-  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  TextureCursorLocation = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   txi::ritxrct();
 }
 
@@ -1313,35 +1313,35 @@ void txi::txdelal() {
 }
 
 auto txi::chkbut() -> bool {
-  if (Msg.hwnd == ButtonWin->operator[](HTXCLR)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXCLR)) {
 	txi::txdelal();
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXHI)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXHI)) {
 	txi::butsid(HTXHI);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXWID)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXWID)) {
 	txi::butsid(HTXWID);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXSPAC)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXSPAC)) {
 	txi::butsid(HTXSPAC);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXVRT)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXVRT)) {
 	txi::dutxfn(VRTYP);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXHOR)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXHOR)) {
 	txi::dutxfn(HORTYP);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXANG)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXANG)) {
 	txi::dutxfn(ANGTYP);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HTXMIR)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HTXMIR)) {
 	txi::dutxmir();
 	return true;
   }
@@ -1382,8 +1382,8 @@ void texture::txtlbut(FRM_HEAD const& textureForm) {
   SelectedTexturePointsList->clear();
   StateMap->set(StateFlag::BZUMIN);
   StateMap->reset(StateFlag::BZUM);
-  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
-  ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
+  ZoomBoxLine[0].y = ZoomBoxLine[1].y = WinMsg.pt.y - StitchWindowOrigin.y;
   ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1L;
 }
 

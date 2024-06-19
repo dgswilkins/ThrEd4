@@ -202,7 +202,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	return true;
   }
   if (StateMap->testAndReset(StateFlag::BAKSHO)) {
-	if (Msg.message == WM_RBUTTONDOWN) {
+	if (WinMsg.message == WM_RBUTTONDOWN) {
 	  StateMap->set(StateFlag::RBUT);
 	}
 	else {
@@ -215,8 +215,8 @@ auto mouse::handleEitherButtonDown() -> bool {
   if (thred::inColorbar()) {
 	thred::unpat();
 	auto const colorBarPosition = thred::getColorbarVertPosition();
-	if (Msg.message == WM_RBUTTONDOWN) {
-	  if (((Msg.wParam & MK_SHIFT) != 0U) &&
+	if (WinMsg.message == WM_RBUTTONDOWN) {
+	  if (((WinMsg.wParam & MK_SHIFT) != 0U) &&
 	      (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL))) {
 		thred::unbox();
 		GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(StitchBuffer->size()));
@@ -318,8 +318,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	else {
 	  auto windowRect = RECT {};
 	  GetWindowRect(DeleteStitchesDialog, &windowRect);
-	  if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
-	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
+	  if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
+	      WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
 		thred::savdo();
 		StateMap->set(StateFlag::DELTO);
 	  }
@@ -353,7 +353,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	StateMap->reset(StateFlag::MOVFRMS);
 	auto formsRect = F_RECTANGLE {};
 	form::pxrct2stch(SelectedFormsRect, formsRect);
-	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+	auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 
 	FormMoveDelta = F_POINT {stitchPoint.x - wrap::midl(formsRect.right, formsRect.left),
 	                         stitchPoint.y - wrap::midl(formsRect.top, formsRect.bottom)};
@@ -443,7 +443,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	auto const relativePoint = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	auto const relativePoint = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	if (relativePoint.x >= controlPoint[0].x && relativePoint.x <= controlPoint[2].x &&
 	    relativePoint.y >= controlPoint[0].y && relativePoint.y <= controlPoint[4].y) {
 	  thred::duSelbox();
@@ -485,8 +485,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	else {
 	  auto windowRect = RECT {};
 	  GetWindowRect(DeleteStitchesDialog, &windowRect);
-	  if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
-	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
+	  if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
+	      WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
 		thred::savdo();
 		StateMap->set(StateFlag::DELTO);
 		code = 1;
@@ -524,9 +524,9 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::FORMIN)) {
 	auto windowRect = RECT {};
 	GetWindowRect(MsgWindow, &windowRect);
-	if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top &&
-	    Msg.pt.y <= windowRect.bottom) {
-	  auto const iFillType = (Msg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
+	if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right && WinMsg.pt.y >= windowRect.top &&
+	    WinMsg.pt.y <= windowRect.bottom) {
+	  auto const iFillType = (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
 	  if (StateMap->testAndReset(StateFlag::FENDIN)) {
 		if (iFillType == 3) {
 		  UserFlagMap->reset(UserFlag::SQRFIL);
@@ -630,10 +630,10 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->testAndReset(StateFlag::BOXZUM)) {
 	  StateMap->set(StateFlag::BZUMIN);
-	  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
-	  ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+	  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
+	  ZoomBoxLine[0].y = ZoomBoxLine[1].y = WinMsg.pt.y - StitchWindowOrigin.y;
 	  ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-	  ZoomBoxOrigin                       = thred::pxCor2stch(Msg.pt);
+	  ZoomBoxOrigin                       = thred::pxCor2stch(WinMsg.pt);
 	  StateMap->set(StateFlag::VCAPT);
 	  return true;
 	}
@@ -652,7 +652,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::INIT)) {
 	  thred::unlin();
 	  if (StateMap->test(StateFlag::INSRT)) {
-		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 		auto       code =
 		    (ActiveColor | USMSK | gsl::narrow_cast<decltype(ActiveColor)>(ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
 		if (StateMap->test(StateFlag::LIN1)) {
@@ -662,7 +662,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			StitchBuffer->emplace_back(stitchPoint.x, stitchPoint.y, code);
 			thred::duzrat();
 			InsertLine[0] = thred::stch2px1(iStitch);
-			InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+			InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 			thred::coltab();
 			StateMap->set(StateFlag::RESTCH);
 			return true;
@@ -672,7 +672,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  StitchBuffer->insert(StitchBuffer->begin(), F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		  StitchBuffer->front().attribute &= (~KNOTMSK);
 		  InsertLine[0] = thred::stch2px1(0);
-		  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+		  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 		  thred::coltab();
 		  StateMap->set(StateFlag::RESTCH);
 		  return true;
@@ -690,7 +690,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		StitchBuffer->insert(wrap::next(StitchBuffer->begin(), ClosestPointIndex),
 		                     F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		thred::xlin();
-		InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+		InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 		InsertLine[0] = thred::stch2px1(ClosestPointIndex);
 		InsertLine[2] = thred::stch2px1(ClosestPointIndex + 1U);
 		thred::coltab();
@@ -706,9 +706,9 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	else {
 	  if (thred::inStitchWin()) {
 		thred::savdo();
-		InsertLine[0]          = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+		InsertLine[0]          = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1]          = InsertLine[0];
-		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 		StitchBuffer->emplace_back(stitchPoint.x,
 		                           stitchPoint.y,
 		                           USMSK | ActiveColor |
@@ -726,27 +726,27 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	StateMap->set(StateFlag::BOXSLCT);
 	StateMap->set(StateFlag::BZUMIN);
 	StateMap->set(StateFlag::NOSEL);
-	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
-	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
+	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
+	ZoomBoxLine[0].y = ZoomBoxLine[1].y = WinMsg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-	ZoomBoxOrigin                       = thred::pxCor2stch(Msg.pt);
+	ZoomBoxOrigin                       = thred::pxCor2stch(WinMsg.pt);
 	StateMap->set(StateFlag::VCAPT);
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HBOXSEL)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HBOXSEL)) {
 	form::boxsel();
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HUPTO)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HUPTO)) {
 	thred::toglup();
 	return true;
   }
-  if (Msg.hwnd == ButtonWin->operator[](HHID)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HHID)) {
 	thred::toglHid();
 	return true;
   }
   if (thred::inDefaultColorWindows()) {
-	if (Msg.message == WM_LBUTTONDOWN) {
+	if (WinMsg.message == WM_LBUTTONDOWN) {
 	  thred::switchUserColors();
 	  if (StateMap->test(StateFlag::HID)) {
 		StateMap->reset(StateFlag::SELBOX);
@@ -834,7 +834,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (thred::inThreadSizeWindows()) {
-	if (Msg.message == WM_LBUTTONDOWN) {
+	if (WinMsg.message == WM_LBUTTONDOWN) {
 	  threadSizeSelected = thred::createChangeThreadSizeWindows();
 	}
 	return true;
@@ -859,8 +859,8 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
   if (StateMap->testAndReset(StateFlag::MOVFRMS)) {
 	thred::savdo();
 	auto const point =
-	    POINT {(Msg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
-	           (Msg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top};
+	    POINT {(WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
+	           (WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top};
 	form::ratsr();
 	FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
 	if (StateMap->test(StateFlag::FPSEL)) {
@@ -921,7 +921,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	return true;
   }
   if (StateMap->testAndReset(StateFlag::MOVCNTR)) {
-	rotationCenter = thred::pxCor2stch(Msg.pt);
+	rotationCenter = thred::pxCor2stch(WinMsg.pt);
 	StateMap->set(StateFlag::ROTAT);
 	return true;
   }
@@ -933,7 +933,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	thred::savdo();
 	ReleaseCapture();
 	thred::unsel();
-	auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
+	auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
 	auto const adjustedPoint = thred::getAdjustedPoint(stitchPoint);
 
 	auto const groupStitchRange =
@@ -950,7 +950,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	ReleaseCapture();
 	StateMap->reset(StateFlag::CAPT);
 	thred::savdo();
-	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+	auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 
 	StitchBuffer->operator[](ClosestPointIndex) = stitchPoint;
 	StitchBuffer->operator[](ClosestPointIndex).attribute |= USMSK;
@@ -963,7 +963,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	return true;
   }
   if (StateMap->test(StateFlag::BZUMIN)) {
-	auto stitchPoint = thred::pxCor2stch(Msg.pt);
+	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	if (StateMap->testAndReset(StateFlag::BOXSLCT)) {
 	  if (ZoomBoxOrigin.x > stitchPoint.x) {
 		StitchRangeRect.right = ZoomBoxOrigin.x;
@@ -1093,7 +1093,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	while (true) {
 	  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
-		thred::ritfcor(thred::pxCor2stch(Msg.pt));
+		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
 	  if ((StateMap->test(StateFlag::PRFACT) || StateMap->test(StateFlag::FORMIN) ||
 	       StateMap->test(StateFlag::POLIMOV)) ||
@@ -1170,7 +1170,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::INSFIL)) {
 	  form::unfrm();
-	  auto const point = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	  auto const point = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  thred::insflin(point);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::dufrm();
@@ -1179,12 +1179,12 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::MOVFRMS)) {
 	  thred::unstrtch(stretchBoxLine);
 	  stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x =
-	      Msg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x;
-	  stretchBoxLine[1].x = stretchBoxLine[2].x = Msg.pt.x + std::lround(SelectedFormsSize.x) -
+	      WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x;
+	  stretchBoxLine[1].x = stretchBoxLine[2].x = WinMsg.pt.x + std::lround(SelectedFormsSize.x) -
 	                                              std::lround(FormMoveDelta.x) - StitchWindowOrigin.x;
 	  stretchBoxLine[0].y = stretchBoxLine[1].y = stretchBoxLine[4].y =
-	      Msg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y;
-	  stretchBoxLine[2].y = stretchBoxLine[3].y = Msg.pt.y + std::lround(SelectedFormsSize.y) -
+	      WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y;
+	  stretchBoxLine[2].y = stretchBoxLine[3].y = WinMsg.pt.y + std::lround(SelectedFormsSize.y) -
 	                                              std::lround(FormMoveDelta.y) - StitchWindowOrigin.y;
 	  if (thred::isLine(stretchBoxLine)) {
 		stretchBoxLine[0].x -= 1;
@@ -1211,8 +1211,8 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::EXPAND)) {
 	  thred::unstrtch(stretchBoxLine);
-	  auto newSize = F_POINT {gsl::narrow<float>(Msg.pt.x - StitchWindowOrigin.x),
-	                          gsl::narrow<float>(Msg.pt.y - StitchWindowOrigin.y)};
+	  auto newSize = F_POINT {gsl::narrow<float>(WinMsg.pt.x - StitchWindowOrigin.x),
+	                          gsl::narrow<float>(WinMsg.pt.y - StitchWindowOrigin.y)};
 
 	  auto       iSide = (SelectedFormControlVertex + 2U) % 4U;
 	  auto const ratio = std::fabs((newSize.x - wrap::toFloat(stretchBoxLine[iSide].x)) /
@@ -1259,8 +1259,8 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::STRTCH)) {
 	  thred::unstrtch(stretchBoxLine);
 	  auto const lineLength = ((SelectedFormControlVertex & 1U) != 0U)
-	                              ? Msg.pt.x - StitchWindowOrigin.x
-	                              : Msg.pt.y - StitchWindowOrigin.y;
+	                              ? WinMsg.pt.x - StitchWindowOrigin.x
+	                              : WinMsg.pt.y - StitchWindowOrigin.y;
 	  auto const dst        = (SelectedFormControlVertex + 2U) % 4U;
 	  auto const code       = mi::nxtcrnr(dst);
 	  for (auto iSide = 0U; iSide < 4; ++iSide) {
@@ -1280,7 +1280,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::INSFRM)) {
 	  form::uninsf();
-	  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOINSF);
 	  form::duinsf();
 	  return true;
@@ -1309,18 +1309,18 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::FRMPMOV)) {
 	  mi::unmov();
-	  RubberBandLine->operator[](1) = {Msg.pt.x - StitchWindowOrigin.x,
-	                                   Msg.pt.y - StitchWindowOrigin.y};
+	  RubberBandLine->operator[](1) = {WinMsg.pt.x - StitchWindowOrigin.x,
+	                                   WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	  if (thred::inStitchWin()) {
-		thred::ritfcor(thred::pxCor2stch(Msg.pt));
+		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
 	  return true;
 	}
 	if (StateMap->test(StateFlag::MOVCNTR)) {
 	  thred::unrot();
-	  thred::ritrot(rotationAngle, thred::pxCor2stch(Msg.pt));
+	  thred::ritrot(rotationAngle, thred::pxCor2stch(WinMsg.pt));
 	  return true;
 	}
 	if (StateMap->test(StateFlag::ROTCAPT)) {
@@ -1359,7 +1359,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::CAPT)) {
 	  if (thred::inStitchWin()) {
-		thred::ritfcor(thred::pxCor2stch(Msg.pt));
+		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
 	  thred::unlin();
 	  thred::updateMoveLine();
@@ -1367,7 +1367,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::INSRT)) {
 	  if (thred::inStitchWin()) {
-		thred::ritfcor(thred::pxCor2stch(Msg.pt));
+		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
 	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
@@ -1375,14 +1375,14 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  if (StateMap->test(StateFlag::LIN1)) {
 		if (!StitchBuffer->empty()) {
 		  thred::xlin1();
-		  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+		  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 		  StateMap->set(StateFlag::ILIN1);
 		  thred::ilin1();
 		}
 		return true;
 	  }
 	  thred::xlin();
-	  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::ILIN);
 	  thred::ilin();
 	  return true;
@@ -1390,13 +1390,13 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) {
 	  SetCapture(ThrEdWindow);
 	}
-	if (StateMap->test(StateFlag::BZUMIN) && ((Msg.wParam & MK_LBUTTON) != 0U)) {
+	if (StateMap->test(StateFlag::BZUMIN) && ((WinMsg.wParam & MK_LBUTTON) != 0U)) {
 	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
 	  thred::unbBox();
-	  ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
-	  ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
+	  ZoomBoxLine[1].x = ZoomBoxLine[2].x = WinMsg.pt.x - StitchWindowOrigin.x;
+	  ZoomBoxLine[2].y = ZoomBoxLine[3].y = WinMsg.pt.y - StitchWindowOrigin.y;
 	  StateMap->set(StateFlag::BZUM);
 	  thred::bBox();
 	  return true;
@@ -1453,7 +1453,7 @@ auto mouse::handleRightButtonDown() -> bool {
   }
   if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
-	  if ((Msg.wParam & MK_SHIFT) != 0U) {
+	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm(ClosestFormToCursor)) {
 		  // ToDo - I don't think this can ever be hit with closfrm
@@ -1476,7 +1476,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		  form::nufsel();
 		}
 	  }
-	  if ((Msg.wParam & MK_CONTROL) != 0U) {
+	  if ((WinMsg.wParam & MK_CONTROL) != 0U) {
 		if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		  StateMap->set(StateFlag::WASEL);
 		  PreviousFormIndex = ClosestFormToCursor;
@@ -1516,7 +1516,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	  }
 	}
 	if (StateMap->test(StateFlag::INIT) || (!ThrName->empty())) {
-	  if ((Msg.wParam & MK_SHIFT) != 0U) {
+	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		if (StateMap->test(StateFlag::SELBOX)) {
 		  auto const code = ClosestPointIndex;
 		  thred::closPnt1(ClosestPointIndex);
@@ -1571,8 +1571,8 @@ auto mouse::handleRightButtonDown() -> bool {
   if (!ButtonWin->empty()) {
 	auto minLenRect = RECT {};
 	if (GetWindowRect(ButtonWin->operator[](HMINLEN), &minLenRect) != 0) {
-	  if (Msg.pt.x >= minLenRect.left && Msg.pt.x <= minLenRect.right &&
-	      Msg.pt.y > minLenRect.top && Msg.pt.y <= minLenRect.bottom) {
+	  if (WinMsg.pt.x >= minLenRect.left && WinMsg.pt.x <= minLenRect.right &&
+	      WinMsg.pt.y > minLenRect.top && WinMsg.pt.y <= minLenRect.bottom) {
 		thred::setSmallestStitchVal();
 		StateMap->set(StateFlag::GRPSEL);
 		StateMap->set(StateFlag::RESTCH);
@@ -1581,8 +1581,8 @@ auto mouse::handleRightButtonDown() -> bool {
 	}
 	auto maxLenRect = RECT {};
 	if (GetWindowRect(ButtonWin->operator[](HMAXLEN), &maxLenRect) != 0) {
-	  if (Msg.pt.x >= maxLenRect.left && Msg.pt.x <= maxLenRect.right &&
-	      Msg.pt.y > maxLenRect.top && Msg.pt.y <= maxLenRect.bottom) {
+	  if (WinMsg.pt.x >= maxLenRect.left && WinMsg.pt.x <= maxLenRect.right &&
+	      WinMsg.pt.y > maxLenRect.top && WinMsg.pt.y <= maxLenRect.bottom) {
 		thred::setLargestStitchVal();
 		StateMap->set(StateFlag::GRPSEL);
 		StateMap->set(StateFlag::RESTCH);

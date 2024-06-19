@@ -403,6 +403,9 @@ auto getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
             std::vector<F_POINT> const& currentFormVertices) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> float;
 auto getLayerPen(uint32_t layer) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> HPEN;
 auto getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uint32_t>;
+auto handleSeq(size_t iSequence, B_SEQ_PNT& bCurrent) -> bool;
+void handleSeqBot(size_t iSequence, B_SEQ_PNT const& bCurrent);
+void handleSeqTop(size_t iSequence, B_SEQ_PNT const& bCurrent);
 void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
 auto insect(FRM_HEAD const&             form,
             std::vector<CLIP_SORT>&     clipIntersectData,
@@ -1166,7 +1169,7 @@ void form::drwfrm() {
 	if (StateMap->test(StateFlag::FRMPMOV)) {
 	  thred::ritmov(ClosestFormToCursor);
 	  RubberBandLine->operator[](1) =
-	      POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	}
@@ -1254,8 +1257,8 @@ void form::setmfrm(uint32_t formIndex) {
 
   auto itVertex = wrap::next(FormVertices->cbegin(), closeForm.vertexIndex);
   auto point    = form::sfCor2px(itVertex[0]);
-  auto const offset = POINT {Msg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
-                             Msg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
+  auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
+                             WinMsg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
@@ -1279,7 +1282,7 @@ void form::durpoli(uint32_t vertexCount) {
   newForm.vertexCount = vertexCount;
   newForm.attribute   = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   newForm.type        = FRMFPOLY;
-  auto point          = thred::pxCor2stch(Msg.pt);
+  auto point          = thred::pxCor2stch(WinMsg.pt);
   auto angle          = 0.0F;
   auto itVertex       = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   for (auto iVertex = 0U; iVertex < vertexCount; ++iVertex) {
@@ -1498,7 +1501,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 	return false;
   }
   auto const screenCoordinate =
-      POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   fi::rats();
   auto       closestForm   = 0U;
   auto       closestVertex = 0U;
@@ -2654,7 +2657,8 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	projectedPoints.reserve(currentVertexCount);
 	currentX += step;
 	auto iPoint = 0U;
-	for (auto iVertex = uint16_t {}; iVertex < currentVertexCount; ++iVertex) {
+	auto vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
+	for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
 	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
 	  if (auto point = F_POINT {};
 	      projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
@@ -4428,11 +4432,9 @@ void fi::duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	movseq(lineEndpoints, sortedLineIndices, iLine);
   }
   if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-	if (iLine != 0U) {
 	  flag = true;
 	  duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 	  sequenceIndex = iLine - 1U;
-	}
   }
   if (flag) {
 	lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
@@ -4869,9 +4871,7 @@ void fi::lcon(FRM_HEAD const&              form,
 #endif
 }
 
-void fi::bakseq() {
-#if BUGSEQ
-#else
+void fi::handleSeqTop(size_t iSequence, B_SEQ_PNT const& bCurrent) {
   constexpr auto RITSIZ = 6;
 
   static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
@@ -4883,6 +4883,145 @@ void fi::bakseq() {
       17,
   };
 
+  auto const& bNext     = BSequence->operator[](iSequence + 1U);
+  auto const& bPrevious = BSequence->operator[](iSequence - 1U);
+  auto        delta     = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+  auto const& form      = FormList->operator[](ClosestFormToCursor);
+  auto const  rcnt      = iSequence % SEQ_TABLE.size();
+  auto        slope     = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
+
+  auto const stitchSpacing2    = LineSpacing * 2;
+  auto const userStitchLength9 = UserStitchLength / MAXSIZ;
+
+  auto const rit = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+
+  if (delta.y != 0.0F) {
+	slope = delta.x / delta.y;
+  }
+  if ((form.extendedAttribute & AT_SQR) != 0U) {
+	if (StateMap->testAndFlip(StateFlag::FILDIR)) {
+	  OSequence->emplace_back(bPrevious.x, bPrevious.y);
+	  auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
+	              wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+	  while (true) {
+		OSequence->emplace_back(0.0F, yVal);
+		if (yVal > bCurrent.y) {
+		  break;
+		}
+		OSequence->back().x = bCurrent.x;
+		yVal += UserStitchLength;
+	  }
+	  OSequence->back() = bCurrent;
+	  return;
+	}
+	OSequence->emplace_back(bCurrent.x, bCurrent.y);
+	auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
+	            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+	while (true) {
+	  OSequence->emplace_back(0.0F, yVal);
+	  if (yVal < bPrevious.y) {
+		break;
+	  }
+	  OSequence->back().x = bCurrent.x;
+	  yVal -= UserStitchLength;
+	}
+	OSequence->back() = bPrevious;
+	return;
+  }
+  auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
+              wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+  while (true) {
+	OSequence->emplace_back(0.0F, yVal);
+	if (yVal > bCurrent.y) {
+	  break;
+	}
+	delta.y             = OSequence->back().y - bNext.y;
+	delta.x             = slope * delta.y;
+	OSequence->back().x = bNext.x + delta.x;
+	yVal += UserStitchLength;
+  }
+  OSequence->back() = bCurrent;
+}
+
+void fi::handleSeqBot(size_t iSequence, B_SEQ_PNT const& bCurrent) {
+  constexpr auto RITSIZ = 6;
+
+  static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
+      12,
+      7,
+      15,
+      11,
+      13,
+      17,
+  };
+
+  auto const& bNext = BSequence->operator[](iSequence + 1U);
+  auto        delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+  auto const& form  = FormList->operator[](ClosestFormToCursor);
+  auto const  rcnt  = iSequence % SEQ_TABLE.size();
+  auto        slope = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
+
+  auto const stitchSpacing2    = LineSpacing * 2;
+  auto const userStitchLength9 = UserStitchLength / MAXSIZ;
+
+  auto const rit = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+
+  if (delta.y != 0.0F) {
+	slope = delta.x / delta.y;
+  }
+  if ((form.extendedAttribute & AT_SQR) != 0U) {
+	return;
+  }
+  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
+              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+  while (true) {
+	OSequence->emplace_back(0.0F, yVal);
+	if (yVal < bCurrent.y) {
+	  break;
+	}
+	delta.y             = OSequence->back().y - bNext.y;
+	delta.x             = slope * delta.y;
+	OSequence->back().x = bNext.x + delta.x;
+	yVal -= UserStitchLength;
+  }
+  OSequence->back() = bCurrent;
+}
+
+auto fi::handleSeq(size_t iSequence, B_SEQ_PNT& bCurrent) -> bool {
+  auto const& bNext = BSequence->operator[](iSequence + 1U);
+  auto const  delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+
+  StateMap->reset(StateFlag::FILDIR);
+  auto const length = std::hypot(delta.x, delta.y);
+  if (length == 0.0F) {
+	OSequence->emplace_back(bCurrent.x, bCurrent.y);
+	return true;
+  }
+  auto const userStitchLength2 = UserStitchLength * 2.0F;
+  if (length <= userStitchLength2) {
+	OSequence->emplace_back(bCurrent.x, bCurrent.y);
+	return true;
+  }
+  auto point = bNext; // intended copy
+  auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
+  if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
+	return false;
+  }
+  auto const fCount = wrap::toFloat(count);
+  auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
+  while (count != 0U) {
+	point.x += step.x;
+	point.y += step.y;
+	OSequence->emplace_back(point.x, point.y);
+	--count;
+  }
+  OSequence->emplace_back(bCurrent.x, bCurrent.y);
+  return true;
+}
+
+void fi::bakseq() {
+#if BUGSEQ
+#else
 #if BUGBAK
 
   for (auto val : *BSequence) {
@@ -4902,114 +5041,18 @@ void fi::bakseq() {
 	--iSequence;
   }
   while (iSequence > 0) {
-	// clang-format off
-	auto const  rcnt           = iSequence % SEQ_TABLE.size();
-	auto const  stitchSpacing2 = LineSpacing * 2;
-	auto const  rit            = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
-	auto const& bPrevious      = BSequence->operator[](iSequence - 1U);
-	auto&       bCurrent       = BSequence->operator[](iSequence);
-	auto const& bNext          = BSequence->operator[](iSequence + 1U);
-	auto        delta          = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
-	auto        slope          = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
-	// clang-format on
-	if (delta.y != 0.0F) {
-	  slope = delta.x / delta.y;
-	}
-	auto const  userStitchLength9 = UserStitchLength / MAXSIZ;
-	auto const& form              = FormList->operator[](ClosestFormToCursor);
+	auto& bCurrent = BSequence->operator[](iSequence);
 	switch (bCurrent.attribute) {
-	  case SEQTOP: {
-		if ((form.extendedAttribute & AT_SQR) != 0U) {
-		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			OSequence->emplace_back(bPrevious.x, bPrevious.y);
-			auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
-			            wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-			while (true) {
-			  OSequence->emplace_back(0.0F, yVal);
-			  if (yVal > bCurrent.y) {
-				break;
-			  }
-			  OSequence->back().x = bCurrent.x;
-			  yVal += UserStitchLength;
-			}
-			OSequence->back() = bCurrent;
-			break;
-		  }
-		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
-		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-		  while (true) {
-			OSequence->emplace_back(0.0F, yVal);
-			if (yVal < bPrevious.y) {
-			  break;
-			}
-			OSequence->back().x = bCurrent.x;
-			yVal -= UserStitchLength;
-		  }
-		  OSequence->back() = bPrevious;
-		  break;
-		}
-		auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
-		            wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-		while (true) {
-		  OSequence->emplace_back(0.0F, yVal);
-		  if (yVal > bCurrent.y) {
-			break;
-		  }
-		  delta.y             = OSequence->back().y - bNext.y;
-		  delta.x             = slope * delta.y;
-		  OSequence->back().x = bNext.x + delta.x;
-		  yVal += UserStitchLength;
-		}
-		OSequence->back() = bCurrent;
+	  case SEQTOP:
+		fi::handleSeqTop(iSequence, bCurrent);
 		break;
-	  }
-	  case SEQBOT: {
-		if ((form.extendedAttribute & AT_SQR) != 0U) {
-		  break;
-		}
-		auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
-		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-		while (true) {
-		  OSequence->emplace_back(0.0F, yVal);
-		  if (yVal < bCurrent.y) {
-			break;
-		  }
-		  delta.y             = OSequence->back().y - bNext.y;
-		  delta.x             = slope * delta.y;
-		  OSequence->back().x = bNext.x + delta.x;
-		  yVal -= UserStitchLength;
-		}
-		OSequence->back() = bCurrent;
+	  case SEQBOT:
+		fi::handleSeqBot(iSequence, bCurrent);
 		break;
-	  }
 	  case 0: {
-		delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
-		StateMap->reset(StateFlag::FILDIR);
-		auto const length = std::hypot(delta.x, delta.y);
-		if (length == 0.0F) {
-		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-		  break;
-		}
-		auto const userStitchLength2 = UserStitchLength * 2.0F;
-		if (length <= userStitchLength2) {
-		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-		  break;
-		}
-		auto point = bNext; // intended copy
-		auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
-		if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
+		if (!fi::handleSeq(iSequence, bCurrent)) {
 		  return;
 		}
-		auto const fCount = wrap::toFloat(count);
-		auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
-		while (count != 0U) {
-		  point.x += step.x;
-		  point.y += step.y;
-		  OSequence->emplace_back(point.x, point.y);
-		  --count;
-		}
-		OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		break;
 	  }
 	  default: {
@@ -5466,8 +5509,8 @@ void form::refil(uint32_t formIndex) {
 void form::setfpnt() {
   // clang-format off
   auto&      form             = FormList->operator[](ClosestFormToCursor);
-  auto const screenCoordinate = POINT {(Msg.pt.x - StitchWindowOrigin.x), 
-									   (Msg.pt.y - StitchWindowOrigin.y)};
+  auto const screenCoordinate = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), 
+									   (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const itVertex         = wrap::next(FormVertices->begin(), form.vertexIndex + ClosestVertexToCursor);
   // clang-format on
   form::unfrm();
@@ -5613,7 +5656,7 @@ void form::filangl() {
 auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
                   std::vector<POINT>&                stretchBoxLine,
                   float&                             xyRatio) -> bool {
-  auto const  point = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
+  auto const  point = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   thred::duzrat();
@@ -5667,7 +5710,7 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
 
 void form::rstfrm() {
   auto const point =
-      POINT {(Msg.pt.x + std::lround(FormMoveDelta.x)), (Msg.pt.y + std::lround(FormMoveDelta.y))};
+      POINT {(WinMsg.pt.x + std::lround(FormMoveDelta.x)), (WinMsg.pt.y + std::lround(FormMoveDelta.y))};
 
   auto const attribute = ClosestFormToCursor << 4U;
   form::setmfrm(ClosestFormToCursor);
@@ -5720,7 +5763,7 @@ void fi::uncon() {
 void form::drwcon() {
   fi::uncon();
   auto& formLines = *FormLines;
-  formLines[1]    = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  formLines[1]    = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOCON);
   fi::ducon();
 }
@@ -5826,7 +5869,7 @@ void form::filsat() {
 
 auto fi::closat(IntersectionStyles& inOutFlag) -> bool {
   auto       minimumLength = BIGFLOAT;
-  auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
+  auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& formIter = FormList->operator[](iForm);
 	if (formIter.vertexCount == 0U) {
@@ -5913,7 +5956,7 @@ void form::insat() { // insert a point in a form
   thred::savdo();
   auto& selectedForm = FormList->operator[](ClosestFormToCursor);
 
-  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
   switch (inOutFlag) {
 	case IntersectionStyles::POINT_BEFORE_LINE: {
 	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
@@ -5932,8 +5975,7 @@ void form::insat() { // insert a point in a form
 	}
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"default hit in insat: inOutFlag [{}]\n", gsl::narrow_cast<int>(inOutFlag));
-	  throw;
+	  throw std::runtime_error("Invalid Intersection Flag in insat");
 	}
   }
   form::refil(ClosestFormToCursor);
@@ -6034,7 +6076,7 @@ void form::rinfrm() {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
   InsertLine[0] = formLines[FormVertexPrev];
-  InsertLine[1] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOINSF);
   form::duinsf();
 }
@@ -6062,8 +6104,7 @@ void form::infrm() { // insert multiple points into a form
 	}
 	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
-	  outDebugString(L"default hit in infrm: inOutFlag [{}]\n", gsl::narrow_cast<int>(inOutFlag));
-	  throw;
+	  throw std::runtime_error("Invalid Intersection Flag in infrm");
 	}
   }
   StateMap->set(StateFlag::INSFRM);
@@ -6072,7 +6113,7 @@ void form::infrm() { // insert multiple points into a form
 }
 
 void form::setins() {
-  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
   fi::nufpnt(FormVertexPrev, *FormForInsert, stitchPoint);
   if (StateMap->test(StateFlag::PRELIN)) {
 	auto const itVertex = wrap::next(FormVertices->begin(), FormForInsert->vertexIndex);
@@ -6084,7 +6125,7 @@ void form::setins() {
   }
   fi::frmlin(*FormForInsert);
   InsertLine[0] = FormLines->operator[](FormVertexPrev);
-  InsertLine[1] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::INSFRM);
   duinsf();
   StateMap->set(StateFlag::RESTCH);
@@ -6325,7 +6366,7 @@ void form::setstrtch() {
 	  stitchPoint = F_POINT {stitchRect.right, stitchRect.bottom};
 	}
 	else {
-	  stitchPoint = thred::pxCor2stch(Msg.pt);
+	  stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	}
   }
   switch (SelectedFormControlVertex) {
@@ -6333,7 +6374,7 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference = stitchRect.bottom;
 
-		auto const offsetY = Msg.pt.y - StitchWindowOrigin.y;
+		auto const offsetY = WinMsg.pt.y - StitchWindowOrigin.y;
 
 		ratio = wrap::toFloat(SelectedFormsRect.bottom - offsetY) /
 		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
@@ -6353,7 +6394,7 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference = stitchRect.left;
 
-		auto const offsetX = Msg.pt.x - StitchWindowOrigin.x;
+		auto const offsetX = WinMsg.pt.x - StitchWindowOrigin.x;
 
 		ratio = wrap::toFloat(offsetX - SelectedFormsRect.left) /
 		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
@@ -6374,7 +6415,7 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference = stitchRect.top;
 
-		auto const offsetY = Msg.pt.y - StitchWindowOrigin.y;
+		auto const offsetY = WinMsg.pt.y - StitchWindowOrigin.y;
 
 		ratio = wrap::toFloat(offsetY - SelectedFormsRect.top) /
 		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
@@ -6394,7 +6435,7 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference = stitchRect.right;
 
-		auto const offsetX = Msg.pt.x - StitchWindowOrigin.x;
+		auto const offsetX = WinMsg.pt.x - StitchWindowOrigin.x;
 
 		ratio = wrap::toFloat(SelectedFormsRect.right - offsetX) /
 		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
@@ -6562,12 +6603,12 @@ void form::setexpand(float xyRatio) {
 	wrap::narrow_cast(rectangle.right, SelectedFormsRect.right);
 	wrap::narrow_cast(rectangle.bottom, SelectedFormsRect.bottom);
 
-	wrap::narrow_cast(stitchPoint.x, Msg.pt.x - StitchWindowOrigin.x);
-	wrap::narrow_cast(stitchPoint.y, Msg.pt.y - StitchWindowOrigin.y);
+	wrap::narrow_cast(stitchPoint.x, WinMsg.pt.x - StitchWindowOrigin.x);
+	wrap::narrow_cast(stitchPoint.y, WinMsg.pt.y - StitchWindowOrigin.y);
 	size0.y = rectangle.bottom - rectangle.top;
   }
   else {
-	stitchPoint = thred::pxCor2stch(Msg.pt);
+	stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	rectangle = StateMap->test(StateFlag::FORMSEL) ? FormList->operator[](ClosestFormToCursor).rectangle
 	                                               : StitchRangeRect;
 	size0.y = rectangle.top - rectangle.bottom;
@@ -6849,7 +6890,7 @@ void form::dustar(uint32_t starCount, float length) {
   newForm.vertexCount    = vertexCount;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
   newForm.type = FRMFPOLY;
-  auto point   = thred::pxCor2stch(Msg.pt);
+  auto point   = thred::pxCor2stch(WinMsg.pt);
   StateMap->set(StateFlag::FILDIR);
   auto const itFirstVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   auto       itVertex      = itFirstVertex;
@@ -6903,7 +6944,7 @@ void form::duspir(uint32_t stepCount) {
   firstSpiral.resize(stepCount);
   auto centeredSpiral = std::vector<F_POINT> {};
   centeredSpiral.resize(stepCount);
-  auto point = thred::pxCor2stch(Msg.pt);
+  auto point = thred::pxCor2stch(WinMsg.pt);
   auto angle = 0.0F;
   for (auto iStep = 0U; iStep < stepCount; ++iStep) {
 	firstSpiral[iStep] = point;
@@ -6952,7 +6993,7 @@ void form::duhart(uint32_t sideCount) {
   wrap::narrow(currentForm.attribute, ActiveLayer << 1U);
   FormVertices->reserve(FormVertices->size() + wrap::toSize(sideCount) * 2U - 2U);
   auto const savedVertexIndex = wrap::toUnsigned(FormVertices->size());
-  auto       point            = thred::pxCor2stch(Msg.pt);
+  auto       point            = thred::pxCor2stch(WinMsg.pt);
   auto       stepAngle        = PI_F2 / wrap::toFloat(sideCount);
   auto const length           = 300.0F / wrap::toFloat(sideCount) * ZoomFactor *
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
@@ -7033,7 +7074,7 @@ void form::dulens(uint32_t sides) {
   auto       currentForm  = FRM_HEAD {};
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   currentForm.attribute   = gsl::narrow_cast<decltype(currentForm.attribute)>(ActiveLayer << 1U);
-  auto const stitchPoint  = thred::pxCor2stch(Msg.pt);
+  auto const stitchPoint  = thred::pxCor2stch(WinMsg.pt);
   auto       point        = stitchPoint;
   auto       iVertex      = 0U;
   FormVertices->reserve(FormVertices->size() + wrap::toSize(steps << 1U) + 1U);
@@ -7109,7 +7150,7 @@ void form::duzig(uint32_t vertices) {
   newForm.vertexIndex = thred::adflt(vertices);
   newForm.vertexCount = vertices;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
-  auto       stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto       stitchPoint = thred::pxCor2stch(WinMsg.pt);
   auto const offset      = F_POINT {UnzoomedRect.cx / 6.0, UnzoomedRect.cy / (6.0 * vertices)};
   auto       itVertex    = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   for (auto iVertex = 0U; iVertex < vertices; ++iVertex) {
@@ -8602,12 +8643,16 @@ void fi::unbean(uint32_t start, uint32_t& finish) {
 	lastStitch = wrap::toUnsigned(StitchBuffer->size()) - 3U;
   }
   auto iSourceStitch = start;
-  for (; iSourceStitch <= lastStitch; ++iSourceStitch) {
+  for (auto skip = 0U; iSourceStitch <= lastStitch; ++iSourceStitch) {
+	if (skip != 0U) {
+      --skip;
+      continue;
+    }
 	auto const& stitch     = StitchBuffer->operator[](iSourceStitch);
 	auto const& stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	highStitchBuffer.push_back(stitch);
 	if (util::closeEnough(stitch.x, stitchFwd2.x) && util::closeEnough(stitch.y, stitchFwd2.y)) {
-	  iSourceStitch += 2;
+	  skip = 2U; // skip the next two stitches
 	}
   }
   if (finish != lastStitch) {

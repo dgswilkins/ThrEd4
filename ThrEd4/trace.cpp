@@ -70,16 +70,18 @@ constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
 constexpr auto TRBASE   = 0.1F;                 // Trace ratio base
 constexpr auto TROFF    = 1.0F;                 // Trace ratio offset
 
-constexpr auto TRWINROW01 = int32_t {15};
-constexpr auto TRWINROW02 = int32_t {16};
-constexpr auto TRWINROW03 = int32_t {17};
-constexpr auto TRWINROW04 = int32_t {18};
-constexpr auto TRWINROW05 = int32_t {19};
-constexpr auto TRWINROW06 = int32_t {20};
-constexpr auto TRWINROW07 = int32_t {21};
-constexpr auto TRWINROW08 = int32_t {22};
-constexpr auto TRWINROW09 = int32_t {23};
-constexpr auto TRWINROW10 = int32_t {24};
+enum TraceWin : int32_t {
+  TRWINROW01 = 15,
+  TRWINROW02,
+  TRWINROW03,
+  TRWINROW04,
+  TRWINROW05,
+  TRWINROW06,
+  TRWINROW07,
+  TRWINROW08,
+  TRWINROW09,
+  TRWINROW10
+};
 
 // edge tracing directions
 enum TraceDirection : uint8_t {
@@ -461,7 +463,7 @@ void trace::trace() {
   auto const spTBD = gsl::span<uint32_t>(
       TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
   if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
-	auto stitchPoint = thred::pxCor2stch(Msg.pt);
+	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	if (StateMap->test(StateFlag::LANDSCAP)) {
 	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
 	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
@@ -798,7 +800,7 @@ void ti::dutrac() {
   if (!thred::inStitchWin()) {
 	return;
   }
-  auto stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
   if (!StateMap->test(StateFlag::WASEDG)) {
 	trace::tracedg();
 	return;
@@ -1162,7 +1164,7 @@ void ti::getColors() {
 	DownPixelColor |= tracePosition;
 	return;
   }
-  if (Msg.message == WM_LBUTTONDOWN) {
+  if (WinMsg.message == WM_LBUTTONDOWN) {
 	UpPixelColor &= TraceRGBMask.at(ColumnColor);
 	UpPixelColor |= position << TraceShift.at(ColumnColor);
   }
@@ -1179,7 +1181,7 @@ void trace::tracpar() {
   if (StateMap->test(StateFlag::TRNIN1)) {
 	trace::dutrnum1();
   }
-  TraceMsgPoint = POINT {Msg.pt.x - ThredWindowOrigin.x, Msg.pt.y - ThredWindowOrigin.y};
+  TraceMsgPoint = POINT {WinMsg.pt.x - ThredWindowOrigin.x, WinMsg.pt.y - ThredWindowOrigin.y};
   if (TraceMsgPoint.x > ButtonWidthX3) {
 	ti::dutrac();
   }

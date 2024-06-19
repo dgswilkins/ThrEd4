@@ -236,7 +236,7 @@ void si::satclos() {
   auto const initialGuideCount = form.satinGuideCount;
   // clang-format on
   form::uninsf();
-  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
+  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
   {
 	auto minimumLength = BIGFLOAT;
 	auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -331,7 +331,7 @@ void satin::satknkt() {
 
 auto si::satselfn() -> bool {
   auto       minimumLength = BIGFLOAT;
-  auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
+  auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
   for (auto& form : *FormList) {
 	auto const layerCode =
 	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
@@ -1271,7 +1271,7 @@ void satin::drwsat() {
   auto const vertexCount = TempPolygon->size();
   auto&      formLines   = *FormLines;
   formLines.resize(vertexCount + 1U);
-  formLines[vertexCount] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  formLines[vertexCount] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOSAT);
   satin::dusat();
 }
@@ -1279,8 +1279,8 @@ void satin::drwsat() {
 void satin::satpnt0() {
   auto& formLines = *FormLines;
   formLines.clear();
-  formLines.push_back(POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y});
-  TempPolygon->push_back(thred::pxCor2stch(Msg.pt));
+  formLines.push_back(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
+  TempPolygon->push_back(thred::pxCor2stch(WinMsg.pt));
   StateMap->set(StateFlag::SATPNT);
 }
 
@@ -1288,9 +1288,9 @@ void satin::satpnt1() {
   si::unsat();
   auto const vertexCount = TempPolygon->size();
   auto&      formLines   = *FormLines;
-  formLines[vertexCount] = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  formLines[vertexCount] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   satin::dusat();
-  TempPolygon->push_back(thred::pxCor2stch(Msg.pt));
+  TempPolygon->push_back(thred::pxCor2stch(WinMsg.pt));
   StateMap->set(StateFlag::RESTCH);
 }
 
