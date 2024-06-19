@@ -109,6 +109,7 @@ void chkdaz();
 
 auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
+auto handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool;
 void handleDaisyIDOK(HWND hwndlg);
 void handlePaisleyDefault(HWND hwndlg);
 void handleTearDefault(HWND hwndlg);
@@ -801,6 +802,43 @@ void ffi::handleDaisyIDOK(HWND hwndlg) {
   ffi::chkdaz();
 }
 
+auto ffi::handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
+  switch (LOWORD(wparam)) {
+	case IDCANCEL: {
+	  EndDialog(hwndlg, 0);
+	  return true;
+	}
+	case IDOK:
+	  handleDaisyIDOK(hwndlg);
+	  EndDialog(hwndlg, 1);
+	  break;
+	case IDC_DAZRST: {
+	  IniFile.dazdef();
+	  UserFlagMap->set(UserFlag::DAZHOL);
+	  UserFlagMap->set(UserFlag::DAZD);
+	  ffi::initdaz(hwndlg);
+	  break;
+	}
+	case IDC_DLIN: {
+	  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
+		CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
+	  }
+	  break;
+	}
+	case IDC_HOLE: {
+	  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) == 0U) {
+		CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
+	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
+	  break;
+	}
+  }
+  return false;
+}
+
 auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -810,39 +848,9 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) {
-		case IDCANCEL: {
-		  EndDialog(hwndlg, 0);
-		  return TRUE;
-		}
-		case IDOK: 
-		  handleDaisyIDOK(hwndlg);
-		  EndDialog(hwndlg, 1);
-		  break;
-		case IDC_DAZRST: {
-		  IniFile.dazdef();
-		  UserFlagMap->set(UserFlag::DAZHOL);
-		  UserFlagMap->set(UserFlag::DAZD);
-		  ffi::initdaz(hwndlg);
-		  break;
-		}
-		case IDC_DLIN: {
-		  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
-			CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
-		  }
-		  break;
-		}
-		case IDC_HOLE: {
-		  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) == 0U) {
-			CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
-		  }
-		  break;
-		}
-		default: {
-		  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
-		  break;
-		}
-	  }
+	  if (handleDaisyWMCOMMAND(wparam, hwndlg)) {
+		return TRUE;
+      }
 	  break;
 	}
 	default: {
