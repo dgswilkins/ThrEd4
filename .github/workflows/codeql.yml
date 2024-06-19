@@ -60,11 +60,11 @@ jobs:
       SOLUTION_FILE_PATH: .
     
       # Configuration type to build.
-      BUILD_CONFIGURATION: Release
+      BUILD_CONFIGURATION: Debug
       BUILD_PLATFORM: x64
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}\vcpkg_installed
-      OUT_PATH: ${{ github.workspace }}\x64\Release
+      OUT_PATH: ${{ github.workspace }}\x64\Debug
 
     steps:
     - name: Checkout repository
