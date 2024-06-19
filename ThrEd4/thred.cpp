@@ -221,6 +221,8 @@ void gselrng() noexcept;
 void handleFeatherIDOK(HWND hwndlg);
 auto handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool;
 void handleFeatherWMINITDIALOG(HWND hwndlg);
+auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool;
+auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool;
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
 void handleSizeRestored(HWND p_hWnd);
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
@@ -8334,108 +8336,122 @@ void thi::ritlock(std::vector<WIN32_FIND_DATA> const& fileInfo, HWND hwndlg) noe
   }
 }
 
+auto thi::handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool {
+  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
+  if (lparam != 0U) {
+	// ToDo - investigate C++17 option shown here: https://web.archive.org/web/20220812120940/https://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+	auto*      fileInfo   = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(lparam);
+	auto const searchName = *DefaultDirectory / L"*.thr";
+	auto       result     = WIN32_FIND_DATA {};
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &result);
+	if (searchResult == INVALID_HANDLE_VALUE) {
+	  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
+	  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
+	  return true;
+	}
+	fileInfo->push_back(result);
+
+	while (FindNextFile(searchResult, &result)) {
+	  fileInfo->push_back(result);
+	}
+	ritlock(*fileInfo, hwndlg);
+  }
+  return false;
+}
+
+auto thi::handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool {
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+  auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+  if (fileInfo != nullptr) {
+	constexpr auto NROMASK = BIGDWORD ^ FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
+	auto&          spFileInfo = *fileInfo;
+	switch (LOWORD(wparam)) {
+	  case IDCANCEL: {
+		EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
+		return true;
+	  }
+	  case IDC_LOCKAL: {
+		for (auto& iFile : spFileInfo) {
+		  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+		}
+		ritlock(spFileInfo, hwndlg);
+		break;
+	  }
+	  case IDC_UNLOCKAL: {
+		for (auto& iFile : spFileInfo) {
+		  iFile.dwFileAttributes &= NROMASK;
+		}
+		ritlock(spFileInfo, hwndlg);
+		break;
+	  }
+	  case IDC_LOCK: {
+		auto fileError = 0U;
+		// NOLINTNEXTLINE(readability-qualified-auto)
+		auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
+		for (auto& iFile : spFileInfo) {
+		  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
+			if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0)) {
+			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+			}
+			++fileError;
+		  }
+		}
+		ritlock(spFileInfo, hwndlg);
+		break;
+	  }
+	  case IDC_UNLOCK: {
+		auto fileError = 0U;
+		// NOLINTNEXTLINE(readability-qualified-auto)
+		auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
+		for (auto& iFile : spFileInfo) {
+		  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
+			if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
+			  iFile.dwFileAttributes &= NROMASK;
+			}
+			++fileError;
+		  }
+		}
+		ritlock(spFileInfo, hwndlg);
+		break;
+	  }
+	  case IDOK: {
+		auto fileError = 0U;
+		for (auto& iFile : spFileInfo) {
+		  auto& cFileName = iFile.cFileName;
+		  auto  fileName  = *DefaultDirectory / std::begin(cFileName);
+		  if (!SetFileAttributes(fileName.wstring().c_str(), iFile.dwFileAttributes)) {
+			++fileError;
+		  }
+		}
+		if (fileError != 0U) {
+		  displayText::showMessage(IDS_LOCKNOT, fileError);
+		}
+		EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
+		return true;
+	  }
+	  default: {
+		outDebugString(L"default hit in lockPrc 1: wparam [{}]\n", LOWORD(wparam));
+		break;
+	  }
+	}
+  }
+  return false;
+}
+
 auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   switch (umsg) {
 	case WM_INITDIALOG: {
-	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-	  if (lparam != 0U) {
-		// ToDo - investigate C++17 option shown here: https://web.archive.org/web/20220812120940/https://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-		auto*      fileInfo   = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(lparam);
-		auto const searchName = *DefaultDirectory / L"*.thr";
-		auto       result     = WIN32_FIND_DATA {};
-		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &result);
-		if (searchResult == INVALID_HANDLE_VALUE) {
-		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
-		  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
-		  return TRUE;
-		}
-		fileInfo->push_back(result);
-
-		while (FindNextFile(searchResult, &result)) {
-		  fileInfo->push_back(result);
-		}
-		ritlock(*fileInfo, hwndlg);
+	  if (handleLockWMINITDIALOG(hwndlg, lparam, wparam)) {
+		return TRUE;
 	  }
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
-	  if (fileInfo != nullptr) {
-		constexpr auto NROMASK = BIGDWORD ^ FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
-		auto& spFileInfo = *fileInfo;
-		switch (LOWORD(wparam)) {
-		  case IDCANCEL: {
-			EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
-			return TRUE;
-		  }
-		  case IDC_LOCKAL: {
-			for (auto& iFile : spFileInfo) {
-			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-			}
-			ritlock(spFileInfo, hwndlg);
-			break;
-		  }
-		  case IDC_UNLOCKAL: {
-			for (auto& iFile : spFileInfo) {
-			  iFile.dwFileAttributes &= NROMASK;
-			}
-			ritlock(spFileInfo, hwndlg);
-			break;
-		  }
-		  case IDC_LOCK: {
-			auto fileError = 0U;
-			// NOLINTNEXTLINE(readability-qualified-auto)
-			auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			for (auto& iFile : spFileInfo) {
-			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
-				if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0)) {
-				  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
-				}
-				++fileError;
-			  }
-			}
-			ritlock(spFileInfo, hwndlg);
-			break;
-		  }
-		  case IDC_UNLOCK: {
-			auto fileError = 0U;
-			// NOLINTNEXTLINE(readability-qualified-auto)
-			auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
-			for (auto& iFile : spFileInfo) {
-			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
-				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
-				  iFile.dwFileAttributes &= NROMASK;
-				}
-				++fileError;
-			  }
-			}
-			ritlock(spFileInfo, hwndlg);
-			break;
-		  }
-		  case IDOK: {
-			auto fileError = 0U;
-			for (auto& iFile : spFileInfo) {
-			  auto& cFileName = iFile.cFileName;
-			  auto  fileName  = *DefaultDirectory / std::begin(cFileName);
-			  if (!SetFileAttributes(fileName.wstring().c_str(), iFile.dwFileAttributes)) {
-				++fileError;
-			  }
-			}
-			if (fileError != 0U) {
-			  displayText::showMessage(IDS_LOCKNOT, fileError);
-			}
-			EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
-			return TRUE;
-		  }
-		  default: {
-			outDebugString(L"default hit in lockPrc 1: wparam [{}]\n", LOWORD(wparam));
-			break;
-		  }
-		}
+	  if (handleLockWMCOMMAND(hwndlg, wparam)) {
+		return TRUE;
 	  }
 	  break;
 	}
