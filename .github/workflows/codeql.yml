@@ -115,6 +115,7 @@ jobs:
       with:
         patterns: |
           -**:cpp/poorly-documented-function
+          -**:cpp/commented-out-code
           -**/vcpkg_installed/**
         input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
         output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
