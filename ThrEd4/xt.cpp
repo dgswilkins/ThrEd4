@@ -245,6 +245,8 @@ auto gucon(FRM_HEAD const&            form,
            F_POINT const&             finish,
            uint32_t                   destination,
            uint32_t                   code) -> uint32_t;
+auto handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool;
+void handleSetsWMINITDIALOG(HWND hwndlg);
 auto isfil(FRM_HEAD const& form) noexcept -> bool;
 auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool;
 auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT;
@@ -2385,62 +2387,73 @@ auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
 
+void xi::handleSetsWMINITDIALOG(HWND hwndlg) {
+  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+  setstxt(IDC_DESWID, DesignSize.x, hwndlg);
+  setstxt(IDC_DESHI, DesignSize.y, hwndlg);
+  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap->test(UserFlag::CHREF)));
+}
+
+auto xi::handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
+  switch (LOWORD(wparam)) {
+	case IDCANCEL: {
+	  EndDialog(hwndlg, 0);
+	  return true;
+	}
+	case IDOK: {
+	  DesignSize = F_POINT {getstxt(IDC_DESWID, hwndlg), getstxt(IDC_DESHI, hwndlg)};
+	  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
+		UserFlagMap->set(UserFlag::CHREF);
+	  }
+	  else {
+		UserFlagMap->reset(UserFlag::CHREF);
+	  }
+	  EndDialog(hwndlg, 1);
+	  return true;
+	}
+	case IDC_DESWID: {
+	  if ((wparam >> WRDSHFT) == EN_CHANGE) {
+		StateMap->reset(StateFlag::DESCHG);
+	  }
+	  break;
+	}
+	case IDC_DESHI: {
+	  if ((wparam >> WRDSHFT) == EN_CHANGE) {
+		StateMap->set(StateFlag::DESCHG);
+	  }
+	  break;
+	}
+	case IDC_DUASP: {
+	  auto const designAspectRatio = DesignSize.y / DesignSize.x;
+	  if (auto designSize = F_POINT {}; !chkasp(designSize, designAspectRatio, hwndlg)) {
+		if (StateMap->test(StateFlag::DESCHG)) {
+		  setstxt(IDC_DESWID, designSize.y / designAspectRatio, hwndlg);
+		}
+		else {
+		  setstxt(IDC_DESHI, designSize.x * designAspectRatio, hwndlg);
+		}
+	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in fangfn: wparam [{}]\n", LOWORD(wparam));
+	  break;
+	}
+  }
+  return false;
+}
+
 auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
-	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-	  setstxt(IDC_DESWID, DesignSize.x, hwndlg);
-	  setstxt(IDC_DESHI, DesignSize.y, hwndlg);
-	  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap->test(UserFlag::CHREF)));
+	  handleSetsWMINITDIALOG(hwndlg);
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) {
-		case IDCANCEL: {
-		  EndDialog(hwndlg, 0);
-		  return TRUE;
-		}
-		case IDOK: {
-		  DesignSize = F_POINT {getstxt(IDC_DESWID, hwndlg), getstxt(IDC_DESHI, hwndlg)};
-		  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
-			UserFlagMap->set(UserFlag::CHREF);
-		  }
-		  else {
-			UserFlagMap->reset(UserFlag::CHREF);
-		  }
-		  EndDialog(hwndlg, 1);
-		  return TRUE;
-		}
-		case IDC_DESWID: {
-		  if ((wparam >> WRDSHFT) == EN_CHANGE) {
-			StateMap->reset(StateFlag::DESCHG);
-		  }
-		  break;
-		}
-		case IDC_DESHI: {
-		  if ((wparam >> WRDSHFT) == EN_CHANGE) {
-			StateMap->set(StateFlag::DESCHG);
-		  }
-		  break;
-		}
-		case IDC_DUASP: {
-		  auto const designAspectRatio = DesignSize.y / DesignSize.x;
-		  if (auto designSize = F_POINT {}; !chkasp(designSize, designAspectRatio, hwndlg)) {
-			if (StateMap->test(StateFlag::DESCHG)) {
-			  setstxt(IDC_DESWID, designSize.y / designAspectRatio, hwndlg);
-			}
-			else {
-			  setstxt(IDC_DESHI, designSize.x * designAspectRatio, hwndlg);
-			}
-		  }
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in fangfn: wparam [{}]\n", LOWORD(wparam));
-		  break;
-		}
-	  }
+	  if (handleSetsWMCOMMAND(wparam, hwndlg)) {
+		return TRUE;
+      }
 	  break;
 	}
 	default: {
