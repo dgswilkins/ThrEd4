@@ -403,6 +403,9 @@ auto getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
             std::vector<F_POINT> const& currentFormVertices) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> float;
 auto getLayerPen(uint32_t layer) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> HPEN;
 auto getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uint32_t>;
+auto handleSeq(size_t iSequence, B_SEQ_PNT& bCurrent) -> bool;
+void handleSeqBot(size_t iSequence, B_SEQ_PNT const& bCurrent);
+void handleSeqTop(size_t iSequence, B_SEQ_PNT const& bCurrent);
 void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
 auto insect(FRM_HEAD const&             form,
             std::vector<CLIP_SORT>&     clipIntersectData,
@@ -4868,9 +4871,7 @@ void fi::lcon(FRM_HEAD const&              form,
 #endif
 }
 
-void fi::bakseq() {
-#if BUGSEQ
-#else
+void fi::handleSeqTop(size_t iSequence, B_SEQ_PNT const& bCurrent) {
   constexpr auto RITSIZ = 6;
 
   static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
@@ -4882,6 +4883,145 @@ void fi::bakseq() {
       17,
   };
 
+  auto const& bNext     = BSequence->operator[](iSequence + 1U);
+  auto const& bPrevious = BSequence->operator[](iSequence - 1U);
+  auto        delta     = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+  auto const& form      = FormList->operator[](ClosestFormToCursor);
+  auto const  rcnt      = iSequence % SEQ_TABLE.size();
+  auto        slope     = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
+
+  auto const stitchSpacing2    = LineSpacing * 2;
+  auto const userStitchLength9 = UserStitchLength / MAXSIZ;
+
+  auto const rit = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+
+  if (delta.y != 0.0F) {
+	slope = delta.x / delta.y;
+  }
+  if ((form.extendedAttribute & AT_SQR) != 0U) {
+	if (StateMap->testAndFlip(StateFlag::FILDIR)) {
+	  OSequence->emplace_back(bPrevious.x, bPrevious.y);
+	  auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
+	              wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+	  while (true) {
+		OSequence->emplace_back(0.0F, yVal);
+		if (yVal > bCurrent.y) {
+		  break;
+		}
+		OSequence->back().x = bCurrent.x;
+		yVal += UserStitchLength;
+	  }
+	  OSequence->back() = bCurrent;
+	  return;
+	}
+	OSequence->emplace_back(bCurrent.x, bCurrent.y);
+	auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
+	            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+	while (true) {
+	  OSequence->emplace_back(0.0F, yVal);
+	  if (yVal < bPrevious.y) {
+		break;
+	  }
+	  OSequence->back().x = bCurrent.x;
+	  yVal -= UserStitchLength;
+	}
+	OSequence->back() = bPrevious;
+	return;
+  }
+  auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
+              wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+  while (true) {
+	OSequence->emplace_back(0.0F, yVal);
+	if (yVal > bCurrent.y) {
+	  break;
+	}
+	delta.y             = OSequence->back().y - bNext.y;
+	delta.x             = slope * delta.y;
+	OSequence->back().x = bNext.x + delta.x;
+	yVal += UserStitchLength;
+  }
+  OSequence->back() = bCurrent;
+}
+
+void fi::handleSeqBot(size_t iSequence, B_SEQ_PNT const& bCurrent) {
+  constexpr auto RITSIZ = 6;
+
+  static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
+      12,
+      7,
+      15,
+      11,
+      13,
+      17,
+  };
+
+  auto const& bNext = BSequence->operator[](iSequence + 1U);
+  auto        delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+  auto const& form  = FormList->operator[](ClosestFormToCursor);
+  auto const  rcnt  = iSequence % SEQ_TABLE.size();
+  auto        slope = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
+
+  auto const stitchSpacing2    = LineSpacing * 2;
+  auto const userStitchLength9 = UserStitchLength / MAXSIZ;
+
+  auto const rit = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+
+  if (delta.y != 0.0F) {
+	slope = delta.x / delta.y;
+  }
+  if ((form.extendedAttribute & AT_SQR) != 0U) {
+	return;
+  }
+  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
+              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
+  while (true) {
+	OSequence->emplace_back(0.0F, yVal);
+	if (yVal < bCurrent.y) {
+	  break;
+	}
+	delta.y             = OSequence->back().y - bNext.y;
+	delta.x             = slope * delta.y;
+	OSequence->back().x = bNext.x + delta.x;
+	yVal -= UserStitchLength;
+  }
+  OSequence->back() = bCurrent;
+}
+
+auto fi::handleSeq(size_t iSequence, B_SEQ_PNT& bCurrent) -> bool {
+  auto const& bNext = BSequence->operator[](iSequence + 1U);
+  auto const  delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+
+  StateMap->reset(StateFlag::FILDIR);
+  auto const length = std::hypot(delta.x, delta.y);
+  if (length == 0.0F) {
+	OSequence->emplace_back(bCurrent.x, bCurrent.y);
+	return true;
+  }
+  auto const userStitchLength2 = UserStitchLength * 2.0F;
+  if (length <= userStitchLength2) {
+	OSequence->emplace_back(bCurrent.x, bCurrent.y);
+	return true;
+  }
+  auto point = bNext; // intended copy
+  auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
+  if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
+	return false;
+  }
+  auto const fCount = wrap::toFloat(count);
+  auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
+  while (count != 0U) {
+	point.x += step.x;
+	point.y += step.y;
+	OSequence->emplace_back(point.x, point.y);
+	--count;
+  }
+  OSequence->emplace_back(bCurrent.x, bCurrent.y);
+  return true;
+}
+
+void fi::bakseq() {
+#if BUGSEQ
+#else
 #if BUGBAK
 
   for (auto val : *BSequence) {
@@ -4901,114 +5041,18 @@ void fi::bakseq() {
 	--iSequence;
   }
   while (iSequence > 0) {
-	// clang-format off
-	auto const  rcnt           = iSequence % SEQ_TABLE.size();
-	auto const  stitchSpacing2 = LineSpacing * 2;
-	auto const  rit            = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
-	auto const& bPrevious      = BSequence->operator[](iSequence - 1U);
-	auto&       bCurrent       = BSequence->operator[](iSequence);
-	auto const& bNext          = BSequence->operator[](iSequence + 1U);
-	auto        delta          = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
-	auto        slope          = BIGFLOAT; // initialize to the max value i.e. slope when y is zero
-	// clang-format on
-	if (delta.y != 0.0F) {
-	  slope = delta.x / delta.y;
-	}
-	auto const  userStitchLength9 = UserStitchLength / MAXSIZ;
-	auto const& form              = FormList->operator[](ClosestFormToCursor);
+	auto& bCurrent = BSequence->operator[](iSequence);
 	switch (bCurrent.attribute) {
-	  case SEQTOP: {
-		if ((form.extendedAttribute & AT_SQR) != 0U) {
-		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			OSequence->emplace_back(bPrevious.x, bPrevious.y);
-			auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
-			            wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-			while (true) {
-			  OSequence->emplace_back(0.0F, yVal);
-			  if (yVal > bCurrent.y) {
-				break;
-			  }
-			  OSequence->back().x = bCurrent.x;
-			  yVal += UserStitchLength;
-			}
-			OSequence->back() = bCurrent;
-			break;
-		  }
-		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
-		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-		  while (true) {
-			OSequence->emplace_back(0.0F, yVal);
-			if (yVal < bPrevious.y) {
-			  break;
-			}
-			OSequence->back().x = bCurrent.x;
-			yVal -= UserStitchLength;
-		  }
-		  OSequence->back() = bPrevious;
-		  break;
-		}
-		auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
-		            wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-		while (true) {
-		  OSequence->emplace_back(0.0F, yVal);
-		  if (yVal > bCurrent.y) {
-			break;
-		  }
-		  delta.y             = OSequence->back().y - bNext.y;
-		  delta.x             = slope * delta.y;
-		  OSequence->back().x = bNext.x + delta.x;
-		  yVal += UserStitchLength;
-		}
-		OSequence->back() = bCurrent;
+	  case SEQTOP:
+		fi::handleSeqTop(iSequence, bCurrent);
 		break;
-	  }
-	  case SEQBOT: {
-		if ((form.extendedAttribute & AT_SQR) != 0U) {
-		  break;
-		}
-		auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
-		            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9;
-		while (true) {
-		  OSequence->emplace_back(0.0F, yVal);
-		  if (yVal < bCurrent.y) {
-			break;
-		  }
-		  delta.y             = OSequence->back().y - bNext.y;
-		  delta.x             = slope * delta.y;
-		  OSequence->back().x = bNext.x + delta.x;
-		  yVal -= UserStitchLength;
-		}
-		OSequence->back() = bCurrent;
+	  case SEQBOT:
+		fi::handleSeqBot(iSequence, bCurrent);
 		break;
-	  }
 	  case 0: {
-		delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
-		StateMap->reset(StateFlag::FILDIR);
-		auto const length = std::hypot(delta.x, delta.y);
-		if (length == 0.0F) {
-		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-		  break;
-		}
-		auto const userStitchLength2 = UserStitchLength * 2.0F;
-		if (length <= userStitchLength2) {
-		  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-		  break;
-		}
-		auto point = bNext; // intended copy
-		auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
-		if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
+		if (!fi::handleSeq(iSequence, bCurrent)) {
 		  return;
 		}
-		auto const fCount = wrap::toFloat(count);
-		auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
-		while (count != 0U) {
-		  point.x += step.x;
-		  point.y += step.y;
-		  OSequence->emplace_back(point.x, point.y);
-		  --count;
-		}
-		OSequence->emplace_back(bCurrent.x, bCurrent.y);
 		break;
 	  }
 	  default: {
