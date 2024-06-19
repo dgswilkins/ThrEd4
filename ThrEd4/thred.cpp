@@ -219,6 +219,13 @@ auto getMaxCount() -> uint32_t;
 auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
 void gselrng() noexcept;
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
+void handleSizeRestored(HWND p_hWnd);
+auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
+auto handleWndProcWMHSCROLL(WPARAM const& wParam, float LINSCROL, LPARAM lParam) -> bool;
+void handleWndProcWMINITMENU();
+void handleWndProcWMMOVE(HWND p_hWnd);
+void handleWndProcWMSIZE(HWND p_hWnd, WPARAM& wParam);
+auto handleWndProcWMVSCROLL(WPARAM const& wParam, float LINSCROL) -> bool;
 void hidwnd(HWND hwnd) noexcept;
 void infadj(float& xCoordinate, float& yCoordinate) noexcept;
 void createBrushes() noexcept;
@@ -11720,6 +11727,445 @@ struct createParams {
   BOOL bEnableNonClientDpiScaling;
 };
 
+void thi::handleSizeRestored(HWND p_hWnd) {
+  UserFlagMap->reset(UserFlag::SAVMAX);
+  chkirct();
+  if (StateMap->testAndSet(StateFlag::SIZED)) {
+	auto       screenCenterOffset = LONG {};
+	auto const maxWindowDimension = SIZE {ScreenSizePixels.cx - 30, ScreenSizePixels.cy - 30};
+	if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
+	  screenCenterOffset    = (ScreenSizePixels.cx - maxWindowDimension.cx) / 2;
+	  ThredWindowRect.left  = screenCenterOffset;
+	  ThredWindowRect.right = ScreenSizePixels.cx - screenCenterOffset;
+	}
+	if ((ThredWindowRect.bottom - ThredWindowRect.top) > maxWindowDimension.cy) {
+	  screenCenterOffset     = (ScreenSizePixels.cy - maxWindowDimension.cy) / 2;
+	  ThredWindowRect.top    = screenCenterOffset;
+	  ThredWindowRect.bottom = ScreenSizePixels.cy - screenCenterOffset;
+	}
+	if (screenCenterOffset != 0) {
+	  MoveWindow(p_hWnd,
+	             ThredWindowRect.left,
+	             ThredWindowRect.top,
+	             ThredWindowRect.right - ThredWindowRect.left,
+	             ThredWindowRect.bottom - ThredWindowRect.top,
+	             TRUE);
+	}
+  }
+  else {
+	MoveWindow(p_hWnd,
+	           IniFile.initialWindowCoords.left,
+	           IniFile.initialWindowCoords.top,
+	           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
+	           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
+	           TRUE);
+  }
+  ShowWindow(p_hWnd, SW_SHOW);
+}
+
+void thi::handleWndProcWMSIZE(HWND p_hWnd, WPARAM& wParam) {
+  GetClientRect(p_hWnd, &ThredWindowRect);
+  switch (wParam) {
+	case SIZE_MAXIMIZED: {
+	  UserFlagMap->set(UserFlag::SAVMAX);
+	  break;
+	}
+	case SIZE_MINIMIZED: {
+	  UserFlagMap->reset(UserFlag::SAVMAX);
+	  break;
+	}
+	case SIZE_RESTORED: {
+	  handleSizeRestored(p_hWnd);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in wndProc 3: wParam [{}]\n", wParam);
+	  break;
+	}
+  }
+  GetClientRect(p_hWnd, &ThredWindowRect);
+  thred::movStch();
+  if (StateMap->test(StateFlag::ZUMED)) {
+	auto const bRatio = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+	auto const adjustedWidth = wrap::toFloat(StitchWindowClientRect.right) / bRatio;
+	auto const unzoomedX     = wrap::toFloat(UnzoomedRect.cx);
+	if (adjustedWidth + ZoomRect.left > unzoomedX) {
+	  ZoomRect.right = unzoomedX;
+	  ZoomRect.left  = unzoomedX - adjustedWidth;
+	}
+	else {
+	  ZoomRect.right = adjustedWidth + ZoomRect.left;
+	}
+  }
+  else {
+	ZoomRect =
+	    F_RECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.cy), gsl::narrow<float>(UnzoomedRect.cx), 0.0F};
+  }
+  NearestCount = 0;
+  StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::SELBOX)) {
+	shft2box();
+  }
+  if (StateMap->test(StateFlag::RUNPAT)) {
+	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
+	if (StateMap->test(StateFlag::ZUMED)) {
+	  RunPoint = GroupStartStitch;
+	}
+	else {
+	  RunPoint = 0;
+	}
+  }
+}
+
+void thi::handleWndProcWMMOVE(HWND p_hWnd) {
+  GetClientRect(p_hWnd, &ThredWindowRect);
+  constexpr auto SMALLWIN  = LONG {20};  // Smallest ThrEd window dimension
+  constexpr auto DEFWINDIM = LONG {300}; // default small Thred window dimension
+  if ((ThredWindowRect.right - ThredWindowRect.left) < SMALLWIN) {
+	ThredWindowRect.left  = 0;
+	ThredWindowRect.right = DEFWINDIM;
+  }
+  if ((ThredWindowRect.bottom - ThredWindowRect.top) < SMALLWIN) {
+	ThredWindowRect.top    = 0;
+	ThredWindowRect.bottom = DEFWINDIM;
+  }
+  thred::movStch();
+  if (StateMap->test(StateFlag::RUNPAT)) {
+	thred::duzrat();
+	RunPoint = 0;
+	FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
+  }
+}
+
+auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
+// owner draw windows
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
+	if (StateMap->test(StateFlag::TXTRED)) {
+	  texture::drwtxtr();
+	  return true;
+	}
+	if (!StateMap->test(StateFlag::RUNPAT)) {
+	  if (!StateMap->test(StateFlag::HIDSTCH) &&
+	      ((!ThrName->empty()) || StateMap->test(StateFlag::INIT) || !FormList->empty() ||
+	       StateMap->test(StateFlag::SATPNT)) &&
+	      !StateMap->test(StateFlag::BAKSHO)) {
+		drwStch();
+	  }
+	  else {
+		thi::drawBackground();
+		if (StateMap->test(StateFlag::HIDSTCH)) {
+		  form::drwfrm();
+		  if (StateMap->test(StateFlag::SATPNT)) {
+			satin::satzum();
+		  }
+		}
+		if (StateMap->test(StateFlag::PRFACT)) {
+		  thred::redraw(PreferencesWindow);
+		}
+		else {
+		  if (StateMap->test(StateFlag::MOVFRM)) {
+			form::unfrm();
+			StateMap->set(StateFlag::SHOFRM);
+			form::dufrm();
+		  }
+		  if (StateMap->test(StateFlag::POLIMOV)) {
+			StateMap->set(StateFlag::SHOFRM);
+			form::mdufrm();
+		  }
+		}
+	  }
+	  BitBlt(StitchWindowDC,                // handle to destination DC
+	         0,                             // x-coord of destination upper-left corner
+	         0,                             // y-coord of destination upper-left corner
+	         StitchWindowClientRect.right,  // width of destination rectangle
+	         StitchWindowClientRect.bottom, // height of destination rectangle
+	         StitchWindowMemDC,             // handle to source DC
+	         0,                             // x-coordinate of source upper-left corner
+	         0,                             // y-coordinate of source upper-left corner
+	         SRCCOPY                        // raster operation code
+	  );
+	  if (FormDataSheet != nullptr) {
+		thred::redraw(FormDataSheet);
+	  }
+	  if (StateMap->test(StateFlag::ROTSHO)) {
+		durot();
+	  }
+	  if (StateMap->test(StateFlag::SHOSAT)) {
+		satin::dusat();
+	  }
+	  if (StateMap->test(StateFlag::SHOINSF)) {
+		form::duinsf();
+	  }
+	}
+	return true;
+  }
+  if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
+	if (!StitchBuffer->empty()) {
+	  dubar();
+	}
+	else {
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
+	}
+	return true;
+  }
+  if (!ButtonWin->empty() && DrawItem->hwndItem == ButtonWin->operator[](HHID) &&
+      DrawItem->itemAction == ODA_DRAWENTIRE) {
+	auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
+	if (StateMap->test(StateFlag::HID)) {
+	  auto const ucb         = wrap::next(UserColorBrush.begin(), ActiveColor);
+	  auto const itUserColor = wrap::next(UserColor.begin(), ActiveColor);
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
+	  SetBkColor(DrawItem->hDC, *itUserColor);
+	}
+	else {
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
+	}
+	if (StateMap->test(StateFlag::TXTRED)) {
+	  texture::writeScreenWidth(position);
+	}
+	else {
+	  auto const pikol = displayText::loadStr(IDS_PIKOL);
+	  wrap::textOut(DrawItem->hDC, position, 1, pikol.c_str(), wrap::toUnsigned(pikol.size()));
+	}
+	return true;
+  }
+  if (StateMap->test(StateFlag::WASTRAC)) {
+	trace::wasTrace();
+	return true;
+  }
+  auto dcb = DefaultColorBrush.begin();
+  auto ucb = UserColorBrush.begin();
+  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
+	if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
+	  if (DisplayedColorBitmap.test(iColor)) {
+		SetBkColor(DrawItem->hDC, DEFAULT_COLORS.at(iColor));
+		SetTextColor(DrawItem->hDC, defTxt(iColor));
+		auto const colorNum = fmt::format(FMT_COMPILE(L"{}"), iColor + 1U);
+		auto       textSize = SIZE {};
+		wrap::getTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
+		wrap::textOut(DrawItem->hDC,
+		              (ButtonWidth - textSize.cx) / 2,
+		              0,
+		              colorNum.c_str(),
+		              wrap::toUnsigned(colorNum.size()));
+	  }
+	  return true;
+	}
+	if (DrawItem->hwndItem == UserColorWin->operator[](iColor)) {
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
+	  if (iColor == ActiveColor) {
+		SelectObject(DrawItem->hDC, CrossPen);
+		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
+		auto line = std::array<POINT, 2> {};
+		line[0]   = POINT {DrawItem->rcItem.right / 2, 0};
+		line[1]   = POINT {DrawItem->rcItem.right / 2, DrawItem->rcItem.bottom};
+		wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
+		line[0] = POINT {0, DrawItem->rcItem.bottom / 2};
+		line[1] = POINT {DrawItem->rcItem.right, DrawItem->rcItem.bottom / 2};
+		wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
+		SetROP2(StitchWindowMemDC, R2_COPYPEN);
+	  }
+	  return true;
+	}
+	++dcb;
+	++ucb;
+  }
+  if (StateMap->test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
+	if (StateMap->test(StateFlag::THUMSHO)) {
+	  auto itHWndBV = BackupViewer.begin();
+	  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
+		if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
+		  ritbak(Thumbnails->operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
+		  rthumnam(iThumb);
+		  return true;
+		}
+		++itHWndBV;
+	  }
+	}
+	else {
+	  auto itHWndBV = BackupViewer.begin();
+	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
+		if (DrawItem->hwndItem == *itHWndBV) {
+		  auto fileName = *ThrName; // intentional copy
+		  auto ext      = fileName.extension().wstring();
+		  ext.back()    = iVersion + 's';
+		  fileName.replace_extension(ext);
+		  ritbak(fileName, *DrawItem);
+		  return true;
+		}
+		++itHWndBV;
+	  }
+	}
+  }
+  return false;
+}
+
+auto thi::handleWndProcWMVSCROLL(WPARAM const& wParam, float LINSCROL) -> bool {
+  switch (LOWORD(wParam)) {
+	case SB_LINEDOWN: {
+	  auto scrollPoint = POINT {};
+	  scrollPoint.y    = std::lround((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
+	  if (scrollPoint.y == 0) {
+		scrollPoint.y = 1;
+	  }
+	  rshft(scrollPoint);
+	  return true;
+	}
+	case SB_LINEUP: {
+	  auto scrollPoint = POINT {};
+	  scrollPoint.y    = std::lround(-(ZoomRect.top - ZoomRect.bottom) * LINSCROL);
+	  if (scrollPoint.y == 0) {
+		scrollPoint.y = -1;
+	  }
+	  rshft(scrollPoint);
+	  return true;
+	}
+	case SB_PAGEDOWN: {
+	  thred::pgdwn();
+	  return true;
+	}
+	case SB_PAGEUP: {
+	  thred::pgup();
+	  return true;
+	}
+	case SB_THUMBPOSITION: {
+	  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
+
+	  ZoomRect.top    = wrap::toFloat(UnzoomedRect.cy) - wrap::toFloat(HIWORD(wParam));
+	  ZoomRect.bottom = ZoomRect.top - zoomHeight;
+	  if (ZoomRect.bottom < 0) {
+		ZoomRect.bottom = 0.0F;
+		ZoomRect.top    = zoomHeight;
+	  }
+	  StateMap->set(StateFlag::RESTCH);
+	  return true;
+	}
+	default: {
+	  outDebugString(L"default hit in wndProc 2: wParam [{}]\n", LOWORD(wParam));
+	  break;
+	}
+  }
+  return false;
+}
+
+auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float LINSCROL, LPARAM lParam) -> bool {
+  constexpr auto SPEDLIN = int32_t {30};  // speed change for line message on speed scroll bar
+  constexpr auto SPEDPAG = int32_t {120}; // speed change for page message on speed scroll bar
+  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
+	case SB_LINELEFT: {
+	  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
+		MovieTimeStep += SPEDLIN;
+		if (MovieTimeStep > MAXDELAY) {
+		  MovieTimeStep = MAXDELAY;
+		}
+		setsped();
+		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+	  }
+	  else {
+		auto scrollPoint = POINT {}; // for scroll bar functions
+		scrollPoint.x    = std::lround((ZoomRect.right - ZoomRect.left) * LINSCROL);
+		if (scrollPoint.x == 0) {
+		  scrollPoint.x = 1;
+		}
+		rshft(scrollPoint);
+	  }
+	  return true;
+	}
+	case SB_LINERIGHT: {
+	  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
+		MovieTimeStep -= SPEDLIN;
+		if (MovieTimeStep < MINDELAY) {
+		  MovieTimeStep = MINDELAY;
+		}
+		setsped();
+		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+	  }
+	  else {
+		auto scrollPoint = POINT {}; // for scroll bar functions
+		scrollPoint.x    = std::lround(-(ZoomRect.right - ZoomRect.left) * LINSCROL);
+		if (scrollPoint.x == 0) {
+		  scrollPoint.x = -1;
+		}
+		rshft(scrollPoint);
+	  }
+	  return true;
+	}
+	case SB_PAGELEFT: {
+	  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
+		MovieTimeStep += SPEDPAG;
+		if (MovieTimeStep < MINDELAY) {
+		  MovieTimeStep = MINDELAY;
+		}
+		setsped();
+		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+	  }
+	  else {
+		thred::pglft();
+	  }
+	  return true;
+	}
+	case SB_PAGERIGHT: {
+	  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
+		MovieTimeStep -= SPEDPAG;
+		if (MovieTimeStep < MINDELAY) {
+		  MovieTimeStep = MINDELAY;
+		}
+		setsped();
+		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
+	  }
+	  else {
+		thred::pgrit();
+	  }
+	  return true;
+	}
+	case SB_THUMBPOSITION: {
+	  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+		if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
+		  auto const position = HIWORD(wParam);
+		  MovieTimeStep       = MAXDELAY - position;
+		  setsped();
+		  SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
+		}
+	  }
+	  else {
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+		if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
+		  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
+		  ZoomRect.left        = wrap::toFloat(HIWORD(wParam));
+		  ZoomRect.right       = ZoomRect.left + zoomWidth;
+		  auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
+		  if (ZoomRect.right > unzoomedX) {
+			ZoomRect.right = unzoomedX;
+			ZoomRect.left  = unzoomedX - zoomWidth;
+		  }
+		  StateMap->set(StateFlag::RESTCH);
+		}
+	  }
+	  return true;
+	}
+	default: {
+	  outDebugString(L"default hit in wndProc 1: wParam [{}]\n", LOWORD(wParam));
+	  break;
+	}
+  }
+  return false;
+}
+
+void thi::handleWndProcWMINITMENU() {
+  if (StateMap->testAndReset(StateFlag::PRFACT)) {
+	DestroyWindow(PreferencesWindow);
+	StateMap->reset(StateFlag::WASRT);
+  }
+  thred::unmsg();
+  thred::undat();
+  StateMap->reset(StateFlag::FORMIN);
+  StateMap->set(StateFlag::RESTCH);
+}
+
 auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
   switch (constexpr auto LINSCROL = 0.05F; message) { // LINSCROL is the line scroll factor
 #if HIGHDPI
@@ -11742,436 +12188,33 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	  break;
 	}
 	case WM_INITMENU: {
-	  if (StateMap->testAndReset(StateFlag::PRFACT)) {
-		DestroyWindow(PreferencesWindow);
-		StateMap->reset(StateFlag::WASRT);
-	  }
-	  thred::unmsg();
-	  thred::undat();
-	  StateMap->reset(StateFlag::FORMIN);
-	  StateMap->set(StateFlag::RESTCH);
+	  handleWndProcWMINITMENU();
 	  break;
 	}
 	case WM_HSCROLL: {
-	  constexpr auto SPEDLIN = int32_t {30};  // speed change for line message on speed scroll bar
-	  constexpr auto SPEDPAG = int32_t {120}; // speed change for page message on speed scroll bar
-	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
-		case SB_LINELEFT: {
-		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-			MovieTimeStep += SPEDLIN;
-			if (MovieTimeStep > MAXDELAY) {
-			  MovieTimeStep = MAXDELAY;
-			}
-			setsped();
-			SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-		  }
-		  else {
-			auto scrollPoint = POINT {}; // for scroll bar functions
-			scrollPoint.x    = std::lround((ZoomRect.right - ZoomRect.left) * LINSCROL);
-			if (scrollPoint.x == 0) {
-			  scrollPoint.x = 1;
-			}
-			rshft(scrollPoint);
-		  }
-		  return 1;
-		}
-		case SB_LINERIGHT: {
-		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-			MovieTimeStep -= SPEDLIN;
-			if (MovieTimeStep < MINDELAY) {
-			  MovieTimeStep = MINDELAY;
-			}
-			setsped();
-			SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-		  }
-		  else {
-			auto scrollPoint = POINT {}; // for scroll bar functions
-			scrollPoint.x    = std::lround(-(ZoomRect.right - ZoomRect.left) * LINSCROL);
-			if (scrollPoint.x == 0) {
-			  scrollPoint.x = -1;
-			}
-			rshft(scrollPoint);
-		  }
-		  return 1;
-		}
-		case SB_PAGELEFT: {
-		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-			MovieTimeStep += SPEDPAG;
-			if (MovieTimeStep < MINDELAY) {
-			  MovieTimeStep = MINDELAY;
-			}
-			setsped();
-			SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-		  }
-		  else {
-			thred::pglft();
-		  }
-		  return 1;
-		}
-		case SB_PAGERIGHT: {
-		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-			MovieTimeStep -= SPEDPAG;
-			if (MovieTimeStep < MINDELAY) {
-			  MovieTimeStep = MINDELAY;
-			}
-			setsped();
-			SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
-		  }
-		  else {
-			thred::pgrit();
-		  }
-		  return 1;
-		}
-		case SB_THUMBPOSITION: {
-		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
-			  auto const position = HIWORD(wParam);
-			  MovieTimeStep       = MAXDELAY - position;
-			  setsped();
-			  SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
-			}
-		  }
-		  else {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
-			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
-			  ZoomRect.left        = wrap::toFloat(HIWORD(wParam));
-			  ZoomRect.right       = ZoomRect.left + zoomWidth;
-			  auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
-			  if (ZoomRect.right > unzoomedX) {
-				ZoomRect.right = unzoomedX;
-				ZoomRect.left  = unzoomedX - zoomWidth;
-			  }
-			  StateMap->set(StateFlag::RESTCH);
-			}
-		  }
-		  return 1;
-		}
-		default: {
-		  outDebugString(L"default hit in wndProc 1: wParam [{}]\n", LOWORD(wParam));
-		  break;
-		}
+	  if (handleWndProcWMHSCROLL(wParam, LINSCROL, lParam)) {
+		return 1;
 	  }
 	  break;
 	}
 	case WM_VSCROLL: {
-	  switch (LOWORD(wParam)) {
-		case SB_LINEDOWN: {
-		  auto scrollPoint = POINT {};
-		  scrollPoint.y    = std::lround((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
-		  if (scrollPoint.y == 0) {
-			scrollPoint.y = 1;
-		  }
-		  rshft(scrollPoint);
-		  return 1;
-		}
-		case SB_LINEUP: {
-		  auto scrollPoint = POINT {};
-		  scrollPoint.y    = std::lround(-(ZoomRect.top - ZoomRect.bottom) * LINSCROL);
-		  if (scrollPoint.y == 0) {
-			scrollPoint.y = -1;
-		  }
-		  rshft(scrollPoint);
-		  return 1;
-		}
-		case SB_PAGEDOWN: {
-		  thred::pgdwn();
-		  return 1;
-		}
-		case SB_PAGEUP: {
-		  thred::pgup();
-		  return 1;
-		}
-		case SB_THUMBPOSITION: {
-		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
-
-		  ZoomRect.top    = wrap::toFloat(UnzoomedRect.cy) - wrap::toFloat(HIWORD(wParam));
-		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
-		  if (ZoomRect.bottom < 0) {
-			ZoomRect.bottom = 0.0F;
-			ZoomRect.top    = zoomHeight;
-		  }
-		  StateMap->set(StateFlag::RESTCH);
-		  return 1;
-		}
-		default: {
-		  outDebugString(L"default hit in wndProc 2: wParam [{}]\n", LOWORD(wParam));
-		  break;
-		}
+	  if (handleWndProcWMVSCROLL(wParam, LINSCROL)) {
+		return 1;
 	  }
 	  break;
 	}
 	case WM_DRAWITEM: {
-// owner draw windows
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-	  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
-		if (StateMap->test(StateFlag::TXTRED)) {
-		  texture::drwtxtr();
-		  return 1;
-		}
-		if (!StateMap->test(StateFlag::RUNPAT)) {
-		  if (!StateMap->test(StateFlag::HIDSTCH) &&
-		      ((!ThrName->empty()) || StateMap->test(StateFlag::INIT) || !FormList->empty() ||
-		       StateMap->test(StateFlag::SATPNT)) &&
-		      !StateMap->test(StateFlag::BAKSHO)) {
-			drwStch();
-		  }
-		  else {
-			thi::drawBackground();
-			if (StateMap->test(StateFlag::HIDSTCH)) {
-			  form::drwfrm();
-			  if (StateMap->test(StateFlag::SATPNT)) {
-				satin::satzum();
-			  }
-			}
-			if (StateMap->test(StateFlag::PRFACT)) {
-			  thred::redraw(PreferencesWindow);
-			}
-			else {
-			  if (StateMap->test(StateFlag::MOVFRM)) {
-				form::unfrm();
-				StateMap->set(StateFlag::SHOFRM);
-				form::dufrm();
-			  }
-			  if (StateMap->test(StateFlag::POLIMOV)) {
-				StateMap->set(StateFlag::SHOFRM);
-				form::mdufrm();
-			  }
-			}
-		  }
-		  BitBlt(StitchWindowDC,                // handle to destination DC
-		         0,                             // x-coord of destination upper-left corner
-		         0,                             // y-coord of destination upper-left corner
-		         StitchWindowClientRect.right,  // width of destination rectangle
-		         StitchWindowClientRect.bottom, // height of destination rectangle
-		         StitchWindowMemDC,             // handle to source DC
-		         0,                             // x-coordinate of source upper-left corner
-		         0,                             // y-coordinate of source upper-left corner
-		         SRCCOPY                        // raster operation code
-		  );
-		  if (FormDataSheet != nullptr) {
-			thred::redraw(FormDataSheet);
-		  }
-		  if (StateMap->test(StateFlag::ROTSHO)) {
-			durot();
-		  }
-		  if (StateMap->test(StateFlag::SHOSAT)) {
-			satin::dusat();
-		  }
-		  if (StateMap->test(StateFlag::SHOINSF)) {
-			form::duinsf();
-		  }
-		}
+	  if (handleWndProcWMDRAWITEM(lParam)) {
 		return 1;
-	  }
-	  if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
-		if (!StitchBuffer->empty()) {
-		  dubar();
-		}
-		else {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
-		}
-		return 1;
-	  }
-	  if (!ButtonWin->empty() && DrawItem->hwndItem == ButtonWin->operator[](HHID) &&
-	      DrawItem->itemAction == ODA_DRAWENTIRE) {
-		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
-		if (StateMap->test(StateFlag::HID)) {
-		  auto const ucb         = wrap::next(UserColorBrush.begin(), ActiveColor);
-		  auto const itUserColor = wrap::next(UserColor.begin(), ActiveColor);
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
-		  SetBkColor(DrawItem->hDC, *itUserColor);
-		}
-		else {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
-		}
-		if (StateMap->test(StateFlag::TXTRED)) {
-		  texture::writeScreenWidth(position);
-		}
-		else {
-		  auto const pikol = displayText::loadStr(IDS_PIKOL);
-		  wrap::textOut(DrawItem->hDC, position, 1, pikol.c_str(), wrap::toUnsigned(pikol.size()));
-		}
-		return 1;
-	  }
-	  if (StateMap->test(StateFlag::WASTRAC)) {
-		trace::wasTrace();
-		return 1;
-	  }
-	  auto dcb = DefaultColorBrush.begin();
-	  auto ucb = UserColorBrush.begin();
-	  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-		if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
-		  if (DisplayedColorBitmap.test(iColor)) {
-			SetBkColor(DrawItem->hDC, DEFAULT_COLORS.at(iColor));
-			SetTextColor(DrawItem->hDC, defTxt(iColor));
-			auto const colorNum = fmt::format(FMT_COMPILE(L"{}"), iColor + 1U);
-			auto       textSize = SIZE {};
-			wrap::getTextExtentPoint32(
-			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
-			wrap::textOut(DrawItem->hDC,
-			              (ButtonWidth - textSize.cx) / 2,
-			              0,
-			              colorNum.c_str(),
-			              wrap::toUnsigned(colorNum.size()));
-		  }
-		  return 1;
-		}
-		if (DrawItem->hwndItem == UserColorWin->operator[](iColor)) {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
-		  if (iColor == ActiveColor) {
-			SelectObject(DrawItem->hDC, CrossPen);
-			SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-			auto line = std::array<POINT, 2> {};
-			line[0]   = POINT {DrawItem->rcItem.right / 2, 0};
-			line[1]   = POINT {DrawItem->rcItem.right / 2, DrawItem->rcItem.bottom};
-			wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
-			line[0] = POINT {0, DrawItem->rcItem.bottom / 2};
-			line[1] = POINT {DrawItem->rcItem.right, DrawItem->rcItem.bottom / 2};
-			wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
-			SetROP2(StitchWindowMemDC, R2_COPYPEN);
-		  }
-		  return 1;
-		}
-		++dcb;
-		++ucb;
-	  }
-	  if (StateMap->test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
-		if (StateMap->test(StateFlag::THUMSHO)) {
-		  auto itHWndBV = BackupViewer.begin();
-		  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
-			if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
-			  ritbak(Thumbnails->operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
-			  rthumnam(iThumb);
-			  return 1;
-			}
-			++itHWndBV;
-		  }
-		}
-		else {
-		  auto itHWndBV = BackupViewer.begin();
-		  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-			if (DrawItem->hwndItem == *itHWndBV) {
-			  auto fileName = *ThrName; // intentional copy
-			  auto ext      = fileName.extension().wstring();
-			  ext.back()    = iVersion + 's';
-			  fileName.replace_extension(ext);
-			  ritbak(fileName, *DrawItem);
-			  return 1;
-			}
-			++itHWndBV;
-		  }
-		}
-	  }
+      }
 	  break;
 	}
 	case WM_SIZE: {
-	  GetClientRect(p_hWnd, &ThredWindowRect);
-	  switch (wParam) {
-		case SIZE_MAXIMIZED: {
-		  UserFlagMap->set(UserFlag::SAVMAX);
-		  break;
-		}
-		case SIZE_MINIMIZED: {
-		  UserFlagMap->reset(UserFlag::SAVMAX);
-		  break;
-		}
-		case SIZE_RESTORED: {
-		  UserFlagMap->reset(UserFlag::SAVMAX);
-		  chkirct();
-		  if (StateMap->testAndSet(StateFlag::SIZED)) {
-			auto screenCenterOffset = LONG {};
-			auto const maxWindowDimension = SIZE {ScreenSizePixels.cx - 30, ScreenSizePixels.cy - 30};
-			if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
-			  screenCenterOffset    = (ScreenSizePixels.cx - maxWindowDimension.cx) / 2;
-			  ThredWindowRect.left  = screenCenterOffset;
-			  ThredWindowRect.right = ScreenSizePixels.cx - screenCenterOffset;
-			}
-			if ((ThredWindowRect.bottom - ThredWindowRect.top) > maxWindowDimension.cy) {
-			  screenCenterOffset     = (ScreenSizePixels.cy - maxWindowDimension.cy) / 2;
-			  ThredWindowRect.top    = screenCenterOffset;
-			  ThredWindowRect.bottom = ScreenSizePixels.cy - screenCenterOffset;
-			}
-			if (screenCenterOffset != 0) {
-			  MoveWindow(p_hWnd,
-			             ThredWindowRect.left,
-			             ThredWindowRect.top,
-			             ThredWindowRect.right - ThredWindowRect.left,
-			             ThredWindowRect.bottom - ThredWindowRect.top,
-			             TRUE);
-			}
-		  }
-		  else {
-			MoveWindow(p_hWnd,
-			           IniFile.initialWindowCoords.left,
-			           IniFile.initialWindowCoords.top,
-			           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
-			           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
-			           TRUE);
-		  }
-		  ShowWindow(p_hWnd, SW_SHOW);
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in wndProc 3: wParam [{}]\n", wParam);
-		  break;
-		}
-	  }
-	  GetClientRect(p_hWnd, &ThredWindowRect);
-	  thred::movStch();
-	  if (StateMap->test(StateFlag::ZUMED)) {
-		auto const bRatio = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
-		auto const adjustedWidth = wrap::toFloat(StitchWindowClientRect.right) / bRatio;
-		auto const unzoomedX     = wrap::toFloat(UnzoomedRect.cx);
-		if (adjustedWidth + ZoomRect.left > unzoomedX) {
-		  ZoomRect.right = unzoomedX;
-		  ZoomRect.left  = unzoomedX - adjustedWidth;
-		}
-		else {
-		  ZoomRect.right = adjustedWidth + ZoomRect.left;
-		}
-	  }
-	  else {
-		ZoomRect = F_RECTANGLE {
-		    0.0F, gsl::narrow<float>(UnzoomedRect.cy), gsl::narrow<float>(UnzoomedRect.cx), 0.0F};
-	  }
-	  NearestCount = 0;
-	  StateMap->set(StateFlag::RESTCH);
-	  if (StateMap->test(StateFlag::SELBOX)) {
-		shft2box();
-	  }
-	  if (StateMap->test(StateFlag::RUNPAT)) {
-		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-		if (StateMap->test(StateFlag::ZUMED)) {
-		  RunPoint = GroupStartStitch;
-		}
-		else {
-		  RunPoint = 0;
-		}
-	  }
+	  handleWndProcWMSIZE(p_hWnd, wParam);
 	  return 1;
 	}
 	case WM_MOVE: {
-	  GetClientRect(p_hWnd, &ThredWindowRect);
-	  constexpr auto SMALLWIN  = LONG {20};  // Smallest ThrEd window dimension
-	  constexpr auto DEFWINDIM = LONG {300}; // default small Thred window dimension
-	  if ((ThredWindowRect.right - ThredWindowRect.left) < SMALLWIN) {
-		ThredWindowRect.left  = 0;
-		ThredWindowRect.right = DEFWINDIM;
-	  }
-	  if ((ThredWindowRect.bottom - ThredWindowRect.top) < SMALLWIN) {
-		ThredWindowRect.top    = 0;
-		ThredWindowRect.bottom = DEFWINDIM;
-	  }
-	  thred::movStch();
-	  if (StateMap->test(StateFlag::RUNPAT)) {
-		thred::duzrat();
-		RunPoint = 0;
-		FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
-	  }
+	  handleWndProcWMMOVE(p_hWnd);
 	  return 1;
 	}
 	case WM_CLOSE: {
