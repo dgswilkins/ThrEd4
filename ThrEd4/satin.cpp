@@ -920,19 +920,23 @@ void si::satfn(FRM_HEAD const&           form,
                uint32_t                  line1End,
                uint32_t                  line2Start,
                uint32_t                  line2End) {
+  // check for zero length lines
   if (line1Start != line1End && line2Start == line2End) {
 	return;
   }
   auto itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  // setup the initial stitch point
   if (!StateMap->testAndSet(StateFlag::SAT1)) {
 	if (StateMap->test(StateFlag::FTHR)) {
 	  if (form.vertexCount != 0U) {
+		// add the first vertex to the bare sequence
 		auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
 		BSequence->emplace_back(itVertex->x, itVertex->y, 0);
 	  }
 	}
 	else {
 	  if (StateMap->test(StateFlag::BARSAT)) {
+		// add the first vertices from line1 and line2 to the bare sequence
 		if (form.vertexCount != 0U) {
 		  auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
 		  BSequence->emplace_back(itVertex->x, itVertex->y, 0);
@@ -941,11 +945,13 @@ void si::satfn(FRM_HEAD const&           form,
 		}
 	  }
 	  else {
+		// add the first vertex to the output sequence
 		auto itVertex = wrap::next(itFirstVertex, line1Start);
 		OSequence->push_back(*itVertex);
 	  }
 	}
   }
+  // determine which line should be the basis for the stitch count
   auto line1Length = lengths[line1End] - lengths[line1Start];
   auto line2Length = lengths[line2Start] - lengths[line2End];
   auto stitchCount = 0U;
@@ -955,6 +961,7 @@ void si::satfn(FRM_HEAD const&           form,
   else {
 	stitchCount = wrap::round<uint32_t>(fabs(line1Length) / LineSpacing);
   }
+  // determine the segment stitch counts
   auto const line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
   auto const line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
   auto line1StitchCounts = std::vector<uint32_t> {};
@@ -963,6 +970,7 @@ void si::satfn(FRM_HEAD const&           form,
   line2StitchCounts.reserve(line2Segments);
   auto iVertex            = line1Start;
   auto segmentStitchCount = 0U;
+  // calculate the stitch counts for the first line
   for (auto iSegment = 0U; iSegment < line1Segments - 1U; ++iSegment) {
 	auto const nextVertex = form::nxt(form, iVertex);
 	auto const val = wrap::ceil<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) *
@@ -975,6 +983,7 @@ void si::satfn(FRM_HEAD const&           form,
   auto iNextVertex   = line2Start;
   iVertex            = form::prv(form, iNextVertex);
   segmentStitchCount = 0;
+  // calculate the stitch counts for the second line
   while (iVertex > line2End) {
 	auto const val = wrap::ceil<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) *
 	                                      wrap::toFloat(stitchCount));
@@ -984,6 +993,7 @@ void si::satfn(FRM_HEAD const&           form,
 	iVertex     = form::prv(form, iNextVertex);
   }
   line2StitchCounts.push_back(stitchCount - segmentStitchCount);
+  // setup the initial vertices and stitch points
   auto line1Point    = *(wrap::next(itFirstVertex, line1Start));
   auto line1Next     = wrap::next(itFirstVertex, form::nxt(form, line1Start));
   auto line2Previous = wrap::next(itFirstVertex, form::prv(form, line2Start));
@@ -1010,11 +1020,12 @@ void si::satfn(FRM_HEAD const&           form,
   auto loop        = 0U;
 
   constexpr auto LOOPLIM = 20000U; // limit the iterations
-
+  // loop until all the stitches have been calculated
   while (flag && (loop < LOOPLIM)) {
 	flag = false;
 	++loop;
 	if (StateMap->test(StateFlag::FTHR)) {
+	  // feathered satin
 	  while ((line1Count != 0U) && (line2Count != 0U)) {
 		line1Point += line1Step;
 		line2Point += line2Step;
@@ -1030,9 +1041,11 @@ void si::satfn(FRM_HEAD const&           form,
 	}
 	else {
 	  if (StateMap->test(StateFlag::BARSAT)) {
+		// bare satin
 		while ((line1Count != 0U) && (line2Count != 0U)) {
 		  line1Point += line1Step;
 		  line2Point += line2Step;
+		  // zig zag the stitches
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			BSequence->emplace_back(line1Point.x, line1Point.y, 0);
 			BSequence->emplace_back(line2Point.x, line2Point.y, 1);
@@ -1046,9 +1059,12 @@ void si::satfn(FRM_HEAD const&           form,
 		}
 	  }
 	  else {
+		// normal satin
 		while ((line1Count != 0U) && (line2Count != 0U)) {
 		  line1Point += line1Step;
 		  line2Point += line2Step;
+		  // check the direction of the stitches and reverse line 1 or line 2 
+		  // depending on the flag for square ends
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			if (UserFlagMap->test(UserFlag::SQRFIL)) {
 			  form::filinu(line2Point, stitchPoint);
@@ -1070,8 +1086,10 @@ void si::satfn(FRM_HEAD const&           form,
 		}
 	  }
 	}
+	// check if there are more stitches to calculate
 	if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
 	  if ((line1Count == 0U) && iLine1Count < line1StitchCounts.size()) {
+		// calculate the next segment stitch count for line 1
 		line1Count           = line1StitchCounts[iLine1Count++];
 		line1Next            = wrap::next(itFirstVertex, form::nxt(form, iLine1Vertex));
 		auto itCurrentVertex = wrap::next(itFirstVertex, iLine1Vertex);
@@ -1080,6 +1098,7 @@ void si::satfn(FRM_HEAD const&           form,
 		line1Step            = line1Delta / wrap::toFloat(line1Count);
 	  }
 	  if ((line2Count == 0U) && iLine2Count < line2StitchCounts.size()) {
+		// calculate the next segment stitch count for line 2
 		line2Count           = line2StitchCounts[iLine2Count++];
 		line2Previous        = wrap::next(itFirstVertex, form::prv(form, iLine2Vertex));
 		auto itCurrentVertex = wrap::next(itFirstVertex, iLine2Vertex);
