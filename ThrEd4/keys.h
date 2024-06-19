@@ -3,7 +3,7 @@
 namespace keys {
 void desiz();
 auto getMoveAnchor() noexcept -> uint32_t;
-auto handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine, bool& retflag)
+auto handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
     -> bool;
 void movmrk();
 void setmov();

@@ -10349,12 +10349,8 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		rotfns(IniFile.rotationAngle);
 	  }
 	  thred::unmsg();
-	  {
-		auto       retflag = true;
-		auto const retval  = keys::handleMainWinKeys(code, rotationCenter, stretchBoxLine, retflag);
-		if (retflag) {
-		  return retval;
-		}
+	  if (keys::handleMainWinKeys(code, rotationCenter, stretchBoxLine)){
+		  return true;
 	  }
 	  break;
 	}
