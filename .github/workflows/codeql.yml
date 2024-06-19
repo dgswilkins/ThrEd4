@@ -102,7 +102,19 @@ jobs:
     # see https://github.com/marketplace/actions/filter-sarif for pattern definitions
     # Also filter out warnings in third-party code
     # typical pattern for filtering out a rule: -**:cpp/poorly-documented-function
-    - name: Filter out unwanted errors and warnings
+    - name: Filter code checks for main
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: advanced-security/filter-sarif@v1
+      with:
+        patterns: |
+          -**:cpp/commented-out-code
+          -**:cpp/poorly-documented-function
+          -**/vcpkg_installed/**
+        input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+        output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+
+    - name: Filter code checks for Develop
+      if: ${{ github.ref == 'refs/heads/Develop' }}
       uses: advanced-security/filter-sarif@v1
       with:
         patterns: |
