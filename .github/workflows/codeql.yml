@@ -114,7 +114,7 @@ jobs:
       uses: advanced-security/filter-sarif@v1
       with:
         patterns: |
-          -**:cpp/commented-out-code
+          -**:cpp/poorly-documented-function
           -**/vcpkg_installed/**
         input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
         output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
