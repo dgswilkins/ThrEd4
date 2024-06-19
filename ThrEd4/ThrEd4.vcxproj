@@ -106,6 +106,7 @@
     <None Include="Resources\RightUp.cur" />
     <None Include="Resources\thred.chm" />
     <None Include="Resources\Upright.cur" />
+    <None Include="_clang-format" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico" />

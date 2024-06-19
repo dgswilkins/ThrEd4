@@ -240,6 +240,8 @@
     <None Include="..\vcpkg-configuration.json" />
     <None Include="..\.clang-tidy" />
     <None Include="..\.github\workflows\build.yml" />
+    <None Include="..\.github\workflows\codeql.yml" />
+    <None Include="_clang-format" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico">
