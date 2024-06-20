@@ -58,13 +58,6 @@ class BACK_HEAD // Backup header
   TX_PNT*       texturePoints {};
   uint32_t      texturePointCount {};
   SIZE          zoomRect {};
-
-  // constexpr BACK_HEAD() noexcept = default;
-  // BACK_HEAD(CLIP_STITCH const&) = default;
-  // BACK_HEAD(CLIP_STITCH&&) = default;
-  // BACK_HEAD& operator=(BACK_HEAD const& rhs) = default;
-  // BACK_HEAD& operator=(BACK_HEAD&&) = default;
-  //~BACK_HEAD() = default;
 };
 
 // Main Variables
