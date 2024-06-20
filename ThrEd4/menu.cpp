@@ -464,13 +464,6 @@ void menu::setGridCols(const COLORREF& color) {
 public:
 	uint32_t id {};
 	uint32_t col {};
-
-	// constexpr GRID_COL() noexcept = default;
-	// GRID_COL(GRID_COL const&) = default;
-	// GRID_COL(GRID_COL&&) = default;
-	// GRID_COL& operator=(GRID_COL const& rhs) = default;
-	// GRID_COL& operator=(GRID_COL&&) = default;
-	//~GRID_COL() = default;
   };
 
   static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, GRDHI};
