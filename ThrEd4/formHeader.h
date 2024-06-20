@@ -27,11 +27,6 @@ union FANGCLPOUT {
 
   public:
   explicit constexpr FANGCLPOUT() noexcept = default;
-  // FANGCLPOUT(FANGCLPOUT const&) = default;
-  // FANGCLPOUT(FANGCLPOUT&&) = default;
-  // FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
-  // FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
-  //~FANGCLPOUT() = default;
 
   // Getter and Setter for angle
   [[nodiscard]] auto getAngle() const noexcept -> float {
@@ -74,11 +69,6 @@ union FLENCNTOUT {
 
   public:
   explicit constexpr FLENCNTOUT() noexcept = default;
-  // FLENCNTOUT(FLENCNTOUT const&) = default;
-  // FLENCNTOUT(FLENCNTOUT&&) = default;
-  // FLENCNTOUT& operator=(FLENCNTOUT const& rhs) = default;
-  // FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
-  //~FLENCNTOUT() = default;
 
   // Getter and Setter for stitchLength
   [[nodiscard]] auto getStitchLength() const noexcept -> float {
@@ -115,11 +105,6 @@ class FTHR_INFO
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr FTHR_INFO() noexcept = default;
-  // FTHR_INFO(FTHR_INFO const&) = default;
-  // FTHR_INFO(FTHR_INFO&&) = default;
-  // FTHR_INFO& operator=(FTHR_INFO const& rhs) = default;
-  // FTHR_INFO& operator=(FTHR_INFO&&) = default;
-  //~FTHR_INFO() = default;
 };
 #pragma pack(pop)
 
@@ -135,11 +120,6 @@ class TXTR_INFO
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr TXTR_INFO() noexcept = default;
-  // TXTR_INFO(TXTR_INFO const&) = default;
-  // TXTR_INFO(TXTR_INFO&&) = default;
-  // TXTR_INFO& operator=(TXTR_INFO const& rhs) = default;
-  // TXTR_INFO& operator=(TXTR_INFO&&) = default;
-  //~TXTR_INFO() = default;
 };
 #pragma pack(pop)
 
@@ -153,11 +133,6 @@ union TF_INFO_OUT {
 
   public:
   explicit constexpr TF_INFO_OUT() noexcept;
-  // TF_INFO_OUT(TF_INFO_OUT const&) = default;
-  // TF_INFO_OUT(TF_INFO_OUT&&) = default;
-  // TF_INFO_OUT& operator=(TF_INFO_OUT const& rhs) = default;
-  // TF_INFO_OUT& operator=(TF_INFO_OUT&&) = default;
-  //~TF_INFO_OUT() = default;
 
   // Getter and Setter for feather
   [[nodiscard]] auto getFeather() const noexcept -> FTHR_INFO {
@@ -190,11 +165,6 @@ union SATINANGLEOUT {
 
   public:
   explicit constexpr SATINANGLEOUT() noexcept = default;
-  // SATINANGLEOUT(SATINANGLEOUT const&) = default;
-  // SATINANGLEOUT(SATINANGLEOUT&&) = default;
-  // SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
-  // SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
-  //~SATINANGLEOUT() = default;
 
   // Getter and Setter for guide
   [[nodiscard]] auto getGuide() const noexcept -> DWORD {
@@ -247,11 +217,6 @@ class FRM_HEAD_O // Original form header used prior to version 2
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   FRM_HEAD_O() noexcept = default;
-  // FRM_HEAD_O(FRM_HEAD_O const&) = default;
-  // FRM_HEAD_O(FRM_HEAD_O&&) = default;
-  // FRM_HEAD_O& operator=(FRM_HEAD_O const& rhs) = default;
-  // FRM_HEAD_O& operator=(FRM_HEAD_O&&) = default;
-  //~FRM_HEAD_O() = default;
 };
 #pragma pack(pop)
 
@@ -305,11 +270,6 @@ class FRM_HEAD
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   FRM_HEAD() noexcept = default;
-  // FRM_HEAD(FRM_HEAD const&) = default;
-  // FRM_HEAD(FRM_HEAD&&) = default;
-  // FRM_HEAD& operator=(FRM_HEAD const& rhs) = default;
-  // FRM_HEAD& operator=(FRM_HEAD&&) = default;
-  //~FRM_HEAD() = default;
 
   explicit inline FRM_HEAD(FRM_HEAD_O const& rhs) noexcept;
   explicit inline FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept;
@@ -373,11 +333,6 @@ class FRM_HEAD_OUT
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr FRM_HEAD_OUT() noexcept = default;
-  // FRM_HEAD_OUT(FRM_HEAD_OUT const&) = default;
-  // FRM_HEAD_OUT(FRM_HEAD_OUT&&) = default;
-  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT const& rhs) = default;
-  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT&&) = default;
-  //~FRM_HEAD_OUT() = default;
 
   explicit inline FRM_HEAD_OUT(FRM_HEAD const& rhs);
 };
