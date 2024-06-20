@@ -118,7 +118,6 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
                            nullptr,
                            ThrEdInstance,
                            nullptr);
-  //		displayText::updateWinFont(MainStitchWin);
 }
 
 void displayText::tabmsg(uint32_t code, bool top) {
