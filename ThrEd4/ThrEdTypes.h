@@ -517,13 +517,6 @@ class LIST_TYPE
   public:
   uint32_t stringID {}; // String resource ID
   uint8_t  value {};    // value index
-
-  // LIST_TYPE() noexcept = default;
-  // LIST_TYPE(LIST_TYPE const&) = default;
-  // LIST_TYPE(LIST_TYPE&&) = default;
-  // LIST_TYPE& operator=(LIST_TYPE const& rhs) = default;
-  // LIST_TYPE& operator=(LIST_TYPE&&) = default;
-  //~LIST_TYPE() = default;
 };
 
 // Layer values
@@ -819,7 +812,7 @@ enum TextureButtons : uint8_t { // text button windows
 
 enum MachineType : int8_t { AUXPCS, AUXDST, AUXPES };
 
-/*
+#ifdef DOUBLE_REQUIRED
 class D_RECTANGLE
 {
   public:
@@ -828,14 +821,14 @@ class D_RECTANGLE
   double left {};
   double right {};
 
-  // constexpr D_RECTANGLE() noexcept = default;
-  // D_RECTANGLE(D_RECTANGLE const&) = default;
-  // D_RECTANGLE(D_RECTANGLE&&) = default;
-  // D_RECTANGLE& operator=(D_RECTANGLE const& rhs) = default;
-  // D_RECTANGLE& operator=(D_RECTANGLE&&) = default;
-  //~D_RECTANGLE() = default;
+  constexpr D_RECTANGLE() noexcept               = default; // default constructor
+  D_RECTANGLE(D_RECTANGLE const&)                = default; // copy constructor
+  D_RECTANGLE(D_RECTANGLE&&)                     = default; // move constructor
+  D_RECTANGLE& operator=(D_RECTANGLE const& rhs) = default; // copy assignment
+  D_RECTANGLE& operator=(D_RECTANGLE&&)          = default; // move assignment
+  ~D_RECTANGLE()                                 = default; // destructor
 };
-*/
+#endif
 
 constexpr uint32_t COLMSK    = 0x0000000fU; // 0000 0000 0000 0000 0000 0000 0000 1111
 constexpr uint32_t APCOLMSK  = 0x000000f0U; // 0000 0000 0000 0000 0000 0000 1111 0000
@@ -957,13 +950,6 @@ class RANGE
   public:
   uint32_t start {};
   uint32_t finish {};
-
-  // constexpr RANGE() noexcept = default;
-  // RANGE(RANGE const&) = default;
-  // RANGE(RANGE&&) = default;
-  // RANGE& operator=(RANGE const& rhs) = default;
-  // RANGE& operator=(RANGE&&) = default;
-  //~RANGE() = default;
 };
 
 class SEARCH_REC
@@ -971,13 +957,6 @@ class SEARCH_REC
   public:
   uint32_t index {};
   float    length {};
-
-  // constexpr SORT_REC() noexcept = default;
-  // SORT_REC(SORT_REC const&) = default;
-  // SORT_REC(SORT_REC&&) = default;
-  // SORT_REC& operator=(SORT_REC const& rhs) = default;
-  // SORT_REC& operator=(SORT_REC&&) = default;
-  //~SORT_REC() = default;
 };
 
 class INS_REC
@@ -987,13 +966,6 @@ class INS_REC
   uint32_t color {};
   uint32_t index {};
   uint32_t seq {};
-
-  // constexpr INS_REC() noexcept = default;
-  // INS_REC(INS_REC const&) = default;
-  // INS_REC(INS_REC&&) = default;
-  // INS_REC& operator=(INS_REC const& rhs) = default;
-  // INS_REC& operator=(INS_REC&&) = default;
-  //~INS_REC() = default;
 };
 
 enum InterleaveTypes : uint8_t { // interleave sequence identifiers
@@ -1008,13 +980,6 @@ class RNG_COUNT
   public:
   int32_t line {};
   int32_t stitchCount {};
-
-  // constexpr RNG_COUNT() noexcept = default;
-  // RNG_COUNT(RNG_COUNT const&) = default;
-  // RNG_COUNT(RNG_COUNT&&) = default;
-  // RNG_COUNT& operator=(RNG_COUNT const& rhs) = default;
-  // RNG_COUNT& operator=(RNG_COUNT&&) = default;
-  //~RNG_COUNT() = default;
 };
 
 class PEC_COLOR
@@ -1023,13 +988,6 @@ class PEC_COLOR
   uint8_t r {};
   uint8_t g {};
   uint8_t b {};
-
-  // constexpr PEC_COLOR() noexcept = default;
-  // PEC_COLOR(PEC_COLOR const&) = default;
-  // PEC_COLOR(PEC_COLOR&&) = default;
-  // PEC_COLOR& operator=(PEC_COLOR const& rhs) = default;
-  // PEC_COLOR& operator=(PEC_COLOR&&) = default;
-  //~PEC_COLOR() = default;
 };
 
 // Do the type punning while ensuring that the returned pointer is non_null
