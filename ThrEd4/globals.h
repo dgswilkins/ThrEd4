@@ -26,13 +26,6 @@ class FORM_VERTICES
   uint32_t vertexCount {};
   uint32_t finish {};
   uint32_t form {};
-
-  // constexpr FORM_VERTICES() noexcept = default;
-  // FORM_VERTICES(FORM_VERTICES const&) = default;
-  // FORM_VERTICES(FORM_VERTICES&&) = default;
-  // FORM_VERTICES& operator=(FORM_VERTICES const& rhs) = default;
-  // FORM_VERTICES& operator=(FORM_VERTICES&&) = default;
-  //~FORM_VERTICES() = default;
 };
 
 class F_LSIZ
@@ -40,13 +33,6 @@ class F_LSIZ
   public:
   float cx {};
   float cy {};
-
-  // constexpr F_LSIZ() noexcept = default;
-  // F_LSIZ(F_LSIZ const&) = default;
-  // F_LSIZ(F_LSIZ&&) = default;
-  // F_LSIZ& operator=(F_LSIZ const& rhs) = default;
-  // F_LSIZ& operator=(F_LSIZ&&) = default;
-  //~F_LSIZ() = default;
 };
 
 namespace fs = std::filesystem;
