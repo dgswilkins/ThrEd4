@@ -88,10 +88,6 @@ class PECHDR
   // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
   explicit constexpr PECHDR() noexcept = default;
-  // PECHDR(PECHDR&&) = default;
-  // PECHDR& operator=(PECHDR const& rhs) = default;
-  // PECHDR& operator=(PECHDR&&) = default;
-  //~PECHDR() = default;
 };
 // clang-format on
 #pragma pack(pop)
@@ -114,10 +110,6 @@ class PECHDR2
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr PECHDR2() noexcept = default;
-  // PECHDR2(PECHDR2&&) = default;
-  // PECHDR2& operator=(PECHDR2 const& rhs) = default;
-  // PECHDR2& operator=(PECHDR2&&) = default;
-  //~PECHDR2() = default;
 };
 #pragma pack(pop)
 
@@ -128,15 +120,9 @@ class PES_COLOR_LIST
   uint16_t m_colorIndex {};
 
   public:
-  // constexpr PES_COLOR_LIST() noexcept = default;
   explicit constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
       m_blockIndex(bIndex), m_colorIndex(cIndex) {
   }
-  // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
-  // PES_COLOR_LIST(PES_COLOR_LIST&&) = default;
-  // PES_COLOR_LIST& operator=(PECCOLORLIST const& rhs) = default;
-  // PES_COLOR_LIST& operator=(PES_COLOR_LIST&&) = default;
-  //~PES_COLOR_LIST() = default;
 
   [[nodiscard]] constexpr auto getBlockIndex() const noexcept -> uint16_t {
 	return m_blockIndex;
@@ -192,10 +178,6 @@ class PESHED
   // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
 
   constexpr PESHED() noexcept = default;
-  // PESHED(PESHED&&) = default;
-  // PESHED& operator=(PESHED const& rhs) = default;
-  // PESHED& operator=(PESHED&&) = default;
-  //~PESHED() = default;
 };
 #pragma pack(pop)
 
@@ -210,10 +192,6 @@ class PESLED
 
   public:
   explicit inline constexpr PESLED() noexcept = default;
-  // PESLED(PESLED&&) = default;
-  // PESLED& operator=(PESLED const& rhs) = default;
-  // PESLED& operator=(PESLED&&) = default;
-  //~PESLED() = default;
 };
 // NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
@@ -230,14 +208,9 @@ class PESSTCHLST
   // NOLINTEND(clang-diagnostic-unused-private-field)
 
   public:
-  // constexpr PESSTCHLST() noexcept = default;
   explicit constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
       m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
   }
-  // PESSTCHLST(PESSTCHLST&&) = default;
-  // PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
-  // PESSTCHLST& operator=(PESSTCHLST&&) = default;
-  //~PESSTCHLST() = default;
 
   void setStitchType(uint32_t stype) {
 	m_stitchType = gsl::narrow<uint16_t>(stype);
@@ -253,12 +226,7 @@ class PESTCH
   int16_t m_y {};
 
   public:
-  // PESTCH() noexcept = default;
-  // PESTCH(PESTCH&&) = default;
-  // PESTCH& operator=(PESTCH const& rhs) = default;
-  // PESTCH& operator=(PESTCH&&) = default;
-  //~PESTCH() = default;
-  inline auto operator=(F_POINT const& rhs) -> PESTCH&;
+   inline auto operator=(F_POINT const& rhs) -> PESTCH&;
 };
 #pragma pack(pop)
 
@@ -283,11 +251,6 @@ class THREAD
   explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
       m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
   }
-  // THREAD(THREAD const&) = default;
-  // THREAD(THREAD&&) = default;
-  // THREAD& operator=(THREAD const& rhs) = default;
-  // THREAD& operator=(THREAD&&) = default;
-  //~THREAD() = default;
 
   [[nodiscard]] constexpr auto getColor() const noexcept -> PEC_COLOR const& {
 	return m_color;
