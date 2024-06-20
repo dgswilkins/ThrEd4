@@ -54,13 +54,6 @@ class BAL_STITCH // balarad stitch
   uint8_t flag {};
   float   x {};
   float   y {};
-
-  // constexpr BAL_STITCH() noexcept = default;
-  // BAL_STITCH(BAL_STITCH const&) = default;
-  // BAL_STITCH(BAL_STITCH&&) = default;
-  // BAL_STITCH& operator=(BAL_STITCH const& rhs) = default;
-  // BAL_STITCH& operator=(BAL_STITCH&&) = default;
-  //~BAL_STITCH() = default;
 };
 #pragma pack(pop)
 
@@ -80,13 +73,6 @@ class BAL_HEAD // balarad file header
   COLORREF backgroundColor {};
 
   std::array<uint8_t, BALPAD> res {};
-
-  // constexpr BAL_HEAD() noexcept = default;
-  // BAL_HEAD(BAL_HEAD const&) = default;
-  // BAL_HEAD(BAL_HEAD&&) = default;
-  // BAL_HEAD& operator=(BAL_HEAD const& rhs) = default;
-  // BAL_HEAD& operator=(BAL_HEAD&&) = default;
-  //~BAL_HEAD() = default;
 };
 #pragma pack(pop)
 
