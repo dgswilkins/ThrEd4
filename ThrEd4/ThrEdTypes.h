@@ -78,6 +78,7 @@ constexpr auto PI_D     = std::numbers::pi;          // PI to double precision
 constexpr auto PI_D2    = PI_D * 2.0;                //
 constexpr auto USPAC    = 15.0F;                     // underlay fill spacing
 constexpr auto URAT     = 0.75F; // ratio of underlay stitch to satin border size
+constexpr auto QUADRT   = uint32_t {4U}; // split display into quadrants
 
 constexpr auto     IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner length
 constexpr auto     IPICSPAC = 6.0F;            // initial picot border space

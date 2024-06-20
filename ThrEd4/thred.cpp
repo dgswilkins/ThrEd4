@@ -130,7 +130,6 @@ enum class FileIndices : uint8_t {
 
 namespace thi {
 void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
-void bakthum();
 void barnam(HWND window, uint32_t iThumbnail);
 void box(uint32_t iNearest, HDC hDC);
 void boxs();
@@ -225,6 +224,8 @@ auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool;
 auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool;
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
 void handleSizeRestored(HWND p_hWnd);
+auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
+    -> bool;
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
 auto handleWndProcWMHSCROLL(WPARAM const& wParam, float LINSCROL, LPARAM lParam) -> bool;
 void handleWndProcWMINITMENU();
@@ -255,15 +256,12 @@ void noMsg();
 auto nuBak() noexcept -> BOOL;
 void nuBrush(HBRUSH& brush, COLORREF color) noexcept;
 auto nuCol(COLORREF init) noexcept -> BOOL;
-void resetState();
 void nuFil(FileIndices fileIndex);
 void nuRct() noexcept;
 void nuStchSiz(uint32_t iColor, int32_t width) noexcept(!(std::is_same_v<ptrdiff_t, int>));
 auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
 void nunams();
 void nuselrct();
-void nuthbak(uint32_t count);
-void nuthsel();
 void nuthum(wchar_t character);
 void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& KnotStep, uint32_t KnotAttribute);
 auto oldwnd(HWND window) noexcept -> bool;
@@ -275,6 +273,7 @@ void rebak();
 void redfnam(std::wstring& designerName);
 void redini();
 void relin();
+void resetState();
 void respac(FRM_HEAD& form) noexcept;
 void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem);
 void ritcor(F_POINT_ATTR const& pointAttribute);
@@ -361,7 +360,6 @@ constexpr auto NERCNT   = 4U;                     // number of entries in the ne
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
-constexpr auto QUADRT   = uint32_t {4U};          // split display into quadrants
 constexpr auto RES_SIZE = 26;                     // reserved for expansion in the ThrEd v1.0 header
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
@@ -4295,7 +4293,7 @@ void thi::resetState() {
   if (!FormList->empty()) {
 	form::delfrms();
   }
-  unthum();
+  thi::unthum();
   thred::unbsho();
   bitmap::resetBmpFile(true);
   TexturePointsBuffer->clear();
@@ -6791,7 +6789,7 @@ void thi::getbak() {
   if (!StateMap->test(StateFlag::RBUT)) {
 	return;
   }
-  unthum();
+  thi::unthum();
   StateMap->set(StateFlag::FRMOF);
   *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(*WorkingFileName);
@@ -7560,7 +7558,7 @@ void thred::thumnail() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thi::nuthsel() {
+void thred::nuthsel() {
   if (ThumbnailIndex >= Thumbnails->size()) {
 	return;
   }
@@ -7593,7 +7591,7 @@ void thi::nuthsel() {
   if (iThumbnail != 0U) {
 	ThumbnailDisplayCount = iThumbnail;
 	while (iThumbnail < OLDVER) {
-	  rthumnam(iThumbnail++);
+	  thi::rthumnam(iThumbnail++);
 	}
   }
   else {
@@ -7601,7 +7599,7 @@ void thi::nuthsel() {
   }
 }
 
-void thi::nuthbak(uint32_t count) {
+void thred::nuthbak(uint32_t count) {
   if (ThumbnailIndex == 0U) {
 	return;
   }
@@ -7626,7 +7624,7 @@ void thi::nuthbak(uint32_t count) {
   if (ThumbnailIndex > MAXFORMS) {
 	ThumbnailIndex = 0;
   }
-  nuthsel();
+  thred::nuthsel();
 }
 
 void thi::nuthum(wchar_t character) {
@@ -7637,10 +7635,10 @@ void thi::nuthum(wchar_t character) {
   auto const txt = std::wstring(ThumbnailSearchString->data());
   displayText::butxt(HBOXSEL, txt);
   ThumbnailIndex = 0;
-  nuthsel();
+  thred::nuthsel();
 }
 
-void thi::bakthum() {
+void thred::thumbBack() {
   if (ThumbnailSearchString->size() <= 1) {
 	return;
   }
@@ -7650,7 +7648,7 @@ void thi::bakthum() {
   ThumbnailIndex                = 0;
   auto const txt                = std::wstring(ThumbnailSearchString->data());
   displayText::butxt(HBOXSEL, txt);
-  nuthsel();
+  thred::nuthsel();
 }
 
 void thred::selalstch() {
@@ -10013,6 +10011,231 @@ auto thi::handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   return {};
 }
 
+void thred::thumbQuit() {
+  thi::unthum();
+  StateMap->reset(StateFlag::BAKSHO);
+  thred::esccode();
+  thred::qcode();
+}
+
+void thred::thumbHome() {
+  ThumbnailIndex = 0;
+  thred::nuthsel();
+}
+
+void thred::thumbEnd() {
+  ThumbnailIndex = wrap::toUnsigned(Thumbnails->size());
+  thred::nuthbak(QUADRT);
+}
+
+void thred::otherPeriod() noexcept {
+  // ToDo - only allow entry if there is not already a period in the buffer
+  if (SideWinMsgIdx < (SideWindowEntryBuffer->size() - 1U)) {
+	SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '.';
+	SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
+	SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+  }
+}
+
+void  thred::otherBack() noexcept {
+  if (SideWinMsgIdx != 0U) {
+	SideWindowEntryBuffer->operator[](--SideWinMsgIdx) = 0;
+	SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+  }
+}
+
+void thred::otherReturn() {
+  thi::chknum();
+  FormMenuChoice  = 0;
+  PreferenceIndex = 0;
+}
+
+auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD&           textureForm,
+                                F_POINT&            rotationCenter,
+                                std::vector<POINT> const& stretchBoxLine) -> bool {
+  auto const code = gsl::narrow<wchar_t>(WinMsg.wParam & 0xffffU);
+  if (StateMap->test(StateFlag::TXTRED)) {
+	texture::txtkey(code, textureForm);
+	return true;
+  }
+  // ToDo - value passed to duform is weird because it is dependant on order of enumeration of the form types.
+  //        and value 'SAT' throws it off
+  if (StateMap->test(StateFlag::FORMIN)) {
+	if (wrap::pressed(VK_CONTROL)) {
+	  return true;
+	}
+	if (keys::createFormType(code)) {
+	  return true;
+	}
+  }
+  if (StateMap->test(StateFlag::FILMSG)) {
+	if (code == VK_RETURN || code == VK_OEM_3) { // check for return or back tick '`'
+	  thred::savdo();
+	  form::unfil();
+	  thred::coltab();
+	  thred::unmsg();
+	  return true;
+	}
+  }
+  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
+	if (code == VK_RETURN || code == VK_OEM_3) {
+	  thred::savdo();
+	  if (!SelectedFormList->empty()) {
+		for (auto const selectedForm : (*SelectedFormList)) {
+		  form::refilfn(selectedForm);
+		}
+	  }
+	  else {
+		form::refilfn(ClosestFormToCursor);
+	  }
+	  thred::unmsg();
+	}
+	else {
+	  backup::bak();
+	}
+	if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
+	  formForms::refrm();
+	}
+	return true;
+  }
+  if (StateMap->testAndReset(StateFlag::PRGMSG)) {
+	if (code == VK_RETURN || code == VK_OEM_3) {
+	  thred::deldir();
+	  return true;
+	}
+  }
+  if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
+	if (code == L'S' || code == VK_RETURN || code == VK_OEM_3) {
+	  thred::savdo();
+	  if (code == L'S') {
+		StateMap->set(StateFlag::DELTO);
+	  }
+	  else {
+		StateMap->reset(StateFlag::DELTO);
+	  }
+	  thred::delsfrms();
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
+	  thred::unmsg();
+	  return true;
+	}
+  }
+  if (StateMap->testAndReset(StateFlag::DELFRM)) {
+	if (code == L'S' || code == VK_RETURN || code == VK_OEM_3) {
+	  thred::savdo();
+	  if (code == L'S') {
+		StateMap->set(StateFlag::DELTO);
+	  }
+	  else {
+		StateMap->reset(StateFlag::DELTO);
+	  }
+	  thred::frmdel();
+	  fndknt();
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
+	  thred::unmsg();
+	  return true;
+	}
+  }
+  if (StateMap->test(StateFlag::THUMSHO)) {
+	keys::navigateThumbnails(code);
+	return true;
+  }
+  if (StateMap->test(StateFlag::FSETFSPAC) || StateMap->test(StateFlag::GTWLKIND)) {
+	// Check for keycode 'dash' and numpad 'subtract'
+	if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
+	  if (MsgBuffer->front() != '-') {
+		thred::resetMsgBuffer();
+		MsgBuffer->back() = '-';
+		MsgBuffer->push_back(0);
+		SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+	  }
+	  return true;
+	}
+  }
+  if ((FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
+	if (chkminus(code)) {
+	  if (SideWindowEntryBuffer->front() != '-') {
+		thred::resetSideBuffer();
+		SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '-';
+		SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+	  }
+	  return true;
+	}
+	if (dunum(code)) {
+	  if (PreferenceIndex == PRFGRDCUT + 1 || PreferenceIndex == PRFSBXCUT + 1U) {
+		auto buffer = std::array<wchar_t, 2> {};
+		buffer[0]   = NumericCode;
+		if (PreferenceIndex == PRFGRDCUT + 1U) {
+		  ShowStitchThreshold = unthrsh(NumericCode - L'0');
+		  SetWindowText(ValueWindow->operator[](PRFGRDCUT), buffer.data());
+		}
+		else {
+		  StitchBoxesThreshold = unthrsh(NumericCode - L'0');
+		  SetWindowText(ValueWindow->operator[](PRFSBXCUT), buffer.data());
+		}
+		thred::unsid();
+	  }
+	  else {
+		if (SideWinMsgIdx < (SideWindowEntryBuffer->size() - 1U)) {
+		  SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = NumericCode;
+		  SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
+		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+		}
+	  }
+	  return true;
+	}
+	if (keys::otherKeys(code)) {
+	  return true;
+	}
+  }
+  if (code == L'I') {
+	thred::movi();
+	LastKeyCode = L'I';
+	return true;
+  }
+  if (code == L'Q' && LastKeyCode == L'Q') {
+	thred::unpat();
+  }
+  LastKeyCode = code;
+  if (StateMap->test(StateFlag::NUMIN)) {
+	{
+	  auto       retflag = true;
+	  auto const retval  = handleNumericInput(code, retflag);
+	  if (retflag) {
+		return retval;
+	  }
+	}
+  }
+  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
+	if (MsgBuffer->size() > 1) {
+	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+	  auto const value = thred::getMsgBufferValue();
+	  if (value != 0.0F) {
+		IniFile.rotationAngle = value * DEGRADF;
+	  }
+	}
+	if (IniFile.rotationAngle != 0.0F) {
+	  form::dupfn(IniFile.rotationAngle);
+	}
+  }
+  if (StateMap->testAndReset(StateFlag::ENTROT)) {
+	if (MsgBuffer->size() > 1) {
+	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+	  auto const value = thred::getMsgBufferValue();
+	  if (value != 0.0F) {
+		IniFile.rotationAngle = value * DEGRADF;
+	  }
+	}
+	rotfns(IniFile.rotationAngle);
+  }
+  thred::unmsg();
+  if (keys::handleMainWinKeys(code, rotationCenter, stretchBoxLine)) {
+	return true;
+  }
+  return false;
+}
+
 auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
     -> bool {
   if (WinMsg.message == WM_MOUSEMOVE) {
@@ -10056,301 +10279,8 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 	  break;
 	}
 	case WM_KEYDOWN: {
-	  auto const code = gsl::narrow<wchar_t>(WinMsg.wParam & 0xffffU);
-	  if (StateMap->test(StateFlag::TXTRED)) {
-		texture::txtkey(code, textureForm);
+	  if (handleWndMsgWMKEYDOWN(textureForm, rotationCenter, stretchBoxLine)) {
 		return true;
-	  }
-	  // ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
-	  //        and value 'SAT' throws it off
-	  if (StateMap->test(StateFlag::FORMIN)) {
-		if (wrap::pressed(VK_CONTROL)) {
-		  return true;
-		}
-		switch (code) {
-		  case L'E': {
-			StateMap->reset(StateFlag::FORMIN);
-			thred::unmsg();
-			form::duform(FRMLINE - 1);
-			return true;
-		  }
-		  case L'F': {
-			StateMap->reset(StateFlag::FORMIN);
-			thred::unmsg();
-			form::duform(FRMFPOLY - 1);
-			return true;
-		  }
-		  case L'R': {
-			form::duform(FRMRPOLY - 1);
-			return true;
-		  }
-		  case L'S': {
-			form::duform(FRMSTAR - 1);
-			return true;
-		  }
-		  case L'A': {
-			form::duform(FRMSPIRAL - 1);
-			return true;
-		  }
-		  case L'H': {
-			form::duform(FRMHEART - 2);
-			return true;
-		  }
-		  case L'L': {
-			form::duform(FRMLENS - 2);
-			return true;
-		  }
-		  case L'G': {
-			form::duform(FRMEGG - 2);
-			return true;
-		  }
-		  case L'T': {
-			form::duform(FRMTEAR - 2);
-			return true;
-		  }
-		  case L'Z': {
-			form::duform(FRMZIGZAG - 2);
-			return true;
-		  }
-		  case L'W': {
-			form::duform(FRMWAVE - 2);
-			return true;
-		  }
-		  case L'D': {
-			form::duform(FRMDAISY - 2);
-			return true;
-		  }
-		  default: {
-		  }
-		}
-	  }
-	  if (StateMap->test(StateFlag::FILMSG)) {
-		if (code == VK_RETURN || code == VK_OEM_3) { // check for return or back tick '`'
-		  thred::savdo();
-		  form::unfil();
-		  thred::coltab();
-		  thred::unmsg();
-		  return true;
-		}
-	  }
-	  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
-		if (code == VK_RETURN || code == VK_OEM_3) {
-		  thred::savdo();
-		  if (!SelectedFormList->empty()) {
-			for (auto const selectedForm : (*SelectedFormList)) {
-			  form::refilfn(selectedForm);
-			}
-		  }
-		  else {
-			form::refilfn(ClosestFormToCursor);
-		  }
-		  thred::unmsg();
-		}
-		else {
-		  backup::bak();
-		}
-		if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
-		  formForms::refrm();
-		}
-		return true;
-	  }
-	  if (StateMap->testAndReset(StateFlag::PRGMSG)) {
-		if (code == VK_RETURN || code == VK_OEM_3) {
-		  thred::deldir();
-		  return true;
-		}
-	  }
-	  if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
-		if (code == L'S' || code == VK_RETURN || code == VK_OEM_3) {
-		  thred::savdo();
-		  if (code == L'S') {
-			StateMap->set(StateFlag::DELTO);
-		  }
-		  else {
-			StateMap->reset(StateFlag::DELTO);
-		  }
-		  thred::delsfrms();
-		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
-		  thred::unmsg();
-		  return true;
-		}
-	  }
-	  if (StateMap->testAndReset(StateFlag::DELFRM)) {
-		if (code == L'S' || code == VK_RETURN || code == VK_OEM_3) {
-		  thred::savdo();
-		  if (code == L'S') {
-			StateMap->set(StateFlag::DELTO);
-		  }
-		  else {
-			StateMap->reset(StateFlag::DELTO);
-		  }
-		  thred::frmdel();
-		  fndknt();
-		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
-		  thred::unmsg();
-		  return true;
-		}
-	  }
-	  if (StateMap->test(StateFlag::THUMSHO)) {
-		switch (code) {
-		  case VK_ESCAPE:
-		  case L'Q': {
-			unthum();
-			StateMap->reset(StateFlag::BAKSHO);
-			thred::esccode();
-			thred::qcode();
-			break;
-		  }
-		  case VK_DOWN:
-		  case VK_NEXT: { // page down
-			nuthsel();
-			break;
-		  }
-		  case VK_UP:
-		  case VK_PRIOR: { // page up
-			nuthbak(QUADRT + QUADRT);
-			break;
-		  }
-		  case VK_HOME: {
-			ThumbnailIndex = 0;
-			nuthsel();
-			break;
-		  }
-		  case VK_END: {
-			ThumbnailIndex = wrap::toUnsigned(Thumbnails->size());
-			nuthbak(QUADRT);
-			break;
-		  }
-		  case VK_BACK: // backspace
-		  case VK_LEFT: {
-			bakthum();
-			break;
-		  }
-		  default: {
-			TranslateMessage(&WinMsg);
-		  }
-		}
-		return true;
-	  }
-	  if (StateMap->test(StateFlag::FSETFSPAC) || StateMap->test(StateFlag::GTWLKIND)) {
-		// Check for keycode 'dash' and numpad 'subtract'
-		if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
-		  if (MsgBuffer->front() != '-') {
-			thred::resetMsgBuffer();
-			MsgBuffer->back() = '-';
-			MsgBuffer->push_back(0);
-			SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
-		  }
-		  return true;
-		}
-	  }
-	  if ((FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
-		if (chkminus(code)) {
-		  if (SideWindowEntryBuffer->front() != '-') {
-			thred::resetSideBuffer();
-			SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '-';
-			SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
-		  }
-		  return true;
-		}
-		if (dunum(code)) {
-		  if (PreferenceIndex == PRFGRDCUT + 1 || PreferenceIndex == PRFSBXCUT + 1U) {
-			auto buffer = std::array<wchar_t, 2> {};
-			buffer[0]   = NumericCode;
-			if (PreferenceIndex == PRFGRDCUT + 1U) {
-			  ShowStitchThreshold = unthrsh(NumericCode - L'0');
-			  SetWindowText(ValueWindow->operator[](PRFGRDCUT), buffer.data());
-			}
-			else {
-			  StitchBoxesThreshold = unthrsh(NumericCode - L'0');
-			  SetWindowText(ValueWindow->operator[](PRFSBXCUT), buffer.data());
-			}
-			thred::unsid();
-		  }
-		  else {
-			if (SideWinMsgIdx < (SideWindowEntryBuffer->size() - 1U)) {
-			  SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = NumericCode;
-			  SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
-			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
-			}
-		  }
-		  return true;
-		}
-		switch (code) {
-		  case VK_DECIMAL:      // numpad period
-		  case VK_OEM_PERIOD: { // period
-			// ToDo - only allow entry if there is not already a period in the buffer
-			if (SideWinMsgIdx < (SideWindowEntryBuffer->size() - 1U)) {
-			  SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '.';
-			  SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
-			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
-			}
-			return true;
-		  }
-		  case VK_BACK: { // backspace
-			if (SideWinMsgIdx != 0U) {
-			  SideWindowEntryBuffer->operator[](--SideWinMsgIdx) = 0;
-			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
-			}
-			return true;
-		  }
-		  case VK_RETURN: {
-			chknum();
-			FormMenuChoice  = 0;
-			PreferenceIndex = 0;
-			return true;
-		  }
-		  default: {
-		  }
-		}
-	  }
-	  if (code == L'I') {
-		thred::movi();
-		LastKeyCode = L'I';
-		return true;
-	  }
-	  if (code == L'Q' && LastKeyCode == L'Q') {
-		thred::unpat();
-	  }
-	  LastKeyCode = code;
-	  if (StateMap->test(StateFlag::NUMIN)) {
-		{
-		  auto       retflag = true;
-		  auto const retval  = handleNumericInput(code, retflag);
-		  if (retflag) {
-			return retval;
-		  }
-		}
-	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
-		if (MsgBuffer->size() > 1) {
-		  outDebugString(
-		      L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
-		  auto const value = thred::getMsgBufferValue();
-		  if (value != 0.0F) {
-			IniFile.rotationAngle = value * DEGRADF;
-		  }
-		}
-		if (IniFile.rotationAngle != 0.0F) {
-		  form::dupfn(IniFile.rotationAngle);
-		}
-	  }
-	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
-		if (MsgBuffer->size() > 1) {
-		  outDebugString(
-		      L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
-		  auto const value = thred::getMsgBufferValue();
-		  if (value != 0.0F) {
-			IniFile.rotationAngle = value * DEGRADF;
-		  }
-		}
-		rotfns(IniFile.rotationAngle);
-	  }
-	  thred::unmsg();
-	  if (keys::handleMainWinKeys(code, rotationCenter, stretchBoxLine)){
-		  return true;
 	  }
 	  break;
 	}

@@ -1392,3 +1392,120 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
   }
   return false;
 }
+
+auto keys::createFormType(const wchar_t code) -> bool {
+  switch (code) {
+	case L'E': {
+	  StateMap->reset(StateFlag::FORMIN);
+	  thred::unmsg();
+	  form::duform(FRMLINE - 1);
+	  return true;
+	}
+	case L'F': {
+	  StateMap->reset(StateFlag::FORMIN);
+	  thred::unmsg();
+	  form::duform(FRMFPOLY - 1);
+	  return true;
+	}
+	case L'R': {
+	  form::duform(FRMRPOLY - 1);
+	  return true;
+	}
+	case L'S': {
+	  form::duform(FRMSTAR - 1);
+	  return true;
+	}
+	case L'A': {
+	  form::duform(FRMSPIRAL - 1);
+	  return true;
+	}
+	case L'H': {
+	  form::duform(FRMHEART - 2);
+	  return true;
+	}
+	case L'L': {
+	  form::duform(FRMLENS - 2);
+	  return true;
+	}
+	case L'G': {
+	  form::duform(FRMEGG - 2);
+	  return true;
+	}
+	case L'T': {
+	  form::duform(FRMTEAR - 2);
+	  return true;
+	}
+	case L'Z': {
+	  form::duform(FRMZIGZAG - 2);
+	  return true;
+	}
+	case L'W': {
+	  form::duform(FRMWAVE - 2);
+	  return true;
+	}
+	case L'D': {
+	  form::duform(FRMDAISY - 2);
+	  return true;
+	}
+	default: {
+	}
+  }
+  return false;
+}
+
+void keys::navigateThumbnails(const wchar_t code) {
+  switch (code) {
+	case VK_ESCAPE:
+	case L'Q': {
+	  thred::thumbQuit();
+	  break;
+	}
+	case VK_DOWN:
+	case VK_NEXT: { // page down
+	  thred::nuthsel();
+	  break;
+	}
+	case VK_UP:
+	case VK_PRIOR: { // page up
+	  thred::nuthbak(QUADRT + QUADRT);
+	  break;
+	}
+	case VK_HOME: {
+	  thred::thumbHome();
+	  break;
+	}
+	case VK_END: {
+	  thred::thumbEnd();
+	  break;
+	}
+	case VK_BACK: // backspace
+	case VK_LEFT: {
+	  thred::thumbBack();
+	  break;
+	}
+	default: {
+	  TranslateMessage(&WinMsg);
+	}
+  }
+}
+
+auto keys::otherKeys(const wchar_t code) -> bool {
+  switch (code) {
+	case VK_DECIMAL:      // numpad period
+	case VK_OEM_PERIOD: { // period
+	  thred::otherPeriod();
+	  return true;
+	}
+	case VK_BACK: { // backspace
+	  thred::otherBack();
+	  return true;
+	}
+	case VK_RETURN: {
+	  thred::otherReturn();
+	  return true;
+	}
+	default: {
+	}
+  }
+  return false;
+}
