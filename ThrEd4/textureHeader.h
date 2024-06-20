@@ -12,13 +12,6 @@ class TX_PNT // textured fill point
   public:
   float    y {};
   uint16_t line {};
-
-  // constexpr TX_PNT() noexcept = default;
-  // TX_PNT(TX_PNT const&) = default;
-  // TX_PNT(TX_PNT&&) = default;
-  // TX_PNT& operator=(TX_PNT const& rhs) = default;
-  // TX_PNT& operator=(TX_PNT&&) = default;
-  //~TX_PNT() = default;
 };
 #pragma pack(pop)
 
@@ -42,11 +35,6 @@ class TXTR_SCREEN
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   explicit constexpr TXTR_SCREEN() noexcept = default;
-  // TXTR_SCREEN(TXTR_SCREEN const&) = default;
-  // TXTR_SCREEN(TXTR_SCREEN&&) = default;
-  // TXTR_SCREEN& operator=(TXTR_SCREEN const& rhs) = default;
-  // TXTR_SCREEN& operator=(TXTR_SCREEN&&) = default;
-  //~TXTR_SCREEN() = default;
 };
 
 class TX_HIST
@@ -57,11 +45,4 @@ class TX_HIST
   float height {};
   float width {};
   float spacing {};
-
-  // constexpr TX_HIST() noexcept = default;
-  // TX_HIST(TX_HIST const&) = default;
-  // TX_HIST(TX_HIST&&) = default;
-  // TX_HIST& operator=(TX_HIST const& rhs) = default;
-  // TX_HIST& operator=(TX_HIST&&) = default;
-  //~TX_HIST() = default;
 };
