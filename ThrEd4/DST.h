@@ -27,12 +27,6 @@ class DSTREC          // dst stitch record
   uint8_t led {};
   uint8_t mid {};
   uint8_t nd {};
-
-  // constexpr DSTREC() noexcept = default;
-  // DSTREC(DSTREC&&) = default;
-  // DSTREC& operator=(DSTREC const& rhs) = default;
-  // DSTREC& operator=(DSTREC&&) = default;
-  //~DSTREC() = default;
 };
 #pragma pack(pop)
 
