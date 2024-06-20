@@ -41,13 +41,6 @@ class BAD_COUNTS
   uint32_t clip {};
   uint32_t guideCount {}; // ToDo - is this an accurate description?
   uint32_t tx {};
-
-  // constexpr BAD_COUNTS() noexcept = default;
-  // BAD_COUNTS(BAD_COUNTS const&) = default;
-  // BAD_COUNTS(BAD_COUNTS&&) = default;
-  // BAD_COUNTS& operator=(BAD_COUNTS const& rhs) = default;
-  // BAD_COUNTS& operator=(BAD_COUNTS&&) = default;
-  //~BAD_COUNTS() = default;
 };
 
 // repair internal namespace
