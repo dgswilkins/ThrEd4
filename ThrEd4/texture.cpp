@@ -76,13 +76,6 @@ class TX_HIST_BUFF
   float height {};
   float width {};
   float spacing {};
-
-  // constexpr TX_HIST_BUFF() noexcept = default;
-  // TX_HIST_BUFF(TX_HIST_BUFF const&) = default;
-  // TX_HIST_BUFF(TX_HIST_BUFF&&) = default;
-  // TX_HIST_BUFF& operator=(TX_HIST_BUFF const& rhs) = default;
-  // TX_HIST_BUFF& operator=(TX_HIST_BUFF&&) = default;
-  //~TX_HIST_BUFF() = default;
 };
 
 #pragma pack(push, 1)
@@ -91,13 +84,6 @@ class TX_OFF // textured fill offset
   public:
   float   y {};
   int32_t line {};
-
-  // constexpr TX_OFF() noexcept = default;
-  // TX_OFF(TX_OFF const&) = default;
-  // TX_OFF(TX_OFF&&) = default;
-  // TX_OFF& operator=(TX_OFF const& rhs) = default;
-  // TX_OFF& operator=(TX_OFF&&) = default;
-  //~TX_OFF() = default;
 };
 #pragma pack(pop)
 
@@ -108,13 +94,6 @@ class TXTR_RECT
   uint16_t right {};
   float    top {};
   float    bottom {};
-
-  // constexpr TXTR_RECT() noexcept = default;
-  // TXTR_RECT(TXTR_RECT const&) = default;
-  // TXTR_RECT(TXTR_RECT&&) = default;
-  // TXTR_RECT& operator=(TXTR_RECT const& rhs) = default;
-  // TXTR_RECT& operator=(TXTR_RECT&&) = default;
-  //~TXTR_RECT() = default;
 };
 
 constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
