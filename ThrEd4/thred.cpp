@@ -12198,7 +12198,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	  break;
 	}
 	default: {
-	  // outDebugString(L"default hit in wndProc 4: message [{}]\n", message);
+	  outDebugString(L"default hit in wndProc 4: message [{}]\n", message);
 	  break;
 	}
   }
