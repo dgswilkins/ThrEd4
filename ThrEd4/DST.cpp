@@ -50,10 +50,6 @@
 #include <string>
 #include <vector>
 
-#ifdef ALLOCFAILURE
-// #include <new.h>
-#endif
-
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
 class DST_OFFSETS
 {
@@ -120,10 +116,6 @@ class DSTHED // dst file header
 
   public:
   constexpr DSTHED() noexcept = default;
-  // DSTHED(DSTHED&&) = default;
-  // DSTHED& operator=(DSTHED const& rhs) = default;
-  // DSTHED& operator=(DSTHED&&) = default;
-  //~DSTHED() = default;
 
   void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset);
   [[nodiscard]] auto chkdst() const noexcept -> bool {
@@ -224,12 +216,6 @@ class DSTDAT
   public:
   char cor {};
   char val {};
-
-  // constexpr DSTDAT() noexcept = default;
-  // DSTDAT(DSTDAT&&) = default;
-  // DSTDAT& operator=(DSTDAT const& rhs) = default;
-  // DSTDAT& operator=(DSTDAT&&) = default;
-  //~DSTDAT() = default;
 };
 
 void di::dstin(uint32_t number, POINT& pout) noexcept {
