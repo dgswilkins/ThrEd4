@@ -111,7 +111,8 @@
 #include <xutility>
 
 #ifdef ALLOCFAILURE
-// #include <new.h>
+#include <iostream>
+#include <new>
 #endif
 
 // File open types
@@ -334,7 +335,7 @@ auto wastch(uint32_t const& formIndex) -> bool;
 void zRctAdj() noexcept;
 
 #ifdef ALLOCFAILURE
-auto handle_program_memory_depletion(uint32_t) -> int32_t;
+void handle_program_memory_depletion();
 #endif
 } // namespace thi
 
@@ -12203,10 +12204,12 @@ void thred::tst() {
 }
 
 #ifdef ALLOCFAILURE
-auto handle_program_memory_depletion(uint32_t) -> int32_t {
+void thi::handle_program_memory_depletion() {
   // ToDo - Make this handle the failure with more user notifiication
-  displayText::shoMsg("Memory Allocation Failure");
-  exit(EXIT_FAILURE);
+  std::set_new_handler(nullptr);
+  outDebugString(L"Memory allocation failure\n");
+  // needs to be here, otherwise nothing will be printed
+  std::exit(EXIT_FAILURE);
 }
 #endif
 
@@ -12222,9 +12225,11 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   ArgList   = CommandLineToArgvW(GetCommandLine(), &ArgCount);
 
 #ifdef ALLOCFAILURE
-  _PNH old_handler = _set_new_handler(handle_program_memory_depletion);
-  // char* testalloc = new char[(~uint32_t((int32_t)0) / 2) - 1U]();
-  // testalloc[0] = 1;
+  auto old_handler = std::set_new_handler(thi::handle_program_memory_depletion);
+#ifdef TEST_FAIL
+  char* testalloc = new char[(~size_t((int32_t)0) / 2) - 1U]();
+  testalloc[0]    = 1;
+#endif
 #endif
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto const hResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
@@ -12455,7 +12460,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		}
 	  }
 #ifdef ALLOCFAILURE
-	  _set_new_handler(old_handler);
+	  std::set_new_handler(old_handler);
 #endif
 	  flag = true;
 	}
