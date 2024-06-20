@@ -851,14 +851,6 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
-#if PESACT
-	  // IniFile.auxFileType=AUXPES;
-	  // strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
-	  // StateMap->set(StateFlag::REDOLD);
-	  // nuFil();
-	  // lodpes();
-	  // savpes();
-#endif
 	  thred::tst();
 	  break;
 	}
