@@ -1071,7 +1071,6 @@ void ffi::handleTearInit(HWND hwndlg) {
   SetWindowPos(hwndlg, nullptr, rcClient.left, rcClient.top, uWidth, uHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
   auto hFont = displayText::getThrEdFont(400);
-  // SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
   EnumChildWindows(
       hwndlg,
       [](HWND p_hWnd, LPARAM lParam) -> BOOL {
