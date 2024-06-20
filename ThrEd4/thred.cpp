@@ -217,6 +217,8 @@ auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noex
 auto getMaxCount() -> uint32_t;
 auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
 void gselrng() noexcept;
+auto handleDeleteLineForm(FRM_HEAD& form) -> bool;
+void handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag);
 void handleFeatherIDOK(HWND hwndlg);
 auto handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool;
 void handleFeatherWMINITDIALOG(HWND hwndlg);
@@ -6081,6 +6083,59 @@ auto thi::frmstch() -> bool {
   });
 }
 
+auto thi::handleDeleteLineForm(FRM_HEAD& form) -> bool {
+  if (form.fillType == CONTF) {
+	if (ClosestVertexToCursor == form.fillGuide.start || ClosestVertexToCursor == form.fillGuide.finish) {
+	  form::delmfil(ClosestFormToCursor);
+	  form.fillType = 0;
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
+	  return true;
+	}
+	if (form.fillGuide.start > ClosestVertexToCursor) {
+	  --form.fillGuide.start;
+	}
+	if (form.fillGuide.finish > ClosestVertexToCursor) {
+	  --form.fillGuide.finish;
+	}
+  }
+  return false;
+}
+
+void thi::handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag) {
+  if (ClosestVertexToCursor <= 1) {
+	if ((form.attribute & FRMEND) != 0U) {
+	  if (form.wordParam != 0U) {
+		form.wordParam = 0;
+	  }
+	  else {
+		form.attribute &= NFRMEND;
+	  }
+	  satinFlag = true;
+	  return;
+	}
+  }
+  auto const& endGuide = form.wordParam;
+  if (endGuide != 0U) {
+	if (ClosestVertexToCursor == endGuide || ClosestVertexToCursor == endGuide + 1U) {
+	  form.wordParam = 0;
+	  satinFlag      = true;
+	  return;
+	}
+  }
+  if (form.satinGuideCount != 0U) {
+	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
+		satin::delcon(form, iGuide);
+		satinFlag = true;
+		break;
+	  }
+	  ++itGuide;
+	}
+  }
+}
+
 void thred::delet() {
   thred::undat();
   if (StateMap->testAndReset(StateFlag::FPSEL)) {
@@ -6222,59 +6277,13 @@ void thred::delet() {
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	switch (form.type) {
 	  case FRMLINE: {
-		if (form.fillType == CONTF) {
-		  if (ClosestVertexToCursor == form.fillGuide.start ||
-		      ClosestVertexToCursor == form.fillGuide.finish) {
-			form::delmfil(ClosestFormToCursor);
-			form.fillType = 0;
-			thred::coltab();
-			StateMap->set(StateFlag::RESTCH);
-			return;
-		  }
-		  if (form.fillGuide.start > ClosestVertexToCursor) {
-			--form.fillGuide.start;
-		  }
-		  if (form.fillGuide.finish > ClosestVertexToCursor) {
-			--form.fillGuide.finish;
-		  }
-		}
+		if (thi::handleDeleteLineForm(form)){
+          return;
+        }
 		break;
 	  }
 	  case SAT: {
-		while (true) {
-		  if (ClosestVertexToCursor <= 1) {
-			if ((form.attribute & FRMEND) != 0U) {
-			  if (form.wordParam != 0U) {
-				form.wordParam = 0;
-			  }
-			  else {
-				form.attribute &= NFRMEND;
-			  }
-			  satinFlag = true;
-			  break;
-			}
-		  }
-		  auto const& endGuide = form.wordParam;
-		  if (endGuide != 0U) {
-			if (ClosestVertexToCursor == endGuide || ClosestVertexToCursor == endGuide + 1U) {
-			  form.wordParam = 0;
-			  satinFlag      = true;
-			  break;
-			}
-		  }
-		  if (form.satinGuideCount != 0U) {
-			auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
-			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-			  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
-				satin::delcon(form, iGuide);
-				satinFlag = true;
-				break;
-			  }
-			  ++itGuide;
-			}
-		  }
-		  break;
-		}
+		thi::handleDeleteSatinForm(form, satinFlag);
 		break;
 	  }
 	  default: {
