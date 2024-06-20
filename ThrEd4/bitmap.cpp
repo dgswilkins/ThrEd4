@@ -399,9 +399,6 @@ void bitmap::savmap() {
 void bi::movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept {
   auto destination = buffer.begin();
   for (auto const& iTBD : src) {
-	//*(destination++) = GetRValue(iTBD);
-	//*(destination++) = GetGValue(iTBD);
-	//*(destination++) = GetBValue(iTBD);
 	*(gsl::narrow_cast<uint32_t*>(gsl::narrow_cast<void*>(&(*destination)))) = iTBD;
 	destination += 3;
   }
