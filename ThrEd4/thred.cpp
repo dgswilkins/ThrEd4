@@ -217,6 +217,7 @@ auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noex
 auto getMaxCount() -> uint32_t;
 auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
 void gselrng() noexcept;
+void handleChkMsgWMCOMMAND(F_POINT& rotationCenter);
 auto handleDeleteLineForm(FRM_HEAD& form) -> bool;
 void handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag);
 void handleFeatherIDOK(HWND hwndlg);
@@ -10245,6 +10246,39 @@ auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD&           textureForm,
   return false;
 }
 
+void thi::handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
+  {
+	auto previousName = PreviousNames->begin();
+	for (auto const& iLRU : *LRUPtr) {
+	  if (WinMsg.wParam == iLRU) {
+		*WorkingFileName = *previousName;
+		StateMap->set(StateFlag::REDOLD);
+		thi::nuFil(FileIndices::THR);
+	  }
+	  ++previousName;
+	}
+  }
+  auto const wParameter = LOWORD(WinMsg.wParam);
+  if (wParameter >= ID_FILE_OPEN1 && wParameter <= ID_AUXPES) {
+	thred::undat();
+  }
+  if (menu::handleMainMenu(wParameter, rotationCenter)) {
+	  return;
+  }
+  if (menu::handleEditMenu(wParameter)) {
+	  return;
+  }
+  if (menu::handleFileMenu(wParameter)) {
+	  return;
+  }
+  if (menu::handleFillMenu(wParameter)) {
+	  return;
+  }
+  if (menu::handleViewMenu(wParameter)) {
+	  return;
+  }
+}
+
 auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
     -> bool {
   if (WinMsg.message == WM_MOUSEMOVE) {
@@ -10295,36 +10329,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 	}
 	case WM_COMMAND: {
 	  thred::unmsg();
-	  {
-		auto previousName = PreviousNames->begin();
-		for (auto const& iLRU : *LRUPtr) {
-		  if (WinMsg.wParam == iLRU) {
-			*WorkingFileName = *previousName;
-			StateMap->set(StateFlag::REDOLD);
-			nuFil(FileIndices::THR);
-		  }
-		  ++previousName;
-		}
-	  }
-	  auto const wParameter = LOWORD(WinMsg.wParam);
-	  if (wParameter >= ID_FILE_OPEN1 && wParameter <= ID_AUXPES) {
-		thred::undat();
-	  }
-	  if (menu::handleMainMenu(wParameter, rotationCenter)) {
-		break;
-	  }
-	  if (menu::handleEditMenu(wParameter)) {
-		break;
-	  }
-	  if (menu::handleFileMenu(wParameter)) {
-		break;
-	  }
-	  if (menu::handleFillMenu(wParameter)) {
-		break;
-	  }
-	  if (menu::handleViewMenu(wParameter)) {
-		break;
-	  }
+	  handleChkMsgWMCOMMAND(rotationCenter);
 	  break;
 	}
 	default: {
