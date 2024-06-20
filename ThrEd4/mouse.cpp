@@ -1043,7 +1043,6 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	  if (!StateMap->test(StateFlag::INSRT)) {
 		mi::rngal();
 	  }
-	  //				gotbox();
 	  return true;
 	}
 
@@ -1070,7 +1069,6 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	  thred::movStch();
 	}
 	return true;
-	//			StateMap->reset(StateFlag::BZUMIN);
   }
   retflag = false;
   return false;
