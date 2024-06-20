@@ -122,12 +122,6 @@ class INI_FILE // ini file structure
   std::array<char, NAME_LEN> designerName {}; // designer name
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  // constexpr INI_FILE() noexcept = default;
-  // INI_FILE(INI_FILE const&) = default;
-  // INI_FILE(INI_FILE&&) = default;
-  // INI_FILE& operator=(INI_FILE const& rhs) = default;
-  // INI_FILE& operator=(INI_FILE&&) = default;
-  //~INI_FILE() = default;
   inline void setWav() noexcept;
   inline void defWav() noexcept;
   inline void defFeather() noexcept;
