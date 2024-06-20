@@ -13,11 +13,6 @@ class F_RECTANGLE
 
   explicit constexpr F_RECTANGLE() noexcept = default;
   explicit constexpr F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
-  // F_RECTANGLE(F_RECTANGLE const&) = default;
-  // F_RECTANGLE(F_RECTANGLE&&) = default;
-  // F_RECTANGLE& operator=(F_RECTANGLE const& rhs) = default;
-  // F_RECTANGLE& operator=(F_RECTANGLE&&) = default;
-  //~F_RECTANGLE() = default;
 };
 #pragma pack(pop)
 
