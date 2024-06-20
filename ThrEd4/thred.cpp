@@ -400,13 +400,6 @@ class COL_CHANGE
   public:
   uint16_t stitchIndex {}; // stitch index
   uint16_t colorIndex {};  // color index
-
-  // constexpr COL_CHANGE() noexcept = default;
-  // COL_CHANGE(COL_CHANGE const&) = default;
-  // COL_CHANGE(COL_CHANGE&&) = default;
-  // COL_CHANGE& operator=(COL_CHANGE const& rhs) = default;
-  // COL_CHANGE& operator=(COL_CHANGE&&) = default;
-  //~COL_CHANGE() = default;
 };
 
 #pragma pack(push, 1)
@@ -424,13 +417,6 @@ class THR_HEAD // thred file header
   uint16_t dlineCount {};    // dline data count
   uint16_t clipDataLen {};   // points to clipboard data
   uint16_t clipDataCount {}; // clipboard data count
-
-  // constexpr THR_HEAD() noexcept = default;
-  // THR_HEAD(THR_HEAD const&) = default;
-  // THR_HEAD(THR_HEAD&&) = default;
-  // THR_HEAD& operator=(THR_HEAD const& rhs) = default;
-  // THR_HEAD& operator=(THR_HEAD&&) = default;
-  //~THR_HEAD() = default;
 };
 #pragma pack(pop)
 
@@ -447,13 +433,6 @@ class THR_HEAD_EX // thred v1.0 file header extension
   int8_t                       stres {};             // reserved
   uint32_t                     texturePointCount {}; // textured fill point count
   std::array<int8_t, RES_SIZE> res {};               // reserved for expansion
-
-  // constexpr THR_HEAD_EX() noexcept = default;
-  // THR_HEAD_EX(THR_HEAD_EX const&) = default;
-  // THR_HEAD_EX(THR_HEAD_EX&&) = default;
-  // THR_HEAD_EX& operator=(THR_HEAD_EX const& rhs) = default;
-  // THR_HEAD_EX& operator=(THR_HEAD_EX&&) = default;
-  //~THR_HEAD_EX() = default;
 };
 #pragma pack(pop)
 
@@ -8868,7 +8847,6 @@ auto thred::unselectAll() -> bool {
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::FRMPSEL);
   StateMap->reset(StateFlag::FPSEL);
-  //StateMap->reset(StateFlag::SELBOX);
   StateMap->set(StateFlag::RESTCH);
   thred::unmsg();
   thi::unboxs();
@@ -10333,7 +10311,6 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 	  break;
 	}
 	default: {
-	  // outDebugString(L"default hit in chkMsg: message [{}]\n", WinMsg.message);
 	  break;
 	}
   }
@@ -12198,7 +12175,6 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	  break;
 	}
 	default: {
-	  outDebugString(L"default hit in wndProc 4: message [{}]\n", message);
 	  break;
 	}
   }
