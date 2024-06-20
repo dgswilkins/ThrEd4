@@ -19,11 +19,6 @@ class SAT_CON
   constexpr SAT_CON() noexcept = default;
   explicit constexpr SAT_CON(SAT_CON_OUT const& rhs) noexcept;
   explicit constexpr SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept;
-  // SAT_CON(SAT_CON const&) = default;
-  // SAT_CON(SAT_CON&&) = default;
-  // SAT_CON& operator=(SAT_CON const& rhs) = default;
-  // SAT_CON& operator=(SAT_CON&&) = default;
-  //~SAT_CON() = default;
 
   inline auto operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON&;
 };
@@ -43,11 +38,6 @@ class SAT_CON_OUT
 
   explicit constexpr SAT_CON_OUT() noexcept = default;
   explicit constexpr SAT_CON_OUT(SAT_CON const& rhs);
-  // SAT_CON_OUT(SAT_CON_OUT const&) = default;
-  // SAT_CON_OUT(SAT_CON_OUT&&) = default;
-  // SAT_CON_OUT& operator=(SAT_CON_OUT const& rhs) = default;
-  // SAT_CON_OUT& operator=(SAT_CON_OUT&&) = default;
-  //~SAT_CON_OUT() = default;
 
   inline auto operator=(SAT_CON const& rhs) -> SAT_CON_OUT&;
 };
