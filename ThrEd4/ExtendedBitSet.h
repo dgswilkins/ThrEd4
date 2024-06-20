@@ -13,13 +13,13 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
   explicit BIT_SET_EX(std::size_t bits) : super::dynamic_bitset(bits) {
   }
 
-  /*
+#ifdef BIT_TEST
   bool testAndReset(std::size_t pos) const {
-      bool val = super::test(pos);
-      super::reset(pos);
-      return val;
+	bool val = super::test(pos);
+	super::reset(pos);
+	return val;
   }
-  */
+#endif
 
   auto getFirst() -> size_t {
 	size_t const foundBit = super::find_first();
