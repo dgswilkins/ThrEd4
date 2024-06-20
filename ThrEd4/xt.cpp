@@ -85,13 +85,6 @@ class FEATHER
   float    globalUp {};
   float    globalDown {};
   float    globalRatio {};
-
-  // constexpr FEATHER() noexcept = default;
-  // FEATHER(FEATHER const&) = default;
-  // FEATHER(FEATHER&&) = default;
-  // FEATHER& operator=(FEATHER const& rhs) = default;
-  // FEATHER& operator=(FEATHER&&) = default;
-  //~FEATHER() = default;
 };
 
 class INT_INFO
@@ -103,13 +96,6 @@ class INT_INFO
   uint32_t      start {};
   uint32_t      output {};
   F_POINT_ATTR* highStitchBuffer {};
-
-  // constexpr INT_INFO() noexcept = default;
-  // INT_INFO(INT_INFO const&) = default;
-  // INT_INFO(INT_INFO&&) = default;
-  // INT_INFO& operator=(INT_INFO const& rhs) = default;
-  // INT_INFO& operator=(INT_INFO&&) = default;
-  //~INT_INFO() = default;
 };
 
 class O_REC
@@ -123,13 +109,6 @@ class O_REC
   uint32_t type {};
   uint32_t form {};
   uint32_t otyp {};
-
-  // constexpr O_REC() noexcept = default;
-  // O_REC(O_REC const&) = default;
-  // O_REC(O_REC&&) = default;
-  // O_REC& operator=(O_REC const& rhs) = default;
-  // O_REC& operator=(O_REC&&) = default;
-  //~O_REC() = default;
 };
 
 class SORT_REC
@@ -140,13 +119,6 @@ class SORT_REC
   uint32_t count {};          // number of regions in range
   uint32_t currentRegion {};  // current region index
   bool     direction = false; // direction of sort
-
-  // constexpr SORT_REC() noexcept = default;
-  // SORT_REC(SORT_REC const&) = default;
-  // SORT_REC(SORT_REC&&) = default;
-  // SORT_REC& operator=(SORT_REC const& rhs) = default;
-  // SORT_REC& operator=(SORT_REC&&) = default;
-  //~SORT_REC() = default;
 };
 
 constexpr auto M_AP     = 1U << 1U;
@@ -1369,12 +1341,6 @@ class ATFLD
   uint32_t type {};
   uint32_t layer {};
   uint32_t user {};
-
-  // constexpr ATFLD() noexcept = default;
-  // ATFLD(ATFLD&&) = default;
-  // ATFLD& operator=(ATFLD const& rhs) = default;
-  // ATFLD& operator=(ATFLD&&) = default;
-  //~ATFLD() = default;
 };
 
 void xi::duatf(uint32_t ind) {
@@ -2542,9 +2508,7 @@ void xt::nudsiz() {
 }
 
 void xt::dushft() {
-  //	StateMap->set(StateFlag::BOXSLCT);
   StateMap->set(StateFlag::BZUMIN);
-  //	StateMap->set(StateFlag::NOSEL);
   ZoomBoxLine[1].x = ZoomBoxLine[2].x = 0L;
   ZoomBoxLine[2].y = ZoomBoxLine[3].y = 0L;
   ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
