@@ -77,13 +77,6 @@ class CLIP_SEG
   uint32_t endIndex {};
   uint32_t zsid {};
   int8_t   dun {};
-
-  // constexpr CLIP_SEG() noexcept = default;
-  // CLIP_SEG(CLIP_SEG const&) = default;
-  // CLIP_SEG(CLIP_SEG&&) = default;
-  // CLIP_SEG& operator=(CLIP_SEG const& rhs) = default;
-  // CLIP_SEG& operator=(CLIP_SEG&&) = default;
-  //~CLIP_SEG() = default;
 };
 
 class CLIP_SORT
@@ -93,13 +86,6 @@ class CLIP_SORT
   float    sideLength {};
   uint32_t vertexIndex {};
   F_POINT  point;
-
-  // constexpr CLIP_SORT() noexcept = default;
-  // CLIP_SORT(CLIP_SORT const&) = default;
-  // CLIP_SORT(CLIP_SORT&&) = default;
-  // CLIP_SORT& operator=(CLIP_SORT const& rhs) = default;
-  // CLIP_SORT& operator=(CLIP_SORT&&) = default;
-  //~CLIP_SORT() = default;
 };
 
 class CLIP_PNT
@@ -109,13 +95,6 @@ class CLIP_PNT
   float    y {};
   uint32_t vertexIndex {};
   uint32_t flag {};
-
-  // constexpr CLIP_PNT() noexcept = default;
-  // CLIP_PNT(CLIP_PNT const&) = default;
-  // CLIP_PNT(CLIP_PNT&&) = default;
-  // CLIP_PNT& operator=(CLIP_PNT const& rhs) = default;
-  // CLIP_PNT& operator=(CLIP_PNT&&) = default;
-  //~CLIP_PNT() = default;
 };
 
 class F_POINT_LINE
@@ -124,13 +103,6 @@ class F_POINT_LINE
   float    x {};
   float    y {};
   uint16_t line {};
-
-  // constexpr F_POINT_LINE() noexcept = default;
-  // F_POINT_LINE(F_POINT_LINE const&) = default;
-  // F_POINT_LINE(F_POINT_LINE&&) = default;
-  // F_POINT_LINE& operator=(F_POINT_LINE const& rhs) = default;
-  // F_POINT_LINE& operator=(F_POINT_LINE&&) = default;
-  //~F_POINT_LINE() = default;
 };
 
 class F_SEQ // Forward SequencePath: path of sequenced regions
@@ -139,13 +111,6 @@ class F_SEQ // Forward SequencePath: path of sequenced regions
   uint16_t node {};
   uint16_t nextGroup {};
   bool     skp {}; // path not found
-
-  // constexpr F_SEQ() noexcept = default;
-  // F_SEQ(F_SEQ const&) = default;
-  // F_SEQ(F_SEQ&&) = default;
-  // F_SEQ& operator=(F_SEQ const& rhs) = default;
-  // F_SEQ& operator=(F_SEQ&&) = default;
-  //~F_SEQ() = default;
 };
 
 class LEN_INFO // Sorted line length info
@@ -154,13 +119,6 @@ class LEN_INFO // Sorted line length info
   uint32_t index {};
   bool     isEnd {};
   float    length {};
-
-  // constexpr LEN_INFO() noexcept = default;
-  // LEN_INFO(LEN_INFO const&) = default;
-  // LEN_INFO(LEN_INFO&&) = default;
-  // LEN_INFO& operator=(LEN_INFO const& rhs) = default;
-  // LEN_INFO& operator=(LEN_INFO&&) = default;
-  //~LEN_INFO() = default;
 };
 
 class R_CON // PathMap: path map for sequencing
@@ -169,13 +127,6 @@ class R_CON // PathMap: path map for sequencing
   uint32_t node {};
   bool     isConnected {};
   uint32_t nextGroup {};
-
-  // constexpr R_CON() noexcept = default;
-  // R_CON(R_CON const&) = default;
-  // R_CON(R_CON&&) = default;
-  // R_CON& operator=(R_CON const& rhs) = default;
-  // R_CON& operator=(R_CON&&) = default;
-  //~R_CON() = default;
 };
 
 class REGION // region for sequencing vertical fills
@@ -188,13 +139,7 @@ class REGION // region for sequencing vertical fills
   uint32_t breakCount {};
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  // constexpr REGION() noexcept = default;
   inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
-  // REGION(REGION const&) = default;
-  // REGION(REGION&&) = default;
-  // REGION& operator=(REGION const& rhs) = default;
-  // REGION& operator=(REGION&&) = default;
-  //~REGION() = default;
 };
 
 inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept :
@@ -207,13 +152,6 @@ class RG_SEQ // TempPath: temporary path connections
   uint32_t pcon {}; // pointer to PathMap entry
   int32_t  count {};
   bool     skp {}; // path not found
-
-  // constexpr RG_SEQ() noexcept = default;
-  // RG_SEQ(RG_SEQ const&) = default;
-  // RG_SEQ(RG_SEQ&&) = default;
-  // RG_SEQ& operator=(RG_SEQ const& rhs) = default;
-  // RG_SEQ& operator=(RG_SEQ&&) = default;
-  //~RG_SEQ() = default;
 };
 
 class V_CLP_X
@@ -221,13 +159,6 @@ class V_CLP_X
   public:
   uint32_t segment {};
   uint32_t vertex {};
-
-  // constexpr V_CLP_X() noexcept = default;
-  // V_CLP_X(V_CLP_X const&) = default;
-  // V_CLP_X(V_CLP_X&&) = default;
-  // V_CLP_X& operator=(V_CLP_X const& rhs) = default;
-  // V_CLP_X& operator=(V_CLP_X&&) = default;
-  //~V_CLP_X() = default;
 };
 
 class V_RECT_2
@@ -241,13 +172,6 @@ class V_RECT_2
   F_POINT copnt;
   F_POINT dipnt;
   F_POINT dopnt;
-
-  // constexpr V_RECT_2() noexcept = default;
-  // V_RECT_2(V_RECT_2 const&) = default;
-  // V_RECT_2(V_RECT_2&&) = default;
-  // V_RECT_2& operator=(V_RECT_2 const& rhs) = default;
-  // V_RECT_2& operator=(V_RECT_2&&) = default;
-  //~V_RECT_2() = default;
 };
 
 constexpr auto BHWIDTH  = 20.0F; // Button hole width
@@ -1029,7 +953,6 @@ void form::dupsel(HDC hDC) {
   SelectObject(hDC, FormPen);
   SetROP2(hDC, R2_XORPEN);
   wrap::polyline(hDC, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
-  // iPoint = SelectedFormVertices.start;
   for (auto iPoint = 0U; iPoint < (SelectedPointsLine->size() - 1U); ++iPoint) {
 	form::selsqr(SelectedPointsLine->operator[](iPoint), hDC);
   }
@@ -2885,13 +2808,6 @@ void fi::contf(FRM_HEAD& form) {
 public:
 	float angle {};
 	float length {};
-
-	// constexpr P_VEC() noexcept = default;
-	// P_VEC(P_VEC const&) = default;
-	// P_VEC(P_VEC&&) = default;
-	// P_VEC& operator=(P_VEC const& rhs) = default;
-	// P_VEC& operator=(P_VEC&&) = default;
-	//~P_VEC() = default;
   };
 
   auto const start = form.fillGuide.start;
@@ -7054,11 +6970,11 @@ void form::dulens(uint32_t sides) {
   if (sides < 4) {
 	sides = 4;
   }
-  /*
+  #ifdef LENS48
       if (sides > 48) {
           sides = 48;
       }
-  */
+  #endif
   auto const steps = sides >> 1U;
   // Calculate the angle subtended by the arc of the lens which is determined by the aspect ratio
   auto const theta = std::atan(1.0F / IniFile.lensRatio);
