@@ -247,7 +247,6 @@ class THREAD
   // NOLINTEND(clang-diagnostic-unused-private-field)
 
   public:
-  // constexpr THREAD() noexcept = default;
   explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
       m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
   }
