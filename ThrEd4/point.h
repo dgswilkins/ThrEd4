@@ -64,7 +64,6 @@ class D_POINT
   double y {};
   // NOLINTEND
 
-  // constexpr D_POINT() noexcept = default;
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
   explicit D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
   }
