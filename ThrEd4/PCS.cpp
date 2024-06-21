@@ -67,10 +67,6 @@ class PCSHEADER // pcs file header structure
 
   public:
   constexpr PCSHEADER() noexcept = default;
-  // PCSHEADER(PCSHEADER&&) = default;
-  // PCSHEADER& operator=(PCSHEADER const& rhs) = default;
-  // PCSHEADER& operator=(PCSHEADER&&) = default;
-  //~PCSHEADER() = default;
 
   void writeHeader(std::array<COLORREF, COLORCNT> userColor) {
 	m_leadIn     = LEADIN;
@@ -113,13 +109,6 @@ class PCS_STITCH
   int16_t y {};  // integer part of y coord
   uint8_t ny {};
   uint8_t tag {};
-
-  // constexpr PCS_STITCH() noexcept = default;
-  // PCS_STITCH(PCS_STITCH const&) = default;
-  // PCS_STITCH(PCS_STITCH&&) = default;
-  // PCS_STITCH& operator=(PCS_STITCH const& rhs) = default;
-  // PCS_STITCH& operator=(PCS_STITCH&&) = default;
-  //~PCS_STITCH() = default;
 };
 #pragma pack(pop)
 
