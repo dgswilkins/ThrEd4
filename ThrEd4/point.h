@@ -71,11 +71,6 @@ class D_POINT
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   explicit inline D_POINT(float rhsX, float rhsY) noexcept;
-  // D_POINT(D_POINT const&) = default;
-  // D_POINT(D_POINT&&) = default;
-  // D_POINT& operator=(D_POINT const& rhs) = default;
-  // D_POINT& operator=(D_POINT&&) = default;
-  //~D_POINT() = default;
 };
 
 #pragma pack(push, 1)
@@ -98,11 +93,6 @@ class F_POINT
   constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
   constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
   constexpr auto operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT&;
-  // F_POINT(F_POINT const&) = default;
-  // F_POINT(F_POINT&&) = default;
-  // F_POINT& operator=(F_POINT const& rhs) = default;
-  // F_POINT& operator=(F_POINT&&) = default;
-  //~F_POINT() = default;
 
   inline auto operator+(F_POINT_ATTR const& rhs) const noexcept -> F_POINT;
 
@@ -167,11 +157,7 @@ class F_POINT_ATTR
   explicit constexpr F_POINT_ATTR() noexcept = default;
   explicit inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA);
   explicit inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
-  // F_POINT_ATTR(F_POINT_ATTR const&) = default;
-  // F_POINT_ATTR(F_POINT_ATTR&&) = default;
-  // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
-  // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
-  //~F_POINT_ATTR() = default;
+
   inline auto operator==(F_POINT_ATTR const& rhs) const noexcept -> bool;
 
   constexpr auto operator=(F_POINT const& rhs) noexcept -> F_POINT_ATTR& {
@@ -210,11 +196,6 @@ class SMAL_PNT_L
 
   explicit constexpr SMAL_PNT_L() noexcept = default;
   explicit constexpr SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept;
-  // SMAL_PNT_L(SMAL_PNT_L const&) = default;
-  // SMAL_PNT_L(SMAL_PNT_L&&) = default;
-  // SMAL_PNT_L& operator=(SMAL_PNT_L const& rhs) = default;
-  // SMAL_PNT_L& operator=(SMAL_PNT_L&&) = default;
-  //~SMAL_PNT_L() = default;
 };
 
 constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept :
@@ -233,11 +214,6 @@ class B_SEQ_PNT
   explicit constexpr B_SEQ_PNT() noexcept = default;
   explicit constexpr B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr);
   explicit constexpr B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr);
-  // B_SEQ_PNT(B_SEQ_PNT const&) = default;
-  // B_SEQ_PNT(B_SEQ_PNT&&) = default;
-  // B_SEQ_PNT& operator=(B_SEQ_PNT const& rhs) = default;
-  // B_SEQ_PNT& operator=(B_SEQ_PNT&&) = default;
-  //~B_SEQ_PNT() = default;
 };
 
 // ToDo - This should use wrap::toFloat but there would be a circular dependency
