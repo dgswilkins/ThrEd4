@@ -11019,9 +11019,9 @@ void thi::drwknot() {
   if (UserFlagMap->test(UserFlag::KNOTOF) || Knots->empty() || StitchBuffer->empty()) {
 	return;
   }
-  constexpr auto KBOFFSET = 5; // offset of the knot box sides;
+  constexpr auto KBOFFSET = 5; // offset of the knot box sides
   auto const     kOffset  = MulDiv(KBOFFSET, *ScreenDPI, STDDPI);
-  constexpr auto KLINELEN = 10; // length of the knot line;
+  constexpr auto KLINELEN = 10; // length of the knot line
   auto const     kLine    = MulDiv(KLINELEN, *ScreenDPI, STDDPI);
   auto           point    = POINT {};
   auto           kOutline = std::array<POINT, SQPNTS> {};
