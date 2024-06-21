@@ -901,12 +901,12 @@ class FORM_INFO
   uint32_t attribute {};
   uint32_t sideCount {};
 
-  // constexpr FORM_INFO() noexcept = default;
-  // FORM_INFO(FORM_INFO const&) = default;
-  // FORM_INFO(FORM_INFO&&) = default;
-  // FORM_INFO& operator=(FORM_INFO const& rhs) = default;
-  // FORM_INFO& operator=(FORM_INFO&&) = default;
-  //~FORM_INFO() = default;
+  // constexpr FORM_INFO() noexcept = default
+  // FORM_INFO(FORM_INFO const&) = default
+  // FORM_INFO(FORM_INFO&&) = default
+  // FORM_INFO& operator=(FORM_INFO const& rhs) = default
+  // FORM_INFO& operator=(FORM_INFO&&) = default
+  //~FORM_INFO() = default
 };
 #endif
 
