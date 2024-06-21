@@ -893,7 +893,7 @@ constexpr uint32_t FRMFIL   = 0x20000000U; // Form Fill Stitches
 constexpr uint32_t FRMBFIL  = 0x40000000U; // Form Border Stitches
 constexpr uint32_t FRMAPFIL = 0x60000000U; // Form Applique Stitches
 
-/*
+#ifdef NEEDS_FORM_INFO
 class FORM_INFO
 {
   public:
@@ -908,7 +908,7 @@ class FORM_INFO
   // FORM_INFO& operator=(FORM_INFO&&) = default;
   //~FORM_INFO() = default;
 };
-*/
+#endif
 
 /*form attribute bits
 
