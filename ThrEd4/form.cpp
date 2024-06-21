@@ -2816,10 +2816,12 @@ public:
   if (start >= finish) {
 	return;
   }
+  // setup the form vertices
   auto       itFirstVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const itSelectedVertex = wrap::next(itFirstVertex, start);
   auto const lowVertexIndex   = start;
   auto const highVertexIndex  = form.vertexCount - start - 1U;
+  // setup the storage for the counts, lengths, deltas, steps, and vertices
   auto       lowCounts        = std::vector<uint32_t> {};
   lowCounts.resize(lowVertexIndex);
   auto highCounts = std::vector<uint32_t> {};
@@ -2844,6 +2846,7 @@ public:
   OSequence->clear();
   auto lowIndex = 0U;
   {
+	// setup the low side of the contours
 	auto itVertex = wrap::next(itFirstVertex, lowVertexIndex);
 	for (auto iVertex = lowVertexIndex; iVertex != 0; --iVertex) {
 	  lowVertices[lowIndex] = *itVertex;
@@ -2860,6 +2863,7 @@ public:
   auto       polyLines           = std::vector<P_VEC> {};
   polyLines.resize(selectedVertexCount);
   {
+	// setup the polyLines
 	auto selind   = 0U;
 	auto itVertex = wrap::next(itFirstVertex, start + 1);
 	for (auto iVertex = start + 1U; iVertex <= finish; ++iVertex) {
@@ -2872,6 +2876,7 @@ public:
   auto highIndex  = 0U;
   auto highLength = 0.0F;
   {
+	// setup the high side of the contours
 	auto itFinishVertex = wrap::next(itFirstVertex, finish);
 	auto itNextVertex   = wrap::next(itFinishVertex, 1);
 	for (auto iVertex = finish; iVertex < form.vertexCount - 1U; ++iVertex) {
@@ -2887,12 +2892,14 @@ public:
   }
   auto lowSpacing  = form.fillSpacing;
   auto highSpacing = lowSpacing;
+  // adjust the spacing depending on the lengths
   if (highLength < lowLength) {
 	highSpacing = form.fillSpacing * highLength / lowLength;
   }
   else {
 	lowSpacing = form.fillSpacing * lowLength / highLength;
   }
+  // setup the counts and steps
   for (auto iVertex = 0U; iVertex < lowVertexIndex; ++iVertex) {
 	lowCounts[iVertex] = wrap::round<uint32_t>(lowLengths[iVertex] / lowSpacing);
 	lowSteps[iVertex]  = F_POINT {lowDeltas[iVertex].x / wrap::toFloat(lowCounts[iVertex]),
@@ -2903,6 +2910,7 @@ public:
 	highSteps[iVertex]  = F_POINT {highDeltas[iVertex].x / wrap::toFloat(highCounts[iVertex]),
                                   highDeltas[iVertex].y / wrap::toFloat(highCounts[iVertex])};
   }
+  // setup the indices and counts
   lowIndex = highIndex = 0;
   StateMap->reset(StateFlag::FILDIR);
   auto lowCount       = 0U;
@@ -2915,6 +2923,7 @@ public:
   auto       lowPoint  = F_POINT {};
   auto       highStep  = F_POINT {};
   auto       highPoint = F_POINT {};
+  // build the contours
   while ((lowCount != 0U) || (lowIndex < lowVertexIndex && highIndex < highVertexIndex)) {
 	if (lowCount != 0U) {
 	  --lowCount;
@@ -2939,9 +2948,10 @@ public:
 	  }
 	}
 	delta = F_POINT {highPoint.x - lowPoint.x, highPoint.y - lowPoint.y};
-
+	// check if the reference length is too long
 	if (constexpr auto REFFACT = 0.9F; // reduction factor for the reference
 	    reference.length > REFFACT * LineSpacing) {
+	  // and if not, create the sequence for the contour
 	  auto const polyLine = P_VEC {std::atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
 	  if (auto const polyDiff = P_VEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
 	      StateMap->testAndFlip(StateFlag::FILDIR)) {
@@ -5189,8 +5199,9 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
   auto rotationCenter      = F_POINT {};
   auto doFill              = true;
   auto rotationAngle       = 0.0F;
+  // use fillType to determine which function to call
   switch (form.fillType) {
-	case VRTF: {
+	case VRTF: { // vertical fill
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(form.vertexCount);
 	  auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -5199,7 +5210,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  fi::fnvrt(workingFormVertices, groupIndexSequence, lineEndpoints);
 	  break;
 	}
-	case HORF: {
+	case HORF: { // horizontal fill
 	  rotationAngle = PI_FHALF;
 	  fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 	  workingFormVertices.clear();
@@ -5209,7 +5220,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
 	}
-	case ANGF: {
+	case ANGF: { // angled fill
 	  rotationAngle = PI_FHALF - form.fillAngle;
 	  fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 	  workingFormVertices.clear();
@@ -5219,7 +5230,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
 	}
-	case VCLPF: {
+	case VCLPF: { // vertical clip fill
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
 	  workingFormVertices.clear();
@@ -5231,14 +5242,14 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  doFill = false;
 	  break;
 	}
-	case HCLPF: {
+	case HCLPF: { // horizontal clip fill
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
 	  fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
-	case ANGCLPF: {
+	case ANGCLPF: { // angled clip fill
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
 	  StateMap->reset(StateFlag::ISUND);
@@ -5246,7 +5257,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  doFill = false;
 	  break;
 	}
-	case TXVRTF: {
+	case TXVRTF: { // vertical fill with texture
 	  texture::setxt(form, textureSegments);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(form.vertexCount);
@@ -5257,13 +5268,13 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  doFill = false;
 	  break;
 	}
-	case TXHORF: {
+	case TXHORF: { // horizontal fill with texture
 	  texture::setxt(form, textureSegments);
 	  fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
-	case TXANGF: {
+	case TXANGF: { // angled fill with texture
 	  texture::setxt(form, textureSegments);
 	  StateMap->reset(StateFlag::ISUND);
 	  form::angclpfn(form, textureSegments, *AngledFormVertices);
@@ -5275,6 +5286,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  break;
 	}
   }
+  // fill the form if it is a vertical, horizontal, or angled fill
   if (doFill) {
 	fi::lcon(form, groupIndexSequence, lineEndpoints, workingFormVertices);
 	fi::bakseq();
