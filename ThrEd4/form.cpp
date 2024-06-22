@@ -6640,6 +6640,7 @@ void fi::resizeStitches(F_POINT const& reference, F_POINT const& ratio) {
 }
 
 void form::setexpand(float xyRatio) {
+  // resharper disable once CppInitializedValueIsAlwaysRewritten
   auto size0     = F_POINT {};
   auto rectangle = F_RECTANGLE {};
   thred::savdo();
@@ -6663,8 +6664,10 @@ void form::setexpand(float xyRatio) {
 	                                               : StitchRangeRect;
 	size0.y = rectangle.top - rectangle.bottom;
   }
+  // resharper disable CppInitializedValueIsAlwaysRewritten
   auto ratio     = F_POINT {1.0F, 1.0F};
   auto reference = F_POINT {};
+  // resharper restore CppInitializedValueIsAlwaysRewritten
   size0.x        = rectangle.right - rectangle.left;
   // we need to determine the reference point and the ratio for the expansion
   switch (SelectedFormControlVertex) {
