@@ -105,7 +105,7 @@ auto BitmapDstRect        = RECT {};   // stitch window destination rectangle fo
 auto BitmapFileHandle     = HANDLE {}; // bitmap handle
 auto BitmapFileHeader     = BITMAPFILEHEADER {}; // bitmap file header
 auto BitmapFileHeaderV4   = BITMAPV4HEADER {};   // bitmap version4 file header
-auto BitmapHeight         = int {};              // bitmap height
+auto BitmapHeight         = LONG {};             // bitmap height
 auto BitmapInfo           = BITMAPINFO {};       // bitmap info
 auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
 auto BitmapPen            = HPEN {};             // bitmap pen
@@ -562,7 +562,7 @@ auto bitmap::getBmpStitchRatio() noexcept -> F_POINT {
   return BmpStitchRatio;
 }
 
-auto bitmap::getBitmapHeight() noexcept -> int {
+auto bitmap::getBitmapHeight() noexcept -> LONG {
   return BitmapHeight;
 }
 

@@ -30,7 +30,7 @@ void chkbit();
 void delmap();
 void drawBmpBackground();
 auto getBitmapDC() noexcept -> HDC;
-auto getBitmapHeight() noexcept -> int;
+auto getBitmapHeight() noexcept -> LONG;
 auto getBitmapSizeinStitches() noexcept -> F_POINT;
 auto getBitmapWidth() noexcept -> int;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
