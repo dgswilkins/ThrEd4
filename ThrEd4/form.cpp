@@ -235,7 +235,7 @@ void doTimeWindow(float rangeX, std::vector<uint32_t> const& xPoints, std::vecto
 void drawGuides(FRM_HEAD const& form);
 void drawFormBox(const FRM_HEAD& form);
 void drawFormsBox();
-void drawStartGuide(FRM_HEAD const& form, const uint8_t layer, unsigned int& lastPoint);
+void drawStartGuide(FRM_HEAD const& form, uint8_t layer, unsigned int& lastPoint) noexcept;
 
 constexpr auto duat(uint32_t attribute) -> uint32_t;
 
@@ -985,7 +985,7 @@ auto form::sRct2px(F_RECTANGLE const& stitchRect) -> RECT {
                                    (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
-void fi::drawStartGuide(FRM_HEAD const& form, const uint8_t layer, unsigned int& lastPoint) {
+void fi::drawStartGuide(FRM_HEAD const& form, uint8_t layer, unsigned int& lastPoint) noexcept {
   SelectObject(StitchWindowMemDC, FormPen);
   fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
   SelectObject(StitchWindowMemDC, FormPen3px);
