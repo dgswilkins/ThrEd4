@@ -111,7 +111,7 @@ auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
 auto BitmapPen            = HPEN {};             // bitmap pen
 auto BitmapSizeinStitches = F_POINT {};          // bitmap end points in stitch points
 auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
-auto BitmapWidth          = int {};              // bitmap width
+auto BitmapWidth          = LONG {};             // bitmap width
 auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
 auto TraceBitmap          = HBITMAP {};          // trace bitmap
 auto TraceDC              = HDC {};              // trace device context
@@ -574,7 +574,7 @@ auto bitmap::getTraceDC() noexcept -> HDC {
   return TraceDC;
 }
 
-auto bitmap::getBitmapWidth() noexcept -> int {
+auto bitmap::getBitmapWidth() noexcept -> LONG {
   return BitmapWidth;
 }
 
