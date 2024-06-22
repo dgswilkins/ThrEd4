@@ -8983,19 +8983,21 @@ void form::dubfil() {
 
 void form::col2frm() {
   auto colorChangedCount = 0U;
-  if (FormList->empty()) {
+  if (FormList->empty()) { // no forms to change
 	displayText::showMessage(IDS_NCOLCHG, colorChangedCount);
 	return;
   }
   auto const formColorPermutations = FormList->size() << 4U; // total number of form and color combinations
   auto fillColorHistogram = std::vector<uint32_t> {};
-  fillColorHistogram.resize(formColorPermutations);
   auto borderColorHistogram = std::vector<uint32_t> {};
-  borderColorHistogram.resize(formColorPermutations);
   auto featherColorHistogram = std::vector<uint32_t> {};
-  featherColorHistogram.resize(formColorPermutations);
   auto underlayColorHistogram = std::vector<uint32_t> {};
+  // prefer resizing to be explicit
+  featherColorHistogram.resize(formColorPermutations);
+  fillColorHistogram.resize(formColorPermutations);
+  borderColorHistogram.resize(formColorPermutations);
   underlayColorHistogram.resize(formColorPermutations);
+  // initialize the histograms
   for (auto const& stitch : *StitchBuffer) {
 	auto const formColorCode = stitch.attribute & (COLMSK | FRMSK);
 	if ((stitch.attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0U) {
@@ -9024,9 +9026,10 @@ void form::col2frm() {
   auto startColorOffset = 0U;
   auto endColorOffset   = COLORCNT;
   for (auto& iForm : *FormList) {
-	if (iForm.fillType != 0U) {
+	if (iForm.fillType != 0U) { // form has a fill
 	  auto count         = 0U;
 	  auto majorityColor = 0U;
+	  // find the most common color in the fill
 	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
 		if (fillColorHistogram[iColor] > count) {
 		  count         = fillColorHistogram[iColor];
@@ -9038,6 +9041,7 @@ void form::col2frm() {
 		++colorChangedCount;
 		wrap::narrow(iForm.fillColor, majorityColor);
 	  }
+	  // if the form has feathering and the feathering color is not the same as the fill color
 	  if (iForm.fillType == FTHF && ((iForm.extendedAttribute & AT_FTHBLND) != 0U)) {
 		count = majorityColor = 0;
 		for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
@@ -9053,9 +9057,10 @@ void form::col2frm() {
 		}
 	  }
 	}
-	if (iForm.edgeType != 0U) {
+	if (iForm.edgeType != 0U) { // form has a border
 	  auto count         = 0U;
 	  auto majorityColor = 0U;
+	  // find the most common color in the border
 	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
 		if (borderColorHistogram[iColor] > count) {
 		  count         = borderColorHistogram[iColor];
@@ -9068,9 +9073,10 @@ void form::col2frm() {
 		wrap::narrow(iForm.borderColor, majorityColor);
 	  }
 	}
-	if ((iForm.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) {
+	if ((iForm.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) { // form has an underlay
 	  auto count         = 0U;
 	  auto majorityColor = 0U;
+	  // find the most common color in the underlay
 	  for (auto iColor = startColorOffset; iColor < endColorOffset; ++iColor) {
 		if (underlayColorHistogram[iColor] > count) {
 		  count         = borderColorHistogram[iColor];
