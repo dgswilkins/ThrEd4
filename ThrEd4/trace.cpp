@@ -805,12 +805,8 @@ void ti::dutrac() {
   }
   auto const bmpSR = bitmap::getBmpStitchRatio();
   CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
-  if (CurrentTracePoint.x > bitmap::getBitmapHeight()) {
-	CurrentTracePoint.x = bitmap::getBitmapWidth();
-  }
-  if (CurrentTracePoint.y > bitmap::getBitmapHeight()) {
-	CurrentTracePoint.y = bitmap::getBitmapHeight();
-  }
+  CurrentTracePoint.x       = std::min(CurrentTracePoint.x, bitmap::getBitmapWidth());
+  CurrentTracePoint.y       = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint     = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
   auto       traceDirection = 0U;
   if (!TracedEdges->test(wrap::toSize(savedPoint))) {
