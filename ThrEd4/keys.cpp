@@ -1,7 +1,6 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 // Local Headers
 #include "stdafx.h"
-#include "switches.h"
 #include "backup.h"
 #include "displayText.h"
 #include "EnumMap.h"
