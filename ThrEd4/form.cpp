@@ -232,6 +232,10 @@ void contf(FRM_HEAD& form);
 auto contsf(uint32_t formIndex) -> bool;
 void cplayfn(uint32_t iForm, uint32_t layer);
 void doTimeWindow(float rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram);
+void drawGuides(FRM_HEAD const& form);
+void drawFormBox(const FRM_HEAD& form);
+void drawFormsBox();
+void drawStartGuide(FRM_HEAD const& form, const uint8_t layer, unsigned int& lastPoint);
 
 constexpr auto duat(uint32_t attribute) -> uint32_t;
 
@@ -981,6 +985,61 @@ auto form::sRct2px(F_RECTANGLE const& stitchRect) -> RECT {
                                    (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
+void fi::drawStartGuide(FRM_HEAD const& form, const uint8_t layer, unsigned int& lastPoint) {
+  SelectObject(StitchWindowMemDC, FormPen);
+  fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
+  SelectObject(StitchWindowMemDC, FormPen3px);
+  wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
+  SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
+  lastPoint = form.wordParam + 1U;
+}
+
+void fi::drawGuides(FRM_HEAD const& form) {
+  auto       line          = std::array<POINT, 2> {};
+  auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+  auto const maxGuide      = form.satinGuideCount;
+  for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
+	auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
+	auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
+	line[0]                   = form::sfCor2px(*itStartVertex);
+	line[1]                   = form::sfCor2px(*itFinishVertex);
+	SelectObject(StitchWindowMemDC, FormPen);
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	++itGuide;
+  }
+}
+
+void fi::drawFormBox(FRM_HEAD const& form) {
+  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
+	if (iVertex == ClosestVertexToCursor) {
+	  fi::frmx(FormLines->operator[](iVertex), StitchWindowMemDC);
+	}
+	else {
+	  fi::frmsqr(form.vertexIndex, iVertex);
+	}
+  }
+  if (ClosestVertexToCursor != 0U) {
+	fi::frmsqr0(FormLines->front());
+  }
+  else {
+	fi::frmx(FormLines->front(), StitchWindowMemDC);
+  }
+  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
+}
+
+void fi::drawFormsBox() {
+  SelectObject(StitchWindowMemDC, MultiFormPen);
+  form::ratsr();
+  SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
+  for (auto const selectedForm : (*SelectedFormList)) {
+	form::fselrct(selectedForm);
+  }
+  wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
+  wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);
+  form::dubig();
+}
+
 void form::drwfrm() {
   StateMap->reset(StateFlag::SHOMOV);
   StateMap->reset(StateFlag::SHOPSEL);
@@ -999,42 +1058,26 @@ void form::drwfrm() {
 	if ((ActiveLayer != 0U) && (layer != 0U) && layer != ActiveLayer) {
 	  continue;
 	}
-	auto line      = std::array<POINT, 2> {};
 	auto lastPoint = 0U;
 	if (form.type == SAT) {
-	  if ((form.attribute & FRMEND) != 0U) {
+	  if ((form.attribute & FRMEND) != 0U) { // if the form has an end guide, draw it
 		SelectObject(StitchWindowMemDC, FormPen3px);
 		wrap::polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
 		lastPoint = 1;
 	  }
-	  if (form.wordParam != 0U) {
-		SelectObject(StitchWindowMemDC, FormPen);
-		fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
-		SelectObject(StitchWindowMemDC, FormPen3px);
-		wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
-		SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
-		lastPoint = form.wordParam + 1U;
+	  if (form.wordParam != 0U) { // if the form has a start guide, draw it
+		fi::drawStartGuide(form, layer, lastPoint);
 	  }
-	  auto const maxGuide = FormList->operator[](iForm).satinGuideCount;
-	  if (maxGuide != 0U) {
-		auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-		auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
-		for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
-		  auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
-		  auto const itFinishVertex = wrap::next(itFirstVertex, itGuide->finish);
-		  line[0]                   = form::sfCor2px(*itStartVertex);
-		  line[1]                   = form::sfCor2px(*itFinishVertex);
-		  SelectObject(StitchWindowMemDC, FormPen);
-		  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-		  ++itGuide;
-		}
+	  if (form.satinGuideCount != 0U) { // if the form has satin guides, draw them
+		fi::drawGuides(form);
 	  }
 	}
 	SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
-	if (form.type == FRMLINE) {
+	if (form.type == FRMLINE) { // if the form is a line, draw it
 	  if (form.vertexCount > 0) {
 		fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
-		if (form.fillType == CONTF) {
+		if (form.fillType == CONTF) { // if the form is a contour fill, draw the fill guide
+		  auto       line           = std::array<POINT, 2> {};
 		  auto const itFirstVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		  auto const itStartVertex  = wrap::next(itFirstVertex, form.fillGuide.start);
 		  auto const itFinishVertex = wrap::next(itFirstVertex, form.fillGuide.finish);
@@ -1044,29 +1087,15 @@ void form::drwfrm() {
 		}
 	  }
 	}
-	else {
+	else { // if the form is a polygon, draw it
 	  if (form.vertexCount > lastPoint) {
 		fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](lastPoint)), form.vertexCount - lastPoint));
 	  }
 	}
-	if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) {
-	  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-		if (iVertex == ClosestVertexToCursor) {
-		  fi::frmx(FormLines->operator[](iVertex), StitchWindowMemDC);
-		}
-		else {
-		  fi::frmsqr(form.vertexIndex, iVertex);
-		}
-	  }
-	  if (ClosestVertexToCursor != 0U) {
-		fi::frmsqr0(FormLines->front());
-	  }
-	  else {
-		fi::frmx(FormLines->front(), StitchWindowMemDC);
-	  }
-	  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
+	if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) { // if the form is selected, draw the selection box
+	  fi::drawFormBox(form);
 	}
-	else {
+	else { // if the form is not selected, draw the form
 	  auto& formLines = *FormLines;
 	  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 		fi::frmsqr(form.vertexIndex, iVertex);
@@ -1074,29 +1103,22 @@ void form::drwfrm() {
 	  SelectObject(StitchWindowMemDC, FormSelectedPen);
 	  fi::frmsqr0(formLines[0]);
 	}
-	if (StateMap->test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
+	if (StateMap->test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) { // if form points are selected, draw the selection box
+      form::dupsel(StitchWindowMemDC);
 	  SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
 	  form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 	  StateMap->set(StateFlag::SHOPSEL);
 	  form::dupsel(StitchWindowMemDC);
 	}
   }
-  if (!SelectedFormList->empty()) {
-	SelectObject(StitchWindowMemDC, MultiFormPen);
-	ratsr();
-	SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
-	for (auto const selectedForm : (*SelectedFormList)) {
-	  fselrct(selectedForm);
-	}
-	wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
-	wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);
-	dubig();
+  if (!SelectedFormList->empty()) { // if there are selected forms, draw the selection box
+	fi::drawFormsBox();
   }
-  else {
+  else { // if there are no selected forms, erase the selection box
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  form::ritfrct(ClosestFormToCursor, StitchWindowMemDC);
 	}
-	if (StateMap->test(StateFlag::FRMPMOV)) {
+	if (StateMap->test(StateFlag::FRMPMOV)) { // if the user is moving a form point
 	  thred::ritmov(ClosestFormToCursor);
 	  RubberBandLine->operator[](1) =
 	      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
