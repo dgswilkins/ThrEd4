@@ -2574,79 +2574,82 @@ void fi::chkbrd(FRM_HEAD const& form) {
 void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
                std::vector<uint32_t>&   groupIndexSequence,
                std::vector<SMAL_PNT_L>& lineEndpoints) {
-  auto const mmTuple = std::minmax_element(
-      currentFillVertices.begin(),
-      currentFillVertices.end(),
-      [](F_POINT const& first, F_POINT const& second) { return first.x < second.x; });
-  auto const highX           = mmTuple.second->x;
-  auto const lineOffset      = std::floor(mmTuple.first->x / LineSpacing);
-  auto const lowX            = LineSpacing * lineOffset;
-  auto       fillLineCount   = wrap::floor<uint32_t>((highX - lowX) / LineSpacing + 1.0F);
-  auto const step            = (highX - lowX) / wrap::toFloat(fillLineCount);
-  auto       currentX        = lowX;
-  auto       projectedPoints = std::vector<F_POINT_LINE> {};
-  projectedPoints.reserve(currentFillVertices.size() + 2U);
-  auto const currentVertexCount = wrap::toUnsigned(currentFillVertices.size());
-  for (auto iLine = 0U; iLine < fillLineCount; ++iLine) {
-	auto iLineCounter = 0U;
-	currentX += step;
-	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
-	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
-	  if (auto point = F_POINT {};
-	      projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
-		++iLineCounter;
+  if (!currentFillVertices.empty()) {
+	auto const mmTuple = std::minmax_element(
+	    currentFillVertices.begin(),
+	    currentFillVertices.end(),
+	    [](F_POINT const& first, F_POINT const& second) { return first.x < second.x; });
+	auto const highX           = mmTuple.second->x;
+	auto const lineOffset      = std::floor(mmTuple.first->x / LineSpacing);
+	auto const lowX            = LineSpacing * lineOffset;
+	auto       fillLineCount   = wrap::floor<uint32_t>((highX - lowX) / LineSpacing + 1.0F);
+	auto const step            = (highX - lowX) / wrap::toFloat(fillLineCount);
+	auto       currentX        = lowX;
+	auto       projectedPoints = std::vector<F_POINT_LINE> {};
+	projectedPoints.reserve(currentFillVertices.size() + 2U);
+	auto const currentVertexCount = currentFillVertices.size();
+	for (auto iLine = 0U; iLine < fillLineCount; ++iLine) {
+	  auto iLineCounter = 0U;
+	  currentX += step;
+	  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
+		// currentVertexCount cannot be 0 so no need to check for division by 0
+		auto const iNextVertex = (iVertex + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
+		if (auto point = F_POINT {};
+		    projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
+		  ++iLineCounter;
+		}
 	  }
+	  fillLineCount += iLineCounter;
 	}
-	fillLineCount += iLineCounter;
-  }
-  lineEndpoints.reserve(wrap::toSize(fillLineCount) + 1U);
-  auto lineGroupIndex = 0U;
-  // groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
-  groupIndexSequence.reserve(fillLineCount);
-  currentX = lowX;
-  for (auto iLine = 0U; iLine < fillLineCount; ++iLine) {
-	projectedPoints.clear();
-	projectedPoints.reserve(currentVertexCount);
-	currentX += step;
-	auto iPoint = 0U;
-	auto vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
-	for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
-	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
-	  if (auto point = F_POINT {};
-	      projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
-		auto const projected = F_POINT_LINE {point.x, point.y, iVertex};
-		projectedPoints.push_back(projected);
-		++iPoint;
+	lineEndpoints.reserve(wrap::toSize(fillLineCount) + 1U);
+	auto lineGroupIndex = 0U;
+	// groupIndex cannot be more than fillLineCount so reserve that amount of memory to reduce re-allocations
+	groupIndexSequence.reserve(fillLineCount);
+	currentX = lowX;
+	for (auto iLine = 0U; iLine < fillLineCount; ++iLine) {
+	  projectedPoints.clear();
+	  projectedPoints.reserve(currentVertexCount);
+	  currentX += step;
+	  auto iPoint      = 0U;
+	  auto vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
+	  for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
+		auto const iNextVertex = (iVertex + 1U) % currentVertexCount;  // NOLINT(clang-analyzer-core.DivideZero)
+		if (auto point = F_POINT {};
+		    projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
+		  auto const projected = F_POINT_LINE {point.x, point.y, iVertex};
+		  projectedPoints.push_back(projected);
+		  ++iPoint;
+		}
 	  }
-	}
-	if (iPoint <= 1) {
-	  continue;
-	}
-	auto const evenPointCount = (iPoint & 0xfffffffe);
-	groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
-	std::ranges::sort(projectedPoints, fi::fplComp);
-	iPoint                    = 0;
-	auto const savedLineCount = lineEndpoints.size();
-	while (iPoint < evenPointCount) {
-	  if (lineEndpoints.size() >= fillLineCount) {
+	  if (iPoint <= 1) {
 		continue;
 	  }
-	  lineEndpoints.emplace_back(projectedPoints[iPoint].line,
-	                             lineGroupIndex,
-	                             projectedPoints[iPoint].x,
-	                             projectedPoints[iPoint].y);
-	  ++iPoint;
-	  lineEndpoints.emplace_back(projectedPoints[iPoint].line,
-	                             lineGroupIndex,
-	                             projectedPoints[iPoint].x,
-	                             projectedPoints[iPoint].y);
-	  ++iPoint;
+	  auto const evenPointCount = (iPoint & 0xfffffffe);
+	  groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
+	  std::ranges::sort(projectedPoints, fi::fplComp);
+	  iPoint                    = 0;
+	  auto const savedLineCount = lineEndpoints.size();
+	  while (iPoint < evenPointCount) {
+		if (lineEndpoints.size() >= fillLineCount) {
+		  continue;
+		}
+		lineEndpoints.emplace_back(projectedPoints[iPoint].line,
+		                           lineGroupIndex,
+		                           projectedPoints[iPoint].x,
+		                           projectedPoints[iPoint].y);
+		++iPoint;
+		lineEndpoints.emplace_back(projectedPoints[iPoint].line,
+		                           lineGroupIndex,
+		                           projectedPoints[iPoint].x,
+		                           projectedPoints[iPoint].y);
+		++iPoint;
+	  }
+	  if (lineEndpoints.size() != savedLineCount) {
+		++lineGroupIndex;
+	  }
 	}
-	if (lineEndpoints.size() != savedLineCount) {
-	  ++lineGroupIndex;
-	}
+	groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
   }
-  groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
 }
 
 void fi::fnang(std::vector<uint32_t>&   groupIndexSequence,
