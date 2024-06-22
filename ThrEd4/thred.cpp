@@ -10219,10 +10219,7 @@ auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD&           textureForm,
 	rotfns(IniFile.rotationAngle);
   }
   thred::unmsg();
-  if (keys::handleMainWinKeys(code, rotationCenter, stretchBoxLine)) {
-	return true;
-  }
-  return false;
+  return keys::handleMainWinKeys(code, rotationCenter, stretchBoxLine);
 }
 
 void thi::handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
