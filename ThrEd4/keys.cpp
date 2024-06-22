@@ -1385,7 +1385,7 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
   return false;
 }
 
-auto keys::createFormType(const wchar_t code) -> bool {
+auto keys::createFormType(wchar_t code) -> bool {
   switch (code) {
 	case L'E': {
 	  StateMap->reset(StateFlag::FORMIN);
@@ -1445,7 +1445,7 @@ auto keys::createFormType(const wchar_t code) -> bool {
   return false;
 }
 
-void keys::navigateThumbnails(const wchar_t code) {
+void keys::navigateThumbnails(wchar_t code) {
   switch (code) {
 	case VK_ESCAPE:
 	case L'Q': {
@@ -1481,7 +1481,7 @@ void keys::navigateThumbnails(const wchar_t code) {
   }
 }
 
-auto keys::otherKeys(const wchar_t code) -> bool {
+auto keys::otherKeys(wchar_t code) -> bool {
   switch (code) {
 	case VK_DECIMAL:      // numpad period
 	case VK_OEM_PERIOD: { // period
