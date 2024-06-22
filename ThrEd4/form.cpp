@@ -2593,7 +2593,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  currentX += step;
 	  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 		// currentVertexCount cannot be 0 so no need to check for division by 0
-		auto const iNextVertex = (iVertex + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
+		auto const iNextVertex = (wrap::toSize(iVertex) + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
 		if (auto point = F_POINT {};
 		    projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 		  ++iLineCounter;
@@ -2613,7 +2613,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  auto iPoint      = 0U;
 	  auto vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
 	  for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
-		auto const iNextVertex = (iVertex + 1U) % currentVertexCount;  // NOLINT(clang-analyzer-core.DivideZero)
+		auto const iNextVertex = (wrap::toSize(iVertex) + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
 		if (auto point = F_POINT {};
 		    projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 		  auto const projected = F_POINT_LINE {point.x, point.y, iVertex};
