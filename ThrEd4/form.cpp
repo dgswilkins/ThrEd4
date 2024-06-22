@@ -439,6 +439,11 @@ auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
             uint32_t                             iRegion,
             std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
             std::vector<REGION> const&           regionsList) noexcept -> float;
+void resizeBigBox(F_POINT const& stitchReference, F_POINT const& ratio);
+void resizeForm(F_POINT const& reference, F_POINT const& ratio);
+void resizeFormPoints(F_POINT const& stitchReference, F_POINT const& ratio);
+void resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& ratio);
+void resizeStitches(F_POINT const& reference, F_POINT const& ratio);
 void ritapbrd();
 void ritbrd(FRM_HEAD const& form);
 void ritfil(FRM_HEAD& form);
@@ -454,6 +459,7 @@ void rotentr(float rotationAngle);
 void sapliq(uint32_t formIndex);
 void sbold(uint32_t formIndex);
 void sbord(uint32_t formIndex);
+void setSize(F_POINT& size1, float xyRatio) noexcept;
 void seteg();
 void sethart();
 void setlens();
@@ -658,7 +664,8 @@ void fi::frmlin(FRM_HEAD const& form) {
   FormLines->clear();
   FormLines->reserve(form.vertexCount);
   auto const itFirstVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-  auto       itCurrentVertex = itFirstVertex;
+
+  auto       itCurrentVertex = itFirstVertex; // intentional copy
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	FormLines->push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
 	                            std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
@@ -1442,7 +1449,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 	  continue;
 	}
 	auto const itFirstVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex);
-	auto       itVertex      = itFirstVertex;
+	auto       itVertex      = itFirstVertex; //intentional copy
 	// find the closest line first and then find the closest vertex on that line
 	auto       length    = 0.0F;
 	auto const sideCount = currentForm.vertexCount;
@@ -1805,7 +1812,7 @@ void fi::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float si
 	return;
   }
   auto const step   = F_POINT {delta.x / wrap::toFloat(count), delta.y / wrap::toFloat(count)};
-  auto       point0 = *itStartVertex;
+  auto       point0 = *itStartVertex; // intentional copy
   auto       point1 = F_POINT {point0.x + step.x, point0.y + step.y};
   while (count != 0U) {
 	OSequence->push_back(point1);
@@ -2009,7 +2016,7 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
   auto const  itFinishVertex = wrap::next(vertices.cbegin(), vertexIndex + finish);
   if ((delta.x != 0.0F) && (delta.y != 0.0F)) {
 	auto const slope        = -delta.x / delta.y;
-	auto       point        = *itFinishVertex;
+	auto       point        = *itFinishVertex; // intentional copy
 	auto&      verticalRect = fillVerticalRect[start];
 	fi::proj(point, slope, opStart, opFinish, verticalRect.dopnt);
 	fi::proj(point, slope, ipStart, ipFinish, verticalRect.dipnt);
@@ -2126,8 +2133,8 @@ void fi::duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& st
   auto const factor  = wrap::toFloat(count);
   auto const step0   = F_POINT {delta0.x / factor, delta0.y / factor};
   auto const step1   = F_POINT {delta1.x / factor, delta1.y / factor};
-  auto       start00 = start0;
-  auto       start11 = start1;
+  auto       start00 = start0; // intentional copy
+  auto       start11 = start1; // intentional copy
   for (auto iStep = 0U; iStep < count; ++iStep) {
 	if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 	  form::filinsb(start00, stitchPoint);
@@ -2309,7 +2316,7 @@ void fi::pfn(std::vector<V_RECT_2> const& underlayVerticalRect,
   auto        currentVertex = startVertex;
   auto        nextVertex    = form::nxt(form, currentVertex);
   auto const  itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex + startVertex);
-  auto        stitchPoint   = *itVertex;
+  auto        stitchPoint   = *itVertex; // intentional copy
   // clang-format on
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	duromb(vrct[currentVertex].bipnt,
@@ -2751,7 +2758,7 @@ void fi::plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>&
 	underlayVerticalRect[angledForm.vertexCount - 4U].dopnt = *itLastVertex;
   }
   OSequence->clear();
-  auto stitchPoint = *itVertex;
+  auto stitchPoint = *itVertex; //intentional copy
   if ((angledForm.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
 	StateMap->set(StateFlag::UND);
@@ -3473,6 +3480,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	clipGrid.bottom += negativeOffset;
 	clipGrid.top += negativeOffset;
 	auto const formNegativeOffset = ClipRectSize.cy * wrap::toFloat(negativeOffset);
+
 	auto       vertIt             = itFirstVertex; // intentional copy
 	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	  vertIt->y += formNegativeOffset;
@@ -3573,7 +3581,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 		if (clipStitchPoints.empty()) {
 		  lineSegmentStart = lineSegmentEnd;
 		}
-		auto textureIt = texture;
+		auto textureIt = texture; // intentional copy
 		for (auto iStitch = 0U; iStitch < clipStitchCount; ++iStitch) {
 		  if (StateMap->test(StateFlag::TXFIL)) {
 			lineSegmentEnd = F_POINT {pasteLocation.x, pasteLocation.y + textureIt->y};
@@ -3802,7 +3810,7 @@ void fi::horclpfn(std::vector<RNG_COUNT> const& textureSegments,
 void form::angclpfn(FRM_HEAD const&               form,
                     std::vector<RNG_COUNT> const& textureSegments,
                     std::vector<F_POINT>&         angledFormVertices) {
-  auto angledForm = form;
+  auto angledForm = form; //intentional copy
   // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
   auto const rotationAngle = StateMap->test(StateFlag::ISUND) ? PI_FHALF - angledForm.underlayStitchAngle
                              : StateMap->test(StateFlag::TXFIL) ? PI_FHALF - angledForm.fillAngle
@@ -4993,7 +5001,7 @@ void fi::bakseq() {
 }
 
 void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
-  auto       point  = stitchPoint;
+  auto       point  = stitchPoint;  //intentional copy
   auto const delta  = F_POINT {(inPoint.x - stitchPoint.x), (inPoint.y - stitchPoint.y)};
   auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
@@ -5016,7 +5024,7 @@ void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
 
 void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
   auto const delta  = F_POINT {(currentPoint.x - stitchPoint.x), (currentPoint.y - stitchPoint.y)};
-  auto       point  = stitchPoint;
+  auto       point  = stitchPoint; //intentional copy
   auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
@@ -6520,12 +6528,100 @@ void form::setstrtch() {
   }
 }
 
+void fi::setSize(F_POINT& size1, float xyRatio) noexcept {
+  // we need to maintain the aspect ratio
+  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
+	size1.x = size1.y * xyRatio;
+  }
+  else {
+	size1.y = size1.x / xyRatio;
+  }
+}
+
+void fi::resizeFormPoints(const F_POINT& stitchReference, F_POINT const& ratio) {
+  auto itVertex = wrap::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
+  auto iCurrent = SelectedFormVertices.start;
+  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
+	auto const itCurrentVertex = wrap::next(itVertex, iCurrent);
+
+	itCurrentVertex->x = (itCurrentVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
+	itCurrentVertex->y = (itCurrentVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
+	iCurrent           = form::pdir(FormList->operator[](ClosestFormToCursor), iCurrent);
+  }
+  thred::setpsel();
+  FormList->operator[](ClosestFormToCursor).outline();
+  form::refil(ClosestFormToCursor);
+  StateMap->set(StateFlag::RESTCH);
+}
+
+void fi::resizeBigBox( F_POINT const& stitchReference, F_POINT const& ratio) {
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	auto&       formIter        = FormList->operator[](iForm);
+	auto        itVertex        = wrap::next(FormVertices->begin(), formIter.vertexIndex);
+	auto const& formVertexCount = formIter.vertexCount;
+	for (auto iVertex = 0U; iVertex < formVertexCount; ++iVertex) {
+	  itVertex->x = (itVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
+	  itVertex->y = (itVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
+	  ++itVertex;
+	}
+	formIter.outline();
+  }
+  for (auto& stitch : *StitchBuffer) {
+	stitch.x = (stitch.x - stitchReference.x) * ratio.x + stitchReference.x;
+	stitch.y = (stitch.y - stitchReference.y) * ratio.y + stitchReference.y;
+  }
+  form::selal();
+}
+
+void fi::resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& ratio) {
+  for (auto selectedForm : (*SelectedFormList)) {
+	auto& form = FormList->operator[](selectedForm);
+
+	auto const& formVertexCount = form.vertexCount;
+	auto        itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
+	for (auto iVertex = 0U; iVertex < formVertexCount; ++iVertex) {
+	  itVertex->x = (itVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
+	  itVertex->y = (itVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
+	  ++itVertex;
+	}
+	form.outline();
+	ClosestFormToCursor = selectedForm;
+	form::refil(ClosestFormToCursor);
+  }
+  StateMap->set(StateFlag::RESTCH);
+}
+
+void fi::resizeForm(F_POINT const& reference, F_POINT const& ratio) {
+  auto& form = FormList->operator[](ClosestFormToCursor);
+
+  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	itVertex->x = (itVertex->x - reference.x) * ratio.x + reference.x;
+	itVertex->y = (itVertex->y - reference.y) * ratio.y + reference.y;
+	++itVertex;
+  }
+  form::refil(ClosestFormToCursor);
+  StateMap->set(StateFlag::RESTCH);
+}
+
+void fi::resizeStitches(F_POINT const& reference, F_POINT const& ratio) {
+  auto itStitch = wrap::next(StitchBuffer->begin(), GroupStartStitch);
+  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
+	itStitch->x = (itStitch->x - reference.x) * ratio.x + reference.x;
+	itStitch->y = (itStitch->y - reference.y) * ratio.y + reference.y;
+	++itStitch;
+  }
+  StateMap->set(StateFlag::RESTCH);
+}
+
 void form::setexpand(float xyRatio) {
   auto size0     = F_POINT {};
   auto rectangle = F_RECTANGLE {};
   thred::savdo();
   auto stitchPoint = F_POINT {};
   if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
+	// if we have multiple forms selected, or we are in big box mode, or we are in form point select mode
+	// we need to use the selected forms rectangle
 	wrap::narrow_cast(rectangle.left, SelectedFormsRect.left);
 	wrap::narrow_cast(rectangle.top, SelectedFormsRect.top);
 	wrap::narrow_cast(rectangle.right, SelectedFormsRect.right);
@@ -6536,6 +6632,7 @@ void form::setexpand(float xyRatio) {
 	size0.y = rectangle.bottom - rectangle.top;
   }
   else {
+	// if we are in form select mode, we need to use the form rectangle or if not, the stitch range rectangle
 	stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	rectangle = StateMap->test(StateFlag::FORMSEL) ? FormList->operator[](ClosestFormToCursor).rectangle
 	                                               : StitchRangeRect;
@@ -6544,16 +6641,12 @@ void form::setexpand(float xyRatio) {
   auto ratio     = F_POINT {1.0F, 1.0F};
   auto reference = F_POINT {};
   size0.x        = rectangle.right - rectangle.left;
+  // we need to determine the reference point and the ratio for the expansion
   switch (SelectedFormControlVertex) {
-	case 0: {
+	case 0: { // top control
 	  reference  = F_POINT {rectangle.right, rectangle.bottom};
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
-	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
-		size1.x = size1.y * xyRatio;
-	  }
-	  else {
-		size1.y = size1.x / xyRatio;
-	  }
+	  fi::setSize(size1, xyRatio);
 	  ratio = size1 / size0;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		auto& formRect = FormList->operator[](ClosestFormToCursor).rectangle;
@@ -6562,15 +6655,10 @@ void form::setexpand(float xyRatio) {
 	  }
 	  break;
 	}
-	case 1: {
+	case 1: { // right control
 	  reference  = F_POINT {rectangle.left, rectangle.bottom};
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
-	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
-		size1.x = size1.y * xyRatio;
-	  }
-	  else {
-		size1.y = size1.x / xyRatio;
-	  }
+	  fi::setSize(size1, xyRatio);
 	  ratio = size1 / size0;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		auto& formRect = FormList->operator[](ClosestFormToCursor).rectangle;
@@ -6579,15 +6667,10 @@ void form::setexpand(float xyRatio) {
 	  }
 	  break;
 	}
-	case 2: {
+	case 2: { // bottom control
 	  reference  = F_POINT {rectangle.left, rectangle.top};
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
-	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
-		size1.x = size1.y * xyRatio;
-	  }
-	  else {
-		size1.y = size1.x / xyRatio;
-	  }
+	  fi::setSize(size1, xyRatio);
 	  ratio = size1 / size0;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		auto& formRect  = FormList->operator[](ClosestFormToCursor).rectangle;
@@ -6596,16 +6679,12 @@ void form::setexpand(float xyRatio) {
 	  }
 	  break;
 	}
-	case 3: {
+	case 3: { // left control
 	  reference  = F_POINT {rectangle.right, rectangle.top};
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
-	  if (auto const aspect = size1.x / size1.y; aspect < xyRatio) {
-		size1.x = size1.y * xyRatio;
-	  }
-	  else {
-		size1.y = size1.x / xyRatio;
-	  }
+	  fi::setSize(size1, xyRatio);
 	  ratio = size1 / size0;
+	  // if we are in form select mode, we need to update the form rectangle
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		auto& formRect  = FormList->operator[](ClosestFormToCursor).rectangle;
 		formRect.left   = rectangle.right - size1.x;
@@ -6619,80 +6698,24 @@ void form::setexpand(float xyRatio) {
   }
   auto const integerReference = POINT {std::lround(reference.x), std::lround(reference.y)};
   auto const stitchReference  = fi::px2stchf(integerReference);
-  if (StateMap->test(StateFlag::FPSEL)) {
-	auto itVertex = wrap::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
-	auto iCurrent = SelectedFormVertices.start;
-	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-	  auto const itCurrentVertex = wrap::next(itVertex, iCurrent);
-
-	  itCurrentVertex->x = (itCurrentVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
-	  itCurrentVertex->y = (itCurrentVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
-	  iCurrent           = form::pdir(FormList->operator[](ClosestFormToCursor), iCurrent);
-	}
-	thred::setpsel();
-	FormList->operator[](ClosestFormToCursor).outline();
-	form::refil(ClosestFormToCursor);
-	StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::FPSEL)) { // form point selected
+	fi::resizeFormPoints(stitchReference, ratio);
 	return;
   }
-  if (StateMap->test(StateFlag::BIGBOX)) {
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto&       formIter        = FormList->operator[](iForm);
-	  auto        itVertex        = wrap::next(FormVertices->begin(), formIter.vertexIndex);
-	  auto const& formVertexCount = formIter.vertexCount;
-	  for (auto iVertex = 0U; iVertex < formVertexCount; ++iVertex) {
-		itVertex->x = (itVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
-		itVertex->y = (itVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
-		++itVertex;
-	  }
-	  formIter.outline();
-	}
-	for (auto& stitch : *StitchBuffer) {
-	  stitch.x = (stitch.x - stitchReference.x) * ratio.x + stitchReference.x;
-	  stitch.y = (stitch.y - stitchReference.y) * ratio.y + stitchReference.y;
-	}
-	form::selal();
+  if (StateMap->test(StateFlag::BIGBOX)) { // everything selected
+	fi::resizeBigBox(stitchReference, ratio);
 	return;
   }
   if (!SelectedFormList->empty()) {
-	for (auto selectedForm : (*SelectedFormList)) {
-	  auto& form = FormList->operator[](selectedForm);
-
-	  auto const& formVertexCount = form.vertexCount;
-	  auto        itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  for (auto iVertex = 0U; iVertex < formVertexCount; ++iVertex) {
-		itVertex->x = (itVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
-		itVertex->y = (itVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
-		++itVertex;
-	  }
-	  form.outline();
-	  ClosestFormToCursor = selectedForm;
-	  form::refil(ClosestFormToCursor);
-	}
-	StateMap->set(StateFlag::RESTCH);
+	fi::resizeSelectedForms(stitchReference, ratio);
 	return;
   }
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
-
-	auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  itVertex->x = (itVertex->x - reference.x) * ratio.x + reference.x;
-	  itVertex->y = (itVertex->y - reference.y) * ratio.y + reference.y;
-	  ++itVertex;
-	}
-	form::refil(ClosestFormToCursor);
-	StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::FORMSEL)) { // single form selected
+	fi::resizeForm(reference, ratio);
 	return;
   }
-  if (StateMap->test(StateFlag::GRPSEL)) {
-	auto itStitch = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  itStitch->x = (itStitch->x - reference.x) * ratio.x + reference.x;
-	  itStitch->y = (itStitch->y - reference.y) * ratio.y + reference.y;
-	  ++itStitch;
-	}
-	StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::GRPSEL)) { // stitch group selected
+	fi::resizeStitches(reference, ratio);
   }
 }
 
@@ -7058,7 +7081,7 @@ void form::dueg(uint32_t sides) {
   }
   itVertex            = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const eggRatio = maximumY / (itVertex[quarterSides].y - itVertex[0].y);
-  auto const ref      = *itVertex;
+  auto const& ref      = *itVertex;
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	*itVertex = F_POINT {fi::shreg(itVertex->x, ref.x, eggRatio), fi::shreg(itVertex->y, ref.y, eggRatio)};
 	++itVertex;
@@ -7386,7 +7409,7 @@ void fi::snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t en
   }
   auto const checkLength = SnapLength * SnapLength;
   for (auto current = start; current < end; ++current) {
-	auto const referencePoint = StitchBuffer->operator[](xPoints[current]);
+	auto const& referencePoint = StitchBuffer->operator[](xPoints[current]);
 	for (auto iPoint = current + 1U; iPoint < finish; ++iPoint) {
 	  auto& checkPoint = StitchBuffer->operator[](xPoints[iPoint]);
 
