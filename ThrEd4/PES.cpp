@@ -885,7 +885,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  // then create the jump block
 	  pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
 	  ++blockIndex;
-	  pi::ritpes(pesBuffer, saveStitches[iStitch - 1U], offset);
+	  auto const prevStitch = iStitch - 1U;
+	  pi::ritpes(pesBuffer, saveStitches[prevStitch], offset);
 	  pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
 	  pi::ritpesCode(pesBuffer);
 	  // and finally start the next block
