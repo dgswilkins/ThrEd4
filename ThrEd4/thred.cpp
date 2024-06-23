@@ -2022,12 +2022,11 @@ void thi::chknum() {
 	  }
 	  return;
 	}
-	while (true) {
 	  auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
 	  if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
 		thred::savdo();
 		form::durpoli(uintValue);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRSTAR)) {
 		thred::savdo();
@@ -2035,183 +2034,181 @@ void thi::chknum() {
 		form::dustar(uintValue,
 		             STARSIZE / value * ZoomFactor *
 		                 wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
 		thred::savdo();
 		form::duspir(uintValue);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRHART)) {
 		thred::savdo();
 		form::duhart(uintValue);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRLENS)) {
 		thred::savdo();
 		form::dulens(uintValue);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTREG)) {
 		thred::savdo();
 		form::dueg(uintValue);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRZIG)) {
 		thred::savdo();
 		form::duzig(uintValue);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::PIXIN)) {
 		IniFile.nudgePixels = pxchk(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::STPXIN)) {
 		IniFile.stitchSizePixels = pxchk(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FRMPXIN)) {
 		IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FRMBOXIN)) {
 		IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::GETMIN)) {
 		SmallStitchLength = value * PFGRAN;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTR30)) {
 		ThreadSize30 = value;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTR40)) {
 		ThreadSize40 = value;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTR60)) {
 		ThreadSize60 = value;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::SCLPSPAC)) {
 		IniFile.clipOffset = value * PFGRAN;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFIND)) {
 		xt::dufind(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFHI)) {
 		if (value != 0.0F) {
 		  xt::dufhi(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFWID)) {
 		if (value != 0.0F) {
 		  xt::dufwid(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFMAX)) {
 		if (value != 0.0F) {
 		  xt::dufmax(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFMIN)) {
 		xt::dufmin(value * PFGRAN);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETBMAX)) {
 		if (value != 0.0F) {
 		  xt::dubmax(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETBMIN)) {
 		xt::dubmin(value * PFGRAN);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETBSPAC)) {
 		if (value != 0.0F) {
 		  xt::dubspac(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
 		if (value != 0.0F) {
 		  xt::dublen(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
 		xt::dubcol(wrap::round<uint8_t>(value));
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
 		xt::dufcol(wrap::round<uint8_t>(value));
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
 		xt::dundcol(wrap::round<uint8_t>(value));
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFANG)) {
 		xt::dufxang(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFSPAC)) {
 		if (value != 0.0F) {
 		  xt::dufspac(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETUANG)) {
 		xt::dufang(value);
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
 		if (value != 0.0F) {
 		  xt::duflen(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETUSPAC)) {
 		if (value != 0.0F) {
 		  xt::duspac(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::FSETULEN)) {
 		if (value != 0.0F) {
 		  xt::dusulen(value * PFGRAN);
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::GTUANG)) {
 		IniFile.underlayAngle = value * DEGRADF;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::GTUSPAC)) {
 		if (value != 0.0F) {
 		  IniFile.underlaySpacing = value * PFGRAN;
 		}
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::GTWLKIND)) {
 		IniFile.underlayIndent = value * PFGRAN;
-		break;
+		return;
 	  }
 	  if (StateMap->testAndReset(StateFlag::GTWLKLEN)) {
 		if (value != 0.0F) {
 		  IniFile.underlayStitchLen = value * PFGRAN;
 		}
-		break;
+		return;
 	  }
-	  break;
-	}
   }
 
   StateMap->set(StateFlag::RESTCH);
