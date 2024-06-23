@@ -2732,11 +2732,12 @@ void fi::plfn(FRM_HEAD const&              form,
 	duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt, stitchPoint);
 	duspnd(form.edgeStitchLen, underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1U, width, stitchPoint);
   }
-  duromb(prct[form.vertexCount - 4U].bipnt,
-         prct[form.vertexCount - 4U].dipnt,
-         prct[form.vertexCount - 4U].bopnt,
-         prct[form.vertexCount - 4U].dopnt,
-         stitchPoint);
+  auto const lastVertex = form.vertexCount - 4U;
+  duromb(prct[lastVertex].bipnt,
+	     prct[lastVertex].dipnt,
+	     prct[lastVertex].bopnt,
+	     prct[lastVertex].dopnt,
+	     stitchPoint);
 }
 
 void fi::plbak(uint32_t backPoint) noexcept(std::is_same_v<size_t, uint32_t>) {
