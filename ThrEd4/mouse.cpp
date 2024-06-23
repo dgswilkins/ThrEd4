@@ -76,6 +76,7 @@ constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
 void rngal();
 void unmov();
+void updateCursor();
 } // namespace mi
 
 auto mi::chkok() noexcept -> bool {
@@ -1074,6 +1075,38 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
   return false;
 }
 
+void mi::updateCursor() {
+  if (UserFlagMap->test(UserFlag::NEDOF)) {
+	wrap::setCursor(CrossCursor);
+  }
+  else {
+	if (StateMap->test(StateFlag::LIN1)) {
+	  wrap::setCursor(NeedleUpCursor);
+	}
+	else {
+	  if (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).x >
+	      StitchBuffer->operator[](ClosestPointIndex).x) {
+		if (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
+		    StitchBuffer->operator[](ClosestPointIndex).y) {
+		  wrap::setCursor(NeedleLeftUpCursor);
+		}
+		else {
+		  wrap::setCursor(NeedleLeftDownCursor);
+		}
+	  }
+	  else {
+		if (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
+		    StitchBuffer->operator[](ClosestPointIndex).y) {
+		  wrap::setCursor(NeedleRightUpCursor);
+		}
+		else {
+		  wrap::setCursor(NeedleRightDownCursor);
+		}
+	  }
+	}
+  }
+}
+
 auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
                             float               xyRatio,
                             float&              rotationAngle,
@@ -1099,7 +1132,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		wrap::setCursor(ArrowCursor);
 		break;
 	  }
-	  if (!StateMap->test(StateFlag::INIT)) {
+	  if (!StateMap->test(StateFlag::INIT)) { // If we are not inserting a stitch
 		if (UserFlagMap->test(UserFlag::NEDOF)) {
 		  wrap::setCursor(CrossCursor);
 		}
@@ -1108,45 +1141,17 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		}
 		break;
 	  }
-	  if (StateMap->test(StateFlag::INSRT)) {
-		if (UserFlagMap->test(UserFlag::NEDOF)) {
-		  wrap::setCursor(CrossCursor);
-		}
-		else {
-		  if (StateMap->test(StateFlag::LIN1)) {
-			wrap::setCursor(NeedleUpCursor);
-		  }
-		  else {
-			if (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).x >
-			    StitchBuffer->operator[](ClosestPointIndex).x) {
-			  if (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
-			      StitchBuffer->operator[](ClosestPointIndex).y) {
-				wrap::setCursor(NeedleLeftUpCursor);
-			  }
-			  else {
-				wrap::setCursor(NeedleLeftDownCursor);
-			  }
-			}
-			else {
-			  if (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
-			      StitchBuffer->operator[](ClosestPointIndex).y) {
-				wrap::setCursor(NeedleRightUpCursor);
-			  }
-			  else {
-				wrap::setCursor(NeedleRightDownCursor);
-			  }
-			}
-		  }
-		}
+	  if (StateMap->test(StateFlag::INSRT)) { // If we are inserting a stitch
+		mi::updateCursor();
 		break;
 	  }
 	  if (StateMap->test(StateFlag::BZUMIN) || StateMap->test(StateFlag::BOXZUM) ||
-	      StateMap->test(StateFlag::SELPNT)) {
+	      StateMap->test(StateFlag::SELPNT)) { // If we are zooming or selecting a point
 		wrap::setCursor(CrossCursor);
 		break;
 	  }
 	  if (StateMap->test(StateFlag::SATIN) || StateMap->test(StateFlag::SATPNT) ||
-	      StateMap->test(StateFlag::INSFRM)) {
+	      StateMap->test(StateFlag::INSFRM)) { // If we are inserting a satin form or a satin point
 		if (UserFlagMap->test(UserFlag::FRMX)) {
 		  wrap::setCursor(CrossCursor);
 		}
@@ -1155,7 +1160,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		}
 		break;
 	  }
-	  if (StateMap->test(StateFlag::SATCNKT)) {
+	  if (StateMap->test(StateFlag::SATCNKT)) { // If we are connecting a satin form guide
 		wrap::setCursor(DLineCursor);
 	  }
 	  else {
@@ -1163,10 +1168,10 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  break;
 	}
-	if (StateMap->test(StateFlag::FPUNCLP)) {
+	if (StateMap->test(StateFlag::FPUNCLP)) {	// If we are retrieve a clip into a form
 	  tfc::fpUnClip();
 	}
-	if (StateMap->test(StateFlag::INSFIL)) {
+	if (StateMap->test(StateFlag::INSFIL)) {   // If we are inserting a fill form
 	  form::unfrm();
 	  auto const point = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  thred::insflin(point);
@@ -1174,7 +1179,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  form::dufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::MOVFRMS)) {
+	if (StateMap->test(StateFlag::MOVFRMS)) {  // If we are moving forms
 	  thred::unstrtch(stretchBoxLine);
 	  stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x =
 	      WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x;
@@ -1200,14 +1205,14 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap->test(StateFlag::POLIMOV)) {
+	if (StateMap->test(StateFlag::POLIMOV)) {  // If we are placing a form
 	  form::munfrm();
 	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::EXPAND)) {
+	if (StateMap->test(StateFlag::EXPAND)) {  // If we are expanding a form
 	  thred::unstrtch(stretchBoxLine);
 	  auto newSize = F_POINT {gsl::narrow<float>(WinMsg.pt.x - StitchWindowOrigin.x),
 	                          gsl::narrow<float>(WinMsg.pt.y - StitchWindowOrigin.y)};
@@ -1215,7 +1220,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  auto       iSide = (SelectedFormControlVertex + 2U) % 4U;
 	  auto const ratio = std::fabs((newSize.x - wrap::toFloat(stretchBoxLine[iSide].x)) /
 	                               (newSize.y - wrap::toFloat(stretchBoxLine[iSide].y)));
-	  if ((iSide & 1U) != 0U) {
+	  if ((iSide & 1U) != 0U) { // If the side is horizontal
 		if (ratio < xyRatio) {
 		  newSize.x = (wrap::toFloat(stretchBoxLine[iSide].y) - newSize.y) * xyRatio +
 		              wrap::toFloat(stretchBoxLine[iSide].x);
@@ -1254,7 +1259,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap->test(StateFlag::STRTCH)) {
+	if (StateMap->test(StateFlag::STRTCH)) {  // If we are stretching a form horizontally or vertically
 	  thred::unstrtch(stretchBoxLine);
 	  auto const lineLength = ((SelectedFormControlVertex & 1U) != 0U)
 	                              ? WinMsg.pt.x - StitchWindowOrigin.x
@@ -1276,36 +1281,36 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap->test(StateFlag::INSFRM)) {
+	if (StateMap->test(StateFlag::INSFRM)) {  // If we are inserting points into a form
 	  form::uninsf();
 	  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOINSF);
 	  form::duinsf();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::FUNCLP)) {
+	if (StateMap->test(StateFlag::FUNCLP)) {  // If we are pasting a form
 	  form::unfrm();
 	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::dufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::SATCNKT)) {
+	if (StateMap->test(StateFlag::SATCNKT)) {  // If we are connecting a satin form guide
 	  form::drwcon();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::SATPNT)) {
+	if (StateMap->test(StateFlag::SATPNT)) {  // If we are placing a satin point
 	  satin::drwsat();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::FRMOV)) {
+	if (StateMap->test(StateFlag::FRMOV)) {  // If we are moving a form
 	  form::munfrm();
 	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::FRMPMOV)) {
+	if (StateMap->test(StateFlag::FRMPMOV)) {  // If we are moving a form point
 	  mi::unmov();
 	  RubberBandLine->operator[](1) = {WinMsg.pt.x - StitchWindowOrigin.x,
 	                                   WinMsg.pt.y - StitchWindowOrigin.y};
@@ -1316,12 +1321,12 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  return true;
 	}
-	if (StateMap->test(StateFlag::MOVCNTR)) {
+	if (StateMap->test(StateFlag::MOVCNTR)) { // If we are moving the center of rotation
 	  thred::unrot();
 	  thred::ritrot(rotationAngle, thred::pxCor2stch(WinMsg.pt));
 	  return true;
 	}
-	if (StateMap->test(StateFlag::ROTCAPT)) {
+	if (StateMap->test(StateFlag::ROTCAPT)) { // If we are rotating
 	  thred::unrotu();
 	  thred::unrot();
 	  auto const adjustedDelta = thred::getAdjustedDelta();
@@ -1342,7 +1347,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::durotu();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::SELPNT)) {
+	if (StateMap->test(StateFlag::SELPNT)) { // If we are selecting a point
 	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
@@ -1350,12 +1355,12 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::rSelbox();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::CLPSHO)) {
+	if (StateMap->test(StateFlag::CLPSHO)) { // If we are pasting a clip
 	  thred::unclp();
 	  thred::clpbox();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::CAPT)) {
+	if (StateMap->test(StateFlag::CAPT)) { // If we are doing a screen capture
 	  if (thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
@@ -1363,7 +1368,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::updateMoveLine();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::INSRT)) {
+	if (StateMap->test(StateFlag::INSRT)) { // If we are inserting a stitch
 	  if (thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
@@ -1385,10 +1390,10 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::ilin();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) {
+	if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) { // If we are zooming
 	  SetCapture(ThrEdWindow);
 	}
-	if (StateMap->test(StateFlag::BZUMIN) && ((WinMsg.wParam & MK_LBUTTON) != 0U)) {
+	if (StateMap->test(StateFlag::BZUMIN) && ((WinMsg.wParam & MK_LBUTTON) != 0U)) { // If we are zooming in
 	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
@@ -1415,10 +1420,11 @@ auto mouse::handleRightButtonDown() -> bool {
 	texture::txtrbut();
 	return true;
   }
-  if (wrap::pressed(VK_SHIFT)) {
+  if (wrap::pressed(VK_SHIFT)) { // If shift is pressed as well
 	if (form::closfrm(ClosestFormToCursor)) {
 	  if ((StateMap->test(StateFlag::FRMPSEL) || StateMap->test(StateFlag::FPSEL)) &&
-	      SelectedFormVertices.form == ClosestFormToCursor) {
+	      SelectedFormVertices.form == ClosestFormToCursor) { // and if we are selecting one of more form points
+		// then we are expanding the selection
 		auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 		StateMap->reset(StateFlag::FRMPSEL);
 		StateMap->set(StateFlag::FPSEL);
@@ -1436,7 +1442,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		thred::setpsel();
 		return true;
 	  }
-	  if (!thred::unselectAll()) {
+	  if (!thred::unselectAll()) { // then we are selecting a form point
 		thred::selfpnt();
 	  }
 	  return true;
@@ -1449,8 +1455,8 @@ auto mouse::handleRightButtonDown() -> bool {
   if (thred::unselectAll()) {
 	return true;
   }
-  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
-	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
+  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) { // If we are in the thread windows
+	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) { // and we are not in a form
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm(ClosestFormToCursor)) {
@@ -1474,7 +1480,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		  form::nufsel();
 		}
 	  }
-	  if ((WinMsg.wParam & MK_CONTROL) != 0U) {
+	  if ((WinMsg.wParam & MK_CONTROL) != 0U) { // If control is pressed
 		if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 		  StateMap->set(StateFlag::WASEL);
 		  PreviousFormIndex = ClosestFormToCursor;
@@ -1488,7 +1494,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		}
 		return true;
 	  }
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) { // If we are already selecting a form
 		thred::handleFormSelected();
 	  }
 	  if (form::closfrm(ClosestFormToCursor)) {
@@ -1505,17 +1511,21 @@ auto mouse::handleRightButtonDown() -> bool {
 		thred::unrot();
 		return true;
 	  }
-	  if (!SelectedFormList->empty()) {
-		SelectedFormList->clear();
+	  // unselect form, forms or form points
+	  if (!SelectedFormList->empty()) { 
+		SelectedFormList->clear(); 
+      }
+      if (StateMap->test(StateFlag::FORMSEL)) {
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
-	if (StateMap->test(StateFlag::INIT) || (!ThrName->empty())) {
+	if (StateMap->test(StateFlag::INIT) || (!ThrName->empty())) { // If we are inserting a stitch
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
-		if (StateMap->test(StateFlag::SELBOX)) {
+		if (StateMap->test(StateFlag::SELBOX)) { // if we are holding shift and selecting a box
+		  // extend the thread selection
 		  auto const code = ClosestPointIndex;
 		  thred::closPnt1(ClosestPointIndex);
 		  if (ClosestPointIndex != code) {
