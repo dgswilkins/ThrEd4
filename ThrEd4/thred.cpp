@@ -9640,26 +9640,31 @@ auto thred::handleFormDataSheet() -> bool {
   auto& form = FormList->operator[](ClosestFormToCursor);
   while (true) {
 	if (WinMsg.hwnd == ValueWindow->operator[](LTXOF) || WinMsg.hwnd == LabelWindow->operator[](LTXOF)) {
+	  // draw the texture fill spacing window
 	  FormMenuChoice = LTXOF;
 	  formForms::sidwnd(ValueWindow->operator[](LTXOF));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LUSPAC) || WinMsg.hwnd == LabelWindow->operator[](LUSPAC)) {
+	  // draw the underlay spacing window
 	  FormMenuChoice = LUSPAC;
 	  formForms::sidwnd(ValueWindow->operator[](LUSPAC));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LUANG) || WinMsg.hwnd == LabelWindow->operator[](LUANG)) {
+	  // draw the underlay angle window
 	  FormMenuChoice = LUANG;
 	  formForms::sidwnd(ValueWindow->operator[](LUANG));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LULEN) || WinMsg.hwnd == LabelWindow->operator[](LULEN)) {
+	  // draw the underlay length window
 	  FormMenuChoice = LULEN;
 	  formForms::sidwnd(ValueWindow->operator[](LULEN));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LWLKIND) || WinMsg.hwnd == LabelWindow->operator[](LWLKIND)) {
+	  // draw the edge walk/underlay indent window
 	  FormMenuChoice = LWLKIND;
 	  formForms::sidwnd(ValueWindow->operator[](LWLKIND));
 	  break;
@@ -9670,26 +9675,31 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHNUM) || WinMsg.hwnd == LabelWindow->operator[](LFTHNUM)) {
+	  // draw the feather number window
 	  FormMenuChoice = LFTHNUM;
 	  formForms::sidwnd(ValueWindow->operator[](LFTHNUM));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHFLR) || WinMsg.hwnd == LabelWindow->operator[](LFTHFLR)) {
+	  // draw the feather floor window
 	  FormMenuChoice = LFTHFLR;
 	  formForms::sidwnd(ValueWindow->operator[](LFTHFLR));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHUPCNT) || WinMsg.hwnd == LabelWindow->operator[](LFTHUPCNT)) {
+	  // draw the feather up count window
 	  FormMenuChoice = LFTHUPCNT;
 	  formForms::sidwnd(ValueWindow->operator[](LFTHUPCNT));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHDWNCNT) || WinMsg.hwnd == LabelWindow->operator[](LFTHDWNCNT)) {
+	  // draw the feather down count window
 	  FormMenuChoice = LFTHDWNCNT;
 	  formForms::sidwnd(ValueWindow->operator[](LFTHDWNCNT));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHBLND) || WinMsg.hwnd == LabelWindow->operator[](LFTHBLND)) {
+	  // draw the feather blend window
 	  form.extendedAttribute ^= AT_FTHBLND;
 	  formForms::refrm();
 	  form::refil(ClosestFormToCursor);
@@ -9698,6 +9708,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHUP) || WinMsg.hwnd == LabelWindow->operator[](LFTHUP)) {
+	  // draw the feather up or down window
 	  form.extendedAttribute ^= AT_FTHUP;
 	  form::refil(ClosestFormToCursor);
 	  auto const choice = displayText::loadStr(((form.extendedAttribute & AT_FTHUP) == 0U) ? IDS_OFF : IDS_ON);
@@ -9706,6 +9717,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHBTH) || WinMsg.hwnd == LabelWindow->operator[](LFTHBTH)) {
+	  // draw the feather both window
 	  form.extendedAttribute ^= AT_FTHBTH;
 	  formForms::refrm();
 	  form::refil(ClosestFormToCursor);
@@ -9714,11 +9726,13 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHTYP) || WinMsg.hwnd == LabelWindow->operator[](LFTHTYP)) {
+	  // draw the feather fill type window
 	  FormMenuChoice = LFTHTYP;
 	  thi::sidmsg(form, ValueWindow->operator[](LFTHTYP));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRM) || WinMsg.hwnd == LabelWindow->operator[](LFRM)) {
+	  // draw the form type window
 	  thred::savdo();
 	  form::unfil();
 	  if (form.type == FRMLINE) {
@@ -9733,24 +9747,28 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LLAYR) || WinMsg.hwnd == LabelWindow->operator[](LLAYR)) {
+	  // draw the layer window
 	  FormMenuChoice = LLAYR;
 	  StateMap->reset(StateFlag::FILTYP);
 	  thi::sidmsg(form, ValueWindow->operator[](LLAYR));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRMFIL) || WinMsg.hwnd == LabelWindow->operator[](LFRMFIL)) {
+	  // draw the fill type window
 	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
 	  thi::sidmsg(form, ValueWindow->operator[](LFRMFIL));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRMCOL) || WinMsg.hwnd == LabelWindow->operator[](LFRMCOL)) {
+	  // draw the fill color window
 	  FormMenuChoice = LFRMCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LFRMCOL));
 	  StateMap->set(StateFlag::SIDCOL);
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LUNDCOL) || WinMsg.hwnd == LabelWindow->operator[](LUNDCOL)) {
+	  // draw the underlay color window
 	  FormMenuChoice = LUNDCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LUNDCOL));
 	  StateMap->set(StateFlag::SIDCOL);
@@ -9758,6 +9776,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFTHCOL) || WinMsg.hwnd == LabelWindow->operator[](LFTHCOL)) {
+	  // draw the feather color window
 	  FormMenuChoice = LFTHCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LFTHCOL));
 	  StateMap->set(StateFlag::SIDCOL);
@@ -9765,22 +9784,26 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRMSPAC) || WinMsg.hwnd == LabelWindow->operator[](LFRMSPAC)) {
+	  // draw the form spacing window
 	  FormMenuChoice = LFRMSPAC;
 	  formForms::sidwnd(ValueWindow->operator[](LFRMSPAC));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRMLEN) || WinMsg.hwnd == LabelWindow->operator[](LFRMLEN)) {
+	  // draw the form stitch length window
 	  FormMenuChoice = LFRMLEN;
 	  formForms::sidwnd(ValueWindow->operator[](LFRMLEN));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRD) || WinMsg.hwnd == LabelWindow->operator[](LBRD)) {
+	  // draw the border window
 	  StateMap->set(StateFlag::FILTYP);
 	  thi::sidmsg(form, ValueWindow->operator[](LBRD));
 	  StateMap->set(StateFlag::BRDACT);
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDCOL) || WinMsg.hwnd == LabelWindow->operator[](LBRDCOL)) {
+	  // draw the border color window
 	  FormMenuChoice = LBRDCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDCOL));
 	  StateMap->set(StateFlag::SIDCOL);
@@ -9788,21 +9811,25 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDSPAC) || WinMsg.hwnd == LabelWindow->operator[](LBRDSPAC)) {
+	  // draw the border stitch spacing window
 	  FormMenuChoice = LBRDSPAC;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDSPAC));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDLEN) || WinMsg.hwnd == LabelWindow->operator[](LBRDLEN)) {
+	  // draw the border stitch length window
 	  FormMenuChoice = LBRDLEN;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDLEN));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDSIZ) || WinMsg.hwnd == LabelWindow->operator[](LBRDSIZ)) {
+	  // draw the border stitch size window
 	  FormMenuChoice = LBRDSIZ;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDSIZ));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LAPCOL) || WinMsg.hwnd == LabelWindow->operator[](LAPCOL)) {
+	  // draw the applique color window
 	  FormMenuChoice = LAPCOL;
 	  StateMap->set(StateFlag::SIDCOL);
 	  StateMap->set(StateFlag::APSID);
@@ -9810,11 +9837,13 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBCSIZ) || WinMsg.hwnd == LabelWindow->operator[](LBCSIZ)) {
+	  // draw the buttonhole corner size window
 	  FormMenuChoice = LBCSIZ;
 	  formForms::sidwnd(ValueWindow->operator[](LBCSIZ));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBSTRT) || WinMsg.hwnd == LabelWindow->operator[](LBSTRT)) {
+	  // draw the satin start style window
 	  auto const code     = form.attribute & SBLNT;
 	  auto const bluntStr = displayText::loadStr((code != 0U) ? IDS_TAPR : IDS_BLUNT);
 	  SetWindowText(ValueWindow->operator[](LBSTRT), bluntStr.c_str());
@@ -9830,6 +9859,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBFIN) || WinMsg.hwnd == LabelWindow->operator[](LBFIN)) {
+	  // draw the satin finish style window
 	  auto const code     = form.attribute & FBLNT;
 	  auto const bluntStr = displayText::loadStr((code != 0U) ? IDS_TAPR : IDS_BLUNT);
 	  SetWindowText(ValueWindow->operator[](LBFIN), bluntStr.c_str());
@@ -9845,16 +9875,19 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRMANG) || WinMsg.hwnd == LabelWindow->operator[](LFRMANG)) {
+	  // draw the form fill angle window
 	  FormMenuChoice = LFRMANG;
 	  formForms::sidwnd(ValueWindow->operator[](LFRMANG));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDPIC) || WinMsg.hwnd == LabelWindow->operator[](LBRDPIC)) {
+	  // draw the picot spacing window
 	  FormMenuChoice = LBRDPIC;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDPIC));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDUND) || WinMsg.hwnd == LabelWindow->operator[](LBRDUND)) {
+	  // draw the border underlay window
 	  form.edgeType ^= EGUND;
 	  form::refil(ClosestFormToCursor);
 	  auto const code    = form.edgeType & EGUND;
@@ -9863,77 +9896,92 @@ auto thred::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LSACANG) || WinMsg.hwnd == LabelWindow->operator[](LSACANG)) {
+	  // draw the clipboard fill angle window
 	  FormMenuChoice = LSACANG;
 	  formForms::sidwnd(ValueWindow->operator[](LSACANG));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRMFAZ) || WinMsg.hwnd == LabelWindow->operator[](LFRMFAZ)) {
+	  // draw the form fill phase window
 	  FormMenuChoice = LFRMFAZ;
 	  formForms::sidwnd(ValueWindow->operator[](LFRMFAZ));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBRDPOS) || WinMsg.hwnd == LabelWindow->operator[](LBRDPOS)) {
+	  // draw the chain position window
 	  FormMenuChoice = LBRDPOS;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDPOS));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LBFILSQR) || WinMsg.hwnd == LabelWindow->operator[](LBFILSQR)) {
+	  // draw the form fill ends square window
 	  xt::dubit(form, AT_SQR);
 	  auto const choice = displayText::loadStr(((form.extendedAttribute & AT_SQR) == 0U) ? IDS_PNTD : IDS_SQR);
 	  SetWindowText(ValueWindow->operator[](LBFILSQR), choice.c_str());
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFSTRT) || WinMsg.hwnd == LabelWindow->operator[](LFSTRT)) {
+	  // draw the form fill start on/off window
 	  xt::dubit(form, AT_STRT);
 	  formForms::refrm();
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LDSTRT) || WinMsg.hwnd == LabelWindow->operator[](LDSTRT)) {
+	  // draw the form fill start window
 	  FormMenuChoice = LDSTRT;
 	  formForms::sidwnd(ValueWindow->operator[](LDSTRT));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFEND) || WinMsg.hwnd == LabelWindow->operator[](LFEND)) {
+	  // draw the form fill end on/off window
 	  xt::dubit(form, AT_END);
 	  formForms::refrm();
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LDEND) || WinMsg.hwnd == LabelWindow->operator[](LDEND)) {
+	  // draw the form fill end window
 	  FormMenuChoice = LDEND;
 	  formForms::sidwnd(ValueWindow->operator[](LDEND));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LWALK) || WinMsg.hwnd == LabelWindow->operator[](LWALK)) {
+	  // draw the edge walk window
 	  xt::dubit(form, AT_WALK);
 	  formForms::refrm();
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LCWLK) || WinMsg.hwnd == LabelWindow->operator[](LCWLK)) {
+	  // draw the center walk window
 	  xt::dubit(form, AT_CWLK);
 	  formForms::refrm();
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LUND) || WinMsg.hwnd == LabelWindow->operator[](LUND)) {
+	  // draw the underlay window
 	  xt::dubit(form, AT_UND);
 	  formForms::refrm();
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LMAXFIL) || WinMsg.hwnd == LabelWindow->operator[](LMAXFIL)) {
+	  // draw the maximum fill stitch length window
 	  FormMenuChoice = LMAXFIL;
 	  formForms::sidwnd(ValueWindow->operator[](LMAXFIL));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LMINFIL) || WinMsg.hwnd == LabelWindow->operator[](LMINFIL)) {
+	  // draw the minimum fill stitch length window
 	  FormMenuChoice = LMINFIL;
 	  formForms::sidwnd(ValueWindow->operator[](LMINFIL));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LMAXBRD) || WinMsg.hwnd == LabelWindow->operator[](LMAXBRD)) {
+	  // draw the maximum border stitch length window
 	  FormMenuChoice = LMAXBRD;
 	  formForms::sidwnd(ValueWindow->operator[](LMAXBRD));
 	  break;
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LMINBRD) || WinMsg.hwnd == LabelWindow->operator[](LMINBRD)) {
+	  // draw the minimum border stitch length window
 	  FormMenuChoice = LMINBRD;
 	  formForms::sidwnd(ValueWindow->operator[](LMINBRD));
 	  break;
