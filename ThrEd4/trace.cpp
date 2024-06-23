@@ -612,90 +612,91 @@ void trace::tracedg() {
 auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
     -> bool {
   auto pixelIndex = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
+  // use the initial direction to determine the next direction
   switch (traceDirection) {
-	case TRCR: {
-	  pixelIndex += (1 - bitmap::getBitmapWidth());
-	  if (CurrentTracePoint.x == gsl::narrow<int32_t>(bitmap::getBitmapWidth()) - 1) {
+	case TRCR: { // was tracing right
+	  pixelIndex += (1 - bitmap::getBitmapWidth()); // look at the pixel down and to the right
+	  if (CurrentTracePoint.x == gsl::narrow<int32_t>(bitmap::getBitmapWidth()) - 1) { // at the edge go up 
 		traceDirection = TRCU;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++(CurrentTracePoint.x);
 		  --(CurrentTracePoint.y);
 		  traceDirection = TRCD;
 		}
-		else {
-		  pixelIndex += bitmap::getBitmapWidth();
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		else { 
+		  pixelIndex += bitmap::getBitmapWidth(); // look at the pixel below
+		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++(CurrentTracePoint.x);
 		  }
-		  else {
+		  else { // start tracing up
 			traceDirection = TRCU;
 		  }
 		}
 	  }
 	  break;
 	}
-	case TRCD: {
-	  pixelIndex -= (bitmap::getBitmapWidth() + 1);
-	  if (CurrentTracePoint.y == 0) {
+	case TRCD: { // was tracing down
+	  pixelIndex -= (bitmap::getBitmapWidth() + 1); // look at the pixel down and to the left
+	  if (CurrentTracePoint.y == 0) { // if we are at the bottom edge
 		traceDirection = TRCR;
 	  }
-	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+	  else { 
+		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --(CurrentTracePoint.x);
 		  --(CurrentTracePoint.y);
 		  traceDirection = TRCL;
 		}
-		else {
-		  ++pixelIndex;
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		else { 
+		  ++pixelIndex; // look at the pixel to the right
+		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--(CurrentTracePoint.y);
 		  }
-		  else {
+		  else { // start tracing right
 			traceDirection = TRCR;
 		  }
 		}
 	  }
 	  break;
 	}
-	case TRCL: {
-	  pixelIndex += (bitmap::getBitmapWidth() - 1);
+	case TRCL: { // was tracing left
+	  pixelIndex += (bitmap::getBitmapWidth() - 1); // look at the pixel above and to the left
 	  if (CurrentTracePoint.x == 0) {
 		traceDirection = TRCD;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --(CurrentTracePoint.x);
 		  ++(CurrentTracePoint.y);
 		  traceDirection = TRCU;
 		}
 		else {
-		  pixelIndex -= bitmap::getBitmapWidth();
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		  pixelIndex -= bitmap::getBitmapWidth(); // look at the pixel above
+		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--(CurrentTracePoint.x);
 		  }
-		  else {
+		  else { // start tracing down
 			traceDirection = TRCD;
 		  }
 		}
 	  }
 	  break;
 	}
-	case TRCU: {
-	  pixelIndex += (1 + bitmap::getBitmapWidth());
-	  if (CurrentTracePoint.y == bitmap::getBitmapHeight() - 1) {
+	case TRCU: { // was tracing up
+	  pixelIndex += (1 + bitmap::getBitmapWidth()); // look at the pixel up and to the right
+	  if (CurrentTracePoint.y == bitmap::getBitmapHeight() - 1) { // if we are at the top edge
 		traceDirection = TRCL;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++(CurrentTracePoint.x);
 		  ++(CurrentTracePoint.y);
 		  traceDirection = TRCR;
 		}
 		else {
-		  --pixelIndex;
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) {
+		  --pixelIndex; // look at the pixel to the left
+		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++(CurrentTracePoint.y);
 		  }
 		  else {
