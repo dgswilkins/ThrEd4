@@ -7329,7 +7329,8 @@ void thred::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
 	  continue;
 	}
 	if ((iStitch - startStitch == 1) && ((startStitch) != 0U)) {
-	  auto& prevStitch     = StitchBuffer->operator[](iStitch - 1U);
+	  auto const prevIndex = iStitch - 1U;
+	  auto& prevStitch     = StitchBuffer->operator[](prevIndex);
 	  prevStitch.attribute = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
 	}
 	color       = stitch.attribute & COLMSK;
@@ -7339,7 +7340,8 @@ void thred::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
 
 auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
   auto newStitches = std::vector<F_POINT_ATTR> {};
-  newStitches.reserve(finish - start); // we know that we will have at least this number of Stitches
+  auto const newSize = finish - start;
+  newStitches.reserve(newSize); // we know that we will have at least this number of Stitches
   auto adcnt = 0U;
   --finish;
   auto stitchIt     = wrap::next(StitchBuffer->begin(), start);
