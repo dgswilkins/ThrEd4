@@ -8648,7 +8648,7 @@ void fi::unbean(uint32_t start, uint32_t& finish) {
 	  highStitchBuffer.push_back(StitchBuffer->operator[](iSourceStitch++));
 	}
   }
-  if ((finish - start) > highStitchBuffer.size()) {
+  if ((wrap::toSize(finish) - start) > highStitchBuffer.size()) {
 	auto const itStartStitch = wrap::next(StitchBuffer->begin(), start);
 	std::ranges::copy(highStitchBuffer, itStartStitch);
 	StitchBuffer->erase(wrap::next(StitchBuffer->cbegin(), start + highStitchBuffer.size()),
