@@ -2779,11 +2779,12 @@ void fi::plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>&
   }
   if ((angledForm.attribute & FBLNT) == 0U) {
 	auto const itLastVertex = wrap::next(itVertex, angledForm.vertexCount - 1U);
+	auto const index = angledForm.vertexCount - 4U;
 
-	fillVerticalRect[angledForm.vertexCount - 4U].dipnt     = *itLastVertex;
-	fillVerticalRect[angledForm.vertexCount - 4U].dopnt     = *itLastVertex;
-	underlayVerticalRect[angledForm.vertexCount - 4U].dipnt = *itLastVertex;
-	underlayVerticalRect[angledForm.vertexCount - 4U].dopnt = *itLastVertex;
+	fillVerticalRect[index].dipnt     = *itLastVertex;
+	fillVerticalRect[index].dopnt     = *itLastVertex;
+	underlayVerticalRect[index].dipnt = *itLastVertex;
+	underlayVerticalRect[index].dopnt = *itLastVertex;
   }
   OSequence->clear();
   auto stitchPoint = *itVertex; //intentional copy
