@@ -4013,9 +4013,10 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
   itRegionPath[0].count   = gsl::narrow<int32_t>(
       mapIndexSequence[gsl::narrow_cast<size_t>(doneRegion) + 1U] - itRegionPath[0].pcon);
   for (auto iPath = ptrdiff_t {1}; iPath < pathLength; ++iPath) {
-	itRegionPath[iPath].pcon  = mapIndexSequence[pathMap[itRegionPath[iPath - 1].pcon].node];
+	auto const prevPath = iPath - 1;
+	itRegionPath[iPath].pcon  = mapIndexSequence[pathMap[itRegionPath[prevPath].pcon].node];
 	itRegionPath[iPath].count = gsl::narrow<int32_t>(
-	    mapIndexSequence[gsl::narrow_cast<size_t>(pathMap[itRegionPath[iPath - 1].pcon].node) + 1] -
+	    mapIndexSequence[gsl::narrow_cast<size_t>(pathMap[itRegionPath[prevPath].pcon].node) + 1] -
 	    itRegionPath[iPath].pcon);
   }
   while (visitedRegions[pathMap[itRegionPath[previousLevel].pcon].node]) {
@@ -4041,9 +4042,10 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
 	++pivot;
 	while (pivot <= previousLevel) {
 	  if (pivot != 0U) {
-		itRegionPath[pivot].pcon  = mapIndexSequence[pathMap[itRegionPath[pivot - 1].pcon].node];
+		auto const prevPivot = pivot - 1;
+		itRegionPath[pivot].pcon  = mapIndexSequence[pathMap[itRegionPath[prevPivot].pcon].node];
 		itRegionPath[pivot].count = gsl::narrow<int32_t>(
-		    mapIndexSequence[wrap::toSize(pathMap[itRegionPath[pivot - 1].pcon].node) + 1U] -
+		    mapIndexSequence[wrap::toSize(pathMap[itRegionPath[prevPivot].pcon].node) + 1U] -
 		    itRegionPath[pivot].pcon);
 	  }
 	  else {
