@@ -748,8 +748,8 @@ void form::setfrm() {
   fi::rats();
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   auto const point    = fi::px2stchf(FormLines->front());
-  auto const spVertices =
-      gsl::span(*FormVertices).subspan(FormList->back().vertexIndex, NewFormVertexCount - 1U);
+  auto const newCount = NewFormVertexCount - 1U; // -1 to account for the last point being the same as the first
+  auto const spVertices = gsl::span(*FormVertices).subspan(FormList->back().vertexIndex, newCount);
   auto const delta = F_POINT {point.x - spVertices.front().x, point.y - spVertices.front().y};
 
   auto minX = BIGFLOAT;
