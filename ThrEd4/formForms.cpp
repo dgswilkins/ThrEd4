@@ -1369,7 +1369,8 @@ void formForms::wavfrm() {
 	  for (auto index = count; index != 0; --index) {
 		*itVertex = currentPosition;
 		++itVertex;
-		currentPosition += points[index - 1U];
+		auto const prevCount = index - 1U;
+		currentPosition += points[prevCount];
 	  }
 	}
   }
