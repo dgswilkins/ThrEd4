@@ -71,6 +71,7 @@ auto CrossCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // cross
 namespace mi {
 auto chkok() noexcept -> bool;
 auto finrng(uint32_t find) noexcept -> bool;
+void moveForms();
 
 constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
@@ -844,93 +845,97 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   return false;
 }
 
+void mi::moveForms() {
+  auto const point =
+      POINT {(WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
+             (WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top};
+  form::ratsr();
+  FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
+  if (StateMap->test(StateFlag::FPSEL)) { // moving a group of form points
+	// clang-format off
+	  auto&      form            = FormList->operator[](ClosestFormToCursor);
+	  auto       iSelectedVertex = SelectedFormVertices.start;
+	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
+	// clang-format on
+	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
+	  auto const thisIt = wrap::next(itVertex, iSelectedVertex);
+	  *thisIt += FormMoveDelta;
+	  iSelectedVertex = form::pdir(form, iSelectedVertex);
+	}
+	thred::setpsel();
+	form.outline();
+	form::refil(ClosestFormToCursor);
+	StateMap->set(StateFlag::RESTCH);
+  }
+  else {
+	if (StateMap->test(StateFlag::BIGBOX)) {
+	  thred::savdo();
+	  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+		form::frmadj(iForm);
+	  }
+	  for (auto& stitch : *StitchBuffer) {
+		stitch += FormMoveDelta;
+	  }
+	  form::selal();
+	}
+	else {
+	  thred::savdo();
+	  for (auto const selectedForm : (*SelectedFormList)) {
+		form::frmadj(selectedForm);
+	  }
+	  form::frmsadj();
+	  StateMap->set(StateFlag::RESTCH);
+	}
+  }
+}
+
 auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) {
+  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) { // shift key pressed as well 
 	texture::setshft();
 	return true;
   }
-  if (StateMap->test(StateFlag::TXTRED)) {
+  if (StateMap->test(StateFlag::TXTRED)) { // in texture fill editor
 	texture::txtrup();
 	return true;
   }
   ReleaseCapture();
   thred::movchk();
-  if (StateMap->testAndReset(StateFlag::MOVFRMS)) {
+  if (StateMap->testAndReset(StateFlag::MOVFRMS)) { // moving forms or form points
 	thred::savdo();
-	auto const point =
-	    POINT {(WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
-	           (WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top};
-	form::ratsr();
-	FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
-	if (StateMap->test(StateFlag::FPSEL)) {
-	  // clang-format off
-	  auto&      form            = FormList->operator[](ClosestFormToCursor);
-	  auto       iSelectedVertex = SelectedFormVertices.start;
-	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  // clang-format on
-	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-		auto const thisIt = wrap::next(itVertex, iSelectedVertex);
-		*thisIt += FormMoveDelta;
-		iSelectedVertex = form::pdir(form, iSelectedVertex);
-	  }
-	  thred::setpsel();
-	  form.outline();
-	  form::refil(ClosestFormToCursor);
-	  StateMap->set(StateFlag::RESTCH);
-	}
-	else {
-	  if (StateMap->test(StateFlag::BIGBOX)) {
-		thred::savdo();
-		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		  form::frmadj(iForm);
-		}
-		for (auto& stitch : *StitchBuffer) {
-		  stitch += FormMoveDelta;
-		}
-		form::selal();
-	  }
-	  else {
-		thred::savdo();
-		for (auto const selectedForm : (*SelectedFormList)) {
-		  form::frmadj(selectedForm);
-		}
-		form::frmsadj();
-		StateMap->set(StateFlag::RESTCH);
-	  }
-	}
+	mi::moveForms();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::EXPAND)) {
+  if (StateMap->testAndReset(StateFlag::EXPAND)) { // expanding a form
 	form::setexpand(xyRatio);
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::STRTCH)) {
+  if (StateMap->testAndReset(StateFlag::STRTCH)) { // stretching a form
 	form::setstrtch();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::FRMOV)) {
+  if (StateMap->testAndReset(StateFlag::FRMOV)) { // moving a single form
 	thred::savdo();
 	form::rstfrm();
 	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::FRMPMOV)) {
+  if (StateMap->testAndReset(StateFlag::FRMPMOV)) { // moving a form point
 	thred::savdo();
 	form::setfpnt();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::MOVCNTR)) {
+  if (StateMap->testAndReset(StateFlag::MOVCNTR)) { // moving the rotate center of a form
 	rotationCenter = thred::pxCor2stch(WinMsg.pt);
 	StateMap->set(StateFlag::ROTAT);
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::ROTCAPT)) {
+  if (StateMap->testAndReset(StateFlag::ROTCAPT)) { // rotating a form
 	thred::rotfn(rotationAngle, rotationCenter);
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::SELPNT)) {
+  if (StateMap->testAndReset(StateFlag::SELPNT)) { // moving a group of stitches
 	thred::savdo();
 	ReleaseCapture();
 	thred::unsel();
@@ -963,7 +968,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap->test(StateFlag::BZUMIN)) {
+  if (StateMap->test(StateFlag::BZUMIN)) { // zooming in
 	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	if (StateMap->testAndReset(StateFlag::BOXSLCT)) {
 	  if (ZoomBoxOrigin.x > stitchPoint.x) {
