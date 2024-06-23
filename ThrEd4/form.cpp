@@ -8245,7 +8245,8 @@ void fi::shrnks() {
   auto  deltas      = std::vector<F_POINT> {};
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
   lengths.reserve(currentForm.vertexCount);
-  deltas.reserve(currentForm.vertexCount - 1U);
+  auto const deltaCount = currentForm.vertexCount - 1U;
+  deltas.reserve(deltaCount);
   clip::oclp(clipRect, currentForm.borderClipData, currentForm.clipEntries);
   auto const itVertex = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
   auto const vMax     = gsl::narrow<ptrdiff_t>(currentForm.vertexCount - 1U);
