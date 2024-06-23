@@ -256,15 +256,15 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   static auto threadSizeSelected = uint32_t {}; // thread selected for size change
 
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
+  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) { // shift key pressed
 	xt::dushft();
 	return true;
   }
-  if (StateMap->test(StateFlag::TXTRED) && !StateMap->test(StateFlag::FORMIN)) {
+  if (StateMap->test(StateFlag::TXTRED) && !StateMap->test(StateFlag::FORMIN)) { // texture entry
 	texture::txtlbut(textureForm);
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
+  if (StateMap->testAndReset(StateFlag::FSETFCOL)) { // setting fill color for forms
 	thred::unsid();
 	thred::unmsg();
 	if (thred::inDefaultColorWindows()) {
@@ -272,7 +272,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
+  if (StateMap->testAndReset(StateFlag::FSETBCOL)) { // setting border color for forms
 	thred::unsid();
 	thred::unmsg();
 	if (thred::inDefaultColorWindows()) {
@@ -280,7 +280,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap->testAndReset(StateFlag::FPUNCLP)) {
+  if (StateMap->testAndReset(StateFlag::FPUNCLP)) { // pasting points into a form
 	thred::savdo();
 	thred::fixpclp(ClosestFormToCursor);
 	FormList->operator[](ClosestFormToCursor).outline();
@@ -294,15 +294,15 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap->test(StateFlag::WASTRAC)) {
+  if (StateMap->test(StateFlag::WASTRAC)) { // tracing
 	trace::tracpar();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::HUPMSG)) {
+  if (StateMap->testAndReset(StateFlag::HUPMSG)) { // hoop size update
 	thred::updateHoopSize();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::INSFIL)) {
+  if (StateMap->testAndReset(StateFlag::INSFIL)) { // inserting a file
 	thred::duinsfil();
 	return true;
   }
@@ -310,7 +310,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
       thred::chkbig(stretchBoxLine, xyRatio)) {
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
+  if (StateMap->testAndReset(StateFlag::DELSFRMS)) { // deleting a group of forms
 	if (mi::chkok()) {
 	  thred::savdo();
 	  StateMap->reset(StateFlag::DELTO);
@@ -328,7 +328,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
+  if (StateMap->testAndReset(StateFlag::MOVMSG)) { // tried to move an edited form
 	if (mi::chkok()) {
 	  thred::savdo();
 	  if (!SelectedFormList->empty()) {
@@ -349,7 +349,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	return true;
   }
-  if (StateMap->test(StateFlag::FUNSCLP)) {
+  if (StateMap->test(StateFlag::FUNSCLP)) { // pasting a group of forms
 	StateMap->reset(StateFlag::MOVFRMS);
 	auto formsRect = F_RECTANGLE {};
 	form::pxrct2stch(SelectedFormsRect, formsRect);
@@ -381,7 +381,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->test(StateFlag::SIDCOL) && thred::inDefaultColorWindows()) {
 	return thred::updateFillColor();
   }
-  if (StateMap->testAndReset(StateFlag::OSAV)) {
+  if (StateMap->testAndReset(StateFlag::OSAV)) { // trying to load a new form
 	if (mi::chkok()) {
 	  thred::save();
 	  thred::nuTHRfile();
@@ -419,10 +419,10 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap->test(StateFlag::PRFACT)) {
+  if (StateMap->test(StateFlag::PRFACT)) { // update preferences
 	return thred::updatePreferences();
   }
-  if (!StateMap->test(StateFlag::ROTAT) && StateMap->test(StateFlag::GRPSEL)) {
+  if (!StateMap->test(StateFlag::ROTAT) && StateMap->test(StateFlag::GRPSEL)) { // if we have a group of stitches selected
 	auto const* formControlPoints = thred::getFormControlPoints();
 	auto const& controlPoint      = *formControlPoints;
 	if (thred::iselpnt()) {
@@ -454,7 +454,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap->testAndReset(StateFlag::NEWBAK)) {
+  if (StateMap->testAndReset(StateFlag::NEWBAK)) { // starting a new design
 	if (mi::chkok()) {
 	  thred::unmsg();
 	  thred::save();
@@ -469,13 +469,13 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap->testAndReset(StateFlag::PRGMSG)) {
+  if (StateMap->testAndReset(StateFlag::PRGMSG)) { // deleting backups
 	if (mi::chkok()) {
 	  thred::deldir();
 	  return true;
 	}
   }
-  if (StateMap->test(StateFlag::DELFRM)) {
+  if (StateMap->test(StateFlag::DELFRM)) { // deleting a form
 	auto code = 0;
 	if (mi::chkok()) {
 	  thred::savdo();
@@ -500,7 +500,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap->test(StateFlag::FILMSG)) {
+  if (StateMap->test(StateFlag::FILMSG)) { // user wants to remove an edited fill
 	if (mi::chkok()) {
 	  thred::savdo();
 	  form::unfil();
@@ -509,14 +509,14 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap->testAndReset(StateFlag::SIZSEL)) {
+  if (StateMap->testAndReset(StateFlag::SIZSEL)) { // updating thread sizes
 	if (thred::inChangeThreadWindows()) {
 	  thred::updateThreadSize(threadSizeSelected);
 	  return true;
 	}
 	thred::destroyChangeThreadSizeWindows();
   }
-  if (StateMap->testAndReset(StateFlag::POLIMOV)) {
+  if (StateMap->testAndReset(StateFlag::POLIMOV)) { // placing a new form
 	thred::savdo();
 	form::setfrm();
 	return true;
@@ -571,7 +571,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	form::setins();
 	return true;
   }
-  if (StateMap->test(StateFlag::FUNCLP)) {
+  if (StateMap->test(StateFlag::FUNCLP)) { // pasting a form
 	StateMap->set(StateFlag::INIT);
 	form::rstfrm();
 	form::refil(ClosestFormToCursor);
@@ -582,12 +582,12 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap->test(StateFlag::SATCNKT)) {
+  if (StateMap->test(StateFlag::SATCNKT)) { // connecting a satin form guide
 	thred::savdo();
 	satin::satknkt();
 	return true;
   }
-  if (StateMap->test(StateFlag::SATPNT)) {
+  if (StateMap->test(StateFlag::SATPNT)) { // adding a satin point
 	satin::satpnt1();
 	return true;
   }
@@ -600,19 +600,19 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap->testAndReset(StateFlag::MOVFRM)) {
+  if (StateMap->testAndReset(StateFlag::MOVFRM)) { // moving a form vertex
 	thred::savdo();
 	form::setfrm();
 	return true;
   }
   thred::unmsg();
-  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) {
+  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) { // we are in the stitch window, so choose an action
 	thred::unpat();
-	if (StateMap->testAndReset(StateFlag::ROTAT)) {
+	if (StateMap->testAndReset(StateFlag::ROTAT)) { // start rotating a form
 	  thred::setRotateCapture();
 	  return true;
 	}
-	if (StateMap->testAndReset(StateFlag::CLPSHO)) {
+	if (StateMap->testAndReset(StateFlag::CLPSHO)) { // pasting
 	  thred::savdo();
 	  if ((!StitchBuffer->empty()) &&
 	      (StateMap->testAndReset(StateFlag::SELBOX) || StateMap->testAndReset(StateFlag::INSRT)) &&
@@ -628,7 +628,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  StateMap->set(StateFlag::RESTCH);
 	  return true;
 	}
-	if (StateMap->testAndReset(StateFlag::BOXZUM)) {
+	if (StateMap->testAndReset(StateFlag::BOXZUM)) { // zooming in
 	  StateMap->set(StateFlag::BZUMIN);
 	  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
 	  ZoomBoxLine[0].y = ZoomBoxLine[1].y = WinMsg.pt.y - StitchWindowOrigin.y;
@@ -651,11 +651,11 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::INIT)) {
 	  thred::unlin();
-	  if (StateMap->test(StateFlag::INSRT)) {
+	  if (StateMap->test(StateFlag::INSRT)) { // insert mode active
 		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 		auto       code =
 		    (ActiveColor | USMSK | gsl::narrow_cast<decltype(ActiveColor)>(ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
-		if (StateMap->test(StateFlag::LIN1)) {
+		if (StateMap->test(StateFlag::LIN1)) { // inserting a stitch
 		  if (StateMap->test(StateFlag::BAKEND)) {
 			thred::xlin1();
 			auto const iStitch = wrap::toUnsigned(StitchBuffer->size());
@@ -741,11 +741,11 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::toglup();
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HHID)) {
+  if (WinMsg.hwnd == ButtonWin->operator[](HHID)) { // only show stitches of the selected color
 	thred::toglHid();
 	return true;
   }
-  if (thred::inDefaultColorWindows()) {
+  if (thred::inDefaultColorWindows()) { // user has clicked in the color windows
 	if (WinMsg.message == WM_LBUTTONDOWN) {
 	  thred::switchUserColors();
 	  if (StateMap->test(StateFlag::HID)) {
@@ -764,7 +764,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
-		if (StateMap->test(StateFlag::FORMSEL)) {
+		if (StateMap->test(StateFlag::FORMSEL)) { // user has selected a form so only update the color for that form
 		  auto& form = FormList->operator[](ClosestFormToCursor);
 		  if ((form.fillType != 0U) || (form.edgeType != 0U) ||
 		      ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
@@ -800,7 +800,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  }
 		}
 		else {
-		  if (StateMap->test(StateFlag::GRPSEL)) {
+		  if (StateMap->test(StateFlag::GRPSEL)) { // user has selected a group of stitches so update stitch colors
 			thred::savdo();
 			if (GroupStartStitch != GroupEndStitch) {
 			  auto const groupStitchRange =
@@ -829,11 +829,11 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	return true;
   }
-  if (thred::inUserColorWindows()) {
+  if (thred::inUserColorWindows()) { // user has clicked in the user color windows
 	thred::updateUserColor();
 	return true;
   }
-  if (thred::inThreadSizeWindows()) {
+  if (thred::inThreadSizeWindows()) { // user has clicked in the thread size windows
 	if (WinMsg.message == WM_LBUTTONDOWN) {
 	  threadSizeSelected = thred::createChangeThreadSizeWindows();
 	}
