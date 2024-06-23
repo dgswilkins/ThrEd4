@@ -3315,7 +3315,7 @@ void fi::chksid(FRM_HEAD const&             form,
   }
   auto const itVertex = currentFormVertices.cbegin();
   if (auto const vertexCount = currentFormVertices.size();
-      (vertexIndex - clipIntersectSide + vertexCount) % vertexCount < (vertexCount / 2)) {
+      (wrap::toSize(vertexIndex) - clipIntersectSide + vertexCount) % vertexCount < (vertexCount / 2)) {
 	auto       iVertex = form::nxt(form, clipIntersectSide);
 	auto const limit   = form::nxt(form, vertexIndex);
 	while (iVertex != limit) {
