@@ -3001,8 +3001,9 @@ public:
 	  else {
 		OSequence->emplace_back(highPoint);
 		for (auto iVertex = selectedVertexCount - 1U; iVertex != 0; --iVertex) {
-		  auto const length = polyLines[iVertex - 1U].length * polyDiff.length;
-		  auto const angle  = polyLines[iVertex - 1U].angle + polyDiff.angle;
+		  auto const prevVertex = iVertex - 1U;
+		  auto const length = polyLines[prevVertex].length * polyDiff.length;
+		  auto const angle  = polyLines[prevVertex].angle + polyDiff.angle;
 		  OSequence->emplace_back(lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length);
 		}
 	  }
