@@ -203,7 +203,8 @@ auto kyi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
 	return false;
   }
   if (destination < start) {
-	tempStitchBuffer.resize(finish - destination);
+	auto const bufSize = finish - destination;
+	tempStitchBuffer.resize(bufSize);
 	std::copy(wrap::next(StitchBuffer->begin(), start),
 	          wrap::next(StitchBuffer->begin(), finish),
 	          tempStitchBuffer.begin());
@@ -213,7 +214,8 @@ auto kyi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
 	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), destination));
   }
   else {
-	tempStitchBuffer.resize(destination - start);
+	auto const bufSize = destination - start;
+	tempStitchBuffer.resize(bufSize);
 	std::copy(wrap::next(StitchBuffer->begin(), finish),
 	          wrap::next(StitchBuffer->begin(), destination),
 	          tempStitchBuffer.begin());
