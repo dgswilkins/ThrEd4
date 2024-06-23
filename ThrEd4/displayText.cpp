@@ -414,7 +414,8 @@ void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
   di::bxtxt(HTXHOR, IDS_TXHOR);
   di::bxtxt(HTXANG, IDS_TXANG);
   di::bxtxt(HTXMIR, IDS_TXMIR);
-  SetWindowText(ButtonWin->operator[](HTXMIR + 1U), L"");
+  auto constexpr index = HTXMIR + 1U;
+  SetWindowText(ButtonWin->operator[](index), L"");
 }
 
 auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
