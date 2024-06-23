@@ -738,7 +738,7 @@ enum FormData : uint8_t {
   LBCSIZ,     // buttonhole corner size 13
   LBSTRT,     // form start style 14
   LBFIN,      // form end style 15
-  LBRDPIC,    // pico border spacing 16
+  LBRDPIC,    // picot border spacing 16
   LBRDUND,    // border underlay 17
   LSACANG,    // angle clipboard angle 18
   LFRMFAZ,    // clipboard phase 19
