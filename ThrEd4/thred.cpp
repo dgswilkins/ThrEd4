@@ -3647,9 +3647,10 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
   GetWindowRect(window, &childListRect);
   GetWindowRect(FormDataSheet, &parentListRect);
   form::ispcdclp();
-  if (StateMap->test(StateFlag::FILTYP)) {
+  if (StateMap->test(StateFlag::FILTYP)) { // if we are choosing a border fill type
 	auto entryCount = gsl::narrow<int32_t>(EDGELIST.size());
 	for (auto const& iEntry : EDGELIST) {
+	  // calculate how many entries we will have in the side window
 	  if ((form.edgeType & NEGUND) == iEntry.value) {
 		--entryCount;
 	  }
@@ -3663,6 +3664,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 		}
 	  }
 	}
+	// create the side window
 	SideMessageWindow = CreateWindow(L"STATIC",
 	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -3675,6 +3677,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 	                                 ThrEdInstance,
 	                                 nullptr);
 	for (auto const& iEntry : EDGELIST) {
+	  // set the side window entries
 	  if ((form.edgeType & NEGUND) != iEntry.value) {
 		if (iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) {
 		  if (StateMap->test(StateFlag::WASPCDCLP)) {
@@ -3690,6 +3693,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 	return;
   }
   auto entryCount = int32_t {0};
+  // choose the side window vertical size based on the form menu choice
   switch (FormMenuChoice) {
 	case LLAYR: {
 	  entryCount      = gsl::narrow<int32_t>(LAYRLIST.size());
@@ -3737,13 +3741,14 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
                                    ThrEdInstance,
                                    nullptr);
   switch (FormMenuChoice) {
-	case LLAYR: {
+	// fill the side window with the appropriate entries
+	case LLAYR: { // if we are choosing a layer
 	  for (auto const& iEntry : LAYRLIST) {
 		dusid(iEntry, sideWindowLocation, sideWindowSize);
 	  }
 	  break;
 	}
-	case LFTHTYP: {
+	case LFTHTYP: { // if we are choosing a feather fill type
 	  for (auto const& iEntry : FTHRLIST) {
 		if (iEntry.value != form.feather.fillType) {
 		  dusid(iEntry, sideWindowLocation, sideWindowSize);
@@ -3751,7 +3756,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
 	  }
 	  break;
 	}
-	case LFRMFIL: {
+	case LFRMFIL: { // if we are choosing a fill type
 	  for (auto const& iEntry : FILLLIST) {
 		if (iEntry.value == form.fillType) {
 		  continue;
