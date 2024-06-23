@@ -1140,21 +1140,22 @@ void trace::blak() {
 }
 
 void ti::getColors() {
+  auto const invColumn = 2U - ColumnColor;
   if (wrap::pressed(VK_SHIFT)) {
 	UpPixelColor &= TraceRGBMask.at(ColumnColor);
-	DownPixelColor |= TraceRGB.at(2 - ColumnColor);
+	DownPixelColor |= TraceRGB.at(invColumn);
 	return;
   }
   auto const ratio      = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
   auto const position   = wrap::floor<uint32_t>(ratio * 255.0);
-  auto       traceColor = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(2 - ColumnColor));
+  auto       traceColor = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(invColumn));
   auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift.at(ColumnColor));
   if (tracePosition < traceColor) {
 	UpPixelColor &= TraceRGBMask.at(ColumnColor);
 	UpPixelColor |= tracePosition;
 	return;
   }
-  traceColor = DownPixelColor & TraceRGB.at(2 - ColumnColor);
+  traceColor = DownPixelColor & TraceRGB.at(invColumn);
   if (tracePosition > traceColor) {
 	DownPixelColor &= TraceRGBMask.at(ColumnColor);
 	DownPixelColor |= tracePosition;
