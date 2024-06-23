@@ -2715,7 +2715,9 @@ void fi::prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>
   auto const itPreviousVertex = wrap::next(itLastVertex, -1);
   delta                       = *itLastVertex - *itPreviousVertex;
   ratio = (fabs(delta.x) > fabs(delta.y)) ? fabs(REDFACT / delta.x) : fabs(REDFACT / delta.y);
-  angledFormVertices[angledForm.vertexCount - 1U] = *itLastVertex + (delta * ratio);
+  auto const prevIndex = angledForm.vertexCount - 1U;
+
+  angledFormVertices[prevIndex] = *itLastVertex + (delta * ratio);
 }
 
 void fi::plfn(FRM_HEAD const&              form,
