@@ -4478,38 +4478,38 @@ void thred::zumin() {
 	thred::movStch();
   }
   auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
-  if (!StateMap->testAndReset(StateFlag::BZUMIN)) {
+  if (!StateMap->testAndReset(StateFlag::BZUMIN)) { // zoom box is not active
 	while (true) {
-	  if (StateMap->test(StateFlag::GMRK)) {
+	  if (StateMap->test(StateFlag::GMRK)) { // zoom to the mark
 		stitchPoint = ZoomMarkPoint;
 		break;
 	  }
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) { // zoom to the selected form
 		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
 
 		stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
 		                       wrap::midl(boundingRect.top, boundingRect.bottom)};
 		break;
 	  }
-	  if (StateMap->test(StateFlag::FRMPSEL)) {
+	  if (StateMap->test(StateFlag::FRMPSEL)) { // zoom to the selected form vertex
 		auto const itVertex =
 		    wrap::next(FormVertices->cbegin(),
 		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		stitchPoint = *itVertex;
 		break;
 	  }
-	  if (StateMap->test(StateFlag::SELBOX)) {
+	  if (StateMap->test(StateFlag::SELBOX)) { // zoom to the selected box
 		stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
 		break;
 	  }
-	  if (StateMap->test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) { // zoom to the selected group of stitches
 		auto groupBoundingRect = F_RECTANGLE {};
 		thred::selRct(groupBoundingRect);
 		stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 		                       wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 		break;
 	  }
-	  if (StateMap->test(StateFlag::INSRT)) {
+	  if (StateMap->test(StateFlag::INSRT)) { // zoom to the insert stitch point
 		if (StateMap->test(StateFlag::LIN1)) {
 		  stitchPoint = StateMap->test(StateFlag::BAKEND) ? StitchBuffer->back() : StitchBuffer->front();
 		}
@@ -4522,7 +4522,7 @@ void thred::zumin() {
 		}
 		break;
 	  }
-	  if (!SelectedFormList->empty()) {
+	  if (!SelectedFormList->empty()) { // zoom to the selected forms
 		auto const  firstForm = SelectedFormList->front();
 		auto const& firstRect = FormList->operator[](firstForm).rectangle;
 
@@ -4549,7 +4549,7 @@ void thred::zumin() {
 		                       wrap::midl(SelectedFormsRect.top, SelectedFormsRect.bottom)};
 		break;
 	  }
-	  if (!thred::inStitchWin()) {
+	  if (!thred::inStitchWin()) {  // nothing is selected or active, so zoom to the center of the hoop
 		stitchPoint = thi::centr();
 	  }
 	  break;
