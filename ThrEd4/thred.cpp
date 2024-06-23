@@ -1541,49 +1541,49 @@ void thi::setSideWinVal(int index) {
 void thi::chknum() {
   xt::clrstch();
   if (SideWinMsgIdx != 0U) {
-	if (FormMenuChoice != 0U) {
+	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 
 	  auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
-		case LTXOF: {
+		case LTXOF: { // update texture fill spacing
 		  thred::savdo();
 		  form.txof = value;
 		  break;
 		}
-		case LUANG: {
+		case LUANG: { // update underlay angle
 		  thred::savdo();
 		  form.underlayStitchAngle = value * DEGRADF * IPFGRAN;
 		  break;
 		}
-		case LUSPAC: {
+		case LUSPAC: { // update underlay spacing
 		  thred::savdo();
 		  form.underlaySpacing = value;
 		  break;
 		}
-		case LWLKIND: {
+		case LWLKIND: { // update underlay indent spacing
 		  thred::savdo();
 		  form.underlayIndent = value;
 		  break;
 		}
-		case LULEN: {
+		case LULEN: { // update underlay stitch length
 		  thred::savdo();
 		  form.underlayStitchLen = value;
 		  break;
 		}
-		case LDSTRT: {
+		case LDSTRT: { // update fill start point
 		  thred::savdo();
 		  form.fillStart = wrap::round<uint32_t>(value * IPFGRAN);
 		  form.fillStart %= form.vertexCount;
 		  break;
 		}
-		case LDEND: {
+		case LDEND: { // update fill end point
 		  thred::savdo();
 		  form.fillEnd = wrap::round<uint32_t>(value * IPFGRAN);
 		  form.fillEnd %= form.vertexCount;
 		  break;
 		}
-		case LFTHUPCNT: {
+		case LFTHUPCNT: { // update feather up count
 		  thred::savdo();
 		  auto           upcnt    = value * IPFGRAN;
 		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
@@ -1592,7 +1592,7 @@ void thi::chknum() {
 		  form.feather.upCount = wrap::round<uint8_t>(upcnt);
 		  break;
 		}
-		case LFTHCOL: {
+		case LFTHCOL: { // update feather color
 		  if (value != 0.0F) {
 			thred::savdo();
 			form::nufthcol((wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
@@ -1603,7 +1603,7 @@ void thi::chknum() {
 		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
-		case LFRMCOL: {
+		case LFRMCOL: { // update form color
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
@@ -1617,7 +1617,7 @@ void thi::chknum() {
 		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
-		case LUNDCOL: {
+		case LUNDCOL: { // update underlay color
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
@@ -1632,7 +1632,7 @@ void thi::chknum() {
 		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
-		case LBRDCOL: {
+		case LBRDCOL: { // update border color
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
@@ -1646,7 +1646,7 @@ void thi::chknum() {
 		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
-		case LBRDPIC: {
+		case LBRDPIC: { // update picot spacing
 		  thred::savdo();
 		  form.edgeSpacing = value;
 		  thred::unsid();
@@ -1654,7 +1654,7 @@ void thi::chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LFRMFAZ: {
+		case LFRMFAZ: { // update clip phase angle
 		  thred::savdo();
 		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
 		  thred::unsid();
@@ -1662,7 +1662,7 @@ void thi::chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LBRDPOS: {
+		case LBRDPOS: { // update chain position
 		  thred::savdo();
 		  form.edgeStitchLen = value * IPFGRAN;
 		  thred::unsid();
@@ -1670,7 +1670,7 @@ void thi::chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMAXFIL: {
+		case LMAXFIL: { // update max fill stitch length
 		  thred::savdo();
 		  form.maxFillStitchLen = value;
 		  thred::unsid();
@@ -1678,7 +1678,7 @@ void thi::chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMINFIL: {
+		case LMINFIL: { // update min fill stitch length
 		  thred::savdo();
 		  form.minFillStitchLen = value;
 		  thred::unsid();
@@ -1686,7 +1686,7 @@ void thi::chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMAXBRD: {
+		case LMAXBRD: { // update max border stitch length
 		  thred::savdo();
 		  form.maxBorderStitchLen = value;
 		  thred::unsid();
@@ -1694,7 +1694,7 @@ void thi::chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMINBRD: {
+		case LMINBRD: { // update min border stitch length
 		  thred::savdo();
 		  form.minBorderStitchLen = value;
 		  thred::unsid();
@@ -1707,7 +1707,7 @@ void thi::chknum() {
 		  break;
 		}
 	  }
-	  if (FormMenuChoice == LBCSIZ) {
+	  if (FormMenuChoice == LBCSIZ) { // update buttonhole corner size or picot length
 		thred::savdo();
 		if (form.edgeType == EDGEBHOL) {
 		  form::savblen(value);
@@ -1719,22 +1719,22 @@ void thi::chknum() {
 	  else {
 		if (value != 0.0F) {
 		  switch (FormMenuChoice) {
-			case LFTHSIZ: {
+			case LFTHSIZ: { // update feather size
 			  thred::savdo();
 			  form.feather.ratio = value * IPFGRAN;
 			  break;
 			}
-			case LFTHNUM: {
+			case LFTHNUM: { // update feather count
 			  thred::savdo();
 			  form.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
 			  break;
 			}
-			case LFTHFLR: {
+			case LFTHFLR: { // update feather min stitch size
 			  thred::savdo();
 			  form.feather.minStitchSize = value;
 			  break;
 			}
-			case LFTHDWNCNT: {
+			case LFTHDWNCNT: { // update feather down count
 			  thred::savdo();
 			  auto           dncnt    = value * IPFGRAN;
 			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
@@ -1743,22 +1743,22 @@ void thi::chknum() {
 			  form.feather.downCount = wrap::round<uint8_t>(dncnt);
 			  break;
 			}
-			case LFRMSPAC: {
+			case LFRMSPAC: { // update fill spacing
 			  thred::savdo();
 			  form.fillSpacing = value;
 			  break;
 			}
-			case LFRMLEN: {
+			case LFRMLEN: { // update fill stitch length
 			  thred::savdo();
 			  form.stitchLength = value;
 			  break;
 			}
-			case LBRDSPAC: {
+			case LBRDSPAC: { // update border spacing
 			  thred::savdo();
 			  switch (auto const edgeType = form.edgeType & NEGUND; edgeType) {
 				case EDGEPROPSAT:
 				case EDGEOCHAIN:
-				case EDGELCHAIN: {
+				case EDGELCHAIN: { 
 				  form.edgeSpacing = value;
 				  break;
 				}
@@ -1768,27 +1768,27 @@ void thi::chknum() {
 			  }
 			  break;
 			}
-			case LBRDLEN: {
+			case LBRDLEN: { // update border stitch length
 			  thred::savdo();
 			  form.edgeStitchLen = value;
 			  break;
 			}
-			case LBRDSIZ: {
+			case LBRDSIZ: { // update border width
 			  thred::savdo();
 			  form.borderSize = value;
 			  break;
 			}
-			case LFRMANG: {
+			case LFRMANG: { // update fill angle
 			  thred::savdo();
 			  form.fillAngle = value * DEGRADF * IPFGRAN;
 			  break;
 			}
-			case LSACANG: {
+			case LSACANG: { // update clip fill angle
 			  thred::savdo();
 			  form.clipFillAngle = value * DEGRADF * IPFGRAN;
 			  break;
 			}
-			case LAPCOL: {
+			case LAPCOL: { // update applique color
 			  thred::savdo();
 			  form.borderColor &= COLMSK;
 			  auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
@@ -1807,7 +1807,7 @@ void thi::chknum() {
 		}
 		else {
 		  thred::savdo();
-		  if (FormMenuChoice == LFRMSPAC && form.isFanClip()) {
+		  if (FormMenuChoice == LFRMSPAC && form.isFanClip()) { // update fan clip spacing
 			form.fillSpacing = 0;
 		  }
 		}
@@ -1817,7 +1817,7 @@ void thi::chknum() {
 	  formForms::refrm();
 	}
 	else {
-	  if (PreferenceIndex != 0U) {
+	  if (PreferenceIndex != 0U) { // the preference menu is open
 		auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data());
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto hWnd   = HWND {nullptr};
@@ -2005,19 +2005,19 @@ void thi::chknum() {
   if (MsgBuffer->size() > 1) {
 	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 	auto const value = thred::getMsgBufferValue();
-	if (StateMap->testAndReset(StateFlag::NUROT)) {
+	if (StateMap->testAndReset(StateFlag::NUROT)) { // rotate
 	  if (value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
 	  }
 	  return;
 	}
-	if (StateMap->testAndReset(StateFlag::ENTRSEG)) {
+	if (StateMap->testAndReset(StateFlag::ENTRSEG)) { // rotation segment
 	  if (value != 0.0F) {
 		IniFile.rotationAngle = PI_F2 / value;
 	  }
 	  return;
 	}
-	if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
+	if (StateMap->testAndReset(StateFlag::ENTRFNUM)) { // form number
 	  if (wrap::round<uint32_t>(value) < FormList->size()) {
 		form::frmnumfn(ClosestFormToCursor, wrap::round<uint32_t>(value));
 	  }
@@ -2027,12 +2027,12 @@ void thi::chknum() {
 	  return;
 	}
 	  auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
-	  if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRPOL)) { // number of sides
 		thred::savdo();
 		form::durpoli(uintValue);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRSTAR)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRSTAR)) { // number of points in star
 		thred::savdo();
 		constexpr auto STARSIZE = 250.0F; // star size factor
 		form::dustar(uintValue,
@@ -2040,174 +2040,174 @@ void thi::chknum() {
 		                 wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) { // number of spirals
 		thred::savdo();
 		form::duspir(uintValue);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRHART)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRHART)) { // number of heart facets
 		thred::savdo();
 		form::duhart(uintValue);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRLENS)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRLENS)) { // number of lens facets
 		thred::savdo();
 		form::dulens(uintValue);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTREG)) {
+	  if (StateMap->testAndReset(StateFlag::ENTREG)) { // number of egg facets
 		thred::savdo();
 		form::dueg(uintValue);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRZIG)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRZIG)) { // number of zigzags
 		thred::savdo();
 		form::duzig(uintValue);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::PIXIN)) {
+	  if (StateMap->testAndReset(StateFlag::PIXIN)) { // nudge pixel size
 		IniFile.nudgePixels = pxchk(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::STPXIN)) {
+	  if (StateMap->testAndReset(StateFlag::STPXIN)) { // stitch point pixel size
 		IniFile.stitchSizePixels = pxchk(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FRMPXIN)) {
+	  if (StateMap->testAndReset(StateFlag::FRMPXIN)) { // form vertex pixel size
 		IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FRMBOXIN)) {
+	  if (StateMap->testAndReset(StateFlag::FRMBOXIN)) { // form box pixel size
 		IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::GETMIN)) {
+	  if (StateMap->testAndReset(StateFlag::GETMIN)) { // minimum stitch length
 		SmallStitchLength = value * PFGRAN;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTR30)) {
+	  if (StateMap->testAndReset(StateFlag::ENTR30)) { // thread size for 30 weight
 		ThreadSize30 = value;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTR40)) {
+	  if (StateMap->testAndReset(StateFlag::ENTR40)) { // thread size for 40 weight
 		ThreadSize40 = value;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTR60)) {
+	  if (StateMap->testAndReset(StateFlag::ENTR60)) { // thread size for 60 weight
 		ThreadSize60 = value;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::SCLPSPAC)) {
+	  if (StateMap->testAndReset(StateFlag::SCLPSPAC)) { // clipboard fill spacing
 		IniFile.clipOffset = value * PFGRAN;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFIND)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFIND)) { // underlay indent
 		xt::dufind(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFHI)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFHI)) { // edit form height
 		if (value != 0.0F) {
 		  xt::dufhi(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFWID)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFWID)) { // edit form width
 		if (value != 0.0F) {
 		  xt::dufwid(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFMAX)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFMAX)) { // edit form max stitch length
 		if (value != 0.0F) {
 		  xt::dufmax(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFMIN)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFMIN)) { // edit form min stitch length
 		xt::dufmin(value * PFGRAN);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBMAX)) {
+	  if (StateMap->testAndReset(StateFlag::FSETBMAX)) { // edit border max stitch length
 		if (value != 0.0F) {
 		  xt::dubmax(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBMIN)) {
+	  if (StateMap->testAndReset(StateFlag::FSETBMIN)) { // edit border min stitch length
 		xt::dubmin(value * PFGRAN);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBSPAC)) {
+	  if (StateMap->testAndReset(StateFlag::FSETBSPAC)) { // edit border spacing
 		if (value != 0.0F) {
 		  xt::dubspac(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) { // edit form stitch length
 		if (value != 0.0F) {
 		  xt::dublen(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
+	  if (StateMap->testAndReset(StateFlag::FSETBCOL)) { // edit border color
 		xt::dubcol(wrap::round<uint8_t>(value));
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFCOL)) { // edit form fill color
 		xt::dufcol(wrap::round<uint8_t>(value));
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
+	  if (StateMap->testAndReset(StateFlag::FSETUCOL)) { // edit form underlay color
 		xt::dundcol(wrap::round<uint8_t>(value));
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFANG)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFANG)) { // edit form fill angle
 		xt::dufxang(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFSPAC)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFSPAC)) { // edit form fill spacing
 		if (value != 0.0F) {
 		  xt::dufspac(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETUANG)) {
+	  if (StateMap->testAndReset(StateFlag::FSETUANG)) { // edit form underlay angle
 		xt::dufang(value);
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
+	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) { // edit form fill stitch length
 		if (value != 0.0F) {
 		  xt::duflen(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETUSPAC)) {
+	  if (StateMap->testAndReset(StateFlag::FSETUSPAC)) { // edit form underlay spacing
 		if (value != 0.0F) {
 		  xt::duspac(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::FSETULEN)) {
+	  if (StateMap->testAndReset(StateFlag::FSETULEN)) { // edit form underlay stitch length
 		if (value != 0.0F) {
 		  xt::dusulen(value * PFGRAN);
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::GTUANG)) {
+	  if (StateMap->testAndReset(StateFlag::GTUANG)) { // default underlay angle
 		IniFile.underlayAngle = value * DEGRADF;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::GTUSPAC)) {
+	  if (StateMap->testAndReset(StateFlag::GTUSPAC)) { // default underlay spacing
 		if (value != 0.0F) {
 		  IniFile.underlaySpacing = value * PFGRAN;
 		}
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::GTWLKIND)) {
+	  if (StateMap->testAndReset(StateFlag::GTWLKIND)) { // default underlay indent
 		IniFile.underlayIndent = value * PFGRAN;
 		return;
 	  }
-	  if (StateMap->testAndReset(StateFlag::GTWLKLEN)) {
+	  if (StateMap->testAndReset(StateFlag::GTWLKLEN)) { // default underlay stitch length
 		if (value != 0.0F) {
 		  IniFile.underlayStitchLen = value * PFGRAN;
 		}
