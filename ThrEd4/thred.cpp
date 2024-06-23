@@ -9052,7 +9052,8 @@ void thi::handleFeatherWMINITDIALOG(HWND hwndlg) {
 	            0,
 	            reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
-  SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
+  auto const wParam = IniFile.featherFillType - 1;
+  SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, wParam, 0);
   auto state = wrap::toUnsigned(((featherType & AT_FTHBLND) != 0) ? BST_CHECKED : BST_UNCHECKED);
   CheckDlgButton(hwndlg, IDC_FDBLND, state);
   state = ((featherType & AT_FTHUP) != 0) ? BST_CHECKED : BST_UNCHECKED;
