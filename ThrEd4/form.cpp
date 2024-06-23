@@ -3645,12 +3645,13 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 		                                lineSegmentEnd,
 		                                currentFormVertices);
 		      count != 0U) {
+			auto constexpr clipMaxSize = size_t {MAXITEMS << 2U};
 			for (auto index = 0U; index < count; ++index) {
 			  clipStitchPoints.push_back({arrayOfClipIntersectData[index]->point.x,
 			                              arrayOfClipIntersectData[index]->point.y,
 			                              arrayOfClipIntersectData[index]->vertexIndex,
 			                              1});
-			  if (clipStitchPoints.size() > MAXITEMS << 2U) {
+			  if (clipStitchPoints.size() > clipMaxSize) {
 				breakFlag = true;
 				break;
 			  }
