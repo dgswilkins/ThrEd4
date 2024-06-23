@@ -8750,7 +8750,8 @@ void thi::inscol() {
 	}
   }
   for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
-	  UserColor.at(iColor) = UserColor.at(iColor - 1U);
+	auto const prevIndex = iColor - 1U;
+	  UserColor.at(iColor) = UserColor.at(prevIndex);
 	thred::nuscol(iColor);
   }
   thred::coltab();
