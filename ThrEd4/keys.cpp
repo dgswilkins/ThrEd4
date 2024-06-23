@@ -316,8 +316,9 @@ void keys::ungrphi() {
   }
   auto flag = true;
   for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; --iStitch) {
-	if (((StitchBuffer->operator[](iStitch - 1U).attribute & NOTFRM) == 0U) &&
-	    ((StitchBuffer->operator[](iStitch - 1U).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+	auto const prevStitch = iStitch - 1U;
+	if (((StitchBuffer->operator[](prevStitch).attribute & NOTFRM) == 0U) &&
+	    ((StitchBuffer->operator[](prevStitch).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 	  ClosestPointIndex = iStitch - 1U;
 	  StateMap->set(StateFlag::SELBOX);
 	  StateMap->set(StateFlag::RESTCH);
