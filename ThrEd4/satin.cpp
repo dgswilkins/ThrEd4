@@ -1144,7 +1144,8 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 		++iVertex;
 	  }
 	  auto const deltaX = lengths[iVertex] - length;
-	  auto const deltaY = length - lengths[iVertex - 1U];
+	  auto const prevVertex = iVertex - 1U;
+	  auto const deltaY = length - lengths[prevVertex];
 	  if (deltaY > deltaX) {
 		--iVertex;
 	  }
