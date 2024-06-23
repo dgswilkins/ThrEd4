@@ -1215,7 +1215,8 @@ void satin::satfil(FRM_HEAD& form) {
 		++iVertex;
 	  }
 	  auto const deltaA = lengths[iVertex] - length;
-	  auto const deltaB = length - lengths[iVertex - 1U];
+	  auto const prevVertex = iVertex - 1U;
+	  auto const deltaB = length - lengths[prevVertex];
 	  if (deltaB > deltaA) {
 		--iVertex;
 	  }
