@@ -76,14 +76,16 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
   auto const sizeLim              = message.size();
   while (iString < sizeLim) {
 	if (constexpr auto NEWLINE = 10; message[iString] == NEWLINE) {
-	  strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
+      auto const subLen = iString++ - previousStringLength;
+	  strings.push_back(message.substr(previousStringLength, subLen));
 	  previousStringLength = iString;
 	}
 	else {
 	  ++iString;
 	}
   }
-  strings.push_back(message.substr(previousStringLength, (iString - previousStringLength)));
+  auto const subLen = iString - previousStringLength;
+  strings.push_back(message.substr(previousStringLength, subLen));
   auto textSize    = SIZE {};
   auto messageSize = SIZE {};
   for (auto& string : strings) {
