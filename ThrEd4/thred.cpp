@@ -167,6 +167,7 @@ void doInitZoomed();
 void doStretch(uint32_t start, uint32_t end);
 void drawBackground();
 void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStitch, const float& maxYcoord);
+void drawStitchBoxes();
 void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
 void drwStch();
 void drwknot();
@@ -301,6 +302,7 @@ auto sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT;
 void segentr(float rotationAngle);
 void selin(uint32_t start, uint32_t end, HDC hDC);
 auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool;
+void setScrollVisibility();
 void setSideWinVal(int index);
 void setbak(int32_t penWidth) noexcept;
 void setknt();
@@ -11341,8 +11343,9 @@ void thi::doInitUnzoomed() {
   }
 }
 
-void thi::doDrwInit() {
-  if (StateMap->test(StateFlag::ZUMED)) {
+void thi::setScrollVisibility() {
+  if (StateMap->test(StateFlag::ZUMED)) { // if we are zoomed
+	// set up the scroll bars
 	auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
 	scrollInfo.cbSize = sizeof(scrollInfo);
 	scrollInfo.fMask  = SIF_ALL;
@@ -11356,6 +11359,7 @@ void thi::doDrwInit() {
 	scrollInfo.nPage = wrap::round<UINT>(ZoomRect.right - ZoomRect.left);
 	scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(ZoomRect.left);
 	SetScrollInfo(HorizontalScrollBar, SB_CTL, &scrollInfo, TRUE);
+	// and show the scroll bars
 	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
 	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
   }
@@ -11363,6 +11367,47 @@ void thi::doDrwInit() {
 	ShowWindow(VerticalScrollBar, SW_HIDE);
 	ShowWindow(HorizontalScrollBar, SW_HIDE);
   }
+}
+
+void thi::drawStitchBoxes() {
+  auto const cellSize =
+      F_POINT {(ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right),
+               (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom)};
+  auto const maxMapSize = wrap::toSize(StitchWindowClientRect.right * StitchWindowClientRect.bottom);
+  auto stitchMap = boost::dynamic_bitset<>(maxMapSize, 0U);
+  SelectObject(StitchWindowMemDC, LinePen);
+  SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
+  if (StateMap->test(StateFlag::HID)) {
+	for (auto iColor = 0U; iColor < thred::maxColor(); ++iColor) {
+	  if (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
+		continue;
+	  }
+	  for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
+	       iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
+	       ++iStitch) {
+		auto const& stitch = StitchBuffer->operator[](iStitch);
+		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
+		    stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
+		  thi::stchbox(iStitch, StitchWindowMemDC);
+		}
+	  }
+	}
+  }
+  else {
+	auto iStitch = 0U;
+	for (auto& stitch : *StitchBuffer) {
+	  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
+	      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
+		thi::stchbox(iStitch, StitchWindowMemDC);
+	  }
+	  ++iStitch;
+	}
+  }
+  SetROP2(StitchWindowMemDC, R2_COPYPEN);
+}
+
+void thi::doDrwInit() {
+  setScrollVisibility();
   thred::duzrat();
   auto const dub6        = ZoomRatio.x * 6.0F;
   auto const threadWidth = std::array<int32_t, 3> {
@@ -11383,7 +11428,7 @@ void thi::doDrwInit() {
   else {
 	thi::doInitUnzoomed();
   }
-  if (StateMap->test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::SELBOX)) { // if we have selected a box which has stitches
 	if (!StitchBuffer->empty()) {
 	  ritcor(StitchBuffer->operator[](ClosestPointIndex));
 	  auto stitchCoordsInPixels = POINT {};
@@ -11392,7 +11437,7 @@ void thi::doDrwInit() {
 	  }
 	}
   }
-  if (StateMap->test(StateFlag::FRMPSEL)) {
+  if (StateMap->test(StateFlag::FRMPSEL)) { // if we have selected a point in a form
 	auto const itVertex =
 	    wrap::next(FormVertices->cbegin(),
 	               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
@@ -11405,7 +11450,7 @@ void thi::doDrwInit() {
   if (StateMap->test(StateFlag::WASLIN)) {
 	relin();
   }
-  if (StateMap->test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) { // if we have selected a group of stitches
 	if (cmpstch(ClosestPointIndex, GroupStitchIndex)) {
 	  cros(ClosestPointIndex);
 	}
@@ -11418,41 +11463,8 @@ void thi::doDrwInit() {
 	StateMap->set(StateFlag::SELSHO);
 	dusel(StitchWindowMemDC);
   }
-  if (ZoomFactor < StitchBoxesThreshold) {
-	auto const cellSize =
-	    F_POINT {(ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right),
-	             (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom)};
-	auto const maxMapSize = wrap::toSize(StitchWindowClientRect.right * StitchWindowClientRect.bottom);
-	auto stitchMap = boost::dynamic_bitset<>(maxMapSize, 0U);
-	SelectObject(StitchWindowMemDC, LinePen);
-	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	if (StateMap->test(StateFlag::HID)) {
-	  for (auto iColor = 0U; iColor < thred::maxColor(); ++iColor) {
-		if (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
-		  continue;
-		}
-		for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
-		     iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
-		     ++iStitch) {
-		  auto const& stitch = StitchBuffer->operator[](iStitch);
-		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
-		      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
-			thi::stchbox(iStitch, StitchWindowMemDC);
-		  }
-		}
-	  }
-	}
-	else {
-	  auto iStitch = 0U;
-	  for (auto& stitch : *StitchBuffer) {
-		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
-		    stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
-		  thi::stchbox(iStitch, StitchWindowMemDC);
-		}
-		++iStitch;
-	  }
-	}
-	SetROP2(StitchWindowMemDC, R2_COPYPEN);
+  if (ZoomFactor < StitchBoxesThreshold) { // do we need to draw the stitch boxes?
+	drawStitchBoxes();
   }
   if (StateMap->test(StateFlag::CLPSHO)) {
 	thi::duclp();
