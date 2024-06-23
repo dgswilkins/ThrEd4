@@ -3199,6 +3199,7 @@ void thi::durit(std::vector<char>& destination, const void* source, uint32_t cou
   }
 }
 
+// fill in the header and write the data to the buffer
 void thi::dubuf(std::vector<char>& buffer) {
   auto stitchHeader  = THR_HEAD {};
   auto vertexCount   = 0U;
@@ -3217,6 +3218,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   if (!FormList->empty()) {
+	// count the number of vertices, satin guides, and clip data points in all forms
 	for (auto& iForm : (*FormList)) {
 	  vertexCount += iForm.vertexCount;
 	  if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
@@ -3230,13 +3232,16 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  }
 	}
   }
+  // fill in the header with the values
   wrap::narrow(stitchHeader.formCount, FormList->size());
   wrap::narrow(stitchHeader.vertexCount, vertexCount);
   wrap::narrow(stitchHeader.dlineCount, guideCount);
   wrap::narrow(stitchHeader.clipDataCount, clipDataCount);
+  // calculate the offset to the form data entry point
   auto const formDataOffset = bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
                               sizeof(UserColor) + sizeof(CustomColor) + TSSIZE;
   auto       vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(StitchBuffer) + formDataOffset;
+  // calculate the design data size
   auto const thredDataSize =
       wrap::sizeofVector(FormList) + vertexCount * wrap::sizeofType(FormVertices) +
       guideCount * wrap::sizeofType(SatinGuides) + clipDataCount * wrap::sizeofType(ClipPoints) +
@@ -3250,27 +3255,33 @@ void thi::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.vertexLen, vtxLen);
   wrap::narrow(stitchHeader.dlineLen, wrap::sizeofType(FormVertices) * vertexCount);
   wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(ClipPoints) * clipDataCount);
+  // write the header to the buffer
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
   ExtendedHeader->auxFormat         = IniFile.auxFileType;
   ExtendedHeader->hoopSizeX         = IniFile.hoopSizeX;
   ExtendedHeader->hoopSizeY         = IniFile.hoopSizeY;
   ExtendedHeader->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
+  // write the rest of the data to the buffer
   durit(buffer, ExtendedHeader, sizeof(*ExtendedHeader));
   durit(buffer, StitchBuffer->data(), wrap::sizeofVector(StitchBuffer));
   durit(buffer, bitmap::getBmpNameData(), bitmap::getBmpNameLength());
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
   durit(buffer, UserColor.data(), sizeof(UserColor));
   durit(buffer, CustomColor.data(), sizeof(CustomColor));
+  // write the thread size data to the buffer
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(TSSIZE);
   auto iBuffer = threadSizeBuffer.begin();
   for (auto const& iThread : ThreadSize) {
 	*(iBuffer++) = gsl::narrow<char>(iThread);
   }
+
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
+  // if we have no forms then we are done
   if (FormList->empty()) {
 	return;
   }
+  // resrve space for the form data
   auto outForms = std::vector<FRM_HEAD_OUT> {};
   outForms.reserve(FormList->size());
   auto vertices = std::vector<F_POINT> {};
@@ -3279,6 +3290,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   guides.reserve(guideCount);
   auto points = std::vector<F_POINT> {};
   points.reserve(clipDataCount);
+  // write the form vertex data to the buffer
   for (auto& srcForm : (*FormList)) {
 	outForms.emplace_back(srcForm);
 	auto itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
@@ -3286,7 +3298,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  vertices.push_back(*itVertex);
 	  ++itVertex;
 	}
-	if (srcForm.type == SAT) {
+	if (srcForm.type == SAT) { // write the satin guide data to the guide buffer
 	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
 	  if (srcForm.satinGuideCount != 0U) {
 		auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinGuideIndex);
@@ -3296,14 +3308,14 @@ void thi::dubuf(std::vector<char>& buffer) {
 		}
 	  }
 	}
-	if (srcForm.isClip()) {
+	if (srcForm.isClip()) { // write the clip data to the points buffer
 	  auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.clipIndex);
 	  for (auto iClip = 0U; iClip < srcForm.clipCount; ++iClip) {
 		points.push_back(*offsetStart);
 		++offsetStart;
 	  }
 	}
-	if (srcForm.isEdgeClipX()) {
+	if (srcForm.isEdgeClipX()) { // write the edge clip data to the points buffer
 	  auto       offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
 	  auto const clipCount   = srcForm.clipEntries;
 	  for (auto iClip = 0U; iClip < clipCount; ++iClip) {
@@ -3312,6 +3324,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  }
 	}
   }
+  // write the form data to the buffer
   if (!outForms.empty()) {
 	durit(buffer, outForms.data(), wrap::sizeofVector(outForms));
   }
