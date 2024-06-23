@@ -853,13 +853,16 @@ void thi::ritfnam(std::wstring const& designerName) {
   PseudoRandomValue = rsed();
   auto iName        = 0U;
   std::ranges::generate(tmpName, []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
+  // encode the designer name
   for (auto& iTmpName : tmpName) {
+	// encode the name
 	if (designer[iName++] != 0) {
 	  auto iNE = wrap::next(NameEncoder.begin(), designer[iName]);
 	  iTmpName = *iNE;
 	  continue;
 	}
 	auto iND = wrap::next(NameDecoder.begin(), iTmpName);
+	// salt the name
 	while (*iND != 0U) {
 	  iTmpName = (form::psg() & BYTMASK);
 	  iND      = wrap::next(NameDecoder.begin(), iTmpName);
@@ -874,6 +877,7 @@ void thi::ritfnam(std::wstring const& designerName) {
 	}
   }
   auto       iTmpName      = tmpName.begin();
+  // write the encoded name
   auto const spCreatorName = gsl::span {ExtendedHeader->creatorName};
   for (auto const& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
