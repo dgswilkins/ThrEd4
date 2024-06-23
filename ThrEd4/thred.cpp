@@ -11219,13 +11219,14 @@ void thi::doInitZoomed() {
   StateMap->reset(StateFlag::LININ);
   // intentional copy of first stitch to initialize previous stitch
   auto prevStitch = StitchBuffer->front();
-  for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
+  for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) { // iterate through all colors
 	if (StateMap->test(StateFlag::HID) && (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor)) {
 	  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	                ColorChangeTable->operator[](iColor).stitchIndex;
 	  auto const sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 	  auto const sEnd   = wrap::next(sStart, stitchCount);
 	  auto       sRange = std::ranges::subrange(sStart, sEnd);
+	  // and check if the color is to be displayed in the zoomed view
 	  for (auto const& iStitch : sRange) {
 		if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
 		    iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
@@ -11245,13 +11246,13 @@ void thi::doInitZoomed() {
 	stitchCount          = chkup(stitchCount, iColor);
 	auto const stitches  = std::ranges::subrange(stStart, wrap::next(stStart, stitchCount));
 	auto const maxYcoord = wrap::toFloat(DrawItem->rcItem.bottom);
-	for (auto& iStitch : stitches) {
+	for (auto& iStitch : stitches) { // iterate through all stitches of the current color
 	  auto const layer = (iStitch.attribute & LAYMSK) >> LAYSHFT;
 	  if ((ActiveLayer != 0U) && (layer != 0U) && (layer != ActiveLayer)) {
 		continue;
 	  }
 	  if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
-	      iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
+	      iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) { // if the stitch is in the zoomed view
 		wascol = 1;
 		if (StateMap->testAndSet(StateFlag::LINED)) {
 		  if (StateMap->testAndSet(StateFlag::LININ)) {
@@ -11292,7 +11293,7 @@ void thi::doInitZoomed() {
 		  StateMap->set(StateFlag::LININ);
 		}
 	  }
-	  else {
+	  else { // the stitch is not in the zoomed view
 		if (StateMap->testAndReset(StateFlag::LININ)) {
 		  linePoints.push_back(
 		      {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
@@ -11309,7 +11310,7 @@ void thi::doInitZoomed() {
 	  }
 	  prevStitch = iStitch;
 	}
-	if (!linePoints.empty()) {
+	if (!linePoints.empty()) { // if we have a set of stitches t0 draw
 	  wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
 	  // intentional copy being made here to save last point
 	  auto const lastPoint = linePoints.back();
