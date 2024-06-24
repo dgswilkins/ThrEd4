@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="github">
+      <UniqueIdentifier>{475d2025-f3f1-4fcd-9b9e-5e68776dc785}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vcpkg">
+      <UniqueIdentifier>{dcbd6f4a-bf3f-4202-a1a2-e46ef9e894e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="clang">
+      <UniqueIdentifier>{3500b413-384e-4ee1-9edf-0fe6a281aef3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="form.cpp">
@@ -236,12 +245,25 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="cpp.hint" />
-    <None Include="..\vcpkg.json" />
-    <None Include="..\vcpkg-configuration.json" />
-    <None Include="..\.clang-tidy" />
-    <None Include="..\.github\workflows\build.yml" />
-    <None Include="..\.github\workflows\codeql.yml" />
-    <None Include="_clang-format" />
+    <None Include="..\.editorconfig" />
+    <None Include="..\.github\workflows\build.yml">
+      <Filter>github</Filter>
+    </None>
+    <None Include="..\.github\workflows\codeql.yml">
+      <Filter>github</Filter>
+    </None>
+    <None Include="..\vcpkg.json">
+      <Filter>vcpkg</Filter>
+    </None>
+    <None Include="..\vcpkg-configuration.json">
+      <Filter>vcpkg</Filter>
+    </None>
+    <None Include="..\.clang-tidy">
+      <Filter>clang</Filter>
+    </None>
+    <None Include="_clang-format">
+      <Filter>clang</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico">
