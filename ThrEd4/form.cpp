@@ -5080,16 +5080,14 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
   auto const bottomDelta = bottomRightPoint - bottomLeftPoint;
   for (auto const& clip : *ClipBuffer) {
 	auto const clipRatio = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
-	// ToDo: check if the following is correct. Should [top|bottom]Midpoint.y be calculated using clipRatio.x?
 	auto const topMidpoint = F_POINT {clipRatio.x * (topDelta.x) + topLeftPoint.x,
-	                                  clipRatio.x * (topDelta.y) + topLeftPoint.y};
+	                                  clipRatio.y * (topDelta.y) + topLeftPoint.y};
 
 	auto const bottomMidpoint = F_POINT {clipRatio.x * (bottomDelta.x) + bottomLeftPoint.x,
-	                                     clipRatio.x * (bottomDelta.y) + bottomLeftPoint.y};
+	                                     clipRatio.y * (bottomDelta.y) + bottomLeftPoint.y};
 
 	auto const middleDelta = topMidpoint - bottomMidpoint;
-	// ToDo: check if the following is correct. Should the x value be using clipRatio.y?
-	OSequence->emplace_back(clipRatio.y * middleDelta.x + bottomMidpoint.x,
+	OSequence->emplace_back(clipRatio.x * middleDelta.x + bottomMidpoint.x,
 	                        clipRatio.y * middleDelta.y + bottomMidpoint.y);
   }
 }
