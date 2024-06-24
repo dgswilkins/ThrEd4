@@ -1233,8 +1233,7 @@ void formForms::setear() {
 	}
   }
   form.outline();
-  // ToDo - is this copy of an iterator required?
-  auto       shiftedVertex = firstVertex;
+  auto       shiftedVertex = firstVertex; // assignment is optimized out, but is clearer
   auto const left          = form.rectangle.left;
   auto const bottom        = form.rectangle.bottom;
   auto const vertexMax     = form.vertexCount;
