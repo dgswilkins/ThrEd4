@@ -421,7 +421,7 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
   hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
-  hResult += pFileOpen->SetTitle(L"Open Thred File");
+  hResult += pFileOpen->SetTitle(L"Open ThrEd File");
 #if USE_DEFBDIR
   // If we want to, we can set the default directory rather than using the OS mechanism for last used
   auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);

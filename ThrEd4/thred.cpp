@@ -3978,7 +3978,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	  throw std::runtime_error("Unknown file index");
 	}
   }
-  hResult += pFileOpen->SetTitle(L"Open Thred File");
+  hResult += pFileOpen->SetTitle(L"Open ThrEd File");
 #if USE_DEFAULTDIR
   // If we want to, we can set the default directory rather than using the OS mechanism for last used
   auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
@@ -4031,7 +4031,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto bytesRead   = DWORD {};
   auto thredHeader = THR_HEAD {};
-  if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for thredHeader in readTHRFile")) {
+  if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in readTHRFile")) {
 	return false;
   }
   if ((thredHeader.headerType & SIGMASK) != THREDSIG) {
@@ -6591,7 +6591,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	homscor = wrap::toUnsigned(FormList->size()) * FRMW +
 	          gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW +
 	          wrap::toUnsigned(FormVertices->size()) * FRMPW + wrap::toUnsigned(StitchBuffer->size()) * STCHW;
-	if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for thredHeader in insTHR")) {
+	if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in insTHR")) {
 	  return false;
 	}
   }
