@@ -169,7 +169,7 @@ uint32_t*                      TraceBitmapData           = nullptr; // trace bit
 boost::dynamic_bitset<>*       TracedEdges               = nullptr; // detected edges of trace areas
 boost::dynamic_bitset<>*       TracedMap                 = nullptr; // in/out state of trace areas
 
-std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer     = nullptr; // backup data NOLINT(modernize-avoid-c-arrays)
+std::array<std::vector<uint32_t>, UNDOLEN>* UndoBuffer   = nullptr; // backup data
 
 SIZE                           UnzoomedRect              = {};      // size of the unzoomed stitch window
 std::array<COLORREF, COLORCNT> UserColor                 = {};      // user colors

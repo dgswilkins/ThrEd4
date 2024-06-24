@@ -518,7 +518,7 @@ class MY_SINGLE
   boost::dynamic_bitset<>   privateTracedEdges;
   boost::dynamic_bitset<>   privateTracedMap;
 
-  std::vector<std::unique_ptr<uint32_t[]>> privateUndoBuffer; // NOLINT(modernize-avoid-c-arrays)
+  std::array<std::vector<uint32_t>, UNDOLEN> privateUndoBuffer;
 
   fs::path              privateUserBMPFileName;
   std::vector<HWND>     privateUserColorWin;
@@ -12364,7 +12364,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  instance.privateThreadSizeWin.resize(COLORCNT);
 	  constexpr auto TSSSIZ = size_t {32U}; // size of the message buffer
 	  instance.privateThumbnailSearchString.reserve(TSSSIZ);
-	  instance.privateUndoBuffer.resize(UNDOLEN);
 	  instance.privateUserColorWin.resize(COLORCNT);
 	  instance.privateUserPen.resize(COLORCNT);
 	  instance.privateValueWindow.resize(LASTLIN);

@@ -72,17 +72,17 @@ void redbak();
 
 #pragma warning(push)
 void backup::dudat() {
-  auto& undoBuffer = *UndoBuffer;
-  undoBuffer[UndoBufferWriteIndex].reset(nullptr);
+  auto& bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
+  bufferElement.clear();
   auto const formCount = wrap::toUnsigned(FormList->size());
 
   auto const size = wrap::sizeofVector(*FormList) + wrap::sizeofVector(StitchBuffer) +
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
-  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT(modernize-avoid-c-arrays)
-  auto* backupData = convertFromPtr<BACK_HEAD*>(undoBuffer[UndoBufferWriteIndex].get());
-  if (backupData == nullptr) {
+  bufferElement.resize(size); 
+  auto* backupData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
+  if (size != bufferElement.size()) {
 	return;
   }
   backupData->zoomRect  = UnzoomedRect;
@@ -136,8 +136,8 @@ void backup::dudat() {
 #pragma warning(pop)
 
 void backup::deldu() {
-  for (auto& undo : *UndoBuffer) {
-	undo.reset(nullptr);
+  for (auto& bufferElement : *UndoBuffer) {
+	bufferElement.clear();
   }
   UndoBufferWriteIndex = 0;
   StateMap->reset(StateFlag::BAKWRAP);
@@ -145,10 +145,11 @@ void backup::deldu() {
 }
 
 void bui::redbak() {
-  auto const* undoData = convertFromPtr<BACK_HEAD*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
-  if (undoData == nullptr) {
+  auto bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
+  if (bufferElement.empty()) {
 	return;
   }
+  auto const* undoData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
   StitchBuffer->clear();
   if (undoData->stitchCount != 0U) {
 	auto const span = gsl::span<F_POINT_ATTR> {undoData->stitches, undoData->stitchCount};
