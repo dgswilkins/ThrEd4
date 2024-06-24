@@ -18,7 +18,7 @@
 #include "textureHeader.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -498,9 +498,9 @@ void texture::drwtxtr() {
 #ifdef _DEBUG
 	outDebugString(L"[{}] texture points erased\n", erased);
 #else
-	// resharper disable CppClangTidyClangDiagnosticUnusedValue
+	// ReSharper disable CppClangTidyClangDiagnosticUnusedValue
 	DBG_UNREFERENCED_LOCAL_VARIABLE(erased);
-	// resharper restore CppClangTidyClangDiagnosticUnusedValue
+	// ReSharper restore CppClangTidyClangDiagnosticUnusedValue
 #endif
   }
   auto const flag = (pixelSpace > editSpace);

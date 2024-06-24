@@ -33,7 +33,7 @@
 #include "ThrEdTypes.h"
 #include "trace.h"
 #include "utf8conv.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -406,7 +406,7 @@ class COL_CHANGE
 };
 
 #pragma pack(push, 1)
-class THR_HEAD // thred file header
+class THR_HEAD // ThrEd file header
 {
   public:
   uint32_t headerType {};
@@ -424,7 +424,7 @@ class THR_HEAD // thred file header
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-class THR_HEAD_EX // thred v1.0 file header extension
+class THR_HEAD_EX // ThrEd v1.0 file header extension
 {
   public:
   float                        hoopSizeX {};         // hoop size x dimension
@@ -544,14 +544,14 @@ class MY_SINGLE
 namespace {
 auto FormControlPoints =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
-auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr);  // thred file header extension
+auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr);  // ThrEd file header extension
 auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
 auto ArgCount        = int32_t {};                               // command line argument count
 auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr);       // command line argument array
 auto ThredWindowRect = RECT {};                                  // main window size
 auto ColorBarSize    = gsl::narrow_cast<int32_t*>(nullptr);      // Color bar width scaled for DPI
 auto ColorBarRect    = RECT {};                                  // color bar rectangle
-auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which thred was executed
+auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which ThrEd was executed
 auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
 auto LargestStitchIndex  = uint32_t {}; // pointer to the largest stitch in the selected range
 auto CurrentStitchIndex  = uint32_t {}; // pointer to the current selection for length search
@@ -3145,7 +3145,7 @@ void thi::ritini() {
   if (iniFileHandle != INVALID_HANDLE_VALUE) {
 	auto bytesRead = DWORD {};
 	WriteFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
-	// ToDo - Check that file is wriiten completely
+	// ToDo - Check that file is written completely
   }
   CloseHandle(iniFileHandle);
 }
@@ -3284,7 +3284,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   if (FormList->empty()) {
 	return;
   }
-  // resrve space for the form data
+  // reserve space for the form data
   auto outForms = std::vector<FRM_HEAD_OUT> {};
   outForms.reserve(FormList->size());
   auto vertices = std::vector<F_POINT> {};
@@ -3570,7 +3570,7 @@ void thred::savAs() {
 	  menu::setdst();
 	  break;
 	}
-	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	// ReSharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
 	  throw std::runtime_error("Unknown file type");
 	}
@@ -3949,7 +3949,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	      pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()), INSERT_FILE_TYPES.data());
 	  break;
 	}
-	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	// ReSharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
 	  throw std::runtime_error("Unknown file style");
 	}
@@ -3973,7 +3973,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	  break;
 	}
 #endif
-	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	// ReSharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
 	  throw std::runtime_error("Unknown file index");
 	}
@@ -4954,7 +4954,7 @@ If the mouse position is outside this rectangle, the stitch is disqualified.
 If the mouse position is inside the rectangle, the distance from the stitch
  to the select point (SelectedPoint) is calculated.
 
-Find the equation for the line by solving the linear parametric eauations using
+Find the equation for the line by solving the linear parametric equations using
 stitch = StitchBuffer->operator[](StitchIndex);
 stitchFwd = StitchBuffer->operator[](StitchIndex + 1);
 
@@ -6029,8 +6029,8 @@ void thi::stchout() {
 }
 
 void thi::setsped() {
-  constexpr auto DEFET = uint32_t {100U}; // default elapsed time per frame. Units are millseconds
-  constexpr auto DEFUT = 10.0;            // default user time per frame. Units are millseconds
+  constexpr auto DEFET = uint32_t {100U}; // default elapsed time per frame. Units are milliseconds
+  constexpr auto DEFUT = 10.0;            // default user time per frame. Units are milliseconds
 
   auto elapsedTimePerFrame = DEFET;
   if (MovieTimeStep == 0) {
@@ -6366,7 +6366,7 @@ void thred::movi() {
                              ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
                              : gsl::narrow_cast<float>(StitchBuffer->size());
   if (!StateMap->test(StateFlag::WASPAT)) {
-	constexpr auto MLEN = 10000.0F; // default movie length (millisecs)
+	constexpr auto MLEN = 10000.0F; // default movie length (milliseconds)
 	MovieTimeStep       = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
   }
   if (MovieTimeStep < MINDELAY) {
@@ -11909,8 +11909,8 @@ auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 		}
 	  }
 	  BitBlt(StitchWindowDC,                // handle to destination DC
-	         0,                             // x-coord of destination upper-left corner
-	         0,                             // y-coord of destination upper-left corner
+	         0,                             // x coordinate of destination upper-left corner
+	         0,                             // y coordinate of destination upper-left corner
 	         StitchWindowClientRect.right,  // width of destination rectangle
 	         StitchWindowClientRect.bottom, // height of destination rectangle
 	         StitchWindowMemDC,             // handle to source DC

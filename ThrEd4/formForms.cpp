@@ -12,7 +12,7 @@
 #include "satin.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -48,7 +48,7 @@
 #include <cwchar>
 #include <iterator>
 #include <string>
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include <type_traits>
 // ReSharper restore CppUnusedIncludeDirective>
 #include <vector>

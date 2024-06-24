@@ -13,7 +13,7 @@
 #include "thred.h"
 #include "ThrEdTypes.h"
 #include "trace.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"

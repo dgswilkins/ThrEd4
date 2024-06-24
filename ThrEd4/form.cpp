@@ -18,7 +18,7 @@
 #include "texture.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -1591,7 +1591,7 @@ void form::chkseq(bool border) {
   auto const savedIndex = InterleaveSequence->size();
   auto&      form       = FormList->operator[](ClosestFormToCursor);
 
-  // resharper disable once CppInitializedValueIsAlwaysRewritten
+  // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto userStitchLen = 0.0F;
   if (border) {
 	userStitchLen = (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN
@@ -5942,7 +5942,7 @@ void form::insat() { // insert a point in a form
 	  fi::nufpnt(ClosestVertexToCursor, selectedForm, stitchPoint);
 	  break;
 	}
-	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	// ReSharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
 	  throw std::runtime_error("Invalid Intersection Flag in insat");
 	}
@@ -6071,7 +6071,7 @@ void form::infrm() { // insert multiple points into a form
 	  FormVertexPrev = ClosestVertexToCursor;
 	  break;
 	}
-	// resharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
+	// ReSharper disable once CppClangTidyClangDiagnosticCoveredSwitchDefault
 	default: { // NOLINT(clang-diagnostic-covered-switch-default)
 	  throw std::runtime_error("Invalid Intersection Flag in infrm");
 	}
@@ -6648,7 +6648,7 @@ void fi::resizeStitches(F_POINT const& reference, F_POINT const& ratio) {
 }
 
 void form::setexpand(float xyRatio) {
-  // resharper disable once CppInitializedValueIsAlwaysRewritten
+  // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto size0     = F_POINT {};
   auto rectangle = F_RECTANGLE {};
   thred::savdo();
@@ -6672,10 +6672,10 @@ void form::setexpand(float xyRatio) {
 	                                               : StitchRangeRect;
 	size0.y = rectangle.top - rectangle.bottom;
   }
-  // resharper disable CppInitializedValueIsAlwaysRewritten
+  // ReSharper disable CppInitializedValueIsAlwaysRewritten
   auto ratio     = F_POINT {1.0F, 1.0F};
   auto reference = F_POINT {};
-  // resharper restore CppInitializedValueIsAlwaysRewritten
+  // ReSharper restore CppInitializedValueIsAlwaysRewritten
   size0.x        = rectangle.right - rectangle.left;
   // we need to determine the reference point and the ratio for the expansion
   switch (SelectedFormControlVertex) {
@@ -6910,7 +6910,7 @@ void form::dustar(uint32_t starCount, float length) {
 }
 
 void form::duspir(uint32_t stepCount) {
-  if (constexpr auto STEPMIN = 3U; // Spiral step minmum
+  if (constexpr auto STEPMIN = 3U; // Spiral step minimum
       stepCount < STEPMIN) {
 	stepCount = STEPMIN;
   }
@@ -7098,7 +7098,7 @@ constexpr auto fi::shreg(float highValue, float reference, float eggRatio) noexc
 }
 
 void form::dueg(uint32_t sides) {
-  if (constexpr auto ESIDEMIN = 8U; // mimimum number of egg vertices
+  if (constexpr auto ESIDEMIN = 8U; // minimum number of egg vertices
       sides < ESIDEMIN) {
 	sides = ESIDEMIN;
   }
@@ -7125,7 +7125,7 @@ void form::dueg(uint32_t sides) {
 }
 
 void form::duzig(uint32_t vertices) {
-  if (constexpr auto ZVERTMIN = 3U; // mimimum number of zig-zag vertices
+  if (constexpr auto ZVERTMIN = 3U; // minimum number of zig-zag vertices
       vertices < ZVERTMIN) {
 	vertices = ZVERTMIN;
   }

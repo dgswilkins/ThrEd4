@@ -2,7 +2,7 @@
 
 // Local Headers
 #include "textureHeader.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 

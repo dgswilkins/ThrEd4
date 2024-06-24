@@ -15,7 +15,7 @@
 #include "thred.h"
 #include "ThrEdTypes.h"
 #include "utf8conv.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -57,7 +57,7 @@
 #endif
 #include <filesystem>
 #include <iterator>
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include <ranges>
 // ReSharper restore CppUnusedIncludeDirective
 #include <stdexcept>
@@ -784,7 +784,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto PESISTR = "#PES";    // PES lead in
   constexpr auto PESVSTR = "0001";    // PES version
   constexpr auto EMBSTR  = "CEmbOne"; // emb section lead in
-  constexpr auto SEWSTR  = "CSewSeg"; // sewing segment leadin
+  constexpr auto SEWSTR  = "CSewSeg"; // sewing segment lead in
   constexpr auto AT5OFF  = 350.0F;    // Affine transform offset 5
   constexpr auto AT6OFF  = 100.0F;    // Affine transform offset 6
 

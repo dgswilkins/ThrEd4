@@ -18,7 +18,7 @@
 #include "thred.h"
 #include "ThrEdTypes.h"
 #include "trace.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -999,7 +999,7 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	  }
 	  if (StateMap->testAndReset(StateFlag::NOSEL)) {
 		SelectedFormList->clear();
-		// We potentially reserve too much memory, but the cost of reallocatioon is higher than the
+		// We potentially reserve too much memory, but the cost of reallocation is higher than the
 		// small amount overallocated
 		SelectedFormList->reserve(FormList->size());
 		StateMap->reset(StateFlag::FORMSEL);

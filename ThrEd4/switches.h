@@ -1,5 +1,5 @@
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
-// resharper disable CppClangTidyModernizeMacroToEnum
+// ReSharper disable CppClangTidyModernizeMacroToEnum
 #pragma once
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage, modernize-macro-to-enum)

@@ -10,7 +10,7 @@
 #include "satCon.h"
 #include "textureHeader.h"
 #include "ThrEdTypes.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 
@@ -67,7 +67,7 @@ CLIP_STITCH*                   ClipStitchData            = nullptr; // for pcs c
 uint32_t                       ClosestFormToCursor       = 0U;      // closest form to the cursor
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
-HWND                           DeleteStitchesDialog      = nullptr; // asking user if they want to delete the sitches associated with a form
+HWND                           DeleteStitchesDialog      = nullptr; // asking user if they want to delete the stitches associated with a form
 HWND                           DiscardButton             = nullptr; // discard button
 DRAWITEMSTRUCT*                DrawItem                  = nullptr; // for owner-draw windows
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points

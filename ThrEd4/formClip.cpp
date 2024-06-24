@@ -17,7 +17,7 @@
 #include "textureHeader.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -52,7 +52,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include <ranges>
 #include <type_traits>
 // ReSharper restore CppUnusedIncludeDirective

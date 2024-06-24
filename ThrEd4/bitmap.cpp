@@ -14,7 +14,7 @@
 #include "ThrEdTypes.h"
 #include "trace.h"
 #include "utf8conv.h"
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
@@ -61,7 +61,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <string>
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include <type_traits>
 // ReSharper restore CppUnusedIncludeDirective
 #include <vector>

@@ -11,7 +11,7 @@
 #ifdef _DEBUG
 #include "ThrEdTypes.h"
 #endif
-// resharper disable CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 #include "wrappers.h"
