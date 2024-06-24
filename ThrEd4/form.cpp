@@ -135,15 +135,14 @@ class REGION // region for sequencing vertical fills
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint32_t start {};       // start line of region
   uint32_t end {};         // end line of region
-  uint32_t regionBreak {}; // ToDo - Is this member needed?
   uint32_t breakCount {};
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
+  inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsCount) noexcept;
 };
 
-inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept :
-    start(rhsStart), end(rhsEnd), regionBreak(rhsBreak), breakCount(rhsCount) {
+inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsCount) noexcept :
+    start(rhsStart), end(rhsEnd), breakCount(rhsCount) {
 }
 
 class RG_SEQ // TempPath: temporary path connections
@@ -4669,14 +4668,14 @@ void fi::lcon(FRM_HEAD const&              form,
   auto const sortedLineIndices = fi::getLineSortOrder(lineEndpoints);
   auto const lineCount         = wrap::toUnsigned(sortedLineIndices.size());
   auto       regions           = std::vector<REGION> {};
-  regions.emplace_back(0U, 0U, 0U, 0U);
+  regions.emplace_back(0U, 0U, 0U);
   auto breakLine = lineEndpoints[sortedLineIndices[0]].line;
   for (auto iLine = 0U; iLine < lineCount; ++iLine) {
 	if (breakLine == lineEndpoints[sortedLineIndices[iLine]].line) {
 	  continue;
 	}
 	regions.back().end = iLine - 1U;
-	regions.emplace_back(iLine, 0U, 0U, 0U);
+	regions.emplace_back(iLine, 0U, 0U);
 	breakLine = lineEndpoints[sortedLineIndices[iLine]].line;
   }
   regions.back().end        = lineCount - 1U;
@@ -4692,9 +4691,6 @@ void fi::lcon(FRM_HEAD const&              form,
 	  ++startGroup;
 	  if (lineEndpoints[sortedLineIndices[iLine]].group == startGroup) {
 		continue;
-	  }
-	  if (constexpr auto STLINE = 0U; count == 0U) {
-		regions[iRegion].regionBreak = STLINE;
 	  }
 	  ++count;
 	  startGroup = lineEndpoints[sortedLineIndices[iLine]].group;
