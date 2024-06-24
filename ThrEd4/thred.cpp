@@ -6644,18 +6644,18 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	}
 	auto vertexOffset = wrap::toUnsigned(FormVertices->size());
 	if (fileHeader.vertexCount != 0U) {
-	  auto inVerticeList = std::vector<F_POINT> {};
-	  inVerticeList.resize(fileHeader.vertexCount);
-	  auto const bytesToRead = fileHeader.vertexCount * wrap::sizeofType(inVerticeList);
-	  if (!wrap::readFile(fileHandle, inVerticeList.data(), bytesToRead, &bytesRead, L"ReadFile for inVerticeList in insTHR")) {
+	  auto inVertexList = std::vector<F_POINT> {};
+	  inVertexList.resize(fileHeader.vertexCount);
+	  auto const bytesToRead = fileHeader.vertexCount * wrap::sizeofType(inVertexList);
+	  if (!wrap::readFile(fileHandle, inVertexList.data(), bytesToRead, &bytesRead, L"ReadFile for inVertexList in insTHR")) {
 		return false;
 	  }
 	  if (bytesRead != bytesToRead) {
-		inVerticeList.resize(bytesRead / wrap::sizeofType(inVerticeList));
+		inVertexList.resize(bytesRead / wrap::sizeofType(inVertexList));
 		StateMap->set(StateFlag::BADFIL);
 	  }
-	  FormVertices->reserve(FormVertices->size() + inVerticeList.size());
-	  FormVertices->insert(FormVertices->end(), inVerticeList.cbegin(), inVerticeList.cend());
+	  FormVertices->reserve(FormVertices->size() + inVertexList.size());
+	  FormVertices->insert(FormVertices->end(), inVertexList.cbegin(), inVertexList.cend());
 	}
 	else {
 	  StateMap->set(StateFlag::BADFIL);
