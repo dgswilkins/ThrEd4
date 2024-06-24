@@ -180,7 +180,6 @@ void bui::redbak() {
 	auto const span = gsl::span<F_POINT> {undoData->clipPoints, undoData->clipPointCount};
 	ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
   }
-  // ToDo - add field in BACK_HEAD to keep track of number of colors
   constexpr auto UCOLSIZE = UserColor.size();
   auto const spUndoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
   auto const spUserColors = gsl::span {UserColor};
