@@ -1,0 +1,6 @@
+root=true
+
+[*]
+spelling_languages = en-US
+spelling_exclusion_path = .\exclusion.dic
+spelling_checkable_types = comments

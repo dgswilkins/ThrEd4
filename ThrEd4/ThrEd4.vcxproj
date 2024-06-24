@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.clang-tidy" />
+    <None Include="..\.editorconfig" />
     <None Include="..\.github\workflows\build.yml" />
     <None Include="..\.github\workflows\codeql.yml" />
     <None Include="..\vcpkg-configuration.json" />
