@@ -77,7 +77,7 @@ constexpr auto PI_FHALF = PI_F / 2.0F;               //
 constexpr auto PI_D     = std::numbers::pi;          // PI to double precision
 constexpr auto PI_D2    = PI_D * 2.0;                //
 constexpr auto USPAC    = 15.0F;                     // underlay fill spacing
-constexpr auto URAT     = 0.75F; // ratio of underlay stitch to satin border size
+constexpr auto URAT     = 0.75F;         // ratio of underlay stitch to satin border size
 constexpr auto QUADRT   = uint32_t {4U}; // split display into quadrants
 
 constexpr auto     IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner length
@@ -221,9 +221,9 @@ enum ViewMenuItems : int8_t {
 enum HoopSize : int8_t {
   SETCUST = 1, // set the custom hoop
   SMALHUP = 2, // pfaf code for small hoop
-  LARGHUP = 3,     // pfaf code for large hoop
-  HUP100 = 4,      // 100 millimeter hoop
-  CUSTHUP = 5      // user defined hoop size
+  LARGHUP = 3, // pfaf code for large hoop
+  HUP100  = 4, // 100 millimeter hoop
+  CUSTHUP = 5  // user defined hoop size
 };
 
 // bitmap
@@ -776,23 +776,23 @@ enum FormData : uint8_t {
 
 // fill message codes
 enum FillMessageCodes : uint16_t {
-  FMM_FAN = 0U,
-  FMM_VRT = 1U,
-  FMM_HOR = 2U,
-  FMM_TXTR = 3U,
-  FMM_ANG  = 4U,
-  FMM_CLP  = 5U,
-  FMM_FTH  = 6U,
-  FML_LIN = 0x100,
-  FML_BLD  = 0x101,
-  FML_ANGS = 0x102,
-  FML_PRPS = 0x103,
-  FML_APLQ = 0x104,
-  FML_BHOL = 0x105,
-  FML_CLP  = 0x106,
-  FML_PIC  = 0x107,
-  FMX_UNF  = 0x108,
-  FML_CONT = 0x109,
+  FMM_FAN   = 0U,
+  FMM_VRT   = 1U,
+  FMM_HOR   = 2U,
+  FMM_TXTR  = 3U,
+  FMM_ANG   = 4U,
+  FMM_CLP   = 5U,
+  FMM_FTH   = 6U,
+  FML_LIN   = 0x100,
+  FML_BLD   = 0x101,
+  FML_ANGS  = 0x102,
+  FML_PRPS  = 0x103,
+  FML_APLQ  = 0x104,
+  FML_BHOL  = 0x105,
+  FML_CLP   = 0x106,
+  FML_PIC   = 0x107,
+  FMX_UNF   = 0x108,
+  FML_CONT  = 0x109,
   FML_CHAIN = 0x10A
 };
 

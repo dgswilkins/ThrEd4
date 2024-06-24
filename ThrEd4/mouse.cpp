@@ -445,7 +445,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	auto const relativePoint = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	auto const relativePoint =
+	    POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	if (relativePoint.x >= controlPoint[0].x && relativePoint.x <= controlPoint[2].x &&
 	    relativePoint.y >= controlPoint[0].y && relativePoint.y <= controlPoint[4].y) {
 	  thred::duSelbox();
@@ -526,8 +527,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::FORMIN)) {
 	auto windowRect = RECT {};
 	GetWindowRect(MsgWindow, &windowRect);
-	if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right && WinMsg.pt.y >= windowRect.top &&
-	    WinMsg.pt.y <= windowRect.bottom) {
+	if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
+	    WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
 	  auto const iFillType = (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
 	  if (StateMap->testAndReset(StateFlag::FENDIN)) {
 		if (iFillType == 3) {
@@ -708,8 +709,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	else {
 	  if (thred::inStitchWin()) {
 		thred::savdo();
-		InsertLine[0]          = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-		InsertLine[1]          = InsertLine[0];
+		InsertLine[0] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+		InsertLine[1] = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 		StitchBuffer->emplace_back(stitchPoint.x,
 		                           stitchPoint.y,
@@ -892,7 +893,7 @@ void mi::moveForms() {
 auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) { // shift key pressed as well 
+  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) { // shift key pressed as well
 	texture::setshft();
 	return true;
   }
@@ -1173,10 +1174,10 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  break;
 	}
-	if (StateMap->test(StateFlag::FPUNCLP)) {	// If we are retrieve a clip into a form
+	if (StateMap->test(StateFlag::FPUNCLP)) { // If we are retrieve a clip into a form
 	  tfc::fpUnClip();
 	}
-	if (StateMap->test(StateFlag::INSFIL)) {   // If we are inserting a fill form
+	if (StateMap->test(StateFlag::INSFIL)) { // If we are inserting a fill form
 	  form::unfrm();
 	  auto const point = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  thred::insflin(point);
@@ -1184,7 +1185,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  form::dufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::MOVFRMS)) {  // If we are moving forms
+	if (StateMap->test(StateFlag::MOVFRMS)) { // If we are moving forms
 	  thred::unstrtch(stretchBoxLine);
 	  stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x =
 	      WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x;
@@ -1210,14 +1211,14 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap->test(StateFlag::POLIMOV)) {  // If we are placing a form
+	if (StateMap->test(StateFlag::POLIMOV)) { // If we are placing a form
 	  form::munfrm();
 	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::EXPAND)) {  // If we are expanding a form
+	if (StateMap->test(StateFlag::EXPAND)) { // If we are expanding a form
 	  thred::unstrtch(stretchBoxLine);
 	  auto newSize = F_POINT {gsl::narrow<float>(WinMsg.pt.x - StitchWindowOrigin.x),
 	                          gsl::narrow<float>(WinMsg.pt.y - StitchWindowOrigin.y)};
@@ -1264,7 +1265,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap->test(StateFlag::STRTCH)) {  // If we are stretching a form horizontally or vertically
+	if (StateMap->test(StateFlag::STRTCH)) { // If we are stretching a form horizontally or vertically
 	  thred::unstrtch(stretchBoxLine);
 	  auto const lineLength = ((SelectedFormControlVertex & 1U) != 0U)
 	                              ? WinMsg.pt.x - StitchWindowOrigin.x
@@ -1286,36 +1287,36 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap->test(StateFlag::INSFRM)) {  // If we are inserting points into a form
+	if (StateMap->test(StateFlag::INSFRM)) { // If we are inserting points into a form
 	  form::uninsf();
 	  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOINSF);
 	  form::duinsf();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::FUNCLP)) {  // If we are pasting a form
+	if (StateMap->test(StateFlag::FUNCLP)) { // If we are pasting a form
 	  form::unfrm();
 	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::dufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::SATCNKT)) {  // If we are connecting a satin form guide
+	if (StateMap->test(StateFlag::SATCNKT)) { // If we are connecting a satin form guide
 	  form::drwcon();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::SATPNT)) {  // If we are placing a satin point
+	if (StateMap->test(StateFlag::SATPNT)) { // If we are placing a satin point
 	  satin::drwsat();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::FRMOV)) {  // If we are moving a form
+	if (StateMap->test(StateFlag::FRMOV)) { // If we are moving a form
 	  form::munfrm();
 	  form::setmfrm(ClosestFormToCursor);
 	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
 	}
-	if (StateMap->test(StateFlag::FRMPMOV)) {  // If we are moving a form point
+	if (StateMap->test(StateFlag::FRMPMOV)) { // If we are moving a form point
 	  mi::unmov();
 	  RubberBandLine->operator[](1) = {WinMsg.pt.x - StitchWindowOrigin.x,
 	                                   WinMsg.pt.y - StitchWindowOrigin.y};
@@ -1517,10 +1518,10 @@ auto mouse::handleRightButtonDown() -> bool {
 		return true;
 	  }
 	  // unselect form, forms or form points
-	  if (!SelectedFormList->empty()) { 
-		SelectedFormList->clear(); 
-      }
-      if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (!SelectedFormList->empty()) {
+		SelectedFormList->clear();
+	  }
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {

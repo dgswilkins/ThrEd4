@@ -572,7 +572,7 @@ auto ThreadSize60        = TSIZ60;      // #60 thread size
 auto RunPoint            = uint32_t {}; // point for animating stitchout
 auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
 auto MovieTimeStep       = int32_t {};  // time delay for stitchout
-auto LastKeyCode = std::numeric_limits<wchar_t>::max(); // last key code
+auto LastKeyCode         = std::numeric_limits<wchar_t>::max(); // last key code
 auto VersionNames = gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
 auto FileVersionIndex = uint8_t {};                     // points to old version to be read
 auto StitchArrow      = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
@@ -876,7 +876,7 @@ void thi::ritfnam(std::wstring const& designerName) {
 	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
 	}
   }
-  auto       iTmpName      = tmpName.begin();
+  auto iTmpName = tmpName.begin();
   // write the encoded name
   auto const spCreatorName = gsl::span {ExtendedHeader->creatorName};
   for (auto const& iNameOrder : NameOrder) {
@@ -1758,7 +1758,7 @@ void thi::chknum() {
 			  switch (auto const edgeType = form.edgeType & NEGUND; edgeType) {
 				case EDGEPROPSAT:
 				case EDGEOCHAIN:
-				case EDGELCHAIN: { 
+				case EDGELCHAIN: {
 				  form.edgeSpacing = value;
 				  break;
 				}
@@ -2026,193 +2026,193 @@ void thi::chknum() {
 	  }
 	  return;
 	}
-	  auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
-	  if (StateMap->testAndReset(StateFlag::ENTRPOL)) { // number of sides
-		thred::savdo();
-		form::durpoli(uintValue);
-		return;
+	auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
+	if (StateMap->testAndReset(StateFlag::ENTRPOL)) { // number of sides
+	  thred::savdo();
+	  form::durpoli(uintValue);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRSTAR)) { // number of points in star
+	  thred::savdo();
+	  constexpr auto STARSIZE = 250.0F; // star size factor
+	  form::dustar(uintValue,
+	               STARSIZE / value * ZoomFactor *
+	                   wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRSPIR)) { // number of spirals
+	  thred::savdo();
+	  form::duspir(uintValue);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRHART)) { // number of heart facets
+	  thred::savdo();
+	  form::duhart(uintValue);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRLENS)) { // number of lens facets
+	  thred::savdo();
+	  form::dulens(uintValue);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTREG)) { // number of egg facets
+	  thred::savdo();
+	  form::dueg(uintValue);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRZIG)) { // number of zigzags
+	  thred::savdo();
+	  form::duzig(uintValue);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::PIXIN)) { // nudge pixel size
+	  IniFile.nudgePixels = pxchk(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::STPXIN)) { // stitch point pixel size
+	  IniFile.stitchSizePixels = pxchk(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FRMPXIN)) { // form vertex pixel size
+	  IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FRMBOXIN)) { // form box pixel size
+	  IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::GETMIN)) { // minimum stitch length
+	  SmallStitchLength = value * PFGRAN;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTR30)) { // thread size for 30 weight
+	  ThreadSize30 = value;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTR40)) { // thread size for 40 weight
+	  ThreadSize40 = value;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTR60)) { // thread size for 60 weight
+	  ThreadSize60 = value;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::SCLPSPAC)) { // clipboard fill spacing
+	  IniFile.clipOffset = value * PFGRAN;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFIND)) { // underlay indent
+	  xt::dufind(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFHI)) { // edit form height
+	  if (value != 0.0F) {
+		xt::dufhi(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRSTAR)) { // number of points in star
-		thred::savdo();
-		constexpr auto STARSIZE = 250.0F; // star size factor
-		form::dustar(uintValue,
-		             STARSIZE / value * ZoomFactor *
-		                 wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFWID)) { // edit form width
+	  if (value != 0.0F) {
+		xt::dufwid(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) { // number of spirals
-		thred::savdo();
-		form::duspir(uintValue);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFMAX)) { // edit form max stitch length
+	  if (value != 0.0F) {
+		xt::dufmax(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRHART)) { // number of heart facets
-		thred::savdo();
-		form::duhart(uintValue);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFMIN)) { // edit form min stitch length
+	  xt::dufmin(value * PFGRAN);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETBMAX)) { // edit border max stitch length
+	  if (value != 0.0F) {
+		xt::dubmax(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRLENS)) { // number of lens facets
-		thred::savdo();
-		form::dulens(uintValue);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETBMIN)) { // edit border min stitch length
+	  xt::dubmin(value * PFGRAN);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETBSPAC)) { // edit border spacing
+	  if (value != 0.0F) {
+		xt::dubspac(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTREG)) { // number of egg facets
-		thred::savdo();
-		form::dueg(uintValue);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFLEN)) { // edit form stitch length
+	  if (value != 0.0F) {
+		xt::dublen(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTRZIG)) { // number of zigzags
-		thred::savdo();
-		form::duzig(uintValue);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETBCOL)) { // edit border color
+	  xt::dubcol(wrap::round<uint8_t>(value));
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFCOL)) { // edit form fill color
+	  xt::dufcol(wrap::round<uint8_t>(value));
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETUCOL)) { // edit form underlay color
+	  xt::dundcol(wrap::round<uint8_t>(value));
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFANG)) { // edit form fill angle
+	  xt::dufxang(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFSPAC)) { // edit form fill spacing
+	  if (value != 0.0F) {
+		xt::dufspac(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::PIXIN)) { // nudge pixel size
-		IniFile.nudgePixels = pxchk(value);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETUANG)) { // edit form underlay angle
+	  xt::dufang(value);
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETFLEN)) { // edit form fill stitch length
+	  if (value != 0.0F) {
+		xt::duflen(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::STPXIN)) { // stitch point pixel size
-		IniFile.stitchSizePixels = pxchk(value);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETUSPAC)) { // edit form underlay spacing
+	  if (value != 0.0F) {
+		xt::duspac(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::FRMPXIN)) { // form vertex pixel size
-		IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::FSETULEN)) { // edit form underlay stitch length
+	  if (value != 0.0F) {
+		xt::dusulen(value * PFGRAN);
 	  }
-	  if (StateMap->testAndReset(StateFlag::FRMBOXIN)) { // form box pixel size
-		IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::GTUANG)) { // default underlay angle
+	  IniFile.underlayAngle = value * DEGRADF;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::GTUSPAC)) { // default underlay spacing
+	  if (value != 0.0F) {
+		IniFile.underlaySpacing = value * PFGRAN;
 	  }
-	  if (StateMap->testAndReset(StateFlag::GETMIN)) { // minimum stitch length
-		SmallStitchLength = value * PFGRAN;
-		return;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::GTWLKIND)) { // default underlay indent
+	  IniFile.underlayIndent = value * PFGRAN;
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::GTWLKLEN)) { // default underlay stitch length
+	  if (value != 0.0F) {
+		IniFile.underlayStitchLen = value * PFGRAN;
 	  }
-	  if (StateMap->testAndReset(StateFlag::ENTR30)) { // thread size for 30 weight
-		ThreadSize30 = value;
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::ENTR40)) { // thread size for 40 weight
-		ThreadSize40 = value;
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::ENTR60)) { // thread size for 60 weight
-		ThreadSize60 = value;
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::SCLPSPAC)) { // clipboard fill spacing
-		IniFile.clipOffset = value * PFGRAN;
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFIND)) { // underlay indent
-		xt::dufind(value);
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFHI)) { // edit form height
-		if (value != 0.0F) {
-		  xt::dufhi(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFWID)) { // edit form width
-		if (value != 0.0F) {
-		  xt::dufwid(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFMAX)) { // edit form max stitch length
-		if (value != 0.0F) {
-		  xt::dufmax(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFMIN)) { // edit form min stitch length
-		xt::dufmin(value * PFGRAN);
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBMAX)) { // edit border max stitch length
-		if (value != 0.0F) {
-		  xt::dubmax(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBMIN)) { // edit border min stitch length
-		xt::dubmin(value * PFGRAN);
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBSPAC)) { // edit border spacing
-		if (value != 0.0F) {
-		  xt::dubspac(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) { // edit form stitch length
-		if (value != 0.0F) {
-		  xt::dublen(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETBCOL)) { // edit border color
-		xt::dubcol(wrap::round<uint8_t>(value));
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFCOL)) { // edit form fill color
-		xt::dufcol(wrap::round<uint8_t>(value));
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETUCOL)) { // edit form underlay color
-		xt::dundcol(wrap::round<uint8_t>(value));
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFANG)) { // edit form fill angle
-		xt::dufxang(value);
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFSPAC)) { // edit form fill spacing
-		if (value != 0.0F) {
-		  xt::dufspac(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETUANG)) { // edit form underlay angle
-		xt::dufang(value);
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) { // edit form fill stitch length
-		if (value != 0.0F) {
-		  xt::duflen(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETUSPAC)) { // edit form underlay spacing
-		if (value != 0.0F) {
-		  xt::duspac(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::FSETULEN)) { // edit form underlay stitch length
-		if (value != 0.0F) {
-		  xt::dusulen(value * PFGRAN);
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::GTUANG)) { // default underlay angle
-		IniFile.underlayAngle = value * DEGRADF;
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::GTUSPAC)) { // default underlay spacing
-		if (value != 0.0F) {
-		  IniFile.underlaySpacing = value * PFGRAN;
-		}
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::GTWLKIND)) { // default underlay indent
-		IniFile.underlayIndent = value * PFGRAN;
-		return;
-	  }
-	  if (StateMap->testAndReset(StateFlag::GTWLKLEN)) { // default underlay stitch length
-		if (value != 0.0F) {
-		  IniFile.underlayStitchLen = value * PFGRAN;
-		}
-		return;
-	  }
+	  return;
+	}
   }
 
   StateMap->set(StateFlag::RESTCH);
@@ -2389,87 +2389,87 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 	displayText::butxt(HMINLEN, blank);
 	return;
   }
-	auto const     code      = ClosestFormToCursor << FRMSHFT;
+  auto const code = ClosestFormToCursor << FRMSHFT;
 
-	auto maxLength      = LOWFLOAT;
-	auto minLength      = BIGFLOAT;
-	smallestStitchIndex = 0U;
-	largestStitchIndex  = 0U;
-	auto stitchFwd1     = std::next(StitchBuffer->begin());
-	auto spStitches = std::ranges::subrange(StitchBuffer->begin(), StitchBuffer->end() - 2U);
-	for (auto index = 0U; auto const& stitch:spStitches) {
-	  if ((stitch.attribute & FRMSK) != code || ((stitch.attribute & NOTFRM) != 0U) ||
-	      (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
-		++stitchFwd1;
-		++index;
-		continue;
-	  }
-	  auto const deltaX = stitchFwd1->x - stitch.x;
-	  auto const deltaY = stitchFwd1->y - stitch.y;
-	  auto const length = deltaX * deltaX + deltaY * deltaY;
-	  if (length > maxLength) {
-		maxLength          = length;
-		largestStitchIndex = index;
-	  }
-	  if (length < minLength) {
-		minLength           = length;
-		smallestStitchIndex = index;
-	  }
+  auto maxLength      = LOWFLOAT;
+  auto minLength      = BIGFLOAT;
+  smallestStitchIndex = 0U;
+  largestStitchIndex  = 0U;
+  auto stitchFwd1     = std::next(StitchBuffer->begin());
+  auto spStitches     = std::ranges::subrange(StitchBuffer->begin(), StitchBuffer->end() - 2U);
+  for (auto index = 0U; auto const& stitch : spStitches) {
+	if ((stitch.attribute & FRMSK) != code || ((stitch.attribute & NOTFRM) != 0U) ||
+	    (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
 	  ++stitchFwd1;
 	  ++index;
+	  continue;
 	}
-	maxLength = std::sqrt(maxLength) * IPFGRAN;
-	minLength = std::sqrt(minLength) * IPFGRAN;
+	auto const deltaX = stitchFwd1->x - stitch.x;
+	auto const deltaY = stitchFwd1->y - stitch.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length > maxLength) {
+	  maxLength          = length;
+	  largestStitchIndex = index;
+	}
+	if (length < minLength) {
+	  minLength           = length;
+	  smallestStitchIndex = index;
+	}
+	++stitchFwd1;
+	++index;
+  }
+  maxLength = std::sqrt(maxLength) * IPFGRAN;
+  minLength = std::sqrt(minLength) * IPFGRAN;
 
-	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
-	if (fabs(maxLength) < DIGITLIM) {
-	  auto const strMax = displayText::format(IDS_LENMAX, maxLength);
-	  displayText::butxt(HMAXLEN, strMax);
-	}
-	if (fabs(minLength) < DIGITLIM) {
-	  auto const strMin = displayText::format(IDS_LENMIN, minLength);
-	  displayText::butxt(HMINLEN, strMin);
-	}
+  constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
+  if (fabs(maxLength) < DIGITLIM) {
+	auto const strMax = displayText::format(IDS_LENMAX, maxLength);
+	displayText::butxt(HMAXLEN, strMax);
+  }
+  if (fabs(minLength) < DIGITLIM) {
+	auto const strMin = displayText::format(IDS_LENMIN, minLength);
+	displayText::butxt(HMINLEN, strMin);
+  }
 }
 
 void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   if (StitchBuffer->empty()) {
 	return;
   }
-	auto maxLength      = LOWFLOAT;
-	auto minLength      = BIGFLOAT;
-	smallestStitchIndex = 0U;
-	largestStitchIndex  = 0U;
-    auto firstStitch    = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
-    auto spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
-    auto stitchFwd1 = std::next(firstStitch);
-    for (auto index = startStitch; auto& stitch : spStitches) {
-	  auto const deltaX = stitchFwd1->x - stitch.x;
-	  auto const deltaY = stitchFwd1->y - stitch.y;
-	  auto const length = deltaX * deltaX + deltaY * deltaY;
-	  if (length > maxLength) {
-		maxLength          = length;
-		largestStitchIndex = index;
-	  }
-	  if (length < minLength) {
-		minLength           = length;
-		smallestStitchIndex = index;
-	  }
-	  ++index;
-	  ++stitchFwd1;
+  auto maxLength      = LOWFLOAT;
+  auto minLength      = BIGFLOAT;
+  smallestStitchIndex = 0U;
+  largestStitchIndex  = 0U;
+  auto firstStitch    = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
+  auto spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
+  auto stitchFwd1 = std::next(firstStitch);
+  for (auto index = startStitch; auto& stitch : spStitches) {
+	auto const deltaX = stitchFwd1->x - stitch.x;
+	auto const deltaY = stitchFwd1->y - stitch.y;
+	auto const length = deltaX * deltaX + deltaY * deltaY;
+	if (length > maxLength) {
+	  maxLength          = length;
+	  largestStitchIndex = index;
 	}
-	maxLength = std::sqrt(maxLength) * IPFGRAN;
-	minLength = std::sqrt(minLength) * IPFGRAN;
+	if (length < minLength) {
+	  minLength           = length;
+	  smallestStitchIndex = index;
+	}
+	++index;
+	++stitchFwd1;
+  }
+  maxLength = std::sqrt(maxLength) * IPFGRAN;
+  minLength = std::sqrt(minLength) * IPFGRAN;
 
-	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
-	if (fabs(maxLength) < DIGITLIM) {
-	  auto const strMax = displayText::format(IDS_LENMAX, maxLength);
-	  displayText::butxt(HMAXLEN, strMax);
-	}
-	if (fabs(minLength) < DIGITLIM) {
-	  auto const strMin = displayText::format(IDS_LENMIN, minLength);
-	  displayText::butxt(HMINLEN, strMin);
-	}
+  constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
+  if (fabs(maxLength) < DIGITLIM) {
+	auto const strMax = displayText::format(IDS_LENMAX, maxLength);
+	displayText::butxt(HMAXLEN, strMax);
+  }
+  if (fabs(minLength) < DIGITLIM) {
+	auto const strMin = displayText::format(IDS_LENMIN, minLength);
+	displayText::butxt(HMINLEN, strMin);
+  }
 }
 
 void thred::lenCalc() {
@@ -3243,7 +3243,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   // calculate the offset to the form data entry point
   auto const formDataOffset = bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
                               sizeof(UserColor) + sizeof(CustomColor) + TSSIZE;
-  auto       vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(StitchBuffer) + formDataOffset;
+  auto vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(StitchBuffer) + formDataOffset;
   // calculate the design data size
   auto const thredDataSize =
       wrap::sizeofVector(FormList) + vertexCount * wrap::sizeofType(FormVertices) +
@@ -4552,7 +4552,7 @@ void thred::zumin() {
 		                       wrap::midl(SelectedFormsRect.top, SelectedFormsRect.bottom)};
 		break;
 	  }
-	  if (!thred::inStitchWin()) {  // nothing is selected or active, so zoom to the center of the hoop
+	  if (!thred::inStitchWin()) { // nothing is selected or active, so zoom to the center of the hoop
 		stitchPoint = thi::centr();
 	  }
 	  break;
@@ -4715,8 +4715,9 @@ void thred::closPnt() {
 }
 
 auto thred::closPnt1(uint32_t& closestStitch) -> bool {
-  auto closestIndex = 0U;
-  auto const pointToCheck = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+  auto       closestIndex = 0U;
+  auto const pointToCheck =
+      POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto stitchCoordsInPixels = POINT {};
   if (StateMap->test(StateFlag::SELBOX) && thred::stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	if (std::hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
@@ -6279,9 +6280,9 @@ void thred::delet() {
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	switch (form.type) {
 	  case FRMLINE: {
-		if (thi::handleDeleteLineForm(form)){
-          return;
-        }
+		if (thi::handleDeleteLineForm(form)) {
+		  return;
+		}
 		break;
 	  }
 	  case SAT: {
@@ -7202,7 +7203,8 @@ void thred::showOnlyLayer(uint8_t play) {
 }
 
 auto thred::iselpnt() noexcept -> bool {
-  auto const pointToTest = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+  auto const pointToTest =
+      POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto closestControlPoint = 0U;
   auto minimumLength       = BIGDBL;
   auto iControlPoint       = 0U;
@@ -7247,8 +7249,9 @@ auto thi::isInBox(POINT const& point, RECT const& box) noexcept -> bool {
 }
 
 auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
-  auto minLength = BIGDBL;
-  auto const pointToTest = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+  auto       minLength = BIGDBL;
+  auto const pointToTest =
+      POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto controlPoint = SelectedFormsLine->begin();
 
   auto const endPoint = SelectedFormsLine->size();
@@ -7329,9 +7332,9 @@ void thred::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
 	  continue;
 	}
 	if ((iStitch - startStitch == 1) && ((startStitch) != 0U)) {
-	  auto const prevIndex = iStitch - 1U;
-	  auto& prevStitch     = StitchBuffer->operator[](prevIndex);
-	  prevStitch.attribute = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
+	  auto const prevIndex  = iStitch - 1U;
+	  auto&      prevStitch = StitchBuffer->operator[](prevIndex);
+	  prevStitch.attribute  = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
 	}
 	color       = stitch.attribute & COLMSK;
 	startStitch = iStitch;
@@ -7339,8 +7342,8 @@ void thred::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
 }
 
 auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
-  auto newStitches = std::vector<F_POINT_ATTR> {};
-  auto const newSize = finish - start;
+  auto       newStitches = std::vector<F_POINT_ATTR> {};
+  auto const newSize     = finish - start;
   newStitches.reserve(newSize); // we know that we will have at least this number of Stitches
   auto adcnt = 0U;
   --finish;
@@ -8751,7 +8754,7 @@ void thi::inscol() {
   }
   for (auto iColor = nextColor; iColor > VerticalIndex; --iColor) {
 	auto const prevIndex = iColor - 1U;
-	  UserColor.at(iColor) = UserColor.at(prevIndex);
+	UserColor.at(iColor) = UserColor.at(prevIndex);
 	thred::nuscol(iColor);
   }
   thred::coltab();
@@ -8821,9 +8824,9 @@ void thred::set1knot() {
 }
 
 void thred::fixpclp(uint32_t closestFormToCursor) {
-  auto const point      = POINT {(WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
+  auto const point = POINT {(WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
                             (WinMsg.pt.y + gsl::narrow_cast<decltype(WinMsg.pt.y)>(FormMoveDelta.y))};
-  auto       itIntlvSeq = std::next(InterleaveSequence->begin());
+  auto       itIntlvSeq  = std::next(InterleaveSequence->begin());
   auto const stitchPoint = thred::pxCor2stch(point);
   auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
   auto const count       = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
@@ -10099,7 +10102,7 @@ void thred::otherPeriod() noexcept {
   }
 }
 
-void  thred::otherBack() noexcept {
+void thred::otherBack() noexcept {
   if (SideWinMsgIdx != 0U) {
 	SideWindowEntryBuffer->operator[](--SideWinMsgIdx) = 0;
 	SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
@@ -10112,9 +10115,8 @@ void thred::otherReturn() {
   PreferenceIndex = 0;
 }
 
-auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD&           textureForm,
-                                F_POINT&            rotationCenter,
-                                std::vector<POINT> const& stretchBoxLine) -> bool {
+auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
+    -> bool {
   auto const code = gsl::narrow<wchar_t>(WinMsg.wParam & 0xffffU);
   if (StateMap->test(StateFlag::TXTRED)) {
 	texture::txtkey(code, textureForm);
@@ -10312,19 +10314,19 @@ void thi::handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
 	thred::undat();
   }
   if (menu::handleMainMenu(wParameter, rotationCenter)) {
-	  return;
+	return;
   }
   if (menu::handleEditMenu(wParameter)) {
-	  return;
+	return;
   }
   if (menu::handleFileMenu(wParameter)) {
-	  return;
+	return;
   }
   if (menu::handleFillMenu(wParameter)) {
-	  return;
+	return;
   }
   if (menu::handleViewMenu(wParameter)) {
-	  return;
+	return;
   }
 }
 
@@ -11258,8 +11260,8 @@ void thi::doInitZoomed() {
 	  if ((ActiveLayer != 0U) && (layer != 0U) && (layer != ActiveLayer)) {
 		continue;
 	  }
-	  if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
-	      iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) { // if the stitch is in the zoomed view
+	  if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right && iStitch.y >= ZoomRect.bottom &&
+	      iStitch.y <= ZoomRect.top) { // if the stitch is in the zoomed view
 		wascol = 1;
 		if (StateMap->testAndSet(StateFlag::LINED)) {
 		  if (StateMap->testAndSet(StateFlag::LININ)) {
@@ -12238,7 +12240,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_DRAWITEM: {
 	  if (handleWndProcWMDRAWITEM(lParam)) {
 		return 1;
-      }
+	  }
 	  break;
 	}
 	case WM_SIZE: {
@@ -12446,7 +12448,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  bitmap::setUBfilename(&instance.privateUserBMPFileName);
 	  DST::setColFilename(&instance.privateColorFileName);
 	  DST::setRGBFilename(&instance.privateRGBFileName);
-	  texture::initTextures(&instance.privateTempTexturePoints, &instance.privateSelectedTexturePointsList, &instance.privateTextureHistory);
+	  texture::initTextures(&instance.privateTempTexturePoints,
+	                        &instance.privateSelectedTexturePointsList,
+	                        &instance.privateTextureHistory);
 	  tfc::setFVAS(&instance.privateFormVerticesAsLine);
 	  thi::redini();
 
@@ -12497,8 +12501,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  ScreenDPI           = &instance.privateDPI;
-	  *ScreenDPI     = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
+	  ScreenDPI     = &instance.privateDPI;
+	  *ScreenDPI    = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
 	  *ScrollSize   = MulDiv(*ScrollSize, *ScreenDPI, STDDPI);
 	  *ColorBarSize = MulDiv(*ColorBarSize, *ScreenDPI, STDDPI);
 	  thi::init();
@@ -12839,7 +12843,8 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
 	  }
 	}
   }
-  MoveLine0[1] = MoveLine1[0] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  MoveLine0[1] =
+      MoveLine1[0] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   if (ClosestPointIndex == 0) {
 	StateMap->reset(StateFlag::ISDWN);
   }
@@ -12933,7 +12938,8 @@ auto thred::getRotationHandleAngle() noexcept -> float {
 }
 
 void thred::updateMoveLine() {
-  MoveLine0[1] = MoveLine1[0] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  MoveLine0[1] =
+      MoveLine1[0] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   thi::dulin(MoveLine0, MoveLine1);
 }
 

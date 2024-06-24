@@ -236,10 +236,10 @@ void ffi::nxtlinprf() noexcept {
 void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   static constexpr auto EDGE_ARRAY = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
-  auto const strOn         = displayText::loadStr(IDS_ON);
-  auto const strOff        = displayText::loadStr(IDS_OFF);
-  auto&      labelWindow   = *LabelWindow;
-  auto&      valueWindow   = *ValueWindow;
+  auto const strOn       = displayText::loadStr(IDS_ON);
+  auto const strOff      = displayText::loadStr(IDS_OFF);
+  auto&      labelWindow = *LabelWindow;
+  auto&      valueWindow = *ValueWindow;
   // set the window coordinates
   ValueWindowCoords.top    = TXTMARG;
   LabelWindowCoords.top    = ValueWindowCoords.top;
@@ -250,7 +250,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   ValueWindowCoords.left   = TXTMARG2 + LabelWindowSize.cx;
   ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   // label and fill the form field
-  labelWindow[LFRM]        = ffi::txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
+  labelWindow[LFRM] = ffi::txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
   auto choice = (form.type == FRMLINE) ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
   valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
@@ -890,7 +890,7 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	case WM_COMMAND: {
 	  if (handleDaisyWMCOMMAND(wparam, hwndlg)) {
 		return TRUE;
-      }
+	  }
 	  break;
 	}
 	default: {
@@ -1125,7 +1125,7 @@ void ffi::handleTearInit(HWND hwndlg) {
 auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
-	case WM_INITDIALOG: 
+	case WM_INITDIALOG:
 	  handleTearInit(hwndlg);
 	  break;
 	case WM_COMMAND: {

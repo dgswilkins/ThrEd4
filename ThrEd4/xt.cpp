@@ -2419,7 +2419,7 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	case WM_COMMAND: {
 	  if (handleSetsWMCOMMAND(wparam, hwndlg)) {
 		return TRUE;
-      }
+	  }
 	  break;
 	}
 	default: {

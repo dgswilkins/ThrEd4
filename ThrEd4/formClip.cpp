@@ -584,8 +584,8 @@ void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t 
   auto fractional = std::modf(source.x - LowerLeftStitch.x, &integer);
   destination.fx  = wrap::floor<decltype(destination.fx)>(fractional * FRACFACT);
   wrap::narrow(destination.x, integer);
-  fractional       = std::modf(source.y - LowerLeftStitch.y, &integer);
-  destination.fy   = wrap::floor<decltype(destination.fy)>(fractional * FRACFACT);
+  fractional     = std::modf(source.y - LowerLeftStitch.y, &integer);
+  destination.fy = wrap::floor<decltype(destination.fy)>(fractional * FRACFACT);
   wrap::narrow(destination.y, integer);
 }
 
@@ -943,9 +943,9 @@ void fci::setpclp() {
   auto point      = form::sfCor2px(*itIntlvSeq);
   ++itIntlvSeq;
   FormVerticesAsLine->push_back(point);
-  point = form::sfCor2px(*itIntlvSeq);
-  auto const offset =
-      POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x, WinMsg.pt.y - StitchWindowOrigin.y - point.y};
+  point             = form::sfCor2px(*itIntlvSeq);
+  auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
+                             WinMsg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(InterleaveSequence->size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;

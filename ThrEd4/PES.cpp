@@ -226,7 +226,7 @@ class PESTCH
   int16_t m_y {};
 
   public:
-   inline auto operator=(F_POINT const& rhs) -> PESTCH&;
+  inline auto operator=(F_POINT const& rhs) -> PESTCH&;
 };
 #pragma pack(pop)
 

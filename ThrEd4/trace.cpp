@@ -615,8 +615,9 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
   // use the initial direction to determine the next direction
   switch (traceDirection) {
 	case TRCR: { // was tracing right
+
 	  pixelIndex += (1 - bitmap::getBitmapWidth()); // look at the pixel down and to the right
-	  if (CurrentTracePoint.x == gsl::narrow<int32_t>(bitmap::getBitmapWidth()) - 1) { // at the edge go up 
+	  if (CurrentTracePoint.x == gsl::narrow<int32_t>(bitmap::getBitmapWidth()) - 1) { // at the edge go up
 		traceDirection = TRCU;
 	  }
 	  else {
@@ -625,8 +626,8 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 		  --(CurrentTracePoint.y);
 		  traceDirection = TRCD;
 		}
-		else { 
-		  pixelIndex += bitmap::getBitmapWidth(); // look at the pixel below
+		else {
+		  pixelIndex += bitmap::getBitmapWidth();            // look at the pixel below
 		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++(CurrentTracePoint.x);
 		  }
@@ -638,18 +639,19 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 	  break;
 	}
 	case TRCD: { // was tracing down
+
 	  pixelIndex -= (bitmap::getBitmapWidth() + 1); // look at the pixel down and to the left
-	  if (CurrentTracePoint.y == 0) { // if we are at the bottom edge
+	  if (CurrentTracePoint.y == 0) {               // if we are at the bottom edge
 		traceDirection = TRCR;
 	  }
-	  else { 
+	  else {
 		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --(CurrentTracePoint.x);
 		  --(CurrentTracePoint.y);
 		  traceDirection = TRCL;
 		}
-		else { 
-		  ++pixelIndex; // look at the pixel to the right
+		else {
+		  ++pixelIndex;                                      // look at the pixel to the right
 		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--(CurrentTracePoint.y);
 		  }
@@ -661,6 +663,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 	  break;
 	}
 	case TRCL: { // was tracing left
+
 	  pixelIndex += (bitmap::getBitmapWidth() - 1); // look at the pixel above and to the left
 	  if (CurrentTracePoint.x == 0) {
 		traceDirection = TRCD;
@@ -672,7 +675,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 		  traceDirection = TRCU;
 		}
 		else {
-		  pixelIndex -= bitmap::getBitmapWidth(); // look at the pixel above
+		  pixelIndex -= bitmap::getBitmapWidth();            // look at the pixel above
 		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--(CurrentTracePoint.x);
 		  }
@@ -684,6 +687,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 	  break;
 	}
 	case TRCU: { // was tracing up
+
 	  pixelIndex += (1 + bitmap::getBitmapWidth()); // look at the pixel up and to the right
 	  if (CurrentTracePoint.y == bitmap::getBitmapHeight() - 1) { // if we are at the top edge
 		traceDirection = TRCL;
@@ -695,7 +699,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 		  traceDirection = TRCR;
 		}
 		else {
-		  --pixelIndex; // look at the pixel to the left
+		  --pixelIndex;                                      // look at the pixel to the left
 		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++(CurrentTracePoint.y);
 		  }
@@ -857,14 +861,14 @@ void ti::dutrac() {
 		flag                = TRCR;
 	  }
 	}
-	if (bottom != 0) {	// trace bottom edge
+	if (bottom != 0) { // trace bottom edge
 	  auto const edgeDistance = CurrentTracePoint.y - bottom;
 	  if (edgeDistance < minimumEdgeDistance) {
 		minimumEdgeDistance = edgeDistance;
 		flag                = TRCD;
 	  }
 	}
-	if (top < bitmap::getBitmapHeight()) { // trace top edge  
+	if (top < bitmap::getBitmapHeight()) { // trace top edge
 	  auto const edgeDistance = top - CurrentTracePoint.y;
 	  if (edgeDistance < minimumEdgeDistance) {
 		flag = TRCU;
@@ -1146,9 +1150,9 @@ void ti::getColors() {
 	DownPixelColor |= TraceRGB.at(invColumn);
 	return;
   }
-  auto const ratio      = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
-  auto const position   = wrap::floor<uint32_t>(ratio * 255.0);
-  auto       traceColor = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(invColumn));
+  auto const ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
+  auto const position      = wrap::floor<uint32_t>(ratio * 255.0);
+  auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(invColumn));
   auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift.at(ColumnColor));
   if (tracePosition < traceColor) {
 	UpPixelColor &= TraceRGBMask.at(ColumnColor);

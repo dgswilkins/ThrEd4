@@ -80,7 +80,7 @@ void backup::dudat() {
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
-  bufferElement.resize(size); 
+  bufferElement.resize(size);
   auto* backupData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
   if (size != bufferElement.size()) {
 	return;

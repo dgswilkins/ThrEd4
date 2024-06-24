@@ -1063,7 +1063,7 @@ void si::satfn(FRM_HEAD const&           form,
 		while ((line1Count != 0U) && (line2Count != 0U)) {
 		  line1Point += line1Step;
 		  line2Point += line2Step;
-		  // check the direction of the stitches and reverse line 1 or line 2 
+		  // check the direction of the stitches and reverse line 1 or line 2
 		  // depending on the flag for square ends
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			if (UserFlagMap->test(UserFlag::SQRFIL)) {
@@ -1143,9 +1143,9 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 	  while (length > lengths[iVertex]) {
 		++iVertex;
 	  }
-	  auto const deltaX = lengths[iVertex] - length;
+	  auto const deltaX     = lengths[iVertex] - length;
 	  auto const prevVertex = iVertex - 1U;
-	  auto const deltaY = length - lengths[prevVertex];
+	  auto const deltaY     = length - lengths[prevVertex];
 	  if (deltaY > deltaX) {
 		--iVertex;
 	  }
@@ -1214,9 +1214,9 @@ void satin::satfil(FRM_HEAD& form) {
 	  while ((iVertex < (form.vertexCount + 1U)) && (length > lengths[iVertex])) {
 		++iVertex;
 	  }
-	  auto const deltaA = lengths[iVertex] - length;
+	  auto const deltaA     = lengths[iVertex] - length;
 	  auto const prevVertex = iVertex - 1U;
-	  auto const deltaB = length - lengths[prevVertex];
+	  auto const deltaB     = length - lengths[prevVertex];
 	  if (deltaB > deltaA) {
 		--iVertex;
 	  }
@@ -1292,7 +1292,8 @@ void satin::drwsat() {
   auto const vertexCount = TempPolygon->size();
   auto&      formLines   = *FormLines;
   formLines.resize(vertexCount + 1U);
-  formLines[vertexCount] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  formLines[vertexCount] =
+      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOSAT);
   satin::dusat();
 }
@@ -1309,7 +1310,8 @@ void satin::satpnt1() {
   si::unsat();
   auto const vertexCount = TempPolygon->size();
   auto&      formLines   = *FormLines;
-  formLines[vertexCount] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  formLines[vertexCount] =
+      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   satin::dusat();
   TempPolygon->push_back(thred::pxCor2stch(WinMsg.pt));
   StateMap->set(StateFlag::RESTCH);
