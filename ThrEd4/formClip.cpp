@@ -584,15 +584,9 @@ void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t 
   auto fractional = std::modf(source.x - LowerLeftStitch.x, &integer);
   destination.fx  = wrap::floor<decltype(destination.fx)>(fractional * FRACFACT);
   wrap::narrow(destination.x, integer);
-  destination.spcx = 0;
   fractional       = std::modf(source.y - LowerLeftStitch.y, &integer);
   destination.fy   = wrap::floor<decltype(destination.fy)>(fractional * FRACFACT);
   wrap::narrow(destination.y, integer);
-  destination.spcy = 0;
-  // ToDo - Are these structure members needed?
-  destination.myst    = 1;
-  constexpr auto DTAG = uint8_t {0x14};
-  destination.tag     = DTAG;
 }
 
 void fci::rtrclpfn(FRM_HEAD const& form) {
