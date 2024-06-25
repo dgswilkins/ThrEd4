@@ -996,10 +996,9 @@ void xt::selalfrm() {
 }
 
 auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
-  auto       bit             = DWORD {};
   auto const maskedAttribute = gsl::narrow_cast<DWORD>(attribute & SRTYPMSK);
-  // ToDo - replace
-  _BitScanReverse(&bit, maskedAttribute);
+  auto bit = gsl::narrow_cast<DWORD>(std::bit_width(maskedAttribute));
+  --bit;
   if (bit == 0) {
 	return 0U;
   }
