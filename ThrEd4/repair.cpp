@@ -39,7 +39,7 @@ class BAD_COUNTS
   uint32_t attribute {};
   uint32_t flt {};
   uint32_t clip {};
-  uint32_t guideCount {}; // ToDo - is this an accurate description?
+  uint32_t guideCount {};
   uint32_t tx {};
 };
 
