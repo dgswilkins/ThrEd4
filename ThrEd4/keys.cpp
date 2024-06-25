@@ -183,7 +183,6 @@ void kyi::ritcur() {
   }
 }
 
-// ToDo - compare and merge with bi::fswap
 constexpr auto kyi::byteSwap(uint32_t data) noexcept -> uint32_t {
   auto const swapped = ((data & 0x000000FFU) << 24U) | ((data & 0x0000FF00U) << 8U) |
                        ((data & 0x00FF0000U) >> 8U) | ((data & 0xFF000000U) >> 24U);
