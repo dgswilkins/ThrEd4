@@ -809,7 +809,6 @@ void xi::fnwlk(FRM_HEAD& form) {
 }
 
 void xi::undclp(float& underlayStitchLen) {
-  // ToDo - Is it better to initialize individually?
   ClipBuffer->clear();
   ClipBuffer->reserve(2);
   ClipRectSize = F_LSIZ {0, underlayStitchLen};
