@@ -2349,7 +2349,6 @@ auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
 
 auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
   point = F_POINT {getstxt(IDC_DESWID, dialog), getstxt(IDC_DESHI, dialog)};
-  // ToDo - should this have a range? aspectRatio +/- %
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
 
