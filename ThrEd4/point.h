@@ -56,6 +56,7 @@ class F_POINT_ATTR;
 class SMAL_PNT_L;
 class B_SEQ_PNT;
 
+#ifdef NEED_DPOINT
 class D_POINT
 {
   public:
@@ -65,12 +66,11 @@ class D_POINT
   // NOLINTEND
 
   explicit inline D_POINT(F_POINT const& rhs) noexcept;
+  explicit inline D_POINT(float rhsX, float rhsY) noexcept;
   explicit D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
   }
-  // ToDo - Not sure why this suppression is required. CPPCheck bug?
-  // cppcheck-suppress unknownMacro
-  explicit inline D_POINT(float rhsX, float rhsY) noexcept;
 };
+#endif
 
 #pragma pack(push, 1)
 class F_POINT
@@ -86,9 +86,11 @@ class F_POINT
   explicit constexpr F_POINT(float rhsX, float rhsY) noexcept;
   explicit constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
   explicit constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
-  explicit constexpr F_POINT(D_POINT const& rhs);
-  inline auto    operator==(F_POINT const& rhs) const noexcept -> bool;
+#ifdef NEED_DPOINT
   constexpr auto operator=(D_POINT const& rhs) -> F_POINT&;
+  explicit constexpr F_POINT(D_POINT const& rhs);
+#endif
+  inline auto    operator==(F_POINT const& rhs) const noexcept -> bool;
   constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
   constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
   constexpr auto operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT&;
@@ -243,6 +245,7 @@ constexpr F_POINT::F_POINT(double rhsX, double rhsY) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)) {
 }
 
+#ifdef NEED_DPOINT
 constexpr F_POINT::F_POINT(D_POINT const& rhs) :
     x(util::doubleToFloat(rhs.x)), y(util::doubleToFloat(rhs.y)) {
 }
@@ -252,6 +255,7 @@ constexpr auto F_POINT::operator=(D_POINT const& rhs) -> F_POINT& {
   y = util::doubleToFloat(rhs.y);
   return *this;
 }
+#endif
 
 constexpr auto F_POINT::operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT& {
   x = rhs.x;
@@ -283,6 +287,7 @@ inline auto F_POINT_ATTR::operator==(F_POINT_ATTR const& rhs) const noexcept -> 
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y) && attribute == rhs.attribute;
 }
 
+#ifdef NEED_DPOINT
 inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
     x(gsl::narrow_cast<double>(rhs.x)), y(gsl::narrow_cast<double>(rhs.y)) {
 }
@@ -290,3 +295,4 @@ inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
 inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
     x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
 }
+#endif
