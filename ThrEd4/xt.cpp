@@ -671,7 +671,6 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 	for (auto val : *OSequence) {
 	  InterleaveSequence->push_back(val);
 	}
-	InterleaveSequenceIndices->back().color = form.underlayColor;
 #else
 	constexpr auto MAXWLK = 54.0F; // max underlay/edge walk stitch length
 	constexpr auto MINWLK = 2.4F;  // max underlay/edge walk stitch length
@@ -706,8 +705,6 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 	  ++sequenceFwd1;
 	}
 	InterleaveSequence->push_back(OSequence->back());
-	// ToDo - should this be front or (back - 1) ?
-	InterleaveSequenceIndices->front().color = form.underlayColor;
 #endif
   }
 }
