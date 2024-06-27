@@ -13,11 +13,11 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main", "Develop" ]
+    branches: ["main", "Develop"]
   pull_request:
-    branches: [ "main", "Develop" ]
+    branches: ["main", "Develop"]
   schedule:
-    - cron: '45 6 * * 0'
+    - cron: "45 6 * * 0"
 
 jobs:
   analyze:
@@ -45,8 +45,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - language: c-cpp
-          build-mode: manual
+          - language: c-cpp
+            build-mode: manual
         # CodeQL supports the following values keywords for 'language': 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -58,7 +58,7 @@ jobs:
     env:
       # Path to the solution file relative to the root of the project.
       SOLUTION_FILE_PATH: .
-    
+
       # Configuration type to build.
       BUILD_CONFIGURATION: Debug
       BUILD_PLATFORM: x64
@@ -67,64 +67,63 @@ jobs:
       OUT_PATH: ${{ github.workspace }}\x64\Debug
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Install vcpkg
-      uses: lukka/run-vcpkg@v11
-      with:
-        runVcpkgInstall: true
+      - name: Install vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          runVcpkgInstall: true
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
-        # queries: security-extended,security-and-quality
-        queries: +security-and-quality
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # queries: security-extended,security-and-quality
+          queries: +security-and-quality
 
-    # ℹ️ Command-line programs to run using the OS shell.
-    - if: matrix.build-mode == 'manual'
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
+      # ℹ️ Command-line programs to run using the OS shell.
+      - if: matrix.build-mode == 'manual'
+        run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{matrix.language}}"
-        upload: false
-      id: step1
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+          upload: false
+        id: step1
 
-    # Filter out rules with low severity or high false positve rate
-    # see https://github.com/marketplace/actions/filter-sarif for pattern definitions
-    # Also filter out warnings in third-party code
-    # typical pattern for filtering out a rule: -**:cpp/poorly-documented-function
-    - name: Filter code checks for main
-      if: ${{ github.ref == 'refs/heads/main' }}
-      uses: advanced-security/filter-sarif@v1
-      with:
-        patterns: |
-          -**:cpp/commented-out-code
-          -**:cpp/poorly-documented-function
-          -**/vcpkg_installed/**
-        input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
-        output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+      # Filter out rules with low severity or high false positve rate
+      # see https://github.com/marketplace/actions/filter-sarif for pattern definitions
+      # Also filter out warnings in third-party code
+      # typical pattern for filtering out a rule: -**:cpp/poorly-documented-function
+      - name: Filter code checks for main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: advanced-security/filter-sarif@v1
+        with:
+          patterns: |
+            -**:cpp/commented-out-code
+            -**:cpp/poorly-documented-function
+            -**/vcpkg_installed/**
+          input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+          output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
 
-    - name: Filter code checks for Develop
-      if: ${{ github.ref == 'refs/heads/Develop' }}
-      uses: advanced-security/filter-sarif@v1
-      with:
-        patterns: |
-          -**/vcpkg_installed/**
-        input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
-        output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+      - name: Filter code checks for Develop
+        if: ${{ github.ref == 'refs/heads/Develop' }}
+        uses: advanced-security/filter-sarif@v1
+        with:
+          patterns: |
+            -**/vcpkg_installed/**
+          input: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
+          output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
 
-    - name: Upload CodeQL results to code scanning
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: ${{ steps.step1.outputs.sarif-output }}
-        category: "/language:${{matrix.language}}"
-
+      - name: Upload CodeQL results to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.step1.outputs.sarif-output }}
+          category: "/language:${{matrix.language}}"
