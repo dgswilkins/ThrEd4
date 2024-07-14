@@ -53,10 +53,6 @@
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
 class DST_OFFSETS
 {
-  private:
-  POINT m_Positive {}; // plus offset written into the destination file header
-  POINT m_Negative {}; // minus offset written into the destination file header
-
   public:
   constexpr DST_OFFSETS() noexcept = default;
 
@@ -79,6 +75,10 @@ class DST_OFFSETS
   void setNegative(const POINT& negative) noexcept {
 	m_Negative = negative;
   }
+
+  private:
+  POINT m_Positive {}; // plus offset written into the destination file header
+  POINT m_Negative {}; // minus offset written into the destination file header
 };
 #pragma pack(pop)
 
@@ -86,6 +86,14 @@ class DST_OFFSETS
 // NOLINTBEGIN(readability-magic-numbers)
 class DSTHED // dst file header
 {
+  public:
+  constexpr DSTHED() noexcept = default;
+
+  void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset);
+  [[nodiscard]] auto chkdst() const noexcept -> bool {
+	return strncmp(m_desched.data(), "LA:", 3) == 0;
+  }
+
   private:
   std::array<char, 3>   m_desched {};  // 00  00	description
   std::array<char, 17>  m_desc {};     // 03  03
@@ -113,14 +121,6 @@ class DSTHED // dst file header
   std::array<char, 7>   m_pd {};       // 116 74
   std::array<char, 1>   m_eof {};      // 123 7B
   std::array<char, 388> m_res {};      // 124 7C
-
-  public:
-  constexpr DSTHED() noexcept = default;
-
-  void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset);
-  [[nodiscard]] auto chkdst() const noexcept -> bool {
-	return strncmp(m_desched.data(), "LA:", 3) == 0;
-  }
 };
 // NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)

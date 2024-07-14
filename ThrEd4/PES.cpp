@@ -115,10 +115,6 @@ class PECHDR2
 
 class PES_COLOR_LIST
 {
-  private:
-  uint16_t m_blockIndex {};
-  uint16_t m_colorIndex {};
-
   public:
   explicit constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
       m_blockIndex(bIndex), m_colorIndex(cIndex) {
@@ -131,6 +127,10 @@ class PES_COLOR_LIST
   [[nodiscard]] constexpr auto getColorIndex() const noexcept -> uint16_t {
 	return m_colorIndex;
   }
+
+  private:
+  uint16_t m_blockIndex {};
+  uint16_t m_colorIndex {};
 };
 
 #pragma pack(push, 1)
@@ -200,13 +200,6 @@ class PESLED
 #pragma pack(push, 1)
 class PESSTCHLST
 {
-  private:
-  uint16_t m_stitchType {};
-  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
-  uint16_t m_threadIndex {};
-  uint16_t m_stitchCount {};
-  // NOLINTEND(clang-diagnostic-unused-private-field)
-
   public:
   explicit constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
       m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
@@ -215,18 +208,25 @@ class PESSTCHLST
   void setStitchType(uint32_t stype) {
 	m_stitchType = gsl::narrow<uint16_t>(stype);
   }
+
+  private:
+  uint16_t m_stitchType {};
+  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
+  uint16_t m_threadIndex {};
+  uint16_t m_stitchCount {};
+  // NOLINTEND(clang-diagnostic-unused-private-field)
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 class PESTCH
 {
-  private:
-  int16_t m_x {};
-  int16_t m_y {};
-
   public:
   inline auto operator=(F_POINT const& rhs) -> PESTCH&;
+
+  private:
+      int16_t m_x {};
+      int16_t m_y {};
 };
 #pragma pack(pop)
 
@@ -239,13 +239,6 @@ inline auto PESTCH::operator=(F_POINT const& rhs) -> PESTCH& {
 
 class THREAD
 {
-  private:
-  PEC_COLOR m_color {};
-  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
-  char const* m_description {};
-  char const* m_catalogNumber {};
-  // NOLINTEND(clang-diagnostic-unused-private-field)
-
   public:
   explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
       m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
@@ -258,6 +251,13 @@ class THREAD
   [[nodiscard]] constexpr auto getRGB() const noexcept -> COLORREF {
 	return RGB(m_color.r, m_color.g, m_color.b);
   }
+
+  private:
+  PEC_COLOR m_color {};
+  // NOLINTBEGIN(clang-diagnostic-unused-private-field)
+  char const* m_description {};
+  char const* m_catalogNumber {};
+  // NOLINTEND(clang-diagnostic-unused-private-field)
 };
 
 constexpr auto BIT12    = uint32_t {0x800U}; // Set bit 12 if delta is negative

@@ -56,15 +56,6 @@ constexpr auto LEADIN    = int8_t {0x32}; // LEADIN marker for PCS file
 
 class PCSHEADER // pcs file header structure
 {
-  private:
-  int8_t   m_leadIn {};
-  int8_t   m_hoopType {};
-  uint16_t m_colorCount {};
-
-  std::array<COLORREF, COLORCNT> m_colors {};
-
-  uint16_t m_stitchCount {};
-
   public:
   constexpr PCSHEADER() noexcept = default;
 
@@ -95,6 +86,15 @@ class PCSHEADER // pcs file header structure
   [[nodiscard]] constexpr auto getHoopType() const noexcept -> int8_t {
 	return m_hoopType;
   }
+
+  private:
+  int8_t   m_leadIn {};
+  int8_t   m_hoopType {};
+  uint16_t m_colorCount {};
+
+  std::array<COLORREF, COLORCNT> m_colors {};
+
+  uint16_t m_stitchCount {};
 };
 #pragma pack(pop)
 
