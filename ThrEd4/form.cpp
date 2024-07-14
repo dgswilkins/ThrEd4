@@ -6482,7 +6482,6 @@ void form::setstrtch() {
 		    (StitchBuffer->operator[](iStitch).x - reference) * ratio + reference;
 	  }
 	  StateMap->set(StateFlag::RESTCH);
-	  return;
 	}
   }
   else {
