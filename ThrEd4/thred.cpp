@@ -7494,7 +7494,7 @@ auto thred::inrng(uint32_t iStitch) noexcept -> bool {
 
 void thi::barnam(HWND window, uint32_t iThumbnail) {
   if (iThumbnail >= ThumbnailDisplayCount) {
-	SetWindowText(window, static_cast<LPCWSTR>(L""));
+	SetWindowText(window, L"");
 	return;
   }
   auto const thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected.at(iThumbnail)).data());
