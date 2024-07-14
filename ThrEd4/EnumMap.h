@@ -89,37 +89,37 @@ template <typename EnumType> class ENUM_MAP
 	m_mask = i_mask;
   }
 
-  auto operator==(ENUM_MAP<EnumType> const& i_other) const -> bool {
+  auto operator==(ENUM_MAP const& i_other) const -> bool {
 	return m_mask == i_other.m_mask;
   }
-  auto operator!=(ENUM_MAP<EnumType> const& i_other) const -> bool {
+  auto operator!=(ENUM_MAP const& i_other) const -> bool {
 	return m_mask != i_other.m_mask;
   }
 
-  auto operator&=(ENUM_MAP<EnumType> const& i_other) -> ENUM_MAP<EnumType> {
+  auto operator&=(ENUM_MAP const& i_other) -> ENUM_MAP {
 	m_mask &= i_other.m_mask;
 	return *this;
   }
 
-  auto operator|=(ENUM_MAP<EnumType> const& i_other) -> ENUM_MAP<EnumType> {
+  auto operator|=(ENUM_MAP const& i_other) -> ENUM_MAP {
 	m_mask |= i_other.m_mask;
 	return *this;
   }
 
-  auto operator&(ENUM_MAP<EnumType> const& i_other) const -> ENUM_MAP<EnumType> {
-	ENUM_MAP<EnumType> newMask;
+  auto operator&(ENUM_MAP const& i_other) const -> ENUM_MAP {
+	ENUM_MAP newMask;
 	newMask.m_mask = m_mask & i_other.m_mask;
 	return newMask;
   }
 
-  auto operator|(ENUM_MAP<EnumType> const& i_other) const -> ENUM_MAP<EnumType> {
-	ENUM_MAP<EnumType> newMask;
+  auto operator|(ENUM_MAP const& i_other) const -> ENUM_MAP {
+	ENUM_MAP newMask;
 	newMask.m_mask = m_mask | i_other.m_mask;
 	return newMask;
   }
 
-  auto operator~() const -> ENUM_MAP<EnumType> {
-	ENUM_MAP<EnumType> newMask;
+  auto operator~() const -> ENUM_MAP {
+	ENUM_MAP newMask;
 	newMask.m_mask = ~m_mask;
 	return newMask;
   }
