@@ -975,7 +975,7 @@ void thi::fndknt() {
   }
   endStitch -= 4U;
   Knots->clear();
-  auto spStitch = std::ranges::subrange(StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), endStitch));
+  auto const spStitch = std::ranges::subrange(StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), endStitch));
   for (auto iStitch = 0; const auto& stitch : spStitch) {
 	if ((stitch.attribute & KNOTMSK) != 0U) {
 	  Knots->emplace_back(iStitch);
@@ -2395,7 +2395,7 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
   auto stitchFwd1     = std::next(StitchBuffer->begin());
-  auto spStitches     = std::ranges::subrange(StitchBuffer->begin(), StitchBuffer->end() - 2U);
+  auto const spStitches     = std::ranges::subrange(StitchBuffer->begin(), StitchBuffer->end() - 2U);
   for (auto index = 0U; auto const& stitch : spStitches) {
 	if ((stitch.attribute & FRMSK) != code || ((stitch.attribute & NOTFRM) != 0U) ||
 	    (stitchFwd1->attribute & FRMSK) != code || ((stitchFwd1->attribute & TYPMSK) == 0U)) {
@@ -2439,8 +2439,8 @@ void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitc
   auto minLength      = BIGFLOAT;
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
-  auto firstStitch    = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
-  auto spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
+  auto const firstStitch    = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
+  auto const spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
   auto stitchFwd1 = std::next(firstStitch);
   for (auto index = startStitch; auto& stitch : spStitches) {
 	auto const deltaX = stitchFwd1->x - stitch.x;

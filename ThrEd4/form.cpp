@@ -2613,7 +2613,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  projectedPoints.reserve(currentVertexCount);
 	  currentX += step;
 	  auto iPoint      = 0U;
-	  auto vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
+	  auto const vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
 	  for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
 		auto const iNextVertex = (wrap::toSize(iVertex) + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
 		if (auto point = F_POINT {};
@@ -6565,7 +6565,7 @@ void fi::setSize(F_POINT& size1, float xyRatio) noexcept {
 }
 
 void fi::resizeFormPoints(const F_POINT& stitchReference, F_POINT const& ratio) {
-  auto itVertex = wrap::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
+  auto const itVertex = wrap::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
   auto iCurrent = SelectedFormVertices.start;
   for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 	auto const itCurrentVertex = wrap::next(itVertex, iCurrent);
@@ -6600,7 +6600,7 @@ void fi::resizeBigBox(F_POINT const& stitchReference, F_POINT const& ratio) {
 }
 
 void fi::resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& ratio) {
-  for (auto selectedForm : (*SelectedFormList)) {
+  for (auto const selectedForm : (*SelectedFormList)) {
 	auto& form = FormList->operator[](selectedForm);
 
 	auto const& formVertexCount = form.vertexCount;

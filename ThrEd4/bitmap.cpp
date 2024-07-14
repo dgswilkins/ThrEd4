@@ -467,7 +467,7 @@ void bitmap::lodbmp(fs::path const& directory) {
   auto       dest  = std::vector<wchar_t> {};
   dest.resize(pleng);
   GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
-  auto filePart = fs::path {dest.data()};
+  auto const filePart = fs::path {dest.data()};
   auto saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
 #else
   auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());

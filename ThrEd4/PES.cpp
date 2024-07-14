@@ -518,7 +518,7 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto iPEC        = wrap::next(PESequivColors.begin(), color);
   auto iPesColors  = pecHeader->pad.begin();
   *iPesColors++    = *iPEC;
-  auto stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
+  auto const stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
   for (auto& stitch : stitchRange) {
 	if ((stitch.attribute & COLMSK) != color) {
 	  color = stitch.attribute & COLMSK;

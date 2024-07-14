@@ -123,7 +123,7 @@ void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
 auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
   auto        guideIndex = 0U;
   auto const& formList   = *FormList;
-  auto formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
+  auto const formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
   for (auto const& form : formRange) {
 	if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	  guideIndex += form.satinGuideCount;
@@ -239,8 +239,8 @@ void si::satclos() {
   auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
   {
 	auto minimumLength = BIGFLOAT;
-	auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	auto vertexRange   = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
+	auto const itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto const vertexRange = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
 	  auto const deltaY = stitchPoint.y - vertex.y;
@@ -338,7 +338,7 @@ auto si::satselfn() -> bool {
 	if ((ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
 	  continue;
 	}
-	auto itVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	auto vertexRange = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
@@ -1489,7 +1489,7 @@ auto si::satOffset(const uint32_t& finish, const uint32_t& start, float satinWid
   constexpr auto SATHRESH = 10.0F;
 
   auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) * HALF;
-  auto factor = std::clamp(1.0F / cos(angle), -SATHRESH, SATHRESH);
+  auto const factor = std::clamp(1.0F / cos(angle), -SATHRESH, SATHRESH);
 
   auto const length = satinWidth * factor;
 
