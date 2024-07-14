@@ -99,7 +99,7 @@ void ilin1() noexcept;
 auto inChangeThreadWindows() -> bool;
 auto inDefaultColorWindows() -> bool;
 auto inColorbar() noexcept -> bool;
-auto inrng(uint32_t stitch) noexcept -> bool;
+auto inrng(uint32_t iStitch) noexcept -> bool;
 auto inStitchWin() noexcept -> bool;
 auto inThreadWindows() -> bool;
 auto inThreadSizeWindows() -> bool;

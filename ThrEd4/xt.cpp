@@ -1075,7 +1075,7 @@ auto xi::chkrdun(std::vector<uint32_t> const& formFillCounter,
   return false;
 }
 
-auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
+auto xi::precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
     -> double {
   auto currentRegion   = sortRecord.currentRegion;
   auto direction       = sortRecord.direction;
@@ -1114,19 +1114,19 @@ auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> c
 	  if (direction) {
 		if (pRecs[currentRegion]->start != 0U) {
 		  for (auto iRegion = pRecs[currentRegion]->finish - 1U; iRegion >= pRecs[currentRegion]->start; --iRegion) {
-			stitchBuffer.push_back(StitchBuffer->operator[](iRegion));
+			tempStitchBuffer.push_back(StitchBuffer->operator[](iRegion));
 		  }
 		}
 		else {
 		  auto iRegion = pRecs[currentRegion]->finish;
 		  while (iRegion != 0U) {
-			stitchBuffer.push_back(StitchBuffer->operator[](--iRegion));
+			tempStitchBuffer.push_back(StitchBuffer->operator[](--iRegion));
 		  }
 		}
 	  }
 	  else {
 		for (auto iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; ++iRegion) {
-		  stitchBuffer.push_back(StitchBuffer->operator[](iRegion));
+		  tempStitchBuffer.push_back(StitchBuffer->operator[](iRegion));
 		}
 	  }
 	}
@@ -1134,12 +1134,12 @@ auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> c
   return totalJumps;
 }
 
-auto xi::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
+auto xi::duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
     -> uint32_t {
   sortRecord.direction = false;
-  auto const jumps0    = wrap::round<uint32_t>(precjmps(stitchBuffer, pRecs, sortRecord));
+  auto const jumps0    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
   sortRecord.direction = true;
-  auto const jumps1    = wrap::round<uint32_t>(precjmps(stitchBuffer, pRecs, sortRecord));
+  auto const jumps1    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
   if (jumps0 < jumps1) {
 	sortRecord.direction = false;
 	return jumps0;

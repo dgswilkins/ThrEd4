@@ -5878,14 +5878,14 @@ auto fi::closat(IntersectionStyles& inOutFlag) -> bool {
   return !util::closeEnough(minimumLength, BIGFLOAT);
 }
 
-void fi::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT stitchPoint) {
+void fi::nufpnt(uint32_t vertex, FRM_HEAD& formForInsert, F_POINT stitchPoint) {
   form::fltspac(vertex + 1U, 1U);
-  ++(form.vertexCount);
-  auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + vertex + 1U);
+  ++(formForInsert.vertexCount);
+  auto const itVertex = wrap::next(FormVertices->begin(), formForInsert.vertexIndex + vertex + 1U);
   *itVertex           = stitchPoint;
-  if (form.satinGuideCount != 0U) {
-	auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
-	for (auto ind = 0U; ind < form.satinGuideCount; ++ind) {
+  if (formForInsert.satinGuideCount != 0U) {
+	auto itGuide = wrap::next(SatinGuides->begin(), formForInsert.satinGuideIndex);
+	for (auto ind = 0U; ind < formForInsert.satinGuideCount; ++ind) {
 	  if (itGuide->start > vertex) {
 		++(itGuide->start);
 	  }
@@ -5895,19 +5895,19 @@ void fi::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT stitchPoint) {
 	  ++itGuide;
 	}
   }
-  if (form.wordParam >= vertex + 1U) {
-	++(form.wordParam);
-	form.wordParam %= form.vertexCount;
+  if (formForInsert.wordParam >= vertex + 1U) {
+	++(formForInsert.wordParam);
+	formForInsert.wordParam %= formForInsert.vertexCount;
   }
-  if (form.fillType == CONTF) {
-	if (form.fillGuide.start > vertex) {
-	  ++form.fillGuide.start;
+  if (formForInsert.fillType == CONTF) {
+	if (formForInsert.fillGuide.start > vertex) {
+	  ++formForInsert.fillGuide.start;
 	}
-	if (form.fillGuide.finish > vertex) {
-	  ++form.fillGuide.finish;
+	if (formForInsert.fillGuide.finish > vertex) {
+	  ++formForInsert.fillGuide.finish;
 	}
   }
-  fi::frmlin(form);
+  fi::frmlin(formForInsert);
 }
 
 void form::insat() { // insert a point in a form
