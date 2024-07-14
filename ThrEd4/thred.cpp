@@ -2631,7 +2631,7 @@ void thred::duzero() {
   }
   auto const minStitch = SmallStitchLength * SmallStitchLength;
   if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
+	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  formMap.set(selectedForm);
 	}
@@ -5598,7 +5598,7 @@ void thred::delsfrms() {
   }
   auto formIndices = std::vector<uint32_t> {};
   formIndices.resize(FormList->size());
-  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
 	thi::f1del(selectedForm);
@@ -6076,7 +6076,7 @@ auto thi::wastch(uint32_t const& formIndex) -> bool {
 }
 
 auto thi::frmstch() -> bool {
-  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
   }
@@ -7711,7 +7711,7 @@ void thred::gotbox() {
 }
 
 void thred::nucols() {
-  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
 	auto& form = FormList->operator[](selectedForm);
@@ -8554,7 +8554,7 @@ void thred::nudgfn(float deltaX, float deltaY) {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
+	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  formMap.set(selectedForm);
 	}
@@ -11378,7 +11378,7 @@ void thi::drawStitchBoxes() {
       F_POINT {(ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right),
                (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom)};
   auto const maxMapSize = wrap::toSize(StitchWindowClientRect.right * StitchWindowClientRect.bottom);
-  auto stitchMap = boost::dynamic_bitset<>(maxMapSize, 0U);
+  auto stitchMap = boost::dynamic_bitset(maxMapSize, 0U); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   SelectObject(StitchWindowMemDC, LinePen);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
   if (StateMap->test(StateFlag::HID)) {

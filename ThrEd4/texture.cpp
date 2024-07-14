@@ -1181,7 +1181,7 @@ void txi::nutx(uint32_t formIndex) {
 
 // Ensure all lines in the texture have at least 1 point
 void txi::altx() {
-  auto       txtLines   = boost::dynamic_bitset<>(wrap::toSize(TextureScreen.lines) + 1U);
+  auto txtLines = boost::dynamic_bitset(wrap::toSize(TextureScreen.lines) + 1U); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   auto const halfHeight = TextureScreen.areaHeight / 2.0F;
   for (auto const& texturePoint : *TempTexturePoints) {
 	txtLines.set(texturePoint.line);
@@ -1407,7 +1407,7 @@ void txi::nxbak() {
 void txi::txtdel() {
   if (!SelectedTexturePointsList->empty()) {
 	texture::savtxt();
-	auto texturePointsMap = boost::dynamic_bitset<>(TempTexturePoints->size());
+	auto texturePointsMap = boost::dynamic_bitset(TempTexturePoints->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const& point : *SelectedTexturePointsList) {
 	  texturePointsMap.set(point);
 	}

@@ -403,7 +403,7 @@ void fci::clipSelectedForms() {
   GlobalUnlock(clipHandle);
   SetClipboardData(thrEdClip, clipHandle);
 
-  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto& selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
   }

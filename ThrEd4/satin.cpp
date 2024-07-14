@@ -406,7 +406,7 @@ void satin::satadj(FRM_HEAD& form) {
   auto  interiorGuides     = std::vector<SAT_CON> {};
   interiorGuides.reserve(currentGuidesCount);
   auto const savedGuideCount = form.satinGuideCount;
-  auto       satinMap        = BIT_SET_EX<>(form.vertexCount);
+  auto satinMap = BIT_SET_EX(form.vertexCount); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   // ensure all guide endpoints are on valid vertices
   auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
   for (auto vertexRange = std::ranges::subrange(itFirstGuide, wrap::next(itFirstGuide, form.satinGuideCount));

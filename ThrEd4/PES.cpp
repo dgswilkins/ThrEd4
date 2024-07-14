@@ -666,7 +666,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   }
   auto const pesColorCount = pecHeader->colorCount + 1U;
   auto const pesColors     = gsl::span {pecHeader->pad.data(), pesColorCount};
-  auto       colorMap      = boost::dynamic_bitset<>(THTYPCNT);
+  auto colorMap = boost::dynamic_bitset(THTYPCNT); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   auto       iUserColor    = UserColor.begin();
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
 	if (pesColors[iColor] < THTYPCNT) {

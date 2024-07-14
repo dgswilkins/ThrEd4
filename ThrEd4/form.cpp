@@ -1324,7 +1324,7 @@ void form::flipv() {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	auto formMap   = boost::dynamic_bitset<> {FormList->size()};
+	auto formMap   = boost::dynamic_bitset {FormList->size()}; // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	auto rectangle = F_RECTANGLE {};
 	pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.top + rectangle.bottom;
@@ -5955,7 +5955,7 @@ void form::unfil() {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
+	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  if (auto& form = FormList->operator[](selectedForm); (form.fillType != 0U) || (form.edgeType != 0U)) {
 		clip::delclps(selectedForm);
@@ -7187,7 +7187,7 @@ void form::fliph() {
   }
   if (!SelectedFormList->empty()) {
 	thred::savdo();
-	auto formMap   = boost::dynamic_bitset<>(FormList->size());
+	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	auto rectangle = F_RECTANGLE {};
 	pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.right + rectangle.left;
@@ -7789,7 +7789,7 @@ void form::movlayr(uint32_t layer) {
   auto const codedStitchLayer = layer << LAYSHFT;
   if (!SelectedFormList->empty()) {
 	thred::savdo();
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
+	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  auto& formAttr = FormList->operator[](selectedForm).attribute;
 	  formAttr = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formAttr & NFRMLMSK) | (layer << FLAYSHFT));
@@ -7917,7 +7917,7 @@ void form::frmadj(uint32_t formIndex) noexcept(!(std::is_same_v<ptrdiff_t, int>)
 }
 
 void form::frmsadj() {
-  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
   }

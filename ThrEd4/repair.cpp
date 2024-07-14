@@ -102,7 +102,7 @@ void repair::lodchk() {
 	  form.maxBorderStitchLen = IniFile.maxStitchLength;
 	}
   }
-  auto formMap = boost::dynamic_bitset<>(FormList->size());
+  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto& stitch : *StitchBuffer) {
 	auto const attribute = stitch.attribute;
 	if ((attribute & TYPMSK) == TYPFRM) {
