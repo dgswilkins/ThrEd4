@@ -376,7 +376,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   auto minY = BIGFLOAT;
   auto maxX = LOWFLOAT;
   auto maxY = LOWFLOAT;
-  for (auto skipStitch = false; auto& stitch : pcsStitchBuffer) {
+  for (auto skipStitch = false; auto const& stitch : pcsStitchBuffer) {
 	if (skipStitch) {
 	  skipStitch = false;
 	  continue;

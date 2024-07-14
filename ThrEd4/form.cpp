@@ -6618,7 +6618,7 @@ void fi::resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& rati
 }
 
 void fi::resizeForm(F_POINT const& reference, F_POINT const& ratio) {
-  auto& form = FormList->operator[](ClosestFormToCursor);
+  auto const& form = FormList->operator[](ClosestFormToCursor);
 
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {

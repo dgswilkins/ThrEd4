@@ -337,7 +337,7 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t
 	return true;
   }
 
-  for (auto itHITP = historyItem.texturePoints.cbegin(); auto& point : *TempTexturePoints) {
+  for (auto itHITP = historyItem.texturePoints.cbegin(); auto const& point : *TempTexturePoints) {
 	if ((point.line != itHITP->line) || !util::closeEnough(point.y, itHITP->y)) {
 	  return true;
 	}

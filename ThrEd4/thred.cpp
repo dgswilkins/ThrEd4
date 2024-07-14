@@ -2442,7 +2442,7 @@ void thi::lenfn(uint32_t startStitch, uint32_t endStitch, uint32_t& largestStitc
   auto const firstStitch    = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
   auto const spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
   auto stitchFwd1 = std::next(firstStitch);
-  for (auto index = startStitch; auto& stitch : spStitches) {
+  for (auto index = startStitch; auto const& stitch : spStitches) {
 	auto const deltaX = stitchFwd1->x - stitch.x;
 	auto const deltaY = stitchFwd1->y - stitch.y;
 	auto const length = deltaX * deltaX + deltaY * deltaY;
