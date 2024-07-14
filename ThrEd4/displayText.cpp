@@ -123,13 +123,13 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
 }
 
 void displayText::tabmsg(uint32_t code, bool top) {
-  displayText::shoMsg(displayText::loadStr(code), top);
+  shoMsg(loadStr(code), top);
 }
 
 void displayText::hsizmsg() {
-  auto const fmtStr = displayText::format2(
+  auto const fmtStr = format2(
       IDS_HSIZ, (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN), (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN));
-  displayText::shoMsg(fmtStr, false);
+  shoMsg(fmtStr, false);
 }
 
 void displayText::numWnd() {
@@ -160,28 +160,28 @@ void displayText::numWnd() {
 }
 
 void displayText::msgflt(uint32_t messageId, float value) {
-  displayText::showMessage(messageId, value);
+  showMessage(messageId, value);
   StateMap->set(StateFlag::NUMIN);
-  displayText::numWnd();
+  numWnd();
 }
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
-  auto const fmtStr = displayText::format2(IDS_SIZ, threadSizeText, threadSize);
-  displayText::shoMsg(fmtStr, true);
+  auto const fmtStr = format2(IDS_SIZ, threadSizeText, threadSize);
+  shoMsg(fmtStr, true);
   StateMap->set(StateFlag::NUMIN);
-  displayText::numWnd();
+  numWnd();
 }
 
 void displayText::bfilmsg() {
-  displayText::showMessage(IDS_BADFIL, WorkingFileName->wstring());
+  showMessage(IDS_BADFIL, WorkingFileName->wstring());
 }
 
 void displayText::filnopn(uint32_t code, fs::path const& fileName) {
-  displayText::showMessage(code, fileName.wstring());
+  showMessage(code, fileName.wstring());
 }
 
 void displayText::crmsg(fs::path const& fileName) {
-  displayText::showMessage(IDS_CREAT, fileName.wstring());
+  showMessage(IDS_CREAT, fileName.wstring());
 }
 
 void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
@@ -190,16 +190,16 @@ void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
 	return;
   }
   if (iButton != HMINLEN) {
-	auto const bText = displayText::loadStr(iButton - 4U + IDS_TRC0);
+	auto const bText = loadStr(iButton - 4U + IDS_TRC0);
 	SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 	return;
   }
   if (!StateMap->test(StateFlag::HIDMAP)) {
-	auto const bText = displayText::loadStr(IDS_TRC1S);
+	auto const bText = loadStr(IDS_TRC1S);
 	SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 	return;
   }
-  auto const bText = displayText::loadStr(IDS_TRC1H);
+  auto const bText = loadStr(IDS_TRC1H);
   SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 }
 
@@ -212,22 +212,22 @@ void displayText::clrhbut(uint32_t startButton) {
 }
 
 void displayText::ritnum(uint32_t code, uint32_t value) {
-  displayText::butxt(HNUM, displayText::format(code, value));
+  butxt(HNUM, format(code, value));
 }
 
 void displayText::riter() {
-  displayText::tabmsg(IDS_RITER, false);
+  tabmsg(IDS_RITER, false);
 }
 
 void displayText::pntmsg(uint32_t msgID) {
-  auto const message = displayText::loadStr(msgID);
-  displayText::showMessage(IDS_PNT, message);
+  auto const message = loadStr(msgID);
+  showMessage(IDS_PNT, message);
 }
 
 void displayText::shoseln(uint32_t code0, uint32_t code1) {
-  auto const msg0 = displayText::loadStr(code0);
-  auto const msg1 = displayText::loadStr(code1);
-  displayText::shoMsg(displayText::format2(IDS_SHOSEL, msg0, msg1), false);
+  auto const msg0 = loadStr(code0);
+  auto const msg1 = loadStr(code1);
+  shoMsg(format2(IDS_SHOSEL, msg0, msg1), false);
 }
 
 auto di::clpmsgs(uint32_t code) -> bool {
@@ -251,35 +251,35 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 	return di::clpmsgs(code);
   }
   if (!FormList->empty()) {
-	displayText::frm1pnt();
+	frm1pnt();
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.vertexCount == 2) {
 		if (code < FML_LIN) {
-		  displayText::tabmsg(IDS_FRM3X, false);
+		  tabmsg(IDS_FRM3X, false);
 		  return false;
 		}
 
 		if (code == FML_PRPS) {
-		  displayText::tabmsg(IDS_ANGS, false);
+		  tabmsg(IDS_ANGS, false);
 		  return false;
 		}
 	  }
 	  return di::clpmsgs(code);
 	}
 
-	displayText::tabmsg(IDS_FILSEL, false);
+	tabmsg(IDS_FILSEL, false);
 	return false;
   }
-  displayText::tabmsg(IDS_FILCR, false);
+  tabmsg(IDS_FILCR, false);
   return false;
 }
 
 void displayText::grpmsg() {
-  displayText::shoseln(IDS_FGRPS, IDS_UNGRP);
+  shoseln(IDS_FGRPS, IDS_UNGRP);
 }
 
 void displayText::grpmsg1() {
-  displayText::tabmsg(IDS_NOGRP, false);
+  tabmsg(IDS_NOGRP, false);
 }
 
 void di::sdmsg() {
@@ -287,15 +287,15 @@ void di::sdmsg() {
 }
 
 void displayText::alrotmsg() {
-  displayText::shoseln(IDS_ALLX, IDS_ROTAGIN);
+ shoseln(IDS_ALLX, IDS_ROTAGIN);
 }
 
 void displayText::shord() {
-  displayText::shoseln(IDS_FGRPF, IDS_ROTDUP);
+  shoseln(IDS_FGRPF, IDS_ROTDUP);
 }
 
 void displayText::spltmsg() {
-  displayText::shoseln(IDS_FRMGUID, IDS_SPLT);
+  shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
 void displayText::okcan() {
@@ -371,7 +371,7 @@ auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 } // namespace
 
 void displayText::updateWinFont(HWND hWnd) noexcept {
-  auto const* hFont = displayText::getThrEdFont(FONTSIZE);
+  auto const* hFont = getThrEdFont(FONTSIZE);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   EnumChildWindows(hWnd, enumChildProc, reinterpret_cast<LPARAM>(hFont));
 }
@@ -380,7 +380,7 @@ void displayText::tomsg() {
   auto okRect   = RECT {};
   auto textSize = SIZE {};
   GetWindowRect(OKButton, &okRect);
-  auto const winName = displayText::loadStr(IDS_DELST2);
+  auto const winName = loadStr(IDS_DELST2);
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);
   DeleteStitchesDialog = CreateWindow(L"STATIC",
                                       winName.c_str(),
@@ -393,7 +393,7 @@ void displayText::tomsg() {
                                       nullptr,
                                       ThrEdInstance,
                                       nullptr);
-  displayText::updateWinFont(MainStitchWin);
+  updateWinFont(MainStitchWin);
 }
 
 void di::bxtxt(uint32_t iButton, uint32_t iMessage) {

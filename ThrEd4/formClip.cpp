@@ -168,7 +168,7 @@ void fci::sizclp(FRM_HEAD const& form,
 	fileSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
   if ((form.fillType != 0U) || (form.edgeType != 0U)) {
-	formStitchCount = fci::frmcnt(ClosestFormToCursor, formFirstStitchIndex);
+	formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
 	length += formStitchCount;
 	fileSize += length * wrap::sizeofType(StitchBuffer);
   }
@@ -189,7 +189,7 @@ void fci::clipSelectedForm() {
   auto        length      = 0U;
   auto        clipSize    = 0U;
   auto const& form        = FormList->operator[](ClosestFormToCursor);
-  fci::sizclp(form, firstStitch, stitchCount, length, clipSize);
+  sizclp(form, firstStitch, stitchCount, length, clipSize);
   clipSize += sizeof(FORM_CLIP);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto clipHandle = GlobalAlloc(GHND, clipSize);
@@ -264,14 +264,14 @@ void fci::clipSelectedForm() {
   auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
   auto const spData         = gsl::span<CLIP_STITCH> {clipStitchData, stitchCount};
   auto       iTexture       = firstStitch;
-  fci::savclp(spData[0], StitchBuffer->operator[](iTexture), length);
+  savclp(spData[0], StitchBuffer->operator[](iTexture), length);
   ++iTexture;
   auto       iDestination   = 1U;
   auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
   while (iTexture < StitchBuffer->size()) {
 	if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
 	    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
-	  fci::savclp(spData[iDestination++],
+	  savclp(spData[iDestination++],
 	              StitchBuffer->operator[](iTexture),
 	              (StitchBuffer->operator[](iTexture).attribute & COLMSK));
 	}
@@ -287,7 +287,7 @@ void fci::clipSelectedForms() {
   auto length = 0U;
   for (auto& selectedForm : (*SelectedFormList)) {
 	auto& currentForm = FormList->operator[](selectedForm);
-	length += fci::sizfclp(currentForm);
+	length += sizfclp(currentForm);
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto clipHandle = GlobalAlloc(GHND, length + sizeof(FORMS_CLIP));
@@ -435,11 +435,11 @@ void fci::clipSelectedForms() {
   auto const spData         = gsl::span<CLIP_STITCH> {clipStitchData, stitchCount};
   auto       iStitch        = 0U;
   auto       iDestination   = 0U;
-  fci::savclp(spData[0], astch[0], stitchCount);
+  savclp(spData[0], astch[0], stitchCount);
   ++iStitch;
   ++iDestination;
   while (iStitch < stitchCount) {
-	fci::savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
+	savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
 	++iStitch;
 	++iDestination;
   }
@@ -506,10 +506,10 @@ void fci::clipSelectedStitches() {
 	Clip                      = RegisterClipboardFormat(PcdClipFormat);
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span<CLIP_STITCH> {clipStitchData, length};
-	fci::savclp(spData[0], StitchBuffer->operator[](iSource), length);
+	savclp(spData[0], StitchBuffer->operator[](iSource), length);
 	++iSource;
 	for (auto iStitch = 1U; iStitch < length; ++iStitch) {
-	  fci::savclp(spData[iStitch],
+	  savclp(spData[iStitch],
 	              StitchBuffer->operator[](iSource),
 	              (StitchBuffer->operator[](iSource).attribute & COLMSK));
 	  ++iSource;
@@ -623,9 +623,9 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
 	return;
   }
   auto const spClipData = gsl::span<CLIP_STITCH> {clipStitchData, count};
-  fci::savclp(spClipData[0], ClipBuffer->operator[](0), count);
+  savclp(spClipData[0], ClipBuffer->operator[](0), count);
   for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-	fci::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
+	savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(Clip, clipHandle);
@@ -964,7 +964,7 @@ void fci::dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
 
 void fci::unpclp() {
   if (StateMap->testAndReset(StateFlag::SHOP)) {
-	fci::dupclp();
+	dupclp();
   }
 }
 

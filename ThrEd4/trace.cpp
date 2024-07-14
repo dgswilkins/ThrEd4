@@ -225,7 +225,7 @@ auto ti::trcin(COLORREF color) -> bool {
   if (color == 0U) {
 	return false;
   }
-  auto const colors = ti::trcols(color);
+  auto const colors = trcols(color);
   if (StateMap->test(StateFlag::TRCRED)) {
 	if (colors[0] > HighColors[0]) {
 	  return false;
@@ -266,20 +266,20 @@ void ti::showTraceWin() noexcept {
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
   for (auto const& iTraceControlWindow : TraceControlWindow) {
-	ti::shownd(iTraceControlWindow);
-	ti::shownd(*(iTraceSelectWindow++));
-	ti::shownd(*(iTraceUpWindow++));
-	ti::shownd(*(iTraceDownWindow++));
+	shownd(iTraceControlWindow);
+	shownd(*(iTraceSelectWindow++));
+	shownd(*(iTraceUpWindow++));
+	shownd(*(iTraceDownWindow++));
   }
 }
 
 void ti::tracwnd() {
   thred::hideColorWin();
-  ti::hidwnd(ButtonWin->operator[](HBOXSEL));
-  ti::hidwnd(ButtonWin->operator[](HUPTO));
-  ti::shownd(TraceStepWin);
-  ti::trcstpnum();
-  ti::trcratnum();
+  hidwnd(ButtonWin->operator[](HBOXSEL));
+  hidwnd(ButtonWin->operator[](HUPTO));
+  shownd(TraceStepWin);
+  trcstpnum();
+  trcratnum();
   displayText::clrhbut(4);
   showTraceWin();
 }
@@ -296,23 +296,23 @@ inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& destinat
 
 void ti::difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept {
   auto iTrcAdjClrs = TraceAdjacentColors.begin();
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 0 - center
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 0 - center
   std::advance(point, -bitmap::getBitmapWidth());
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 1 - N
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 1 - N
   std::advance(point, -1);
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
   std::advance(point, 2);
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
   std::advance(point, bitmap::getBitmapWidth());
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 4 - E
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 4 - E
   std::advance(point, -2);
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 5 - W
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 5 - W
   std::advance(point, bitmap::getBitmapWidth());
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
   std::advance(point, 1);
-  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 7 - S
+  difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 7 - S
   std::advance(point, 1);
-  ti::difsub(*point, shift, *iTrcAdjClrs); // pixel 8 - SE
+  difsub(*point, shift, *iTrcAdjClrs); // pixel 8 - SE
 }
 
 auto ti::trsum() -> uint32_t {
@@ -330,10 +330,10 @@ void ti::hideTraceWin() noexcept {
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
   for (auto const& iTraceControlWindow : TraceControlWindow) {
-	ti::hidwnd(iTraceControlWindow);
-	ti::hidwnd(*(iTraceSelectWindow++));
-	ti::hidwnd(*(iTraceUpWindow++));
-	ti::hidwnd(*(iTraceDownWindow++));
+	hidwnd(iTraceControlWindow);
+	hidwnd(*(iTraceSelectWindow++));
+	hidwnd(*(iTraceUpWindow++));
+	hidwnd(*(iTraceDownWindow++));
   }
 }
 
@@ -370,7 +370,7 @@ void trace::trdif() {
   }
   StateMap->reset(StateFlag::TRSET);
   StateMap->reset(StateFlag::HIDMAP);
-  trace::untrace();
+  untrace();
   auto const bitmapSize = bitmap::getBitmapHeight() * bitmap::getBitmapWidth();
   if (bitmapSize == 0U) {
 	return;
@@ -450,7 +450,7 @@ void trace::trace() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  trace::untrace();
+  untrace();
   ti::tracwnd();
   TraceDataSize    = bitmap::getrmap();
   auto const spTBD = gsl::span<uint32_t>(
@@ -545,7 +545,7 @@ void trace::trace() {
 
 void trace::tracedg() {
   if (!StateMap->test(StateFlag::WASTRAC)) {
-	trace::trace();
+	trace();
   }
   TracedEdges->resize(TraceDataSize, false);
   TracedEdges->reset();
@@ -904,7 +904,7 @@ void ti::dutrac() {
   auto           tracedPoints     = std::vector<TRACE_PNT> {};
   tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
                                     gsl::narrow<int16_t>(CurrentTracePoint.y)});
-  while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
+  while (trcbit(initialDirection, traceDirection, tracedPoints)) { }
   if (tracedPoints.size() >= POINTMAX) { // too many points
 	displayText::tabmsg(IDS_FRM2L, false);
 	return;
@@ -940,7 +940,7 @@ void trace::trinit() {
   }
   if (StateMap->test(StateFlag::TRSET)) {
 	StateMap->set(StateFlag::WASTRCOL);
-	trace::trace();
+	trace();
 	return;
   }
   StateMap->set(StateFlag::TRCRED);
@@ -1008,7 +1008,7 @@ void trace::trinit() {
   InvertUpColor  = PENWHITE;
   UpPixelColor   = 0U;
   StateMap->set(StateFlag::WASTRCOL);
-  trace::trace();
+  trace();
 }
 
 void trace::trcsel() {
@@ -1022,7 +1022,7 @@ void trace::trcsel() {
   StateMap->set(StateFlag::TRCGRN);
   DownPixelColor = PENWHITE;
   UpPixelColor   = 0;
-  trace::trace();
+  trace();
   StateMap->reset(StateFlag::HIDMAP);
   StateMap->reset(StateFlag::TRSET);
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
@@ -1057,13 +1057,13 @@ void ti::dutrnum0(uint32_t colNum) {
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
 	auto const itTraceUpWindow = wrap::next(TraceUpWindow.begin(), ColumnColor);
-	ti::ritrcol(InvertUpColor, colNum);
+	ritrcol(InvertUpColor, colNum);
 	UpPixelColor = InvertUpColor ^ COLMASK;
 	thred::redraw(*itTraceUpWindow);
   }
   else {
 	auto const itTraceDownWindow = wrap::next(TraceDownWindow.begin(), ColumnColor);
-	ti::ritrcol(InvertDownColor, colNum);
+	ritrcol(InvertDownColor, colNum);
 	DownPixelColor = InvertDownColor ^ COLMASK;
 	thred::redraw(*itTraceDownWindow);
   }
@@ -1177,10 +1177,10 @@ void ti::getColors() {
 
 void trace::tracpar() {
   if (StateMap->test(StateFlag::TRNIN0)) {
-	trace::dutrnum2();
+	dutrnum2();
   }
   if (StateMap->test(StateFlag::TRNIN1)) {
-	trace::dutrnum1();
+	dutrnum1();
   }
   TraceMsgPoint = POINT {WinMsg.pt.x - ThredWindowOrigin.x, WinMsg.pt.y - ThredWindowOrigin.y};
   if (TraceMsgPoint.x > ButtonWidthX3) {
@@ -1192,7 +1192,7 @@ void trace::tracpar() {
 	  ti::getColors();
 	  auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
 	  thred::redraw(*itTraceControlWindow);
-	  trace::trace();
+	  trace();
 	}
 	else {
 	  auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight);
@@ -1200,7 +1200,7 @@ void trace::tracpar() {
 		StateMap->flip(TraceRGBFlag.at(ColumnColor));
 		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
 		thred::redraw(*itTraceSelectWindow);
-		trace::trace();
+		trace();
 	  }
 	  else {
 		if (position < TRWINROW04) {
@@ -1234,7 +1234,7 @@ void trace::tracpar() {
 		  else {
 			switch (position) {
 			  case TRWINROW06: {
-				trace::trdif();
+				trdif();
 				break;
 			  }
 			  case TRWINROW07: {
@@ -1242,15 +1242,15 @@ void trace::tracpar() {
 				break;
 			  }
 			  case TRWINROW08: {
-				trace::blak();
+				blak();
 				break;
 			  }
 			  case TRWINROW09: {
-				trace::trcsel();
+				trcsel();
 				break;
 			  }
 			  case TRWINROW10: {
-				trace::tracedg();
+				tracedg();
 				break;
 			  }
 			  default: {
@@ -1373,13 +1373,13 @@ void trace::wasTrace() {
 
 void trace::wasTrace1() {
   if (StateMap->test(StateFlag::TRNIN0)) {
-	trace::dutrnum2();
+	dutrnum2();
   }
   if (StateMap->test(StateFlag::TRNIN1)) {
-	trace::dutrnum1();
+	dutrnum1();
   }
   if (!StateMap->test(StateFlag::WASEDG)) {
-	trace::tracpar();
+	tracpar();
   }
 }
 

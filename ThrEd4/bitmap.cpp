@@ -145,20 +145,20 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
 	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
 	CloseHandle(hBitmapFile);
-	bitmap::resetBmpFile(true);
+	resetBmpFile(true);
 	return;
   }
   auto bytesRead = DWORD {};
   if (!wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
 	auto errorCode = GetLastError();
 	CloseHandle(hBitmapFile);
-	bitmap::resetBmpFile(true);
+	resetBmpFile(true);
 	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil", errorCode);
 	return;
   }
   // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType != MB_SIG) {
-	bitmap::resetBmpFile(true);
+	resetBmpFile(true);
 	return;
   }
   auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
@@ -170,7 +170,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   }
   if (!bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
 	CloseHandle(hBitmapFile);
-	bitmap::resetBmpFile(true);
+	resetBmpFile(true);
 	displayText::tabmsg(IDS_BMAP, false);
 	return;
   }
@@ -312,7 +312,7 @@ constexpr auto bi::gudtyp(WORD bitCount) noexcept -> bool {
 }
 
 void bitmap::resetBmpFile(bool reset) {
-  if (!bitmap::ismap()) {
+  if (!ismap()) {
 	return;
   }
   DeleteObject(BitmapFileHandle);
@@ -361,7 +361,7 @@ auto bi::saveName(fs::path& fileName) {
 }
 
 void bitmap::savmap() {
-  if (bitmap::ismap() && (nullptr != TraceBitmapData)) {
+  if (ismap() && (nullptr != TraceBitmapData)) {
 	displayText::tabmsg(IDS_SHOMAP, false);
 	return;
   }
@@ -460,7 +460,7 @@ void bitmap::lodbmp(fs::path const& directory) {
   if (!bi::loadName(directory, *UTF16BMPname)) {
 	return;
   }
-  bitmap::resetBmpFile(false);
+  resetBmpFile(false);
   trace::untrace();
 #if USE_SHORT_NAME
   auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), nullptr, 0);
@@ -474,7 +474,7 @@ void bitmap::lodbmp(fs::path const& directory) {
 #endif
   if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	std::ranges::copy(saveFile, UTF8BMPname.begin());
-	bitmap::bfil(BackgroundColor);
+	bfil(BackgroundColor);
   }
   else {
 	// THR version 2 file can only store a 16 character filename
@@ -501,8 +501,8 @@ void bitmap::setBmpColor() {
 	return;
   }
   BitmapColor = bi::fswap(BitMapColorStruct.rgbResult);
-  if (bitmap::ismap()) {
-	bitmap::bfil(BackgroundColor);
+  if (ismap()) {
+	bfil(BackgroundColor);
   }
   thred::nuPen(BitmapPen, 1, BitmapColor);
   thred::zumhom();
@@ -517,11 +517,11 @@ void bitmap::setUBfilename(fs::path* fileName) noexcept {
 }
 
 void bitmap::assignUBFilename(fs::path const& directory) {
-  fs::current_path(directory);
+  current_path(directory);
   auto const bmpFileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
   auto const fullPath    = directory / bmpFileName;
   UTF16BMPname->assign(fullPath);
-  bitmap::bfil(BackgroundColor);
+  bfil(BackgroundColor);
 }
 
 auto bitmap::getBitmapSizeinStitches() noexcept -> F_POINT {
@@ -604,10 +604,10 @@ auto bitmap::ismap() noexcept -> bool {
 }
 
 void bitmap::chkbit() {
-  if (bitmap::ismap() && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
+  if (ismap() && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
                           StateMap->test(StateFlag::WASBLAK))) {
 	StateMap->set(StateFlag::WASESC);
-	bitmap::bfil(BackgroundColor);
+	bfil(BackgroundColor);
   }
 }
 
@@ -736,8 +736,8 @@ void bi::pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
   auto const vStart   = wrap::next(vertexIt, start);
   auto const vFinish  = wrap::next(vertexIt, finish);
 
-  line[0] = bi::stch2bit(*vStart);
-  line[1] = bi::stch2bit(*vFinish);
+  line[0] = stch2bit(*vStart);
+  line[1] = stch2bit(*vFinish);
   wrap::polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
   wrap::polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }

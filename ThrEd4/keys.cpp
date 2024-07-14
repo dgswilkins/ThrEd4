@@ -152,7 +152,7 @@ void kyi::ritcur() {
   GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
   if (currentCursor != mouse::getArrowCursor()) {
 	for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-	  auto const     bitmapInverse = kyi::byteSwap(*(iIBMB++));
+	  auto const     bitmapInverse = byteSwap(*(iIBMB++));
 	  auto           bitMask       = uint32_t {1U} << HBSHFT;
 	  constexpr auto BPINT         = 32; // bits in an uint32_t
 	  for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
@@ -169,8 +169,8 @@ void kyi::ritcur() {
 	return;
   }
   for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-	auto const     mask          = kyi::byteSwap(*(iBMB++));
-	auto const     bitmapInverse = kyi::byteSwap(*(iIBMB++));
+	auto const     mask          = byteSwap(*(iBMB++));
+	auto const     bitmapInverse = byteSwap(*(iIBMB++));
 	auto           bitMask       = uint32_t {1U} << HBSHFT;
 	constexpr auto BPINT         = 32; // bits in an uint32_t
 	for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
@@ -675,7 +675,7 @@ void kyi::handleShiftedRightKey() {
 auto kyi::handleRightKey(bool& retflag) -> bool {
   retflag = true;
   if (wrap::pressed(VK_SHIFT)) {
-	kyi::handleShiftedRightKey();
+	handleShiftedRightKey();
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
@@ -770,7 +770,7 @@ void kyi::handleShiftedLeftKey() {
 auto kyi::handleLeftKey(bool& retflag) -> bool {
   retflag = true;
   if (wrap::pressed(VK_SHIFT)) {
-	kyi::handleShiftedLeftKey();
+	handleShiftedLeftKey();
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
@@ -891,7 +891,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 	  break;
 	}
 	case VK_OEM_1: { // ';:' for US
-	  keys::movmrk();
+	  movmrk();
 	  break;
 	}
 	case VK_OEM_PLUS: { // '+' any country
@@ -912,7 +912,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 		xt::setfilend();
 		break;
 	  }
-	  keys::setmov();
+	  setmov();
 	  break;
 	}
 	case VK_OEM_2: { // '/?' for US
@@ -924,7 +924,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 		kyi::selfrm0();
 		break;
 	  }
-	  keys::ungrplo();
+	  ungrplo();
 	  break;
 	}
 	case VK_OEM_6: { //  ']}' for US
@@ -932,11 +932,11 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 		kyi::selfrmx();
 		break;
 	  }
-	  keys::ungrphi();
+	  ungrphi();
 	  break;
 	}
 	case VK_OEM_7: { //  ''"' for US
-	  keys::desiz();
+	  desiz();
 	  break;
 	}
 	case VK_F1: {

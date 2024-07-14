@@ -1002,7 +1002,7 @@ void thred::addColor(uint32_t stitch, uint32_t color) {
 }
 
 void thred::coltab() {
-  thred::resetColorChanges();
+  resetColorChanges();
   if (StitchBuffer->size() <= 1) {
 	return;
   }
@@ -1263,7 +1263,7 @@ void thred::movStch() {
   }
   MoveWindow(ColorBar, ThredWindowRect.right - *ColorBarSize, 0, *ColorBarSize, ThredWindowRect.bottom, TRUE);
   thi::nuRct();
-  thred::redrawColorBar();
+  redrawColorBar();
 }
 
 void thi::destroyBV() noexcept {
@@ -1395,7 +1395,7 @@ void thred::ilin() noexcept {
 
 void thred::xlin() {
   if (StateMap->testAndReset(StateFlag::ILIN)) {
-	thred::ilin();
+	ilin();
   }
 }
 
@@ -1408,14 +1408,14 @@ void thred::ilin1() noexcept {
 
 void thred::xlin1() {
   if (StateMap->testAndReset(StateFlag::ILIN1)) {
-	thred::ilin1();
+	ilin1();
   }
 }
 
 void thred::endpnt(POINT const& stitchCoordsInPixels) {
-  thred::unbox();
-  thred::xlin();
-  thred::xlin1();
+  unbox();
+  xlin();
+  xlin1();
   StateMap->set(StateFlag::LIN1);
   StateMap->set(StateFlag::INSRT);
   StateMap->reset(StateFlag::GRPSEL);
@@ -1425,11 +1425,11 @@ void thred::endpnt(POINT const& stitchCoordsInPixels) {
 
 void thred::duIns() {
   InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  InsertLine[0] = thred::stch2px1(ClosestPointIndex);
-  InsertLine[2] = thred::stch2px1(ClosestPointIndex + 1U);
-  thred::xlin();
+  InsertLine[0] = stch2px1(ClosestPointIndex);
+  InsertLine[2] = stch2px1(ClosestPointIndex + 1U);
+  xlin();
   StateMap->set(StateFlag::ILIN);
-  thred::ilin();
+  ilin();
 }
 
 void thi::movins() {
@@ -1450,7 +1450,7 @@ void thred::zumhom() {
   ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
-  thred::movStch();
+  movStch();
   NearestCount = 0;
   if (StateMap->test(StateFlag::RUNPAT)) {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
@@ -1460,14 +1460,14 @@ void thred::zumhom() {
   if (StateMap->test(StateFlag::SELBOX)) {
 	thi::shft2box();
   }
-  thred::duzrat();
+  duzrat();
   thi::movins();
 }
 
 void thred::hupfn() {
   auto checkHoopRect = F_RECTANGLE {}; // for checking the hoop size
   StateMap->reset(StateFlag::HUPCHNG);
-  thred::stchrct(checkHoopRect);
+  stchrct(checkHoopRect);
   if (!FormList->empty()) {
 	if (StitchBuffer->empty()) {
 	  auto const itVertex  = FormVertices->cbegin();
@@ -1521,12 +1521,12 @@ void thred::hupfn() {
   }
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   ZoomMin      = MINZUMF / wrap::toFloat(UnzoomedRect.cx);
-  thred::zumhom();
+  zumhom();
 }
 
 void thred::chkhup() {
   StateMap->set(StateFlag::HUPEX);
-  thred::hupfn();
+  hupfn();
   if (StateMap->test(StateFlag::INIT)) {
 	formForms::prfmsg();
   }
@@ -1595,7 +1595,7 @@ void thi::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			form::nufthcol((wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
-			thi::setSideWinVal(LFTHCOL);
+			setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
 		  thred::unsid();
@@ -1649,7 +1649,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.edgeSpacing = value;
 		  thred::unsid();
-		  thi::setSideWinVal(LBRDPIC);
+		  setSideWinVal(LBRDPIC);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -1657,7 +1657,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
 		  thred::unsid();
-		  thi::setSideWinVal(LFRMFAZ);
+		  setSideWinVal(LFRMFAZ);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -1665,7 +1665,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.edgeStitchLen = value * IPFGRAN;
 		  thred::unsid();
-		  thi::setSideWinVal(LBRDPOS);
+		  setSideWinVal(LBRDPOS);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -1673,7 +1673,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.maxFillStitchLen = value;
 		  thred::unsid();
-		  thi::setSideWinVal(LMAXFIL);
+		  setSideWinVal(LMAXFIL);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -1681,7 +1681,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.minFillStitchLen = value;
 		  thred::unsid();
-		  thi::setSideWinVal(LMINFIL);
+		  setSideWinVal(LMINFIL);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -1689,7 +1689,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.maxBorderStitchLen = value;
 		  thred::unsid();
-		  thi::setSideWinVal(LMAXBRD);
+		  setSideWinVal(LMAXBRD);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -1697,7 +1697,7 @@ void thi::chknum() {
 		  thred::savdo();
 		  form.minBorderStitchLen = value;
 		  thred::unsid();
-		  thi::setSideWinVal(LMINBRD);
+		  setSideWinVal(LMINBRD);
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
@@ -2344,15 +2344,15 @@ void thred::rstAll() {
   if (util::closeEnough(ZoomFactor, 1.0F)) {
 	StateMap->reset(StateFlag::ZUMED);
   }
-  thred::movStch();
+  movStch();
   ShowWindow(MainStitchWin, SW_SHOWNORMAL);
-  thred::unbsho();
+  unbsho();
   StateMap->reset(StateFlag::SIDACT);
-  thred::unsid();
+  unsid();
   StateMap->reset(StateFlag::PRFACT);
   StateMap->reset(StateFlag::WASRT);
   DestroyWindow(PreferencesWindow);
-  thred::undat();
+  undat();
   if (StateMap->testAndReset(StateFlag::INSFRM)) {
 	thi::insadj();
   }
@@ -2368,7 +2368,7 @@ void thred::rstAll() {
   if (!SelectedFormList->empty()) {
 	SelectedFormList->clear();
   }
-  thred::unmsg();
+  unmsg();
   SearchLine->clear();
   SearchLine->shrink_to_fit();
   FirstWin = nullptr;
@@ -2495,7 +2495,7 @@ void thred::lenCalc() {
 	displayText::butxt(HCOR, blank);
 	return;
   }
-  thred::rngadj();
+  rngadj();
   if (StateMap->test(StateFlag::GRPSEL) && GroupStartStitch != GroupEndStitch) {
 	thi::lenfn(GroupStartStitch, GroupEndStitch - 1U, LargestStitchIndex, SmallestStitchIndex);
   }
@@ -2515,7 +2515,7 @@ auto thi::chk2of() -> bool {
 }
 
 auto thi::find1st() -> uint32_t {
-  if (thi::chk2of()) {
+  if (chk2of()) {
 	return ClosestPointIndex;
   }
   return thred::findFirstStitch(ClosestFormToCursor);
@@ -2527,7 +2527,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
   auto const minStitchLength = SmallStitchLength * SmallStitchLength;
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	auto iPrevStitch = thi::find1st();
+	auto iPrevStitch = find1st();
 	auto iStitch     = iPrevStitch + 1U;
 	auto lastStitch  = StitchBuffer->size();
 	--lastStitch;
@@ -2660,12 +2660,12 @@ void thred::duzero() {
 	  ++iDestination;
 	}
 	StitchBuffer->erase(iDestination, StitchBuffer->end());
-	thred::coltab();
+	coltab();
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rngadj();
+	rngadj();
 	thi::delsmal(GroupStartStitch, GroupEndStitch);
   }
   else {
@@ -2851,11 +2851,11 @@ void thi::nuselrct() {
 
 void thred::grpAdj() {
   thi::uncros();
-  thred::unsel();
-  thred::rngadj();
+  unsel();
+  rngadj();
   thi::ducros(StitchWindowDC);
-  thred::lenCalc();
-  thred::selRct(StitchRangeRect);
+  lenCalc();
+  selRct(StitchRangeRect);
   if (!StateMap->test(StateFlag::ZUMED) || GroupEndStitch == GroupStartStitch) {
 	StateMap->set(StateFlag::RESTCH);
 	return;
@@ -2892,7 +2892,7 @@ void thred::grpAdj() {
 	ZoomRect.top                    = wrap::toFloat(UnzoomedRect.cy);
 	StateMap->reset(StateFlag::ZUMED);
 	ZoomFactor = 1.0;
-	thred::movStch();
+	movStch();
   }
   else {
 	ZoomRect.right = ZoomRect.left + newSize.x;
@@ -2901,7 +2901,7 @@ void thred::grpAdj() {
 	auto const stitchPoint =
 	    F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
 	             ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
-	thred::shft(stitchPoint);
+	shft(stitchPoint);
   }
   StateMap->set(StateFlag::RESTCH);
 }
@@ -2914,8 +2914,8 @@ void thred::nuAct(uint32_t iStitch) noexcept {
   else {
 	ActiveColor = 0;
   }
-  thred::redraw(UserColorWin->operator[](color));
-  thred::redraw(UserColorWin->operator[](ActiveColor));
+  redraw(UserColorWin->operator[](color));
+  redraw(UserColorWin->operator[](ActiveColor));
 }
 
 void thi::lensadj() {
@@ -3024,7 +3024,7 @@ void thred::dubox(POINT const& stitchCoordsInPixels) {
   StateMap->reset(StateFlag::ELIN);
   StateMap->set(StateFlag::SELBOX);
   StateMap->reset(StateFlag::FRMPSEL);
-  thred::redrawColorBar();
+  redrawColorBar();
   displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 }
 
@@ -3167,12 +3167,12 @@ void thred::reldun() {
 
 auto thi::chkattr(fs::path const& filename) -> bool {
   constexpr auto WRBITS = (fs::perms::owner_write | fs::perms::others_write | fs::perms::group_write); // Write permissions bits
-  if (fs::space(filename.parent_path()).available == 0U) {
+  if (space(filename.parent_path()).available == 0U) {
 	StateMap->set(StateFlag::NOTFREE);
 	return true;
   }
   StateMap->reset(StateFlag::NOTFREE);
-  auto const writePerms = fs::status(filename).permissions() & WRBITS;
+  auto const writePerms = status(filename).permissions() & WRBITS;
   if (writePerms != fs::perms::none) {
 	return false;
   }
@@ -3182,7 +3182,7 @@ auto thi::chkattr(fs::path const& filename) -> bool {
   if (buttonPressed != IDYES) {
 	return true;
   }
-  fs::permissions(filename, WRBITS, fs::perm_options::add);
+  permissions(filename, WRBITS, fs::perm_options::add);
   return false;
 }
 
@@ -3586,7 +3586,7 @@ void thred::savAs() {
 
 void thred::save() {
   if (WorkingFileName->empty()) {
-	thred::savAs();
+	savAs();
 	return;
   }
   if (WorkingFileName->extension().empty()) {
@@ -3604,13 +3604,13 @@ void thred::dun() {
 	DestroyWindow(PreferencesWindow);
 	StateMap->reset(StateFlag::WASRT);
   }
-  thred::unsid();
-  thred::unbsho();
-  thred::rstAll();
+  unsid();
+  unbsho();
+  rstAll();
   gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
   if (thi::savcmp() || (!balaradName0->empty())) {
-	thred::reldun();
+	reldun();
 	return;
   }
   if (StitchWindowClientRect.right != 0) {
@@ -3620,9 +3620,9 @@ void thred::dun() {
   }
   auto const fmtStr = displayText::format(IDS_SAVFIL, ThrName->wstring());
   if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
-	thred::save();
+	save();
   }
-  thred::reldun();
+  reldun();
 }
 
 void thi::dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize) {
@@ -3898,7 +3898,7 @@ void thi::unthum() {
   if (!StateMap->testAndReset(StateFlag::THUMSHO)) {
 	return;
   }
-  thi::destroyBV();
+  destroyBV();
   if (StateMap->test(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
@@ -4012,7 +4012,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 
 auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
   auto eCode = std::error_code {};
-  size       = fs::file_size(newFileName, eCode);
+  size       = file_size(newFileName, eCode);
   if (eCode != std::error_code {}) {
 	// ToDo - find better error message
 	displayText::filnopn(IDS_FNOPN, newFileName);
@@ -4296,7 +4296,7 @@ void thi::resetState() {
   if (!FormList->empty()) {
 	form::delfrms();
   }
-  thi::unthum();
+  unthum();
   thred::unbsho();
   bitmap::resetBmpFile(true);
   TexturePointsBuffer->clear();
@@ -4389,7 +4389,7 @@ void thi::nuFil(FileIndices fileIndex) {
   for (auto const& color : UserColor) {
 	thred::nuPen(*itUserPen, 1, color);
 	++itUserPen;
-	thi::nuBrush(*ucb, color);
+	nuBrush(*ucb, color);
 	++ucb;
 	buffer[0] = *(itThreadSize++);
 	SetWindowText(*(tsw++), buffer.data());
@@ -4477,9 +4477,9 @@ void thred::zumin() {
 	ZoomFactor = ZoomMin;
   }
   if (!StateMap->testAndSet(StateFlag::ZUMED)) {
-	thred::movStch();
+	movStch();
   }
-  auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
+  auto stitchPoint = pxCor2stch(WinMsg.pt);
   if (!StateMap->testAndReset(StateFlag::BZUMIN)) { // zoom box is not active
 	while (true) {
 	  if (StateMap->test(StateFlag::GMRK)) { // zoom to the mark
@@ -4506,7 +4506,7 @@ void thred::zumin() {
 	  }
 	  if (StateMap->test(StateFlag::GRPSEL)) { // zoom to the selected group of stitches
 		auto groupBoundingRect = F_RECTANGLE {};
-		thred::selRct(groupBoundingRect);
+		selRct(groupBoundingRect);
 		stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 		                       wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 		break;
@@ -4551,7 +4551,7 @@ void thred::zumin() {
 		                       wrap::midl(SelectedFormsRect.top, SelectedFormsRect.bottom)};
 		break;
 	  }
-	  if (!thred::inStitchWin()) { // nothing is selected or active, so zoom to the center of the hoop
+	  if (!inStitchWin()) { // nothing is selected or active, so zoom to the center of the hoop
 		stitchPoint = thi::centr();
 	  }
 	  break;
@@ -4559,7 +4559,7 @@ void thred::zumin() {
   }
   auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
   ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
-  thred::shft(stitchPoint);
+  shft(stitchPoint);
   NearestCount = 0;
   if (!StateMap->test(StateFlag::GMRK) && StateMap->test(StateFlag::SELBOX)) {
 	thi::shft2box();
@@ -4568,18 +4568,18 @@ void thred::zumin() {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	RunPoint = 0;
   }
-  thred::duzrat();
+  duzrat();
   thi::movins();
   StateMap->set(StateFlag::RESTCH);
-  thred::ilin();
+  ilin();
 }
 
 void thred::zumshft() {
   if (StateMap->test(StateFlag::ZUMED)) {
 	thi::unboxs();
-	if (thred::inStitchWin()) {
+	if (inStitchWin()) {
 	  NearestCount = 0;
-	  thred::shft(thred::pxCor2stch(WinMsg.pt));
+	  shft(pxCor2stch(WinMsg.pt));
 	  if (StateMap->test(StateFlag::RUNPAT)) {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		RunPoint = 0;
@@ -4592,7 +4592,7 @@ void thred::zumshft() {
 
 void thred::zumout() {
   thi::unboxs();
-  auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
+  auto stitchPoint = pxCor2stch(WinMsg.pt);
   if (!StateMap->test(StateFlag::ZUMED)) {
 	return;
   }
@@ -4621,7 +4621,7 @@ void thred::zumout() {
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  auto groupBoundingRect = F_RECTANGLE {};
-	  thred::selRct(groupBoundingRect);
+	  selRct(groupBoundingRect);
 	  stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 	                         wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 	  break;
@@ -4630,7 +4630,7 @@ void thred::zumout() {
 	  thi::shft2box();
 	  break;
 	}
-	if (!thred::inStitchWin()) {
+	if (!inStitchWin()) {
 	  stitchPoint = thi::centr();
 	}
 	break;
@@ -4641,20 +4641,20 @@ void thred::zumout() {
 	ZoomFactor = 1;
 	StateMap->reset(StateFlag::ZUMED);
 	ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
-	thred::movStch();
+	movStch();
 	NearestCount = 0;
   }
   else {
 	auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
 	ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
-	thred::shft(stitchPoint);
+	shft(stitchPoint);
   }
   if (StateMap->test(StateFlag::RUNPAT)) {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	RunPoint = 0;
   }
   StateMap->set(StateFlag::RESTCH);
-  thred::duzrat();
+  duzrat();
   thi::movins();
 }
 
@@ -4687,8 +4687,8 @@ void thred::closPnt() {
   auto gapToNearest = std::vector<float> {};           // distances of the closest points
   gapToNearest.resize(NearestPoint->size(), BIGFLOAT); // to a mouse click
   NearestPoint->assign(NearestPoint->size(), BIGUINT);
-  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
-  for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
+  auto const stitchPoint = pxCor2stch(WinMsg.pt);
+  for (auto iColor = size_t {}; iColor < maxColor(); ++iColor) {
 	auto const iStitch0 = ColorChangeTable->operator[](iColor).stitchIndex;
 
 	auto const iStitch1 =
@@ -4718,7 +4718,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   auto const pointToCheck =
       POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto stitchCoordsInPixels = POINT {};
-  if (StateMap->test(StateFlag::SELBOX) && thred::stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+  if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	if (std::hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
 	  closestStitch = ClosestPointIndex;
 	  return true;
@@ -4739,7 +4739,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 	  ++npo;
 	}
   }
-  auto const stitchPoint     = thred::pxCor2stch(WinMsg.pt);
+  auto const stitchPoint     = pxCor2stch(WinMsg.pt);
   auto       distanceToClick = BIGFLOAT;
   if (StateMap->test(StateFlag::HID)) {
 	auto const maxIt = wrap::next(ColorChangeTable->end(), -1);
@@ -4792,7 +4792,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   if (util::closeEnough(distanceToClick, BIGFLOAT)) {
 	return false;
   }
-  thred::stch2px(closestIndex, stitchCoordsInPixels);
+  stch2px(closestIndex, stitchCoordsInPixels);
   if (StateMap->test(StateFlag::IGNTHR)) {
 	closestStitch = closestIndex;
 	return true;
@@ -4806,7 +4806,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 
 auto thred::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
   auto iColor = 0U;
-  for (; iColor < thred::maxColor(); ++iColor) {
+  for (; iColor < maxColor(); ++iColor) {
 	if (ColorChangeTable->operator[](iColor).stitchIndex > iStitch) {
 	  break;
 	}
@@ -4848,7 +4848,7 @@ void thred::toglup() {
 	return;
   }
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
-	thred::rngadj();
+	rngadj();
 	ClosestPointIndex = GroupStartStitch;
 	StateMap->set(StateFlag::SELBOX);
 	StateMap->reset(StateFlag::FRMPSEL);
@@ -4857,7 +4857,7 @@ void thred::toglup() {
 	if (!StateMap->test(StateFlag::SELBOX)) {
 	  ClosestPointIndex = 0;
 	  if (StateMap->testAndReset(StateFlag::FORMSEL)) {
-		ClosestPointIndex = thred::findFirstStitch(ClosestFormToCursor);
+		ClosestPointIndex = findFirstStitch(ClosestFormToCursor);
 		StateMap->set(StateFlag::SELBOX);
 		StateMap->reset(StateFlag::FRMPSEL);
 	  }
@@ -4875,7 +4875,7 @@ void thred::toglHid() {
 	StateMap->set(StateFlag::FRMOF);
   }
   thi::unthum();
-  thred::redraw(ButtonWin->operator[](HHID));
+  redraw(ButtonWin->operator[](HHID));
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -4913,8 +4913,8 @@ void thred::movbox() {
 	return;
   }
   auto stitchCoordsInPixels = POINT {};
-  if (thred::stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
-	thred::unbox();
+  if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+	unbox();
 #ifdef _DEBUG
 	auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
 	outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
@@ -4924,7 +4924,7 @@ void thred::movbox() {
 	               stitch.x,
 	               stitch.y);
 #endif
-	thred::dubox(stitchCoordsInPixels);
+	dubox(stitchCoordsInPixels);
 	if (StateMap->test(StateFlag::UPTO)) {
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -4935,7 +4935,7 @@ void thred::movbox() {
 	StateMap->reset(StateFlag::FRMPSEL);
 	StateMap->set(StateFlag::RESTCH);
   }
-  thred::nuAct(ClosestPointIndex);
+  nuAct(ClosestPointIndex);
   thi::ritcor(StitchBuffer->operator[](ClosestPointIndex));
 }
 
@@ -5026,7 +5026,7 @@ auto thred::closlin() -> uint32_t {
   offset         = (ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right);
   auto       sum = BIGFLOAT;
   auto const tolerance = offset * TLFACTOR;
-  for (auto iChange = size_t {}; iChange < thred::maxColor(); ++iChange) {
+  for (auto iChange = size_t {}; iChange < maxColor(); ++iChange) {
 	auto stitchCount =
 	    gsl::narrow_cast<ptrdiff_t>(std::abs(ColorChangeTable->operator[](iChange + 1U).stitchIndex -
 	                                         ColorChangeTable->operator[](iChange).stitchIndex));
@@ -5164,8 +5164,8 @@ void thred::selCol() {
 	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
   }
   StateMap->set(StateFlag::GRPSEL);
-  thred::unbox();
-  thred::grpAdj();
+  unbox();
+  grpAdj();
   ActiveColor = color;
   StateMap->set(StateFlag::RESTCH);
 }
@@ -5184,12 +5184,12 @@ void thred::newFil() {
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   thi::rstdu();
-  thred::rstAll();
+  rstAll();
   displayText::clrhbut(3);
   StateMap->reset(StateFlag::MOVSET);
-  thred::unbox();
-  thred::xlin();
-  thred::xlin1();
+  unbox();
+  xlin();
+  xlin1();
   StateMap->reset(StateFlag::INIT);
   StateMap->reset(StateFlag::INSRT);
   StateMap->reset(StateFlag::LIN1);
@@ -5210,15 +5210,15 @@ void thred::newFil() {
   SatinGuides->shrink_to_fit();
   FormList->clear();
   FormList->shrink_to_fit();
-  thred::resetColorChanges();
+  resetColorChanges();
   Knots->clear();
   WorkingFileName->clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	thred::redraw(DefaultColorWin->operator[](iColor));
-	thred::redraw(UserColorWin->operator[](iColor));
-	thred::redraw(ThreadSizeWin->operator[](iColor));
+	redraw(DefaultColorWin->operator[](iColor));
+	redraw(UserColorWin->operator[](iColor));
+	redraw(ThreadSizeWin->operator[](iColor));
   }
-  thred::zumhom();
+  zumhom();
 }
 
 void thred::bBox() noexcept(std::is_same_v<size_t, uint32_t>) {
@@ -5230,19 +5230,19 @@ void thred::bBox() noexcept(std::is_same_v<size_t, uint32_t>) {
 
 void thred::unbBox() {
   if (StateMap->testAndReset(StateFlag::BZUM)) {
-	thred::bBox();
+	bBox();
   }
 }
 
 void thred::rebox() {
-  thred::unbox();
-  if (!thred::closPnt1(ClosestPointIndex)) {
+  unbox();
+  if (!closPnt1(ClosestPointIndex)) {
 	return;
   }
-  thred::nuAct(ClosestPointIndex);
+  nuAct(ClosestPointIndex);
   auto stitchCoordsInPixels = POINT {};
-  if (thred::stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
-	thred::dubox(stitchCoordsInPixels);
+  if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+	dubox(stitchCoordsInPixels);
 	outDebugString(L"rebox:Stitch [{}] form [{}] type [{}]\n",
 	               ClosestPointIndex,
 	               ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
@@ -5255,14 +5255,14 @@ void thred::rebox() {
 	SearchLine->shrink_to_fit();
 	StateMap->set(StateFlag::RESTCH);
 	for (auto const& window : *UserColorWin) {
-	  thred::redraw(window);
+	  redraw(window);
 	}
   }
   thi::ritcor(StitchBuffer->operator[](ClosestPointIndex));
 }
 
 void thred::delstchm() {
-  thred::rngadj();
+  rngadj();
   auto const start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
   auto const end   = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
   StitchBuffer->erase(start, end);
@@ -5283,7 +5283,7 @@ void thred::unclp() {
 
 void thred::clpbox() {
   auto const ratio = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-  auto       stitchPoint = thred::pxCor2stch(WinMsg.pt);
+  auto       stitchPoint = pxCor2stch(WinMsg.pt);
   auto const unzoomedX   = wrap::toFloat(UnzoomedRect.cx);
   if (stitchPoint.x + ClipRectSize.cx > unzoomedX) {
 	stitchPoint.x = unzoomedX - ClipRectSize.cx;
@@ -5313,7 +5313,7 @@ void thred::rSelbox() {
       SIZE {gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cx) * ratio)),
             gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cy) * ratio))};
   unsel();
-  auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
+  auto stitchPoint = pxCor2stch(WinMsg.pt);
   if (stitchPoint.x - wrap::toFloat(SelectBoxOffset.x + SelectBoxSize.cx) >=
       wrap::toFloat(UnzoomedRect.cx)) {
 	stitchPoint.x = wrap::toFloat(UnzoomedRect.cx - SelectBoxSize.cx + SelectBoxOffset.x);
@@ -5345,7 +5345,7 @@ void thred::rSelbox() {
 }
 
 void thred::duSelbox() noexcept {
-  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
+  auto const stitchPoint = pxCor2stch(WinMsg.pt);
 
   SelectBoxSize = {std::lround(StitchRangeRect.right - StitchRangeRect.left),
                    std::lround(StitchRangeRect.top - StitchRangeRect.bottom)};
@@ -5429,7 +5429,7 @@ void thred::durotu() noexcept(std::is_same_v<size_t, uint32_t>) {
 
 void thred::unrotu() {
   if (StateMap->testAndReset(StateFlag::ROTUSHO)) {
-	thred::durotu();
+	durotu();
   }
 }
 
@@ -5462,11 +5462,11 @@ void thi::rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngl
 auto thred::rotang1(F_POINT_ATTR const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
     -> F_POINT {
   auto const point = F_POINT {unrotatedPoint.x, unrotatedPoint.y};
-  return thred::rotangf(point, rotationAngle, rotationCenter);
+  return rotangf(point, rotationAngle, rotationCenter);
 }
 
 void thred::rotflt(F_POINT& point, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
-  point = thred::rotangf(point, rotationAngle, rotationCenter);
+  point = rotangf(point, rotationAngle, rotationCenter);
 }
 
 void thi::rotstch(F_POINT_ATTR& stitch, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
@@ -5504,7 +5504,7 @@ void thred::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
   rotationReference.y = rotationCenter.y;
   thi::rotang(rotationReference, rotated, rotationAngle, rotationCenter);
   RotateBoxCrossHorzLine[0] = rotated;
-  thred::sCor2px(rotationCenter, RotateBoxToCursorLine[0]);
+  sCor2px(rotationCenter, RotateBoxToCursorLine[0]);
   StateMap->set(StateFlag::ROTSHO);
   thi::durot();
 }
@@ -5518,7 +5518,7 @@ void thred::rot(F_POINT& rotationCenter) {
   }
   StateMap->set(StateFlag::ROTAT);
   rotationCenter = form::rotpar();
-  thred::ritrot(0, rotationCenter);
+  ritrot(0, rotationCenter);
 }
 
 void thi::delfstchs() {
@@ -5645,30 +5645,30 @@ void thred::delsfrms() {
   }
   SelectedFormList->clear();
   StateMap->reset(StateFlag::FORMSEL);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::cut() {
-  thred::savdo();
+  savdo();
   tfc::duclip();
   if (!SelectedFormList->empty()) {
 	StateMap->set(StateFlag::DELTO);
-	thred::delsfrms();
+	delsfrms();
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thi::delfstchs();
-	  thred::frmdel();
+	  frmdel();
 	}
 	else {
 	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::delstchm();
+		delstchm();
 	  }
 	}
   }
-  thred::coltab();
-  thred::rstAll();
+  coltab();
+  rstAll();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -5725,7 +5725,7 @@ void thred::stretch() {
 	return;
   }
   if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rngadj();
+	rngadj();
 	thi::doStretch(GroupStartStitch, GroupEndStitch);
 	return;
   }
@@ -5733,7 +5733,7 @@ void thred::stretch() {
 }
 
 void thred::contract() {
-  thred::savdo();
+  savdo();
 }
 
 void thred::unpat() {
@@ -5742,7 +5742,7 @@ void thred::unpat() {
   }
   ShowWindow(SpeedScrollBar, SW_HIDE);
   DestroyWindow(SpeedScrollBar);
-  thred::movStch();
+  movStch();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -5833,7 +5833,7 @@ void thred::delknot() {
   if (firstStitch == StitchBuffer->end()) {
 	return;
   }
-  thred::savdo();
+  savdo();
   // delete the knot stitches
   StitchBuffer->erase(std::remove_if(firstStitch,
                                      StitchBuffer->end(),
@@ -5841,7 +5841,7 @@ void thred::delknot() {
 	                                   return (stitch.attribute & KNOTMSK) != 0U;
                                      }),
                       StitchBuffer->end());
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -5928,14 +5928,14 @@ void thred::setknots() {
   if (StitchBuffer->empty()) {
 	return;
   }
-  thred::savdo();
+  savdo();
   thi::delknt();
   thi::setknt();
   thi::fndknt();
   thi::chkncol();
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
-  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+  ritot(wrap::toUnsigned(StitchBuffer->size()));
 }
 
 void thred::hidbit() {
@@ -6062,9 +6062,9 @@ void thred::deltot() {
   FormVertices->clear();
   SatinGuides->clear();
   StateMap->reset(StateFlag::GMRK);
-  thred::rstAll();
-  thred::coltab();
-  thred::zumhom();
+  rstAll();
+  coltab();
+  zumhom();
   auto const wTxt = displayText::format2(IDS_THRDBY, ThrName->wstring(), *DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
@@ -6139,9 +6139,9 @@ void thi::handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag) {
 }
 
 void thred::delet() {
-  thred::undat();
+  undat();
   if (StateMap->testAndReset(StateFlag::FPSEL)) {
-	thred::savdo();
+	savdo();
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
 	auto vertexMap         = boost::dynamic_bitset<>(form.vertexCount);
@@ -6216,11 +6216,11 @@ void thred::delet() {
 	return;
   }
   if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_SHIFT)) {
-	thred::deltot();
+	deltot();
 	thi::fndknt();
 	return;
   }
-  thred::savdo();
+  savdo();
   auto satinFlag = false;
   if (!SelectedFormList->empty()) {
 	if (thi::frmstch()) {
@@ -6230,7 +6230,7 @@ void thred::delet() {
 	  displayText::tomsg();
 	}
 	else {
-	  thred::delsfrms();
+	  delsfrms();
 	}
 	return;
   }
@@ -6243,7 +6243,7 @@ void thred::delet() {
 	}
 	else {
 	  StateMap->reset(StateFlag::DELTO);
-	  thred::frmdel();
+	  frmdel();
 	  StateMap->set(StateFlag::RESTCH);
 	}
 	thi::fndknt();
@@ -6253,23 +6253,23 @@ void thred::delet() {
 	if (StitchBuffer->size() > 2U) {
 	  thi::delstch1(ClosestPointIndex);
 	  if (!thi::stch2px2(ClosestPointIndex)) {
-		thred::movbox();
+		movbox();
 	  }
 	}
 	else {
 	  StitchBuffer->clear();
 	  StateMap->reset(StateFlag::SELBOX);
 	}
-	thred::coltab();
+	coltab();
 	xt::setfchk();
 	thi::fndknt();
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::delstchm();
-	thred::coltab();
-	thred::rstAll();
+	delstchm();
+	coltab();
+	rstAll();
 	xt::setfchk();
 	thi::fndknt();
 	StateMap->set(StateFlag::RESTCH);
@@ -6301,21 +6301,21 @@ void thred::delet() {
 	}
 	form.outline();
 	form::refil(ClosestFormToCursor);
-	thred::coltab();
+	coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
-  if (!satinFlag && thred::closPnt1(ClosestPointIndex)) {
+  if (!satinFlag && closPnt1(ClosestPointIndex)) {
 	if (StitchBuffer->size() > 2U) {
 	  thi::delstch1(ClosestPointIndex);
 	  if (!thi::stch2px2(ClosestPointIndex)) {
-		thred::movbox();
+		movbox();
 	  }
 	}
 	else {
 	  StitchBuffer->clear();
 	  StateMap->reset(StateFlag::SELBOX);
 	}
-	thred::coltab();
+	coltab();
 	xt::setfchk();
 	thi::fndknt();
 	StateMap->set(StateFlag::RESTCH);
@@ -6327,11 +6327,11 @@ void thred::delet() {
 void thred::movi() {
   constexpr auto MOVITIM = int32_t {12}; // default movie time
   if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rstAll();
+	rstAll();
 	StateMap->set(StateFlag::GRPSEL);
   }
   else {
-	thred::rstAll();
+	rstAll();
   }
   if (StitchBuffer->empty()) {
 	return;
@@ -6342,13 +6342,13 @@ void thred::movi() {
   }
   StateMap->set(StateFlag::RUNPAT);
   if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rngadj();
+	rngadj();
 	RunPoint = GroupStartStitch;
   }
   else {
 	RunPoint = 0;
   }
-  thred::movStch();
+  movStch();
   if (!StateMap->test(StateFlag::WASPAT)) {
 	SpeedScrollBar = CreateWindow(L"SCROLLBAR",
 	                              nullptr,
@@ -6469,7 +6469,7 @@ void thred::vubak() {
 	return;
   }
   StateMap->set(StateFlag::ZUMED);
-  thred::movStch();
+  movStch();
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
   auto const deltaX   = StitchWindowClientRect.right / 2;
   auto const deltaY   = StitchWindowClientRect.bottom / 2;
@@ -6553,7 +6553,7 @@ void thred::insfil(fs::path& insertedFile) {
   // ToDo - Should this be vertical ratio?
   InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
   auto const initialInsertPoint = POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
-  thred::insflin(initialInsertPoint);
+  insflin(initialInsertPoint);
   NewFormVertexCount = 5U; // inserted file is a rectangle NOLINT(readability-magic-numbers)
   StateMap->set(StateFlag::SHOFRM);
   StateMap->set(StateFlag::INSFIL);
@@ -6800,7 +6800,7 @@ void thi::getbak() {
   if (!StateMap->test(StateFlag::RBUT)) {
 	return;
   }
-  thi::unthum();
+  unthum();
   StateMap->set(StateFlag::FRMOF);
   *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(*WorkingFileName);
@@ -6815,7 +6815,7 @@ void thi::getbak() {
 }
 
 void thi::rebak() {
-  thi::destroyBV();
+  destroyBV();
   auto newFileName    = *ThrName;    // intentional copy
   auto safetyFileName = newFileName; // initialise from local variable
   auto ext            = newFileName.extension().wstring();
@@ -6824,7 +6824,7 @@ void thi::rebak() {
   ext.back() = 'x';
   safetyFileName.replace_extension(ext);
   fs::rename(*ThrName, safetyFileName);
-  if (fs::exists(newFileName)) {
+  if (exists(newFileName)) {
 	fs::rename(newFileName, *ThrName);
   }
   fs::rename(safetyFileName, newFileName);
@@ -6859,11 +6859,11 @@ void thred::purgdir() {
 }
 
 void thred::deldir() {
-  thred::unmsg();
+  unmsg();
   displayText::tabmsg(IDS_BAKDEL, false);
   auto backSpec = std::wstring {L".th0"};
   for (auto const& filePath : fs::directory_iterator(*DefaultDirectory)) {
-	if (!fs::is_directory(filePath)) {
+	if (!is_directory(filePath)) {
 	  auto fileExt    = filePath.path().extension().wstring();
 	  backSpec.back() = 's';
 	  for (auto iLastChar = wchar_t {}; iLastChar < OLDVER; ++iLastChar) {
@@ -6874,7 +6874,7 @@ void thred::deldir() {
 	  }
 	}
   }
-  thred::unmsg();
+  unmsg();
   displayText::tabmsg(IDS_BAKDT, false);
 }
 
@@ -6887,7 +6887,7 @@ auto thred::chkwnd(HWND window) noexcept -> bool {
 
 void thred::mv2f() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
-	thred::savdo();
+	savdo();
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	// since most of the stitches will be moved into the temp buffer, reserve the space
 	tempStitchBuffer.reserve(StitchBuffer->size());
@@ -6902,16 +6902,16 @@ void thred::mv2f() {
 	  }
 	}
 	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
-	thred::coltab();
+	coltab();
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
-	thred::savdo();
+	savdo();
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	auto const                grpSize = GroupEndStitch + 1U - GroupStartStitch;
 	tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
-	thred::rngadj();
+	rngadj();
 	std::copy(StitchBuffer->begin(),
 	          wrap::next(StitchBuffer->begin(), GroupStartStitch),
 	          tempStitchBuffer.begin());
@@ -6922,14 +6922,14 @@ void thred::mv2f() {
 	          wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
 	          StitchBuffer->begin());
 	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), grpSize));
-	thred::coltab();
+	coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
 }
 
 void thred::mv2b() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
-	thred::savdo();
+	savdo();
 	auto       tempStitchBuffer = std::vector<F_POINT_ATTR> {};
 	auto       iLowBuffer       = 0U;
 	auto const attribute        = ClosestFormToCursor << FRMSHFT;
@@ -6942,13 +6942,13 @@ void thred::mv2b() {
 	  }
 	}
 	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
-	thred::coltab();
+	coltab();
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
-	thred::savdo();
-	thred::rngadj();
+	savdo();
+	rngadj();
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	auto const                grpSize = GroupEndStitch + 1U - GroupStartStitch;
 	tempStitchBuffer.resize(grpSize);
@@ -6959,7 +6959,7 @@ void thred::mv2b() {
 	          StitchBuffer->end(),
 	          wrap::next(StitchBuffer->begin(), GroupStartStitch));
 	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
-	thred::coltab();
+	coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
 }
@@ -6999,8 +6999,8 @@ void thred::delinf() noexcept {
 }
 
 void thred::chkrng(F_POINT& range) {
-  thred::savdo();
-  thred::delinf();
+  savdo();
+  delinf();
   wrap::narrow(range.x, UnzoomedRect.cx);
   wrap::narrow(range.y, UnzoomedRect.cy);
   if (!FormList->empty()) {
@@ -7025,7 +7025,7 @@ void thred::chkrng(F_POINT& range) {
 	  }
 	}
 	StitchBuffer->resize(wrap::toSize(std::distance(StitchBuffer->begin(), iDestination)));
-	thred::coltab();
+	coltab();
 	return;
   }
   for (auto& stitch : *StitchBuffer) {
@@ -7106,7 +7106,7 @@ void thred::setpsel() {
 }
 
 void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
-  thred::savdo();
+  savdo();
   if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
 	auto&       form          = FormList->operator[](ClosestFormToCursor);
@@ -7115,18 +7115,18 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	// clang-format on
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 	  auto itVertex = wrap::next(vBegin, currentVertex);
-	  thred::rotflt(*itVertex, rotationAngle, rotationCenter);
+	  rotflt(*itVertex, rotationAngle, rotationCenter);
 	  currentVertex = form::pdir(form, currentVertex);
 	}
 	form.outline();
-	thred::setpsel();
+	setpsel();
 	form::refil(ClosestFormToCursor);
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
 	for (auto& formVertice : *FormVertices) {
-	  thred::rotflt(formVertice, rotationAngle, rotationCenter);
+	  rotflt(formVertice, rotationAngle, rotationCenter);
 	}
 	for (auto& stitch : *StitchBuffer) {
 	  thi::rotstch(stitch, rotationAngle, rotationCenter);
@@ -7144,7 +7144,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
+		rotflt(*itVertex, rotationAngle, rotationCenter);
 		++itVertex;
 	  }
 	  form.outline();
@@ -7158,7 +7158,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 
 	auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  thred::rotflt(*itVertex, rotationAngle, rotationCenter);
+	  rotflt(*itVertex, rotationAngle, rotationCenter);
 	  ++itVertex;
 	}
 	form.outline();
@@ -7169,7 +7169,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
   for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	thi::rotstch(StitchBuffer->operator[](iStitch), rotationAngle, rotationCenter);
   }
-  thred::rngadj();
+  rngadj();
   thi::selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
   StateMap->set(StateFlag::RESTCH);
 }
@@ -7233,7 +7233,7 @@ void thred::strtchbox(std::vector<POINT> const& stretchBoxLine) noexcept(std::is
 
 void thred::unstrtch(std::vector<POINT> const& stretchBoxLine) {
   if (StateMap->testAndReset(StateFlag::SHOSTRTCH)) {
-	thred::strtchbox(stretchBoxLine);
+	strtchbox(stretchBoxLine);
   }
 }
 
@@ -7272,12 +7272,12 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
 	formLines[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);
   }
   formLines[4] = formLines[0];
-  if (minimumLength < CLOSENUF && !thred::isLine(formLines)) {
+  if (minimumLength < CLOSENUF && !isLine(formLines)) {
 	for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
 	  stretchBoxLine[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);
 	}
 	stretchBoxLine[4] = stretchBoxLine[0];
-	thred::strtchbox(stretchBoxLine);
+	strtchbox(stretchBoxLine);
 	if ((SelectedFormControlVertex & 1U) != 0U) {
 	  StateMap->set(StateFlag::STRTCH);
 	}
@@ -7291,14 +7291,14 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
 	return true;
   }
   SelectedFormControlVertex >>= 1U;
-  if (thi::isInBox(pointToTest, SelectedFormsRect) || (minimumLength < CLOSENUF && thred::isLine(formLines))) {
+  if (thi::isInBox(pointToTest, SelectedFormsRect) || (minimumLength < CLOSENUF && isLine(formLines))) {
 	SelectedFormsSize = F_POINT {SelectedFormsRect.right - SelectedFormsRect.left,
 	                             SelectedFormsRect.bottom - SelectedFormsRect.top};
 	StateMap->set(StateFlag::MOVFRMS);
 	FormMoveDelta =
 	    F_POINT {pointToTest.x - SelectedFormsRect.left, pointToTest.y - SelectedFormsRect.top};
 	StateMap->set(StateFlag::SHOSTRTCH);
-	thred::strtchbox(stretchBoxLine);
+	strtchbox(stretchBoxLine);
 	return true;
   }
   return false;
@@ -7306,7 +7306,7 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
 
 void thred::delfre() {
   auto currentStitchCount = 0U;
-  thred::savdo();
+  savdo();
   // ToDo - this loop does not delete all free stitches. look at frmdel as well
   for (auto const& stitch : *StitchBuffer) {
 	if ((stitch.attribute & NOTFRM) == 0U) {
@@ -7314,7 +7314,7 @@ void thred::delfre() {
 	}
   }
   StitchBuffer->resize(currentStitchCount);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7398,7 +7398,7 @@ void thred::rembig() {
 	displayText::tabmsg(IDS_REM1, false);
 	return;
   }
-  thred::savdo();
+  savdo();
   while (true) {
 	if (!SelectedFormList->empty()) {
 	  auto range = RANGE {};
@@ -7417,7 +7417,7 @@ void thred::rembig() {
 	  break;
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
-	  thred::rngadj();
+	  rngadj();
 	  if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
 		++GroupEndStitch;
 	  }
@@ -7427,13 +7427,13 @@ void thred::rembig() {
 	  else {
 		ClosestPointIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
 	  }
-	  thred::grpAdj();
+	  grpAdj();
 	  break;
 	}
 	thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
 	break;
   }
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7479,7 +7479,7 @@ void thi::setsrch(bool end) {
 	CurrentStitchIndex = SmallestStitchIndex;
 	SortIndex          = 0U;
   }
-  thi::lensadj();
+  lensadj();
   displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
 
@@ -7531,10 +7531,10 @@ void thi::rthumnam(uint32_t iThumbnail) {
 
 void thred::thumnail() {
   auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-  thred::unbsho();
-  thred::undat();
+  unbsho();
+  undat();
   trace::untrace();
-  fs::current_path(*DefaultDirectory);
+  current_path(*DefaultDirectory);
   auto const searchName = *DefaultDirectory / L"*.thr";
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const file = FindFirstFile(searchName.wstring().c_str(), &fileData);
@@ -7569,7 +7569,7 @@ void thred::thumnail() {
   SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
-  thred::vubak();
+  vubak();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7586,7 +7586,7 @@ void thred::nuthsel() {
 	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
 	  if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
-		thred::redraw(*itHWndBV);
+		redraw(*itHWndBV);
 		++itHWndBV;
 		++iThumbnail;
 	  }
@@ -7597,7 +7597,7 @@ void thred::nuthsel() {
 	auto itHWndBV = BackupViewer.begin();
 	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
 	  ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
-	  thred::redraw(*itHWndBV);
+	  redraw(*itHWndBV);
 	  ++itHWndBV;
 	  ++iThumbnail;
 	  ++ThumbnailIndex;
@@ -7639,7 +7639,7 @@ void thred::nuthbak(uint32_t count) {
   if (ThumbnailIndex > MAXFORMS) {
 	ThumbnailIndex = 0;
   }
-  thred::nuthsel();
+  nuthsel();
 }
 
 void thi::nuthum(wchar_t character) {
@@ -7663,7 +7663,7 @@ void thred::thumbBack() {
   ThumbnailIndex                = 0;
   auto const txt                = std::wstring(ThumbnailSearchString->data());
   displayText::butxt(HBOXSEL, txt);
-  thred::nuthsel();
+  nuthsel();
 }
 
 void thred::selalstch() {
@@ -7677,12 +7677,12 @@ void thred::selalstch() {
   StateMap->set(StateFlag::GRPSEL);
   StateMap->set(StateFlag::SCROS);
   StateMap->set(StateFlag::ECROS);
-  thred::grpAdj();
+  grpAdj();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::duinsfil() {
-  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
+  auto const stitchPoint = pxCor2stch(WinMsg.pt);
   auto const offset      = F_POINT {stitchPoint.x - InsertCenter.x, stitchPoint.y - InsertCenter.y};
   for (auto iForm = InsertedFormIndex; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& formRectangle = FormList->operator[](iForm).rectangle;
@@ -7699,7 +7699,7 @@ void thred::duinsfil() {
   }
   StateMap->reset(StateFlag::FRMOF);
   StateMap->set(StateFlag::INIT);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7707,7 +7707,7 @@ void thred::gotbox() {
   StateMap->reset(StateFlag::BZUMIN);
   StateMap->reset(StateFlag::BOXSLCT);
   StateMap->reset(StateFlag::FRMPSEL);
-  thred::grpAdj();
+  grpAdj();
 }
 
 void thred::nucols() {
@@ -7829,7 +7829,7 @@ void thred::fop() {
   if (!FormList->empty() || (!StitchBuffer->empty())) {
 	if (thi::savcmp()) {
 	  thi::nuFil(FileIndices::THR);
-	  thred::showOnlyLayer(0U);
+	  showOnlyLayer(0U);
 	}
 	else {
 	  displayText::savdisc();
@@ -7838,7 +7838,7 @@ void thred::fop() {
   }
   else {
 	thi::nuFil(FileIndices::THR);
-	thred::showOnlyLayer(0U);
+	showOnlyLayer(0U);
   }
 }
 
@@ -7862,7 +7862,7 @@ void thred::clpadj() {
 	displayText::shoseln(IDS_GRPMSG, IDS_RNGEND);
 	return;
   }
-  thred::rngadj();
+  rngadj();
   auto iStitch          = GroupStartStitch;
   auto clipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
                                        StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
@@ -7889,14 +7889,14 @@ void thred::clpadj() {
 	StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.left;
 	StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.right;
   }
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::shftflt(F_POINT const& point) noexcept {
   if (point.x <= ZoomRect.left || point.x >= ZoomRect.right || point.y <= ZoomRect.bottom ||
       point.y >= ZoomRect.top) {
-	thred::shft(point);
+	shft(point);
   }
 }
 
@@ -8094,7 +8094,7 @@ void thred::rotmrk() {
 	}
   }
   else {
-	thred::rngadj();
+	rngadj();
 	auto const originalAngle =
 	    std::atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
 	               StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
@@ -8129,7 +8129,7 @@ void thred::rotseg() {
 
 void thred::pntmrk() {
   if (StateMap->test(StateFlag::SELBOX)) {
-	thred::dumrk(StitchBuffer->operator[](ClosestPointIndex).x,
+	dumrk(StitchBuffer->operator[](ClosestPointIndex).x,
 	             StitchBuffer->operator[](ClosestPointIndex).y);
 	return;
   }
@@ -8137,7 +8137,7 @@ void thred::pntmrk() {
 	auto const itVertex =
 	    wrap::next(FormVertices->cbegin(),
 	               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-	thred::dumrk(itVertex->x, itVertex->y);
+	dumrk(itVertex->x, itVertex->y);
 	return;
   }
   displayText::shoseln(IDS_STCH_FRM, IDS_SETMRK);
@@ -8148,12 +8148,12 @@ void thred::filfrms() {
 	if (!StateMap->test(StateFlag::FORMSEL)) {
 	  return;
 	}
-	thred::savdo();
+	savdo();
 	form::refil(ClosestFormToCursor);
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  thred::savdo();
+  savdo();
   for (auto const selectedForm : (*SelectedFormList)) {
 	form::refilfn(selectedForm);
   }
@@ -8243,8 +8243,8 @@ void thred::retrac() {
 	displayText::shoseln(IDS_GRPMSG, IDS_RETRAC);
 	return;
   }
-  thred::savdo();
-  thred::rngadj();
+  savdo();
+  rngadj();
   if (GroupStartStitch == 0U) {
 	++GroupStartStitch;
   }
@@ -8253,24 +8253,24 @@ void thred::retrac() {
   auto const startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
   auto const endPoint   = wrap::next(startPoint, count);
   StitchBuffer->insert(insertPoint, startPoint, endPoint);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::setgrd(COLORREF color) {
   menu::setGridCols(color);
-  thred::nuPen(GridPen, 1, color);
+  nuPen(GridPen, 1, color);
   IniFile.gridColor = color;
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::ovrlay() {
   auto fileName = fs::path {};
-  thred::insfil(fileName);
+  insfil(fileName);
   StateMap->reset(StateFlag::INSFIL);
   StateMap->reset(StateFlag::FRMOF);
   StateMap->set(StateFlag::INIT);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -8303,13 +8303,13 @@ void thred::gsnap() {
 		displayText::shoseln(IDS_FGRPF, IDS_SNAP2GRD);
 		return;
 	  }
-	  thred::savdo();
-	  thred::rngadj();
+	  savdo();
+	  rngadj();
 	  thi::stchsnap(GroupStartStitch, GroupEndStitch + 1U);
 	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
-	thred::savdo();
+	savdo();
 	auto& formIter = FormList->operator[](ClosestFormToCursor);
 	thi::frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	formIter.outline();
@@ -8317,7 +8317,7 @@ void thred::gsnap() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  thred::savdo();
+  savdo();
   for (auto const selectedForm : (*SelectedFormList)) {
 	ClosestFormToCursor = selectedForm;
 	auto& formIter      = FormList->operator[](ClosestFormToCursor);
@@ -8487,14 +8487,14 @@ void thred::fileLock() noexcept {
 }
 
 void thred::delstch() {
-  thred::savdo();
+  savdo();
   StitchBuffer->clear();
   StitchBuffer->shrink_to_fit();
   TexturePointsBuffer->clear();
   TexturePointsBuffer->shrink_to_fit();
-  thred::rstAll();
+  rstAll();
   form::clrfills();
-  thred::resetColorChanges();
+  resetColorChanges();
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
   displayText::butxt(HTOT, blank);
@@ -8502,7 +8502,7 @@ void thred::delstch() {
 }
 
 void thred::closfn() {
-  thred::deltot();
+  deltot();
   Knots->clear();
   WorkingFileName->clear();
   bitmap::delmap();
@@ -8514,7 +8514,7 @@ void thred::closfn() {
 
 void thred::filclos() {
   if (thi::savcmp()) {
-	thred::closfn();
+	closfn();
 	return;
   }
   StateMap->set(StateFlag::FCLOS);
@@ -8536,7 +8536,7 @@ void thi::frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!(std::is_
 void thred::nudgfn(float deltaX, float deltaY) {
   if (StateMap->test(StateFlag::BIGBOX) || !SelectedFormList->empty() || StateMap->test(StateFlag::FORMSEL) ||
       StateMap->test(StateFlag::GRPSEL) || StateMap->test(StateFlag::SELBOX)) {
-	thred::savdo();
+	savdo();
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
 	for (auto& iForm : *FormList) {
@@ -8584,11 +8584,11 @@ void thred::nudgfn(float deltaX, float deltaY) {
 	return;
   }
   if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rngadj();
+	rngadj();
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	  StitchBuffer->operator[](iStitch) += F_POINT {deltaX, deltaY};
 	}
-	thred::grpAdj();
+	grpAdj();
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
@@ -8625,26 +8625,26 @@ void thred::bakmrk() {
   if (ZoomMarkPoint.y > IniFile.hoopSizeY) {
 	ZoomMarkPoint.y = IniFile.hoopSizeY / 2;
   }
-  thred::dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
+  dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
   F_POINT const point(ZoomMarkPoint);
-  thred::shft(point);
+  shft(point);
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::nuscol(size_t iColor) {
   auto const itUserColor = wrap::next(UserColor.begin(), iColor);
   auto const itUserPen   = wrap::next(UserPen->begin(), iColor);
-  thred::nuPen(*itUserPen, 1, *itUserColor);
+  nuPen(*itUserPen, 1, *itUserColor);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   thi::nuBrush(*ucb, *itUserColor);
-  thred::redraw(UserColorWin->operator[](iColor));
+  redraw(UserColorWin->operator[](iColor));
 }
 
 void thred::movchk() {
   static auto draggedColor = uint8_t {};
   if ((WinMsg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
-	  if (thred::inDefaultColorWindows()) {
+	  if (inDefaultColorWindows()) {
 		draggedColor = VerticalIndex & COLORMAX;
 		StateMap->set(StateFlag::WASCOL);
 	  }
@@ -8654,10 +8654,10 @@ void thred::movchk() {
   if (!StateMap->testAndReset(StateFlag::WASMOV) || !StateMap->testAndReset(StateFlag::WASCOL)) {
 	return;
   }
-  if (!thred::inDefaultColorWindows() || draggedColor == VerticalIndex) {
+  if (!inDefaultColorWindows() || draggedColor == VerticalIndex) {
 	return;
   }
-  thred::savdo();
+  savdo();
   auto const key          = wrap::pressed(VK_SHIFT);
   auto const switchColors = wrap::pressed(VK_CONTROL);
   for (auto& stitch : *StitchBuffer) {
@@ -8710,11 +8710,11 @@ void thred::movchk() {
 	UserColor.at(wrap::toSize(VerticalIndex)) = UserColor.at(wrap::toSize(draggedColor));
 	if (!key) {
 	  UserColor.at(wrap::toSize(draggedColor)) = swapColor;
-	  thred::nuscol(draggedColor);
+	  nuscol(draggedColor);
 	}
-	thred::nuscol(VerticalIndex);
+	nuscol(VerticalIndex);
   }
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -8804,7 +8804,7 @@ void thred::set1knot() {
 	displayText::tabmsg(IDS_NOSTCHSEL, false);
 	return;
   }
-  thred::savdo();
+  savdo();
   auto buffer = std::vector<F_POINT_ATTR> {};
   buffer.reserve(StitchBuffer->size() + KNTSTCH);
   buffer.insert(buffer.begin(), StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U));
@@ -8818,7 +8818,7 @@ void thred::set1knot() {
   buffer.insert(
       buffer.end(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U), StitchBuffer->end());
   *StitchBuffer = std::move(buffer);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -8826,7 +8826,7 @@ void thred::fixpclp(uint32_t closestFormToCursor) {
   auto const point = POINT {(WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
                             (WinMsg.pt.y + gsl::narrow_cast<decltype(WinMsg.pt.y)>(FormMoveDelta.y))};
   auto       itIntlvSeq  = std::next(InterleaveSequence->begin());
-  auto const stitchPoint = thred::pxCor2stch(point);
+  auto const stitchPoint = pxCor2stch(point);
   auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
   auto const count       = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
   auto&      form        = FormList->operator[](closestFormToCursor);
@@ -8840,7 +8840,7 @@ void thred::fixpclp(uint32_t closestFormToCursor) {
 	++itIntlvSeq;
   }
   form::refil(ClosestFormToCursor);
-  thred::coltab();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -8865,7 +8865,7 @@ void thred::selfpnt() {
   auto const itVertex =
       wrap::next(FormVertices->cbegin(),
                  FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-  thred::ritfcor(*itVertex);
+  ritfcor(*itVertex);
   StateMap->set(StateFlag::FRMPSEL);
   StateMap->set(StateFlag::RESTCH);
 }
@@ -8875,9 +8875,9 @@ auto thred::unselectAll() -> bool {
   StateMap->reset(StateFlag::FRMPSEL);
   StateMap->reset(StateFlag::FPSEL);
   StateMap->set(StateFlag::RESTCH);
-  thred::unmsg();
+  unmsg();
   thi::unboxs();
-  thred::unpat();
+  unpat();
   StateMap->reset(StateFlag::SATIN);
   if (StateMap->testAndReset(StateFlag::SATPNT)) {
 	satin::satfix();
@@ -8887,12 +8887,12 @@ auto thred::unselectAll() -> bool {
   }
   if (StateMap->test(StateFlag::PRFACT)) {
 	if (StateMap->testAndReset(StateFlag::HUPMSG)) {
-	  thred::unsid();
+	  unsid();
 	  return true;
 	}
 	if (PreferenceIndex != 0U) {
 	  thi::chknum();
-	  thred::unsid();
+	  unsid();
 	  PreferenceIndex = 0;
 	  return true;
 	}
@@ -8915,7 +8915,7 @@ auto thred::unselectAll() -> bool {
 	return true;
   }
   if (StateMap->test(StateFlag::BAKSHO)) {
-	thred::unbsho();
+	unbsho();
 	return true;
   }
   if (!SelectedFormList->empty()) {
@@ -8933,7 +8933,7 @@ void thred::esccode() {
   StateMap->reset(StateFlag::HID);
   StateMap->reset(StateFlag::FRMOF);
   StateMap->reset(StateFlag::THRDS);
-  thred::redraw(ButtonWin->operator[](HHID));
+  redraw(ButtonWin->operator[](HHID));
   menu::resetThreadView();
   StateMap->reset(StateFlag::RUNPAT);
   StateMap->reset(StateFlag::WASPAT);
@@ -8992,10 +8992,10 @@ void thred::qcode() {
 	  return;
 	}
 
-	thred::rstAll();
+	rstAll();
   }
   else {
-	thred::rstAll();
+	rstAll();
   }
   StateMap->set(StateFlag::RESTCH);
   auto const blank = std::wstring {};
@@ -9171,7 +9171,7 @@ auto thred::displayBackups() -> bool {
 	  else {
 		thi::rebak();
 	  }
-	  thred::rstAll();
+	  rstAll();
 	  StateMap->set(StateFlag::RESTCH);
 	  return true;
 	}
@@ -9197,8 +9197,8 @@ void thred::handleFormSelected() {
 	return;
   }
   if (FormDataSheet != nullptr) {
-	thred::undat();
-	thred::unsid();
+	undat();
+	unsid();
 	FormMenuChoice = 0;
 	StateMap->set(StateFlag::RESTCH);
 	return;
@@ -9209,8 +9209,8 @@ void thred::handleFormSelected() {
 	StateMap->reset(StateFlag::FORMSEL);
   }
   StateMap->set(StateFlag::DUMEN);
-  if (!thred::closPnt1(ClosestPointIndex)) {
-	thred::unbox();
+  if (!closPnt1(ClosestPointIndex)) {
+	unbox();
   }
 }
 
@@ -9256,14 +9256,14 @@ void thred::updateHoopSize() {
   }
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   form::sethup();
-  thred::chkhup();
-  thred::unsid();
+  chkhup();
+  unsid();
   formForms::prfmsg();
 }
 
 auto thred::updateFillColor() -> bool {
   while (true) {
-	thred::savdo();
+	savdo();
 	if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
 	  xt::dufcol(VerticalIndex + 1U);
 	  return true;
@@ -9283,7 +9283,7 @@ auto thred::updateFillColor() -> bool {
 	if (StateMap->testAndReset(StateFlag::UNDCOL)) {
 	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLMSK;
 	  form::refilfn(ClosestFormToCursor);
-	  thred::coltab();
+	  coltab();
 	  break;
 	}
 	if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
@@ -9296,8 +9296,8 @@ auto thred::updateFillColor() -> bool {
   auto buffer = std::array<wchar_t, 2> {};
   wrap::narrow(buffer[0], VerticalIndex + '0');
   SetWindowText(ValueWindow->operator[](LBRDCOL), buffer.data());
-  thred::unsid();
-  thred::coltab();
+  unsid();
+  coltab();
   StateMap->set(StateFlag::RESTCH);
   StateMap->reset(StateFlag::SIDCOL);
   FormMenuChoice = 0;
@@ -9349,7 +9349,7 @@ auto thred::updatePreferences() -> bool {
 }
 
 auto thred::handleSideWindowActive() -> bool {
-  thred::savdo();
+  savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
 	auto const iFeather = std::ranges::find_if(FTHRLIST, [](LIST_TYPE const& feather) noexcept -> bool {
@@ -9357,7 +9357,7 @@ auto thred::handleSideWindowActive() -> bool {
 	});
 	if (iFeather != FTHRLIST.end()) {
 	  form.feather.fillType = iFeather->value;
-	  thred::unsid();
+	  unsid();
 	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();
 	}
@@ -9373,7 +9373,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  auto const layerStr = displayText::loadStr(iLayer->stringID);
 	  SetWindowText(ValueWindow->operator[](LLAYR), layerStr.c_str());
 	}
-	thred::unsid();
+	unsid();
 	formForms::refrm();
 	return true;
   }
@@ -9385,7 +9385,7 @@ auto thred::handleSideWindowActive() -> bool {
 		  clip::deleclp(ClosestFormToCursor);
 		}
 		form.edgeType = 0;
-		thred::coltab();
+		coltab();
 		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
@@ -9431,13 +9431,13 @@ auto thred::handleSideWindowActive() -> bool {
 	  if (WinMsg.hwnd == SideWindow->operator[](EDGELCHAIN)) {
 		StateMap->set(StateFlag::LINCHN);
 		form::chain();
-		thred::coltab();
+		coltab();
 		break;
 	  }
 	  if (WinMsg.hwnd == SideWindow->operator[](EDGEOCHAIN)) {
 		StateMap->reset(StateFlag::LINCHN);
 		form::chain();
-		thred::coltab();
+		coltab();
 		break;
 	  }
 	  if (WinMsg.hwnd == SideWindow->operator[](EDGECLIPX)) {
@@ -9447,8 +9447,8 @@ auto thred::handleSideWindowActive() -> bool {
 	}
 	formForms::refrm();
 	form::refil(ClosestFormToCursor);
-	thred::unmsg();
-	thred::unsid();
+	unmsg();
+	unsid();
 	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
@@ -9468,12 +9468,12 @@ auto thred::handleSideWindowActive() -> bool {
 	  form.type = FRMFPOLY;
 	  form::delmfil(ClosestFormToCursor);
 	  form.fillType = 0;
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::VRTF)) { // vertical fill
-	  thred::savdo();
+	if (WinMsg.hwnd == SideWindow->operator[](VRTF)) { // vertical fill
+	  savdo();
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		thi::respac(form);
@@ -9485,7 +9485,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filvrt();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::HORF)) { // horizontal fill
+	if (WinMsg.hwnd == SideWindow->operator[](HORF)) { // horizontal fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		thi::respac(form);
@@ -9496,7 +9496,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filhor();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::ANGF)) { // angle fill
+	if (WinMsg.hwnd == SideWindow->operator[](ANGF)) { // angle fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		if (form.satinGuideCount != 0U) {
@@ -9512,7 +9512,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filangl();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::SATF)) { // fan fill
+	if (WinMsg.hwnd == SideWindow->operator[](SATF)) { // fan fill
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinGuideIndex = 0;
@@ -9527,7 +9527,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filsat();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::CLPF)) { // fan clip
+	if (WinMsg.hwnd == SideWindow->operator[](CLPF)) { // fan clip
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinGuideIndex = 0;
@@ -9535,7 +9535,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::clpfil();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::CONTF)) { // contour fill
+	if (WinMsg.hwnd == SideWindow->operator[](CONTF)) { // contour fill
 	  if (form.vertexCount > 4) {
 		if (form.fillType != 0U) {
 		  if (form.fillType == CLPF) {
@@ -9552,25 +9552,25 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::VCLPF)) { // vertical clip
+	if (WinMsg.hwnd == SideWindow->operator[](VCLPF)) { // vertical clip
 	  if (thi::sidclp()) {
 		form::vrtsclp(ClosestFormToCursor);
 	  }
 	  StateMap->reset(StateFlag::CLPSHO);
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::HCLPF)) { // horizontal clip
+	if (WinMsg.hwnd == SideWindow->operator[](HCLPF)) { // horizontal clip
 	  if (thi::sidclp()) {
 		form::horsclp();
 	  }
 	  StateMap->reset(StateFlag::CLPSHO);
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::ANGCLPF)) { // angle clip
+	if (WinMsg.hwnd == SideWindow->operator[](ANGCLPF)) { // angle clip
 	  if (thi::sidclp()) {
 		if (form.satinGuideCount != 0U) {
 		  satin::delsac(ClosestFormToCursor);
@@ -9578,21 +9578,21 @@ auto thred::handleSideWindowActive() -> bool {
 		form::angsclp(form);
 	  }
 	  StateMap->reset(StateFlag::CLPSHO);
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::FTHF)) { // feather fill
+	if (WinMsg.hwnd == SideWindow->operator[](FTHF)) { // feather fill
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinGuideIndex = 0;
 	  }
 	  xt::fethrf(ClosestFormToCursor);
 	  StateMap->set(StateFlag::INIT);
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::TXVRTF)) // vertical texture
+	if (WinMsg.hwnd == SideWindow->operator[](TXVRTF)) // vertical texture
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXVRTF;
@@ -9603,7 +9603,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::TXHORF)) // horizontal texture
+	if (WinMsg.hwnd == SideWindow->operator[](TXHORF)) // horizontal texture
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXHORF;
@@ -9614,7 +9614,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
+	if (WinMsg.hwnd == SideWindow->operator[](TXANGF)) // angle texture
 	{
 	  if (form.isTexture()) {
 		form.fillType  = TXANGF;
@@ -9628,7 +9628,7 @@ auto thred::handleSideWindowActive() -> bool {
 	break;
   }
   if (textureFlag) {
-	thred::unsid();
+	unsid();
 	DestroyWindow(FormDataSheet);
 	FormDataSheet = nullptr;
 	StateMap->set(StateFlag::WASFRMFRM);
@@ -9636,8 +9636,8 @@ auto thred::handleSideWindowActive() -> bool {
   else {
 	formForms::refrm();
 	form::refil(ClosestFormToCursor);
-	thred::unmsg();
-	thred::unsid();
+	unmsg();
+	unsid();
 	StateMap->set(StateFlag::RESTCH);
   }
   return true;
@@ -9645,7 +9645,7 @@ auto thred::handleSideWindowActive() -> bool {
 
 auto thred::handleFormDataSheet() -> bool {
   thi::chknum();
-  thred::unsid();
+  unsid();
   auto& form = FormList->operator[](ClosestFormToCursor);
   while (true) {
 	if (WinMsg.hwnd == ValueWindow->operator[](LTXOF) || WinMsg.hwnd == LabelWindow->operator[](LTXOF)) {
@@ -9712,7 +9712,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  form.extendedAttribute ^= AT_FTHBLND;
 	  formForms::refrm();
 	  form::refil(ClosestFormToCursor);
-	  thred::unsid();
+	  unsid();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
@@ -9730,7 +9730,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  form.extendedAttribute ^= AT_FTHBTH;
 	  formForms::refrm();
 	  form::refil(ClosestFormToCursor);
-	  thred::unsid();
+	  unsid();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
@@ -9742,7 +9742,7 @@ auto thred::handleFormDataSheet() -> bool {
 	}
 	if (WinMsg.hwnd == ValueWindow->operator[](LFRM) || WinMsg.hwnd == LabelWindow->operator[](LFRM)) {
 	  // draw the form type window
-	  thred::savdo();
+	  savdo();
 	  form::unfil();
 	  if (form.type == FRMLINE) {
 		form.type = FRMFPOLY;
@@ -9750,7 +9750,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  else {
 		form.type = FRMLINE;
 	  }
-	  thred::coltab();
+	  coltab();
 	  satin::delsac(ClosestFormToCursor);
 	  formForms::refrm();
 	  break;
@@ -9863,7 +9863,7 @@ auto thred::handleFormDataSheet() -> bool {
 		form.attribute |= SBLNT;
 	  }
 	  form::refil(ClosestFormToCursor);
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
@@ -9879,7 +9879,7 @@ auto thred::handleFormDataSheet() -> bool {
 		form.attribute |= FBLNT;
 	  }
 	  form::refil(ClosestFormToCursor);
-	  thred::coltab();
+	  coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
@@ -10004,7 +10004,7 @@ auto thred::handleFormDataSheet() -> bool {
 
 void thred::updateBackground() {
   BackgroundColor = 0x505050; // darker DimGrey NOLINT(readability-magic-numbers)
-  thred::nuPen(BackgroundPen, 1, BackgroundColor);
+  nuPen(BackgroundPen, 1, BackgroundColor);
   BackgroundPenWidth = 1;
   DeleteObject(BackgroundBrush);
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
@@ -10078,18 +10078,18 @@ auto thi::handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 void thred::thumbQuit() {
   thi::unthum();
   StateMap->reset(StateFlag::BAKSHO);
-  thred::esccode();
-  thred::qcode();
+  esccode();
+  qcode();
 }
 
 void thred::thumbHome() {
   ThumbnailIndex = 0;
-  thred::nuthsel();
+  nuthsel();
 }
 
 void thred::thumbEnd() {
   ThumbnailIndex = wrap::toUnsigned(Thumbnails->size());
-  thred::nuthbak(QUADRT);
+  nuthbak(QUADRT);
 }
 
 void thred::otherPeriod() noexcept {
@@ -10303,7 +10303,7 @@ void thi::handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
 	  if (WinMsg.wParam == iLRU) {
 		*WorkingFileName = *previousName;
 		StateMap->set(StateFlag::REDOLD);
-		thi::nuFil(FileIndices::THR);
+		nuFil(FileIndices::THR);
 	  }
 	  ++previousName;
 	}
@@ -10457,7 +10457,7 @@ void thi::ritloc() {
   lockFilePath.assign(ppszPath); // make a local copy of the path
   CoTaskMemFree(ppszPath);       // free up the path memory block
   lockFilePath /= L"ThrEd";
-  fs::create_directory(lockFilePath);
+  create_directory(lockFilePath);
   lockFilePath /= L"thredloc.txt";
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
@@ -10598,7 +10598,7 @@ void thi::redini() {
 		}
 	  }
 	  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
-	  thi::loadColors();
+	  loadColors();
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
 	  bitmap::setBitmapColor(IniFile.bitmapColor);
@@ -11009,7 +11009,7 @@ void thi::relin() {
   }
   MoveLine1[1] = thred::stch2px1(ClosestPointIndex + 1U);
   StateMap->reset(StateFlag::WASLIN);
-  thi::dulin(MoveLine0, MoveLine1);
+  dulin(MoveLine0, MoveLine1);
 }
 
 /* Arrow box points
@@ -11331,7 +11331,7 @@ void thi::doInitZoomed() {
 
 void thi::doInitUnzoomed() {
   auto linePoints = std::vector<POINT> {};
-  linePoints.reserve(wrap::toSize(thi::getMaxCount()) + 2U);
+  linePoints.reserve(wrap::toSize(getMaxCount()) + 2U);
   auto const pwid = StateMap->test(StateFlag::HID);
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
@@ -11392,7 +11392,7 @@ void thi::drawStitchBoxes() {
 		auto const& stitch = StitchBuffer->operator[](iStitch);
 		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
 		    stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
-		  thi::stchbox(iStitch, StitchWindowMemDC);
+		  stchbox(iStitch, StitchWindowMemDC);
 		}
 	  }
 	}
@@ -11402,7 +11402,7 @@ void thi::drawStitchBoxes() {
 	for (auto& stitch : *StitchBuffer) {
 	  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
 	      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
-		thi::stchbox(iStitch, StitchWindowMemDC);
+		stchbox(iStitch, StitchWindowMemDC);
 	  }
 	  ++iStitch;
 	}
@@ -11427,10 +11427,10 @@ void thi::doDrwInit() {
   }
   DisplayedColorBitmap.reset();
   if (StateMap->test(StateFlag::ZUMED)) {
-	thi::doInitZoomed();
+	doInitZoomed();
   }
   else {
-	thi::doInitUnzoomed();
+	doInitUnzoomed();
   }
   if (StateMap->test(StateFlag::SELBOX)) { // if we have selected a box which has stitches
 	if (!StitchBuffer->empty()) {
@@ -11471,7 +11471,7 @@ void thi::doDrwInit() {
 	drawStitchBoxes();
   }
   if (StateMap->test(StateFlag::CLPSHO)) {
-	thi::duclp();
+	duclp();
   }
 }
 
@@ -11486,9 +11486,9 @@ void thi::drwStch() {
   StateMap->reset(StateFlag::ILIN);
   uncros();
   StateMap->reset(StateFlag::SHOFRM);
-  thi::drawBackground();
+  drawBackground();
   if (StateMap->test(StateFlag::INIT)) {
-	thi::doDrwInit();
+	doDrwInit();
   }
   if (StateMap->test(StateFlag::ROTAT) || StateMap->test(StateFlag::ROTCAPT) ||
       StateMap->test(StateFlag::MOVCNTR)) {
@@ -11511,7 +11511,7 @@ void thi::drwStch() {
 	satin::satzum();
   }
   if (StateMap->test(StateFlag::GMRK)) {
-	thi::drwmrk(StitchWindowMemDC);
+	drwmrk(StitchWindowMemDC);
   }
   if (StateMap->test(StateFlag::PRFACT)) {
 	thred::redraw(PreferencesWindow);
@@ -11885,7 +11885,7 @@ auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 		drwStch();
 	  }
 	  else {
-		thi::drawBackground();
+		drawBackground();
 		if (StateMap->test(StateFlag::HIDSTCH)) {
 		  form::drwfrm();
 		  if (StateMap->test(StateFlag::SATPNT)) {
@@ -12563,13 +12563,13 @@ void thred::refreshColors() noexcept {
   auto itUserPen = UserPen->begin();
   auto ucb       = UserColorBrush.begin();
   for (auto const& color : UserColor) {
-	thred::nuPen(*itUserPen, 1, color);
+	nuPen(*itUserPen, 1, color);
 	thi::nuBrush(*ucb, color);
 	++itUserPen;
 	++ucb;
   }
   for (auto const& iColor : *UserColorWin) {
-	thred::redraw(iColor);
+	redraw(iColor);
   }
 }
 
@@ -12584,7 +12584,7 @@ void thred::initPenBrush() noexcept {
 }
 
 void thred::initBackPenBrush() noexcept {
-  thred::nuPen(BackgroundPen, 1, BackgroundColor);
+  nuPen(BackgroundPen, 1, BackgroundColor);
   BackgroundPenWidth = 1;
   DeleteObject(BackgroundBrush);
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
@@ -12622,7 +12622,7 @@ void thred::chkDelCol() {
 	thi::delcol();
   }
   else {
-	thred::delet();
+	delet();
   }
 }
 
@@ -12646,8 +12646,8 @@ void thred::resetColors() {
   for (auto const& color : DEFAULT_COLORS) {
 	*itUserColor = color;
 	thi::nuBrush(*ucb, *itUserColor);
-	thred::nuPen(*itUserPen, 1, *itUserColor);
-	thred::redraw(*ucw);
+	nuPen(*itUserPen, 1, *itUserColor);
+	redraw(*ucw);
 	++ucb;
 	++itUserColor;
 	++itUserPen;
@@ -12680,14 +12680,14 @@ void thred::viewThread60() {
 void thred::setBackGroundColor() {
   if (thi::nuBak() != 0U) {
 	BackgroundColor = BackgroundColorStruct.rgbResult;
-	thred::nuPen(BackgroundPen, 1, BackgroundColor);
+	nuPen(BackgroundPen, 1, BackgroundColor);
 	BackgroundPenWidth = 1;
 	DeleteObject(BackgroundBrush);
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
 	if (bitmap::ismap()) {
 	  bitmap::bfil(BackgroundColor);
 	}
-	thred::zumhom();
+	zumhom();
   }
 }
 
@@ -12707,19 +12707,19 @@ void thred::openAuxFile() {
 	  thi::nuFil(FileIndices::PCS);
 	}
   }
-  thred::showOnlyLayer(0U);
+  showOnlyLayer(0U);
 }
 
 void thred::openNewFile() {
   if (thi::savcmp()) {
-	thred::newFil();
-	thred::showOnlyLayer(0U);
+	newFil();
+	showOnlyLayer(0U);
   }
   else {
 	displayText::savdisc();
 	StateMap->set(StateFlag::NEWBAK);
 	StateMap->reset(StateFlag::PRFACT);
-	thred::undat();
+	undat();
   }
 }
 
@@ -12749,12 +12749,12 @@ void thred::updateThreadSize(uint32_t threadSizeSelected) {
   auto const tsw          = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
   SetWindowText(*tsw, buffer.data());
   StateMap->set(StateFlag::RESTCH);
-  thred::destroyChangeThreadSizeWindows();
+  destroyChangeThreadSizeWindows();
 }
 
 auto thred::createChangeThreadSizeWindows() -> uint32_t {
   static constexpr auto THREAD_SIZES = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
-  thred::savdo();
+  savdo();
   auto const threadSizeSelected = VerticalIndex;
   auto       idx                = gsl::narrow_cast<int32_t>(VerticalIndex);
   auto       iStr               = THREAD_SIZES.begin();
@@ -12777,14 +12777,14 @@ auto thred::createChangeThreadSizeWindows() -> uint32_t {
 
 void thred::updateUserColor() {
   if (WinMsg.message == WM_LBUTTONDOWN && (thi::nuCol(UserColor.at(VerticalIndex)) != 0U)) {
-	thred::savdo();
+	savdo();
 	auto const itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
 	*itUserColor           = ColorStruct.rgbResult;
 	auto const itUserPen   = wrap::next(UserPen->begin(), VerticalIndex);
-	thred::nuPen(*itUserPen, 1, *itUserColor);
+	nuPen(*itUserPen, 1, *itUserColor);
 	auto const ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
 	thi::nuBrush(*ucb, *itUserColor);
-	thred::redraw(UserColorWin->operator[](VerticalIndex));
+	redraw(UserColorWin->operator[](VerticalIndex));
 	StateMap->set(StateFlag::RESTCH);
   }
 }
@@ -12792,14 +12792,14 @@ void thred::updateUserColor() {
 void thred::switchUserColors() noexcept {
   auto const code = ActiveColor;
   ActiveColor     = VerticalIndex & COLMSK;
-  thred::redraw(UserColorWin->operator[](code));
-  thred::redraw(UserColorWin->operator[](ActiveColor));
+  redraw(UserColorWin->operator[](code));
+  redraw(UserColorWin->operator[](ActiveColor));
 }
 
 // ToDo - rename this to something more appropriate
 void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
   ClosestPointIndex = closestPointIndexClone;
-  thred::unbox();
+  unbox();
   thi::unboxs();
   auto const index = StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK;
   auto const spTSP = wrap::next(ThreadSizePixels.begin(), index);
@@ -12847,7 +12847,7 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
   }
   else {
 	StateMap->set(StateFlag::ISDWN);
-	MoveLine0[0] = thred::stch2px1(ClosestPointIndex - 1);
+	MoveLine0[0] = stch2px1(ClosestPointIndex - 1);
   }
   auto iStitch = wrap::toUnsigned(StitchBuffer->size());
   if (iStitch != 0U) {
@@ -12858,7 +12858,7 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
   }
   else {
 	StateMap->set(StateFlag::ISUP);
-	MoveLine1[1] = thred::stch2px1(ClosestPointIndex + 1U);
+	MoveLine1[1] = stch2px1(ClosestPointIndex + 1U);
   }
   thi::dulin(MoveLine0, MoveLine1);
   SetCapture(ThrEdWindow);
@@ -12868,7 +12868,7 @@ void thred::redrawCapturedStitch(uint32_t closestPointIndexClone) {
 
 void thred::setFormControls() noexcept(!std::is_same_v<size_t, uint32_t>) {
   auto formsRect = F_RECTANGLE {};
-  thred::selRct(formsRect);
+  selRct(formsRect);
   auto& frmCtrls = *FormControlPoints;
   frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = std::lround(formsRect.left);
   frmCtrls[PTL].y = frmCtrls[PTR].y = frmCtrls[PTM].y = frmCtrls[PTLE].y = std::lround(formsRect.top);
@@ -12885,8 +12885,8 @@ void thred::setRotateCapture() {
                gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
   if (std::hypot(adjustedPoint.x, adjustedPoint.y) < FCLOSNUF) {
 	StateMap->set(StateFlag::MOVCNTR);
-	thred::unrot();
-	thred::ritrot(0, thred::pxCor2stch(WinMsg.pt));
+	unrot();
+	ritrot(0, pxCor2stch(WinMsg.pt));
   }
   else {
 	if (adjustedPoint.x != 0.0F) {
@@ -12901,7 +12901,7 @@ void thred::setRotateCapture() {
 	  }
 	}
 	StateMap->set(StateFlag::ROTUSHO);
-	thred::durotu();
+	durotu();
 	StateMap->set(StateFlag::ROTCAPT);
   }
 }
@@ -12964,7 +12964,7 @@ void thred::setSmallestStitchVal() {
   thi::srchk();
   thi::fillSortBuffer();
   SortIndex = 0U;
-  thred::setSrchSmallest();
+  setSrchSmallest();
   thi::lensadj();
 }
 
@@ -12972,6 +12972,6 @@ void thred::setLargestStitchVal() {
   thi::srchk();
   thi::fillSortBuffer();
   SortIndex = wrap::toUnsigned(SortBuffer->size() - 1U);
-  thred::setSrchLargest();
+  setSrchLargest();
   thi::lensadj();
 }

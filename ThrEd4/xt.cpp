@@ -616,12 +616,12 @@ void xt::fethr() {
   }
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	xt::fethrf(ClosestFormToCursor);
+	fethrf(ClosestFormToCursor);
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  if (FormList->operator[](selectedForm).vertexCount > 2U) {
-		xt::fethrf(selectedForm);
+		fethrf(selectedForm);
 	  }
 	}
   }
@@ -1401,35 +1401,35 @@ void xt::fdelstch(uint32_t formIndex, FillStartsDataType& fillStartsData, uint32
 		case TYPE_APPLIQUE: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;
-			fillStartsData[FSI::applique] = iDestinationStitch;
+			fillStartsData[applique] = iDestinationStitch;
 		  }
 		  break;
 		}
 		case TYPE_FTHR: {
 		  if ((tmap & M_FTH) == 0U) {
 			tmap |= M_FTH;
-			fillStartsData[FSI::feather] = iDestinationStitch;
+			fillStartsData[feather] = iDestinationStitch;
 		  }
 		  break;
 		}
 		case TYPE_FILL: {
 		  if ((tmap & M_FIL) == 0U) {
 			tmap |= M_FIL;
-			fillStartsData[FSI::fill] = iDestinationStitch;
+			fillStartsData[fill] = iDestinationStitch;
 		  }
 		  break;
 		}
 		case TYPE_BORDER: {
 		  if ((tmap & M_BRD) == 0U) {
 			tmap |= M_BRD;
-			fillStartsData[FSI::border] = iDestinationStitch;
+			fillStartsData[border] = iDestinationStitch;
 		  }
 		  break;
 		}
 		default: {
 		  if ((form.fillType != 0U) && ((tmap & M_FIL) == 0U)) {
 			tmap |= M_FIL;
-			fillStartsData[FSI::fill] = iDestinationStitch;
+			fillStartsData[fill] = iDestinationStitch;
 		  }
 		  break;
 		}
@@ -1442,15 +1442,15 @@ void xt::fdelstch(uint32_t formIndex, FillStartsDataType& fillStartsData, uint32
 	  auto const color = attribute & COLMSK;
 	  if (color == form.fillColor) {
 		tmap |= M_FCOL;
-		fillStartsData[FSI::fillColor] = iDestinationStitch;
+		fillStartsData[fillColor] = iDestinationStitch;
 	  }
 	  if (color == form.feather.color) {
 		tmap |= M_FTHCOL;
-		fillStartsData[FSI::featherColor] = iDestinationStitch;
+		fillStartsData[featherColor] = iDestinationStitch;
 	  }
 	  if (color == bordercolor) {
 		tmap |= M_ECOL;
-		fillStartsData[FSI::borderColor] = iDestinationStitch;
+		fillStartsData[borderColor] = iDestinationStitch;
 	  }
 	  if (color == appliqueColor) {
 		tmap |= M_APCOL;
@@ -1460,58 +1460,58 @@ void xt::fdelstch(uint32_t formIndex, FillStartsDataType& fillStartsData, uint32
 	  ++iDestinationStitch;
 	}
   }
-  ++(fillStartsData[FSI::fillColor]);
-  ++(fillStartsData[FSI::featherColor]);
-  ++(fillStartsData[FSI::borderColor]);
+  ++(fillStartsData[fillColor]);
+  ++(fillStartsData[featherColor]);
+  ++(fillStartsData[borderColor]);
   ++(fillStartsData[FSI::appliqueColor]);
   fillStartsMap = tmap;
   StitchBuffer->resize(iDestinationStitch);
   if ((tmap & M_ECOL) == 0U) {
-	fillStartsData[FSI::borderColor] = wrap::toUnsigned(StitchBuffer->size());
+	fillStartsData[borderColor] = wrap::toUnsigned(StitchBuffer->size());
   }
   if ((tmap & M_FTHCOL) == 0U) {
-	fillStartsData[FSI::featherColor] = wrap::toUnsigned(StitchBuffer->size());
+	fillStartsData[featherColor] = wrap::toUnsigned(StitchBuffer->size());
   }
   if ((tmap & M_FCOL) == 0U) {
-	fillStartsData[FSI::fillColor] = wrap::toUnsigned(StitchBuffer->size());
+	fillStartsData[fillColor] = wrap::toUnsigned(StitchBuffer->size());
   }
   if (form.edgeType != 0U) {
 	if (form.edgeType == EDGEAPPL) {
 	  if ((tmap & M_AP) == 0U) {
 		if ((tmap & M_APCOL) != 0U) {
-		  fillStartsData[FSI::applique] = fillStartsData[FSI::appliqueColor] + 1U;
+		  fillStartsData[applique] = fillStartsData[FSI::appliqueColor] + 1U;
 		}
 		else {
-		  fillStartsData[FSI::applique] = wrap::toUnsigned(StitchBuffer->size());
+		  fillStartsData[applique] = wrap::toUnsigned(StitchBuffer->size());
 		}
 	  }
 	}
 	if ((tmap & M_BRD) == 0U) {
 	  if ((tmap & M_ECOL) != 0U) {
-		fillStartsData[FSI::border] = fillStartsData[FSI::borderColor] + 1U;
+		fillStartsData[border] = fillStartsData[borderColor] + 1U;
 	  }
 	  else {
-		fillStartsData[FSI::border] = wrap::toUnsigned(StitchBuffer->size());
+		fillStartsData[border] = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
   if ((form.fillType != 0U) || ((tmap & (M_WALK | M_UND | M_CWLK)) != 0U)) {
 	if ((tmap & M_FIL) == 0U) {
 	  if ((tmap & M_FCOL) != 0U) {
-		fillStartsData[FSI::fill] = fillStartsData[FSI::fillColor] + 1U;
+		fillStartsData[fill] = fillStartsData[fillColor] + 1U;
 	  }
 	  else {
-		fillStartsData[FSI::fill] = wrap::toUnsigned(StitchBuffer->size());
+		fillStartsData[fill] = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
   if (form.fillType == FTHF) {
 	if ((tmap & M_FTH) == 0U) {
 	  if ((tmap & M_FTHCOL) != 0U) {
-		fillStartsData[FSI::feather] = fillStartsData[FSI::featherColor] + 1U;
+		fillStartsData[feather] = fillStartsData[featherColor] + 1U;
 	  }
 	  else {
-		fillStartsData[FSI::feather] = wrap::toUnsigned(StitchBuffer->size());
+		fillStartsData[feather] = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
@@ -1626,7 +1626,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 		auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
-		ilData.output += xi::gucon(
+		ilData.output += gucon(
 		    form,
 		    *StitchBuffer,
 		    *itVertex,
@@ -1635,9 +1635,9 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 		    code);
 	  }
 	}
-	if (auto colpnt = F_POINT {}; xi::lastcol(iSequence, colpnt)) {
+	if (auto colpnt = F_POINT {}; lastcol(iSequence, colpnt)) {
 	  ilData.output +=
-	      xi::gucon(form,
+	      gucon(form,
 	                *StitchBuffer,
 	                colpnt,
 	                InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
@@ -1662,7 +1662,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	  }
 	}
   }
-  xi::chkend(form, *StitchBuffer, code, ilData);
+  chkend(form, *StitchBuffer, code, ilData);
 }
 
 void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uint32_t fillStartsMap) {
@@ -1680,11 +1680,11 @@ void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uin
 	  ilData.pins = iSequence;
 	  switch (InterleaveSequenceIndices->operator[](iSequence).seq) {
 		case I_AP: {
-		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[FSI::applique] >= ilData.coloc) {
-			ilData.coloc = fillStartsData[FSI::applique];
+		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[applique] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[applique];
 		  }
 		  else {
-			ilData.coloc = fillStartsData[FSI::appliqueColor];
+			ilData.coloc = fillStartsData[appliqueColor];
 			if (ilData.coloc == 1) {
 			  ilData.coloc = 0;
 			}
@@ -1692,29 +1692,29 @@ void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uin
 		  break;
 		}
 		case I_FIL: {
-		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[FSI::fill] >= ilData.coloc) {
-			ilData.coloc = fillStartsData[FSI::fill];
+		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[fill] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[fill];
 		  }
 		  else {
-			ilData.coloc = fillStartsData[FSI::fillColor];
+			ilData.coloc = fillStartsData[fillColor];
 		  }
 		  break;
 		}
 		case I_FTH: {
-		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[FSI::feather] >= ilData.coloc) {
-			ilData.coloc = fillStartsData[FSI::feather];
+		  if (((fillStartsMap & M_FIL) != 0U) && fillStartsData[feather] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[feather];
 		  }
 		  else {
-			ilData.coloc = fillStartsData[FSI::featherColor];
+			ilData.coloc = fillStartsData[featherColor];
 		  }
 		  break;
 		}
 		case I_BRD: {
-		  if (((fillStartsMap & M_BRD) != 0U) && fillStartsData[FSI::border] >= ilData.coloc) {
-			ilData.coloc = fillStartsData[FSI::border];
+		  if (((fillStartsMap & M_BRD) != 0U) && fillStartsData[border] >= ilData.coloc) {
+			ilData.coloc = fillStartsData[border];
 		  }
 		  else {
-			ilData.coloc = fillStartsData[FSI::borderColor];
+			ilData.coloc = fillStartsData[borderColor];
 		  }
 		  break;
 		}

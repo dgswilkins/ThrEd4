@@ -18,7 +18,7 @@ enum FSI : uint8_t { // fill starts index values
   fsi_size
 };
 
-using FillStartsDataType = std::array<uint32_t, FSI::fsi_size>;
+using FillStartsDataType = std::array<uint32_t, fsi_size>;
 
 namespace xt {
 

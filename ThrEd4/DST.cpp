@@ -247,7 +247,7 @@ void di::dstin(uint32_t number, POINT& pout) noexcept {
 void di::dstran(std::vector<DSTREC>& DSTData) {
   auto bytesRead = DWORD {};
   auto colors    = std::vector<uint32_t> {};
-  if (di::colfil()) {
+  if (colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -295,7 +295,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	  continue;
 	}
 	auto dstStitch = POINT {};
-	di::dstin(di::dtrn(&record), dstStitch);
+	dstin(dtrn(&record), dstStitch);
 	localStitch += F_POINT {dstStitch.x, dstStitch.y};
 	constexpr auto C0MASK = 0x80U;
 	if ((record.nd & C0MASK) != 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
@@ -411,7 +411,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  else {
 		difference.cy = lengths.cy;
 	  }
-	  di::savdst(DSTRecords, di::dudbits(difference) | dstType);
+	  savdst(DSTRecords, dudbits(difference) | dstType);
 	  centerCoordinate.x += difference.cx;
 	  centerCoordinate.y += difference.cy;
 	  lengths.cx -= difference.cx;
@@ -420,7 +420,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   }
   constexpr auto ENDCODE = uint8_t {0xF3};
   DSTRecords.push_back(DSTREC {0, 0, ENDCODE});
-  if (!di::colfil()) {
+  if (!colfil()) {
 	return;
   }
   auto bytesWritten = DWORD {};

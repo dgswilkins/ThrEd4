@@ -80,7 +80,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
 
 auto wrap::createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN {
   auto const scaledWidth = MulDiv(width, *ScreenDPI, STDDPI);
-  return ::CreatePen(iStyle, scaledWidth, color);
+  return CreatePen(iStyle, scaledWidth, color);
 }
 
 auto wrap::getFormVertices() noexcept -> std::vector<F_POINT>* {

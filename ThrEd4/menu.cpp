@@ -182,19 +182,19 @@ void mni::pcsbsavof() {
 
 void menu::setpcs() {
   IniFile.auxFileType = AUXPCS;
-  menu::auxmen();
+  auxmen();
 }
 
 #if PESACT
 void menu::setpes() {
   IniFile.auxFileType = AUXPES;
-  menu::auxmen();
+  auxmen();
 }
 #endif
 
 void menu::setdst() {
   IniFile.auxFileType = AUXDST;
-  menu::auxmen();
+  auxmen();
 }
 
 void menu::disableRedo() {
@@ -493,10 +493,10 @@ void menu::duhbit(uint32_t cod) noexcept {
 
 void menu::flipHideBitmap() {
   if (StateMap->testAndFlip(StateFlag::HIDMAP)) {
-	menu::duhbit(MF_UNCHECKED);
+	duhbit(MF_UNCHECKED);
   }
   else {
-	menu::duhbit(MF_CHECKED);
+	duhbit(MF_CHECKED);
   }
   StateMap->set(StateFlag::DUMEN);
 }
@@ -1226,13 +1226,13 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_MARKESC: { // view / Set / Retrieve Mark / Escape
 	  UserFlagMap->set(UserFlag::MARQ);
-	  menu::qchk();
+	  qchk();
 	  flag = true;
 	  break;
 	}
 	case ID_MARKQ: { // view / Set / Retrieve Mark / Q
 	  UserFlagMap->reset(UserFlag::MARQ);
-	  menu::qchk();
+	  qchk();
 	  flag = true;
 	  break;
 	}
@@ -1273,13 +1273,13 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_LINBEXACT: { // view / Set / Line Border Spacing / Exact
 	  UserFlagMap->reset(UserFlag::LINSPAC);
-	  menu::linbmen();
+	  linbmen();
 	  flag = true;
 	  break;
 	}
 	case ID_LINBEVEN: { // view / Set / Line Border Spacing / Even
 	  UserFlagMap->set(UserFlag::LINSPAC);
-	  menu::linbmen();
+	  linbmen();
 	  flag = true;
 	  break;
 	}
@@ -1319,19 +1319,19 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_AUXPCS: { // view / Set / Machine File Type / Pfaff PCS
-	  menu::setpcs();
+	  setpcs();
 	  flag = true;
 	  break;
 	}
 #if PESACT
 	case ID_AUXPES: { // view / Set / Machine File Type / Brother PES
-	  menu::setpes();
+	  setpes();
 	  flag = true;
 	  break;
 	}
 #endif
 	case ID_AUXDST: { // view / Set / Machine File Type / Tajima DST
-	  menu::setdst();
+	  setdst();
 	  flag = true;
 	  break;
 	}
@@ -1351,7 +1351,7 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VUTHRDS: { // view / Show Threads
-	  menu::vuthrds();
+	  vuthrds();
 	  flag = true;
 	  break;
 	}

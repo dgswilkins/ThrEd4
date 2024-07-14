@@ -194,8 +194,8 @@ void clip::deleclp(uint32_t formIndex) {
 }
 
 void clip::delclps(uint32_t formIndex) {
-  clip::deleclp(formIndex);
-  clip::delmclp(formIndex);
+  deleclp(formIndex);
+  delmclp(formIndex);
 }
 
 auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
@@ -349,7 +349,7 @@ void ci::lincrnr(uint32_t                    vertexIndex,
                  F_POINT const&              borderClipReference) {
   auto const itVertex     = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 2);
   auto       moveToCoords = *itVertex; // intended copy
-  if (!ci::nupnt(clipAngle, moveToCoords, stitchPoint)) {
+  if (!nupnt(clipAngle, moveToCoords, stitchPoint)) {
 	return;
   }
   auto const delta = F_POINT {moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y};
@@ -360,7 +360,7 @@ void ci::lincrnr(uint32_t                    vertexIndex,
 	data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
 	++reversedData;
   }
-  ci::ritclp(clipFillData, stitchPoint);
+  ritclp(clipFillData, stitchPoint);
   stitchPoint = moveToCoords;
 }
 
@@ -386,7 +386,7 @@ void ci::linsid(uint32_t                    vertexIndex,
 	++reversedData;
   }
   for (auto iClip = 0U; iClip < clipCount; ++iClip) {
-	if (!ci::ritclp(clipFillData, stitchPoint)) {
+	if (!ritclp(clipFillData, stitchPoint)) {
 	  break;
 	}
 	stitchPoint += vector0;
@@ -444,7 +444,7 @@ auto ci::clpsid(uint32_t                    vertexIndex,
 	++reversedData;
   }
   for (auto stepCount = 0U; stepCount < clipCount; ++stepCount) {
-	if (!ci::ritclp(clipFillData, insertPoint)) {
+	if (!ritclp(clipFillData, insertPoint)) {
 	  break;
 	}
 	insertPoint += step;
@@ -531,7 +531,7 @@ void ci::fxlit(uint32_t                  vertexIndex,
                uint32_t&                 adjCount,
                float                     adjustedSpace,
                uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
-  if (!ci::fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
+  if (!fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
 	return;
   }
   stitchPoint = moveToCoords;
@@ -554,7 +554,7 @@ void ci::fxlin(uint32_t                  vertexIndex,
                F_POINT&                  stitchPoint,
                float                     adjustedSpace,
                uint32_t                  nextStart) {
-  if (!ci::fxpnt(vertexIndex, ListSINEs, ListCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
+  if (!fxpnt(vertexIndex, ListSINEs, ListCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
 	return;
   }
   stitchPoint = moveToCoords;
@@ -612,11 +612,11 @@ void ci::fxlen(FRM_HEAD const&           form,
 	auto stitchPoint = *itFirstVertex;
 	for (auto currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
 	  nextStart = currentSide + 1U;
-	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount, adjustedSpace, nextStart);
+	  fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount, adjustedSpace, nextStart);
 	}
 	if (form.type != FRMLINE) {
 	  nextStart = 0;
-	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjCount, adjustedSpace, nextStart);
+	  fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjCount, adjustedSpace, nextStart);
 	}
 	else {
 	  nextStart = form.vertexCount - 1U;
@@ -662,11 +662,11 @@ void ci::fxlen(FRM_HEAD const&           form,
   chainEndPoints.push_back(stitchPoint);
   for (auto currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
 	nextStart = currentSide + 1U;
-	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart);
+	fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart);
   }
   if (form.type != FRMLINE) {
 	nextStart = 0;
-	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
+	fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
   }
   auto const lastVertex = wrap::next(itFirstVertex, nextStart);
   if (auto const interval = std::hypot(lastVertex->x - stitchPoint.x, lastVertex->y - stitchPoint.y);
@@ -692,7 +692,7 @@ void ci::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
   listSINEs.push_back(sin((FormAngles->front() > FormAngles->operator[](prevCount))
                               ? (FormAngles->front() - FormAngles->operator[](prevCount))
                               : (FormAngles->operator[](prevCount) - FormAngles->front())));
-  ci::fxlen(form, chainEndPoints, listSINEs, listCOSINEs);
+  fxlen(form, chainEndPoints, listSINEs, listCOSINEs);
 }
 
 void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
@@ -728,7 +728,7 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 }
 
 void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
-  ci::dulast(chainEndPoints);
+  dulast(chainEndPoints);
   auto const& form = FormList->operator[](ClosestFormToCursor);
   if (form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
@@ -807,7 +807,7 @@ void ci::clpcrnr(FRM_HEAD const&       form,
   OSequence->push_back(point);
   OSequence->push_back(*itVertex);
   OSequence->push_back(point);
-  if (ci::ritclp(clipFillData, point)) {
+  if (ritclp(clipFillData, point)) {
 	OSequence->push_back(point);
 	OSequence->push_back(*itVertex);
   }
@@ -858,7 +858,7 @@ void ci::picfn(FRM_HEAD const&       form,
 	OSequence->push_back(outerPoint);
 	OSequence->push_back(firstPoint);
 	OSequence->push_back(outerPoint);
-	if (!ci::ritclp(clipFillData, outerPoint)) {
+	if (!ritclp(clipFillData, outerPoint)) {
 	  flag = false;
 	  break;
 	}
@@ -955,15 +955,15 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   }
   --chainLength;
   for (auto iPoint = 0U; iPoint < chainLength - 1U; ++iPoint) {
-	ci::duchfn(chainEndPoints, iPoint, iPoint + 1U);
+	duchfn(chainEndPoints, iPoint, iPoint + 1U);
   }
   auto const& form = FormList->operator[](ClosestFormToCursor);
   if (form.type != FRMLINE) {
-	ci::duchfn(chainEndPoints, chainLength - 1, 0);
+	duchfn(chainEndPoints, chainLength - 1, 0);
 	OSequence->push_back(chainEndPoints[chainLength]);
 	return;
   }
-  ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
+  duchfn(chainEndPoints, chainLength - 1, chainLength);
   constexpr auto CHLEN = size_t {8U}; // number of stitches in a chain
 
   auto backupAt = CHLEN;
@@ -981,7 +981,7 @@ void clip::chnfn(FRM_HEAD const& form) {
   // reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
   constexpr auto CLRES = size_t {50U}; // testing shows this to be a good value
   chainEndPoints.reserve(CLRES);
-  clip::deleclp(ClosestFormToCursor);
+  deleclp(ClosestFormToCursor);
   ci::dufxlen(form, chainEndPoints);
   ci::dulast(chainEndPoints);
   ci::duch(chainEndPoints);

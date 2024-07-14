@@ -129,7 +129,7 @@ auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
 	  guideIndex += form.satinGuideCount;
 	}
   }
-  si::sacspac(guideIndex, guideCount);
+  sacspac(guideIndex, guideCount);
   return guideIndex;
 }
 
@@ -308,7 +308,7 @@ void si::satclos() {
 	return;
   }
   if (form.satinGuideCount != 0U) {
-	si::sacspac(form.satinGuideIndex + form.satinGuideCount, 1);
+	sacspac(form.satinGuideIndex + form.satinGuideCount, 1);
 	auto const itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex + form.satinGuideCount);
 	itGuide->start  = closestVertex;
 	itGuide->finish = ClosestVertexToCursor;
@@ -316,7 +316,7 @@ void si::satclos() {
 	satin::satadj(form);
 	return;
   }
-  form.satinGuideIndex = si::nusac(ClosestFormToCursor, 1);
+  form.satinGuideIndex = nusac(ClosestFormToCursor, 1);
   auto const itGuide   = wrap::next(SatinGuides->begin(), form.satinGuideIndex + initialGuideCount);
   itGuide->start       = closestVertex;
   itGuide->finish      = ClosestVertexToCursor;
@@ -606,7 +606,7 @@ void satin::satadj(FRM_HEAD& form) {
 	// sort the guides
 	auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
 	auto const itEndGuide   = wrap::next(itStartGuide, form.satinGuideCount);
-	std::sort(itStartGuide, itEndGuide, satin::scomp);
+	std::sort(itStartGuide, itEndGuide, scomp);
   }
   if (form.satinGuideCount < savedGuideCount) {
 	auto const iGuide = savedGuideCount - currentGuidesCount;
@@ -807,7 +807,7 @@ void satin::ribon() {
   }
   thred::savdo();
   auto const savedFormIndex = ClosestFormToCursor;
-  satin::satout(FormList->operator[](ClosestFormToCursor), BorderWidth);
+  satout(FormList->operator[](ClosestFormToCursor), BorderWidth);
   if (FormList->empty()) {
 	throw std::runtime_error("FormList is empty");
   }
@@ -891,7 +891,7 @@ void satin::slbrd(FRM_HEAD const& form) {
   OSequence->clear();
   if ((form.edgeType & EGUND) != 0U) {
 	auto const width = form.borderSize * URAT;
-	satin::satout(form, width);
+	satout(form, width);
 	si::satends(form, form.attribute, width);
 	StateMap->reset(StateFlag::SAT1);
 	StateMap->reset(StateFlag::FILDIR);
@@ -904,7 +904,7 @@ void satin::slbrd(FRM_HEAD const& form) {
 	  si::sbfn(*InsidePoints, iVertex, iVertex - 1, stitchPoint);
 	}
   }
-  satin::satout(form, form.borderSize);
+  satout(form, form.borderSize);
   si::satends(form, form.attribute, form.borderSize);
   LineSpacing = form.edgeSpacing;
   StateMap->reset(StateFlag::SAT1);
@@ -1119,7 +1119,7 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 	start = 1;
   }
   auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
-  si::satfn(form, lengths, start, itGuide->start, form.vertexCount, itGuide->finish);
+  satfn(form, lengths, start, itGuide->start, form.vertexCount, itGuide->finish);
   auto endGuideIndex = form.satinGuideCount;
   if (endGuideIndex != 0U) {
 	--endGuideIndex;
@@ -1129,11 +1129,11 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 	auto const& thisGuide = *itGuide;
 	++itGuide;
 	auto const& nextGuide = *itGuide;
-	si::satfn(form, lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
+	satfn(form, lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
   }
   auto const& endGuide = form.wordParam;
   if (endGuide != 0U) {
-	si::satfn(form, lengths, itEndGuide->start, endGuide, itEndGuide->finish, endGuide + 1U);
+	satfn(form, lengths, itEndGuide->start, endGuide, itEndGuide->finish, endGuide + 1U);
   }
   else {
 	if (itEndGuide->finish - itEndGuide->start > 2) {
@@ -1149,10 +1149,10 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 	  if (deltaY > deltaX) {
 		--iVertex;
 	  }
-	  si::satfn(form, lengths, itEndGuide->start, iVertex, itEndGuide->finish, iVertex);
+	  satfn(form, lengths, itEndGuide->start, iVertex, itEndGuide->finish, iVertex);
 	}
 	else {
-	  si::satfn(
+	  satfn(
 	      form, lengths, itEndGuide->start, itEndGuide->start + 1, itEndGuide->finish, itEndGuide->start + 1U);
 	}
   }
@@ -1160,7 +1160,7 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 
 void satin::satfil(FRM_HEAD& form) {
   auto const savedSpacing = LineSpacing;
-  satin::satadj(form);
+  satadj(form);
   LineSpacing /= 2;
   OSequence->clear();
   BSequence->clear();
@@ -1295,7 +1295,7 @@ void satin::drwsat() {
   formLines[vertexCount] =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOSAT);
-  satin::dusat();
+  dusat();
 }
 
 void satin::satpnt0() {
@@ -1312,7 +1312,7 @@ void satin::satpnt1() {
   auto&      formLines   = *FormLines;
   formLines[vertexCount] =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  satin::dusat();
+  dusat();
   TempPolygon->push_back(thred::pxCor2stch(WinMsg.pt));
   StateMap->set(StateFlag::RESTCH);
 }
@@ -1381,10 +1381,10 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
 		auto const offsetStep   = F_POINT {offsetDelta.x / wrap::toFloat(offsetCount),
                                          offsetDelta.y / wrap::toFloat(offsetCount)};
 		auto       offset       = innerPoint;
-		while (si::chkbak(satinBackup, offset)) {
+		while (chkbak(satinBackup, offset)) {
 		  offset -= offsetStep;
 		}
-		si::filinsbw(satinBackup, offset, satinBackupIndex, stitchPoint);
+		filinsbw(satinBackup, offset, satinBackupIndex, stitchPoint);
 	  }
 	  else {
 		form::filinsb(innerPoint, stitchPoint);
@@ -1398,10 +1398,10 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
 		auto const offsetStep   = F_POINT {offsetDelta.x / wrap::toFloat(offsetCount),
                                          offsetDelta.y / wrap::toFloat(offsetCount)};
 		auto       offset       = outerPoint;
-		while (si::chkbak(satinBackup, offset)) {
+		while (chkbak(satinBackup, offset)) {
 		  offset -= offsetStep;
 		}
-		si::filinsbw(satinBackup, offset, satinBackupIndex, stitchPoint);
+		filinsbw(satinBackup, offset, satinBackupIndex, stitchPoint);
 	  }
 	  else {
 		form::filinsb(outerPoint, stitchPoint);
@@ -1413,7 +1413,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
 void si::sfn(FRM_HEAD const& form, uint32_t startVertex, F_POINT& stitchPoint) {
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const nextVertex = form::nxt(form, startVertex);
-	si::sbfn(*InsidePoints, startVertex, nextVertex, stitchPoint);
+	sbfn(*InsidePoints, startVertex, nextVertex, stitchPoint);
 	startVertex = nextVertex;
   }
   OSequence->front() = OSequence->back();
@@ -1428,7 +1428,7 @@ void satin::satzum() {
   SelectObject(StitchWindowMemDC, FormPen);
   wrap::polyline(StitchWindowMemDC, FormLines->data(), vertexCount);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
-  satin::drwsat();
+  drwsat();
 }
 
 void satin::satout(FRM_HEAD const& form, float satinWidth) {
@@ -1474,12 +1474,12 @@ void satin::sbrd(FRM_HEAD const& form) {
   OSequence->emplace_back();
   if ((form.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
-	satin::satout(form, form.borderSize * URAT);
+	satout(form, form.borderSize * URAT);
 	si::sfn(form, start, stitchPoint);
 	StateMap->set(StateFlag::FILDIR);
 	si::sfn(form, start, stitchPoint);
   }
-  satin::satout(form, form.borderSize);
+  satout(form, form.borderSize);
   LineSpacing = form.edgeSpacing;
   si::sfn(form, start, stitchPoint);
   LineSpacing = savedSpacing;

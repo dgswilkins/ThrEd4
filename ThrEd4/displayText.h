@@ -52,22 +52,22 @@ void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
 
 template <class inType> auto format(uint32_t messageId, inType value) -> std::wstring {
-  return fmt::format(fmt::runtime(displayText::loadStr(messageId)), value);
+  return fmt::format(fmt::runtime(loadStr(messageId)), value);
 }
 
 template <class inTypeA, class inTypeB>
 auto format2(uint32_t messageId, inTypeA valueA, inTypeB valueB) -> std::wstring {
-  return fmt::format(fmt::runtime(displayText::loadStr(messageId)), valueA, valueB);
+  return fmt::format(fmt::runtime(loadStr(messageId)), valueA, valueB);
 }
 
 template <class inTypeA, class inTypeB, class inTypeC, class inTypeD, class inTypeE>
 auto format5(uint32_t messageId, inTypeA valueA, inTypeB valueB, inTypeC valueC, inTypeD valueD, inTypeE valueE)
     -> std::wstring {
-  return fmt::format(fmt::runtime(displayText::loadStr(messageId)), valueA, valueB, valueC, valueD, valueE);
+  return fmt::format(fmt::runtime(loadStr(messageId)), valueA, valueB, valueC, valueD, valueE);
 }
 
 template <class inType> void showMessage(uint32_t messageId, inType value) {
-  auto const fmtStr = displayText::format(messageId, value);
+  auto const fmtStr = format(messageId, value);
   displayText::shoMsg(fmtStr, true);
 }
 

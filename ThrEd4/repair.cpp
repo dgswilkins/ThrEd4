@@ -190,24 +190,24 @@ auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 		if (form.vertexCount == 0U) {
 		  badData.attribute |= BADFLT;
 		}
-		ri::chkVrtx(form, badData);
+		chkVrtx(form, badData);
 	  }
 	  if ((badData.attribute & BADCLP) == 0U) {
 		if (form.isClip()) {
-		  ri::chkclp(form, badData);
+		  chkclp(form, badData);
 		}
 		if (form.isEdgeClip()) {
-		  ri::chkeclp(form, badData);
+		  chkeclp(form, badData);
 		}
 	  }
 	  if ((badData.attribute & BADSAT) == 0U) {
 		if (form.type == SAT && (form.satinGuideCount != 0U)) {
-		  ri::chkSat(form, badData);
+		  chkSat(form, badData);
 		}
 	  }
 	  if ((badData.attribute & BADTX) == 0U) {
 		if (form.isTexture()) {
-		  ri::chkTxt(form, badData);
+		  chkTxt(form, badData);
 		}
 	  }
 	  if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX)) {
@@ -273,7 +273,7 @@ void ri::repflt(std::wstring& repairMessage) {
 	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
 	  form.vertexIndex = iVertex;
 	  iVertex += form.vertexCount;
-	  ri::bcup(form, badData);
+	  bcup(form, badData);
 	  ++iForm;
 	  continue;
 	}
@@ -283,7 +283,7 @@ void ri::repflt(std::wstring& repairMessage) {
 	  auto const startVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	  auto const endVertex   = wrap::next(startVertex, form.vertexCount);
 	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
-	  ri::bcup(form, badData);
+	  bcup(form, badData);
 	  ++iForm;
 	  continue;
 	}
@@ -291,8 +291,8 @@ void ri::repflt(std::wstring& repairMessage) {
 	ClipPoints->resize(badData.clip);
 	SatinGuides->resize(badData.guideCount);
 	TexturePointsBuffer->resize(badData.tx);
-	ri::chkfstch();
-	ri::adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(FormList->size()));
+	chkfstch();
+	adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(FormList->size()));
 	break;
   }
   *FormVertices = std::move(vertexPoint);
@@ -377,7 +377,7 @@ void ri::repclp(std::wstring& repairMessage) {
   }
   std::ranges::copy(clipPoint, ClipPoints->begin());
   if (badClipCount != 0U) {
-	ri::adbad(repairMessage, IDS_CLPDAT, badClipCount);
+	adbad(repairMessage, IDS_CLPDAT, badClipCount);
   }
 }
 
@@ -396,7 +396,7 @@ void ri::repsat() {
 	  std::copy(startGuide, endGuide, destination);
 	  form.satinGuideIndex = guideCount;
 	  guideCount += form.satinGuideCount;
-	  ri::bcup(form, badData);
+	  bcup(form, badData);
 	  continue;
 	}
 	if (guideDifference < SatinGuides->size()) {
@@ -405,7 +405,7 @@ void ri::repsat() {
 	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
 	  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
 	  std::copy(startGuide, endGuide, destination);
-	  ri::bcup(form, badData);
+	  bcup(form, badData);
 	  continue;
 	}
 	guideCount           = badData.guideCount;
@@ -429,7 +429,7 @@ void ri::reptx() {
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(iForm.texture.index, textureCount);
 	  textureCount += iForm.texture.count;
-	  ri::bcup(iForm, badData);
+	  bcup(iForm, badData);
 	  continue;
 	}
 	if (TexturePointsBuffer->size() > iForm.texture.index) {
@@ -439,7 +439,7 @@ void ri::reptx() {
 	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(iForm.texture.index, textureCount);
-	  ri::bcup(iForm, badData);
+	  bcup(iForm, badData);
 	  textureCount = badData.tx;
 	  continue;
 	}
@@ -464,7 +464,7 @@ void repair::repar() {
   if ((repairType & BADTX) != 0U) {
 	ri::reptx();
   }
-  repair::lodchk();
+  lodchk();
   StateMap->set(StateFlag::RESTCH);
   displayText::shoMsg(repairMessage, false);
 }
@@ -504,13 +504,13 @@ void repair::frmchkx() {
 	}
 	case 2: {
 	  if (code != 0U) {
-		repair::repar();
+		repar();
 	  }
 	  break;
 	}
 	case 3: {
 	  if (code != 0U) {
-		repair::repar();
+		repar();
 		displayText::tabmsg(IDS_DATREP, false);
 	  }
 	  break;

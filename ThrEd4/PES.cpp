@@ -566,7 +566,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 	auto const iRow       = std::next(iThumbnail->begin(), xCoord);
 	*iRow                 = 1U;
   }
-  pi::writeThumbnail(pecBuffer, thumbnail);
+  writeThumbnail(pecBuffer, thumbnail);
   // now write out the individual thread thumbnails
   thumbnail        = IMAGE_WITH_FRAME;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
@@ -579,13 +579,13 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 	  *iRow = 1U;
 	}
 	else {
-	  pi::writeThumbnail(pecBuffer, thumbnail);
+	  writeThumbnail(pecBuffer, thumbnail);
 	  thumbnail   = IMAGE_WITH_FRAME;
 	  stitchColor = (stitch.attribute & COLMSK);
 	  *iRow       = 1U;
 	}
   }
-  pi::writeThumbnail(pecBuffer, thumbnail);
+  writeThumbnail(pecBuffer, thumbnail);
 }
 
 auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
