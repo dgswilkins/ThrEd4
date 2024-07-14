@@ -144,9 +144,9 @@ auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number wind
 auto CurrentTracePoint  = POINT {};                      // current point being traced
 auto TraceDataSize      = uint32_t {};                   // size of the trace bitmap in double words
 auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
-auto TraceRGBFlag = std::array<StateFlag, 3> {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
-auto TraceRGBMask = std::array<uint32_t, 3> {REDMSK, GRNMSK, BLUMSK}; // trace masks
-auto TraceRGB     = std::array<uint32_t, 3> {BLUCOL, GRNCOL, REDCOL}; // trace colors
+auto TraceRGBFlag = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
+auto TraceRGBMask = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
+auto TraceRGB     = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
 auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
 auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
 auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
@@ -158,7 +158,7 @@ auto TraceMsgPoint    = POINT {};    // message point for trace parsing
 auto HighColors       = std::array<uint32_t, CHANLCNT> {}; // separated upper reference colors
 auto LowColors        = std::array<uint32_t, CHANLCNT> {}; // separated lower reference colors
 auto ColumnColor      = uint32_t {};                       // trace color column
-auto TraceShift       = std::array<uint32_t, 3> {0U, BYTSHFT, WRDSHFT}; // trace shift values
+auto TraceShift       = std::array {0U, BYTSHFT, WRDSHFT}; // trace shift values
 auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {}; // red,green,and blue brushes
 auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr); // trace number input window
 auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
@@ -382,7 +382,7 @@ void trace::trdif() {
   if (!StateMap->test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
-  auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(bitmapSize));
+  auto const spTBD = gsl::span(TraceBitmapData, wrap::toSize(bitmapSize));
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
 	  auto iPoint = iHeight * bitmap::getBitmapWidth();
@@ -453,7 +453,7 @@ void trace::trace() {
   untrace();
   ti::tracwnd();
   TraceDataSize    = bitmap::getrmap();
-  auto const spTBD = gsl::span<uint32_t>(
+  auto const spTBD = gsl::span(
       TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
   if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
@@ -594,7 +594,7 @@ void trace::tracedg() {
 	}
   }
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
-  auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  auto const spTBD      = gsl::span(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
   for (auto& iPixel : spTBD) {
 	if (TracedEdges->test(pos)) {
@@ -951,7 +951,7 @@ void trace::trinit() {
 	TraceDataSize = bitmap::getrmap();
   }
   if (StateMap->test(StateFlag::MONOMAP)) {
-	auto const spTBD = gsl::span<uint32_t> {
+	auto const spTBD = gsl::span {
 	    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
 	auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
 	auto       highColor = color;
@@ -971,7 +971,7 @@ void trace::trinit() {
 	}
   }
   else {
-	auto const spTBD = gsl::span<uint32_t> {
+	auto const spTBD = gsl::span {
 	    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
 	for (auto const pixel : spTBD) {
 	  auto colors  = ti::trcols(pixel);
@@ -1026,7 +1026,7 @@ void trace::trcsel() {
   StateMap->reset(StateFlag::HIDMAP);
   StateMap->reset(StateFlag::TRSET);
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
-  auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  auto const spTBD      = gsl::span(TraceBitmapData, bitmapSize);
   for (auto& iPixel : spTBD) {
 	auto colors                = ti::trcols(iPixel);
 	auto maximumColorComponent = colors[0];

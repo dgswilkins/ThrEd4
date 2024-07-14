@@ -3196,7 +3196,7 @@ void thi::duver(fs::path const& name) {
 void thi::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
 	auto const spSrc =
-	    gsl::span<const char> {gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count)};
+	    gsl::span {gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count)};
 	destination.insert(destination.end(), spSrc.begin(), spSrc.end());
   }
 }
@@ -3477,7 +3477,7 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
   }
 #if PESACT
   static constexpr auto ALL_FILE_TYPES =
-      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
+      std::array {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
 #else
   static constexpr auto ALL_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
@@ -3607,7 +3607,7 @@ void thred::dun() {
   unsid();
   unbsho();
   rstAll();
-  gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
+  gsl::not_null const balaradName0 = bal::getBN0();
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
   if (thi::savcmp() || (!balaradName0->empty())) {
 	reldun();
@@ -3935,7 +3935,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	case FileStyles::ALL_FILES: {
 #if PESACT
 	  static constexpr auto ALL_FILE_TYPES =
-	      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
+	      std::array {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
 #else
 	  static constexpr auto ALL_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
@@ -3943,7 +3943,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 	  break;
 	}
 	case FileStyles::INS_FILES: {
-	  static constexpr auto INSERT_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
+	  static constexpr auto INSERT_FILE_TYPES = std::array {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
 	  hResult +=
 	      pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()), INSERT_FILE_TYPES.data());
 	  break;
@@ -6395,7 +6395,7 @@ void thred::redclp() {
   }
   auto const* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(clipPointer);
   auto const        clipSize         = clipStitchPtr->led;
-  auto const        spClipStitchData = gsl::span<const CLIP_STITCH> {clipStitchPtr, clipSize};
+  auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
   ClipBuffer->clear();
   ClipBuffer->reserve(clipSize);
   ClipBuffer->emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
@@ -10486,7 +10486,7 @@ void thi::ducmd() {
   if (ArgCount <= 1) {
 	return;
   }
-  auto const spArgList = gsl::span<LPTSTR> {ArgList, wrap::toSize(ArgCount)};
+  auto const spArgList = gsl::span {ArgList, wrap::toSize(ArgCount)};
   auto const arg1      = std::wstring {spArgList[1]};
   if (arg1.compare(0, 4, L"/F1:") != 0) {
 	WorkingFileName->assign(arg1);
@@ -10502,7 +10502,7 @@ void thi::ducmd() {
 	return;
   }
   CloseHandle(balaradFile);
-  gsl::not_null<fs::path*> const balaradName0 = bal::getBN0();
+  gsl::not_null const balaradName0 = bal::getBN0();
   *balaradName0                               = balaradFileName;
   if (ArgCount <= 2) {
 	return;
@@ -10519,7 +10519,7 @@ void thi::ducmd() {
   }
   auto readBuffer = std::vector<char> {};
   readBuffer.resize(MAX_PATH + 1);
-  gsl::not_null<fs::path*> const balaradName1 = bal::getBN1();
+  gsl::not_null const balaradName1 = bal::getBN1();
   *balaradName1                               = balaradFileName;
   auto bytesRead                              = DWORD {};
   if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
@@ -10527,7 +10527,7 @@ void thi::ducmd() {
   }
   if (bytesRead != 0U) {
 	readBuffer.resize(bytesRead);
-	gsl::not_null<fs::path*> const balaradName2 = bal::getBN2();
+	gsl::not_null const balaradName2 = bal::getBN2();
 	balaradName2->assign(readBuffer.data());
 	bal::redbal();
   }
@@ -12736,7 +12736,7 @@ void thred::destroyChangeThreadSizeWindows() noexcept {
 }
 
 void thred::updateThreadSize(uint32_t threadSizeSelected) {
-  static constexpr auto THREAD_SIZE_MAP = std::array<wchar_t, 3> {L'3', L'4', L'6'};
+  static constexpr auto THREAD_SIZE_MAP = std::array {L'3', L'4', L'6'};
 
   auto const itThreadSize = wrap::next(ThreadSize.begin(), threadSizeSelected);
   auto const tsm          = wrap::next(THREAD_SIZE_MAP.begin(), VerticalIndex);
@@ -12753,7 +12753,7 @@ void thred::updateThreadSize(uint32_t threadSizeSelected) {
 }
 
 auto thred::createChangeThreadSizeWindows() -> uint32_t {
-  static constexpr auto THREAD_SIZES = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
+  static constexpr auto THREAD_SIZES = std::array {L"30", L"40", L"60"};
   savdo();
   auto const threadSizeSelected = VerticalIndex;
   auto       idx                = gsl::narrow_cast<int32_t>(VerticalIndex);

@@ -473,7 +473,7 @@ public:
   static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, GRDBLU};
   static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRDGRN};
   static constexpr auto GRID_CODES =
-      std::array<GRID_COL, 6> {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
+      std::array {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
 
   for (auto const& gridCode : GRID_CODES) {
 	if (color == gridCode.col) {

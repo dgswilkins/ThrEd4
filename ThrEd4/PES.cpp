@@ -352,7 +352,7 @@ static constexpr auto INDEX62 = THREAD {{0xff, 0xc8, 0x64}, "Applique Material",
 static constexpr auto INDEX63 = THREAD {{0xff, 0xc8, 0xc8}, "Applique Position", ""};
 static constexpr auto INDEX64 = THREAD {{0xff, 0xc8, 0xc8}, "Applique", ""};
 
-static constexpr auto PES_THREAD = std::array<THREAD, 65> {
+static constexpr auto PES_THREAD = std::array {
     INDEX00, INDEX01, INDEX02, INDEX03, INDEX04, INDEX05, INDEX06, INDEX07, INDEX08, INDEX09,
     INDEX10, INDEX11, INDEX12, INDEX13, INDEX14, INDEX15, INDEX16, INDEX17, INDEX18, INDEX19,
     INDEX20, INDEX21, INDEX22, INDEX23, INDEX24, INDEX25, INDEX26, INDEX27, INDEX28, INDEX29,
@@ -642,9 +642,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  constexpr auto VERLEN = 13; // number of version strings in the array
 
-  constexpr std::array<const char*, VERLEN> VER_STRINGS = {
+  constexpr std::array VER_STRINGS = {
       "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
 
   auto contFlag = false;
@@ -666,7 +665,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   auto const pesColorCount = pecHeader->colorCount + 1U;
-  auto const pesColors     = gsl::span<uint8_t> {pecHeader->pad.data(), pesColorCount};
+  auto const pesColors     = gsl::span {pecHeader->pad.data(), pesColorCount};
   auto       colorMap      = boost::dynamic_bitset<>(THTYPCNT);
   auto       iUserColor    = UserColor.begin();
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
@@ -704,7 +703,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
   auto       pesColorIndex = uint32_t {1U};
-  auto const pesStitches   = gsl::span<const uint8_t> {pesStitch, pecCount};
+  auto const pesStitches   = gsl::span {pesStitch, pecCount};
   while (iPESstitch < pecCount) {
 	// check for end marker NOLINTNEXTLINE(readability-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xff && pesStitches[iPESstitch + 1U] == 0) {
@@ -921,7 +920,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  CloseHandle(fileHandle);
 	  return false;
 	}
-	auto const colorEntries = gsl::span<uint16_t> {colorEntry, 2};
+	auto const colorEntries = gsl::span {colorEntry, 2};
 	colorEntries[0]         = threadList[paletteIndex].getBlockIndex();
 	colorEntries[1]         = threadList[paletteIndex].getColorIndex();
   }

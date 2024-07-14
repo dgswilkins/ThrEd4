@@ -986,7 +986,7 @@ auto form::sRct2px(F_RECTANGLE const& stitchRect) -> RECT {
 
 void fi::drawStartGuide(FRM_HEAD const& form, uint8_t layer, unsigned int& lastPoint) noexcept {
   SelectObject(StitchWindowMemDC, FormPen);
-  frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
+  frmpoly(gsl::span(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
   SelectObject(StitchWindowMemDC, FormPen3px);
   wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
   SelectObject(StitchWindowMemDC, getLayerPen(layer));
@@ -1074,7 +1074,7 @@ void form::drwfrm() {
 	SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
 	if (form.type == FRMLINE) { // if the form is a line, draw it
 	  if (form.vertexCount > 0) {
-		fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
+		fi::frmpoly(gsl::span(FormLines->data(), form.vertexCount - 1));
 		if (form.fillType == CONTF) { // if the form is a contour fill, draw the fill guide
 		  auto       line           = std::array<POINT, 2> {};
 		  auto const itFirstVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -1088,7 +1088,7 @@ void form::drwfrm() {
 	}
 	else { // if the form is a polygon, draw it
 	  if (form.vertexCount > lastPoint) {
-		fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](lastPoint)), form.vertexCount - lastPoint));
+		fi::frmpoly(gsl::span(std::addressof(FormLines->operator[](lastPoint)), form.vertexCount - lastPoint));
 	  }
 	}
 	if (ClosestFormToCursor == iForm &&
@@ -2195,27 +2195,27 @@ void fi::fillSB(const F_POINT& pivot, float angle, float const& radius, F_POINT&
 
 void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint) {
   // clang-format off
-  static constexpr auto LEVEL00 = std::array<float,  1U>{ 0.0F };
-  static constexpr auto LEVEL01 = std::array<float,  1U>{ 1.0F };
-  static constexpr auto LEVEL02 = std::array<float,  2U>{ 0.0F/2.0F , 1.0F/2.0F  };
-  static constexpr auto LEVEL03 = std::array<float,  3U>{ 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
-  static constexpr auto LEVEL04 = std::array<float,  4U>{ 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
-  static constexpr auto LEVEL05 = std::array<float,  5U>{ 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
-  static constexpr auto LEVEL06 = std::array<float,  6U>{ 2.0F/6.0F , 3.0F/6.0F , 1.0F/6.0F , 4.0F/6.0F , 0.0F/6.0F , 5.0F/6.0F  };
-  static constexpr auto LEVEL07 = std::array<float,  7U>{ 3.0F/7.0F , 2.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 5.0F/7.0F , 0.0F/7.0F ,  6.0F/7.0F  };
-  static constexpr auto LEVEL08 = std::array<float,  8U>{ 4.0F/8.0F , 3.0F/8.0F , 5.0F/8.0F , 2.0F/8.0F , 6.0F/8.0F , 1.0F/8.0F ,  7.0F/8.0F , 0.0F/8.0F  };
-  static constexpr auto LEVEL09 = std::array<float,  9U>{ 4.0F/9.0F , 3.0F/9.0F , 5.0F/9.0F , 2.0F/9.0F , 6.0F/9.0F , 1.0F/9.0F ,  7.0F/9.0F , 0.0F/9.0F ,  8.0F/9.0F  };
-  static constexpr auto LEVEL10 = std::array<float, 10U>{ 5.0F/10.0F, 4.0F/10.0F, 6.0F/10.0F, 3.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 1.0F/10.0F,  9.0F/10.0F,  0.0F/10.0F };
-  static constexpr auto LEVEL11 = std::array<float, 11U>{ 5.0F/11.0F, 4.0F/11.0F, 6.0F/11.0F, 3.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 1.0F/11.0F,  9.0F/11.0F,  0.0F/11.0F, 10.0F/11.0F };
-  static constexpr auto LEVEL12 = std::array<float, 12U>{ 6.0F/12.0F, 5.0F/12.0F, 7.0F/12.0F, 4.0F/12.0F, 8.0F/12.0F, 3.0F/12.0F,  9.0F/12.0F, 2.0F/12.0F, 10.0F/12.0F,  1.0F/12.0F, 11.0F/12.0F,  0.0F/12.0F};
-  static constexpr auto LEVEL13 = std::array<float, 13U>{ 6.0F/13.0F, 5.0F/13.0F, 7.0F/13.0F, 4.0F/13.0F, 8.0F/13.0F, 3.0F/13.0F,  9.0F/13.0F, 2.0F/13.0F, 10.0F/13.0F,  1.0F/13.0F, 11.0F/13.0F,  0.0F/13.0F, 12.0F/13.0F};
-  static constexpr auto LEVEL14 = std::array<float, 14U>{ 7.0F/14.0F, 6.0F/14.0F, 8.0F/14.0F, 5.0F/14.0F, 9.0F/14.0F, 4.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F, 12.0F/14.0F,  1.0F/14.0F, 13.0F/14.0F,  0.0F/14.0F };
-  static constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 6.0F/15.0F, 8.0F/15.0F, 5.0F/15.0F, 9.0F/15.0F, 4.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  2.0F/15.0F, 12.0F/15.0F,  1.0F/15.0F, 13.0F/15.0F,  0.0F/15.0F, 14.0F/15.0F};
+  static constexpr auto LEVEL00 = std::array { 0.0F };
+  static constexpr auto LEVEL01 = std::array { 1.0F };
+  static constexpr auto LEVEL02 = std::array { 0.0F/2.0F , 1.0F/2.0F  };
+  static constexpr auto LEVEL03 = std::array { 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
+  static constexpr auto LEVEL04 = std::array { 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
+  static constexpr auto LEVEL05 = std::array { 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
+  static constexpr auto LEVEL06 = std::array { 2.0F/6.0F , 3.0F/6.0F , 1.0F/6.0F , 4.0F/6.0F , 0.0F/6.0F , 5.0F/6.0F  };
+  static constexpr auto LEVEL07 = std::array { 3.0F/7.0F , 2.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 5.0F/7.0F , 0.0F/7.0F ,  6.0F/7.0F  };
+  static constexpr auto LEVEL08 = std::array { 4.0F/8.0F , 3.0F/8.0F , 5.0F/8.0F , 2.0F/8.0F , 6.0F/8.0F , 1.0F/8.0F ,  7.0F/8.0F , 0.0F/8.0F  };
+  static constexpr auto LEVEL09 = std::array { 4.0F/9.0F , 3.0F/9.0F , 5.0F/9.0F , 2.0F/9.0F , 6.0F/9.0F , 1.0F/9.0F ,  7.0F/9.0F , 0.0F/9.0F ,  8.0F/9.0F  };
+  static constexpr auto LEVEL10 = std::array { 5.0F/10.0F, 4.0F/10.0F, 6.0F/10.0F, 3.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 1.0F/10.0F,  9.0F/10.0F,  0.0F/10.0F };
+  static constexpr auto LEVEL11 = std::array { 5.0F/11.0F, 4.0F/11.0F, 6.0F/11.0F, 3.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 1.0F/11.0F,  9.0F/11.0F,  0.0F/11.0F, 10.0F/11.0F };
+  static constexpr auto LEVEL12 = std::array { 6.0F/12.0F, 5.0F/12.0F, 7.0F/12.0F, 4.0F/12.0F, 8.0F/12.0F, 3.0F/12.0F,  9.0F/12.0F, 2.0F/12.0F, 10.0F/12.0F,  1.0F/12.0F, 11.0F/12.0F,  0.0F/12.0F};
+  static constexpr auto LEVEL13 = std::array { 6.0F/13.0F, 5.0F/13.0F, 7.0F/13.0F, 4.0F/13.0F, 8.0F/13.0F, 3.0F/13.0F,  9.0F/13.0F, 2.0F/13.0F, 10.0F/13.0F,  1.0F/13.0F, 11.0F/13.0F,  0.0F/13.0F, 12.0F/13.0F};
+  static constexpr auto LEVEL14 = std::array { 7.0F/14.0F, 6.0F/14.0F, 8.0F/14.0F, 5.0F/14.0F, 9.0F/14.0F, 4.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F, 12.0F/14.0F,  1.0F/14.0F, 13.0F/14.0F,  0.0F/14.0F };
+  static constexpr auto LEVEL15 = std::array { 7.0F/15.0F, 6.0F/15.0F, 8.0F/15.0F, 5.0F/15.0F, 9.0F/15.0F, 4.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  2.0F/15.0F, 12.0F/15.0F,  1.0F/15.0F, 13.0F/15.0F,  0.0F/15.0F, 14.0F/15.0F};
   // clang-format on
 
   constexpr auto LEVELSMAX = uint32_t {15U}; // max number of levels defined in the table
 
-  auto constexpr LEVELS = std::array<float const*, 16> {LEVEL00.data(),
+  auto constexpr LEVELS = std::array {LEVEL00.data(),
                                                         LEVEL01.data(),
                                                         LEVEL02.data(),
                                                         LEVEL03.data(),
@@ -2277,7 +2277,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
 	}
 	return;
   }
-  auto const spLevels = gsl::span<const float> {LEVELS.operator[](count), count};
+  auto const spLevels = gsl::span {LEVELS.operator[](count), count};
   for (auto const& level : spLevels) {
 	fillSB(pivot, startAngle, radius, stitchPoint, level);
 	startAngle += stepAngle;
@@ -4834,9 +4834,8 @@ void fi::lcon(FRM_HEAD const&              form,
 }
 
 void fi::handleSeqTop(size_t iSequence, B_SEQ_PNT const& bCurrent) {
-  constexpr auto RITSIZ = 6;
 
-  static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
+  static constexpr auto SEQ_TABLE = std::array {
       12,
       7,
       15,
@@ -4906,9 +4905,8 @@ void fi::handleSeqTop(size_t iSequence, B_SEQ_PNT const& bCurrent) {
 }
 
 void fi::handleSeqBot(size_t iSequence, B_SEQ_PNT const& bCurrent) {
-  constexpr auto RITSIZ = 6;
 
-  static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
+  static constexpr auto SEQ_TABLE = std::array {
       12,
       7,
       15,

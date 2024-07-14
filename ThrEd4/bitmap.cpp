@@ -216,8 +216,8 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	auto const bitmap = bi::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	// Synchronize
 	GdiFlush();
-	auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
-	auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth * BitmapHeight));
+	auto const spMBD     = gsl::span(monoBitmapData);
+	auto const spBits    = gsl::span(bits, wrap::toSize(BitmapWidth * BitmapHeight));
 	auto       srcOffset = 0U;
 	auto       dstOffset = 0U;
 	auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
@@ -330,7 +330,7 @@ auto bi::saveName(fs::path& fileName) {
   if (FAILED(hResult) || (nullptr == pFileSave)) {
 	return false;
   }
-  constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+  constexpr auto FILTER_FILE_TYPES = std::array {FLTBMP, FLTALL};
   hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
   hResult += pFileSave->SetFileTypeIndex(0);
   hResult += pFileSave->SetTitle(L"Save Bitmap");
@@ -389,7 +389,7 @@ void bitmap::savmap() {
   WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
   auto buffer = std::vector<uint8_t> {};
   buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
-  auto const spTrace = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(BitmapWidth * BitmapHeight));
+  auto const spTrace = gsl::span(TraceBitmapData, wrap::toSize(BitmapWidth * BitmapHeight));
   bi::movmap(spTrace, buffer);
   WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
   CloseHandle(hBitmap);
@@ -417,7 +417,7 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
   if (FAILED(hResult)) {
 	return false;
   }
-  static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+  static constexpr auto FILTER_FILE_TYPES = std::array {FLTBMP, FLTALL};
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
   hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());

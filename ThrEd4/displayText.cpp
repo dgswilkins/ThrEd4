@@ -60,7 +60,7 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
   auto  sDest = std::wstring {};
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) {
-	auto const span = gsl::span<wchar_t> {pBuf, wrap::toSize(len)};
+	auto const span = gsl::span {pBuf, wrap::toSize(len)};
 	sDest.insert(sDest.end(), span.begin(), span.end());
   }
   return sDest;
