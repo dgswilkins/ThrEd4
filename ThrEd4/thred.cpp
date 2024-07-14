@@ -10324,9 +10324,7 @@ void thi::handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
   if (menu::handleFillMenu(wParameter)) {
 	return;
   }
-  if (menu::handleViewMenu(wParameter)) {
-	return;
-  }
+  menu::handleViewMenu(wParameter);
 }
 
 auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
