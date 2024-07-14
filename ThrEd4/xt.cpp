@@ -50,6 +50,7 @@
 
 // Standard Libraries
 #include <array>
+#include <bit>
 #include <cstring>
 #include <cmath>
 #include <cstddef>
