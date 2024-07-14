@@ -993,7 +993,7 @@ class PEC_COLOR
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
-template <class T2, class T1> inline _Ret_notnull_ auto convertFromPtr(T1* pointer) -> T2 {
+template <class T2, class T1> _Ret_notnull_ auto convertFromPtr(T1* pointer) -> T2 {
   if (pointer) {
 	return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
   }
