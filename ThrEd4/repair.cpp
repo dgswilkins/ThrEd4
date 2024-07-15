@@ -104,10 +104,8 @@ void repair::lodchk() {
   }
   auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto& stitch : *StitchBuffer) {
-	auto const attribute = stitch.attribute;
-	if ((attribute & TYPMSK) == TYPFRM) {
-	  auto const tform = (attribute & FRMSK) >> FRMSHFT;
-	  if (tform < formMap.size()) {
+	if (auto const attribute = stitch.attribute; (attribute & TYPMSK) == TYPFRM) {
+	  if (auto const tform = (attribute & FRMSK) >> FRMSHFT; tform < formMap.size()) {
 		formMap.set(tform);
 	  }
 	  else {
@@ -124,8 +122,7 @@ void repair::lodchk() {
   }
   formMap.reset();
   for (auto const& stitch : *StitchBuffer) {
-	auto const attribute = stitch.attribute;
-	if ((attribute & TYPBRD) != 0U) {
+	if (auto const attribute = stitch.attribute; (attribute & TYPBRD) != 0U) {
 	  formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
   }

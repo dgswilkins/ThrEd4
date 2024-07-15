@@ -754,9 +754,9 @@ void ti::decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
   auto itDL = src.begin();
   dst.push_back(*itDL);
   for (auto itDL1 = std::next(itDL); itDL1 != src.end(); ++itDL1) {
-	auto const traceLength =
-	    std::hypotf(wrap::toFloat(itDL1->x - itDL->x), wrap::toFloat(itDL1->y - itDL->y));
-	if (traceLength > IniFile.traceLength) {
+	if (auto const traceLength =
+	        std::hypotf(wrap::toFloat(itDL1->x - itDL->x), wrap::toFloat(itDL1->y - itDL->y));
+	    traceLength > IniFile.traceLength) {
 	  dst.push_back(*itDL1);
 	}
 	++itDL;
@@ -778,9 +778,9 @@ void ti::decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
   }
   for (auto itTP1 = std::next(itTP); itTP1 < src.end(); ++itTP1) {
 	traceLengthSum1 += std::hypotf(wrap::toFloat(itTP1->x - itTP->x), wrap::toFloat(itTP1->y - itTP->y));
-	auto const traceLength =
-	    std::hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
-	if (traceLengthSum1 > traceLength * IniFile.traceRatio) {
+	if (auto const traceLength =
+	        std::hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
+	    traceLengthSum1 > traceLength * IniFile.traceRatio) {
 	  dst.emplace_back(wrap::toFloat(itTP->x) * StitchBmpRatio.x,
 	                   wrap::toFloat(itTP->y) * StitchBmpRatio.y + landscapeOffset1);
 
@@ -855,22 +855,19 @@ void ti::dutrac() {
 	  flag                = TRCL;
 	}
 	if (right < bitmap::getBitmapWidth()) { // trace right edge
-	  auto const edgeDistance = right - CurrentTracePoint.x;
-	  if (edgeDistance < minimumEdgeDistance) {
+	  if (auto const edgeDistance = right - CurrentTracePoint.x; edgeDistance < minimumEdgeDistance) {
 		minimumEdgeDistance = edgeDistance;
 		flag                = TRCR;
 	  }
 	}
 	if (bottom != 0) { // trace bottom edge
-	  auto const edgeDistance = CurrentTracePoint.y - bottom;
-	  if (edgeDistance < minimumEdgeDistance) {
+	  if (auto const edgeDistance = CurrentTracePoint.y - bottom; edgeDistance < minimumEdgeDistance) {
 		minimumEdgeDistance = edgeDistance;
 		flag                = TRCD;
 	  }
 	}
 	if (top < bitmap::getBitmapHeight()) { // trace top edge
-	  auto const edgeDistance = top - CurrentTracePoint.y;
-	  if (edgeDistance < minimumEdgeDistance) {
+	  if (auto const edgeDistance = top - CurrentTracePoint.y; edgeDistance < minimumEdgeDistance) {
 		flag = TRCU;
 	  }
 	}
@@ -955,9 +952,11 @@ void trace::trinit() {
 	    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
 	auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
 	auto       highColor = color;
-	auto const pixel     = std::ranges::find_if(
-        spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool { return data != color; });
-	if (pixel != spTBD.end()) {
+	if (auto const pixel =
+	        std::ranges::find_if(spTBD.begin(),
+	                             spTBD.end(),
+	                             [color](uint32_t const& data) -> bool { return data != color; });
+	    pixel != spTBD.end()) {
 	  highColor = *pixel;
 	}
 	auto colors = ti::trcols(highColor);
@@ -971,9 +970,9 @@ void trace::trinit() {
 	}
   }
   else {
-	auto const spTBD = gsl::span {
-	    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
-	for (auto const pixel : spTBD) {
+	for (auto const spTBD =
+	         gsl::span {TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+	     auto const pixel : spTBD) {
 	  auto colors  = ti::trcols(pixel);
 	  auto iColors = colors.begin();
 	  for (auto& iHistogramData : histogramData) {
@@ -1026,8 +1025,7 @@ void trace::trcsel() {
   StateMap->reset(StateFlag::HIDMAP);
   StateMap->reset(StateFlag::TRSET);
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
-  auto const spTBD      = gsl::span(TraceBitmapData, bitmapSize);
-  for (auto& iPixel : spTBD) {
+  for (auto const spTBD = gsl::span(TraceBitmapData, bitmapSize); auto& iPixel : spTBD) {
 	auto colors                = ti::trcols(iPixel);
 	auto maximumColorComponent = colors[0];
 	auto iRGB                  = 2U;
@@ -1195,8 +1193,7 @@ void trace::tracpar() {
 	  trace();
 	}
 	else {
-	  auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight);
-	  if (position < TRWINROW02) {
+	  if (auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight); position < TRWINROW02) {
 		StateMap->flip(TraceRGBFlag.at(ColumnColor));
 		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
 		thred::redraw(*itTraceSelectWindow);
@@ -1392,8 +1389,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
   switch (TraceMsgIndex) {
 	case 2: {
 	  // if it is greater than 25, we can process as-is since the maximum value is 255
-	  constexpr auto TWODIGIT = uint32_t {25U};
-	  if (traceColor > TWODIGIT) {
+	  if (constexpr auto TWODIGIT = uint32_t {25U}; traceColor > TWODIGIT) {
 		ti::dutrnum0(traceColor);
 	  }
 	  break;

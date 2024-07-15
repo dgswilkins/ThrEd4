@@ -263,8 +263,7 @@ void bi::bitlin(gsl::span<uint8_t> const&  source,
                 COLORREF                   foreground,
                 COLORREF                   background) noexcept {
   auto       dst       = destination.begin();
-  auto const subSource = source.subspan(0, source.size() - 1U);
-  for (auto const& src : subSource) {
+  for (auto const subSource = source.subspan(0, source.size() - 1U); auto const& src : subSource) {
 	auto bits = std::bitset<CHAR_BIT>(src);
 	for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
 	  auto const offset = bitOffset ^ (CHAR_BIT - 1U);

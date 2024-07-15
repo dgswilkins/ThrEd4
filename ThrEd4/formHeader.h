@@ -630,8 +630,8 @@ inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
 	  auto maxX = LOWFLOAT;
 	  auto maxY = LOWFLOAT;
 
-	  auto const spVertices = gsl::span(*formVertices).subspan(vertexIndex, vertexCount);
-	  for (auto const& vertex : spVertices) {
+	  for (auto const  spVertices = gsl::span(*formVertices).subspan(vertexIndex, vertexCount);
+	       auto const& vertex : spVertices) {
 		minX = std::min(minX, vertex.x);
 		maxX = std::max(maxX, vertex.x);
 		minY = std::min(minY, vertex.y);

@@ -45,15 +45,14 @@
 void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode) {
   auto* lpMsgBuf = gsl::narrow_cast<LPVOID>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
-  auto const res = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 nullptr,
-                                 errorCode,
-                                 0,
-                                 reinterpret_cast<LPTSTR>(&lpMsgBuf),
-                                 0,
-                                 nullptr);
-  // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (res != 0U) {
+  if (auto const res = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                     nullptr,
+                                     errorCode,
+                                     0,
+                                     reinterpret_cast<LPTSTR>(&lpMsgBuf),
+                                     0,
+                                     nullptr);
+      res != 0U) { // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
 	auto const msg = gsl::span {static_cast<wchar_t*>(lpMsgBuf), res};
 	// erase the \r\n at the end of the msg
 	msg[wrap::toSize(res) - 2U] = 0;

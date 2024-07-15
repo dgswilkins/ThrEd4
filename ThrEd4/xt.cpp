@@ -299,8 +299,8 @@ void xi::durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequenc
   auto const& bCurrent = BSequence->operator[](iSequence);
   auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 
-  auto const stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
-  if (stitchLength < feather.minStitch) {
+  if (auto const stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
+      stitchLength < feather.minStitch) {
 	sequence->emplace_back(bCurrent.x, bCurrent.y);
   }
   else {
@@ -529,8 +529,8 @@ void xt::fthrfn(FRM_HEAD& form) {
 	feather.phaseIndex = 1U;
   }
   auto       ind = gsl::narrow_cast<uint32_t>(BSequence->size()) / (feather.phaseIndex << 2U);
-  auto const res = gsl::narrow_cast<uint32_t>(BSequence->size()) % (feather.phaseIndex << 2U);
-  if (res > (feather.phaseIndex << 1U)) {
+  if (auto const res = gsl::narrow_cast<uint32_t>(BSequence->size()) % (feather.phaseIndex << 2U);
+      res > (feather.phaseIndex << 1U)) {
 	++ind;
   }
   constexpr auto FSTEPSZ = 4.0F;
@@ -689,8 +689,7 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 	for (auto iSequence = size_t {}; iSequence < iSeqMax; ++iSequence) {
 	  auto const delta  = F_POINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
 	  auto const length = hypot(delta.x, delta.y);
-	  auto const stitchCount = wrap::round<uint32_t>(length / underlayStitchLength);
-	  if (stitchCount != 0U) {
+	  if (auto const stitchCount = wrap::round<uint32_t>(length / underlayStitchLength); stitchCount != 0U) {
 		auto const step =
 		    F_POINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 		auto point = *sequence;
@@ -720,8 +719,8 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto       startVertex = form::closflt(form, start.x, start.y);
   auto const endVertex   = form::closflt(form, finish.x, finish.y);
 
-  constexpr auto MINCONN = 5.0F; // if connector is less than this, don't bother
-  if (length < MINCONN) {
+  // if connector is less than this, don't bother
+  if (constexpr auto MINCONN = 5.0F; length < MINCONN) {
 	return 0;
   }
   if (startVertex == endVertex) {
@@ -761,8 +760,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	                            indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y};
 	length           = hypot(delta.x, delta.y);
 
-	auto const stitchCount = wrap::round<uint32_t>(length / UserStitchLength);
-	if (stitchCount > 1U) {
+	if (auto const stitchCount = wrap::round<uint32_t>(length / UserStitchLength); stitchCount > 1U) {
 	  auto const step = F_POINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 	  auto localPoint =
 	      F_POINT {indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y};
@@ -850,9 +848,9 @@ void xi::fncwlk(FRM_HEAD& form) {
 	for (auto iGuide = 1U; iGuide < (form.vertexCount / 2U); ++iGuide) {
 	  auto const startVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
 	  auto const finishVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
-	  auto const pnt          = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
-                                wrap::midl(finishVertex->y, startVertex->y)};
-	  if (form::cisin(form, pnt.x, pnt.y)) {
+	  if (auto const pnt = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
+	                                wrap::midl(finishVertex->y, startVertex->y)};
+	      form::cisin(form, pnt.x, pnt.y)) {
 		OSequence->push_back(pnt);
 	  }
 	  start  = form::nxt(form, start);
@@ -907,8 +905,7 @@ void xt::dubit(FRM_HEAD& form, uint32_t bit) {
 	form.underlayStitchAngle = IniFile.underlayAngle;
 	form.underlaySpacing     = IniFile.underlaySpacing;
   }
-  auto const code = form.extendedAttribute & bit;
-  if (code != 0U) {
+  if (auto const code = form.extendedAttribute & bit; code != 0U) {
 	form.extendedAttribute &= ~(bit);
   }
   else {
@@ -1000,8 +997,7 @@ auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
 	return 0U;
   }
   auto const     result  = gsl::narrow_cast<uint8_t>((bit & B1MASK) - STSHFT);
-  constexpr auto USRSTCH = 12U;
-  if ((result != USRSTCH) ||                 // check if bit 31 is set (user edited stitch)
+  if (constexpr auto USRSTCH = 12U; (result != USRSTCH) || // check if bit 31 is set (user edited stitch)
       ((maskedAttribute & TYPATMSK) == 0)) { // check if the stitch is a form stitch
 	return result & NIBMASK;
   }
@@ -1106,8 +1102,8 @@ auto xi::precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC
 		}
 	  }
 	}
-	constexpr auto SLMAX = 9.0F * PFGRAN; // anything over 9 millimeters should result in another stitch
-	if (minimumLength > SLMAX) {
+	// anything over 9 millimeters should result in another stitch
+	if (constexpr auto SLMAX = 9.0F * PFGRAN; minimumLength > SLMAX) {
 	  ++totalJumps;
 	}
 	++(formFillCounter[pRecs[currentRegion]->form]);
@@ -1176,10 +1172,9 @@ auto xi::srtchk(std::vector<O_REC*> const& stitchRegion,
   for (auto iRegion = 1U; iRegion < count; ++iRegion) {
 	if ((*iStitchRegion)->form == formIndex) {
 	  auto const itSRColorOrder = wrap::next(ColorOrder.begin(), (*iStitchRegion)->color);
-	  auto const itColorOrder   = wrap::next(ColorOrder.begin(), color);
-	  if (*itSRColorOrder < *itColorOrder) {
-		auto const& form = FormList->operator[](formIndex);
-		if (form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U) &&
+	  if (auto const itColorOrder = wrap::next(ColorOrder.begin(), color); *itSRColorOrder < *itColorOrder) {
+		if (auto const& form = FormList->operator[](formIndex);
+		    form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U) &&
 		    (*iStitchRegion)->color == form.fillColor) {
 		  continue;
 		}

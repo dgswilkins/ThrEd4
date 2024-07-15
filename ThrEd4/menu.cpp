@@ -403,8 +403,8 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> lruMenuId,
 	  }
 	  else {
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const fileHandle = FindFirstFile(previousName->c_str(), &findData);
-		if (fileHandle == INVALID_HANDLE_VALUE) {
+		if (auto const fileHandle = FindFirstFile(previousName->c_str(), &findData);
+		    fileHandle == INVALID_HANDLE_VALUE) {
 		  previousName->clear();
 		}
 		else {

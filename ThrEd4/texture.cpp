@@ -301,8 +301,8 @@ void texture::redtx() {
 		continue;
 	  }
 	  texture->texturePoints.resize(entry.count);
-	  auto const bytesToReadTx = wrap::sizeofType(TextureHistory->front().texturePoints) * entry.count;
-	  if (!wrap::readFile(handle, texture->texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
+	  if (auto const bytesToReadTx = wrap::sizeofType(TextureHistory->front().texturePoints) * entry.count;
+	      !wrap::readFile(handle, texture->texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
 		txi::rollbackTexture(texture);
 		break;
 	  }
@@ -350,8 +350,8 @@ void texture::savtxt() {
   if (TempTexturePoints->empty()) {
 	return;
   }
-  auto const& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
-  if (!txi::chktxh(currentHistoryItem)) {
+  if (auto const& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
+      !txi::chktxh(currentHistoryItem)) {
 	return;
   }
   StateMap->set(StateFlag::WASTXBAK);
@@ -649,8 +649,7 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
 	txt2pix(TempTexturePoints->operator[](iPoint), point);
 	auto const deltaX = point.x - reference.x;
 	auto const deltaY = point.y - reference.y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length < minimumLength) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 	  minimumLength       = length;
 	  closestTexturePoint = iPoint;
 	}
@@ -745,9 +744,9 @@ void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
   auto const lineRange = wrap::toSize(integerFinish - integerStart);
   TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
   while (integerStart <= integerFinish) {
-	auto const yOffset =
-	    slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing) + point0.y;
-	if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
+	if (auto const yOffset =
+	        slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing) + point0.y;
+	    yOffset > 0 && yOffset < TextureScreen.areaHeight) {
 	  TempTexturePoints->push_back(TX_PNT {yOffset, gsl::narrow<uint16_t>(integerStart)});
 	}
 	++integerStart;
@@ -919,8 +918,7 @@ void texture::setxfrm() noexcept {
 	vertex.y -= angleRect.bottom;
   }
   txi::angrct(angleRect);
-  auto const height = angleRect.top - angleRect.bottom;
-  if (height > TextureScreen.areaHeight) {
+  if (auto const height = angleRect.top - angleRect.bottom; height > TextureScreen.areaHeight) {
 	for (auto const ratio = TextureScreen.areaHeight / height * 0.95F; auto& vertex : angledFormVertices) {
 	  vertex *= ratio;
 	}
@@ -1419,8 +1417,7 @@ void txi::txtdel() {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  auto iClosestPoint = 0U;
-  if (!TempTexturePoints->empty() && txtclos(iClosestPoint)) {
+  if (auto iClosestPoint = 0U; !TempTexturePoints->empty() && txtclos(iClosestPoint)) {
 	auto itPoint = TempTexturePoints->cbegin();
 	std::advance(itPoint, iClosestPoint);
 	itPoint = TempTexturePoints->erase(itPoint);
@@ -1439,8 +1436,7 @@ void txi::txcntrv(FRM_HEAD const& textureForm) {
 
 void txi::txsiz(float ratio, FRM_HEAD const& textureForm) {
   ritxfrm(textureForm);
-  auto& angledFormVertices = *AngledFormVertices;
-  for (auto& vertex : angledFormVertices) {
+  for (auto& angledFormVertices = *AngledFormVertices; auto& vertex : angledFormVertices) {
 	vertex *= ratio;
   }
   auto angleRect = F_RECTANGLE {};
@@ -1484,8 +1480,8 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
   if (deltaY != 0.0F) {
 	auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 	for (auto const& point : *SelectedTexturePointsList) {
-	  auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
-	  if ((yCoord < 0.0F) || (yCoord > TextureScreen.areaHeight)) {
+	  if (auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
+	      (yCoord < 0.0F) || (yCoord > TextureScreen.areaHeight)) {
 		return;
 	  }
 	}
@@ -1495,8 +1491,8 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
   }
   else {
 	for (auto const& point : *SelectedTexturePointsList) {
-	  auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
-	  if ((textureLine < 1) || (textureLine > TextureScreen.lines)) {
+	  if (auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
+	      (textureLine < 1) || (textureLine > TextureScreen.lines)) {
 		return;
 	  }
 	}
@@ -1560,9 +1556,8 @@ void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
 	  }
 	}
 	if (flag) {
-	  constexpr auto BUFFLEN   = 8U; // i.e. floating point 7 digits of precision + '.'
 	  auto           character = wchar_t {};
-	  if (TextureInputBuffer->size() < BUFFLEN) {
+	   if (constexpr auto BUFFLEN = 8U; TextureInputBuffer->size() < BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
 		if (txi::txdig(keyCode, character)) {
 		  TextureInputBuffer->push_back(character);
 		}
@@ -1691,9 +1686,9 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 	return;
   }
   for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	auto const& currentPoint =
-	    TexturePointsBuffer->operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
-	if (currentPoint.line != 0U) {
+	if (auto const& currentPoint =
+	        TexturePointsBuffer->operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
+	    currentPoint.line != 0U) {
 	  auto const iSegment            = currentPoint.line - 1U;
 	  textureSegments[iSegment].line = iTexturePoint;
 	  ++(textureSegments[iSegment].stitchCount);

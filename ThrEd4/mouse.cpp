@@ -85,8 +85,8 @@ auto mi::chkok() noexcept -> bool {
 }
 
 auto mi::finrng(uint32_t find) noexcept -> bool {
-  auto const& rectFind = FormList->operator[](find).rectangle;
-  if (rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
+  if (auto const& rectFind = FormList->operator[](find).rectangle;
+      rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
       rectFind.bottom < StitchRangeRect.bottom || rectFind.top > StitchRangeRect.top) {
 	return false;
   }
@@ -134,8 +134,7 @@ void mi::rngal() {
   auto maximumLength = 0U;
   auto largestRange  = 0U;
   for (auto index = 0U; index < prng.size(); ++index) {
-	auto const length = prng[index].finish - prng[index].start;
-	if (length > maximumLength) {
+	if (auto const length = prng[index].finish - prng[index].start; length > maximumLength) {
 	  maximumLength = length;
 	  largestRange  = index;
 	}
@@ -445,9 +444,9 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	auto const relativePoint =
-	    POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-	if (relativePoint.x >= controlPoint[0].x && relativePoint.x <= controlPoint[2].x &&
+	if (auto const relativePoint =
+	        POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	    relativePoint.x >= controlPoint[0].x && relativePoint.x <= controlPoint[2].x &&
 	    relativePoint.y >= controlPoint[0].y && relativePoint.y <= controlPoint[4].y) {
 	  thred::duSelbox();
 	  StateMap->set(StateFlag::SELPNT);
@@ -701,8 +700,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 		return true;
 	  }
-	  auto closestPointIndexClone = uint32_t {};
-	  if ((!StateMap->test(StateFlag::HIDSTCH)) && thred::closPnt1(closestPointIndexClone)) {
+	  if (auto closestPointIndexClone = uint32_t {};
+	      (!StateMap->test(StateFlag::HIDSTCH)) && thred::closPnt1(closestPointIndexClone)) {
 		thred::redrawCapturedStitch(closestPointIndexClone);
 	  }
 	}
@@ -768,8 +767,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  return true;
 		}
 		if (StateMap->test(StateFlag::FORMSEL)) { // user has selected a form so only update the color for that form
-		  auto& form = FormList->operator[](ClosestFormToCursor);
-		  if ((form.fillType != 0U) || (form.edgeType != 0U) ||
+		  if (auto& form = FormList->operator[](ClosestFormToCursor);
+		      (form.fillType != 0U) || (form.edgeType != 0U) ||
 		      ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
 			thred::savdo();
 			if (form.fillType != 0U) {
@@ -806,10 +805,10 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  if (StateMap->test(StateFlag::GRPSEL)) { // user has selected a group of stitches so update stitch colors
 			thred::savdo();
 			if (GroupStartStitch != GroupEndStitch) {
-			  auto const groupStitchRange =
-			      std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-			                            wrap::next(StitchBuffer->begin(), GroupEndStitch));
-			  for (auto& stitch : groupStitchRange) {
+			  for (auto const groupStitchRange =
+			           std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+			                                 wrap::next(StitchBuffer->begin(), GroupEndStitch));
+			       auto& stitch : groupStitchRange) {
 				stitch.attribute &= NCOLMSK;
 				stitch.attribute |= ActiveColor;
 			  }
@@ -943,10 +942,10 @@ auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rota
 	auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
 	auto const adjustedPoint = thred::getAdjustedPoint(stitchPoint);
 
-	auto const groupStitchRange =
-	    std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	                          wrap::next(StitchBuffer->begin(), GroupEndStitch));
-	for (auto& stitch : groupStitchRange) {
+	for (auto const groupStitchRange =
+	         std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	                               wrap::next(StitchBuffer->begin(), GroupEndStitch));
+	     auto& stitch : groupStitchRange) {
 	  stitch -= adjustedPoint;
 	}
 	StateMap->set(StateFlag::RESTCH);
@@ -1335,8 +1334,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::ROTCAPT)) { // If we are rotating
 	  thred::unrotu();
 	  thred::unrot();
-	  auto const adjustedDelta = thred::getAdjustedDelta();
-	  if (adjustedDelta.x != 0.0F) {
+	  if (auto const adjustedDelta = thred::getAdjustedDelta(); adjustedDelta.x != 0.0F) {
 		rotationAngle = -atan2(adjustedDelta.y, adjustedDelta.x);
 	  }
 	  else {
@@ -1435,9 +1433,9 @@ auto mouse::handleRightButtonDown() -> bool {
 		StateMap->reset(StateFlag::FRMPSEL);
 		StateMap->set(StateFlag::FPSEL);
 		SelectedFormVertices.finish = ClosestVertexToCursor;
-		auto const selectedVertexCount =
-		    (SelectedFormVertices.finish - SelectedFormVertices.start + vertexCount) % vertexCount;
-		if (selectedVertexCount < vertexCount / 2U) {
+		if (auto const selectedVertexCount =
+		        (SelectedFormVertices.finish - SelectedFormVertices.start + vertexCount) % vertexCount;
+		    selectedVertexCount < vertexCount / 2U) {
 		  SelectedFormVertices.vertexCount = selectedVertexCount;
 		  StateMap->set(StateFlag::PSELDIR);
 		}

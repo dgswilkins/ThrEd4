@@ -435,8 +435,7 @@ void pi::ritpesCode(std::vector<uint8_t>& buffer) {
   constexpr auto ENDCODE = uint16_t {0x8003U}; // Block end code
   auto const     oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(uint16_t));
-  auto* contCode = convertFromPtr<uint16_t*>(&buffer[oldSize]);
-  if (contCode != nullptr) {
+  if (auto* contCode = convertFromPtr<uint16_t*>(&buffer[oldSize]); contCode != nullptr) {
 	*contCode = ENDCODE;
   }
 }
@@ -518,8 +517,8 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto iPEC        = wrap::next(PESequivColors.begin(), color);
   auto iPesColors  = pecHeader->pad.begin();
   *iPesColors++    = *iPEC;
-  auto const stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
-  for (auto const& stitch : stitchRange) {
+  for (auto const stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
+       auto const& stitch : stitchRange) {
 	if ((stitch.attribute & COLMSK) != color) {
 	  color = stitch.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
@@ -601,8 +600,7 @@ auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint3
   auto minimumDistance = BIGUINT;
   auto matchIndex      = 0U;
   for (auto iColor = 1U; iColor < activeColor; ++iColor) {
-	auto const matchDistance = pesmtch(color, pesColors[iColor]);
-	if (matchDistance < minimumDistance) {
+	if (auto const matchDistance = pesmtch(color, pesColors[iColor]); matchDistance < minimumDistance) {
 	  minimumDistance = matchDistance;
 	  matchIndex      = iColor;
 	}
@@ -636,8 +634,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   }
   auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());
 
-  constexpr auto PESSTR = "#PES"; // PES lead in value
-  if (strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) {
+  // Check for the PES lead in value
+  if (constexpr auto PESSTR = "#PES"; strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
@@ -801,8 +799,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  auto matchIndex = 0U;
 	  auto matchMin   = BIGUINT;
 	  for (auto iColorMatch = 1U; iColorMatch < THTYPCNT; ++iColorMatch) {
-		auto const match = pi::pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch));
-		if (match < matchMin) {
+		if (auto const match = pi::pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch)); match < matchMin) {
 		  matchIndex = iColorMatch;
 		  matchMin   = match;
 		}

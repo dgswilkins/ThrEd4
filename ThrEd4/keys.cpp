@@ -104,8 +104,8 @@ void kyi::istch() {
 	  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	  auto const angt        = std::atan2(stitch->y - stitchPoint.y, stitch->x - stitchPoint.x);
 	  auto const nxtStitch   = std::next(stitch);
-	  auto const angf        = std::atan2(stitch->y - nxtStitch->y, stitch->x - nxtStitch->x);
-	  if (fabs(angf - angt) > fabs(angb - angt)) {
+	  if (auto const angf = std::atan2(stitch->y - nxtStitch->y, stitch->x - nxtStitch->x);
+	      fabs(angf - angt) > fabs(angb - angt)) {
 		--ClosestPointIndex;
 	  }
 	}
@@ -315,8 +315,8 @@ void keys::ungrphi() {
   }
   auto flag = true;
   for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; --iStitch) {
-	auto const prevStitch = iStitch - 1U;
-	if (((StitchBuffer->operator[](prevStitch).attribute & NOTFRM) == 0U) &&
+	if (auto const prevStitch = iStitch - 1U;
+	    ((StitchBuffer->operator[](prevStitch).attribute & NOTFRM) == 0U) &&
 	    ((StitchBuffer->operator[](prevStitch).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 	  ClosestPointIndex = iStitch - 1U;
 	  StateMap->set(StateFlag::SELBOX);
@@ -650,8 +650,7 @@ void kyi::handleShiftedRightKey() {
 	  StateMap->reset(StateFlag::FORMSEL);
 	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
 		if (!StitchBuffer->empty()) {
-		  auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-		  if (ClosestPointIndex < lastStitch) {
+		  if (auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U); ClosestPointIndex < lastStitch) {
 			StateMap->set(StateFlag::GRPSEL);
 			GroupStitchIndex = ClosestPointIndex + 1U;
 		  }
@@ -659,8 +658,7 @@ void kyi::handleShiftedRightKey() {
 	  }
 	  else {
 		if (!StitchBuffer->empty()) {
-		  auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
-		  if (GroupStitchIndex < lastStitch) {
+		  if (auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U); GroupStitchIndex < lastStitch) {
 			++GroupStitchIndex;
 			thred::nuAct(GroupStitchIndex);
 		  }

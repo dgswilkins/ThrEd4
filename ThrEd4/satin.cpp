@@ -111,9 +111,9 @@ void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
   auto const itGuide = wrap::next(SatinGuides->cbegin(), startGuide);
   SatinGuides->insert(itGuide, VAL);
   auto& formList = *FormList;
-  auto  formRange =
-      std::ranges::subrange(wrap::next(formList.begin(), ClosestFormToCursor + 1U), formList.end());
-  for (auto& form : formRange) {
+  for (auto formRange =
+           std::ranges::subrange(wrap::next(formList.begin(), ClosestFormToCursor + 1U), formList.end());
+       auto& form : formRange) {
 	if (form.type == SAT && form.fillType == SATF) {
 	  form.satinGuideIndex += guideCount;
 	}
@@ -123,8 +123,8 @@ void si::sacspac(uint32_t startGuide, uint32_t guideCount) {
 auto si::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
   auto        guideIndex = 0U;
   auto const& formList   = *FormList;
-  auto const formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
-  for (auto const& form : formRange) {
+  for (auto const formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
+       auto const& form : formRange) {
 	if (form.type == SAT && (form.satinGuideCount != 0U)) {
 	  guideIndex += form.satinGuideCount;
 	}
@@ -244,8 +244,7 @@ void si::satclos() {
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
 	  auto const deltaY = stitchPoint.y - vertex.y;
-	  auto const length = deltaX * deltaX + deltaY * deltaY;
-	  if (length < minimumLength) {
+	  if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 		minimumLength         = length;
 		ClosestVertexToCursor = iVertex;
 	  }
@@ -333,9 +332,9 @@ auto si::satselfn() -> bool {
   auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
   for (auto& form : *FormList) {
-	auto const layerCode =
-	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
-	if ((ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
+	if (auto const layerCode =
+	        gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
+	    (ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
 	  continue;
 	}
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -343,8 +342,7 @@ auto si::satselfn() -> bool {
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
 	  auto const deltaY = stitchPoint.y - vertex.y;
-	  auto const length = deltaX * deltaX + deltaY * deltaY;
-	  if (length < minimumLength) {
+	  if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 		minimumLength = length;
 		ClosestFormToCursor =
 		    wrap::toUnsigned(&form - FormList->data()); // index of the form. Possible with vectors
@@ -1131,8 +1129,7 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 	auto const& nextGuide = *itGuide;
 	satfn(form, lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
   }
-  auto const& endGuide = form.wordParam;
-  if (endGuide != 0U) {
+  if (auto const& endGuide = form.wordParam; endGuide != 0U) {
 	satfn(form, lengths, itEndGuide->start, endGuide, itEndGuide->finish, endGuide + 1U);
   }
   else {
@@ -1145,8 +1142,7 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
 	  }
 	  auto const deltaX     = lengths[iVertex] - length;
 	  auto const prevVertex = iVertex - 1U;
-	  auto const deltaY     = length - lengths[prevVertex];
-	  if (deltaY > deltaX) {
+	  if (auto const deltaY = length - lengths[prevVertex]; deltaY > deltaX) {
 		--iVertex;
 	  }
 	  satfn(form, lengths, itEndGuide->start, iVertex, itEndGuide->finish, iVertex);
@@ -1187,8 +1183,7 @@ void satin::satfil(FRM_HEAD& form) {
   length += std::hypot(lastDelta.x, lastDelta.y);
   lengths.push_back(length);
   while (true) {
-	auto const& endGuide = form.wordParam;
-	if (endGuide != 0U) {
+	if (auto const& endGuide = form.wordParam; endGuide != 0U) {
 	  if (form.satinGuideCount != 0U) {
 		si::satmf(form, lengths);
 		break;
@@ -1216,8 +1211,7 @@ void satin::satfil(FRM_HEAD& form) {
 	  }
 	  auto const deltaA     = lengths[iVertex] - length;
 	  auto const prevVertex = iVertex - 1U;
-	  auto const deltaB     = length - lengths[prevVertex];
-	  if (deltaB > deltaA) {
+	  if (auto const deltaB = length - lengths[prevVertex]; deltaB > deltaA) {
 		--iVertex;
 	  }
 	  si::satfn(form, lengths, 1, iVertex, form.vertexCount, iVertex);
@@ -1236,8 +1230,7 @@ void satin::satfil(FRM_HEAD& form) {
 	  ++iVertex;
 	}
 	auto const deltaA = lengths[iVertex] - length;
-	auto const deltaB = length - lengths[wrap::toSize(iVertex) - 1U];
-	if (deltaB > deltaA) {
+	if (auto const deltaB = length - lengths[wrap::toSize(iVertex) - 1U]; deltaB > deltaA) {
 	  --iVertex;
 	}
 	si::satfn(form, lengths, 0, iVertex, form.vertexCount, iVertex);
@@ -1341,16 +1334,14 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
   }
   if (outerLength > innerLength) {
 	innerFlag         = true;
-	auto intersection = F_POINT {};
-	if (form::linx(insidePoints, start, finish, intersection)) {
+	if (auto intersection = F_POINT {}; form::linx(insidePoints, start, finish, intersection)) {
 	  innerDelta = F_POINT {};
 	  innerPoint = intersection;
 	}
   }
   else {
 	outerFlag         = true;
-	auto intersection = F_POINT {};
-	if (form::linx(insidePoints, start, finish, intersection)) {
+	if (auto intersection = F_POINT {}; form::linx(insidePoints, start, finish, intersection)) {
 	  outerDelta = F_POINT {};
 	  outerPoint = intersection;
 	}

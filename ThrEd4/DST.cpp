@@ -249,9 +249,9 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
   auto colors    = std::vector<uint32_t> {};
   if (colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const colorFile =
-	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (colorFile != INVALID_HANDLE_VALUE) {
+	if (auto const colorFile =
+	        CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	    colorFile != INVALID_HANDLE_VALUE) {
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
 	  // There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
@@ -297,8 +297,8 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	auto dstStitch = POINT {};
 	dstin(dtrn(&record), dstStitch);
 	localStitch += F_POINT {dstStitch.x, dstStitch.y};
-	constexpr auto C0MASK = 0x80U;
-	if ((record.nd & C0MASK) != 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
+	if (constexpr auto C0MASK = 0x80U;
+	    (record.nd & C0MASK) != 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
 	  continue;
 	}
 	auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};

@@ -877,8 +877,7 @@ void form::ritfrct(uint32_t iForm, HDC hDC) {
   wrap::polyline(hDC, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
   auto const spOutline = gsl::span {pixelOutline};
   // drawing the boxes on corners and sides, so don't overwrite the first box which will "erase" it
-  auto const subsp = spOutline.subspan(0, spOutline.size() - 1);
-  for (auto const& controlPoint : subsp) {
+  for (auto const subsp = spOutline.subspan(0, spOutline.size() - 1); auto const& controlPoint : subsp) {
 	selsqr(controlPoint, hDC);
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -1468,8 +1467,8 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 	  continue;
 	}
 	auto&      currentForm = FormList->operator[](iForm);
-	auto const formLayer   = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
-	if ((ActiveLayer != 0U) && (formLayer != 0U) && formLayer != layerCoded) {
+	if (auto const formLayer = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
+	    (ActiveLayer != 0U) && (formLayer != 0U) && formLayer != layerCoded) {
 	  continue;
 	}
 	auto const itFirstVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex);
@@ -1572,8 +1571,7 @@ auto form::closflt(FRM_HEAD const& form,
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const deltaX = xCoordinate - itVertex->x;
 	auto const deltaY = yCoordinate - itVertex->y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length < minimumLength) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 	  closestVertex = iVertex;
 	  minimumLength = length;
 	}
@@ -1642,8 +1640,7 @@ void form::chkseq(bool border) {
 	auto const& seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
 	auto const  deltaX   = seq.x - seqBack1.x;
 	auto const  deltaY   = seq.y - seqBack1.y;
-	auto const  length   = deltaX * deltaX + deltaY * deltaY;
-	if (length > lengthCheck) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length > lengthCheck) {
 	  InterleaveSequence->operator[](destination) = seq;
 	  ++destination;
 	}
@@ -1703,8 +1700,7 @@ auto form::getlast(FRM_HEAD const& form) noexcept(!(std::is_same_v<ptrdiff_t, in
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const deltaX = LastPoint.x - itVertex->x;
 	auto const deltaY = LastPoint.y - itVertex->y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length < minimumLength) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 	  minimumLength = length;
 	  closestVertex = iVertex;
 	}
@@ -1870,8 +1866,7 @@ void fi::bold(FRM_HEAD const& form) {
 	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
 	auto const  deltaX       = sequenceFwd1.x - sequence.x;
 	auto const  deltaY       = sequenceFwd1.y - sequence.y;
-	auto const  length       = deltaX * deltaX + deltaY * deltaY;
-	if (length > TNYFLOAT) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length > TNYFLOAT) {
 	  OSequence->operator[](iOutput++) = sequence;
 	}
   }
@@ -1915,8 +1910,8 @@ auto fi::projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& uppe
 auto form::cisin(FRM_HEAD const& form,
                  float           xCoordinate,
                  float           yCoordinate) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool {
-  auto const& rectangle = form.rectangle;
-  if (xCoordinate < rectangle.left || xCoordinate > rectangle.right ||
+  if (auto const& rectangle = form.rectangle;
+      xCoordinate < rectangle.left || xCoordinate > rectangle.right ||
       yCoordinate < rectangle.bottom || yCoordinate > rectangle.top) {
 	return false;
   }
@@ -2277,8 +2272,7 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
 	}
 	return;
   }
-  auto const spLevels = gsl::span {LEVELS.operator[](count), count};
-  for (auto const& level : spLevels) {
+  for (auto const spLevels = gsl::span {LEVELS.operator[](count), count}; auto const& level : spLevels) {
 	fillSB(pivot, startAngle, radius, stitchPoint, level);
 	startAngle += stepAngle;
   }
@@ -2370,8 +2364,7 @@ void fi::prsmal(float width) {
 	auto const& seqRef = OSequence->operator[](iReference);
 	auto const  deltaX = seq.x - seqRef.x;
 	auto const  deltaY = seq.y - seqRef.y;
-	auto const  length = deltaX * deltaX + deltaY * deltaY;
-	if (length > lengthCheck) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length > lengthCheck) {
 	  OSequence->operator[](iOutput++) = seq;
 	  iReference                       = iSequence;
 	}
@@ -4437,9 +4430,8 @@ void fi::durgn(FRM_HEAD const&                form,
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  auto const deltaX = bpnt.x - workingFormVertices.operator[](iVertex).x;
 	  auto const deltaY = bpnt.y - workingFormVertices.operator[](iVertex).y;
-	  auto const length = deltaX * deltaX + deltaY * deltaY;
 
-	  if (length < minimumLength) {
+	  if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 		minimumLength = length;
 		mindif        = iVertex;
 	  }
@@ -4957,8 +4949,7 @@ auto fi::handleSeq(size_t iSequence, B_SEQ_PNT& bCurrent) -> bool {
 	OSequence->emplace_back(bCurrent.x, bCurrent.y);
 	return true;
   }
-  auto const userStitchLength2 = UserStitchLength * 2.0F;
-  if (length <= userStitchLength2) {
+  if (auto const userStitchLength2 = UserStitchLength * 2.0F; length <= userStitchLength2) {
 	OSequence->emplace_back(bCurrent.x, bCurrent.y);
 	return true;
   }
@@ -5001,8 +4992,7 @@ void fi::bakseq() {
 	--iSequence;
   }
   while (iSequence > 0) {
-	auto& bCurrent = BSequence->operator[](iSequence);
-	switch (bCurrent.attribute) {
+	switch (auto& bCurrent = BSequence->operator[](iSequence); bCurrent.attribute) {
 	  case SEQTOP:
 		handleSeqTop(iSequence, bCurrent);
 		break;
@@ -5448,8 +5438,8 @@ void form::refil(uint32_t formIndex) {
 	refilfn(formIndex);
 	return;
   }
-  auto const codedForm = formIndex << FRMSHFT | USMSK;
-  if (!std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
+  if (auto const codedForm = formIndex << FRMSHFT | USMSK;
+      !std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
 	    return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
       })) {
 	refilfn(formIndex);
@@ -5630,8 +5620,7 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints,
   for (auto const& iControl : formControls) {
 	auto const deltaX = iControl.x - point.x;
 	auto const deltaY = iControl.y - point.y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length < minimumLength) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 	  minimumLength             = length;
 	  SelectedFormControlVertex = formControlIndex;
 	}
@@ -5835,9 +5824,9 @@ auto fi::closat(IntersectionStyles& inOutFlag) -> bool {
 	if (formIter.vertexCount == 0U) {
 	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", gsl::narrow_cast<int>(inOutFlag));
 	}
-	auto const layer =
-	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1U);
-	if ((ActiveLayer != 0U) && layer != ActiveLayer && ((formIter.attribute & FRMLMSK) != 0U)) {
+	if (auto const layer =
+	        gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1U);
+	    (ActiveLayer != 0U) && layer != ActiveLayer && ((formIter.attribute & FRMLMSK) != 0U)) {
 	  continue;
 	}
 	auto const lastVertex = (formIter.type == FRMLINE) ? formIter.vertexCount - 1U : formIter.vertexCount;
@@ -7441,8 +7430,7 @@ void fi::snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t en
 
 	  auto const deltaX = checkPoint.x - referencePoint.x;
 	  auto const deltaY = checkPoint.y - referencePoint.y;
-	  auto const length = deltaX * deltaX + deltaY * deltaY;
-	  if (length < checkLength) {
+	  if (auto const length = deltaX * deltaX + deltaY * deltaY; length < checkLength) {
 		checkPoint = referencePoint;
 	  }
 	}

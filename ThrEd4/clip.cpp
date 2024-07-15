@@ -583,8 +583,7 @@ void ci::fxlen(FRM_HEAD const&           form,
        auto const& iVertex : spVertices) {
 	auto const deltaX = iVertex.x - itFirstVertex->x;
 	auto const deltaY = iVertex.y - itFirstVertex->y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length > minimumLength) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length > minimumLength) {
 	  flag = false;
 	  break;
 	}
@@ -706,8 +705,7 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   for (auto index = 0U; auto const& iPoint : chainEndPoints) {
 	auto const deltaX = LastPoint.x - iPoint.x;
 	auto const deltaY = LastPoint.y - iPoint.y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
-	if (length < minimumLength) {
+	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
 	  minimumLength = length;
 	  minimumIndex  = index;
 	}
@@ -729,8 +727,7 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 
 void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   dulast(chainEndPoints);
-  auto const& form = FormList->operator[](ClosestFormToCursor);
-  if (form.type == FRMLINE) {
+  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
 	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
@@ -957,8 +954,7 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   for (auto iPoint = 0U; iPoint < chainLength - 1U; ++iPoint) {
 	duchfn(chainEndPoints, iPoint, iPoint + 1U);
   }
-  auto const& form = FormList->operator[](ClosestFormToCursor);
-  if (form.type != FRMLINE) {
+  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type != FRMLINE) {
 	duchfn(chainEndPoints, chainLength - 1, 0);
 	OSequence->push_back(chainEndPoints[chainLength]);
 	return;

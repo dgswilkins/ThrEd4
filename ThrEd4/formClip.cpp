@@ -331,8 +331,7 @@ void fci::clipSelectedForms() {
   auto* ptrGuides  = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, iVertex));
   auto  guidesSize = 0U;
   for (auto& selectedForm : (*SelectedFormList)) {
-	auto& form = FormList->operator[](selectedForm);
-	if (form.type == SAT && (form.satinGuideCount != 0U)) {
+	if (auto& form = FormList->operator[](selectedForm); form.type == SAT && (form.satinGuideCount != 0U)) {
 	  guidesSize += form.satinGuideCount;
 	}
   }
@@ -340,8 +339,7 @@ void fci::clipSelectedForms() {
   if (guidesSize != 0U) {
 	auto const guides = gsl::span {ptrGuides, guidesSize};
 	for (auto& selectedForm : (*SelectedFormList)) {
-	  auto& form = FormList->operator[](selectedForm);
-	  if (form.type == SAT && (form.satinGuideCount != 0U)) {
+	  if (auto& form = FormList->operator[](selectedForm); form.type == SAT && (form.satinGuideCount != 0U)) {
 		auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		  guides[guideCount++] = *itGuide;
@@ -485,10 +483,10 @@ void fci::clipSelectedStitches() {
   thred::rngadj();
   if (GroupStartStitch != GroupEndStitch) {
 	LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
-	auto const groupStitchRange =
-	    std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	                          wrap::next(StitchBuffer->begin(), GroupEndStitch));
-	for (auto& stitch : groupStitchRange) {
+	for (auto const groupStitchRange =
+	         std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	                               wrap::next(StitchBuffer->begin(), GroupEndStitch));
+	     auto& stitch : groupStitchRange) {
 	  LowerLeftStitch.x = std::min(LowerLeftStitch.x, stitch.x);
 	  LowerLeftStitch.y = std::min(LowerLeftStitch.y, stitch.y);
 	}
@@ -650,10 +648,9 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
   auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
   ClipMemory           = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
-	auto* clipPointer = GlobalLock(ClipMemory);
-	if (clipPointer != nullptr) {
-	  auto* ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipPointer);
-	  if (ptrFormVertexData->clipType == CLP_FRMPS) {
+	if (auto* clipPointer = GlobalLock(ClipMemory); clipPointer != nullptr) {
+	  if (auto* ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipPointer);
+	      ptrFormVertexData->clipType == CLP_FRMPS) {
 		thred::duzrat();
 		auto const byteCount =
 		    sizeof(*ptrFormVertexData) +
@@ -707,8 +704,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		return true;
 	  }
 	  // ToDo - Add more information to the clipboard so that memory can be allocated
-	  auto* ptrFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(clipPointer);
-	  if (ptrFormsHeader->clipType == CLP_FRMS) {
+	  if (auto* ptrFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(clipPointer); ptrFormsHeader->clipType == CLP_FRMS) {
 		auto iForm            = 0U;
 		ClipFormsCount        = ptrFormsHeader->formCount;
 		auto*      ptrForms   = convertFromPtr<FRM_HEAD*>(std::next(ptrFormsHeader));
@@ -736,8 +732,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto  guideCount = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
-		  auto&      form   = FormList->operator[](offset);
-		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
+		  if (auto& form = FormList->operator[](offset); form.type == SAT && (form.satinGuideCount != 0U)) {
 			guideCount += form.satinGuideCount;
 		  }
 		}
@@ -745,8 +740,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const guides       = gsl::span {ptrGuides, guideCount};
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
-		  auto&      form   = FormList->operator[](offset);
-		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
+		  if (auto& form = FormList->operator[](offset); form.type == SAT && (form.satinGuideCount != 0U)) {
 			form.satinGuideIndex = satin::adsatk(form.satinGuideCount);
 			auto itGuide         = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
@@ -832,8 +826,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		StateMap->set(StateFlag::FUNSCLP);
 	  }
 	  else {
-		auto* ptrClipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipPointer);
-		if (ptrClipFormHeader->clipType == CLP_FRM) {
+		if (auto* ptrClipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipPointer);
+		    ptrClipFormHeader->clipType == CLP_FRM) {
 		  FormMoveDelta = F_POINT {};
 		  StateMap->set(StateFlag::FUNCLP);
 		  auto formIter = ptrClipFormHeader->form;
