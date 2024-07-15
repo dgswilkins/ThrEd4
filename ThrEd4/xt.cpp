@@ -2462,13 +2462,12 @@ void xt::nudsiz() {
   DesignSize =
       F_POINT {designSizeRect.right - designSizeRect.left, designSizeRect.top - designSizeRect.bottom};
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
-  auto const nResult = DialogBox(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
-
-  if (nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
+  if (auto const nResult = DialogBox(
+          ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+      nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
 	return;
   }
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
   flag = 0;
 
   constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger

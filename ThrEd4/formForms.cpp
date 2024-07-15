@@ -904,15 +904,14 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
-  // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  // clang-format on
-  if (nResult < 1) {
+  if (auto const nResult = DialogBox(
+          ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+      nResult < 1) {
 	StateMap->reset(StateFlag::FORMIN);
 	return;
   }
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   auto const referencePoint =
       F_POINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
   auto form               = FRM_HEAD {};
@@ -1161,14 +1160,13 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void formForms::setear() {
   thred::unmsg();
-  // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  // clang-format on
-  if (nResult <= 0) {
+  if (auto const nResult = DialogBox(
+          ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+      nResult <= 0) {
 	return;
   }
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   thred::savdo();
   constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
 
@@ -1321,14 +1319,13 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 
 void formForms::wavfrm() {
   thred::unmsg();
-  // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  // clang-format on
-  if (nResult <= 0) {
+  if (auto const nResult = DialogBox(
+          ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+      nResult <= 0) {
 	return;
   }
+  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   thred::savdo();
   auto points = std::vector<F_POINT> {};
   points.reserve(IniFile.wavePoints);
