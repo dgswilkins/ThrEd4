@@ -1262,13 +1262,8 @@ void ffi::handleWaveIDOK(HWND hwndlg) {
   GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
   wrap::wcsToULong(IniFile.waveLobes, buffer.data());
 
-  constexpr auto WPCLAMP = 100U; // max number of points in a wave form
-  if (IniFile.wavePoints > WPCLAMP) {
-	IniFile.wavePoints = WPCLAMP;
-  }
-  if (IniFile.wavePoints < 3) {
-	IniFile.wavePoints = 3;
-  }
+  constexpr auto WPCLAMP = uint16_t {100U}; // max number of points in a wave form
+  IniFile.wavePoints     = std::clamp(IniFile.wavePoints, uint16_t {3U}, WPCLAMP);
   if (IniFile.waveStart == IniFile.waveEnd) {
 	IniFile.waveEnd += (IniFile.wavePoints >> 2U);
   }

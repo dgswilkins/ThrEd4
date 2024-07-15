@@ -49,6 +49,7 @@
 #include <WinUser.h>
 
 // Standard Libraries
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <cstring>
@@ -674,14 +675,9 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 	}
 #else
 	constexpr auto MAXWLK = 54.0F; // max underlay/edge walk stitch length
-	constexpr auto MINWLK = 2.4F;  // max underlay/edge walk stitch length
+	constexpr auto MINWLK = 2.4F;  // min underlay/edge walk stitch length
+	form.underlayStitchLen          = std::clamp(form.underlayStitchLen, MINWLK, MAXWLK);
 
-	if (form.underlayStitchLen < MINWLK) {
-	  form.underlayStitchLen = MINWLK;
-	}
-	if (form.underlayStitchLen > MAXWLK) {
-	  form.underlayStitchLen = MAXWLK;
-	}
 	auto const underlayStitchLength = form.underlayStitchLen;
 	auto const iSeqMax              = OSequence->size() - 1U;
 	auto       sequence             = OSequence->begin();

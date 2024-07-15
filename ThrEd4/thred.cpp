@@ -3100,12 +3100,7 @@ void thi::ritini() {
 
   constexpr auto SSMAX = 9.0F; // Show stitch threshold maximum
   constexpr auto SSMIN = 0.0F; // Show stitch threshold minimum
-  if (ShowStitchThreshold < SSMIN) {
-	ShowStitchThreshold = SSMIN;
-  }
-  if (ShowStitchThreshold > SSMAX) {
-	ShowStitchThreshold = SSMAX;
-  }
+  ShowStitchThreshold            = std::clamp(ShowStitchThreshold, SSMIN, SSMAX);
   IniFile.showStitchThreshold    = ShowStitchThreshold;
   IniFile.threadSize30           = ThreadSize30;
   IniFile.threadSize40           = ThreadSize40;
@@ -6945,25 +6940,11 @@ void thred::mv2b() {
 void thi::infadj(float& xCoordinate, float& yCoordinate) noexcept {
   if (isfinite(xCoordinate)) {
 	auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
-	if (xCoordinate > unzoomedX) {
-	  xCoordinate = unzoomedX;
-	}
-	else {
-	  if (xCoordinate < 0.0F) {
-		xCoordinate = 0.0F;
-	  }
-	}
+	xCoordinate          = std::clamp(xCoordinate, 0.0F, unzoomedX);
   }
   if (isfinite(yCoordinate)) {
 	auto const unzoomedY = wrap::toFloat(UnzoomedRect.cy);
-	if (yCoordinate > unzoomedY) {
-	  yCoordinate = unzoomedY;
-	}
-	else {
-	  if (yCoordinate < 0.0F) {
-		yCoordinate = 0.0F;
-	  }
-	}
+	yCoordinate          = std::clamp(yCoordinate, 0.0F, unzoomedY);
   }
 }
 
