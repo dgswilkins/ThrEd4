@@ -3236,10 +3236,8 @@ void thi::dubuf(std::vector<char>& buffer) {
       wrap::sizeofVector(TexturePointsBuffer);
   buffer.reserve(vtxLen + thredDataSize);
   // ToDo - vertexLength overflows a 16 bit integer if there are more than 5446 stitches, so clamp it until version 3
-  constexpr auto VTXCLAMP = std::numeric_limits<decltype(stitchHeader.vertexLen)>::max();
-  if (vtxLen > VTXCLAMP) {
-	vtxLen = VTXCLAMP;
-  }
+  constexpr auto VTXCLAMP = gsl::narrow_cast<size_t>(std::numeric_limits<decltype(stitchHeader.vertexLen)>::max());
+  vtxLen                  = std::min(vtxLen, VTXCLAMP);
   wrap::narrow(stitchHeader.vertexLen, vtxLen);
   wrap::narrow(stitchHeader.dlineLen, wrap::sizeofType(FormVertices) * vertexCount);
   wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(ClipPoints) * clipDataCount);
@@ -6015,9 +6013,7 @@ void thi::setsped() {
   if (auto const userTimePerFrame = wrap::toDouble(MovieTimeStep) / DEFUT; userTimePerFrame < DEFUT) {
 	StitchesPerFrame        = wrap::round<uint32_t>(elapsedTimePerFrame / userTimePerFrame);
 	constexpr auto SPFCLAMP = 99U; // maximum stitches per frame
-	if (StitchesPerFrame > SPFCLAMP) {
-	  StitchesPerFrame = SPFCLAMP;
-	}
+	StitchesPerFrame        = std::min(StitchesPerFrame, SPFCLAMP);
   }
   else {
 	elapsedTimePerFrame = wrap::round<uint32_t>(userTimePerFrame);
@@ -10562,9 +10558,7 @@ void thi::redini() {
 		IniFile.showStitchThreshold = 0;
 	  }
 	  constexpr auto SSTCLAMP = 9.0F; // clamp the show stitch threshold to this value
-	  if (IniFile.showStitchThreshold > SSTCLAMP) {
-		IniFile.showStitchThreshold = SSTCLAMP;
-	  }
+	  IniFile.showStitchThreshold = std::min(IniFile.showStitchThreshold, SSTCLAMP);
 	  ShowStitchThreshold = IniFile.showStitchThreshold;
 	  if (IniFile.threadSize30 != 0.0F) {
 		ThreadSize30 = IniFile.threadSize30;
