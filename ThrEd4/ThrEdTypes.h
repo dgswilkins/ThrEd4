@@ -2,7 +2,7 @@
 #pragma once
 
 // Local Headers
-#include "Resources\resource.h"
+#include "Resources/resource.h"
 #include "utf8conv.h"
 
 // Open Source headers
