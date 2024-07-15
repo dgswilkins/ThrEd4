@@ -1164,7 +1164,7 @@ void thi::stchPars() {
 	                    ThredWindowRect.bottom - ThredWindowRect.top};
 	auto const sizeX = wrap::toFloat(StitchWindowSize.cx);
 	auto const sizeY = wrap::toFloat(StitchWindowSize.cy);
-	if ((sizeX / sizeY) > aspectRatio) {
+	if (auto const ratio = sizeX / sizeY; ratio > aspectRatio) {
 	  StitchWindowSize.cx = std::lround(sizeY * aspectRatio);
 	}
 	else {
