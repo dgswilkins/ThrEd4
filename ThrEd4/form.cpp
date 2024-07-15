@@ -2172,9 +2172,7 @@ auto form::psg() noexcept -> uint32_t {
   }
   auto const temp = PseudoRandomValue & 0x48000000U;
   PseudoRandomValue <<= 1U;
-  constexpr auto BIT27 = 0x8000000U;
-  constexpr auto BIT30 = 0x40000000U;
-  if (temp == BIT30 || temp == BIT27) {
+  if (constexpr auto BITS = std::array {0x8000000U, 0x40000000U}; temp == BITS[1] || temp == BITS[0]) {
 	++PseudoRandomValue;
   }
   return PseudoRandomValue;
