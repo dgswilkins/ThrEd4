@@ -75,7 +75,7 @@ class PCSHEADER // pcs file header structure
 	return (m_leadIn == LEADIN && m_colorCount == COLORCNT);
   }
 
-  constexpr void setHoopType(bool flag) noexcept {
+  constexpr void setHoopType(bool const flag) noexcept {
 	m_hoopType = flag ? LARGHUP : SMALHUP;
   }
 

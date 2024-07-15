@@ -33,7 +33,7 @@ union FANGCLPOUT {
 	return m_angle;
   }
 
-  void setAngle(float value) noexcept {
+  void setAngle(float const value) noexcept {
 	m_angle = value;
   }
 
@@ -42,7 +42,7 @@ union FANGCLPOUT {
 	return m_clip;
   }
 
-  void setClip(DWORD value) noexcept {
+  void setClip(DWORD const value) noexcept {
 	m_clip = value;
   }
 
@@ -51,11 +51,11 @@ union FANGCLPOUT {
 	return m_guide;
   }
 
-  void setGuide(SAT_CON_OUT value) noexcept {
+  void setGuide(SAT_CON_OUT const value) noexcept {
 	m_guide = value;
   }
 
-  void setGuide(SAT_CON value) {
+  void setGuide(SAT_CON const value) {
 	m_guide = value;
   }
 };
@@ -74,7 +74,7 @@ union FLENCNTOUT {
   [[nodiscard]] auto getStitchLength() const noexcept -> float {
 	return m_stitchLength;
   }
-  void setStitchLength(float value) noexcept {
+  void setStitchLength(float const value) noexcept {
 	m_stitchLength = value;
   }
 
@@ -82,7 +82,7 @@ union FLENCNTOUT {
   [[nodiscard]] auto getClipCount() const noexcept -> uint32_t {
 	return m_clipCount;
   }
-  void setClipCount(uint32_t value) noexcept {
+  void setClipCount(uint32_t const value) noexcept {
 	m_clipCount = value;
   }
 };
@@ -171,7 +171,7 @@ union SATINANGLEOUT {
 	return m_guide;
   }
 
-  void setGuide(DWORD value) noexcept {
+  void setGuide(DWORD const value) noexcept {
 	m_guide = value;
   }
 
@@ -180,7 +180,7 @@ union SATINANGLEOUT {
 	return m_angle;
   }
 
-  void setAngle(float value) noexcept {
+  void setAngle(float const value) noexcept {
 	m_angle = value;
   }
 };
@@ -653,7 +653,7 @@ inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   }
 }
 
-inline void FRM_HEAD::squareEnd(bool flag) noexcept {
+inline void FRM_HEAD::squareEnd(bool const flag) noexcept {
   if (flag) {
 	extendedAttribute |= AT_SQR;
   }

@@ -218,7 +218,7 @@ class DSTDAT
   char val {};
 };
 
-void di::dstin(uint32_t number, POINT& pout) noexcept {
+void di::dstin(uint32_t const number, POINT& pout) noexcept {
   constexpr auto XCOR = char {0};
   constexpr auto YCOR = char {1};
   // ToDo - what is this code doing?
@@ -465,7 +465,7 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
   RGBFileName = directory;
 }
 
-auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
+auto di::coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
   auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
   auto color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
@@ -479,7 +479,7 @@ auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   // NOLINTEND(readability-magic-numbers)
 }
 
-auto DST::colmatch(COLORREF color) -> uint32_t {
+auto DST::colmatch(COLORREF const color) -> uint32_t {
   if (auto const colorChanges = thred::maxColor() + 1U; colorChanges < UserColor.size()) {
 	auto iUserColor = UserColor.begin();
 	for (auto iColor = 0U; iColor < colorChanges; ++iColor) {
@@ -1007,7 +1007,7 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
   return X_DST.at(wrap::toSize(xOffset)) | Y_DST.at(wrap::toSize(yOffset));
 }
 
-void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
+void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t const data) {
   DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & B1MASK),
                                gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
                                gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});

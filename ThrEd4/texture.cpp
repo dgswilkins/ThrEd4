@@ -170,7 +170,7 @@ auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); /
 auto TextureScreen = TXTR_SCREEN {}; // texture editor layout parameters
 } // namespace
 
-void texture::setTxtCurLoc(POINT location) noexcept {
+void texture::setTxtCurLoc(POINT const location) noexcept {
   TextureCursorLocation = location;
 }
 
@@ -435,7 +435,7 @@ void txi::txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept {
                   wrap::toFloat(TextureScreen.top));
 }
 
-void txi::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
+void txi::txtxfn(POINT const& reference, uint16_t const offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto line = std::array<POINT, 2> {};
   line[0]   = POINT {reference.x, reference.y - offsetPixels};
   line[1]   = POINT {reference.x, reference.y + offsetPixels};
@@ -445,7 +445,7 @@ void txi::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept(std::is
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
-void txi::dutxtx(uint32_t index, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
+void txi::dutxtx(uint32_t const index, uint16_t const offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto ref = POINT {};
   txt2pix(TempTexturePoints->operator[](index), ref);
   txtxfn(ref, offsetPixels);
@@ -1010,7 +1010,7 @@ void txi::chktxnum() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void txi::butsid(uint32_t windowId) {
+void txi::butsid(uint32_t const windowId) {
   auto buttonRect = RECT {};
   chktxnum();
   TextureWindowId = windowId;
@@ -1094,7 +1094,7 @@ void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uin
   iBuffer += current.texture.count;
 }
 
-void texture::deltx(uint32_t formIndex) {
+void texture::deltx(uint32_t const formIndex) {
   auto const itForm = wrap::next(FormList->begin(), formIndex);
   auto const itNext = std::next(itForm);
   if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->texture.count == 0U)) {
@@ -1138,7 +1138,7 @@ void texture::deltx(uint32_t formIndex) {
   *TexturePointsBuffer = std::move(textureBuffer);
 }
 
-void txi::nutx(uint32_t formIndex) {
+void txi::nutx(uint32_t const formIndex) {
   if (FormList->empty()) {
 	return;
   }
@@ -1210,7 +1210,7 @@ void texture::txof() {
 
 enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
-void txi::txfn(uint32_t textureType, uint32_t formIndex) {
+void txi::txfn(uint32_t textureType, uint32_t const formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   if (form.satinGuideCount != 0U) {
@@ -1239,7 +1239,7 @@ void txi::txfn(uint32_t textureType, uint32_t formIndex) {
   }
 }
 
-void txi::dutxfn(uint32_t textureType) {
+void txi::dutxfn(uint32_t const textureType) {
   altx();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	txfn(textureType, ClosestFormToCursor);
@@ -1434,7 +1434,7 @@ void txi::txcntrv(FRM_HEAD const& textureForm) {
   }
 }
 
-void txi::txsiz(float ratio, FRM_HEAD const& textureForm) {
+void txi::txsiz(float const ratio, FRM_HEAD const& textureForm) {
   ritxfrm(textureForm);
   for (auto& angledFormVertices = *AngledFormVertices; auto& vertex : angledFormVertices) {
 	vertex *= ratio;
@@ -1457,7 +1457,7 @@ void txi::txgro(FRM_HEAD const& textureForm) {
   txsiz(1.0F / TXTRAT, textureForm);
 }
 
-auto txi::txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool {
+auto txi::txdig(wchar_t const keyCode, wchar_t& character) noexcept -> bool {
   if (isdigit(keyCode) != 0) {
 	character = keyCode;
 	return true;
@@ -1473,7 +1473,7 @@ auto txi::txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool {
   return false;
 }
 
-void txi::txnudg(int32_t deltaX, float deltaY) {
+void txi::txnudg(int32_t const deltaX, float const deltaY) {
   if (SelectedTexturePointsList->empty()) {
 	return;
   }
@@ -1762,7 +1762,7 @@ void texture::setshft() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void texture::writeScreenWidth(int32_t position) {
+void texture::writeScreenWidth(int32_t const position) {
   auto const scrWidth = displayText::format(IDS_TXWID, (TextureScreen.width * IPFGRAN));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

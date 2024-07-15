@@ -171,7 +171,7 @@ void trace::initColorRef() noexcept {
   InvertDownColor = PENGRAY;
 }
 
-auto ti::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND {
+auto ti::trcsub(int32_t const xCoordinate, int32_t const yCoordinate, int32_t const buttonHeight) -> HWND {
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
   // NOLINTNEXTLINE(readability-qualified-auto)
   if (auto const window = CreateWindowEx(
@@ -202,7 +202,7 @@ void trace::initTraceWindows() {
   }
 }
 
-auto ti::trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT> {
+auto ti::trcols(COLORREF const color) noexcept -> std::array<uint32_t, CHANLCNT> {
   auto colors = std::array<uint32_t, CHANLCNT> {};
   colors[0]   = color & B1MASK;
   colors[1]   = (color & B2MASK) >> BYTSHFT;
@@ -221,7 +221,7 @@ void ti::trcratnum() {
   displayText::butxt(HLIN, fmtStr);
 }
 
-auto ti::trcin(COLORREF color) -> bool {
+auto ti::trcin(COLORREF const color) -> bool {
   if (color == 0U) {
 	return false;
   }
@@ -285,7 +285,7 @@ void ti::tracwnd() {
 }
 
 // Check Translation
-inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
+inline void ti::difsub(uint32_t const source, uint32_t const shift, uint32_t& destination) noexcept {
   destination = (source >> (shift & NIBMASK)) & BYTMASK;
 }
 
@@ -294,7 +294,7 @@ inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& destinat
 //  504
 //  678
 
-void ti::difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept {
+void ti::difbits(uint32_t const shift, gsl::details::span_iterator<uint32_t> point) noexcept {
   auto iTrcAdjClrs = TraceAdjacentColors.begin();
   difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 0 - center
   std::advance(point, -bitmap::getBitmapWidth());
@@ -319,7 +319,7 @@ auto ti::trsum() -> uint32_t {
   auto const firstColor = TraceAdjacentColors.front();
   auto const iBegin     = std::next(TraceAdjacentColors.begin());
   auto const iEnd       = std::next(TraceAdjacentColors.end(), -1);
-  auto const fold       = [firstColor](uint32_t varA, uint32_t varB) {
+  auto const fold       = [firstColor](uint32_t const varA, uint32_t const varB) {
     return varA + ((varB > firstColor) ? (varB - firstColor) : (firstColor - varB));
   };
   return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
@@ -1050,7 +1050,7 @@ void ti::ritrcol(COLORREF& colRef, uint32_t colNum) noexcept {
   colRef |= (colNum << TraceShift.at(ColumnColor));
 }
 
-void ti::dutrnum0(uint32_t colNum) {
+void ti::dutrnum0(uint32_t const colNum) {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
@@ -1105,13 +1105,13 @@ auto ti::ducolm() -> uint32_t {
   return 2U;
 }
 
-void ti::trnumwnd0(int32_t position) noexcept {
+void ti::trnumwnd0(int32_t const position) noexcept {
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
   TraceNumberInput        = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
-void ti::trnumwnd1(int32_t position) noexcept {
+void ti::trnumwnd1(int32_t const position) noexcept {
   constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
   GeneralNumberInputBox   = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
@@ -1262,7 +1262,7 @@ void trace::tracpar() {
   }
 }
 
-void ti::trcnum(uint32_t shift, COLORREF color, uint32_t backColor) {
+void ti::trcnum(uint32_t const shift, COLORREF color, uint32_t const backColor) {
   auto const zeroWidth = thred::txtWid(L"0");
   color >>= shift;
   color &= BYTMASK;
@@ -1272,7 +1272,7 @@ void ti::trcnum(uint32_t shift, COLORREF color, uint32_t backColor) {
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
 
-void ti::durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask) {
+void ti::durct(uint32_t const shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask) {
   auto const lowerColor    = gsl::narrow_cast<uint8_t>((UpPixelColor >> shift) & 0xffU);
   auto const upperColor    = gsl::narrow_cast<uint8_t>((DownPixelColor >> shift) & 0xffU);
   auto const controlHeight = wrap::toFloat(traceControlRect.bottom - traceControlRect.top);
@@ -1296,7 +1296,7 @@ void ti::durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask
   }
 }
 
-void ti::dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
+void ti::dublk(HDC const hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
   if (StateMap->test(StateFlag::DUHI)) {
 	FillRect(hDC, &traceHighMask, brush);
   }
@@ -1380,7 +1380,7 @@ void trace::wasTrace1() {
   }
 }
 
-void trace::traceNumberInput(wchar_t NumericCode) {
+void trace::traceNumberInput(wchar_t const NumericCode) {
   auto itTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
   *(itTraceInputBuffer++) = NumericCode;
   *itTraceInputBuffer     = 0;

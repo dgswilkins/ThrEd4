@@ -71,7 +71,7 @@ void repsat();
 void reptx();
 } // namespace ri
 
-void ri::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
+void ri::adbad(std::wstring& repairMessage, uint32_t const code, uint32_t const count) {
   auto fmtStr = displayText::loadStr(code);
   fmtStr += displayText::format(IDS_NOTREP, count);
   repairMessage += fmtStr;
@@ -466,7 +466,7 @@ void repair::repar() {
   displayText::shoMsg(repairMessage, false);
 }
 
-void ri::datmsg(uint32_t code) {
+void ri::datmsg(uint32_t const code) {
   auto dataErrorID = wrap::toUnsigned(IDS_BADUKN);
   switch (code) {
 	case BADFLT:

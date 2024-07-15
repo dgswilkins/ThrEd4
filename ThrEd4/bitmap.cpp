@@ -119,7 +119,7 @@ auto UTF16BMPname         = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file
 auto UTF8BMPname          = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
 } // namespace
 
-constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
+constexpr auto bi::fswap(COLORREF const color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
   auto const swapped = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
@@ -128,6 +128,7 @@ constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
 }
 
 auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
+auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> const ppvBits) -> HBITMAP {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
   auto const bitmap =
       CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -260,8 +261,8 @@ auto bi::binv(const std::vector<uint8_t>& monoBitmapData) noexcept -> bool {
 
 void bi::bitlin(gsl::span<uint8_t> const&  source,
                 gsl::span<uint32_t> const& destination,
-                COLORREF                   foreground,
-                COLORREF                   background) noexcept {
+                COLORREF const             foreground,
+                COLORREF const             background) noexcept {
   auto       dst       = destination.begin();
   for (auto const subSource = source.subspan(0, source.size() - 1U); auto const& src : subSource) {
 	auto bits = std::bitset<CHAR_BIT>(src);
@@ -299,7 +300,7 @@ void bi::bitsiz() {
                             (BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight))};
 }
 
-constexpr auto bi::gudtyp(WORD bitCount) noexcept -> bool {
+constexpr auto bi::gudtyp(WORD const bitCount) noexcept -> bool {
   switch (bitCount) {
 	case 1U:
 	case BPP24:
@@ -310,7 +311,7 @@ constexpr auto bi::gudtyp(WORD bitCount) noexcept -> bool {
   }
 }
 
-void bitmap::resetBmpFile(bool reset) {
+void bitmap::resetBmpFile(bool const reset) {
   if (!ismap()) {
 	return;
   }
@@ -729,7 +730,7 @@ auto bi::stch2bit(F_POINT& point) -> POINT {
                 wrap::round<LONG>(wrap::toFloat(BitmapHeight) - BmpStitchRatio.y * point.y)};
 }
 
-void bi::pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
+void bi::pxlin(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {
   auto       line     = std::array<POINT, 2> {};
   auto const vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const vStart   = wrap::next(vertexIt, start);

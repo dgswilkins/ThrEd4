@@ -55,7 +55,7 @@ void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
 void sdmsg();
 } // namespace di
 
-auto displayText::loadStr(uint32_t stringID) -> std::wstring {
+auto displayText::loadStr(uint32_t const stringID) -> std::wstring {
   auto* pBuf  = gsl::narrow_cast<wchar_t*>(nullptr);
   auto  sDest = std::wstring {};
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -66,7 +66,7 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
   return sDest;
 }
 
-void displayText::shoMsg(std::wstring const& message, bool top) {
+void displayText::shoMsg(std::wstring const& message, bool const top) {
   if (message.empty()) {
 	return;
   }
@@ -122,7 +122,7 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
                            nullptr);
 }
 
-void displayText::tabmsg(uint32_t code, bool top) {
+void displayText::tabmsg(uint32_t const code, bool const top) {
   shoMsg(loadStr(code), top);
 }
 
@@ -159,13 +159,13 @@ void displayText::numWnd() {
   thred::resetMsgBuffer();
 }
 
-void displayText::msgflt(uint32_t messageId, float value) {
+void displayText::msgflt(uint32_t const messageId, float const value) {
   showMessage(messageId, value);
   StateMap->set(StateFlag::NUMIN);
   numWnd();
 }
 
-void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
+void displayText::tsizmsg(wchar_t const* threadSizeText, float const threadSize) {
   auto const fmtStr = format2(IDS_SIZ, threadSizeText, threadSize);
   shoMsg(fmtStr, true);
   StateMap->set(StateFlag::NUMIN);
@@ -176,7 +176,7 @@ void displayText::bfilmsg() {
   showMessage(IDS_BADFIL, WorkingFileName->wstring());
 }
 
-void displayText::filnopn(uint32_t code, fs::path const& fileName) {
+void displayText::filnopn(uint32_t const code, fs::path const& fileName) {
   showMessage(code, fileName.wstring());
 }
 
@@ -184,7 +184,7 @@ void displayText::crmsg(fs::path const& fileName) {
   showMessage(IDS_CREAT, fileName.wstring());
 }
 
-void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
+void displayText::butxt(uint32_t const iButton, std::wstring const& buttonText) {
   if (!StateMap->test(StateFlag::WASTRAC) || iButton <= HNUM) {
 	SetWindowText(ButtonWin->operator[](iButton), buttonText.c_str());
 	return;
@@ -203,7 +203,7 @@ void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
   SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 }
 
-void displayText::clrhbut(uint32_t startButton) {
+void displayText::clrhbut(uint32_t const startButton) {
   for (auto const spButtons =
            std::ranges::subrange(wrap::next(ButtonWin->begin(), startButton), ButtonWin->end());
        auto const iButton : spButtons) { // NOLINT(readability-qualified-auto)
@@ -211,7 +211,7 @@ void displayText::clrhbut(uint32_t startButton) {
   }
 }
 
-void displayText::ritnum(uint32_t code, uint32_t value) {
+void displayText::ritnum(uint32_t const code, uint32_t const value) {
   butxt(HNUM, format(code, value));
 }
 
@@ -219,18 +219,18 @@ void displayText::riter() {
   tabmsg(IDS_RITER, false);
 }
 
-void displayText::pntmsg(uint32_t msgID) {
+void displayText::pntmsg(uint32_t const msgID) {
   auto const message = loadStr(msgID);
   showMessage(IDS_PNT, message);
 }
 
-void displayText::shoseln(uint32_t code0, uint32_t code1) {
+void displayText::shoseln(uint32_t const code0, uint32_t const code1) {
   auto const msg0 = loadStr(code0);
   auto const msg1 = loadStr(code1);
   shoMsg(format2(IDS_SHOSEL, msg0, msg1), false);
 }
 
-auto di::clpmsgs(uint32_t code) -> bool {
+auto di::clpmsgs(uint32_t const code) -> bool {
   form::ispcdclp();
   if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS, false);
@@ -246,7 +246,7 @@ void displayText::frm1pnt() {
   }
 }
 
-auto displayText::filmsgs(uint32_t code) -> bool {
+auto displayText::filmsgs(uint32_t const code) -> bool {
   if (!SelectedFormList->empty()) {
 	return di::clpmsgs(code);
   }
@@ -396,11 +396,11 @@ void displayText::tomsg() {
   updateWinFont(MainStitchWin);
 }
 
-void di::bxtxt(uint32_t iButton, uint32_t iMessage) {
+void di::bxtxt(uint32_t const iButton, uint32_t const iMessage) {
   SetWindowText(ButtonWin->operator[](iButton), displayText::loadStr(iMessage).c_str());
 }
 
-void di::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
+void di::hlpflt(uint32_t const iButton, uint32_t const iMessage, float const data) {
   auto const fmtStr = displayText::format(iMessage, data);
   SetWindowText(ButtonWin->operator[](iButton), fmtStr.c_str());
 }

@@ -287,16 +287,16 @@ void xi::fthvars(FRM_HEAD const& form, FEATHER& feather) {
   }
 }
 
-constexpr auto xi::durat(float start, float finish, float featherRatio) -> float {
+constexpr auto xi::durat(float const start, float const finish, float const featherRatio) -> float {
   return (finish - start) * featherRatio + start;
 }
 
-void xi::duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept {
+void xi::duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, float const featherRatioLocal) noexcept {
   point = F_POINT {durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal),
                    durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal)};
 }
 
-void xi::durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather) {
+void xi::durats(uint32_t const iSequence, gsl::not_null<std::vector<F_POINT>*> const sequence, FEATHER& feather) {
   auto const& bCurrent = BSequence->operator[](iSequence);
   auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 
@@ -409,12 +409,12 @@ void xi::nurat(FEATHER& feather) noexcept {
   feather.globalPosition += feather.globalStep;
 }
 
-void xi::fthfn(uint32_t iSequence, FEATHER& feather) {
+void xi::fthfn(uint32_t const iSequence, FEATHER& feather) {
   nurat(feather);
   durats(iSequence, OSequence, feather);
 }
 
-void xi::ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept {
+void xi::ratpnt(uint32_t const iPoint, uint32_t const iNextPoint, F_POINT& point, float const featherRatio) noexcept {
   auto const& bPoint = BSequence->operator[](iPoint);
 
   point = F_POINT {((BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x),
@@ -425,12 +425,12 @@ auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> 
   return F_POINT {wrap::midl(endPoint.x, startPoint.x), wrap::midl(endPoint.y, startPoint.y)};
 }
 
-void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept {
+void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float const featherRatioLocal) noexcept {
   point = F_POINT {((endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x),
                    ((endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y)};
 }
 
-void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
+void xi::fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
   auto currentPoint = F_POINT {};
   auto nextPoint    = F_POINT {};
 
@@ -466,7 +466,7 @@ void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& fea
   featherSequence.push_back(midPoint);
 }
 
-void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
+void xi::fthdfn(uint32_t const iSequence, FEATHER& feather) {
   auto const& bCurrent = BSequence->operator[](iSequence);
   auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 
@@ -587,7 +587,7 @@ void xt::fthrfn(FRM_HEAD& form) {
   xi::fritfil(form, featherSequence);
 }
 
-void xt::fethrf(uint32_t formIndex) {
+void xt::fethrf(uint32_t const formIndex) {
   if (!displayText::filmsgs(FMM_FTH)) {
 	return;
   }
@@ -631,7 +631,7 @@ void xt::fethr() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-constexpr auto xi::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
+constexpr auto xi::tim2int(FILETIME const time) noexcept -> ULARGE_INTEGER {
   auto const largeInt = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
   return largeInt;
 }
@@ -665,7 +665,7 @@ void xi::delwlk(uint32_t code) {
   }
 }
 
-void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
+void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
   if (!OSequence->empty()) {
 	InterleaveSequenceIndices->emplace_back(
 	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
@@ -709,7 +709,7 @@ auto xi::gucon(FRM_HEAD const&            form,
                std::vector<F_POINT_ATTR>& buffer,
                F_POINT const&             start,
                F_POINT const&             finish,
-               uint32_t                   destination,
+               uint32_t const             destination,
                uint32_t                   code) -> uint32_t {
   auto       length      = hypot(finish.x - start.x, finish.y - start.y);
   auto       startVertex = form::closflt(form, start.x, start.y);
@@ -881,7 +881,7 @@ void xt::srtcol() {
   std::ranges::copy(highStitchBuffer, StitchBuffer->begin());
 }
 
-void xt::dubit(FRM_HEAD& form, uint32_t bit) {
+void xt::dubit(FRM_HEAD& form, uint32_t const bit) {
   thred::savdo();
   StateMap->set(StateFlag::WASDO);
   if (form.type == FRMLINE) {
@@ -932,7 +932,7 @@ void xt::setulen() {
   displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen * IPFGRAN);
 }
 
-void xt::chkcwlk(uint32_t formIndex) {
+void xt::chkcwlk(uint32_t const formIndex) {
   if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_CWLK) != 0U) {
 	xi::fncwlk(form);
   }
@@ -941,7 +941,7 @@ void xt::chkcwlk(uint32_t formIndex) {
   }
 }
 
-void xt::chkwlk(uint32_t formIndex) {
+void xt::chkwlk(uint32_t const formIndex) {
   if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_WALK) != 0U) {
 	xi::fnwlk(form);
   }
@@ -950,7 +950,7 @@ void xt::chkwlk(uint32_t formIndex) {
   }
 }
 
-void xi::fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+void xi::fnund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
   auto& form = FormList->operator[](formIndex);
 
   auto const savedStitchSize = UserStitchLength;
@@ -968,7 +968,7 @@ void xi::fnund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments
   UserStitchLength = savedStitchSize;
 }
 
-void xt::chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+void xt::chkund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
   if (auto const& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	xi::fnund(formIndex, textureSegments, angledFormVertices);
   }
@@ -985,7 +985,7 @@ void xt::selalfrm() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
+auto xi::dutyp(uint32_t const attribute) noexcept -> uint32_t {
   auto const maskedAttribute = gsl::narrow_cast<DWORD>(attribute & SRTYPMSK);
   auto bit = gsl::narrow_cast<DWORD>(std::bit_width(maskedAttribute));
   --bit;
@@ -1008,7 +1008,7 @@ void xi::durec(O_REC& record) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
   record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
-auto xi::orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool {
+auto xi::orComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   auto const itColor1 = wrap::next(ColorOrder.begin(), record1->color);
   auto const itColor2 = wrap::next(ColorOrder.begin(), record2->color);
@@ -1039,7 +1039,7 @@ auto xi::orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*>
   return false;
 }
 
-auto xi::orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool {
+auto xi::orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1->form < record2->form) {
 	return true;
@@ -1143,7 +1143,7 @@ auto xi::duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*
 
 #ifdef _DEBUG
 
-void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
+void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t const count) {
   for (auto iRegion = 0U; iRegion < count; ++iRegion) {
 	outDebugString(
 	    L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
@@ -1159,7 +1159,7 @@ void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
 #endif
 
 auto xi::srtchk(std::vector<O_REC*> const& stitchRegion,
-                uint32_t                   count,
+                uint32_t const             count,
                 uint32_t& badForm) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool {
   auto iStitchRegion = stitchRegion.begin();
   auto formIndex     = (*iStitchRegion)->form;
@@ -1370,7 +1370,7 @@ void xt::dmpat() {
 }
 #endif
 
-void xt::fdelstch(uint32_t formIndex, FillStartsDataType& fillStartsData, uint32_t& fillStartsMap) {
+void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, uint32_t& fillStartsMap) {
   auto const& form = FormList->operator[](formIndex);
 
   auto iDestinationStitch = 0U;
@@ -1599,7 +1599,7 @@ auto xi::isfil(FRM_HEAD const& form) noexcept -> bool {
   return false;
 }
 
-void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
+void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t const code, INT_INFO& ilData) {
   if (isfil(form)) {
 	StateMap->set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
@@ -1656,7 +1656,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
   chkend(form, *StitchBuffer, code, ilData);
 }
 
-void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uint32_t fillStartsMap) {
+void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsData, uint32_t const fillStartsMap) {
   auto ilData = INT_INFO {};
   StateMap->reset(StateFlag::ISEND);
   auto const& form = FormList->operator[](formIndex);
@@ -1742,7 +1742,7 @@ void xt::intlv(uint32_t formIndex, FillStartsDataType const& fillStartsData, uin
   thred::coltab();
 }
 
-void xi::setundfn(uint32_t code) {
+void xi::setundfn(uint32_t const code) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	if (auto& form = FormList->operator[](ClosestFormToCursor); form.type != FRMLINE) {
@@ -1823,7 +1823,7 @@ void xt::notcwlk() {
   xi::notundfn(AT_CWLK);
 }
 
-void xi::ulenfn(uint32_t formIndex, float length) {
+void xi::ulenfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 	form.underlayStitchLen = length;
@@ -1831,7 +1831,7 @@ void xi::ulenfn(uint32_t formIndex, float length) {
   }
 }
 
-void xt::dusulen(float length) {
+void xt::dusulen(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::ulenfn(ClosestFormToCursor, length);
@@ -1845,21 +1845,21 @@ void xt::dusulen(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setEdit(uint32_t code, StateFlag flag) {
+void xt::setEdit(uint32_t const code, StateFlag const flag) {
   displayText::tabmsg(code, true);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(flag);
   displayText::numWnd();
 }
 
-void xi::uspacfn(uint32_t formIndex, float spacing) {
+void xi::uspacfn(uint32_t const formIndex, float const spacing) {
   if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlaySpacing = spacing;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::duspac(float spacing) {
+void xt::duspac(float const spacing) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::uspacfn(ClosestFormToCursor, spacing);
@@ -1873,7 +1873,7 @@ void xt::duspac(float spacing) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::uangfn(uint32_t formIndex, float angle) {
+void xi::uangfn(uint32_t const formIndex, float const angle) {
   if (auto& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlayStitchAngle = angle;
 	form::refilfn(formIndex);
@@ -1895,14 +1895,14 @@ void xt::dufang(float angle) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::flenfn(uint32_t formIndex, float length) {
+void xi::flenfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex); (form.fillType != 0U) && !form.isClip()) {
 	form.stitchLength = length;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::duflen(float length) {
+void xt::duflen(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::flenfn(ClosestFormToCursor, length);
@@ -1916,7 +1916,7 @@ void xt::duflen(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fspacfn(uint32_t formIndex, float spacing) {
+void xi::fspacfn(uint32_t const formIndex, float const spacing) {
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	if (spacing < 0) {
 	  if (!form.isClip()) {
@@ -1928,7 +1928,7 @@ void xi::fspacfn(uint32_t formIndex, float spacing) {
   }
 }
 
-void xt::dufspac(float spacing) {
+void xt::dufspac(float const spacing) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::fspacfn(ClosestFormToCursor, spacing);
@@ -1942,7 +1942,7 @@ void xt::dufspac(float spacing) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::findfn(uint32_t formIndex, float indent) {
+void xi::findfn(uint32_t const formIndex, float const indent) {
   auto& form          = FormList->operator[](formIndex);
   form.underlayIndent = indent;
   if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U) {
@@ -1965,7 +1965,7 @@ void xt::dufind(float indent) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fangfn(uint32_t formIndex, float angle) {
+void xi::fangfn(uint32_t const formIndex, float const angle) {
   if (auto& form = FormList->operator[](formIndex); form.type == FRMFPOLY && (form.fillType != 0U)) {
 	switch (form.fillType) {
 	  case VRTF:
@@ -2013,7 +2013,7 @@ void xt::dufxang(float angle) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::ucolfn(uint32_t formIndex, uint8_t color) {
+void xi::ucolfn(uint32_t const formIndex, uint8_t const color) {
   if (auto& form = FormList->operator[](formIndex);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 	form.underlayColor = color;
@@ -2039,7 +2039,7 @@ void xt::dundcol(uint8_t color) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fcolfn(uint32_t formIndex, uint8_t color) {
+void xi::fcolfn(uint32_t const formIndex, uint8_t const color) {
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	form.fillColor = color;
 	form::refilfn(formIndex);
@@ -2064,7 +2064,7 @@ void xt::dufcol(uint8_t color) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::bcolfn(uint32_t formIndex, uint8_t color) {
+void xi::bcolfn(uint32_t const formIndex, uint8_t const color) {
   auto& form = FormList->operator[](formIndex);
   if (form.edgeType == 0U) {
 	return;
@@ -2091,7 +2091,7 @@ void xt::dubcol(uint8_t color) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::blenfn(uint32_t formIndex, float length) {
+void xi::blenfn(uint32_t const formIndex, float const length) {
   auto& form = FormList->operator[](formIndex);
   if (form.isClip()) {
 	return;
@@ -2100,7 +2100,7 @@ void xi::blenfn(uint32_t formIndex, float length) {
   form::refilfn(formIndex);
 }
 
-void xt::dublen(float length) {
+void xt::dublen(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::blenfn(ClosestFormToCursor, length);
@@ -2114,14 +2114,14 @@ void xt::dublen(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::bspacfn(uint32_t formIndex, float length) {
+void xi::bspacfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex); form.edgeType != 0U) {
 	form.edgeSpacing = length;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::dubspac(float length) {
+void xt::dubspac(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::bspacfn(ClosestFormToCursor, length);
@@ -2135,14 +2135,14 @@ void xt::dubspac(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::bminfn(uint32_t formIndex, float length) {
+void xi::bminfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex); form.edgeType != 0U) {
 	form.minBorderStitchLen = length;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::dubmin(float length) {
+void xt::dubmin(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::bminfn(ClosestFormToCursor, length);
@@ -2156,14 +2156,14 @@ void xt::dubmin(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::bmaxfn(uint32_t formIndex, float length) {
+void xi::bmaxfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex); form.edgeType != 0U) {
 	form.maxBorderStitchLen = length;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::dubmax(float length) {
+void xt::dubmax(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::bmaxfn(ClosestFormToCursor, length);
@@ -2177,14 +2177,14 @@ void xt::dubmax(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fminfn(uint32_t formIndex, float length) {
+void xi::fminfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	form.minFillStitchLen = length;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::dufmin(float length) {
+void xt::dufmin(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::fminfn(ClosestFormToCursor, length);
@@ -2198,14 +2198,14 @@ void xt::dufmin(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fmaxfn(uint32_t formIndex, float length) {
+void xi::fmaxfn(uint32_t const formIndex, float const length) {
   if (auto& form = FormList->operator[](formIndex); form.fillType != 0U) {
 	form.maxFillStitchLen = length;
 	form::refilfn(formIndex);
   }
 }
 
-void xt::dufmax(float length) {
+void xt::dufmax(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::fmaxfn(ClosestFormToCursor, length);
@@ -2219,7 +2219,7 @@ void xt::dufmax(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fwidfn(uint32_t formIndex, float length) {
+void xi::fwidfn(uint32_t const formIndex, float const length) {
   auto& form = FormList->operator[](formIndex);
 
   auto const reference = form.rectangle.left;
@@ -2233,7 +2233,7 @@ void xi::fwidfn(uint32_t formIndex, float length) {
   form::refilfn(formIndex);
 }
 
-void xt::dufwid(float length) {
+void xt::dufwid(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::fwidfn(ClosestFormToCursor, length);
@@ -2247,7 +2247,7 @@ void xt::dufwid(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xi::fhifn(uint32_t formIndex, float length) {
+void xi::fhifn(uint32_t const formIndex, float const length) {
   auto& form = FormList->operator[](formIndex);
 
   auto const reference = form.rectangle.bottom;
@@ -2261,7 +2261,7 @@ void xi::fhifn(uint32_t formIndex, float length) {
   form::refilfn(formIndex);
 }
 
-void xt::dufhi(float length) {
+void xt::dufhi(float const length) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::fhifn(ClosestFormToCursor, length);
@@ -2320,12 +2320,12 @@ void xt::duauxnam(fs::path& auxName) {
   }
 }
 
-void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
+void xi::setstxt(int32_t const stringIndex, float const value, HWND dialog) {
   SetWindowText(GetDlgItem(dialog, stringIndex),
                 fmt::format(FMT_COMPILE(L"{:.2f}"), (value * IPFGRAN)).c_str());
 }
 
-auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
+auto xi::getstxt(int32_t const stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto SZBUFFER = 16U;
 
@@ -2334,7 +2334,7 @@ auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
   return wrap::wcsToFloat(buffer.data()) * PFGRAN;
 }
 
-auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
+auto xi::chkasp(F_POINT& point, float const aspectRatio, HWND dialog) -> bool {
   point = F_POINT {getstxt(IDC_DESWID, dialog), getstxt(IDC_DESHI, dialog)};
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
@@ -2543,7 +2543,7 @@ void xt::chgwrn() {
   menu::wrnmen();
 }
 
-void xt::chgchk(uint8_t code) {
+void xt::chgchk(uint8_t const code) {
   IniFile.dataCheck = code;
   menu::chkmen();
 }

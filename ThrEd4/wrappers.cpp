@@ -48,24 +48,24 @@ auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   }
 }
 
-void wrap::polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
+void wrap::polyline(HDC const hdc, POINT const* apt, uint32_t const cpt) noexcept {
   Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
-auto wrap::pressed(int virtKey) noexcept -> bool {
+auto wrap::pressed(int const virtKey) noexcept -> bool {
   constexpr auto HIGHBIT = 0x8000U;
   return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & HIGHBIT) != 0U;
 }
 
-void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
+void wrap::writeFile(HANDLE const file, LPCVOID buffer, uint32_t const bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
   WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 
-void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSize) noexcept {
+void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t const iLen, LPSIZE lpSize) noexcept {
   GetTextExtentPoint32(hdc, lpString, gsl::narrow<int32_t>(iLen), lpSize);
 }
 
-void wrap::textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept {
+void wrap::textOut(HDC hdc, int32_t const nXStart, int32_t const nYStart, LPCTSTR lpString, uint32_t const cchString) noexcept {
   TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int32_t>(cchString));
 }
 
@@ -78,7 +78,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
   saveCursor = hCursor;
 }
 
-auto wrap::createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN {
+auto wrap::createPen(int32_t const iStyle, int32_t const width, COLORREF const color) noexcept -> HPEN {
   auto const scaledWidth = MulDiv(width, *ScreenDPI, STDDPI);
   return CreatePen(iStyle, scaledWidth, color);
 }

@@ -23,7 +23,7 @@ class SAT_CON
   inline auto operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON&;
 };
 
-constexpr SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept :
+constexpr SAT_CON::SAT_CON(uint32_t const rStart, uint32_t const rFinish) noexcept :
     start(rStart), finish(rFinish) {
 }
 

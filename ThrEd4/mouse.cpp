@@ -84,7 +84,7 @@ auto mi::chkok() noexcept -> bool {
   return thred::chkwnd(OKButton);
 }
 
-auto mi::finrng(uint32_t find) noexcept -> bool {
+auto mi::finrng(uint32_t const find) noexcept -> bool {
   if (auto const& rectFind = FormList->operator[](find).rectangle;
       rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
       rectFind.bottom < StitchRangeRect.bottom || rectFind.top > StitchRangeRect.top) {
@@ -98,7 +98,7 @@ auto mi::finrng(uint32_t find) noexcept -> bool {
   return (cod == 0U) || (ActiveLayer == cod);
 }
 
-constexpr auto mi::nxtcrnr(uint32_t corner) -> uint32_t {
+constexpr auto mi::nxtcrnr(uint32_t const corner) -> uint32_t {
   return (corner + 1U) & 3U;
 }
 
@@ -889,7 +889,7 @@ void mi::moveForms() {
   }
 }
 
-auto mouse::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag)
+auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F_POINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
   if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) { // shift key pressed as well
@@ -1113,7 +1113,7 @@ void mi::updateCursor() {
 }
 
 auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
-                            float               xyRatio,
+                            float const         xyRatio,
                             float&              rotationAngle,
                             F_POINT const&      rotationCenter,
                             FRM_HEAD const&     textureForm) -> bool {

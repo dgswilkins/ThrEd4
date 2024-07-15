@@ -51,17 +51,17 @@ void tomsg();
 void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
 
-template <class inType> auto format(uint32_t messageId, inType value) -> std::wstring {
+template <class inType> auto format(uint32_t const messageId, inType value) -> std::wstring {
   return fmt::format(fmt::runtime(loadStr(messageId)), value);
 }
 
 template <class inTypeA, class inTypeB>
-auto format2(uint32_t messageId, inTypeA valueA, inTypeB valueB) -> std::wstring {
+auto format2(uint32_t const messageId, inTypeA valueA, inTypeB valueB) -> std::wstring {
   return fmt::format(fmt::runtime(loadStr(messageId)), valueA, valueB);
 }
 
 template <class inTypeA, class inTypeB, class inTypeC, class inTypeD, class inTypeE>
-auto format5(uint32_t messageId, inTypeA valueA, inTypeB valueB, inTypeC valueC, inTypeD valueD, inTypeE valueE)
+auto format5(uint32_t const messageId, inTypeA valueA, inTypeB valueB, inTypeC valueC, inTypeD valueD, inTypeE valueE)
     -> std::wstring {
   return fmt::format(fmt::runtime(loadStr(messageId)), valueA, valueB, valueC, valueD, valueE);
 }

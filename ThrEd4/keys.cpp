@@ -89,7 +89,7 @@ auto keys::getMoveAnchor() noexcept -> uint32_t {
   return MoveAnchor;
 }
 
-void kyi::setMoveAnchor(uint32_t source) noexcept {
+void kyi::setMoveAnchor(uint32_t const source) noexcept {
   MoveAnchor = source;
 }
 
@@ -183,7 +183,7 @@ void kyi::ritcur() {
   }
 }
 
-constexpr auto kyi::byteSwap(uint32_t data) noexcept -> uint32_t {
+constexpr auto kyi::byteSwap(uint32_t const data) noexcept -> uint32_t {
   auto const swapped = ((data & 0x000000FFU) << 24U) | ((data & 0x0000FF00U) << 8U) |
                        ((data & 0x00FF0000U) >> 8U) | ((data & 0xFF000000U) >> 24U);
   return swapped;
@@ -1383,7 +1383,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
   return false;
 }
 
-auto keys::createFormType(wchar_t code) -> bool {
+auto keys::createFormType(wchar_t const code) -> bool {
   switch (code) {
 	case L'E': {
 	  StateMap->reset(StateFlag::FORMIN);
@@ -1443,7 +1443,7 @@ auto keys::createFormType(wchar_t code) -> bool {
   return false;
 }
 
-void keys::navigateThumbnails(wchar_t code) {
+void keys::navigateThumbnails(wchar_t const code) {
   switch (code) {
 	case VK_ESCAPE:
 	case L'Q': {
@@ -1479,7 +1479,7 @@ void keys::navigateThumbnails(wchar_t code) {
   }
 }
 
-auto keys::otherKeys(wchar_t code) -> bool {
+auto keys::otherKeys(wchar_t const code) -> bool {
   switch (code) {
 	case VK_DECIMAL:      // numpad period
 	case VK_OEM_PERIOD: { // period

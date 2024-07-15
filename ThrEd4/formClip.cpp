@@ -124,7 +124,7 @@ void tfc::setFVAS(std::vector<POINT>* source) noexcept {
   FormVerticesAsLine = source;
 }
 
-void tfc::setClipOrigin(POINT source) noexcept {
+void tfc::setClipOrigin(POINT const source) noexcept {
   ClipOrigin = source;
 }
 
@@ -548,7 +548,7 @@ void tfc::duclip() {
   fci::clipSelectedStitches();
 }
 
-auto fci::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t {
+auto fci::frmcnt(uint32_t const iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t {
   auto const codedAttribute = iForm << FRMSHFT;
   auto       iStitch        = StitchBuffer->begin();
   auto       stitchCount    = 0U;
@@ -576,7 +576,7 @@ auto fci::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uin
   return stitchCount;
 }
 
-void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t led) {
+void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const led) {
   auto integer    = 0.0F;
   destination.led = led;
   auto fractional = std::modf(source.x - LowerLeftStitch.x, &integer);

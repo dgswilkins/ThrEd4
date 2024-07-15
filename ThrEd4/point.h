@@ -19,12 +19,12 @@
 #include <cstdint>
 
 namespace util {
-auto inline closeEnough(float first, float second) noexcept -> bool {
+auto inline closeEnough(float const first, float const second) noexcept -> bool {
   // test if the floats are so close together that they can be considered equal
   return std::abs(first - second) < FLT_EPSILON;
 }
 
-auto inline closeEnough(double first, double second) noexcept -> bool {
+auto inline closeEnough(double const first, double const second) noexcept -> bool {
   // test if the doubles are so close together that they can be considered equal
   return std::abs(first - second) < DBL_EPSILON;
 }
@@ -119,25 +119,25 @@ class F_POINT
 	return *this;
   }
 
-  constexpr auto operator*=(float rhs) noexcept -> F_POINT& {
+  constexpr auto operator*=(float const rhs) noexcept -> F_POINT& {
 	x *= rhs;
 	y *= rhs;
 	return *this;
   }
 
-  constexpr auto operator*(float rhs) const noexcept -> F_POINT {
+  constexpr auto operator*(float const rhs) const noexcept -> F_POINT {
 	return F_POINT {x * rhs, y * rhs};
   }
 
-  constexpr auto operator*(F_POINT rhs) const noexcept -> F_POINT {
+  constexpr auto operator*(F_POINT const rhs) const noexcept -> F_POINT {
 	return F_POINT {x * rhs.x, y * rhs.y};
   }
 
-  constexpr auto operator/(float rhs) const noexcept -> F_POINT {
+  constexpr auto operator/(float const rhs) const noexcept -> F_POINT {
 	return F_POINT {x / rhs, y / rhs};
   }
 
-  constexpr auto operator/(F_POINT rhs) const noexcept -> F_POINT {
+  constexpr auto operator/(F_POINT const rhs) const noexcept -> F_POINT {
 	return F_POINT {x / rhs.x, y / rhs.y};
   }
 };
@@ -197,7 +197,7 @@ class SMAL_PNT_L
   explicit constexpr SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept;
 };
 
-constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept :
+constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t const rhsLine, uint32_t const rhsGroup, float const rhsX, float const rhsY) noexcept :
     line(rhsLine), group(rhsGroup), x(rhsX), y(rhsY) {
 }
 
@@ -216,11 +216,11 @@ class B_SEQ_PNT
 };
 
 // ToDo - This should use wrap::toFloat but there would be a circular dependency
-constexpr B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
+constexpr B_SEQ_PNT::B_SEQ_PNT(double const rhsX, double const rhsY, int32_t const rhsAttr) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-constexpr B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
+constexpr B_SEQ_PNT::B_SEQ_PNT(float const rhsX, float const rhsY, int32_t const rhsAttr) :
     x(rhsX), y(rhsY), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
@@ -228,7 +228,7 @@ inline auto F_POINT::operator==(F_POINT const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
-constexpr F_POINT::F_POINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
+constexpr F_POINT::F_POINT(float const rhsX, float const rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 
 constexpr F_POINT::F_POINT(int32_t rhsX, int32_t rhsY) noexcept :
@@ -239,7 +239,7 @@ constexpr F_POINT::F_POINT(LONG rhsX, LONG rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-constexpr F_POINT::F_POINT(double rhsX, double rhsY) :
+constexpr F_POINT::F_POINT(double const rhsX, double const rhsY) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)) {
 }
 
@@ -273,11 +273,11 @@ constexpr auto F_POINT::operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT& {
   return *this;
 }
 
-inline F_POINT_ATTR::F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept :
+inline F_POINT_ATTR::F_POINT_ATTR(float const rhsX, float const rhsY, uint32_t const rhsA) noexcept :
     x(rhsX), y(rhsY), attribute(rhsA) {
 }
 
-inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) :
+inline F_POINT_ATTR::F_POINT_ATTR(double const rhsX, double const rhsY, uint32_t const rhsA) :
     x(util::doubleToFloat(rhsX)), y(util::doubleToFloat(rhsY)), attribute(rhsA) {
 }
 

@@ -116,7 +116,7 @@ class PECHDR2
 class PES_COLOR_LIST
 {
   public:
-  explicit constexpr PES_COLOR_LIST(uint16_t bIndex, uint16_t cIndex) noexcept :
+  explicit constexpr PES_COLOR_LIST(uint16_t const bIndex, uint16_t const cIndex) noexcept :
       m_blockIndex(bIndex), m_colorIndex(cIndex) {
   }
 
@@ -201,11 +201,11 @@ class PESLED
 class PESSTCHLST
 {
   public:
-  explicit constexpr PESSTCHLST(uint16_t stype, uint16_t tIndex, uint16_t count) noexcept :
+  explicit constexpr PESSTCHLST(uint16_t const stype, uint16_t const tIndex, uint16_t const count) noexcept :
       m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
   }
 
-  void setStitchType(uint32_t stype) {
+  void setStitchType(uint32_t const stype) {
 	m_stitchType = gsl::narrow<uint16_t>(stype);
   }
 
@@ -440,7 +440,7 @@ void pi::ritpesCode(std::vector<uint8_t>& buffer) {
   }
 }
 
-void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
+void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST const newBlock) {
   auto const oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(PESSTCHLST));
   auto* blockHeader = convertFromPtr<PESSTCHLST*>(&buffer[oldSize]);
@@ -464,7 +464,7 @@ void pi::pecnam(gsl::span<char> const& label) {
 // ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
 
-void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta) {
+void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t const delta) {
   constexpr auto MSK11BIT  = uint32_t {0x7FFU}; // used to mask the value to 11 bits
   auto           outputVal = gsl::narrow_cast<uint32_t>(std::abs(delta)) & MSK11BIT;
   if (delta < 0) {
@@ -479,7 +479,7 @@ void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta) {
   buffer.push_back(lowerByte);
 }
 
-void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float srcY) {
+void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float const srcX, float const srcY) {
   constexpr auto DELTAMAX = int32_t {63};  // maximum value of the delta
   constexpr auto DELTAMIN = int32_t {-64}; // minimum value of the delta
 
@@ -500,7 +500,7 @@ void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, fl
   thisStitch += F_POINT {deltaX, -deltaY} * IPECFACT;
 }
 
-void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
+void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t const val) {
   // NOLINTBEGIN(readability-magic-numbers)
   buffer.push_back(0xfe);
   buffer.push_back(0xb0);
@@ -587,7 +587,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   writeThumbnail(pecBuffer, thumbnail);
 }
 
-auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
+auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t const activeColor, uint32_t& index) -> uint32_t {
   auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
   auto const  color       = threadColor.getRGB();
   auto        iUserColor  = UserColor.cbegin();

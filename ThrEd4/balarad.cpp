@@ -117,7 +117,7 @@ void bal::setBN2(fs::path* name) noexcept {
   BalaradName2 = name;
 }
 
-void bali::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag) {
+void bali::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
   balaradStitch.push_back(BAL_STITCH {code,
                                       flag,
                                       (StitchBuffer->operator[](source).x - BalaradOffset.x) * BALRATIO,

@@ -94,7 +94,7 @@ void shoknot();
 void vuselthr();
 } // namespace mni
 
-void mni::fil2sel(uint32_t stat) {
+void mni::fil2sel(uint32_t const stat) {
   UserFlagMap->set(UserFlag::FIL2OF);
   if (stat != 0U) {
 	UserFlagMap->reset(UserFlag::FIL2OF);
@@ -102,7 +102,7 @@ void mni::fil2sel(uint32_t stat) {
   menu::fil2men();
 }
 
-void mni::rotauxsel(uint32_t stat) {
+void mni::rotauxsel(uint32_t const stat) {
   UserFlagMap->set(UserFlag::ROTAUX);
   if (stat == 0U) {
 	UserFlagMap->reset(UserFlag::ROTAUX);
@@ -110,7 +110,7 @@ void mni::rotauxsel(uint32_t stat) {
   menu::rotauxmen();
 }
 
-void mni::frmcursel(uint32_t cursorType) {
+void mni::frmcursel(uint32_t const cursorType) {
   UserFlagMap->set(UserFlag::FRMX);
   if (cursorType == 0U) {
 	UserFlagMap->reset(UserFlag::FRMX);
@@ -387,8 +387,8 @@ void menu::auxmen() {
   StateMap->set(StateFlag::DUMEN);
 }
 
-void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> lruMenuId,
-                   gsl::not_null<std::vector<fs::path>*>        previousNames) {
+void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> const lruMenuId,
+                   gsl::not_null<std::vector<fs::path>*> const        previousNames) {
   auto findData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
   for (auto const& iLRU : *lruMenuId) {
 	if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != gsl::narrow_cast<UINT>(-1)) {
@@ -486,7 +486,7 @@ public:
   StateMap->set(StateFlag::DUMEN);
 }
 
-void menu::duhbit(uint32_t cod) noexcept {
+void menu::duhbit(uint32_t const cod) noexcept {
   CheckMenuItem(MainMenu, ID_HIDBIT, MF_BYCOMMAND | cod);
   CheckMenuItem(MainMenu, ID_HIDBITF, MF_BYCOMMAND | cod);
 }
