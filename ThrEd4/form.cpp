@@ -803,6 +803,7 @@ void fi::frmsqr(uint32_t const vertexIndex, uint32_t const iVertex) {
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
+// ReSharper disable CppParameterMayBeConst
 void form::selsqr(POINT const& controlPoint, HDC hDC) {
   auto line = std::array<POINT, SQPNTS> {};
   auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *ScreenDPI, STDDPI);
@@ -813,6 +814,7 @@ void form::selsqr(POINT const& controlPoint, HDC hDC) {
   line[4].y             = controlPoint.y - offset;
   wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
 }
+// ReSharper restore CppParameterMayBeConst
 
 void fi::frmsqr0(POINT const& controlPoint) {
   auto line = std::array<POINT, SQPNTS> {};
@@ -827,6 +829,7 @@ void fi::frmsqr0(POINT const& controlPoint) {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void fi::frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto       line   = std::array<POINT, LNPNTS> {};
   auto const offset = MulDiv(8, *ScreenDPI, STDDPI);
@@ -841,6 +844,7 @@ void fi::frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t
   wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
   SelectObject(hDC, FormPen);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void form::ratsr() {
   if (StateMap->test(StateFlag::ZUMED)) {
@@ -853,6 +857,7 @@ void form::ratsr() {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void form::ritfrct(uint32_t const iForm, HDC hDC) {
   auto pixelOutline = std::array<POINT, OUTPNTS> {};
 
@@ -888,6 +893,7 @@ void form::ritfrct(uint32_t const iForm, HDC hDC) {
 	StateMap->set(StateFlag::RESTCH);
   }
 }
+// ReSharper restore CppParameterMayBeConst
 
 void form::delfrms() {
   thred::savdo();
@@ -958,6 +964,7 @@ void fi::frmpoly(gsl::span<POINT> const& source) noexcept {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void form::dupsel(HDC hDC) {
   SelectObject(hDC, FormPen);
   SetROP2(hDC, R2_XORPEN);
@@ -967,6 +974,7 @@ void form::dupsel(HDC hDC) {
   }
   fi::frmx(EndPointCross, hDC);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void form::unpsel() {
   if (StateMap->testAndReset(StateFlag::SHOPSEL)) {

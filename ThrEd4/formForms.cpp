@@ -589,6 +589,7 @@ void formForms::refrm() {
   ffi::refrmfn(form, formMenuEntryCount);
 }
 
+// ReSharper disable CppParameterMayBeConst
 void formForms::sidwnd(HWND wnd) {
   auto windowRect = RECT {};
   thred::resetSideBuffer();
@@ -609,7 +610,9 @@ void formForms::sidwnd(HWND wnd) {
                                    ThrEdInstance,
                                    nullptr);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void formForms::prfsid(HWND wnd) {
   thred::resetSideBuffer();
   thred::unsid();
@@ -628,6 +631,7 @@ void formForms::prfsid(HWND wnd) {
                                    ThrEdInstance,
                                    nullptr);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void ffi::prftwin(std::wstring const& text) noexcept {
   CreateWindow(L"STATIC",
@@ -767,6 +771,7 @@ void ffi::chkdaz() {
       std::min(IniFile.daisyHeartCount, gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints));
 }
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::initdaz(HWND hWinDialog) {
   chkdaz();
   SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS),
@@ -802,7 +807,9 @@ void ffi::initdaz(HWND hWinDialog) {
   }
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::handleDaisyIDOK(HWND hwndlg) {
   auto buffer = std::array<wchar_t, HBUFSIZ> {};
   GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
@@ -841,7 +848,9 @@ void ffi::handleDaisyIDOK(HWND hwndlg) {
   }
   chkdaz();
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto ffi::handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   switch (LOWORD(wparam)) {
 	case IDCANCEL: {
@@ -878,7 +887,9 @@ auto ffi::handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -900,6 +911,7 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
@@ -1053,6 +1065,7 @@ void formForms::dasyfrm() {
   form::mdufrm();
 }
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::initTearDlg(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS),
                 fmt::format(FMT_COMPILE(L"{:d}"), IniFile.formSides).c_str());
@@ -1063,7 +1076,9 @@ void ffi::initTearDlg(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT),
                 fmt::format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTwistRatio).c_str());
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::handleTearIDOK(HWND hwndlg) {
   auto buffer = std::array<wchar_t, HBUFSIZ> {};
   GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
@@ -1075,7 +1090,9 @@ void ffi::handleTearIDOK(HWND hwndlg) {
   GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
   IniFile.tearTwistRatio = wrap::wcsToFloat(buffer.data());
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::handleTearDefault(HWND hwndlg) {
   constexpr auto TEARSIDES    = uint16_t {20U};
   constexpr auto TEARTAILFACT = 1.1F;
@@ -1086,7 +1103,9 @@ void ffi::handleTearDefault(HWND hwndlg) {
   IniFile.tearTwistRatio      = TEARTWIST;
   initTearDlg(hwndlg);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::handlePaisleyDefault(HWND hwndlg) {
   constexpr auto PAISSIDES    = uint16_t {24U};
   constexpr auto PAISTAILFACT = 1.15F;
@@ -1098,6 +1117,7 @@ void ffi::handlePaisleyDefault(HWND hwndlg) {
   IniFile.tearTwistRatio      = PAISTWIST;
   initTearDlg(hwndlg);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void ffi::handleTearInit(HWND hwndlg) {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -1121,6 +1141,7 @@ void ffi::handleTearInit(HWND hwndlg) {
   initTearDlg(hwndlg);
 }
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -1157,6 +1178,7 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void formForms::setear() {
   thred::unmsg();
@@ -1242,6 +1264,7 @@ void formForms::setear() {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::wavinit(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS),
                 fmt::format(FMT_COMPILE(L"{:d}"), IniFile.wavePoints).c_str());
@@ -1250,7 +1273,9 @@ void ffi::wavinit(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveEnd).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(FMT_COMPILE(L"{:d}"), IniFile.waveLobes).c_str());
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void ffi::handleWaveIDOK(HWND hwndlg) {
   auto buffer = std::array<wchar_t, HBUFSIZ> {};
   GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
@@ -1270,7 +1295,9 @@ void ffi::handleWaveIDOK(HWND hwndlg) {
   IniFile.waveStart %= IniFile.wavePoints;
   IniFile.waveEnd %= IniFile.wavePoints;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -1311,6 +1338,7 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void formForms::wavfrm() {
   thred::unmsg();

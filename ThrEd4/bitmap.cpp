@@ -127,7 +127,7 @@ constexpr auto bi::fswap(COLORREF const color) noexcept -> COLORREF {
   return swapped >> BPB;
 }
 
-auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
+// ReSharper disable CppParameterMayBeConst
 auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> const ppvBits) -> HBITMAP {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
   auto const bitmap =
@@ -137,6 +137,7 @@ auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> co
   }
   throw std::runtime_error("CreateDIBSection failed");
 }
+// ReSharper restore CppParameterMayBeConst
 
 void bitmap::bfil(COLORREF const& backgroundColor) {
   auto const inverseBackgroundColor = bi::fswap(backgroundColor);
@@ -582,9 +583,11 @@ void bitmap::setBitmapColor(COLORREF const& newColor) noexcept {
   BitmapColor = newColor;
 }
 
+// ReSharper disable once CppParameterMayBeConst
 void bitmap::setBitmapPen(HPEN pen) noexcept {
   BitmapPen = pen;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void bitmap::resetDC() noexcept {
   DeleteObject(TraceBitmap);

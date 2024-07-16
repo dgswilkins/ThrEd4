@@ -253,13 +253,17 @@ auto ti::trcin(COLORREF const color) -> bool {
   return true;
 }
 
+// ReSharper disable CppParameterMayBeConst
 void ti::shownd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_SHOW);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void ti::hidwnd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_HIDE);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void ti::showTraceWin() noexcept {
   auto iTraceSelectWindow = TraceSelectWindow.begin();
@@ -1296,6 +1300,7 @@ void ti::durct(uint32_t const shift, RECT const& traceControlRect, RECT& traceHi
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void ti::dublk(HDC const hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
   if (StateMap->test(StateFlag::DUHI)) {
 	FillRect(hDC, &traceHighMask, brush);
@@ -1304,6 +1309,7 @@ void ti::dublk(HDC const hDC, RECT const& traceHighMask, RECT const& traceLowMas
 	FillRect(hDC, &traceLowMask, brush);
   }
 }
+// ReSharper restore CppParameterMayBeConst
 
 void trace::wasTrace() {
   auto traceHighMaskRect   = RECT {}; // high trace mask rectangle

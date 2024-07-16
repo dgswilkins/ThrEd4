@@ -364,17 +364,21 @@ void displayText::savdisc() {
 }
 
 namespace {
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
 }
+// ReSharper restore CppParameterMayBeConst
 } // namespace
 
+// ReSharper disable CppParameterMayBeConst
 void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = getThrEdFont(FONTSIZE);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   EnumChildWindows(hWnd, enumChildProc, reinterpret_cast<LPARAM>(hFont));
 }
+// ReSharper restore CppParameterMayBeConst
 
 void displayText::tomsg() {
   auto okRect   = RECT {};
@@ -433,8 +437,10 @@ auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 #endif
 }
 
+// ReSharper disable CppParameterMayBeConst
 #pragma warning(suppress : 26461) // con.3 The pointer argument can be marked as a pointer to const
 void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }
+// ReSharper restore CppParameterMayBeConst

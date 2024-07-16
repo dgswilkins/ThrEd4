@@ -2320,11 +2320,14 @@ void xt::duauxnam(fs::path& auxName) {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void xi::setstxt(int32_t const stringIndex, float const value, HWND dialog) {
   SetWindowText(GetDlgItem(dialog, stringIndex),
                 fmt::format(FMT_COMPILE(L"{:.2f}"), (value * IPFGRAN)).c_str());
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto xi::getstxt(int32_t const stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto SZBUFFER = 16U;
@@ -2333,19 +2336,25 @@ auto xi::getstxt(int32_t const stringIndex, HWND dialog) -> float {
   GetWindowText(GetDlgItem(dialog, stringIndex), buffer.data(), gsl::narrow<int>(buffer.size()));
   return wrap::wcsToFloat(buffer.data()) * PFGRAN;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto xi::chkasp(F_POINT& point, float const aspectRatio, HWND dialog) -> bool {
   point = F_POINT {getstxt(IDC_DESWID, dialog), getstxt(IDC_DESHI, dialog)};
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void xi::handleSetsWMINITDIALOG(HWND hwndlg) {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
   setstxt(IDC_DESWID, DesignSize.x, hwndlg);
   setstxt(IDC_DESHI, DesignSize.y, hwndlg);
   CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap->test(UserFlag::CHREF)));
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto xi::handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   switch (LOWORD(wparam)) {
 	case IDCANCEL: {
@@ -2394,7 +2403,9 @@ auto xi::handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -2415,6 +2426,7 @@ auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void xi::sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
   stitch.x = (stitch.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
@@ -2528,11 +2540,13 @@ void xt::setclpspac() {
   StateMap->set(StateFlag::SCLPSPAC);
 }
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK xi::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   UNREFERENCED_PARAMETER(lParam);
   DestroyWindow(hwnd);
   return TRUE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void xt::clrstch() noexcept {
   while (EnumChildWindows(MainStitchWin, xi::enumch, 0) != 0) { }

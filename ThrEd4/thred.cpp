@@ -686,6 +686,7 @@ auto RotateBoxToCursorLine = std::array<POINT, LNPNTS> {}; // line from the curs
 auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
 } // namespace
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -728,14 +729,19 @@ auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void thi::shownd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_SHOW);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void thi::hidwnd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_HIDE);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin->begin();
@@ -1114,6 +1120,7 @@ void thred::rngadj() noexcept(std::is_same_v<size_t, uint32_t>) {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::box(uint32_t const iNearest, HDC hDC) {
   auto const itBoxWidth     = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth       = *itBoxWidth;
@@ -1129,6 +1136,7 @@ void thi::box(uint32_t const iNearest, HDC hDC) {
   line[4] = {npx - boxWidth, npy - boxWidth};
   wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::boxs() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -1177,6 +1185,7 @@ void thred::redrawColorBar() noexcept {
   RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thred::redraw(HWND window) noexcept {
   RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
   if (window != MainStitchWin) {
@@ -1189,6 +1198,7 @@ void thred::redraw(HWND window) noexcept {
   }
   RedrawWindow(ColorBar, nullptr, nullptr, RDW_INVALIDATE);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::nuRct() noexcept {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
@@ -2241,6 +2251,7 @@ void thred::unmsg() {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
 auto thi::oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
@@ -2271,7 +2282,9 @@ auto thi::oldwnd(HWND window) noexcept -> bool {
   }
   return true;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK thi::enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   UNREFERENCED_PARAMETER(lParam);
   if (oldwnd(hwnd)) {
@@ -2286,6 +2299,7 @@ auto CALLBACK thi::enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   FirstWin = hwnd;
   return TRUE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::rstAll() {
   StateMap->reset(StateFlag::WASFPNT);
@@ -2706,6 +2720,7 @@ void thred::pgrit() {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::selin(uint32_t start, uint32_t end, HDC hDC) {
   SelectObject(hDC, GroupSelectPen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -2728,6 +2743,7 @@ void thi::selin(uint32_t start, uint32_t end, HDC hDC) {
   }
   SetROP2(hDC, R2_COPYPEN);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::cros(uint32_t const iStitch) {
   auto const armLength            = BoxOffset[0];
@@ -2764,6 +2780,7 @@ void thi::uncros() {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::ducros(HDC hDC) {
   uncros();
   StateMap->set(StateFlag::SCROS);
@@ -2774,6 +2791,7 @@ void thi::ducros(HDC hDC) {
   }
   selin(GroupStartStitch, GroupEndStitch, hDC);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uint32_t>) {
   if (!StitchBuffer->empty()) {
@@ -2809,6 +2827,7 @@ void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uin
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::dusel(HDC hDC) {
   SetROP2(hDC, R2_NOTXORPEN);
   SelectObject(hDC, LinePen);
@@ -2818,6 +2837,7 @@ void thi::dusel(HDC hDC) {
   }
   SetROP2(hDC, R2_COPYPEN);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::unsel() {
   if (StateMap->testAndReset(StateFlag::SELSHO)) {
@@ -3622,6 +3642,7 @@ void thi::dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& wind
   ++windowLocation;
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::sidmsg(FRM_HEAD const& form, HWND window) {
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
@@ -3762,6 +3783,7 @@ void thi::sidmsg(FRM_HEAD const& form, HWND window) {
   }
   StateMap->set(StateFlag::SIDACT);
 }
+// ReSharper restore CppParameterMayBeConst
 
 auto thi::centr() noexcept -> F_POINT {
   auto const center = POINT {std::lround((ZoomRect.right - ZoomRect.left) * 0.5F),
@@ -3818,7 +3840,7 @@ void thi::stchWnd() {
 
 // check if a click occurred in a vertical set of windows
 // and calculate which window had the click
-auto thi::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
+// ReSharper disable CppParameterMayBeConst
 auto thi::chkMsgs(POINT const clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
   auto topRect    = RECT {};
   auto bottomRect = RECT {};
@@ -3837,6 +3859,7 @@ auto thi::chkMsgs(POINT const clickCoord, HWND topWindow, HWND bottomWindow) -> 
   // we have a valid Index
   return true;
 }
+// ReSharper restore CppParameterMayBeConst
 
 auto thred::inDefaultColorWindows() -> bool {
   return thi::chkMsgs(WinMsg.pt, DefaultColorWin->front(), DefaultColorWin->back());
@@ -3868,6 +3891,7 @@ void thi::delstch1(uint32_t const iStitch) {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::prtred(HANDLE fileHandle, uint32_t const code) {
   CloseHandle(fileHandle);
   StateMap->reset(StateFlag::INIT);
@@ -3876,6 +3900,7 @@ void thi::prtred(HANDLE fileHandle, uint32_t const code) {
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::unthum() {
   if (!StateMap->testAndReset(StateFlag::THUMSHO)) {
@@ -5339,6 +5364,7 @@ void thi::setbak(int32_t const penWidth) noexcept {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::stchbox(uint32_t const iStitch, HDC hDC) {
   auto       line   = std::array<POINT, SQPNTS> {};
   auto const layer  = (StitchBuffer->operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
@@ -5354,6 +5380,7 @@ void thi::stchbox(uint32_t const iStitch, HDC hDC) {
   line[4].y             = stitchCoordsInPixels.y - offset;
   wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::drawCapturedStitchBox() {
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
@@ -6418,6 +6445,7 @@ void thred::redclp() {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::drwmrk(HDC hDC) {
   auto       markCoordinates = POINT {};
   auto       markLine        = std::array<POINT, 2> {};
@@ -6433,6 +6461,7 @@ void thi::drwmrk(HDC hDC) {
   wrap::polyline(hDC, markLine.data(), wrap::toUnsigned(markLine.size()));
   SetROP2(hDC, R2_COPYPEN);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::vubak() {
   if (WorkingFileName->empty() && !StateMap->test(StateFlag::THUMSHO)) {
@@ -6848,12 +6877,14 @@ void thred::deldir() {
   displayText::tabmsg(IDS_BAKDT, false);
 }
 
+// ReSharper disable CppParameterMayBeConst
 auto thred::chkwnd(HWND window) noexcept -> bool {
   auto windowRect = RECT {};
   GetWindowRect(window, &windowRect);
   return WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
          WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::mv2f() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
@@ -7445,6 +7476,7 @@ auto thred::inrng(uint32_t const iStitch) noexcept -> bool {
          stitch.y >= StitchRangeRect.bottom && stitch.y <= StitchRangeRect.top;
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::barnam(HWND window, uint32_t const iThumbnail) {
   if (iThumbnail >= ThumbnailDisplayCount) {
 	SetWindowText(window, L"");
@@ -7456,6 +7488,7 @@ void thi::barnam(HWND window, uint32_t const iThumbnail) {
   auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
   SetWindowText(window, name.c_str());
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::rthumnam(uint32_t iThumbnail) {
   switch (iThumbnail) {
@@ -8280,6 +8313,7 @@ void thred::gsnap() {
   StateMap->set(StateFlag::RESTCH);
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::ritlock(std::vector<WIN32_FIND_DATA> const& fileInfo, HWND hwndlg) noexcept {
   SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
   SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
@@ -8300,7 +8334,9 @@ void thi::ritlock(std::vector<WIN32_FIND_DATA> const& fileInfo, HWND hwndlg) noe
 	}
   }
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto thi::handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
   SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
@@ -8326,7 +8362,9 @@ auto thi::handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wpara
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto thi::handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
   if (auto* fileInfo = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(GetWindowLongPtr(hwndlg, DWLP_USER));
@@ -8405,7 +8443,9 @@ auto thi::handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool {
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -8427,6 +8467,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::fileLock() noexcept {
   auto lockInfo = std::vector<WIN32_FIND_DATA> {};
@@ -8953,6 +8994,7 @@ void thred::qcode() {
   displayText::butxt(HNUM, blank);
 }
 
+// ReSharper disable CppParameterMayBeConst
 void thi::drwLin(std::vector<POINT>& linePoints, uint32_t const currentStitch, uint32_t const length, HPEN hPen) {
   if (StitchBuffer->empty() || length == 0) {
 	return;
@@ -8982,7 +9024,9 @@ void thi::drwLin(std::vector<POINT>& linePoints, uint32_t const currentStitch, u
                         std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     (firstStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void thi::handleFeatherWMINITDIALOG(HWND hwndlg) {
   auto const featherType = IniFile.featherType;
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -9013,7 +9057,9 @@ void thi::handleFeatherWMINITDIALOG(HWND hwndlg) {
   state = ((featherType & AT_FTHBTH) != 0) ? BST_CHECKED : BST_UNCHECKED;
   CheckDlgButton(hwndlg, IDC_FBTH, state);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void thi::handleFeatherIDOK(HWND hwndlg) {
   IniFile.featherType = 0;
   if (IsDlgButtonChecked(hwndlg, IDC_FDBLND) != 0U) {
@@ -9051,7 +9097,9 @@ void thi::handleFeatherIDOK(HWND hwndlg) {
   }
   EndDialog(hwndlg, 1);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto thi::handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   switch (LOWORD(wparam)) {
 	case IDCANCEL: {
@@ -9069,7 +9117,9 @@ auto thi::handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
@@ -9090,6 +9140,7 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
   }
   return FALSE;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thred::dufdef() noexcept {
   // ToDo - don't update values in DialogBox as then 'cancel' does not work
@@ -11704,6 +11755,7 @@ struct createParams {
   BOOL bEnableNonClientDpiScaling;
 };
 
+// ReSharper disable CppParameterMayBeConst
 void thi::handleSizeRestored(HWND p_hWnd) {
   UserFlagMap->reset(UserFlag::SAVMAX);
   chkirct();
@@ -11739,7 +11791,9 @@ void thi::handleSizeRestored(HWND p_hWnd) {
   }
   ShowWindow(p_hWnd, SW_SHOW);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void thi::handleWndProcWMSIZE(HWND p_hWnd, WPARAM& wParam) {
   GetClientRect(p_hWnd, &ThredWindowRect);
   switch (wParam) {
@@ -11792,7 +11846,9 @@ void thi::handleWndProcWMSIZE(HWND p_hWnd, WPARAM& wParam) {
 	}
   }
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void thi::handleWndProcWMMOVE(HWND p_hWnd) {
   GetClientRect(p_hWnd, &ThredWindowRect);
   constexpr auto SMALLWIN  = LONG {20};  // Smallest ThrEd window dimension
@@ -11812,7 +11868,9 @@ void thi::handleWndProcWMMOVE(HWND p_hWnd) {
 	FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
   }
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 // owner draw windows
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
@@ -11978,6 +12036,7 @@ auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
 auto thi::handleWndProcWMVSCROLL(WPARAM const& wParam, float const LINSCROL) -> bool {
   switch (LOWORD(wParam)) {
@@ -12027,6 +12086,7 @@ auto thi::handleWndProcWMVSCROLL(WPARAM const& wParam, float const LINSCROL) -> 
   return false;
 }
 
+// ReSharper disable CppParameterMayBeConst
 auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPARAM lParam) -> bool {
   constexpr auto SPEDLIN = int32_t {30};  // speed change for line message on speed scroll bar
   constexpr auto SPEDPAG = int32_t {120}; // speed change for page message on speed scroll bar
@@ -12129,6 +12189,7 @@ auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPA
   }
   return false;
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::handleWndProcWMINITMENU() {
   if (StateMap->testAndReset(StateFlag::PRFACT)) {
@@ -12141,6 +12202,7 @@ void thi::handleWndProcWMINITMENU() {
   StateMap->set(StateFlag::RESTCH);
 }
 
+// ReSharper disable CppParameterMayBeConst
 auto CALLBACK thi::wndProc(HWND p_hWnd, UINT const message, WPARAM wParam, LPARAM lParam) -> LRESULT {
   switch (constexpr auto LINSCROL = 0.05F; message) { // LINSCROL is the line scroll factor
 #if HIGHDPI
@@ -12205,6 +12267,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT const message, WPARAM wParam, LPARA
   }
   return DefWindowProc(p_hWnd, message, wParam, lParam);
 }
+// ReSharper restore CppParameterMayBeConst
 
 void thi::sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {

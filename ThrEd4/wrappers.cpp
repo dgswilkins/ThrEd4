@@ -57,18 +57,25 @@ auto wrap::pressed(int const virtKey) noexcept -> bool {
   return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & HIGHBIT) != 0U;
 }
 
+// ReSharper disable CppParameterMayBeConst
 void wrap::writeFile(HANDLE const file, LPCVOID buffer, uint32_t const bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
   WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t const iLen, LPSIZE lpSize) noexcept {
   GetTextExtentPoint32(hdc, lpString, gsl::narrow<int32_t>(iLen), lpSize);
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void wrap::textOut(HDC hdc, int32_t const nXStart, int32_t const nYStart, LPCTSTR lpString, uint32_t const cchString) noexcept {
   TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int32_t>(cchString));
 }
+// ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void wrap::setCursor(HCURSOR hCursor) noexcept {
   static HCURSOR saveCursor = nullptr;
   if (saveCursor == hCursor) {
@@ -77,6 +84,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
   SetCursor(hCursor);
   saveCursor = hCursor;
 }
+// ReSharper restore CppParameterMayBeConst
 
 auto wrap::createPen(int32_t const iStyle, int32_t const width, COLORREF const color) noexcept -> HPEN {
   auto const scaledWidth = MulDiv(width, *ScreenDPI, STDDPI);
