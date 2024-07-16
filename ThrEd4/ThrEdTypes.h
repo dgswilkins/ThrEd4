@@ -29,6 +29,7 @@ class FMT_WITH_LOC
   std::source_location loc;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
+  // ReSharper disable once CppNonExplicitConvertingConstructor
   // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
   constexpr FMT_WITH_LOC(const wchar_t* fmtString,
                          const std::source_location& fileLoc = std::source_location::current()) noexcept :
