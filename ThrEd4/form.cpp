@@ -1385,7 +1385,7 @@ void form::flipv() {
   }
 }
 
-void form::duform(int32_t formType) {
+void form::duform(int32_t const formType) {
   switch (formType + 1) {
 	case FRMLINE:
 	  thred::savdo();
@@ -6845,7 +6845,7 @@ void form::sethup() noexcept {
   IniFile.hoopType = CUSTHUP;
 }
 
-void form::dustar(uint32_t starCount, float length) {
+void form::dustar(uint32_t starCount, float const length) {
   if (constexpr auto STARMIN = 3U; // minimum star vertices
       starCount < STARMIN) {
 	starCount = STARMIN;

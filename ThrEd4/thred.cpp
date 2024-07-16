@@ -7490,7 +7490,7 @@ void thi::barnam(HWND window, uint32_t const iThumbnail) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-void thi::rthumnam(uint32_t iThumbnail) {
+void thi::rthumnam(uint32_t const iThumbnail) {
   switch (iThumbnail) {
 	case 0: {
 	  barnam(ButtonWin->operator[](HNUM), iThumbnail);

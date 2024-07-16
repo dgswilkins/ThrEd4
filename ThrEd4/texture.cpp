@@ -1210,7 +1210,7 @@ void texture::txof() {
 
 enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
-void txi::txfn(uint32_t textureType, uint32_t const formIndex) {
+void txi::txfn(uint32_t const textureType, uint32_t const formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   if (form.satinGuideCount != 0U) {
@@ -1528,7 +1528,7 @@ void texture::txsnap() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
+void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
   if (SideWindowButton != nullptr) {
 	auto flag = true;
 	switch (keyCode) {
