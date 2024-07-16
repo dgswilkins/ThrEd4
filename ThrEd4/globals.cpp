@@ -41,6 +41,7 @@
 #include <vector>
 
 // clang-format off
+// ReSharper disable CppUseAuto
 uint8_t                        ActiveColor               = 0U;      // active color selector
 uint8_t                        ActiveLayer               = 0U;      // active layer
 F_RECTANGLE*                   AllItemsRect              = nullptr; // rectangle enclosing all forms and stitches
@@ -184,4 +185,5 @@ float                          ZoomFactor                = 1.0F;    // zoom fact
 F_POINT                        ZoomMarkPoint             = F_POINT {}; // stitch coordinates of the zoom mark
 F_POINT                        ZoomRatio                 = F_POINT {}; // zoom ratio used to draw stitch window
 F_RECTANGLE                    ZoomRect                  = F_RECTANGLE {}; // zoom rectangle
+// ReSharper restore CppUseAuto
 // clang-format on
