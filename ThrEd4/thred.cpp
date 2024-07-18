@@ -234,7 +234,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
 auto handleWndProcWMHSCROLL(WPARAM const& wParam, float LINSCROL, LPARAM lParam) -> bool;
 void handleWndProcWMINITMENU();
 void handleWndProcWMMOVE(HWND p_hWnd);
-void handleWndProcWMSIZE(HWND p_hWnd, WPARAM& wParam);
+void handleWndProcWMSIZE(HWND p_hWnd, WPARAM const wParam);
 auto handleWndProcWMVSCROLL(WPARAM const& wParam, float LINSCROL) -> bool;
 void hidwnd(HWND hwnd) noexcept;
 void infadj(float& xCoordinate, float& yCoordinate) noexcept;
@@ -11794,7 +11794,7 @@ void thi::handleSizeRestored(HWND p_hWnd) {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-void thi::handleWndProcWMSIZE(HWND p_hWnd, WPARAM& wParam) {
+void thi::handleWndProcWMSIZE(HWND p_hWnd, WPARAM const wParam) {
   GetClientRect(p_hWnd, &ThredWindowRect);
   switch (wParam) {
 	case SIZE_MAXIMIZED: {
