@@ -60,7 +60,7 @@ void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode) 
 	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 #else
 #if SHOW_ERROR
-	auto const info = fmt::format(
+	auto const info = format(
 	    fmt::runtime(L"{} failed with error [{}], {}\n"), prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 	displayText::shoMsg(info, false);
 #endif
