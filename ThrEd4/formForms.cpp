@@ -107,7 +107,7 @@ enum DaisyStyles : uint8_t { // daisy form types
 namespace ffi {
 void chkdaz();
 
-auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 auto handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool;
 void handleDaisyIDOK(HWND hwndlg);
@@ -854,12 +854,12 @@ void ffi::handleDaisyIDOK(HWND hwndlg) {
 auto ffi::handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   switch (LOWORD(wparam)) {
 	case IDCANCEL: {
-	  EndDialog(hwndlg, 0);
+	  EndDialog(hwndlg, FALSE);
 	  return true;
 	}
 	case IDOK:
 	  handleDaisyIDOK(hwndlg);
-	  EndDialog(hwndlg, 1);
+	  EndDialog(hwndlg, TRUE);
 	  break;
 	case IDC_DAZRST: {
 	  IniFile.dazdef();
@@ -890,7 +890,7 @@ auto ffi::handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -916,14 +916,12 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
   if (auto const nResult = DialogBox(
-          ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+          ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, &ffi::dasyproc);
       nResult < 1) {
 	StateMap->reset(StateFlag::FORMIN);
 	return;
   }
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   auto const referencePoint =
       F_POINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
   auto form               = FRM_HEAD {};
