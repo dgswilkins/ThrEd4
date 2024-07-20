@@ -237,7 +237,7 @@ void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& des
 void sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
 void setColorOrder() noexcept;
 
-auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 void setstxt(int32_t stringIndex, float value, HWND dialog);
 void setundfn(uint32_t code);
@@ -2358,7 +2358,7 @@ void xi::handleSetsWMINITDIALOG(HWND hwndlg) {
 auto xi::handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   switch (LOWORD(wparam)) {
 	case IDCANCEL: {
-	  EndDialog(hwndlg, 0);
+	  EndDialog(hwndlg, FALSE);
 	  return true;
 	}
 	case IDOK: {
@@ -2369,8 +2369,8 @@ auto xi::handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 	  else {
 		UserFlagMap->reset(UserFlag::CHREF);
 	  }
-	  EndDialog(hwndlg, 1);
-	  return true;
+	  EndDialog(hwndlg, TRUE);
+	  break;
 	}
 	case IDC_DESWID: {
 	  if (wparam >> WRDSHFT == EN_CHANGE) {
@@ -2406,7 +2406,7 @@ auto xi::handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -2469,13 +2469,11 @@ void xt::nudsiz() {
   }
   DesignSize =
       F_POINT {designSizeRect.right - designSizeRect.left, designSizeRect.top - designSizeRect.bottom};
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
   if (auto const nResult = DialogBox(
-          ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+          ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, &xi::setsprc);
       nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
 	return;
   }
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict CppClangTidyPerformanceNoIntToPtr
   flag = 0;
 
   constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger
