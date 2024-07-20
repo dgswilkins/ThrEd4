@@ -133,7 +133,7 @@ auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
 auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
 void wavinit(HWND hwndlg);
 
-auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 } // namespace ffi
 
 namespace {
@@ -1294,7 +1294,7 @@ void ffi::handleWaveIDOK(HWND hwndlg) {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -1305,12 +1305,12 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 	case WM_COMMAND: {
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
-		  EndDialog(hwndlg, 0);
+		  EndDialog(hwndlg, FALSE);
 		  return TRUE;
 		}
 		case IDOK:
 		  handleWaveIDOK(hwndlg);
-		  EndDialog(hwndlg, 1);
+		  EndDialog(hwndlg, TRUE);
 		  break;
 		case IDC_DEFWAV: {
 		  IniFile.wavePoints = IWAVPNTS;
@@ -1338,13 +1338,11 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 
 void formForms::wavfrm() {
   thred::unmsg();
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
   if (auto const nResult = DialogBox(
-          ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+          ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, &ffi::wavprc);
       nResult <= 0) {
 	return;
   }
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   thred::savdo();
   auto points = std::vector<F_POINT> {};
   points.reserve(IniFile.wavePoints);
