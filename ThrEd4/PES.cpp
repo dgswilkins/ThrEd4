@@ -568,7 +568,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   writeThumbnail(pecBuffer, thumbnail);
   // now write out the individual thread thumbnails
   thumbnail        = IMAGE_WITH_FRAME;
-  auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
+  auto stitchColor = StitchBuffer->front().attribute & COLMSK;
   for (auto const& stitch : *StitchBuffer) {
 	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
@@ -580,7 +580,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
 	else {
 	  writeThumbnail(pecBuffer, thumbnail);
 	  thumbnail   = IMAGE_WITH_FRAME;
-	  stitchColor = (stitch.attribute & COLMSK);
+	  stitchColor = stitch.attribute & COLMSK;
 	  *iRow       = 1U;
 	}
   }
@@ -687,7 +687,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   }
   auto loc = F_POINT {};
   StateMap->reset(StateFlag::FILDIR);
-  if (bytesRead <= ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
+  if (bytesRead <= pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2)) + 3U) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
@@ -758,17 +758,17 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      auxName.wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
   }
   auto pesHeader = PESHED {};
-  if ((IniFile.hoopSizeX <= HUP100XY) && (IniFile.hoopSizeY <= HUP100XY)) {
+  if (IniFile.hoopSizeX <= HUP100XY && IniFile.hoopSizeY <= HUP100XY) {
 	pesHeader.hpsz = 0;
   }
   else {
-	if ((IniFile.hoopSizeX <= LHUPX) && (IniFile.hoopSizeY <= LHUPY)) {
+	if (IniFile.hoopSizeX <= LHUPX && IniFile.hoopSizeY <= LHUPY) {
 	  pesHeader.hpsz = 1;
 	}
 	else {
@@ -821,8 +821,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.ysiz         = wrap::round<int16_t>(designSizeY);
   auto const hoopSizeX   = IniFile.hoopSizeX * PECFACT;
   auto const hoopSizeY   = IniFile.hoopSizeY * PECFACT;
-  pesHeader.atfm5        = AT5OFF + (hoopSizeX * HALF) - (designSizeX * HALF);
-  pesHeader.atfm6        = AT6OFF + (designSizeY) + (hoopSizeY * HALF) - (designSizeY * HALF);
+  pesHeader.atfm5        = AT5OFF + hoopSizeX * HALF - designSizeX * HALF;
+  pesHeader.atfm6        = AT6OFF + designSizeY + hoopSizeY * HALF - designSizeY * HALF;
   auto pesBuffer         = std::vector<uint8_t> {};
   // ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
   auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;

@@ -95,7 +95,7 @@ auto mi::finrng(uint32_t const find) noexcept -> bool {
   }
   auto const cod = gsl::narrow_cast<uint8_t>(
       gsl::narrow_cast<uint8_t>(FormList->operator[](find).attribute & FRMLMSK) >> 1U);
-  return (cod == 0U) || (ActiveLayer == cod);
+  return cod == 0U || ActiveLayer == cod;
 }
 
 constexpr auto mi::nxtcrnr(uint32_t const corner) -> uint32_t {
@@ -217,7 +217,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	thred::unpat();
 	auto const colorBarPosition = thred::getColorbarVertPosition();
 	if (WinMsg.message == WM_RBUTTONDOWN) {
-	  if (((WinMsg.wParam & MK_SHIFT) != 0U) &&
+	  if ((WinMsg.wParam & MK_SHIFT) != 0U &&
 	      (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL))) {
 		thred::unbox();
 		GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(StitchBuffer->size()));
@@ -257,7 +257,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   static auto threadSizeSelected = uint32_t {}; // thread selected for size change
 
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) { // shift key pressed
+  if (wrap::pressed(VK_SHIFT) && thred::inStitchWin()) { // shift key pressed
 	xt::dushft();
 	return true;
   }
@@ -333,7 +333,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (mi::chkok()) {
 	  thred::savdo();
 	  if (!SelectedFormList->empty()) {
-		for (auto const selectedForm : (*SelectedFormList)) {
+		for (auto const selectedForm : *SelectedFormList) {
 		  form::refilfn(selectedForm);
 		}
 	  }
@@ -616,7 +616,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->testAndReset(StateFlag::CLPSHO)) { // pasting
 	  thred::savdo();
-	  if ((!StitchBuffer->empty()) &&
+	  if (!StitchBuffer->empty() &&
 	      (StateMap->testAndReset(StateFlag::SELBOX) || StateMap->testAndReset(StateFlag::INSRT)) &&
 	      ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 		tfc::lodclp(ClosestPointIndex);
@@ -672,7 +672,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 
 		  thred::xlin1();
 		  StitchBuffer->insert(StitchBuffer->begin(), F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
-		  StitchBuffer->front().attribute &= (~KNOTMSK);
+		  StitchBuffer->front().attribute &= ~KNOTMSK;
 		  InsertLine[0] = thred::stch2px1(0);
 		  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 		  thred::coltab();
@@ -680,8 +680,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  return true;
 		}
 		thred::xlin();
-		if (((StitchBuffer->operator[](ClosestPointIndex).attribute & ALTYPMSK) != 0U) &&
-		    ((StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & ALTYPMSK) != 0U)) {
+		if ((StitchBuffer->operator[](ClosestPointIndex).attribute & ALTYPMSK) != 0U &&
+		    (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & ALTYPMSK) != 0U) {
 		  if ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) ==
 		      (StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & FRMSK)) {
 			code = StitchBuffer->operator[](ClosestPointIndex).attribute | USMSK;
@@ -701,7 +701,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		return true;
 	  }
 	  if (auto closestPointIndexClone = uint32_t {};
-	      (!StateMap->test(StateFlag::HIDSTCH)) && thred::closPnt1(closestPointIndexClone)) {
+	      !StateMap->test(StateFlag::HIDSTCH) && thred::closPnt1(closestPointIndexClone)) {
 		thred::redrawCapturedStitch(closestPointIndexClone);
 	  }
 	}
@@ -768,8 +768,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		if (StateMap->test(StateFlag::FORMSEL)) { // user has selected a form so only update the color for that form
 		  if (auto& form = FormList->operator[](ClosestFormToCursor);
-		      (form.fillType != 0U) || (form.edgeType != 0U) ||
-		      ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
+		      form.fillType != 0U || form.edgeType != 0U ||
+		      (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 			thred::savdo();
 			if (form.fillType != 0U) {
 			  form.fillColor = ActiveColor;
@@ -791,7 +791,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			}
 			auto const formCode = ClosestFormToCursor << FRMSHFT;
 			for (auto& stitch : *StitchBuffer) {
-			  if (((stitch.attribute & ALTYPMSK) != 0U) && (stitch.attribute & FRMSK) == formCode &&
+			  if ((stitch.attribute & ALTYPMSK) != 0U && (stitch.attribute & FRMSK) == formCode &&
 			      (stitch.attribute & TYPMSK) != TYPMSK) {
 				stitch.attribute &= NCOLMSK;
 				stitch.attribute |= ActiveColor;
@@ -847,8 +847,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 
 void mi::moveForms() {
   auto const point =
-      POINT {(WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
-             (WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top};
+      POINT {WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x - SelectedFormsRect.left,
+             WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
   form::ratsr();
   FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
   if (StateMap->test(StateFlag::FPSEL)) { // moving a group of form points
@@ -880,7 +880,7 @@ void mi::moveForms() {
 	}
 	else {
 	  thred::savdo();
-	  for (auto const selectedForm : (*SelectedFormList)) {
+	  for (auto const selectedForm : *SelectedFormList) {
 		form::frmadj(selectedForm);
 	  }
 	  form::frmsadj();
@@ -892,7 +892,7 @@ void mi::moveForms() {
 auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F_POINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) { // shift key pressed as well
+  if (wrap::pressed(VK_SHIFT) && thred::inStitchWin() && !StateMap->test(StateFlag::TXTRED)) { // shift key pressed as well
 	texture::setshft();
 	return true;
   }
@@ -1128,12 +1128,12 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
 	while (true) {
-	  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
+	  if (wrap::pressed(VK_SHIFT) && thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
-	  if ((StateMap->test(StateFlag::PRFACT) || StateMap->test(StateFlag::FORMIN) ||
-	       StateMap->test(StateFlag::POLIMOV)) ||
-	      (FormDataSheet != nullptr)) {
+	  if (StateMap->test(StateFlag::PRFACT) || StateMap->test(StateFlag::FORMIN) ||
+	       StateMap->test(StateFlag::POLIMOV) ||
+	      FormDataSheet != nullptr) {
 		wrap::setCursor(ArrowCursor);
 		break;
 	  }
@@ -1266,7 +1266,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::STRTCH)) { // If we are stretching a form horizontally or vertically
 	  thred::unstrtch(stretchBoxLine);
-	  auto const lineLength = ((SelectedFormControlVertex & 1U) != 0U)
+	  auto const lineLength = (SelectedFormControlVertex & 1U) != 0U
 	                              ? WinMsg.pt.x - StitchWindowOrigin.x
 	                              : WinMsg.pt.y - StitchWindowOrigin.y;
 	  auto const dst        = (SelectedFormControlVertex + 2U) % 4U;
@@ -1397,7 +1397,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) { // If we are zooming
 	  SetCapture(ThrEdWindow);
 	}
-	if (StateMap->test(StateFlag::BZUMIN) && ((WinMsg.wParam & MK_LBUTTON) != 0U)) { // If we are zooming in
+	if (StateMap->test(StateFlag::BZUMIN) && (WinMsg.wParam & MK_LBUTTON) != 0U) { // If we are zooming in
 	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
@@ -1420,7 +1420,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 }
 
 auto mouse::handleRightButtonDown() -> bool {
-  if (StateMap->test(StateFlag::TXTRED) && (MsgWindow == nullptr)) {
+  if (StateMap->test(StateFlag::TXTRED) && MsgWindow == nullptr) {
 	texture::txtrbut();
 	return true;
   }
@@ -1526,7 +1526,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
-	if (StateMap->test(StateFlag::INIT) || (!ThrName->empty())) { // If we are inserting a stitch
+	if (StateMap->test(StateFlag::INIT) || !ThrName->empty()) { // If we are inserting a stitch
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		if (StateMap->test(StateFlag::SELBOX)) { // if we are holding shift and selecting a box
 		  // extend the thread selection

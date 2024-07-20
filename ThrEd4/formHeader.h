@@ -282,7 +282,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto isEdgeClipX() const noexcept -> bool;
   [[nodiscard]] inline auto isTexture() const noexcept -> bool;
   [[nodiscard]] inline auto isFanClip() const noexcept -> bool;
-  inline void               outline() noexcept(!(std::is_same_v<ptrdiff_t, int>));
+  inline void               outline() noexcept(!std::is_same_v<ptrdiff_t, int>);
   inline void               squareEnd(bool flag) noexcept;
 };
 
@@ -590,7 +590,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
 // NOLINTEND(cppcoreguidelines-pro-type-union-access)
 
 inline auto FRM_HEAD::isClip() const noexcept -> bool {
-  return ((1U << fillType) & CLIPTYPEMAP) != 0;
+  return (1U << fillType & CLIPTYPEMAP) != 0;
 }
 
 inline auto FRM_HEAD::isEdgeClip() const noexcept -> bool {
@@ -598,11 +598,11 @@ inline auto FRM_HEAD::isEdgeClip() const noexcept -> bool {
 }
 
 inline auto FRM_HEAD::isClipX() const noexcept -> bool {
-  return isClip() && (clipCount != 0U);
+  return isClip() && clipCount != 0U;
 }
 
 inline auto FRM_HEAD::isEdgeClipX() const noexcept -> bool {
-  return isEdgeClip() && (clipEntries != 0U);
+  return isEdgeClip() && clipEntries != 0U;
 }
 
 inline auto FRM_HEAD::isFanClip() const noexcept -> bool {
@@ -622,7 +622,7 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
   return false;
 }
 
-inline void FRM_HEAD::outline() noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
+inline void FRM_HEAD::outline() noexcept(!std::is_same_v<ptrdiff_t, int>) {
   if (vertexCount != 0U) {
 	if (auto const* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
 	  auto minX = BIGFLOAT;
@@ -658,6 +658,6 @@ inline void FRM_HEAD::squareEnd(bool const flag) noexcept {
 	extendedAttribute |= AT_SQR;
   }
   else {
-	extendedAttribute &= ~(AT_SQR);
+	extendedAttribute &= ~AT_SQR;
   }
 }

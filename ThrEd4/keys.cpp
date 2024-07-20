@@ -97,7 +97,7 @@ void kyi::istch() {
   thred::xlin();
   thred::xlin1();
   if (StateMap->test(StateFlag::SELBOX)) {
-	if ((ClosestPointIndex != 0U) && ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	if (ClosestPointIndex != 0U && ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	  auto const prvStitch   = wrap::next(StitchBuffer->begin(), ClosestPointIndex - 1U);
 	  auto const stitch      = std::next(prvStitch);
 	  auto const angb        = std::atan2(stitch->y - prvStitch->y, stitch->x - prvStitch->x);
@@ -140,8 +140,8 @@ void kyi::ritcur() {
   GetIconInfo(currentCursor, &iconInfo);
   auto cursorPosition = POINT {};
   GetCursorPos(&cursorPosition);
-  cursorPosition.x -= (StitchWindowOrigin.x + gsl::narrow_cast<LONG>(iconInfo.xHotspot));
-  cursorPosition.y -= (StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot));
+  cursorPosition.x -= StitchWindowOrigin.x + gsl::narrow_cast<LONG>(iconInfo.xHotspot);
+  cursorPosition.y -= StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot);
   // ToDo - replace with GetDIBits
   constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
   constexpr auto ICONROWS = 32;  // rows in the icon
@@ -152,7 +152,7 @@ void kyi::ritcur() {
   GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
   if (currentCursor != mouse::getArrowCursor()) {
 	for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-	  auto const     bitmapInverse = byteSwap(*(iIBMB++));
+	  auto const     bitmapInverse = byteSwap(*iIBMB++);
 	  auto           bitMask       = uint32_t {1U} << HBSHFT;
 	  constexpr auto BPINT         = 32; // bits in an uint32_t
 	  for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
@@ -169,13 +169,13 @@ void kyi::ritcur() {
 	return;
   }
   for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-	auto const     mask          = byteSwap(*(iBMB++));
-	auto const     bitmapInverse = byteSwap(*(iIBMB++));
+	auto const     mask          = byteSwap(*iBMB++);
+	auto const     bitmapInverse = byteSwap(*iIBMB++);
 	auto           bitMask       = uint32_t {1U} << HBSHFT;
 	constexpr auto BPINT         = 32; // bits in an uint32_t
 	for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 	  if ((bitMask & mask) == 0U) {
-		auto const pixelColor = ((bitMask & bitmapInverse) != 0U) ? PENWHITE : PENBLK;
+		auto const pixelColor = (bitMask & bitmapInverse) != 0U ? PENWHITE : PENBLK;
 		SetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow, pixelColor);
 	  }
 	  bitMask >>= 1U;
@@ -191,7 +191,7 @@ constexpr auto kyi::byteSwap(uint32_t const data) noexcept -> uint32_t {
 
 auto kyi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool {
   auto tempStitchBuffer = std::vector<F_POINT_ATTR> {};
-  if ((destination + 1U) < wrap::toUnsigned(StitchBuffer->size())) {
+  if (destination + 1U < wrap::toUnsigned(StitchBuffer->size())) {
 	++destination;
   }
   if (start > finish) {
@@ -278,7 +278,7 @@ void keys::ungrplo() {
   auto flag    = true;
   auto iStitch = 0U;
   for (auto const& stitch : *StitchBuffer) {
-	if (((stitch.attribute & NOTFRM) == 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+	if ((stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 	  ClosestPointIndex = iStitch;
 	  StateMap->set(StateFlag::SELBOX);
 	  StateMap->set(StateFlag::RESTCH);
@@ -316,8 +316,8 @@ void keys::ungrphi() {
   auto flag = true;
   for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; --iStitch) {
 	if (auto const prevStitch = iStitch - 1U;
-	    ((StitchBuffer->operator[](prevStitch).attribute & NOTFRM) == 0U) &&
-	    ((StitchBuffer->operator[](prevStitch).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+	    (StitchBuffer->operator[](prevStitch).attribute & NOTFRM) == 0U &&
+	    (StitchBuffer->operator[](prevStitch).attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 	  ClosestPointIndex = iStitch - 1U;
 	  StateMap->set(StateFlag::SELBOX);
 	  StateMap->set(StateFlag::RESTCH);
@@ -339,20 +339,20 @@ void keys::desiz() {
 	thred::stchrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
-	if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) ||
-	    (rectangle.top > IniFile.hoopSizeY)) {
+	if (rectangle.left < 0 || rectangle.bottom < 0 || rectangle.right > IniFile.hoopSizeX ||
+	    rectangle.top > IniFile.hoopSizeY) {
 	  info += displayText::loadStr(IDS_STCHOUT);
 	}
 	info += displayText::format5(
-	    IDS_STCHS, wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
+	    IDS_STCHS, wrap::toUnsigned(StitchBuffer->size()), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
   if (!FormList->empty()) {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
-	info += displayText::format5(IDS_FORMS, FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
+	info += displayText::format5(IDS_FORMS, FormList->size(), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
-  info += displayText::format2(IDS_HUPWID, (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
+  info += displayText::format2(IDS_HUPWID, IniFile.hoopSizeX * IPFGRAN, IniFile.hoopSizeY * IPFGRAN);
   if (!StitchBuffer->empty()) {
 	info += thred::getDesigner();
   }
@@ -361,7 +361,7 @@ void keys::desiz() {
 
 auto kyi::handleHomeKey(bool& retflag) -> bool {
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
+  if (wrap::pressed(VK_SHIFT) && wrap::pressed(VK_CONTROL)) {
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  GroupStitchIndex = 0;
 	  StateMap->set(StateFlag::GRPSEL);
@@ -385,7 +385,7 @@ auto kyi::handleHomeKey(bool& retflag) -> bool {
 	return true;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	auto iColor = (StateMap->testAndReset(StateFlag::SELBOX)) ? thred::pt2colInd(ClosestPointIndex)
+	auto iColor = StateMap->testAndReset(StateFlag::SELBOX) ? thred::pt2colInd(ClosestPointIndex)
 	                                                          : thred::pt2colInd(GroupStitchIndex);
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  StateMap->set(StateFlag::GRPSEL);
@@ -428,7 +428,7 @@ auto kyi::handleHomeKey(bool& retflag) -> bool {
 
 auto kyi::handleEndKey(int32_t& retflag) -> bool {
   retflag = 1;
-  if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
+  if (wrap::pressed(VK_SHIFT) && wrap::pressed(VK_CONTROL)) {
 	if (!StitchBuffer->empty()) {
 	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
 		GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
@@ -458,7 +458,7 @@ auto kyi::handleEndKey(int32_t& retflag) -> bool {
 	return false;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	auto const iColor = (StateMap->testAndReset(StateFlag::SELBOX)) ? thred::pt2colInd(ClosestPointIndex)
+	auto const iColor = StateMap->testAndReset(StateFlag::SELBOX) ? thred::pt2colInd(ClosestPointIndex)
 	                                                                : thred::pt2colInd(GroupStitchIndex);
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  StateMap->set(StateFlag::GRPSEL);
@@ -497,8 +497,8 @@ auto kyi::handleEndKey(int32_t& retflag) -> bool {
 }
 
 void kyi::dufsel() {
-  auto start = (LastFormSelected > ClosestFormToCursor) ? ClosestFormToCursor : LastFormSelected;
-  auto const finish = (LastFormSelected > ClosestFormToCursor) ? LastFormSelected : ClosestFormToCursor;
+  auto start = LastFormSelected > ClosestFormToCursor ? ClosestFormToCursor : LastFormSelected;
+  auto const finish = LastFormSelected > ClosestFormToCursor ? LastFormSelected : ClosestFormToCursor;
   SelectedFormList->clear();
   SelectedFormList->reserve(wrap::toSize(finish) - start + 1U);
   while (start <= finish) {
@@ -537,7 +537,7 @@ void kyi::seldwn() {
   if (StateMap->test(StateFlag::SELBOX)) {
 	thred::unbox();
 	auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
-	while ((ClosestPointIndex != 0U) &&
+	while (ClosestPointIndex != 0U &&
 	       (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 	  --ClosestPointIndex;
 	}
@@ -622,7 +622,7 @@ void kyi::handleShiftedRightKey() {
 	}
 	else {
 	  if (SelectedFormVertices.vertexCount != 0U) {
-		--(SelectedFormVertices.vertexCount);
+		--SelectedFormVertices.vertexCount;
 		SelectedFormVertices.finish =
 		    (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
 	  }
@@ -728,7 +728,7 @@ void kyi::handleShiftedLeftKey() {
 	}
 	else {
 	  if (SelectedFormVertices.vertexCount != 0U) {
-		--(SelectedFormVertices.vertexCount);
+		--SelectedFormVertices.vertexCount;
 		SelectedFormVertices.finish =
 		    (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
 	  }
@@ -1317,7 +1317,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 	  break;
 	}
 	case L'V': {
-	  if ((wrap::pressed(VK_CONTROL)) && (OpenClipboard(ThrEdWindow) != 0)) {
+	  if (wrap::pressed(VK_CONTROL) && OpenClipboard(ThrEdWindow) != 0) {
 		auto       pasteFlag = true;
 		auto const retval    = tfc::doPaste(stretchBoxLine, pasteFlag);
 		if (pasteFlag) {

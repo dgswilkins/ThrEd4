@@ -544,7 +544,7 @@ auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMS
 void menu::chkmen() {
   constexpr auto LASTCODE = DataCode.size();
   for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
-	auto const code = (iCode == IniFile.dataCheck) ? gsl::narrow_cast<UINT>(MF_CHECKED)
+	auto const code = iCode == IniFile.dataCheck ? gsl::narrow_cast<UINT>(MF_CHECKED)
 	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
 	CheckMenuItem(MainMenu, DataCode.at(iCode), code);
   }

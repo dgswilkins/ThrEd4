@@ -195,7 +195,7 @@ void bui::redbak() {
 
 void backup::redo() {
   ++UndoBufferWriteIndex;
-  UndoBufferWriteIndex &= (UNDOLEN - 1U);
+  UndoBufferWriteIndex &= UNDOLEN - 1U;
   if (auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UNDOLEN - 1U);
       nextBufferIndex == UndoBufferReadIndex) {
 	menu::disableRedo();
@@ -226,7 +226,7 @@ void backup::bak() {
   }
   if (StateMap->test(StateFlag::BAKWRAP)) {
 	--UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UNDOLEN - 1U);
+	UndoBufferWriteIndex &= UNDOLEN - 1U;
 	if (auto const previousBufferIndex = UndoBufferWriteIndex - 1U; previousBufferIndex == UndoBufferReadIndex) {
 	  menu::disableRedo();
 	}
@@ -249,7 +249,7 @@ void backup::bak() {
 
 void backup::updateWriteIndex() {
   ++UndoBufferWriteIndex;
-  UndoBufferWriteIndex &= (UNDOLEN - 1U);
+  UndoBufferWriteIndex &= UNDOLEN - 1U;
   if (UndoBufferWriteIndex == 0U) {
 	StateMap->set(StateFlag::BAKWRAP);
   }

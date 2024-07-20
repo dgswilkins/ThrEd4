@@ -257,7 +257,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 // is dominant in the monochrome bitmap
 auto bi::binv(const std::vector<uint8_t>& monoBitmapData) noexcept -> bool {
   auto const whiteBits = gsl::narrow_cast<size_t>(std::ranges::count(monoBitmapData, UCHAR_MAX));
-  return (whiteBits > (monoBitmapData.size() >> 1U));
+  return whiteBits > monoBitmapData.size() >> 1U;
 }
 
 void bi::bitlin(gsl::span<uint8_t> const&  source,
@@ -273,7 +273,7 @@ void bi::bitlin(gsl::span<uint8_t> const&  source,
 	  ++dst;
 	}
   }
-  if (auto const final = (destination.size() % CHAR_BIT)) {
+  if (auto const final = destination.size() % CHAR_BIT) {
 	auto const bits = std::bitset<CHAR_BIT>(source.back());
 	for (auto bitOffset = 0U; bitOffset < final; ++bitOffset) {
 	  auto const offset = bitOffset ^ (CHAR_BIT - 1U);
@@ -328,7 +328,7 @@ auto bi::saveName(fs::path& fileName) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (FAILED(hResult) || (nullptr == pFileSave)) {
+  if (FAILED(hResult) || nullptr == pFileSave) {
 	return false;
   }
   constexpr auto FILTER_FILE_TYPES = std::array {FLTBMP, FLTALL};
@@ -347,7 +347,7 @@ auto bi::saveName(fs::path& fileName) {
   }
   auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
   hResult     = pFileSave->GetResult(&pItem);
-  if (FAILED(hResult) || (nullptr == pItem)) {
+  if (FAILED(hResult) || nullptr == pItem) {
 	return false;
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
@@ -362,7 +362,7 @@ auto bi::saveName(fs::path& fileName) {
 }
 
 void bitmap::savmap() {
-  if (ismap() && (nullptr != TraceBitmapData)) {
+  if (ismap() && nullptr != TraceBitmapData) {
 	displayText::tabmsg(IDS_SHOMAP, false);
 	return;
   }
@@ -400,7 +400,7 @@ void bitmap::savmap() {
 void bi::movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept {
   auto destination = buffer.begin();
   for (auto const& iTBD : src) {
-	*(gsl::narrow_cast<uint32_t*>(gsl::narrow_cast<void*>(&(*destination)))) = iTBD;
+	*gsl::narrow_cast<uint32_t*>(gsl::narrow_cast<void*>(&(*destination))) = iTBD;
 	destination += 3;
   }
 }
@@ -410,7 +410,7 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
       CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (FAILED(hResult) || (nullptr == pFileOpen)) {
+  if (FAILED(hResult) || nullptr == pFileOpen) {
 	return false;
   }
   auto dwOptions = DWORD {};
@@ -443,7 +443,7 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
   }
   auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
   hResult     = pFileOpen->GetResult(&pItem);
-  if (FAILED(hResult) || (nullptr == pItem)) {
+  if (FAILED(hResult) || nullptr == pItem) {
 	return false;
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
@@ -603,7 +603,7 @@ auto bitmap::getBmpNameData() noexcept -> char* {
 }
 
 auto bitmap::ismap() noexcept -> bool {
-  return (UTF8BMPname[0] != 0);
+  return UTF8BMPname[0] != 0;
 }
 
 void bitmap::chkbit() {
@@ -727,7 +727,7 @@ void bitmap::bitbltBitmap() noexcept {
 
 auto bi::stch2bit(F_POINT& point) -> POINT {
   if (StateMap->test(StateFlag::LANDSCAP)) {
-	point.y -= (wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y);
+	point.y -= wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y;
   }
   return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
                 wrap::round<LONG>(wrap::toFloat(BitmapHeight) - BmpStitchRatio.y * point.y)};

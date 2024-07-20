@@ -140,7 +140,7 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
 	auto const name   = convAuxName.substr(pos + 1);
 	auto       itChar = spDstHdrDesc.begin();
 	for (auto const& iDHD : name) {
-	  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
+	  if (iDHD != '.' && itChar != spDstHdrDesc.end()) {
 		*itChar = iDHD;
 	  }
 	  else {
@@ -260,7 +260,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 		return;
 	  }
 	  CloseHandle(colorFile);
-	  if (bytesRead > (wrap::sizeofType(colors) * 2)) {
+	  if (bytesRead > wrap::sizeofType(colors) * 2) {
 		if (colors[0] == COLVER) {
 		  BackgroundColor = colors[1];
 		  thred::resetColorChanges();
@@ -271,7 +271,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
   }
   auto iColor = 2U;
   auto color  = 0U;
-  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
+  if (bytesRead >= (wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors)) {
 	UserColor[0] = colors[iColor];
 	color        = DST::colmatch(colors[iColor++]);
 	thred::addColor(0, color);
@@ -284,7 +284,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
   for (auto& record : DSTData) {
 	if (constexpr auto C1MASK = 0x40U;
 	    (record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
-	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
+	  if (bytesRead >= (wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors)) {
 		color                    = DST::colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		thred::addColor(currentStitch, color);
@@ -328,7 +328,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 }
 
 auto di::dtrn(DSTREC* dpnt) -> uint32_t {
-  return *(convertFromPtr<uint32_t*>(dpnt));
+  return *convertFromPtr<uint32_t*>(dpnt);
 }
 
 void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
@@ -380,12 +380,12 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
-	auto const count = (absoluteLengths.cx > absoluteLengths.cy) ? absoluteLengths.cx / DSTMAX + 1
+	auto const count = absoluteLengths.cx > absoluteLengths.cy ? absoluteLengths.cx / DSTMAX + 1
 	                                                             : absoluteLengths.cy / DSTMAX + 1;
 	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
 
 	auto difference = SIZE {};
-	while ((lengths.cx != 0) || (lengths.cy != 0)) {
+	while (lengths.cx != 0 || lengths.cy != 0) {
 	  auto dstType = TYPREG;
 	  if (abs(lengths.cx) > stepSize.cx) {
 		dstType = TYPJMP;
@@ -474,8 +474,8 @@ auto di::coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
   auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // NOLINTBEGIN(readability-magic-numbers)
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
-                                                     (((767 - meanR) * deltaB * deltaB) / 256))));
+  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat(((512 + meanR) * deltaR * deltaR / 256) + 4 * deltaG * deltaG +
+                                                     (767 - meanR) * deltaB * deltaB / 256)));
   // NOLINTEND(readability-magic-numbers)
 }
 
@@ -1053,7 +1053,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      auxName.wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;

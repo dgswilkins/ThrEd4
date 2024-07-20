@@ -78,7 +78,7 @@ void fxlit(uint32_t                  vertexIndex,
            F_POINT&                  stitchPoint,
            uint32_t&                 adjCount,
            float                     adjustedSpace,
-           uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>));
+           uint32_t                  nextStart) noexcept(!std::is_same_v<ptrdiff_t, int>);
 auto fxpnt(uint32_t                  vertexIndex,
            std::vector<float> const& listSINEs,
            std::vector<float> const& listCOSINEs,
@@ -86,7 +86,7 @@ auto fxpnt(uint32_t                  vertexIndex,
            uint32_t                  currentSide,
            F_POINT const&            stitchPoint,
            float                     adjustedSpace,
-           uint32_t                  nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool;
+           uint32_t                  nextStart) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool;
 void lincrnr(uint32_t                    vertexIndex,
              std::vector<F_POINT> const& clipReversedData,
              std::vector<F_POINT>&       clipFillData,
@@ -117,7 +117,7 @@ void setvct(uint32_t vertexIndex,
             uint32_t start,
             uint32_t finish,
             float&   clipAngle,
-            F_POINT& vector0) noexcept(!(std::is_same_v<ptrdiff_t, int>));
+            F_POINT& vector0) noexcept(!std::is_same_v<ptrdiff_t, int>);
 void xclpfn(std::vector<F_POINT> const& tempClipPoints,
             std::vector<F_POINT> const& chainEndPoints,
             uint32_t                    start,
@@ -301,7 +301,7 @@ void ci::setvct(uint32_t const vertexIndex,
                 uint32_t const start,
                 uint32_t const finish,
                 float&   clipAngle,
-                F_POINT& vector0) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
+                F_POINT& vector0) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   auto const itVertex       = wrap::next(FormVertices->cbegin(), vertexIndex);
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);
@@ -433,7 +433,7 @@ auto ci::clpsid(uint32_t const              vertexIndex,
   }
   auto const fClipCount = wrap::toFloat(clipCount);
   auto const remainder =
-      (clipCount > 1U)
+      clipCount > 1U
           ? ((length - fClipCount * ClipRectSize.cx) / (fClipCount - 1.0F) + ClipRectSize.cx) / length
           : (length - ClipRectSize.cx) / 2;
   auto const step         = F_POINT {delta.x * remainder, delta.y * remainder};
@@ -503,7 +503,7 @@ auto ci::fxpnt(uint32_t const            vertexIndex,
                uint32_t const            currentSide,
                F_POINT const&            stitchPoint,
                float const               adjustedSpace,
-               uint32_t const nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) -> bool {
+               uint32_t const nextStart) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
   moveToCoords        = *itVertex;
   auto length         = std::hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
@@ -530,7 +530,7 @@ void ci::fxlit(uint32_t const            vertexIndex,
                F_POINT&                  stitchPoint,
                uint32_t&                 adjCount,
                float const               adjustedSpace,
-               uint32_t const            nextStart) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
+               uint32_t const            nextStart) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   if (!fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
 	return;
   }
@@ -605,7 +605,7 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto nextStart       = 0U;
 
   constexpr auto ITLIMIT = 50U; // Iterate at most 50 times to try to guarantee convergence
-  while (loopCount < ITLIMIT && (largestSpacing - smallestSpacing) > TNYFLOAT) {
+  while (loopCount < ITLIMIT && largestSpacing - smallestSpacing > TNYFLOAT) {
 	auto adjCount = 0U;
 	// intentional copy
 	auto stitchPoint = *itFirstVertex;
@@ -688,9 +688,9 @@ void ci::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
 	listCOSINEs.push_back(cos(FormAngles->operator[](iVertex)));
   }
   auto const prevCount = form.vertexCount - 1U;
-  listSINEs.push_back(sin((FormAngles->front() > FormAngles->operator[](prevCount))
-                              ? (FormAngles->front() - FormAngles->operator[](prevCount))
-                              : (FormAngles->operator[](prevCount) - FormAngles->front())));
+  listSINEs.push_back(sin(FormAngles->front() > FormAngles->operator[](prevCount)
+                              ? FormAngles->front() - FormAngles->operator[](prevCount)
+                              : FormAngles->operator[](prevCount) - FormAngles->front()));
   fxlen(form, chainEndPoints, listSINEs, listCOSINEs);
 }
 
@@ -966,7 +966,7 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   if (StateMap->test(StateFlag::LINCHN)) {
 	--backupAt;
   }
-  if ((OSequence->size() >= backupAt)) {
+  if (OSequence->size() >= backupAt) {
 	OSequence->operator[](OSequence->size() - backupAt) = chainEndPoints[chainLength];
   }
   OSequence->push_back(chainEndPoints[chainLength]);

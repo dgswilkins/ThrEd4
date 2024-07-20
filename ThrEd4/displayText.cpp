@@ -107,7 +107,7 @@ void displayText::shoMsg(std::wstring const& message, bool const top) {
   if (!top) {
 	constexpr auto PXOFFSET = 12; // pixel offset
 
-	yOffset = (mainRect.bottom - mainRect.top) - PXOFFSET - messageSize.cy;
+	yOffset = mainRect.bottom - mainRect.top - PXOFFSET - messageSize.cy;
   }
   MsgWindow = CreateWindow(L"STATIC",
                            message.c_str(),
@@ -128,7 +128,7 @@ void displayText::tabmsg(uint32_t const code, bool const top) {
 
 void displayText::hsizmsg() {
   auto const fmtStr = format2(
-      IDS_HSIZ, (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN), (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN));
+      IDS_HSIZ, wrap::toFloat(UnzoomedRect.cx) * IPFGRAN, wrap::toFloat(UnzoomedRect.cy) * IPFGRAN);
   shoMsg(fmtStr, false);
 }
 

@@ -150,7 +150,7 @@ void bal::redbal() {
 
   auto const newSize = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
   balaradStitch.resize(gsl::narrow<size_t>(newSize));
-  if (!wrap::readFile(balaradFile, balaradStitch.data(), (fileSize - sizeof(balaradHeader)), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
+  if (!wrap::readFile(balaradFile, balaradStitch.data(), fileSize - sizeof(balaradHeader), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
 	return;
   }
   auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
@@ -178,7 +178,7 @@ void bal::redbal() {
 		break;
 	  }
 	  case BALSTOP: {
-		color = DST::colmatch(*(iBHC++));
+		color = DST::colmatch(*iBHC++);
 
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		thred::addColor(currentStitch, color);
@@ -200,7 +200,7 @@ void bal::redbal() {
 
 void bal::ritbal() {
   auto balaradHeader = BAL_HEAD {};
-  if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
+  if (!BalaradName0->empty() && !BalaradName1->empty() && !StitchBuffer->empty()) {
 	auto outputName = thred::setFileName();
 	outputName.replace_extension(L".thv");
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -217,7 +217,7 @@ void bal::ritbal() {
 	for (auto const& stitch : *StitchBuffer) {
 	  if (auto const stitchColor = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK); color != stitchColor) {
 		color     = stitchColor;
-		*(iBHC++) = UserColor.at(color);
+		*iBHC++ = UserColor.at(color);
 		if (iBHC == bhcEnd) {
 		  break;
 		}

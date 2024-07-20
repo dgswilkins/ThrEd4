@@ -81,18 +81,18 @@ constexpr auto BEMAX    = 1U << 8U;
 constexpr auto BEMIN    = 1U << 9U;
 constexpr auto CHNPOS   = 1U << 10U;
 
-constexpr auto MEGLIN  = (BELEN | BEMAX | BEMIN);
-constexpr auto MEGBLD  = (BELEN | BEMAX | BEMIN);
-constexpr auto MEGCLP  = (BNCLP | BEMAX | BEMIN);
-constexpr auto MEGSAT  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
-constexpr auto MEGAP   = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
-constexpr auto MEGPRP  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
-constexpr auto MEGHOL  = (BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN);
-constexpr auto MEGPIC  = (BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN);
-constexpr auto MEGDUB  = (BELEN | BEMAX | BEMIN);
-constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
-constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
-constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
+constexpr auto MEGLIN  = BELEN | BEMAX | BEMIN;
+constexpr auto MEGBLD  = BELEN | BEMAX | BEMIN;
+constexpr auto MEGCLP  = BNCLP | BEMAX | BEMIN;
+constexpr auto MEGSAT  = BESPAC | BESIZ | BRDEND | BEMAX | BEMIN;
+constexpr auto MEGAP   = BESPAC | BESIZ | BRDEND | BEMAX | BEMIN;
+constexpr auto MEGPRP  = BESPAC | BESIZ | BRDEND | BEMAX | BEMIN;
+constexpr auto MEGHOL  = BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN;
+constexpr auto MEGPIC  = BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN;
+constexpr auto MEGDUB  = BELEN | BEMAX | BEMIN;
+constexpr auto MEGCHNL = BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS;
+constexpr auto MEGCHNH = BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS;
+constexpr auto MEGCLPX = BNCLP | BEMAX | BEMIN;
 
 enum DaisyStyles : uint8_t { // daisy form types
   DSIN,                      // Sine shape
@@ -251,7 +251,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   // label and fill the form field
   labelWindow[LFRM] = txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
-  auto choice = (form.type == FRMLINE) ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
+  auto choice = form.type == FRMLINE ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
   valueWindow[LFRM] = txtrwin(choice, ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   // label and fill the layer field
@@ -263,42 +263,42 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   if (form.type != FRMLINE) { // not a line form
 	// label and fill the center walk, walk, and underlay fields with 'on' or 'off'
 	labelWindow[LCWLK] = txtwin(displayText::loadStr(IDS_CWLK), LabelWindowCoords);
-	choice             = ((form.extendedAttribute & AT_CWLK) != 0U) ? strOn : strOff;
+	choice             = (form.extendedAttribute & AT_CWLK) != 0U ? strOn : strOff;
 	valueWindow[LCWLK] = txtrwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	labelWindow[LWALK] = txtwin(displayText::loadStr(IDS_WALK), LabelWindowCoords);
-	choice             = ((form.extendedAttribute & AT_WALK) != 0U) ? strOn : strOff;
+	choice             = (form.extendedAttribute & AT_WALK) != 0U ? strOn : strOff;
 	valueWindow[LWALK] = txtrwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	labelWindow[LUND] = txtwin(displayText::loadStr(IDS_UND), LabelWindowCoords);
-	choice            = ((form.extendedAttribute & AT_UND) != 0U) ? strOn : strOff;
+	choice            = (form.extendedAttribute & AT_UND) != 0U ? strOn : strOff;
 	valueWindow[LUND] = txtrwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	if ((form.extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) != 0U) {
 	  // label and fill the underlay color and stitch length fields
 	  labelWindow[LUNDCOL] = txtwin(displayText::loadStr(IDS_UNDCOL), LabelWindowCoords);
 	  valueWindow[LUNDCOL] =
-	      txtrwin(fmt::format(FMT_COMPILE(L"{}"), (form.underlayColor + 1U)), ValueWindowCoords);
+	      txtrwin(fmt::format(FMT_COMPILE(L"{}"), form.underlayColor + 1U), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LULEN] = txtwin(displayText::loadStr(IDS_ULEN), LabelWindowCoords);
 	  valueWindow[LULEN] = txtrwin(
-	      fmt::format(FMT_COMPILE(L"{:.2f}"), (form.underlayStitchLen * IPFGRAN)), ValueWindowCoords);
+	      fmt::format(FMT_COMPILE(L"{:.2f}"), form.underlayStitchLen * IPFGRAN), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	// label and fill the underlay indent field
 	labelWindow[LWLKIND] = txtwin(displayText::loadStr(IDS_UWLKIND), LabelWindowCoords);
 	valueWindow[LWLKIND] =
-	    txtrwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.underlayIndent * IPFGRAN)), ValueWindowCoords);
+	    txtrwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.underlayIndent * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	if ((form.extendedAttribute & AT_UND) != 0U) {
 	  // label and fill the underlay spacing and angle fields
 	  labelWindow[LUSPAC] = txtwin(displayText::loadStr(IDS_FUSPAC), LabelWindowCoords);
 	  valueWindow[LUSPAC] =
-	      txtrwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.underlaySpacing * IPFGRAN)), ValueWindowCoords);
+	      txtrwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.underlaySpacing * IPFGRAN), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LUANG] = txtwin(displayText::loadStr(IDS_FUANG), LabelWindowCoords);
 	  valueWindow[LUANG] = txtrwin(
-	      fmt::format(FMT_COMPILE(L"{:.2f}"), (form.underlayStitchAngle * RADDEGF)), ValueWindowCoords);
+	      fmt::format(FMT_COMPILE(L"{:.2f}"), form.underlayStitchAngle * RADDEGF), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
   }
@@ -311,32 +311,32 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	// label and fill the fill color field
 	labelWindow[LFRMCOL] = txtwin(displayText::loadStr(IDS_TXT3), LabelWindowCoords);
 	valueWindow[LFRMCOL] =
-	    numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillColor + 1U)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{}"), form.fillColor + 1U), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	if (form.fillType == FTHF) {
 	  // label and fill the feather color, feather type & blend fields
 	  labelWindow[LFTHCOL] = txtwin(displayText::loadStr(IDS_FTHCOL), LabelWindowCoords);
 	  valueWindow[LFTHCOL] =
-	      numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.color + 1U)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{}"), form.feather.color + 1U), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHTYP] = txtwin(displayText::loadStr(IDS_FTHTYP), LabelWindowCoords);
 	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.feather.fillType - 1U);
 	  valueWindow[LFTHTYP] = numwin(displayText::loadStr(itFeather->stringID), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHBLND] = txtwin(displayText::loadStr(IDS_FTHBLND), LabelWindowCoords);
-	  choice                = ((form.extendedAttribute & AT_FTHBLND) != 0U) ? strOn : strOff;
+	  choice                = (form.extendedAttribute & AT_FTHBLND) != 0U ? strOn : strOff;
 	  valueWindow[LFTHBLND] = txtrwin(choice, ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  if ((form.extendedAttribute & AT_FTHBLND) == 0U) {
 		// label and fill the feather both field
 		labelWindow[LFTHBTH] = txtwin(displayText::loadStr(IDS_FTHBOTH), LabelWindowCoords);
-		choice               = ((form.extendedAttribute & (AT_FTHBTH)) != 0U) ? strOn : strOff;
+		choice               = (form.extendedAttribute & AT_FTHBTH) != 0U ? strOn : strOff;
 		valueWindow[LFTHBTH] = txtrwin(choice, ValueWindowCoords);
 		nxtlin(formMenuEntryCount);
 		if ((form.extendedAttribute & AT_FTHBTH) == 0U) {
 		  // label and fill the feather up field
 		  labelWindow[LFTHUP] = txtwin(displayText::loadStr(IDS_FTHUP), LabelWindowCoords);
-		  choice              = ((form.extendedAttribute & AT_FTHUP) != 0U) ? strOn : strOff;
+		  choice              = (form.extendedAttribute & AT_FTHUP) != 0U ? strOn : strOff;
 		  valueWindow[LFTHUP] = txtrwin(choice, ValueWindowCoords);
 		  nxtlin(formMenuEntryCount);
 		}
@@ -344,85 +344,85 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  // label and fill the feather up and down count fields
 	  labelWindow[LFTHUPCNT] = txtwin(displayText::loadStr(IDS_FTHUPCNT), LabelWindowCoords);
 	  valueWindow[LFTHUPCNT] =
-	      numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.upCount)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{}"), form.feather.upCount), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHDWNCNT] = txtwin(displayText::loadStr(IDS_FTHDWNCNT), LabelWindowCoords);
 	  valueWindow[LFTHDWNCNT] =
-	      numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.downCount)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{}"), form.feather.downCount), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  // label and fill the feather ratio, number and floor fields
 	  labelWindow[LFTHSIZ] = txtwin(displayText::loadStr(IDS_FTHSIZ), LabelWindowCoords);
 	  valueWindow[LFTHSIZ] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.ratio)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.feather.ratio), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  if (form.feather.fillType == FTHPSG) { // if the feather is ragged
 		// label and fill the feather steps field
 		labelWindow[LFTHNUM] = txtwin(displayText::loadStr(IDS_FTHNUM), LabelWindowCoords);
 		valueWindow[LFTHNUM] =
-		    numwin(fmt::format(FMT_COMPILE(L"{}"), (form.feather.count)), ValueWindowCoords);
+		    numwin(fmt::format(FMT_COMPILE(L"{}"), form.feather.count), ValueWindowCoords);
 		nxtlin(formMenuEntryCount);
 	  }
 	  // label and fill the feather floor field
 	  labelWindow[LFTHFLR] = txtwin(displayText::loadStr(IDS_FTHFLR), LabelWindowCoords);
 	  valueWindow[LFTHFLR] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.feather.minStitchSize * IPFGRAN)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.feather.minStitchSize * IPFGRAN), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType != CLPF) {
 	  // label and fill the fill spacing field
 	  labelWindow[LFRMSPAC] = txtwin(displayText::loadStr(IDS_TXT4), LabelWindowCoords);
 	  valueWindow[LFRMSPAC] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillSpacing * IPFGRAN)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.fillSpacing * IPFGRAN), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	if (form.isTexture()) {
 	  // label and fill the texture offset field
 	  labelWindow[LTXOF] = txtwin(displayText::loadStr(IDS_TXOF), LabelWindowCoords);
 	  valueWindow[LTXOF] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.txof * IPFGRAN)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.txof * IPFGRAN), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	// label and fill the fill stitch maximum length field
 	labelWindow[LMAXFIL] = txtwin(displayText::loadStr(IDS_TXT20), LabelWindowCoords);
 	valueWindow[LMAXFIL] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.maxFillStitchLen * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.maxFillStitchLen * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	if (!form.isClip() && !form.isTexture()) { // if the form is not a clip or texture
 	  // label and fill the fill stitch length field
 	  labelWindow[LFRMLEN] = txtwin(displayText::loadStr(IDS_TXT5), LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.stitchLength * IPFGRAN)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.stitchLength * IPFGRAN), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	// label and fill the fill stitch minimum length field
 	labelWindow[LMINFIL] = txtwin(displayText::loadStr(IDS_TXT21), LabelWindowCoords);
 	valueWindow[LMINFIL] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.minFillStitchLen * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.minFillStitchLen * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  // label and fill the fill angle field
 	  labelWindow[LFRMANG] = txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LFRMANG] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.fillAngle * RADDEGF)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.fillAngle * RADDEGF), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == ANGCLPF) {
 	  // label and fill the clip fill angle field
 	  labelWindow[LSACANG] = txtwin(displayText::loadStr(IDS_TXT6), LabelWindowCoords);
 	  valueWindow[LSACANG] =
-	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.clipFillAngle * RADDEGF)), ValueWindowCoords);
+	      numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.clipFillAngle * RADDEGF), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
 	  // label and fill the clip fill spacing field
 	  labelWindow[LFRMFAZ] = txtwin(displayText::loadStr(IDS_TXT18), LabelWindowCoords);
-	  valueWindow[LFRMFAZ] = numwin(fmt::format(FMT_COMPILE(L"{}"), (form.wordParam)), ValueWindowCoords);
+	  valueWindow[LFRMFAZ] = numwin(fmt::format(FMT_COMPILE(L"{}"), form.wordParam), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF || form.isTexture()) {
 	  // label and fill the fill ends field
 	  labelWindow[LBFILSQR] = txtwin(displayText::loadStr(PREFLIST[PRFFILEND].stringID), LabelWindowCoords);
-	  choice = ((form.extendedAttribute & AT_SQR) != 0U) ? displayText::loadStr(IDS_SQR)
+	  choice = (form.extendedAttribute & AT_SQR) != 0U ? displayText::loadStr(IDS_SQR)
 	                                                     : displayText::loadStr(IDS_PNTD);
 	  valueWindow[LBFILSQR] = txtrwin(choice, ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
@@ -430,21 +430,21 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   }
   // label and fill the fill start and end fields
   labelWindow[LFSTRT] = txtwin(displayText::loadStr(IDS_FSTRT), LabelWindowCoords);
-  choice              = ((form.extendedAttribute & AT_STRT) != 0U) ? strOn : strOff;
+  choice              = (form.extendedAttribute & AT_STRT) != 0U ? strOn : strOff;
   valueWindow[LFSTRT] = txtrwin(choice, ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	labelWindow[LDSTRT] = txtwin(displayText::loadStr(IDS_FSTRT), LabelWindowCoords);
-	valueWindow[LDSTRT] = numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillStart)), ValueWindowCoords);
+	valueWindow[LDSTRT] = numwin(fmt::format(FMT_COMPILE(L"{}"), form.fillStart), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   labelWindow[LFEND] = txtwin(displayText::loadStr(IDS_FEND), LabelWindowCoords);
-  choice             = ((form.extendedAttribute & AT_END) != 0U) ? strOn : strOff;
+  choice             = (form.extendedAttribute & AT_END) != 0U ? strOn : strOff;
   valueWindow[LFEND] = txtrwin(choice, ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   if ((form.extendedAttribute & AT_END) != 0U) {
 	labelWindow[LDEND] = txtwin(displayText::loadStr(IDS_FEND), LabelWindowCoords);
-	valueWindow[LDEND] = numwin(fmt::format(FMT_COMPILE(L"{}"), (form.fillEnd)), ValueWindowCoords);
+	valueWindow[LDEND] = numwin(fmt::format(FMT_COMPILE(L"{}"), form.fillEnd), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   // label and fill border type field
@@ -463,14 +463,14 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   // label and fill the border color field
   labelWindow[LBRDCOL] = txtwin(displayText::loadStr(IDS_TXT8), LabelWindowCoords);
   valueWindow[LBRDCOL] =
-      numwin(fmt::format(FMT_COMPILE(L"{}"), ((form.borderColor & COLMSK) + 1U)), ValueWindowCoords);
+      numwin(fmt::format(FMT_COMPILE(L"{}"), form.borderColor & COLMSK + 1U), ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   if ((EDGE_ARRAY.at(edgeIdx) & BESPAC) != 0) {
 	// label and fill the border spacing field
 	labelWindow[LBRDSPAC] = txtwin(displayText::loadStr(IDS_TXT9), LabelWindowCoords);
-	choice = (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
-	             ? fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeSpacing * IPFGRAN))
-	             : fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeSpacing * IPFGRAN * 2));
+	choice = edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN
+	             ? fmt::format(FMT_COMPILE(L"{:.2f}"), form.edgeSpacing * IPFGRAN)
+	             : fmt::format(FMT_COMPILE(L"{:.2f}"), form.edgeSpacing * IPFGRAN * 2);
 	valueWindow[LBRDSPAC] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
@@ -478,83 +478,83 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	// label and fill the border picot spacing field
 	labelWindow[LBRDPIC] = txtwin(displayText::loadStr(IDS_TXT16), LabelWindowCoords);
 	valueWindow[LBRDPIC] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeSpacing * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.edgeSpacing * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & BEMAX) != 0) {
 	// label and fill the maximum border stitch field
 	labelWindow[LMAXBRD] = txtwin(displayText::loadStr(IDS_TXT22), LabelWindowCoords);
 	valueWindow[LMAXBRD] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.maxBorderStitchLen * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.maxBorderStitchLen * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & BELEN) != 0) {
 	// label and fill the border stitch length field
 	labelWindow[LBRDLEN] = txtwin(displayText::loadStr(IDS_TXT10), LabelWindowCoords);
 	valueWindow[LBRDLEN] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeStitchLen * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.edgeStitchLen * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & BEMIN) != 0) {
 	// label and fill the minimum border stitch length field
 	labelWindow[LMINBRD] = txtwin(displayText::loadStr(IDS_TXT23), LabelWindowCoords);
 	valueWindow[LMINBRD] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.minBorderStitchLen * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.minBorderStitchLen * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & BESIZ) != 0) {
 	// label and fill the border width field
 	labelWindow[LBRDSIZ] = txtwin(displayText::loadStr(IDS_TXT11), LabelWindowCoords);
 	valueWindow[LBRDSIZ] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.borderSize * IPFGRAN)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.borderSize * IPFGRAN), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & BRDPOS) != 0) {
 	// label and fill the fill phase field
 	labelWindow[LBRDPOS] = txtwin(displayText::loadStr(IDS_TXT18), LabelWindowCoords);
 	valueWindow[LBRDPOS] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.edgeStitchLen), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & CHNPOS) != 0) {
 	// label and fill the chain position field
 	labelWindow[LBRDPOS] = txtwin(displayText::loadStr(IDS_TXT19), LabelWindowCoords);
 	valueWindow[LBRDPOS] =
-	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), form.edgeStitchLen), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if (edgeFillType == EDGEAPPL) {
 	// label and fill the applique color field
 	labelWindow[LAPCOL] = txtwin(displayText::loadStr(IDS_TXT12), LabelWindowCoords);
 	valueWindow[LAPCOL] =
-	    numwin(fmt::format(FMT_COMPILE(L"{}"), ((form.borderColor >> 4U) + 1U)), ValueWindowCoords);
+	    numwin(fmt::format(FMT_COMPILE(L"{}"), (form.borderColor >> 4U) + 1U), ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
 	// label and fill the border underlay field
 	labelWindow[LBRDUND] = txtwin(displayText::loadStr(IDS_TXT17), LabelWindowCoords);
-	choice               = ((form.edgeType & EGUND) != 0U) ? strOn : strOff;
+	choice               = (form.edgeType & EGUND) != 0U ? strOn : strOff;
 	valueWindow[LBRDUND] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
   if ((EDGE_ARRAY.at(edgeIdx) & BCNRSIZ) != 0) {
 	// label and fill the buttonhole corner size field
-	choice              = (form.edgeType == EDGEBHOL)
-	                          ? fmt::format(FMT_COMPILE(L"{:.2f}"), (form::getblen() * IPFGRAN))
-	                          : fmt::format(FMT_COMPILE(L"{:.2f}"), (form::getplen() * IPFGRAN));
+	choice              = form.edgeType == EDGEBHOL
+	                          ? fmt::format(FMT_COMPILE(L"{:.2f}"), form::getblen() * IPFGRAN)
+	                          : fmt::format(FMT_COMPILE(L"{:.2f}"), form::getplen() * IPFGRAN);
 	labelWindow[LBCSIZ] = txtwin(displayText::loadStr(IDS_TXT13), LabelWindowCoords);
 	valueWindow[LBCSIZ] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
-  if (form.type == FRMLINE && ((EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0)) {
+  if (form.type == FRMLINE && (EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0) {
 	// label and fill the border start & end fields
 	labelWindow[LBSTRT] = txtwin(displayText::loadStr(IDS_TXT14), LabelWindowCoords);
-	choice              = ((form.attribute & SBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT)
+	choice              = (form.attribute & SBLNT) != 0U ? displayText::loadStr(IDS_BLUNT)
 	                                                       : displayText::loadStr(IDS_TAPR);
 	valueWindow[LBSTRT] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
 	labelWindow[LBFIN] = txtwin(displayText::loadStr(IDS_TXT15), LabelWindowCoords);
-	choice             = ((form.attribute & FBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT)
+	choice             = (form.attribute & FBLNT) != 0U ? displayText::loadStr(IDS_BLUNT)
 	                                                      : displayText::loadStr(IDS_TAPR);
 	valueWindow[LBFIN] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
@@ -710,44 +710,44 @@ void formForms::prfmsg() {
   ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.cx;
   ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   auto row                = PREFLIST.begin();
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), (AppliqueColor + 1U)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.AppStitchLen * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (BorderWidth * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (ButtonholeCornerLength * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.chainSpace * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.chainRatio)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f} mm"), (IniFile.clipOffset * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), (IniFile.fillPhase)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.eggRatio)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.fillAngle * RADDEGF)), *(row++));
-  auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? displayText::loadStr(IDS_SQR)
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), AppliqueColor + 1U), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.AppStitchLen * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), BorderWidth * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), ButtonholeCornerLength * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.chainSpace * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.chainRatio), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f} mm"), IniFile.clipOffset * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), IniFile.fillPhase), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.eggRatio), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.fillAngle * RADDEGF), *row++);
+  auto choice = UserFlagMap->test(UserFlag::SQRFIL) ? displayText::loadStr(IDS_SQR)
                                                       : displayText::loadStr(IDS_PNTD);
-  ffi::prflin(choice, *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (LineSpacing * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), (thred::duthrsh(ShowStitchThreshold))), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f} mm"), (IniFile.gridSize * IPFGRAN)), *(row++));
+  ffi::prflin(choice, *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), thred::duthrsh(ShowStitchThreshold)), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
   ffi::prflin(fmt::format(FMT_COMPILE(L"{}"),
                           displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
-              *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.0f} mm"), (IniFile.hoopSizeY * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.0f} mm"), (IniFile.hoopSizeX * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.lensRatio)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.cursorNudgeStep)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (PicotSpacing * IPFGRAN)), *(row++));
-  choice = (UserFlagMap->test(UserFlag::BLUNT)) ? displayText::loadStr(IDS_BLUNT)
+              *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.cursorNudgeStep), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), PicotSpacing * IPFGRAN), *row++);
+  choice = UserFlagMap->test(UserFlag::BLUNT) ? displayText::loadStr(IDS_BLUNT)
                                                 : displayText::loadStr(IDS_TAPR);
-  ffi::prflin(choice, *(row++));
-  choice = (UserFlagMap->test(UserFlag::DUND)) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
-  ffi::prflin(choice, *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (SmallStitchLength * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (SnapLength * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (SpiralWrap)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (StarRatio)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), (thred::duthrsh(StitchBoxesThreshold))), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.maxStitchLength * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (UserStitchLength * IPFGRAN)), *(row++));
-  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), (MinStitchLength * IPFGRAN)), *row);
+  ffi::prflin(choice, *row++);
+  choice = UserFlagMap->test(UserFlag::DUND) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
+  ffi::prflin(choice, *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), SmallStitchLength * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), SpiralWrap), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), StarRatio), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{}"), thred::duthrsh(StitchBoxesThreshold)), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.maxStitchLength * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), UserStitchLength * IPFGRAN), *row++);
+  ffi::prflin(fmt::format(FMT_COMPILE(L"{:.2f}"), MinStitchLength * IPFGRAN), *row);
   StateMap->set(StateFlag::PRFACT);
   ReleaseDC(ThrEdWindow, preferenceDC);
 }
@@ -992,14 +992,14 @@ void formForms::dasyfrm() {
 		}
 		case DSAW: {
 		  auto const sawPointCount =
-		      wrap::toFloat((iPoint > halfPetalPointCount) ? IniFile.daisyPetalPoints - iPoint : iPoint);
+		      wrap::toFloat(iPoint > halfPetalPointCount ? IniFile.daisyPetalPoints - iPoint : iPoint);
 		  auto const offset = (sawPointCount / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  distanceFromDaisyCenter = diameter + offset;
 		  break;
 		}
 		case DRAG: {
-		  distanceFromDaisyCenter = diameter + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
-		                                        wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
+		  distanceFromDaisyCenter = diameter + wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
+		                                        wrap::toFloat(IniFile.daisyPetalPoints) * petalLength;
 		  break;
 		}
 		case DCOG: {
@@ -1232,7 +1232,7 @@ void formForms::setear() {
 	firstVertex->x = middle;
   }
   firstVertex->y = verticalPosition;
-  ++(form.vertexCount);
+  ++form.vertexCount;
   ++NewFormVertexCount;
   StateMap->set(StateFlag::FORMSEL);
   form::flipv();
@@ -1290,7 +1290,7 @@ void ffi::handleWaveIDOK(HWND hwndlg) {
   constexpr auto WPCLAMP = uint16_t {100U}; // max number of points in a wave form
   IniFile.wavePoints     = std::clamp(IniFile.wavePoints, uint16_t {3U}, WPCLAMP);
   if (IniFile.waveStart == IniFile.waveEnd) {
-	IniFile.waveEnd += (IniFile.wavePoints >> 2U);
+	IniFile.waveEnd += IniFile.wavePoints >> 2U;
   }
   IniFile.waveStart %= IniFile.wavePoints;
   IniFile.waveEnd %= IniFile.wavePoints;
@@ -1370,7 +1370,7 @@ void formForms::wavfrm() {
   }
   auto const count            = iPoint;
   auto       currentPosition  = F_POINT {};
-  auto const formVerticesSize = (IniFile.waveLobes * count) + 1 -
+  auto const formVerticesSize = IniFile.waveLobes * count + 1 -
                                 IniFile.wavePoints; // account for vertices already allocated by durpoli above
   FormVertices->resize(FormVertices->size() + formVerticesSize);
   firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // resize may invalidate iterator

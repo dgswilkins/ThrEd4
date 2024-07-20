@@ -72,7 +72,7 @@ class PCSHEADER // pcs file header structure
   }
 
   [[nodiscard]] auto isValid() const noexcept -> bool {
-	return (m_leadIn == LEADIN && m_colorCount == COLORCNT);
+	return m_leadIn == LEADIN && m_colorCount == COLORCNT;
   }
 
   constexpr void setHoopType(bool const flag) noexcept {
@@ -127,7 +127,7 @@ auto PCSHeader = PCSHEADER {}; // pcs file header
 auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
-      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      auxName.wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::crmsg(auxName);
 	return false;
@@ -301,7 +301,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 	return false;
   }
   auto const largeFlag =
-      (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
+      boundingSize.x > SHUPX || boundingSize.y > SHUPY ||
       (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
   auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
   PCSHeader.setHoopType(largeFlag);
@@ -318,7 +318,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
   if (minY < 0) {
 	delta.y = -minY;
   }
-  if ((delta.x != 0.0F) || (delta.y != 0.0F)) {
+  if (delta.x != 0.0F || delta.y != 0.0F) {
 	for (auto& offsetStitch : stitches) {
 	  offsetStitch += delta;
 	}
@@ -329,13 +329,13 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 auto PCS::isPCS(fs::path const& path) -> bool {
   auto extention = path.extension().wstring();
   std::ranges::transform(extention, extention.begin(), towlower);
-  return (extention.compare(0, 4, L".pcs") == 0);
+  return extention.compare(0, 4, L".pcs") == 0;
 }
 
 auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
-      CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
+      CreateFile(insertedFile.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
 	return false;

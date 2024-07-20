@@ -109,7 +109,7 @@ void repair::lodchk() {
 		formMap.set(tform);
 	  }
 	  else {
-		stitch.attribute &= (NFRMSK & NTYPMSK);
+		stitch.attribute &= NFRMSK & NTYPMSK;
 		stitch.attribute |= NOTFRM;
 	  }
 	}
@@ -198,7 +198,7 @@ auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 		}
 	  }
 	  if ((badData.attribute & BADSAT) == 0U) {
-		if (form.type == SAT && (form.satinGuideCount != 0U)) {
+		if (form.type == SAT && form.satinGuideCount != 0U) {
 		  chkSat(form, badData);
 		}
 	  }
@@ -234,7 +234,7 @@ void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.isEdgeClip()) {
 	badData.clip += form.clipEntries;
   }
-  if (form.type == SAT && (form.satinGuideCount != 0U)) {
+  if (form.type == SAT && form.satinGuideCount != 0U) {
 	badData.guideCount += form.satinGuideCount;
   }
   if (form.isTexture()) {
@@ -361,8 +361,8 @@ void ri::repclp(std::wstring& repairMessage) {
   auto clipPoint    = std::vector<F_POINT> {};
   for (auto& form : *FormList) {
 	// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
-	auto const clipDifference = (form.isClip())       ? form.clipIndex
-	                            : (form.isEdgeClip()) ? form.borderClipData
+	auto const clipDifference = form.isClip()       ? form.clipIndex
+	                            : form.isEdgeClip() ? form.borderClipData
 	                                                  : 0U;
 	// NOLINTEND(readability-avoid-nested-conditional-operator)
 	if (form.isClip()) {
@@ -382,7 +382,7 @@ void ri::repsat() {
   auto guideCount = 0U;
   auto badData    = BAD_COUNTS {};
   for (auto& form : *FormList) {
-	if (form.type != SAT || (form.satinGuideCount == 0U)) {
+	if (form.type != SAT || form.satinGuideCount == 0U) {
 	  continue;
 	}
 	auto const guideDifference = form.satinGuideIndex;

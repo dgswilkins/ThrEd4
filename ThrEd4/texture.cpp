@@ -251,7 +251,7 @@ void txi::redtbak() {
 
 void txi::rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
   auto dist           = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
-  TextureHistoryIndex = (dist == 0) ? wrap::toUnsigned(TextureHistory->size() - 1U) : --dist;
+  TextureHistoryIndex = dist == 0 ? wrap::toUnsigned(TextureHistory->size() - 1U) : --dist;
   texture->height     = 0;
   texture->width      = 0;
   texture->spacing    = 0;
@@ -316,7 +316,7 @@ void texture::redtx() {
 }
 
 void txi::txrfor() noexcept {
-  if (TextureHistoryIndex == (TextureHistory->size() - 1U)) {
+  if (TextureHistoryIndex == TextureHistory->size() - 1U) {
 	TextureHistoryIndex = 0;
 	return;
   }
@@ -338,7 +338,7 @@ auto txi::chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t
   }
 
   for (auto itHITP = historyItem.texturePoints.cbegin(); auto const& point : *TempTexturePoints) {
-	if ((point.line != itHITP->line) || !util::closeEnough(point.y, itHITP->y)) {
+	if (point.line != itHITP->line || !util::closeEnough(point.y, itHITP->y)) {
 	  return true;
 	}
 	++itHITP;
@@ -427,7 +427,7 @@ auto texture::dutxtfil() -> bool {
 
 void txi::txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept {
   screenPoint.x =
-      std::lround(((TextureScreen.spacing) * wrap::toFloat(texturePoint.line) + TextureScreen.xOffset) /
+      std::lround((TextureScreen.spacing * wrap::toFloat(texturePoint.line) + TextureScreen.xOffset) /
                   TextureScreen.editToPixelRatio);
   screenPoint.y =
       std::lround(wrap::toFloat(TextureScreen.height) -
@@ -503,7 +503,7 @@ void texture::drwtxtr() {
 	// ReSharper restore CppClangTidyClangDiagnosticUnusedValue
 #endif
   }
-  auto const flag = (pixelSpace > editSpace);
+  auto const flag = pixelSpace > editSpace;
   TextureScreen.editToPixelRatio =
       flag ? extraWidth / wrap::toFloat(StitchWindowClientRect.bottom)
            : TextureScreen.areaHeight * DBLF / wrap::toFloat(StitchWindowClientRect.bottom);
@@ -592,13 +592,13 @@ auto txi::px2txt(POINT const& offset) -> bool {
 	return false;
   }
   auto txPoint = TX_PNT {0.0F, wrap::round<uint16_t>(line)};
-  if ((txPoint.line > TextureScreen.lines) || (offset.y <= TextureScreen.top) ||
-      (offset.y > TextureScreen.bottom)) {
+  if (txPoint.line > TextureScreen.lines || offset.y <= TextureScreen.top ||
+      offset.y > TextureScreen.bottom) {
 	return false;
   }
   txPoint.y = TextureScreen.areaHeight -
-              (((wrap::toFloat(offset.y - TextureScreen.top)) / wrap::toFloat(TextureScreen.height)) *
-               TextureScreen.areaHeight);
+              (wrap::toFloat(offset.y - TextureScreen.top) / wrap::toFloat(TextureScreen.height)) *
+               TextureScreen.areaHeight;
   TempTexturePoints->push_back(txPoint);
   return true;
 }
@@ -654,7 +654,7 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
 	  closestTexturePoint = iPoint;
 	}
   }
-  return (std::sqrtf(wrap::toFloat(minimumLength)) < FCLOSNUF);
+  return std::sqrtf(wrap::toFloat(minimumLength)) < FCLOSNUF;
 }
 
 void txi::setxmov() {
@@ -759,7 +759,7 @@ void txi::setxclp(FRM_HEAD const& form) {
   deorg(screenOffset);
   px2ed(screenOffset, editorOffset);
   if (StateMap->testAndReset(StateFlag::TXHCNTR)) {
-	editorOffset.x = (wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing) * HALF +
+	editorOffset.x = wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing * HALF +
 	                 TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing * HALF;
   }
   else {
@@ -802,7 +802,7 @@ void txi::ed2txp(POINT const& offset, TX_PNT& textureRecord) {
   }
   textureRecord.line = wrap::round<uint16_t>(val);
   textureRecord.y    = TextureScreen.areaHeight -
-                    (((wrap::toFloat(offset.y - TextureScreen.top)) / wrap::toFloat(TextureScreen.height)) *
+                    ((wrap::toFloat(offset.y - TextureScreen.top) / wrap::toFloat(TextureScreen.height)) *
                      TextureScreen.areaHeight);
 }
 
@@ -1097,7 +1097,7 @@ void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uin
 void texture::deltx(uint32_t const formIndex) {
   auto const itForm = wrap::next(FormList->begin(), formIndex);
   auto const itNext = std::next(itForm);
-  if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->texture.count == 0U)) {
+  if (TexturePointsBuffer->empty() || !itForm->isTexture() || itForm->texture.count == 0U) {
 	return;
   }
   auto const& currentIndex = itForm->texture.index;
@@ -1481,7 +1481,7 @@ void txi::txnudg(int32_t const deltaX, float const deltaY) {
 	auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 	for (auto const& point : *SelectedTexturePointsList) {
 	  if (auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
-	      (yCoord < 0.0F) || (yCoord > TextureScreen.areaHeight)) {
+	      yCoord < 0.0F || yCoord > TextureScreen.areaHeight) {
 		return;
 	  }
 	}
@@ -1492,7 +1492,7 @@ void txi::txnudg(int32_t const deltaX, float const deltaY) {
   else {
 	for (auto const& point : *SelectedTexturePointsList) {
 	  if (auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
-	      (textureLine < 1) || (textureLine > TextureScreen.lines)) {
+	      textureLine < 1 || textureLine > TextureScreen.lines) {
 		return;
 	  }
 	}
@@ -1691,7 +1691,7 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 	    currentPoint.line != 0U) {
 	  auto const iSegment            = currentPoint.line - 1U;
 	  textureSegments[iSegment].line = iTexturePoint;
-	  ++(textureSegments[iSegment].stitchCount);
+	  ++textureSegments[iSegment].stitchCount;
 	}
   }
 }
@@ -1719,8 +1719,8 @@ void texture::rtrtx(FRM_HEAD const& form) {
 }
 
 auto txi::inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool {
-  return (stitch.x >= rectangle.left && stitch.x <= rectangle.right &&
-          stitch.y >= rectangle.bottom && stitch.y <= rectangle.top);
+  return stitch.x >= rectangle.left && stitch.x <= rectangle.right &&
+          stitch.y >= rectangle.bottom && stitch.y <= rectangle.top;
 }
 
 void texture::setshft() {
@@ -1763,6 +1763,6 @@ void texture::setshft() {
 }
 
 void texture::writeScreenWidth(int32_t const position) {
-  auto const scrWidth = displayText::format(IDS_TXWID, (TextureScreen.width * IPFGRAN));
+  auto const scrWidth = displayText::format(IDS_TXWID, TextureScreen.width * IPFGRAN);
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

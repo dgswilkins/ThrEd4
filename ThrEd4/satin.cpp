@@ -61,7 +61,7 @@ auto nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t;
 void outfn(FRM_HEAD const& form,
            uint32_t        start,
            uint32_t        finish,
-           float           satinWidth) noexcept(!(std::is_same_v<ptrdiff_t, int>));
+           float           satinWidth) noexcept(!std::is_same_v<ptrdiff_t, int>);
 void sacspac(uint32_t startGuide, uint32_t guideCount);
 void satclos();
 void satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t size);
@@ -88,7 +88,7 @@ auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-l
 void satin::delsac(uint32_t const formIndex) {
   auto& formList    = *FormList;
   auto& currentForm = formList[formIndex];
-  if (SatinGuides->empty() || currentForm.type != SAT || (currentForm.satinGuideCount == 0U)) {
+  if (SatinGuides->empty() || currentForm.type != SAT || currentForm.satinGuideCount == 0U) {
 	formList[formIndex].satinGuideCount = 0;
 	return;
   }
@@ -125,7 +125,7 @@ auto si::nusac(uint32_t const formIndex, uint32_t const guideCount) -> uint32_t 
   auto const& formList   = *FormList;
   for (auto const formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
        auto const& form : formRange) {
-	if (form.type == SAT && (form.satinGuideCount != 0U)) {
+	if (form.type == SAT && form.satinGuideCount != 0U) {
 	  guideIndex += form.satinGuideCount;
 	}
   }
@@ -150,7 +150,7 @@ void satin::spltsat(uint32_t const guideIndex) {
 	form.vertexIndex += 2;
   }
   auto iOldVertex = 0U;
-  auto const currentGuide = *(wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex));
+  auto const currentGuide = *wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex);
   auto const oldLastVertex = currentGuide.start + (firstForm.vertexCount - currentGuide.finish) + 1U;
   auto       iNewVertex    = oldLastVertex + 1U;
   auto const itFirstVertex = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
@@ -182,7 +182,7 @@ void satin::spltsat(uint32_t const guideIndex) {
   }
   itVertex = itFirstVertex;
   for (auto iVertex = 0U; iVertex < iNewVertex; ++iVertex) {
-	*(itVertex++) = vertexBuffer[iVertex];
+	*itVertex++ = vertexBuffer[iVertex];
   }
   firstForm.vertexCount = iOldVertex;
   auto& nextForm        = FormList->operator[](wrap::toSize(ClosestFormToCursor) + 1U);
@@ -199,12 +199,12 @@ void satin::spltsat(uint32_t const guideIndex) {
 	firstForm.wordParam = currentGuide.start;
   }
   for (auto iGuide = guideIndex; iGuide < firstForm.satinGuideCount; ++iGuide) {
-	itGuide->start -= (currentGuide.start - 1);
-	itGuide->finish -= (currentGuide.start - 1);
+	itGuide->start -= currentGuide.start - 1;
+	itGuide->finish -= currentGuide.start - 1;
 	++itGuide;
   }
   if (nextForm.wordParam != 0U) {
-	nextForm.wordParam -= (currentGuide.start - 1);
+	nextForm.wordParam -= currentGuide.start - 1;
   }
   auto const offset      = firstForm.satinGuideIndex + guideIndex;
   auto const itThisGuide = wrap::next(SatinGuides->cbegin(), offset);
@@ -215,7 +215,7 @@ void satin::spltsat(uint32_t const guideIndex) {
   for (auto formRange = std::ranges::subrange(wrap::next(FormList->begin(), ClosestFormToCursor + 2U),
                                               FormList->end());
        auto& form : formRange) {
-	if ((form.type == SAT) && (form.satinGuideCount != 0U) && form.satinGuideIndex != 0U) {
+	if (form.type == SAT && form.satinGuideCount != 0U && form.satinGuideIndex != 0U) {
 	  --form.satinGuideIndex;
 	}
   }
@@ -261,20 +261,20 @@ void si::satclos() {
 	if (StartPoint == 0U) {
 	  ++StartPoint;
 	}
-	if (StartPoint == form.vertexCount - 2 && closestVertex == (form.vertexCount) - 1) {
+	if (StartPoint == form.vertexCount - 2 && closestVertex == form.vertexCount - 1) {
 	  StartPoint    = 1;
 	  closestVertex = form.vertexCount - 2U;
 	}
-	if (closestVertex >= (form.vertexCount) - 2U) {
+	if (closestVertex >= form.vertexCount - 2U) {
 	  closestVertex = form.vertexCount - 2U;
-	  if (StartPoint >= (form.vertexCount) - 2U) {
+	  if (StartPoint >= form.vertexCount - 2U) {
 		StartPoint = form.vertexCount - 2U;
 	  }
 	}
 	if (closestVertex - StartPoint < 2U) {
 	  closestVertex = StartPoint + 2U;
 	  if (closestVertex > form.vertexCount - 2) {
-		closestVertex = (form.vertexCount - 2U);
+		closestVertex = form.vertexCount - 2U;
 		StartPoint    = closestVertex - 2U;
 	  }
 	}
@@ -334,7 +334,7 @@ auto si::satselfn() -> bool {
   for (auto& form : *FormList) {
 	if (auto const layerCode =
 	        gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
-	    (ActiveLayer != 0U) && (layerCode != 0U) && layerCode != ActiveLayer) {
+	    ActiveLayer != 0U && layerCode != 0U && layerCode != ActiveLayer) {
 	  continue;
 	}
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -373,7 +373,7 @@ void satin::satsel() {
 void si::satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t const size) {
   auto const& currentFormGuides = form.satinGuideIndex;
   auto const  startGuide        = wrap::next(SatinGuides->cbegin(), currentFormGuides);
-  auto const  endGuide          = wrap::next(startGuide, (form.satinGuideCount - size));
+  auto const  endGuide          = wrap::next(startGuide, form.satinGuideCount - size);
   SatinGuides->erase(startGuide, endGuide);
   auto const itGuide = wrap::next(SatinGuides->begin(), currentFormGuides);
   std::ranges::copy(source, itGuide);
@@ -409,7 +409,7 @@ void satin::satadj(FRM_HEAD& form) {
   auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
   for (auto vertexRange = std::ranges::subrange(itFirstGuide, wrap::next(itFirstGuide, form.satinGuideCount));
        auto& guide : vertexRange) {
-	auto const endCount = (form.vertexCount - 1);
+	auto const endCount = form.vertexCount - 1;
 
 	guide.finish = std::min(guide.finish, endCount);
 	guide.start  = std::min(guide.start, endCount);
@@ -421,13 +421,13 @@ void satin::satadj(FRM_HEAD& form) {
                [](const SAT_CON& guide) { return guide.start != guide.finish; });
   auto iDestination = wrap::toUnsigned(interiorGuides.size());
   if (currentGuidesCount > iDestination) {
-	outDebugString(L"Removed {} zero distance guides\n", (currentGuidesCount - iDestination));
+	outDebugString(L"Removed {} zero distance guides\n", currentGuidesCount - iDestination);
 	si::satcpy(form, interiorGuides, iDestination);
 	itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 	currentGuidesCount = iDestination;
   }
   auto const endGuide = form.wordParam;
-  if ((endGuide != 0U) || ((form.attribute & FRMEND) != 0U)) {
+  if (endGuide != 0U || (form.attribute & FRMEND) != 0U) {
 	// there are end guides so set the satinMap for the next step
 	satinMap.reset();
 	if ((form.attribute & FRMEND) != 0U) {
@@ -448,7 +448,7 @@ void satin::satadj(FRM_HEAD& form) {
 	             });
 	iDestination = wrap::toUnsigned(interiorGuides.size());
 	if (currentGuidesCount > iDestination) {
-	  outDebugString(L"Removed {} end guides\n", (currentGuidesCount - iDestination));
+	  outDebugString(L"Removed {} end guides\n", currentGuidesCount - iDestination);
 	  si::satcpy(form, interiorGuides, iDestination);
 	  itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 	  currentGuidesCount = iDestination;
@@ -462,7 +462,7 @@ void satin::satadj(FRM_HEAD& form) {
 	               [endGuide](const auto& guide) { return guide.start < endGuide; });
 	  iDestination = wrap::toUnsigned(interiorGuides.size());
 	  if (currentGuidesCount > iDestination) {
-		outDebugString(L"Removed {} reversed guides\n", (currentGuidesCount - iDestination));
+		outDebugString(L"Removed {} reversed guides\n", currentGuidesCount - iDestination);
 		si::satcpy(form, interiorGuides, iDestination);
 		itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 		form.satinGuideCount = iDestination;
@@ -485,10 +485,10 @@ void satin::satadj(FRM_HEAD& form) {
 		  if (iReverse != 0U) {
 			--iReverse;
 		  }
-		  while (satinMap.test(iForward) && (iForward < ((endGuide)-1))) {
+		  while (satinMap.test(iForward) && iForward < endGuide-1) {
 			++iForward;
 		  }
-		  while ((iReverse != 0U) && (satinMap.test(iReverse))) {
+		  while (iReverse != 0U && satinMap.test(iReverse)) {
 			--iReverse;
 		  }
 		  if (satinMap.test(iForward) && satinMap.test(iReverse)) {
@@ -542,13 +542,13 @@ void satin::satadj(FRM_HEAD& form) {
 		if (iForward < form.vertexCount - 1U) {
 		  ++iForward;
 		}
-		if (iReverse > (endGuide) + 1U) {
+		if (iReverse > endGuide + 1U) {
 		  --iReverse;
 		}
 		while (satinMap.test(iForward) && iForward < form.vertexCount - 1U) {
 		  ++iForward;
 		}
-		while (iReverse > (endGuide)-1 && (satinMap.test(iReverse))) {
+		while (iReverse > endGuide-1 && satinMap.test(iReverse)) {
 		  --iReverse;
 		}
 		if (satinMap.test(iForward) && satinMap.test(iReverse)) {
@@ -591,8 +591,8 @@ void satin::satadj(FRM_HEAD& form) {
 	  iGuide = currentGuidesCount;
 	}
 	currentGuidesCount = iGuide;
-	auto const end0    = (form.vertexCount - endGuide - 2U);
-	auto const end1    = (endGuide - 2U);
+	auto const end0    = form.vertexCount - endGuide - 2U;
+	auto const end1    = endGuide - 2U;
 	if (currentGuidesCount > end0) {
 	  currentGuidesCount = end0;
 	}
@@ -610,7 +610,7 @@ void satin::satadj(FRM_HEAD& form) {
 	auto const iGuide = savedGuideCount - currentGuidesCount;
 	outDebugString(L"Guides adjusted by {}, so updating forms\n", iGuide);
 	std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 1U), FormList->end(), [iGuide](auto& iForm) {
-	  if ((iForm.type == SAT) && (iForm.satinGuideIndex >= iGuide)) {
+	  if (iForm.type == SAT && iForm.satinGuideIndex >= iGuide) {
 		iForm.satinGuideIndex -= iGuide;
 	  }
 	});
@@ -622,11 +622,11 @@ void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
   auto const itGuide = wrap::next(SatinGuides->cbegin(), offset);
   SatinGuides->erase(itGuide);
   std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 1U), FormList->end(), [](auto& iForm) {
-	if ((iForm.type == SAT) && (iForm.satinGuideCount != 0U) && (iForm.satinGuideIndex != 0U)) {
+	if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex != 0U) {
 	  --iForm.satinGuideIndex;
 	}
   });
-  --(form.satinGuideCount);
+  --form.satinGuideCount;
   if (form.fillType == SATF) {
 	form::refil(ClosestFormToCursor);
   }
@@ -646,7 +646,7 @@ void satin::delspnt() {
   }
   if (currentForm.type == SAT && currentForm.fillType == SATF) {
 	if (ClosestVertexToCursor < currentForm.wordParam) {
-	  --(currentForm.wordParam);
+	  --currentForm.wordParam;
 	}
 	if (currentForm.satinGuideCount != 0U) {
 	  auto const itStartGuide = wrap::next(SatinGuides->begin(), currentForm.satinGuideIndex);
@@ -664,13 +664,13 @@ void satin::delspnt() {
 	  if (iGuide < currentForm.satinGuideCount &&
 	      (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor)) {
 		while (iGuide < currentForm.satinGuideCount) {
-		  *itGuide = *(std::next(itGuide));
+		  *itGuide = *std::next(itGuide);
 		  ++itGuide;
 		  ++iGuide;
 		}
-		--(currentForm.satinGuideCount);
+		--currentForm.satinGuideCount;
 		std::for_each(wrap::next(FormList->begin(), ClosestFormToCursor + 1U), FormList->end(), [](auto& iForm) {
-		  if (iForm.type == SAT && (iForm.satinGuideCount != 0U)) {
+		  if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
 			++iForm.satinGuideIndex;
 		  }
 		});
@@ -678,10 +678,10 @@ void satin::delspnt() {
 	  itGuide = itStartGuide;
 	  for (iGuide = 0; iGuide < currentForm.satinGuideCount; ++iGuide) {
 		if (itGuide->start > ClosestVertexToCursor) {
-		  --(itGuide->start);
+		  --itGuide->start;
 		}
 		if (itGuide->finish > ClosestVertexToCursor) {
-		  --(itGuide->finish);
+		  --itGuide->finish;
 		}
 		++itGuide;
 	  }
@@ -690,14 +690,14 @@ void satin::delspnt() {
   auto const closestVertexIt =
       wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
   FormVertices->erase(closestVertexIt);
-  --(currentForm.vertexCount);
-  if (ClosestVertexToCursor > (currentForm.vertexCount) - 1) {
+  --currentForm.vertexCount;
+  if (ClosestVertexToCursor > currentForm.vertexCount - 1) {
 	ClosestVertexToCursor = currentForm.vertexCount - 1U;
   }
   StateMap->set(StateFlag::FRMPSEL);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
-	--(form.vertexIndex);
+	--form.vertexIndex;
   }
   auto const itVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*itVertex);
@@ -729,7 +729,7 @@ void satin::satbrd() {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	for (auto const selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : *SelectedFormList) {
 	  auto& form = FormList->operator[](selectedForm);
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow_cast<decltype(form.attribute)>(SBLNT | FBLNT);
@@ -823,15 +823,15 @@ void satin::ribon() {
 	}
 	si::satends(FormList->operator[](ClosestFormToCursor), isBlunt, BorderWidth);
   }
-  newForm.vertexIndex    = (currentType == FRMLINE) ? thred::adflt(currentVertexCount * 2U)
-                                                    : thred::adflt((currentVertexCount * 2U) + 2U);
+  newForm.vertexIndex    = currentType == FRMLINE ? thred::adflt(currentVertexCount * 2U)
+                                                    : thred::adflt(currentVertexCount * 2U + 2U);
   auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
   auto       itVertex    = startVertex;
-  *(itVertex++)          = OutsidePoints->front();
-  itVertex               = (std::ranges::copy(*InsidePoints, itVertex)).out;
+  *itVertex++          = OutsidePoints->front();
+  itVertex               = std::ranges::copy(*InsidePoints, itVertex).out;
   if (currentType != FRMLINE) {
-	*(itVertex++) = InsidePoints->front();
-	*(itVertex++) = OutsidePoints->front();
+	*itVertex++ = InsidePoints->front();
+	*itVertex++ = OutsidePoints->front();
 
 	newForm.underlayIndent = IniFile.underlayIndent;
   }
@@ -960,8 +960,8 @@ void si::satfn(FRM_HEAD const&           form,
 	stitchCount = wrap::round<uint32_t>(fabs(line1Length) / LineSpacing);
   }
   // determine the segment stitch counts
-  auto const line1Segments = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
-  auto const line2Segments = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
+  auto const line1Segments = line1End > line1Start ? line1End - line1Start : line1Start - line1End;
+  auto const line2Segments = line2Start > line2End ? line2Start - line2End : line2End - line2Start;
   auto line1StitchCounts = std::vector<uint32_t> {};
   line1StitchCounts.reserve(line1Segments);
   auto line2StitchCounts = std::vector<uint32_t> {};
@@ -992,7 +992,7 @@ void si::satfn(FRM_HEAD const&           form,
   }
   line2StitchCounts.push_back(stitchCount - segmentStitchCount);
   // setup the initial vertices and stitch points
-  auto line1Point    = *(wrap::next(itFirstVertex, line1Start));
+  auto line1Point    = *wrap::next(itFirstVertex, line1Start);
   auto line1Next     = wrap::next(itFirstVertex, form::nxt(form, line1Start));
   auto line2Previous = wrap::next(itFirstVertex, form::prv(form, line2Start));
   auto line1Count    = line1StitchCounts[0];
@@ -1002,8 +1002,8 @@ void si::satfn(FRM_HEAD const&           form,
 
   auto itLine1Vertex = wrap::next(itFirstVertex, iLine1Vertex);
   auto line1Delta    = F_POINT {line1Next->x - itLine1Vertex->x, line1Next->y - itLine1Vertex->y};
-  auto line2Point    = (iLine2Vertex == form.vertexCount) ? *itFirstVertex
-                                                          : *(wrap::next(itFirstVertex, iLine2Vertex));
+  auto line2Point    = iLine2Vertex == form.vertexCount ? *itFirstVertex
+                                                          : *wrap::next(itFirstVertex, iLine2Vertex);
   auto line2Delta    = F_POINT {line2Previous->x - line2Point.x, line2Previous->y - line2Point.y};
   iLine1Vertex       = form::nxt(form, iLine1Vertex);
   iLine2Vertex       = form::prv(form, iLine2Vertex);
@@ -1014,17 +1014,17 @@ void si::satfn(FRM_HEAD const&           form,
   bool flag        = true;
   auto iLine1Count = 1U;
   auto iLine2Count = 1U;
-  auto stitchPoint = *(wrap::next(itFirstVertex, line1Start)); // intentional copy
+  auto stitchPoint = *wrap::next(itFirstVertex, line1Start); // intentional copy
   auto loop        = 0U;
 
   constexpr auto LOOPLIM = 20000U; // limit the iterations
   // loop until all the stitches have been calculated
-  while (flag && (loop < LOOPLIM)) {
+  while (flag && loop < LOOPLIM) {
 	flag = false;
 	++loop;
 	if (StateMap->test(StateFlag::FTHR)) {
 	  // feathered satin
-	  while ((line1Count != 0U) && (line2Count != 0U)) {
+	  while (line1Count != 0U && line2Count != 0U) {
 		line1Point += line1Step;
 		line2Point += line2Step;
 		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
@@ -1040,7 +1040,7 @@ void si::satfn(FRM_HEAD const&           form,
 	else {
 	  if (StateMap->test(StateFlag::BARSAT)) {
 		// bare satin
-		while ((line1Count != 0U) && (line2Count != 0U)) {
+		while (line1Count != 0U && line2Count != 0U) {
 		  line1Point += line1Step;
 		  line2Point += line2Step;
 		  // zig zag the stitches
@@ -1058,7 +1058,7 @@ void si::satfn(FRM_HEAD const&           form,
 	  }
 	  else {
 		// normal satin
-		while ((line1Count != 0U) && (line2Count != 0U)) {
+		while (line1Count != 0U && line2Count != 0U) {
 		  line1Point += line1Step;
 		  line2Point += line2Step;
 		  // check the direction of the stitches and reverse line 1 or line 2
@@ -1085,8 +1085,8 @@ void si::satfn(FRM_HEAD const&           form,
 	  }
 	}
 	// check if there are more stitches to calculate
-	if ((iLine1Count < line1Segments || iLine2Count < line2Segments)) {
-	  if ((line1Count == 0U) && iLine1Count < line1StitchCounts.size()) {
+	if (iLine1Count < line1Segments || iLine2Count < line2Segments) {
+	  if (line1Count == 0U && iLine1Count < line1StitchCounts.size()) {
 		// calculate the next segment stitch count for line 1
 		line1Count           = line1StitchCounts[iLine1Count++];
 		line1Next            = wrap::next(itFirstVertex, form::nxt(form, iLine1Vertex));
@@ -1095,7 +1095,7 @@ void si::satfn(FRM_HEAD const&           form,
 		iLine1Vertex         = form::nxt(form, iLine1Vertex);
 		line1Step            = line1Delta / wrap::toFloat(line1Count);
 	  }
-	  if ((line2Count == 0U) && iLine2Count < line2StitchCounts.size()) {
+	  if (line2Count == 0U && iLine2Count < line2StitchCounts.size()) {
 		// calculate the next segment stitch count for line 2
 		line2Count           = line2StitchCounts[iLine2Count++];
 		line2Previous        = wrap::next(itFirstVertex, form::prv(form, iLine2Vertex));
@@ -1104,7 +1104,7 @@ void si::satfn(FRM_HEAD const&           form,
 		iLine2Vertex         = form::prv(form, iLine2Vertex);
 		line2Step            = line2Delta / wrap::toFloat(line2Count);
 	  }
-	  if (((line1Count != 0U) || (line2Count != 0U)) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
+	  if ((line1Count != 0U || line2Count != 0U) && line1Count < MAXITEMS && line2Count < MAXITEMS) {
 		flag = true;
 	  }
 	}
@@ -1196,7 +1196,7 @@ void satin::satfil(FRM_HEAD& form) {
 		si::satmf(form, lengths);
 		break;
 	  }
-	  if (form.vertexCount == 3 && ((form.attribute & 1U) != 0)) {
+	  if (form.vertexCount == 3 && (form.attribute & 1U) != 0) {
 		si::satfn(form, lengths, 2, 3, 2, 1);
 		break;
 	  }
@@ -1206,7 +1206,7 @@ void satin::satfil(FRM_HEAD& form) {
 		auto const vNext = std::next(itFirstVertex);
 		OSequence->push_back(*vNext);
 	  }
-	  while ((iVertex < (form.vertexCount + 1U)) && (length > lengths[iVertex])) {
+	  while (iVertex < form.vertexCount + 1U && length > lengths[iVertex]) {
 		++iVertex;
 	  }
 	  auto const deltaA     = lengths[iVertex] - length;
@@ -1312,7 +1312,7 @@ void satin::satpnt1() {
 
 void si::filinsbw(std::vector<F_POINT>& satinBackup, F_POINT const& point, uint32_t& satinBackupIndex, F_POINT& stitchPoint) {
   satinBackup[satinBackupIndex++] = point;
-  satinBackupIndex &= (satinBackup.size() - 1U); // make sure that satinBackupIndex rolls over when it reaches the end of the buffer
+  satinBackupIndex &= satinBackup.size() - 1U; // make sure that satinBackupIndex rolls over when it reaches the end of the buffer
   form::filinsb(point, stitchPoint);
 }
 
@@ -1346,7 +1346,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t const start, ui
 	  outerPoint = intersection;
 	}
   }
-  auto count = wrap::round<uint32_t>(((outerLength > innerLength) ? outerLength : innerLength) / LineSpacing);
+  auto count = wrap::round<uint32_t>((outerLength > innerLength ? outerLength : innerLength) / LineSpacing);
   if (count == 0U) {
 	count = 1;
   }
@@ -1448,7 +1448,7 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
   }
   si::outfn(form, form.vertexCount - 1U, 0, satinWidth);
   StateMap->reset(StateFlag::INDIR);
-  if (count < (form.vertexCount / 2U)) {
+  if (count < form.vertexCount / 2U) {
 	StateMap->set(StateFlag::INDIR);
 	OutsidePoints = InsidePointList;
 	InsidePoints  = OutsidePointList;
@@ -1494,12 +1494,12 @@ auto si::satOffset(const uint32_t& finish, const uint32_t& start, float const sa
 void si::outfn(FRM_HEAD const& form,
                uint32_t const  start,
                uint32_t const  finish,
-               float const     satinWidth) noexcept(!(std::is_same_v<ptrdiff_t, int>)) {
+               float const     satinWidth) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   auto const offset =
-      (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT)
+      fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT
           ? F_POINT {0.0F, satinWidth}
           : satOffset(finish, start, satinWidth);
-  auto const itVertex = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
+  auto const itVertex = form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT
                             ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
                             : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
   InsidePoints->operator[](finish)  = *itVertex - offset;
