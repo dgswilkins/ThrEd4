@@ -714,6 +714,7 @@ auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
 		  SetWindowText(ThrEdWindow, fmtStr.c_str());
 		  EndDialog(hwndlg, TRUE);
+		  break;
 		}
 		default: {
 		  outDebugString(L"default hit in dnamproc 1: wparam [{}]\n", LOWORD(wparam));
