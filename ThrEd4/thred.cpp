@@ -158,7 +158,7 @@ void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
 void destroyBV() noexcept;
 
-auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 void doDrwInit();
 void doInitUnzoomed();
@@ -687,7 +687,7 @@ auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
 } // namespace
 
 // ReSharper disable CppParameterMayBeConst
-auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -701,7 +701,7 @@ auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 	case WM_COMMAND: {
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
-		  EndDialog(hwndlg, 0);
+		  EndDialog(hwndlg, FALSE);
 		  return TRUE;
 		}
 		case IDOK: {
@@ -713,7 +713,7 @@ auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  EndDialog(hwndlg, 0);
 		  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
 		  SetWindowText(ThrEdWindow, fmtStr.c_str());
-		  return TRUE;
+		  EndDialog(hwndlg, TRUE);
 		}
 		default: {
 		  outDebugString(L"default hit in dnamproc 1: wparam [{}]\n", LOWORD(wparam));
@@ -783,10 +783,7 @@ auto thred::getMsgBufferValue() -> float {
 }
 
 void thred::getdes() noexcept {
-  // ToDo - don't update values in DialogBox as then 'cancel' does not work
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, &thi::dnamproc);
 }
 
 auto thi::stlen(uint32_t const iStitch) -> float {
