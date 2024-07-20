@@ -48,9 +48,11 @@ auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   }
 }
 
+// ReSharper disable CppParameterMayBeConst
 void wrap::polyline(HDC hdc, POINT const* apt, uint32_t const cpt) noexcept {
   Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
+// ReSharper restore CppParameterMayBeConst
 
 auto wrap::pressed(int const virtKey) noexcept -> bool {
   constexpr auto HIGHBIT = 0x8000U;
