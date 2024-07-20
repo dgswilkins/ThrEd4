@@ -127,7 +127,7 @@ auto prfnwin(std::wstring const& text) noexcept -> HWND;
 void prftwin(std::wstring const& text) noexcept;
 void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount);
 
-auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
 auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
@@ -1140,7 +1140,7 @@ void ffi::handleTearInit(HWND hwndlg) {
 }
 
 // ReSharper disable CppParameterMayBeConst
-auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG:
@@ -1149,12 +1149,12 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	case WM_COMMAND: {
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
-		  EndDialog(hwndlg, 0);
+		  EndDialog(hwndlg, FALSE);
 		  return TRUE;
 		}
 		case IDOK:
 		  handleTearIDOK(hwndlg);
-		  EndDialog(hwndlg, 1);
+		  EndDialog(hwndlg, TRUE);
 		  break;
 		case IDC_DEFTEAR:
 		  handleTearDefault(hwndlg);
@@ -1180,13 +1180,11 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void formForms::setear() {
   thred::unmsg();
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
   if (auto const nResult = DialogBox(
-          ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
+          ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, &ffi::tearprc);
       nResult <= 0) {
 	return;
   }
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
   thred::savdo();
   constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
 
