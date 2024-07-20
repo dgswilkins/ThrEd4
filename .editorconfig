@@ -4,3 +4,6 @@ root=true
 spelling_languages = en-US
 spelling_exclusion_path = .\exclusion.dic
 spelling_checkable_types = comments
+resharper_cpp_inconsistent_naming_highlighting=none
+resharper_cpp_redundant_parentheses_highlighting=none
+resharper_cpp_use_structured_binding_highlighting=none
