@@ -12782,7 +12782,7 @@ auto thred::createChangeThreadSizeWindows() -> uint32_t {
 }
 
 void thred::updateUserColor() {
-  if (WinMsg.message == WM_LBUTTONDOWN && thi::nuCol(UserColor.at(VerticalIndex) != 0U)) {
+  if (WinMsg.message == WM_LBUTTONDOWN && thi::nuCol(UserColor.at(VerticalIndex)) != FALSE) {
 	savdo();
 	auto const itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
 	*itUserColor           = ColorStruct.rgbResult;
