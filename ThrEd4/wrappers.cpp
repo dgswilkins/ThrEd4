@@ -48,7 +48,7 @@ auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   }
 }
 
-void wrap::polyline(HDC const hdc, POINT const* apt, uint32_t const cpt) noexcept {
+void wrap::polyline(HDC hdc, POINT const* apt, uint32_t const cpt) noexcept {
   Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
@@ -58,7 +58,7 @@ auto wrap::pressed(int const virtKey) noexcept -> bool {
 }
 
 // ReSharper disable CppParameterMayBeConst
-void wrap::writeFile(HANDLE const file, LPCVOID buffer, uint32_t const bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
+void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t const bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
   WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 // ReSharper restore CppParameterMayBeConst
