@@ -210,7 +210,7 @@ void frmpos(FRM_HEAD& form, float deltaX, float deltaY) noexcept(!std::is_same_v
 void frmsnap(uint32_t start, uint32_t count) noexcept(!std::is_same_v<ptrdiff_t, int>);
 auto frmstch() -> bool;
 
-auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 void getbak();
 void getDocsFolder(fs::path& directory);
@@ -9092,7 +9092,7 @@ void thi::handleFeatherIDOK(HWND hwndlg) {
   if (IniFile.featherCount < 1) {
 	IniFile.featherCount = 1;
   }
-  EndDialog(hwndlg, 1);
+  EndDialog(hwndlg, TRUE);
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -9100,7 +9100,7 @@ void thi::handleFeatherIDOK(HWND hwndlg) {
 auto thi::handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
   switch (LOWORD(wparam)) {
 	case IDCANCEL: {
-	  EndDialog(hwndlg, 0);
+	  EndDialog(hwndlg, FALSE);
 	  return true;
 	}
 	case IDOK: {
@@ -9117,7 +9117,7 @@ auto thi::handleFeatherWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -9140,10 +9140,7 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 // ReSharper restore CppParameterMayBeConst
 
 void thred::dufdef() noexcept {
-  // ToDo - don't update values in DialogBox as then 'cancel' does not work
-  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionTypeStrict
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(thi::fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, clang-diagnostic-cast-function-type-strict)
-  // ReSharper restore CppClangTidyClangDiagnosticCastFunctionTypeStrict
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, &thi::fthdefprc);
 }
 
 auto thred::displayBackups() -> bool {
