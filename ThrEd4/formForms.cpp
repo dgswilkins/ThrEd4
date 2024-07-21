@@ -34,6 +34,7 @@
 #endif
 
 // Windows Header Files:
+#include <basetsd.h>
 #include <minwindef.h>
 #include <windef.h>
 #include <winnt.h>
