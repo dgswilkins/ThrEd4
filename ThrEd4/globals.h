@@ -17,6 +17,7 @@
 // Standard Libraries
 #include <filesystem>
 
+constexpr auto RES_SIZE = 26;  // reserved for expansion in the ThrEd v1.0 header
 constexpr auto UNDOLEN = 16U; // UndoBuffer length
 
 class FORM_VERTICES
@@ -41,6 +42,22 @@ class COL_CHANGE
   uint16_t stitchIndex {}; // stitch index
   uint16_t colorIndex {};  // color index
 };
+
+#pragma pack(push, 1)
+class THR_HEAD_EX // ThrEd v1.0 file header extension
+{
+  public:
+  float                        hoopSizeX {};         // hoop size x dimension
+  float                        hoopSizeY {};         // hoop size y dimension
+  float                        stgran {};            // stitches per millimeter
+  std::array<char, NAME_LEN>   creatorName {};       // name of the file creator
+  std::array<char, NAME_LEN>   modifierName {};      // name of last file modifier
+  int8_t                       auxFormat {};         // auxillary file format
+  int8_t                       stres {};             // reserved
+  uint32_t                     texturePointCount {}; // textured fill point count
+  std::array<int8_t, RES_SIZE> res {};               // reserved for expansion
+};
+#pragma pack(pop)
 
 namespace fs = std::filesystem;
 

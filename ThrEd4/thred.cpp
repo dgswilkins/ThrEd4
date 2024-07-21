@@ -365,7 +365,6 @@ constexpr auto NERCNT   = 4U;                     // number of entries in the ne
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
-constexpr auto RES_SIZE = 26;                     // reserved for expansion in the ThrEd v1.0 header
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
@@ -412,22 +411,6 @@ class THR_HEAD // ThrEd file header
   uint16_t dlineCount {};    // dline data count
   uint16_t clipDataLen {};   // points to clipboard data
   uint16_t clipDataCount {}; // clipboard data count
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-class THR_HEAD_EX // ThrEd v1.0 file header extension
-{
-  public:
-  float                        hoopSizeX {};         // hoop size x dimension
-  float                        hoopSizeY {};         // hoop size y dimension
-  float                        stgran {};            // stitches per millimeter
-  std::array<char, NAME_LEN>   creatorName {};       // name of the file creator
-  std::array<char, NAME_LEN>   modifierName {};      // name of last file modifier
-  int8_t                       auxFormat {};         // auxillary file format
-  int8_t                       stres {};             // reserved
-  uint32_t                     texturePointCount {}; // textured fill point count
-  std::array<int8_t, RES_SIZE> res {};               // reserved for expansion
 };
 #pragma pack(pop)
 
