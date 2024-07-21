@@ -917,6 +917,7 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
+  // set the daisy form parameters
   if (auto const nResult = DialogBox(
           ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, &ffi::dasyproc);
       nResult < 1) {
@@ -928,6 +929,7 @@ void formForms::dasyfrm() {
   auto form               = FRM_HEAD {};
   form.vertexIndex        = wrap::toUnsigned(FormVertices->size());
   form.attribute          = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
+  // Determine the width of a daisy based on the Zoom rectangle and the default width percent.
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
   auto const maximumYsize = ZoomRect.top - ZoomRect.bottom;
   maximumXsize            = std::max(maximumXsize, maximumYsize);
@@ -936,13 +938,14 @@ void formForms::dasyfrm() {
   auto       petalLength  = IniFile.daisyPetalLen;
   auto       holeDiameter = IniFile.daisyHoleDiameter;
   auto const ratio        = maximumXsize / (diameter + petalLength);
+  // now adjust on the ratio
   diameter *= ratio;
   petalLength *= ratio;
   holeDiameter *= ratio;
   form.type    = FRMFPOLY;
   auto iVertex = 0U;
   auto fref    = 0U;
-  if (UserFlagMap->test(UserFlag::DAZHOL)) {
+  if (UserFlagMap->test(UserFlag::DAZHOL)) { // add the hole at the center of the daisy
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
@@ -960,55 +963,55 @@ void formForms::dasyfrm() {
   auto       petalVertexCount = IniFile.daisyPetalCount * IniFile.daisyPetalPoints;
   auto       petalPointCount  = IniFile.daisyPetalPoints;
   auto const borderType       = IniFile.daisyBorderType;
-  if (borderType == DHART) {
+  if (borderType == DHART) { // update the petal count for heart shaped daisies
 	petalPointCount  = (IniFile.daisyHeartCount + 1U) * 2U;
 	petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
   }
   auto const petalSegmentAngle = PI_F2 / wrap::toFloat(petalVertexCount);
   auto const deltaPetalAngle   = PI_F / wrap::toFloat(IniFile.daisyPetalPoints);
-  if (UserFlagMap->test(UserFlag::DAZD)) {
+  if (UserFlagMap->test(UserFlag::DAZD)) { // add the satin guides
 	form.satinGuideCount = IniFile.daisyPetalCount - 1U;
 	form.wordParam       = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
 	form.satinGuideIndex = satin::adsatk(IniFile.daisyPetalCount - 1);
   }
   auto const halfPetalPointCount = IniFile.daisyPetalPoints / 2;
   auto       angle               = 0.0F;
-  for (auto iMacroPetal = 0U; iMacroPetal < IniFile.daisyPetalCount; ++iMacroPetal) {
+  for (auto iMacroPetal = 0U; iMacroPetal < IniFile.daisyPetalCount; ++iMacroPetal) { // add the petals
 	auto petalPointAngle = 0.0F;
 	PseudoRandomValue    = SEED;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
-	  switch (borderType) {
-		case DSIN: {
+	  switch (borderType) { 
+		case DSIN: { // sin wave
 		  distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
 		  petalPointAngle += deltaPetalAngle;
 		  break;
 		}
-		case DRAMP: {
+		case DRAMP: { // ramp
 		  distanceFromDaisyCenter =
 		      diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DSAW: {
+		case DSAW: { // sawtooth
 		  auto const sawPointCount =
 		      wrap::toFloat(iPoint > halfPetalPointCount ? IniFile.daisyPetalPoints - iPoint : iPoint);
 		  auto const offset = (sawPointCount / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  distanceFromDaisyCenter = diameter + offset;
 		  break;
 		}
-		case DRAG: {
+		case DRAG: { // ragged
 		  distanceFromDaisyCenter = diameter + wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
 		                                        wrap::toFloat(IniFile.daisyPetalPoints) * petalLength;
 		  break;
 		}
-		case DCOG: {
+		case DCOG: { // cog wheel
 		  distanceFromDaisyCenter = diameter;
 		  if (iPoint > halfPetalPointCount) {
 			distanceFromDaisyCenter += petalLength;
 		  }
 		  break;
 		}
-		case DHART: {
+		case DHART: { // heart shaped
 		  distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
 		  if (iPoint > IniFile.daisyHeartCount) {
 			petalPointAngle -= deltaPetalAngle;
