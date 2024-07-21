@@ -64,11 +64,11 @@ namespace fs = std::filesystem;
 class MY_SINGLE
 {
   public:
-  static auto getInstance() -> MY_SINGLE& {
+  static auto getInstance() -> MY_SINGLE* {
 	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
 	static MY_SINGLE instance;
 
-	return instance;
+	return &instance;
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
@@ -185,6 +185,7 @@ class MY_SINGLE
   };
 };
 
+extern MY_SINGLE*   Instance;
 extern uint8_t      ActiveColor;
 extern uint8_t      ActiveLayer;
 extern F_RECTANGLE* AllItemsRect;

@@ -42,6 +42,7 @@
 
 // clang-format off
 // ReSharper disable CppUseAuto
+MY_SINGLE*                     Instance                  = nullptr; // main instance
 uint8_t                        ActiveColor               = 0U;      // active color selector
 uint8_t                        ActiveLayer               = 0U;      // active layer
 F_RECTANGLE*                   AllItemsRect              = nullptr; // rectangle enclosing all forms and stitches

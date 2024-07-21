@@ -12206,116 +12206,116 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
 
 	if (RegisterClassEx(&winClass)) {
-	  auto& instance = MY_SINGLE::getInstance();
+	  Instance = MY_SINGLE::getInstance();
 
 	  constexpr auto COLSIZ        = int32_t {12}; // logical pixel width of the color bar
-	  instance.privateColorBarSize = COLSIZ;
-	  instance.privateFormControlPoints.resize(OUTPNTS);
-	  instance.privateDefaultColorWin.resize(COLORCNT);
-	  instance.privateLabelWindow.resize(LASTLIN);
+	  Instance->privateColorBarSize = COLSIZ;
+	  Instance->privateFormControlPoints.resize(OUTPNTS);
+	  Instance->privateDefaultColorWin.resize(COLORCNT);
+	  Instance->privateLabelWindow.resize(LASTLIN);
 	  constexpr auto MSGSIZ = uint32_t {8192U}; // size of the message buffer
-	  instance.privateMsgBuffer.reserve(MSGSIZ);
-	  instance.privateNearestPixel.resize(NERCNT);
-	  instance.privateNearestPoint.resize(NERCNT);
-	  instance.privateRubberBandLine.resize(3U);
+	  Instance->privateMsgBuffer.reserve(MSGSIZ);
+	  Instance->privateNearestPixel.resize(NERCNT);
+	  Instance->privateNearestPoint.resize(NERCNT);
+	  Instance->privateRubberBandLine.resize(3U);
 	  constexpr auto SCROLSIZ    = int32_t {12}; // logical pixel width of a scroll bar
-	  instance.privateScrollSize = SCROLSIZ;
-	  instance.privateSelectedFormsLine.resize(OUTPNTS);
-	  instance.privateSelectedPointsLine.resize(OUTPNTS);
+	  Instance->privateScrollSize = SCROLSIZ;
+	  Instance->privateSelectedFormsLine.resize(OUTPNTS);
+	  Instance->privateSelectedPointsLine.resize(OUTPNTS);
 	  constexpr auto SWCOUNT = 16U; // number of side windows to create/track
-	  instance.privateSideWindow.resize(SWCOUNT);
+	  Instance->privateSideWindow.resize(SWCOUNT);
 	  constexpr auto SWBLEN = 11U; // Side Window buffer length including the zero terminator
-	  instance.privateSideWindowEntryBuffer.resize(SWBLEN);
-	  instance.privateTextureHistory.resize(ITXBUFSZ);
-	  instance.privateThreadSizeWin.resize(COLORCNT);
+	  Instance->privateSideWindowEntryBuffer.resize(SWBLEN);
+	  Instance->privateTextureHistory.resize(ITXBUFSZ);
+	  Instance->privateThreadSizeWin.resize(COLORCNT);
 	  constexpr auto TSSSIZ = size_t {32U}; // size of the message buffer
-	  instance.privateThumbnailSearchString.reserve(TSSSIZ);
-	  instance.privateUserColorWin.resize(COLORCNT);
-	  instance.privateUserPen.resize(COLORCNT);
-	  instance.privateValueWindow.resize(LASTLIN);
-	  instance.privatePreviousNames.reserve(OLDNUM);
-	  instance.privateVersionNames.reserve(OLDVER);
+	  Instance->privateThumbnailSearchString.reserve(TSSSIZ);
+	  Instance->privateUserColorWin.resize(COLORCNT);
+	  Instance->privateUserPen.resize(COLORCNT);
+	  Instance->privateValueWindow.resize(LASTLIN);
+	  Instance->privatePreviousNames.reserve(OLDNUM);
+	  Instance->privateVersionNames.reserve(OLDVER);
 	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
-		instance.privatePreviousNames.emplace_back(L"");
+		Instance->privatePreviousNames.emplace_back(L"");
 	  }
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-		instance.privateVersionNames.emplace_back(L"");
+		Instance->privateVersionNames.emplace_back(L"");
 	  }
 
-	  AllItemsRect              = &instance.privateAllItemsRect;
-	  AngledFormVertices        = &instance.privateAngledFormVertices;
-	  AuxName                   = &instance.privateAuxName;
-	  BSequence                 = &instance.privateBSequence;
-	  ButtonWin                 = &instance.privateButtonWin;
-	  ClipBuffer                = &instance.privateClipBuffer;
-	  ClipPoints                = &instance.privateClipPoints;
-	  ColorBarSize              = &instance.privateColorBarSize;
-	  ColorChangeTable          = &instance.privateColorChangeTable;
-	  DefaultColorWin           = &instance.privateDefaultColorWin;
-	  DefaultDirectory          = &instance.privateDefaultDirectory;
-	  DesignerName              = &instance.privateDesignerName;
-	  ExtendedHeader            = &instance.privateExtendedHeader;
-	  FormAngles                = &instance.privateFormAngles;
-	  FormControlPoints         = &instance.privateFormControlPoints;
-	  FormLines                 = &instance.privateFormLines;
-	  FormList                  = &instance.privateFormList;
-	  FormOnOff                 = &instance.privateFormOnOff;
-	  FormVertices              = &instance.privateFormVertices;
-	  HomeDirectory             = &instance.privateHomeDirectory;
-	  IniFileName               = &instance.privateIniFileName;
-	  InsidePointList           = &instance.privateInsidePointList;
-	  InterleaveSequence        = &instance.privateInterleaveSequence;
-	  InterleaveSequenceIndices = &instance.privateInterleaveSequenceIndices;
-	  Knots                     = &instance.privateKnots;
-	  LabelWindow               = &instance.privateLabelWindow;
-	  LRUPtr                    = &instance.privateLRUMenuId;
-	  MenuInfo                  = &instance.privateMenuInfo;
-	  MsgBuffer                 = &instance.privateMsgBuffer;
-	  NearestPixel              = &instance.privateNearestPixel;
-	  NearestPoint              = &instance.privateNearestPoint;
-	  OSequence                 = &instance.privateOSequence;
-	  OutsidePointList          = &instance.privateOutsidePointList;
-	  PreviousNames             = &instance.privatePreviousNames;
-	  RubberBandLine            = &instance.privateRubberBandLine;
-	  SatinGuides               = &instance.privateSatinGuides;
-	  ScrollSize                = &instance.privateScrollSize;
-	  SearchLine                = &instance.privateSearchLine;
-	  SelectedFormList          = &instance.privateSelectedFormList;
-	  SelectedFormsLine         = &instance.privateSelectedFormsLine;
-	  SelectedPointsLine        = &instance.privateSelectedPointsLine;
-	  SideWindow                = &instance.privateSideWindow;
-	  SideWindowEntryBuffer     = &instance.privateSideWindowEntryBuffer;
-	  SortBuffer                = &instance.privateSortBuffer;
-	  StateMap                  = &instance.privateStateMap;
-	  StitchBuffer              = &instance.privateStitchBuffer;
-	  TempPolygon               = &instance.privateTempPolygon;
-	  TextureInputBuffer        = &instance.privatetextureInputBuffer;
-	  TexturePointsBuffer       = &instance.privateTexturePointsBuffer;
-	  ThrName                   = &instance.privateThrName;
-	  ThreadSizeWin             = &instance.privateThreadSizeWin;
-	  ThumbnailSearchString     = &instance.privateThumbnailSearchString;
-	  Thumbnails                = &instance.privateThumbnails;
-	  TracedEdges               = &instance.privateTracedEdges;
-	  TracedMap                 = &instance.privateTracedMap;
-	  UndoBuffer                = &instance.privateUndoBuffer;
-	  UserColorWin              = &instance.privateUserColorWin;
-	  UserFlagMap               = &instance.privateUserFlagMap;
-	  UserPen                   = &instance.privateUserPen;
-	  ValueWindow               = &instance.privateValueWindow;
-	  VersionNames              = &instance.privateVersionNames;
-	  WorkingFileName           = &instance.privateWorkingFileName;
+	  AllItemsRect              = &Instance->privateAllItemsRect;
+	  AngledFormVertices        = &Instance->privateAngledFormVertices;
+	  AuxName                   = &Instance->privateAuxName;
+	  BSequence                 = &Instance->privateBSequence;
+	  ButtonWin                 = &Instance->privateButtonWin;
+	  ClipBuffer                = &Instance->privateClipBuffer;
+	  ClipPoints                = &Instance->privateClipPoints;
+	  ColorBarSize              = &Instance->privateColorBarSize;
+	  ColorChangeTable          = &Instance->privateColorChangeTable;
+	  DefaultColorWin           = &Instance->privateDefaultColorWin;
+	  DefaultDirectory          = &Instance->privateDefaultDirectory;
+	  DesignerName              = &Instance->privateDesignerName;
+	  ExtendedHeader            = &Instance->privateExtendedHeader;
+	  FormAngles                = &Instance->privateFormAngles;
+	  FormControlPoints         = &Instance->privateFormControlPoints;
+	  FormLines                 = &Instance->privateFormLines;
+	  FormList                  = &Instance->privateFormList;
+	  FormOnOff                 = &Instance->privateFormOnOff;
+	  FormVertices              = &Instance->privateFormVertices;
+	  HomeDirectory             = &Instance->privateHomeDirectory;
+	  IniFileName               = &Instance->privateIniFileName;
+	  InsidePointList           = &Instance->privateInsidePointList;
+	  InterleaveSequence        = &Instance->privateInterleaveSequence;
+	  InterleaveSequenceIndices = &Instance->privateInterleaveSequenceIndices;
+	  Knots                     = &Instance->privateKnots;
+	  LabelWindow               = &Instance->privateLabelWindow;
+	  LRUPtr                    = &Instance->privateLRUMenuId;
+	  MenuInfo                  = &Instance->privateMenuInfo;
+	  MsgBuffer                 = &Instance->privateMsgBuffer;
+	  NearestPixel              = &Instance->privateNearestPixel;
+	  NearestPoint              = &Instance->privateNearestPoint;
+	  OSequence                 = &Instance->privateOSequence;
+	  OutsidePointList          = &Instance->privateOutsidePointList;
+	  PreviousNames             = &Instance->privatePreviousNames;
+	  RubberBandLine            = &Instance->privateRubberBandLine;
+	  SatinGuides               = &Instance->privateSatinGuides;
+	  ScrollSize                = &Instance->privateScrollSize;
+	  SearchLine                = &Instance->privateSearchLine;
+	  SelectedFormList          = &Instance->privateSelectedFormList;
+	  SelectedFormsLine         = &Instance->privateSelectedFormsLine;
+	  SelectedPointsLine        = &Instance->privateSelectedPointsLine;
+	  SideWindow                = &Instance->privateSideWindow;
+	  SideWindowEntryBuffer     = &Instance->privateSideWindowEntryBuffer;
+	  SortBuffer                = &Instance->privateSortBuffer;
+	  StateMap                  = &Instance->privateStateMap;
+	  StitchBuffer              = &Instance->privateStitchBuffer;
+	  TempPolygon               = &Instance->privateTempPolygon;
+	  TextureInputBuffer        = &Instance->privatetextureInputBuffer;
+	  TexturePointsBuffer       = &Instance->privateTexturePointsBuffer;
+	  ThrName                   = &Instance->privateThrName;
+	  ThreadSizeWin             = &Instance->privateThreadSizeWin;
+	  ThumbnailSearchString     = &Instance->privateThumbnailSearchString;
+	  Thumbnails                = &Instance->privateThumbnails;
+	  TracedEdges               = &Instance->privateTracedEdges;
+	  TracedMap                 = &Instance->privateTracedMap;
+	  UndoBuffer                = &Instance->privateUndoBuffer;
+	  UserColorWin              = &Instance->privateUserColorWin;
+	  UserFlagMap               = &Instance->privateUserFlagMap;
+	  UserPen                   = &Instance->privateUserPen;
+	  ValueWindow               = &Instance->privateValueWindow;
+	  VersionNames              = &Instance->privateVersionNames;
+	  WorkingFileName           = &Instance->privateWorkingFileName;
 
-	  bal::setBN0(&instance.privateBalaradName0);
-	  bal::setBN1(&instance.privateBalaradName1);
-	  bal::setBN2(&instance.privateBalaradName2);
-	  bitmap::setBBCV(&instance.privateBitmapBackgroundColor);
-	  bitmap::setUBfilename(&instance.privateUserBMPFileName);
-	  DST::setColFilename(&instance.privateColorFileName);
-	  DST::setRGBFilename(&instance.privateRGBFileName);
-	  texture::initTextures(&instance.privateTempTexturePoints,
-	                        &instance.privateSelectedTexturePointsList,
-	                        &instance.privateTextureHistory);
-	  tfc::setFVAS(&instance.privateFormVerticesAsLine);
+	  bal::setBN0(&Instance->privateBalaradName0);
+	  bal::setBN1(&Instance->privateBalaradName1);
+	  bal::setBN2(&Instance->privateBalaradName2);
+	  bitmap::setBBCV(&Instance->privateBitmapBackgroundColor);
+	  bitmap::setUBfilename(&Instance->privateUserBMPFileName);
+	  DST::setColFilename(&Instance->privateColorFileName);
+	  DST::setRGBFilename(&Instance->privateRGBFileName);
+	  texture::initTextures(&Instance->privateTempTexturePoints,
+	                        &Instance->privateSelectedTexturePointsList,
+	                        &Instance->privateTextureHistory);
+	  tfc::setFVAS(&Instance->privateFormVerticesAsLine);
 	  thi::redini();
 
 	  *MenuInfo = MENUITEMINFO {
@@ -12365,7 +12365,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  ScreenDPI     = &instance.privateDPI;
+	  ScreenDPI     = &Instance->privateDPI;
 	  *ScreenDPI    = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
 	  *ScrollSize   = MulDiv(*ScrollSize, *ScreenDPI, STDDPI);
 	  *ColorBarSize = MulDiv(*ColorBarSize, *ScreenDPI, STDDPI);
