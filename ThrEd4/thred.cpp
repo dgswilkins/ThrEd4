@@ -397,13 +397,6 @@ enum FileMenuItems : uint8_t {
   FM_ONAM3
 };
 
-class COL_CHANGE
-{
-  public:
-  uint16_t stitchIndex {}; // stitch index
-  uint16_t colorIndex {};  // color index
-};
-
 #pragma pack(push, 1)
 class THR_HEAD // ThrEd file header
 {

@@ -35,6 +35,13 @@ class F_LSIZ
   float cy {};
 };
 
+class COL_CHANGE
+{
+  public:
+  uint16_t stitchIndex {}; // stitch index
+  uint16_t colorIndex {};  // color index
+};
+
 namespace fs = std::filesystem;
 
 extern uint8_t      ActiveColor;
