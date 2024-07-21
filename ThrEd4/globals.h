@@ -17,6 +17,7 @@
 // Standard Libraries
 #include <filesystem>
 
+constexpr auto OLDVER   = wchar_t {4}; // number of old file versions kept
 constexpr auto RES_SIZE = 26;  // reserved for expansion in the ThrEd v1.0 header
 constexpr auto UNDOLEN = 16U; // UndoBuffer length
 
@@ -69,6 +70,44 @@ class MY_SINGLE
 	static MY_SINGLE instance;
 
 	return &instance;
+  }
+
+  void initialize() {
+	constexpr auto COLSIZ         = int32_t {12}; // logical pixel width of the color bar
+	constexpr auto MSGSIZ = uint32_t {8192U}; // size of the message buffer
+	constexpr auto NERCNT         = 4U;               // number of entries in the near array;
+	constexpr auto SCROLSIZ       = int32_t {12};     // logical pixel width of a scroll bar
+	constexpr auto SWCOUNT        = 16U;              // number of side windows to create/track
+	constexpr auto SWBLEN         = 11U; // Side Window buffer length including the zero terminator
+	constexpr auto ITXBUFSZ       = uint32_t {16U}; // texture buffer depth
+	constexpr auto TSSSIZ         = size_t {32U};   // size of the message buffer
+	privateColorBarSize           = COLSIZ;
+	privateFormControlPoints.resize(OUTPNTS);
+	privateDefaultColorWin.resize(COLORCNT);
+	privateLabelWindow.resize(LASTLIN);
+	privateMsgBuffer.reserve(MSGSIZ);
+	privateNearestPixel.resize(NERCNT);
+	privateNearestPoint.resize(NERCNT);
+	privateRubberBandLine.resize(3U);
+	privateScrollSize = SCROLSIZ;
+	privateSelectedFormsLine.resize(OUTPNTS);
+	privateSelectedPointsLine.resize(OUTPNTS);
+	privateSideWindow.resize(SWCOUNT);
+	privateSideWindowEntryBuffer.resize(SWBLEN);
+	privateTextureHistory.resize(ITXBUFSZ);
+	privateThreadSizeWin.resize(COLORCNT);
+	privateThumbnailSearchString.reserve(TSSSIZ);
+	privateUserColorWin.resize(COLORCNT);
+	privateUserPen.resize(COLORCNT);
+	privateValueWindow.resize(LASTLIN);
+	privatePreviousNames.reserve(OLDNUM);
+	privateVersionNames.reserve(OLDVER);
+	for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
+	  privatePreviousNames.emplace_back(L"");
+	}
+	for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
+	  privateVersionNames.emplace_back(L"");
+	}
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)

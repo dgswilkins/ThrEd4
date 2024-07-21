@@ -91,11 +91,13 @@
 #include <bitset>
 #include <cctype>
 #include <cmath>
-#include <cstring>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
+#include <cstring>
 #include <cwchar>
 #include <cwctype>
+#include <exception>
 #include <filesystem>
 #include <iterator>
 #include <limits>
@@ -355,15 +357,12 @@ constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
 constexpr auto FLTPES   = COMDLG_FILTERSPEC {L"Brother", L"*.pes"};
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
-constexpr auto ITXBUFSZ = uint32_t {16U};         // texture buffer depth
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
 constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
 constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
 constexpr auto MINZUMF  = float {MINZUM};         // minimum zoom in stitch points
-constexpr auto NERCNT   = 4U;                     // number of entries in the near array;
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
-constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
@@ -12207,39 +12206,20 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
 	if (RegisterClassEx(&winClass)) {
 	  Instance = MY_SINGLE::getInstance();
-
-	  constexpr auto COLSIZ        = int32_t {12}; // logical pixel width of the color bar
-	  Instance->privateColorBarSize = COLSIZ;
-	  Instance->privateFormControlPoints.resize(OUTPNTS);
-	  Instance->privateDefaultColorWin.resize(COLORCNT);
-	  Instance->privateLabelWindow.resize(LASTLIN);
-	  constexpr auto MSGSIZ = uint32_t {8192U}; // size of the message buffer
-	  Instance->privateMsgBuffer.reserve(MSGSIZ);
-	  Instance->privateNearestPixel.resize(NERCNT);
-	  Instance->privateNearestPoint.resize(NERCNT);
-	  Instance->privateRubberBandLine.resize(3U);
-	  constexpr auto SCROLSIZ    = int32_t {12}; // logical pixel width of a scroll bar
-	  Instance->privateScrollSize = SCROLSIZ;
-	  Instance->privateSelectedFormsLine.resize(OUTPNTS);
-	  Instance->privateSelectedPointsLine.resize(OUTPNTS);
-	  constexpr auto SWCOUNT = 16U; // number of side windows to create/track
-	  Instance->privateSideWindow.resize(SWCOUNT);
-	  constexpr auto SWBLEN = 11U; // Side Window buffer length including the zero terminator
-	  Instance->privateSideWindowEntryBuffer.resize(SWBLEN);
-	  Instance->privateTextureHistory.resize(ITXBUFSZ);
-	  Instance->privateThreadSizeWin.resize(COLORCNT);
-	  constexpr auto TSSSIZ = size_t {32U}; // size of the message buffer
-	  Instance->privateThumbnailSearchString.reserve(TSSSIZ);
-	  Instance->privateUserColorWin.resize(COLORCNT);
-	  Instance->privateUserPen.resize(COLORCNT);
-	  Instance->privateValueWindow.resize(LASTLIN);
-	  Instance->privatePreviousNames.reserve(OLDNUM);
-	  Instance->privateVersionNames.reserve(OLDVER);
-	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
-		Instance->privatePreviousNames.emplace_back(L"");
+	  try {
+		Instance->initialize();
 	  }
-	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-		Instance->privateVersionNames.emplace_back(L"");
+	  catch (std::bad_alloc const&) {
+		outDebugString(L"Memory allocation failure\n");
+		return EXIT_FAILURE;
+	  }
+	  catch (std::exception const& e) {
+		outDebugString(L"Exception caught: {}\n", static_cast<const void*>(e.what()));
+		return EXIT_FAILURE;
+	  }
+	  catch (...) {
+		outDebugString(L"Unknown exception caught\n");
+		return EXIT_FAILURE;
 	  }
 
 	  AllItemsRect              = &Instance->privateAllItemsRect;
