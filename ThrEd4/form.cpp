@@ -4416,6 +4416,7 @@ void fi::durgn(FRM_HEAD const&                form,
                uint32_t&                      lastGroup,
                uint32_t const                 sequencePathIndex,
                std::vector<F_POINT>&          workingFormVertices) {
+  // ReSharper disable once CppTemplateArgumentsCanBeDeduced
   auto        sequenceMap   = boost::dynamic_bitset<>(lineCount);
   auto        nextGroup     = gsl::narrow_cast<uint32_t>(sequencePath[pthi].nextGroup);
   auto const  iRegion       = sequencePath[pthi].node;
@@ -4677,6 +4678,7 @@ void fi::lcon(FRM_HEAD const&              form,
   }
   regions.back().end        = lineCount - 1U;
   auto const regionCount    = wrap::toUnsigned(regions.size());
+  // ReSharper disable once CppTemplateArgumentsCanBeDeduced
   auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
   for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 	auto count = 0U;

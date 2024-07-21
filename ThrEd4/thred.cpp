@@ -6140,6 +6140,7 @@ void thred::delet() {
 	savdo();
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
+	// ReSharper disable once CppTemplateArgumentsCanBeDeduced
 	auto vertexMap         = boost::dynamic_bitset<>(form.vertexCount);
 	auto currentFormVertex = SelectedFormVertices.start;
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
