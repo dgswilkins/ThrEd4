@@ -373,29 +373,6 @@ constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeter
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 } // namespace
 
-// file menu items
-enum FileMenuItems : uint8_t {
-  FM_NEW,
-  FM_OPEN,
-  FM_CLOS,
-  FM_THUMB,
-  FM_OPNPCS,
-  FM_INSRT,
-  FM_OVRLAY,
-  FM_SAV,
-  FM_SAVAS,
-  FM_LODBIT,
-  FM_SAVBIT,
-  FM_HIDBIT,
-  FM_RMVBIT,
-  FM_PURG,
-  FM_LOCK,
-  FM_ONAM0,
-  FM_ONAM1,
-  FM_ONAM2,
-  FM_ONAM3
-};
-
 #pragma pack(push, 1)
 class THR_HEAD // ThrEd file header
 {
@@ -413,107 +390,6 @@ class THR_HEAD // ThrEd file header
   uint16_t clipDataCount {}; // clipboard data count
 };
 #pragma pack(pop)
-
-class MY_SINGLE
-{
-  public:
-  static auto getInstance() -> MY_SINGLE& {
-	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
-	static MY_SINGLE instance;
-
-	return instance;
-  }
-
-  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  F_RECTANGLE               privateAllItemsRect;
-  std::vector<F_POINT>      privateAngledFormVertices;
-  fs::path                  privateAuxName;
-  std::vector<COLORREF>     privateBitmapBackgroundColor;
-  std::vector<B_SEQ_PNT>    privateBSequence;
-  fs::path                  privateBalaradName0;
-  fs::path                  privateBalaradName1;
-  fs::path                  privateBalaradName2;
-  std::vector<HWND>         privateButtonWin;
-  std::vector<F_POINT_ATTR> privateClipBuffer;
-  std::vector<F_POINT>      privateClipPoints;
-  int32_t                   privateColorBarSize = 0;
-  fs::path                  privateColorFileName;
-  std::vector<COL_CHANGE>   privateColorChangeTable;
-  std::vector<HWND>         privateDefaultColorWin;
-  fs::path                  privateDefaultDirectory;
-  std::wstring              privateDesignerName;
-  int32_t                   privateDPI = 0;
-  THR_HEAD_EX               privateExtendedHeader;
-  std::vector<float>        privateFormAngles;
-  std::vector<POINT>        privateFormControlPoints;
-  std::vector<POINT>        privateFormLines;
-  std::vector<FRM_HEAD>     privateFormList;
-  std::wstring              privateFormOnOff;
-  std::vector<F_POINT>      privateFormVertices;
-  std::vector<POINT>        privateFormVerticesAsLine;
-  fs::path                  privateHomeDirectory;
-  fs::path                  privateIniFileName;
-  std::vector<F_POINT>      privateInsidePointList;
-  std::vector<F_POINT>      privateInterleaveSequence;
-  std::vector<INS_REC>      privateInterleaveSequenceIndices;
-  std::vector<uint32_t>     privateKnots;
-  std::vector<HWND>         privateLabelWindow;
-
-  std::array<uint32_t, OLDNUM> privateLRUMenuId = {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-
-  MENUITEMINFO              privateMenuInfo = MENUITEMINFO {};
-  std::vector<wchar_t>      privateMsgBuffer;
-  std::vector<POINT>        privateNearestPixel;
-  std::vector<uint32_t>     privateNearestPoint;
-  std::vector<F_POINT>      privateOSequence;
-  std::vector<F_POINT>      privateOutsidePointList;
-  std::vector<fs::path>     privatePreviousNames;
-  fs::path                  privateRGBFileName;
-  std::vector<POINT>        privateRubberBandLine;
-  std::vector<SAT_CON>      privateSatinGuides;
-  int32_t                   privateScrollSize = 0;
-  std::vector<POINT>        privateSearchLine;
-  std::vector<uint32_t>     privateSelectedFormList;
-  std::vector<POINT>        privateSelectedFormsLine;
-  std::vector<POINT>        privateSelectedPointsLine;
-  std::vector<uint32_t>     privateSelectedTexturePointsList;
-  std::vector<HWND>         privateSideWindow;
-  std::vector<wchar_t>      privateSideWindowEntryBuffer;
-  std::vector<SEARCH_REC>   privateSortBuffer;
-  ENUM_MAP<StateFlag>       privateStateMap = ENUM_MAP<StateFlag> {0};
-  std::vector<F_POINT_ATTR> privateStitchBuffer;
-  std::vector<F_POINT>      privateTempPolygon;
-  std::vector<TX_PNT>       privateTempTexturePoints;
-  std::vector<TX_HIST>      privateTextureHistory;
-  std::vector<TX_PNT>       privateTexturePointsBuffer;
-  fs::path                  privateThrName;
-  std::vector<HWND>         privateThreadSizeWin;
-  std::vector<wchar_t>      privateThumbnailSearchString;
-  std::vector<std::wstring> privateThumbnails;
-  boost::dynamic_bitset<>   privateTracedEdges;
-  boost::dynamic_bitset<>   privateTracedMap;
-
-  std::array<std::vector<uint32_t>, UNDOLEN> privateUndoBuffer;
-
-  fs::path              privateUserBMPFileName;
-  std::vector<HWND>     privateUserColorWin;
-  ENUM_MAP<UserFlag>    privateUserFlagMap = ENUM_MAP<UserFlag> {0};
-  std::vector<HPEN>     privateUserPen;
-  std::vector<HWND>     privateValueWindow;
-  std::vector<fs::path> privateVersionNames;
-  fs::path              privateWorkingFileName;
-  std::wstring          privatetextureInputBuffer;
-  // NOLINTEND(misc-non-private-member-variables-in-classes)
-
-  MY_SINGLE(const MY_SINGLE&)                    = delete;
-  auto operator=(const MY_SINGLE&) -> MY_SINGLE& = delete;
-  MY_SINGLE(MY_SINGLE&&)                         = delete;
-  auto operator=(MY_SINGLE&&) -> MY_SINGLE&      = delete;
-
-  private:
-  MY_SINGLE()  = default;
-  ~MY_SINGLE() = default;
-};
 
 // main variables
 namespace {
