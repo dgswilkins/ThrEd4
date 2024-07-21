@@ -216,7 +216,7 @@ void bal::ritbal() {
 	*iBHC             = UserColor.at(color);
 	for (auto const& stitch : *StitchBuffer) {
 	  if (auto const stitchColor = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK); color != stitchColor) {
-		color     = stitchColor;
+		color   = stitchColor;
 		*iBHC++ = UserColor.at(color);
 		if (iBHC == bhcEnd) {
 		  break;

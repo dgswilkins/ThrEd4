@@ -179,9 +179,9 @@ void bui::redbak() {
 	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
 	ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
   }
-  constexpr auto UCOLSIZE = UserColor.size();
-  auto const spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
-  auto const spUserColors = gsl::span {UserColor};
+  constexpr auto UCOLSIZE     = UserColor.size();
+  auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+  auto const     spUserColors = gsl::span {UserColor};
   std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
   thred::refreshColors();
   TexturePointsBuffer->clear();

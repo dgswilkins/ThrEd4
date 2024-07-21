@@ -472,8 +472,7 @@ public:
   static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, GRDRED};
   static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, GRDBLU};
   static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRDGRN};
-  static constexpr auto GRID_CODES =
-      std::array {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
+  static constexpr auto GRID_CODES = std::array {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
 
   for (auto const& gridCode : GRID_CODES) {
 	if (color == gridCode.col) {
@@ -545,7 +544,7 @@ void menu::chkmen() {
   constexpr auto LASTCODE = DataCode.size();
   for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
 	auto const code = iCode == IniFile.dataCheck ? gsl::narrow_cast<UINT>(MF_CHECKED)
-	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
+	                                             : gsl::narrow_cast<UINT>(MF_UNCHECKED);
 	CheckMenuItem(MainMenu, DataCode.at(iCode), code);
   }
   StateMap->set(StateFlag::DUMEN);

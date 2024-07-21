@@ -581,12 +581,11 @@ void form::delmfil(uint32_t const formIndex) {
   clip::delmclp(formIndex);
   // find the first stitch to delete
   auto const codedForm = formIndex << FRMSHFT;
-  if (auto const firstStitch =
-          std::ranges::find_if(*StitchBuffer,
-                               [codedForm](F_POINT_ATTR const& stitch) -> bool {
-	                             return (stitch.attribute & (FRMSK | NOTFRM)) == codedForm &&
-	                                    (stitch.attribute & (TYPFRM | FTHMSK)) != 0U;
-                               });
+  if (auto const firstStitch = std::ranges::find_if(*StitchBuffer,
+                                                    [codedForm](F_POINT_ATTR const& stitch) -> bool {
+	                                                  return (stitch.attribute & (FRMSK | NOTFRM)) == codedForm &&
+	                                                         (stitch.attribute & (TYPFRM | FTHMSK)) != 0U;
+                                                    });
       firstStitch != StitchBuffer->end()) {
 	// we found the first stitch, so now delete the stitches in the form
 	StitchBuffer->erase(std::remove_if(firstStitch,
@@ -1331,7 +1330,7 @@ void form::flipv() {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	auto formMap   = boost::dynamic_bitset {FormList->size()}; // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+	auto formMap = boost::dynamic_bitset {FormList->size()}; // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	auto rectangle = F_RECTANGLE {};
 	pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.top + rectangle.bottom;
@@ -1474,7 +1473,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 	if (StateMap->test(StateFlag::FRMSAM) && iForm == formIndex) {
 	  continue;
 	}
-	auto&      currentForm = FormList->operator[](iForm);
+	auto& currentForm = FormList->operator[](iForm);
 	if (auto const formLayer = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
 	    ActiveLayer != 0U && formLayer != 0U && formLayer != layerCoded) {
 	  continue;
@@ -1603,7 +1602,7 @@ void form::chkseq(bool border) {
   auto userStitchLen = 0.0F;
   if (border) {
 	userStitchLen = form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN ? MAXSIZ * PFGRAN
-	                                                                             : form.edgeStitchLen;
+	                                                                           : form.edgeStitchLen;
   }
   else {
 	userStitchLen = form.isClip() ? MaxStitchLen : form.stitchLength;
@@ -2217,21 +2216,21 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t const sta
   constexpr auto LEVELSMAX = uint32_t {15U}; // max number of levels defined in the table
 
   auto constexpr LEVELS = std::array {LEVEL00.data(),
-                                                        LEVEL01.data(),
-                                                        LEVEL02.data(),
-                                                        LEVEL03.data(),
-                                                        LEVEL04.data(),
-                                                        LEVEL05.data(),
-                                                        LEVEL06.data(),
-                                                        LEVEL07.data(),
-                                                        LEVEL08.data(),
-                                                        LEVEL09.data(),
-                                                        LEVEL10.data(),
-                                                        LEVEL11.data(),
-                                                        LEVEL12.data(),
-                                                        LEVEL13.data(),
-                                                        LEVEL14.data(),
-                                                        LEVEL15.data()};
+                                      LEVEL01.data(),
+                                      LEVEL02.data(),
+                                      LEVEL03.data(),
+                                      LEVEL04.data(),
+                                      LEVEL05.data(),
+                                      LEVEL06.data(),
+                                      LEVEL07.data(),
+                                      LEVEL08.data(),
+                                      LEVEL09.data(),
+                                      LEVEL10.data(),
+                                      LEVEL11.data(),
+                                      LEVEL12.data(),
+                                      LEVEL13.data(),
+                                      LEVEL14.data(),
+                                      LEVEL15.data()};
 
   auto const innerDelta = F_POINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                    (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
@@ -2611,7 +2610,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  projectedPoints.clear();
 	  projectedPoints.reserve(currentVertexCount);
 	  currentX += step;
-	  auto iPoint      = 0U;
+	  auto       iPoint      = 0U;
 	  auto const vertexCheck = gsl::narrow<uint16_t>(currentVertexCount);
 	  for (auto iVertex = uint16_t {}; iVertex < vertexCheck; ++iVertex) {
 		auto const iNextVertex = (wrap::toSize(iVertex) + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
@@ -3200,7 +3199,9 @@ auto fi::clipComp(const gsl::not_null<CLIP_SORT const*> arg1,
   return false;
 }
 
-void fi::mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData, uint32_t const destination, uint32_t const source) noexcept {
+void fi::mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData,
+                uint32_t const           destination,
+                uint32_t const           source) noexcept {
   if (destination != source) {
 	arrayOfClipIntersectData[destination] = arrayOfClipIntersectData[source];
   }
@@ -3403,8 +3404,8 @@ auto fi::nucseg(std::vector<CLIP_SEG> const& clipSegments,
                 std::vector<LEN_INFO> const& sortedLengths,
                 uint32_t&                    currentSegmentIndex) -> bool {
   auto const index = StateMap->test(StateFlag::FILDIR) ? clipSegments[currentSegmentIndex].endIndex
-                                                         : clipSegments[currentSegmentIndex].beginIndex;
-  auto outIndex = 0U;
+                                                       : clipSegments[currentSegmentIndex].beginIndex;
+  auto       outIndex = 0U;
   if (clpnxt(clipSegments, sortedLengths, index, outIndex)) {
 	return false;
   }
@@ -4518,8 +4519,8 @@ void fi::durgn(FRM_HEAD const&                form,
 		auto mindif = BIGUINT;
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  if (auto const gdif = lineEndpoints[sortedLineIndices[ind]].group > lastGroup
-		                             ? lineEndpoints[sortedLineIndices[ind]].group - lastGroup
-		                             : lastGroup - lineEndpoints[sortedLineIndices[ind]].group;
+		                            ? lineEndpoints[sortedLineIndices[ind]].group - lastGroup
+		                            : lastGroup - lineEndpoints[sortedLineIndices[ind]].group;
 		      gdif < mindif) {
 			mindif = gdif;
 			seql   = ind;
@@ -4540,8 +4541,8 @@ void fi::durgn(FRM_HEAD const&                form,
 		auto mindif = BIGUINT;
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  if (auto const gdif = lineEndpoints[sortedLineIndices[ind]].group > nextGroup
-		                             ? lineEndpoints[sortedLineIndices[ind]].group - nextGroup
-		                             : nextGroup - lineEndpoints[sortedLineIndices[ind]].group;
+		                            ? lineEndpoints[sortedLineIndices[ind]].group - nextGroup
+		                            : nextGroup - lineEndpoints[sortedLineIndices[ind]].group;
 		      gdif < mindif) {
 			mindif = gdif;
 			seqn   = ind;
@@ -4676,10 +4677,10 @@ void fi::lcon(FRM_HEAD const&              form,
 	regions.emplace_back(iLine, 0U, 0U);
 	breakLine = lineEndpoints[sortedLineIndices[iLine]].line;
   }
-  regions.back().end        = lineCount - 1U;
-  auto const regionCount    = wrap::toUnsigned(regions.size());
+  regions.back().end     = lineCount - 1U;
+  auto const regionCount = wrap::toUnsigned(regions.size());
   // ReSharper disable once CppTemplateArgumentsCanBeDeduced
-  auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
+  auto visitedRegions = boost::dynamic_bitset<>(regionCount);
   for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 	auto count = 0U;
 	if (regions[iRegion].end - regions[iRegion].start <= 1) {
@@ -4834,7 +4835,6 @@ void fi::lcon(FRM_HEAD const&              form,
 }
 
 void fi::handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
-
   static constexpr auto SEQ_TABLE = std::array {
       12,
       7,
@@ -4905,7 +4905,6 @@ void fi::handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
 }
 
 void fi::handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
-
   static constexpr auto SEQ_TABLE = std::array {
       12,
       7,
@@ -5074,9 +5073,9 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
   auto const topDelta    = topRightPoint - topLeftPoint;
   auto const bottomDelta = bottomRightPoint - bottomLeftPoint;
   for (auto const& clip : *ClipBuffer) {
-	auto const clipRatio   = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
-	auto const topMidpoint = F_POINT {clipRatio.x * topDelta.x + topLeftPoint.x,
-	                                  clipRatio.y * topDelta.y + topLeftPoint.y};
+	auto const clipRatio = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
+	auto const topMidpoint =
+	    F_POINT {clipRatio.x * topDelta.x + topLeftPoint.x, clipRatio.y * topDelta.y + topLeftPoint.y};
 
 	auto const bottomMidpoint = F_POINT {clipRatio.x * bottomDelta.x + bottomLeftPoint.x,
 	                                     clipRatio.y * bottomDelta.y + bottomLeftPoint.y};
@@ -5100,7 +5099,7 @@ void fi::clpfm() {
 	auto const rightDelta  = F_POINT {bSeq2.x - bSeq3.x, bSeq2.y - bSeq3.y};
 
 	auto count = std::round(rightLength > leftLength ? leftLength / ClipRectSize.cy
-	                                                   : rightLength / ClipRectSize.cy);
+	                                                 : rightLength / ClipRectSize.cy);
 	if (count == 0.0F) {
 	  count = 1.0F;
 	}
@@ -5612,8 +5611,8 @@ void form::filangl() {
 }
 
 auto form::chkfrm(gsl::not_null<std::vector<POINT>*> const formControlPoints,
-                  std::vector<POINT>&                stretchBoxLine,
-                  float&                             xyRatio) -> bool {
+                  std::vector<POINT>&                      stretchBoxLine,
+                  float&                                   xyRatio) -> bool {
   auto const point = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;

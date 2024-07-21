@@ -35,10 +35,11 @@ template <class inType>
 auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
                                       (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>)))
     -> float {
-  static_assert(std::is_same_v<inType, double> || std::is_same_v<inType, char> || std::is_same_v<inType, int16_t> ||
-                 std::is_same_v<inType, int32_t> || std::is_same_v<inType, LONG> ||
-                 std::is_same_v<inType, uint8_t> || std::is_same_v<inType, uint16_t> ||
-                 std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint64_t>,
+  static_assert(std::is_same_v<inType, double> || std::is_same_v<inType, char> ||
+                    std::is_same_v<inType, int16_t> || std::is_same_v<inType, int32_t> ||
+                    std::is_same_v<inType, LONG> || std::is_same_v<inType, uint8_t> ||
+                    std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint32_t> ||
+                    std::is_same_v<inType, uint64_t>,
                 "cannot use wrap::toFloat here.");
   if constexpr (std::is_same_v<inType, double>) {
 	return util::doubleToFloat(invar);
@@ -60,7 +61,8 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape)
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
+constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>)
+    -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -71,7 +73,8 @@ constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(s
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape)
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
+constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>)
+    -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -108,8 +111,7 @@ auto sizeofVector(std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, s
 }
 
 template <class outType, class inType>
-auto ceil(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v<outType, float>)
-    -> outType {
+auto ceil(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v<outType, float>) -> outType {
   if constexpr (std::is_same_v<inType, float>) {
 	if constexpr (std::is_same_v<outType, float>) {
 	  return std::ceilf(invar);
@@ -131,8 +133,7 @@ auto ceil(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v
 auto createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
 
 template <class outType, class inType>
-auto floor(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v<outType, float>)
-    -> outType {
+auto floor(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v<outType, float>) -> outType {
   if constexpr (std::is_same_v<inType, float>) {
 	if constexpr (std::is_same_v<outType, float>) {
 	  return std::floorf(invar);
@@ -181,8 +182,8 @@ auto next(itType iterator,
                                    (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>)))
     -> itType {
   static_assert(std::is_same_v<inType, size_t> || std::is_same_v<inType, uint32_t> ||
-                 std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint8_t> ||
-                 std::is_same_v<inType, int> || std::is_same_v<inType, char>,
+                    std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint8_t> ||
+                    std::is_same_v<inType, int> || std::is_same_v<inType, char>,
                 "next cannot be used here.");
   if constexpr (std::is_same_v<inType, ptrdiff_t>) {
 	return std::next(iterator, index);
@@ -249,8 +250,7 @@ auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD by
 }
 
 template <class outType, class inType>
-auto round(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v<outType, float>)
-    -> outType {
+auto round(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_v<outType, float>) -> outType {
   if constexpr (std::is_same_v<inType, float>) {
 	if constexpr (std::is_same_v<outType, float>) {
 	  return std::roundf(invar);
@@ -305,8 +305,8 @@ auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || (std::is_same_v
                                                                   std::is_same_v<size_t, uint32_t>)))
     -> size_t {
   static_assert(std::is_signed_v<inType> || std::is_same_v<inType, uint64_t> ||
-                 std::is_same_v<inType, uint8_t> || std::is_same_v<inType, uint16_t> ||
-                 std::is_same_v<inType, uint32_t> || std::is_same_v<inType, DWORD>,
+                    std::is_same_v<inType, uint8_t> || std::is_same_v<inType, uint16_t> ||
+                    std::is_same_v<inType, uint32_t> || std::is_same_v<inType, DWORD>,
                 "cannot use wrap::toSize here.");
   if constexpr (std::is_signed_v<inType>) {
 	return gsl::narrow<size_t>(invar);
@@ -329,8 +329,9 @@ auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || (std::is_same_v
 template <class inType>
 auto toUnsigned(inType invar) noexcept(std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint16_t>)
     -> uint32_t {
-  static_assert(std::is_signed_v<inType> || std::is_same_v<inType, ptrdiff_t> || std::is_same_v<inType, uint16_t> ||
-                 std::is_same_v<inType, uint32_t> || std::is_same_v<inType, size_t>,
+  static_assert(std::is_signed_v<inType> || std::is_same_v<inType, ptrdiff_t> ||
+                    std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint32_t> ||
+                    std::is_same_v<inType, size_t>,
                 "cannot use wrap::toUnsigned here.");
   if constexpr (std::is_same_v<inType, uint16_t>) {
 	return gsl::narrow_cast<uint32_t>(invar);

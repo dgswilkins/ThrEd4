@@ -363,7 +363,7 @@ void ri::repclp(std::wstring& repairMessage) {
 	// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
 	auto const clipDifference = form.isClip()       ? form.clipIndex
 	                            : form.isEdgeClip() ? form.borderClipData
-	                                                  : 0U;
+	                                                : 0U;
 	// NOLINTEND(readability-avoid-nested-conditional-operator)
 	if (form.isClip()) {
 	  checkClip(clipDifference, form, clipPoint, clipCount, badClipCount);

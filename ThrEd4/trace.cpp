@@ -59,7 +59,7 @@ constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are
 constexpr auto BLUCOL   = uint32_t {0xff0000U}; // code for the color blue
 constexpr auto BLUMSK   = uint32_t {0x00ffffU}; // mask for the color blue
 constexpr auto BYTEMAXV = uint8_t {255U};       // max color value in a byte wide counter
-constexpr auto CCRATIO  = 1.0F / 255.0F;      // This is used to convert 0-255 to 0-1
+constexpr auto CCRATIO  = 1.0F / 255.0F;        // This is used to convert 0-255 to 0-1
 constexpr auto CHANLCNT = uint32_t {3U};        // number of color channels i.e. RGB
 constexpr auto GRNCOL   = uint32_t {0x00ff00U}; // code for the color green
 constexpr auto GRNMSK   = uint32_t {0xff00ffU}; // mask for the color green
@@ -145,8 +145,8 @@ auto CurrentTracePoint  = POINT {};                      // current point being 
 auto TraceDataSize      = uint32_t {};                   // size of the trace bitmap in double words
 auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
 auto TraceRGBFlag = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
-auto TraceRGBMask = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
-auto TraceRGB     = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
+auto TraceRGBMask = std::array {REDMSK, GRNMSK, BLUMSK};      // trace masks
+auto TraceRGB     = std::array {BLUCOL, GRNCOL, REDCOL};      // trace colors
 auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
 auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
 auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
@@ -159,9 +159,9 @@ auto HighColors       = std::array<uint32_t, CHANLCNT> {}; // separated upper re
 auto LowColors        = std::array<uint32_t, CHANLCNT> {}; // separated lower reference colors
 auto ColumnColor      = uint32_t {};                       // trace color column
 auto TraceShift       = std::array {0U, BYTSHFT, WRDSHFT}; // trace shift values
-auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {}; // red,green,and blue brushes
-auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr); // trace number input window
-auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
+auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {};   // red,green,and blue brushes
+auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr);   // trace number input window
+auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr);   // black pen
 } // namespace
 
 void trace::initColorRef() noexcept {
@@ -193,7 +193,7 @@ void trace::initTraceWindows() {
   auto iTraceBrush         = TraceBrush.begin();
   auto iTraceRGB           = TraceRGB.begin();
   for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
-	auto const channel       = gsl::narrow_cast<int32_t>(iRGB);
+	auto const channel     = gsl::narrow_cast<int32_t>(iRGB);
 	*iTraceControlWindow++ = ti::trcsub(ButtonWidth * channel, 0, ButtonHeight * TRWINROW01);
 	*iTraceSelectWindow++ = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW01, ButtonHeight);
 	*iTraceUpWindow++ = ti::trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW02, ButtonHeight);
@@ -456,9 +456,9 @@ void trace::trace() {
   }
   untrace();
   ti::tracwnd();
-  TraceDataSize    = bitmap::getrmap();
-  auto const spTBD = gsl::span(
-      TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
+  TraceDataSize = bitmap::getrmap();
+  auto const spTBD =
+      gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
   if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
 	if (StateMap->test(StateFlag::LANDSCAP)) {
@@ -645,7 +645,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 	case TRCD: { // was tracing down
 
 	  pixelIndex -= bitmap::getBitmapWidth() + 1; // look at the pixel down and to the left
-	  if (CurrentTracePoint.y == 0) {               // if we are at the bottom edge
+	  if (CurrentTracePoint.y == 0) {             // if we are at the bottom edge
 		traceDirection = TRCR;
 	  }
 	  else {
@@ -826,7 +826,7 @@ void ti::dutrac() {
 	  ++point;
 	}
 	auto const right = point < limit ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
-	                                   : bitmap::getBitmapWidth();
+	                                 : bitmap::getBitmapWidth();
 	point            = savedPoint;
 	limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	// find the left edge
@@ -851,8 +851,8 @@ void ti::dutrac() {
 	while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
 	  point += bitmap::getBitmapWidth();
 	}
-	auto const top = point < limit ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
-	auto       flag                = 0U;
+	auto const top  = point < limit ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
+	auto       flag = 0U;
 	auto       minimumEdgeDistance = BIGINT32;
 	if (left != 0) { // trace left edge
 	  minimumEdgeDistance = CurrentTracePoint.x - left;
@@ -952,8 +952,8 @@ void trace::trinit() {
 	TraceDataSize = bitmap::getrmap();
   }
   if (StateMap->test(StateFlag::MONOMAP)) {
-	auto const spTBD = gsl::span {
-	    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+	auto const spTBD =
+	    gsl::span {TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
 	auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
 	auto       highColor = color;
 	if (auto const pixel =
@@ -1388,7 +1388,7 @@ void trace::wasTrace1() {
 
 void trace::traceNumberInput(wchar_t const NumericCode) {
   auto itTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
-  *itTraceInputBuffer++ = NumericCode;
+  *itTraceInputBuffer++   = NumericCode;
   *itTraceInputBuffer     = 0;
   ++TraceMsgIndex;
   auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD));

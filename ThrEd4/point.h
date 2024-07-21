@@ -36,7 +36,7 @@ auto constexpr doubleToFloat(double value) -> float {
   catch (gsl::narrowing_error const& e) { // check if we are seeing a significant rounding error
 	UNREFERENCED_PARAMETER(e);
 	constexpr auto MINDBL = 4e-7; // small number for conversions
-	auto const var  = gsl::narrow_cast<float>(value);
+	auto const     var    = gsl::narrow_cast<float>(value);
 	if (auto const diff = abs(value - gsl::narrow_cast<double>(var)) / value; diff > MINDBL) {
 	  throw std::runtime_error("conversion error above limit");
 	}

@@ -127,8 +127,8 @@ void displayText::tabmsg(uint32_t const code, bool const top) {
 }
 
 void displayText::hsizmsg() {
-  auto const fmtStr = format2(
-      IDS_HSIZ, wrap::toFloat(UnzoomedRect.cx) * IPFGRAN, wrap::toFloat(UnzoomedRect.cy) * IPFGRAN);
+  auto const fmtStr =
+      format2(IDS_HSIZ, wrap::toFloat(UnzoomedRect.cx) * IPFGRAN, wrap::toFloat(UnzoomedRect.cy) * IPFGRAN);
   shoMsg(fmtStr, false);
 }
 
@@ -287,7 +287,7 @@ void di::sdmsg() {
 }
 
 void displayText::alrotmsg() {
- shoseln(IDS_ALLX, IDS_ROTAGIN);
+  shoseln(IDS_ALLX, IDS_ROTAGIN);
 }
 
 void displayText::shord() {

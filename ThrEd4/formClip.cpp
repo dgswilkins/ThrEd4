@@ -272,8 +272,8 @@ void fci::clipSelectedForm() {
 	if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
 	    (StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U) {
 	  savclp(spData[iDestination++],
-	              StitchBuffer->operator[](iTexture),
-	              StitchBuffer->operator[](iTexture).attribute & COLMSK);
+	         StitchBuffer->operator[](iTexture),
+	         StitchBuffer->operator[](iTexture).attribute & COLMSK);
 	}
 	++iTexture;
   }
@@ -393,7 +393,7 @@ void fci::clipSelectedForms() {
 	}
 	auto       startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.texture.index);
 	auto       endPoint   = wrap::next(startPoint, form.texture.count);
-	auto const spDest = gsl::span {std::next(textures, textureCount), form.texture.count};
+	auto const spDest     = gsl::span {std::next(textures, textureCount), form.texture.count};
 	std::copy(startPoint, endPoint, spDest.begin());
 	forms[iForm++].texture.index = textureCount;
 	textureCount += form.texture.count;
@@ -507,9 +507,7 @@ void fci::clipSelectedStitches() {
 	savclp(spData[0], StitchBuffer->operator[](iSource), length);
 	++iSource;
 	for (auto iStitch = 1U; iStitch < length; ++iStitch) {
-	  savclp(spData[iStitch],
-	              StitchBuffer->operator[](iSource),
-	              StitchBuffer->operator[](iSource).attribute & COLMSK);
+	  savclp(spData[iStitch], StitchBuffer->operator[](iSource), StitchBuffer->operator[](iSource).attribute & COLMSK);
 	  ++iSource;
 	}
 	GlobalUnlock(clipHandle);
@@ -712,9 +710,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const formOffset = wrap::toUnsigned(FormList->size());
 		for (auto& cForm : forms) {
 		  FormList->push_back(cForm);
-		  FormList->back().attribute =
-		      gsl::narrow_cast<decltype(cForm.attribute)>(cForm.attribute & NFRMLMSK) |
-		       gsl::narrow_cast<decltype(cForm.attribute)>(ActiveLayer << 1U);
+		  FormList->back().attribute = gsl::narrow_cast<decltype(cForm.attribute)>(cForm.attribute & NFRMLMSK) |
+		                               gsl::narrow_cast<decltype(cForm.attribute)>(ActiveLayer << 1U);
 		}
 		auto* ptrFormVertices = convertFromPtr<F_POINT*>(wrap::next(ptrForms, ClipFormsCount));
 		auto  currentVertex   = 0U;

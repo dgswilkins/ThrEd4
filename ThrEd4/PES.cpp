@@ -225,8 +225,8 @@ class PESTCH
   inline auto operator=(F_POINT const& rhs) -> PESTCH&;
 
   private:
-      int16_t m_x {};
-      int16_t m_y {};
+  int16_t m_x {};
+  int16_t m_y {};
 };
 #pragma pack(pop)
 
@@ -512,11 +512,11 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
   auto  thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
-  auto iColor      = 1U;
-  auto color       = StitchBuffer->front().attribute & COLMSK;
-  auto iPEC        = wrap::next(PESequivColors.begin(), color);
-  auto iPesColors  = pecHeader->pad.begin();
-  *iPesColors++    = *iPEC;
+  auto iColor     = 1U;
+  auto color      = StitchBuffer->front().attribute & COLMSK;
+  auto iPEC       = wrap::next(PESequivColors.begin(), color);
+  auto iPesColors = pecHeader->pad.begin();
+  *iPesColors++   = *iPEC;
   for (auto const stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
        auto const& stitch : stitchRange) {
 	if ((stitch.attribute & COLMSK) != color) {
@@ -665,7 +665,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto const pesColorCount = pecHeader->colorCount + 1U;
   auto const pesColors     = gsl::span {pecHeader->pad.data(), pesColorCount};
   auto colorMap = boost::dynamic_bitset(THTYPCNT); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  auto       iUserColor    = UserColor.begin();
+  auto iUserColor = UserColor.begin();
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
 	if (pesColors[iColor] < THTYPCNT) {
 	  if (colorMap.test_set(pesColors[iColor])) {

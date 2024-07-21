@@ -530,7 +530,7 @@ void xt::fthrfn(FRM_HEAD& form) {
   if (feather.phaseIndex == 0U) {
 	feather.phaseIndex = 1U;
   }
-  auto       ind = gsl::narrow_cast<uint32_t>(BSequence->size()) / (feather.phaseIndex << 2U);
+  auto ind = gsl::narrow_cast<uint32_t>(BSequence->size()) / (feather.phaseIndex << 2U);
   if (auto const res = gsl::narrow_cast<uint32_t>(BSequence->size()) % (feather.phaseIndex << 2U);
       res > feather.phaseIndex << 1U) {
 	++ind;
@@ -675,9 +675,9 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 	  InterleaveSequence->push_back(val);
 	}
 #else
-	constexpr auto MAXWLK = 54.0F; // max underlay/edge walk stitch length
-	constexpr auto MINWLK = 2.4F;  // min underlay/edge walk stitch length
-	form.underlayStitchLen          = std::clamp(form.underlayStitchLen, MINWLK, MAXWLK);
+	constexpr auto MAXWLK  = 54.0F; // max underlay/edge walk stitch length
+	constexpr auto MINWLK  = 2.4F;  // min underlay/edge walk stitch length
+	form.underlayStitchLen = std::clamp(form.underlayStitchLen, MINWLK, MAXWLK);
 
 	auto const underlayStitchLength = form.underlayStitchLen;
 	auto const iSeqMax              = OSequence->size() - 1U;
@@ -951,7 +951,9 @@ void xt::chkwlk(uint32_t const formIndex) {
   }
 }
 
-void xi::fnund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+void xi::fnund(uint32_t const                formIndex,
+               std::vector<RNG_COUNT> const& textureSegments,
+               std::vector<F_POINT>&         angledFormVertices) {
   auto& form = FormList->operator[](formIndex);
 
   auto const savedStitchSize = UserStitchLength;
@@ -969,7 +971,9 @@ void xi::fnund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSe
   UserStitchLength = savedStitchSize;
 }
 
-void xt::chkund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+void xt::chkund(uint32_t const                formIndex,
+                std::vector<RNG_COUNT> const& textureSegments,
+                std::vector<F_POINT>&         angledFormVertices) {
   if (auto const& form = FormList->operator[](formIndex); (form.extendedAttribute & AT_UND) != 0U) {
 	xi::fnund(formIndex, textureSegments, angledFormVertices);
   }
@@ -988,14 +992,14 @@ void xt::selalfrm() {
 
 auto xi::dutyp(uint32_t const attribute) noexcept -> uint32_t {
   auto const maskedAttribute = gsl::narrow_cast<DWORD>(attribute & SRTYPMSK);
-  auto bit = gsl::narrow_cast<DWORD>(std::bit_width(maskedAttribute));
+  auto       bit             = gsl::narrow_cast<DWORD>(std::bit_width(maskedAttribute));
   --bit;
   if (bit == 0) {
 	return 0U;
   }
-  auto const     result  = gsl::narrow_cast<uint8_t>((bit & B1MASK) - STSHFT);
+  auto const result = gsl::narrow_cast<uint8_t>((bit & B1MASK) - STSHFT);
   if (constexpr auto USRSTCH = 12U; result != USRSTCH || // check if bit 31 is set (user edited stitch)
-      (maskedAttribute & TYPATMSK) == 0) { // check if the stitch is a form stitch
+                                    (maskedAttribute & TYPATMSK) == 0) { // check if the stitch is a form stitch
 	return result & NIBMASK;
   }
   return 1U; // must be an applique stitch
@@ -1040,7 +1044,8 @@ auto xi::orComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC c
   return false;
 }
 
-auto xi::orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept -> bool {
+auto xi::orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept
+    -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1->form < record2->form) {
 	return true;
@@ -1069,18 +1074,18 @@ auto xi::chkrdun(std::vector<uint32_t> const& formFillCounter,
   return false;
 }
 
-auto xi::precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
-    -> double {
+auto xi::precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
+                  std::vector<O_REC*> const& pRecs,
+                  SORT_REC const&            sortRecord) -> double {
   auto currentRegion   = sortRecord.currentRegion;
   auto direction       = sortRecord.direction;
   auto formFillCounter = std::vector<uint32_t> {};
   formFillCounter.resize((FormList->size() + 2U) << 2U);
   auto totalJumps = 0U;
   while (chkrdun(formFillCounter, pRecs, sortRecord)) {
-	auto       minimumLength = BIGFLOAT;
-	auto const stitchIt      = direction
-	                               ? wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
-	                               : wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
+	auto minimumLength = BIGFLOAT;
+	auto const stitchIt = direction ? wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
+	                                : wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
 	  if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 		auto const& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
@@ -1618,23 +1623,23 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 		auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
-		ilData.output += gucon(
-		    form,
-		    *StitchBuffer,
-		    *itVertex,
-		    InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
-		    ilData.output,
-		    code);
+		ilData.output +=
+		    gucon(form,
+		          *StitchBuffer,
+		          *itVertex,
+		          InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+		          ilData.output,
+		          code);
 	  }
 	}
 	if (auto colpnt = F_POINT {}; lastcol(iSequence, colpnt)) {
 	  ilData.output +=
 	      gucon(form,
-	                *StitchBuffer,
-	                colpnt,
-	                InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
-	                ilData.output,
-	                code);
+	            *StitchBuffer,
+	            colpnt,
+	            InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
+	            ilData.output,
+	            code);
 	}
 	auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
 	auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
@@ -1662,8 +1667,8 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   StateMap->reset(StateFlag::ISEND);
   auto const& form = FormList->operator[](formIndex);
   InterleaveSequenceIndices->emplace_back(INS_REC {0, 0, wrap::toUnsigned(InterleaveSequence->size()), 0});
-  ilData.layerIndex = gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) |
-                      formIndex << FRMSHFT;
+  ilData.layerIndex =
+      gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) | formIndex << FRMSHFT;
   StateMap->reset(StateFlag::DIDSTRT);
   if (!StitchBuffer->empty()) {
 	auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
@@ -2470,8 +2475,7 @@ void xt::nudsiz() {
   }
   DesignSize =
       F_POINT {designSizeRect.right - designSizeRect.left, designSizeRect.top - designSizeRect.bottom};
-  if (auto const nResult = DialogBox(
-          ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, &xi::setsprc);
+  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, &xi::setsprc);
       nResult < 1) { // if result is 0 (parent invalid) or -1 (function failed) don't do anything
 	return;
   }

@@ -264,7 +264,7 @@ void bi::bitlin(gsl::span<uint8_t> const&  source,
                 gsl::span<uint32_t> const& destination,
                 COLORREF const             foreground,
                 COLORREF const             background) noexcept {
-  auto       dst       = destination.begin();
+  auto dst = destination.begin();
   for (auto const subSource = source.subspan(0, source.size() - 1U); auto const& src : subSource) {
 	auto bits = std::bitset<CHAR_BIT>(src);
 	for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
@@ -469,7 +469,7 @@ void bitmap::lodbmp(fs::path const& directory) {
   dest.resize(pleng);
   GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
   auto const filePart = fs::path {dest.data()};
-  auto saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
+  auto       saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
 #else
   auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());
 #endif
@@ -608,7 +608,7 @@ auto bitmap::ismap() noexcept -> bool {
 
 void bitmap::chkbit() {
   if (ismap() && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
-                          StateMap->test(StateFlag::WASBLAK))) {
+                  StateMap->test(StateFlag::WASBLAK))) {
 	StateMap->set(StateFlag::WASESC);
 	bfil(BackgroundColor);
   }

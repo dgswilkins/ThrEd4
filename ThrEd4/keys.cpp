@@ -386,7 +386,7 @@ auto kyi::handleHomeKey(bool& retflag) -> bool {
   }
   if (wrap::pressed(VK_SHIFT)) {
 	auto iColor = StateMap->testAndReset(StateFlag::SELBOX) ? thred::pt2colInd(ClosestPointIndex)
-	                                                          : thred::pt2colInd(GroupStitchIndex);
+	                                                        : thred::pt2colInd(GroupStitchIndex);
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  StateMap->set(StateFlag::GRPSEL);
 	}
@@ -459,7 +459,7 @@ auto kyi::handleEndKey(int32_t& retflag) -> bool {
   }
   if (wrap::pressed(VK_SHIFT)) {
 	auto const iColor = StateMap->testAndReset(StateFlag::SELBOX) ? thred::pt2colInd(ClosestPointIndex)
-	                                                                : thred::pt2colInd(GroupStitchIndex);
+	                                                              : thred::pt2colInd(GroupStitchIndex);
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  StateMap->set(StateFlag::GRPSEL);
 	}
@@ -537,8 +537,7 @@ void kyi::seldwn() {
   if (StateMap->test(StateFlag::SELBOX)) {
 	thred::unbox();
 	auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
-	while (ClosestPointIndex != 0U &&
-	       (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
+	while (ClosestPointIndex != 0U && (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 	  --ClosestPointIndex;
 	}
 	auto stitchCoordsInPixels = POINT {};

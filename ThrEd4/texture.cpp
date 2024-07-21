@@ -598,7 +598,7 @@ auto txi::px2txt(POINT const& offset) -> bool {
   }
   txPoint.y = TextureScreen.areaHeight -
               (wrap::toFloat(offset.y - TextureScreen.top) / wrap::toFloat(TextureScreen.height)) *
-               TextureScreen.areaHeight;
+                  TextureScreen.areaHeight;
   TempTexturePoints->push_back(txPoint);
   return true;
 }
@@ -1556,8 +1556,9 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  }
 	}
 	if (flag) {
-	  auto           character = wchar_t {};
-	   if (constexpr auto BUFFLEN = 8U; TextureInputBuffer->size() < BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
+	  auto character = wchar_t {};
+	  if (constexpr auto BUFFLEN = 8U;
+	      TextureInputBuffer->size() < BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
 		if (txi::txdig(keyCode, character)) {
 		  TextureInputBuffer->push_back(character);
 		}
@@ -1720,7 +1721,7 @@ void texture::rtrtx(FRM_HEAD const& form) {
 
 auto txi::inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool {
   return stitch.x >= rectangle.left && stitch.x <= rectangle.right &&
-          stitch.y >= rectangle.bottom && stitch.y <= rectangle.top;
+         stitch.y >= rectangle.bottom && stitch.y <= rectangle.top;
 }
 
 void texture::setshft() {

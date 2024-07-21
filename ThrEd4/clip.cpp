@@ -300,8 +300,8 @@ void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedDa
 void ci::setvct(uint32_t const vertexIndex,
                 uint32_t const start,
                 uint32_t const finish,
-                float&   clipAngle,
-                F_POINT& vector0) noexcept(!std::is_same_v<ptrdiff_t, int>) {
+                float&         clipAngle,
+                F_POINT&       vector0) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   auto const itVertex       = wrap::next(FormVertices->cbegin(), vertexIndex);
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);

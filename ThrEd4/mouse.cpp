@@ -1132,8 +1132,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
 	  if (StateMap->test(StateFlag::PRFACT) || StateMap->test(StateFlag::FORMIN) ||
-	       StateMap->test(StateFlag::POLIMOV) ||
-	      FormDataSheet != nullptr) {
+	      StateMap->test(StateFlag::POLIMOV) || FormDataSheet != nullptr) {
 		wrap::setCursor(ArrowCursor);
 		break;
 	  }
