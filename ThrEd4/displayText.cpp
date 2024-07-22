@@ -186,26 +186,26 @@ void displayText::crmsg(fs::path const& fileName) {
 
 void displayText::butxt(uint32_t const iButton, std::wstring const& buttonText) {
   if (!StateMap->test(StateFlag::WASTRAC) || iButton <= HNUM) {
-	SetWindowText(ButtonWin->operator[](iButton), buttonText.c_str());
+	SetWindowText(Instance->ButtonWin.operator[](iButton), buttonText.c_str());
 	return;
   }
   if (iButton != HMINLEN) {
 	auto const bText = loadStr(iButton - 4U + IDS_TRC0);
-	SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
+	SetWindowText(Instance->ButtonWin.operator[](iButton), bText.c_str());
 	return;
   }
   if (!StateMap->test(StateFlag::HIDMAP)) {
 	auto const bText = loadStr(IDS_TRC1S);
-	SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
+	SetWindowText(Instance->ButtonWin.operator[](iButton), bText.c_str());
 	return;
   }
   auto const bText = loadStr(IDS_TRC1H);
-  SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
+  SetWindowText(Instance->ButtonWin.operator[](iButton), bText.c_str());
 }
 
 void displayText::clrhbut(uint32_t const startButton) {
   for (auto const spButtons =
-           std::ranges::subrange(wrap::next(ButtonWin->begin(), startButton), ButtonWin->end());
+           std::ranges::subrange(wrap::next(Instance->ButtonWin.begin(), startButton), Instance->ButtonWin.end());
        auto const iButton : spButtons) { // NOLINT(readability-qualified-auto)
 	SetWindowText(iButton, L"");
   }
@@ -401,25 +401,25 @@ void displayText::tomsg() {
 }
 
 void di::bxtxt(uint32_t const iButton, uint32_t const iMessage) {
-  SetWindowText(ButtonWin->operator[](iButton), displayText::loadStr(iMessage).c_str());
+  SetWindowText(Instance->ButtonWin.operator[](iButton), displayText::loadStr(iMessage).c_str());
 }
 
 void di::hlpflt(uint32_t const iButton, uint32_t const iMessage, float const data) {
   auto const fmtStr = displayText::format(iMessage, data);
-  SetWindowText(ButtonWin->operator[](iButton), fmtStr.c_str());
+  SetWindowText(Instance->ButtonWin.operator[](iButton), fmtStr.c_str());
 }
 
 void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
   di::bxtxt(HTXCLR, IDS_CLEAR);
   di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight * IPFGRAN);
-  thred::redraw(ButtonWin->operator[](HTXWID));
+  thred::redraw(Instance->ButtonWin.operator[](HTXWID));
   di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing * IPFGRAN);
   di::bxtxt(HTXVRT, IDS_TXVRT);
   di::bxtxt(HTXHOR, IDS_TXHOR);
   di::bxtxt(HTXANG, IDS_TXANG);
   di::bxtxt(HTXMIR, IDS_TXMIR);
   auto constexpr INDEX = HTXMIR + 1U;
-  SetWindowText(ButtonWin->operator[](INDEX), L"");
+  SetWindowText(Instance->ButtonWin.operator[](INDEX), L"");
 }
 
 auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {

@@ -279,8 +279,8 @@ void ti::showTraceWin() noexcept {
 
 void ti::tracwnd() {
   thred::hideColorWin();
-  hidwnd(ButtonWin->operator[](HBOXSEL));
-  hidwnd(ButtonWin->operator[](HUPTO));
+  hidwnd(Instance->ButtonWin.operator[](HBOXSEL));
+  hidwnd(Instance->ButtonWin.operator[](HUPTO));
   shownd(TraceStepWin);
   trcstpnum();
   trcratnum();
@@ -362,7 +362,7 @@ void trace::untrace() {
   ti::hideTraceWin();
   ti::hidwnd(TraceStepWin);
   thred::showColorWin();
-  for (auto const& iButton : *ButtonWin) {
+  for (auto const& iButton : Instance->ButtonWin) {
 	ti::shownd(iButton);
   }
 }

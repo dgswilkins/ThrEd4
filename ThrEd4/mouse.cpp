@@ -735,15 +735,15 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	StateMap->set(StateFlag::VCAPT);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HBOXSEL)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HBOXSEL)) {
 	form::boxsel();
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HUPTO)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HUPTO)) {
 	thred::toglup();
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HHID)) { // only show stitches of the selected color
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HHID)) { // only show stitches of the selected color
 	thred::toglHid();
 	return true;
   }
@@ -756,7 +756,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		StateMap->reset(StateFlag::SCROS);
 		StateMap->reset(StateFlag::ECROS);
 		StateMap->set(StateFlag::RESTCH);
-		thred::redraw(ButtonWin->operator[](HHID));
+		thred::redraw(Instance->ButtonWin.operator[](HHID));
 	  }
 	  else {
 		if (!SelectedFormList->empty()) {
@@ -1579,9 +1579,9 @@ auto mouse::handleRightButtonDown() -> bool {
 	}
 	return true;
   }
-  if (!ButtonWin->empty()) {
+  if (!Instance->ButtonWin.empty()) {
 	auto minLenRect = RECT {};
-	if (GetWindowRect(ButtonWin->operator[](HMINLEN), &minLenRect) != 0) {
+	if (GetWindowRect(Instance->ButtonWin.operator[](HMINLEN), &minLenRect) != 0) {
 	  if (WinMsg.pt.x >= minLenRect.left && WinMsg.pt.x <= minLenRect.right &&
 	      WinMsg.pt.y > minLenRect.top && WinMsg.pt.y <= minLenRect.bottom) {
 		thred::setSmallestStitchVal();
@@ -1591,7 +1591,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	  }
 	}
 	auto maxLenRect = RECT {};
-	if (GetWindowRect(ButtonWin->operator[](HMAXLEN), &maxLenRect) != 0) {
+	if (GetWindowRect(Instance->ButtonWin.operator[](HMAXLEN), &maxLenRect) != 0) {
 	  if (WinMsg.pt.x >= maxLenRect.left && WinMsg.pt.x <= maxLenRect.right &&
 	      WinMsg.pt.y > maxLenRect.top && WinMsg.pt.y <= maxLenRect.bottom) {
 		thred::setLargestStitchVal();

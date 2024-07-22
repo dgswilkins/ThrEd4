@@ -236,8 +236,6 @@ extern int32_t  ButtonHeight;
 extern int32_t  ButtonWidth;
 extern int32_t  ButtonWidthX3;
 
-extern std::vector<HWND>* ButtonWin;
-
 extern float    ButtonholeCornerLength;
 extern HWND     CancelButton;
 extern uint32_t Clip;

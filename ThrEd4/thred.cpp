@@ -2111,7 +2111,7 @@ auto thi::oldwnd(HWND window) noexcept -> bool {
 	}
   }
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
-	if (ButtonWin->operator[](iButton) == window) {
+	if (Instance->ButtonWin.operator[](iButton) == window) {
 	  return false;
 	}
   }
@@ -3770,7 +3770,7 @@ void thi::unthum() {
   }
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
-  thred::redraw(ButtonWin->operator[](HHID));
+  thred::redraw(Instance->ButtonWin.operator[](HHID));
   displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
 }
 
@@ -4738,7 +4738,7 @@ void thred::toglHid() {
 	StateMap->set(StateFlag::FRMOF);
   }
   thi::unthum();
-  redraw(ButtonWin->operator[](HHID));
+  redraw(Instance->ButtonWin.operator[](HHID));
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7354,19 +7354,19 @@ void thi::barnam(HWND window, uint32_t const iThumbnail) {
 void thi::rthumnam(uint32_t const iThumbnail) {
   switch (iThumbnail) {
 	case 0: {
-	  barnam(ButtonWin->operator[](HNUM), iThumbnail);
+	  barnam(Instance->ButtonWin.operator[](HNUM), iThumbnail);
 	  break;
 	}
 	case 1: {
-	  barnam(ButtonWin->operator[](HTOT), iThumbnail);
+	  barnam(Instance->ButtonWin.operator[](HTOT), iThumbnail);
 	  break;
 	}
 	case 2: {
-	  barnam(ButtonWin->operator[](HMINLEN), iThumbnail);
+	  barnam(Instance->ButtonWin.operator[](HMINLEN), iThumbnail);
 	  break;
 	}
 	case 3: {
-	  barnam(ButtonWin->operator[](HMAXLEN), iThumbnail);
+	  barnam(Instance->ButtonWin.operator[](HMAXLEN), iThumbnail);
 	  break;
 	}
 	default: {
@@ -7413,7 +7413,7 @@ void thred::thumnail() {
   StateMap->set(StateFlag::THUMSHO);
   ThumbnailSearchString->clear();
   ThumbnailSearchString->push_back(0);
-  SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
+  SetWindowText(Instance->ButtonWin.operator[](HBOXSEL), L"");
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
   vubak();
@@ -8786,7 +8786,7 @@ void thred::esccode() {
   StateMap->reset(StateFlag::HID);
   StateMap->reset(StateFlag::FRMOF);
   StateMap->reset(StateFlag::THRDS);
-  redraw(ButtonWin->operator[](HHID));
+  redraw(Instance->ButtonWin.operator[](HHID));
   menu::resetThreadView();
   StateMap->reset(StateFlag::RUNPAT);
   StateMap->reset(StateFlag::WASPAT);
@@ -10741,7 +10741,7 @@ void thi::init() {
   }
   thred::setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
-  ButtonWin->resize(BTNCOUNT);
+  Instance->ButtonWin.resize(BTNCOUNT);
   auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
 	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
@@ -10766,7 +10766,7 @@ void thi::init() {
 		buttonTxt.assign(blank);
 	  }
 	}
-	ButtonWin->operator[](iButton) = CreateWindow(L"STATIC",
+	Instance->ButtonWin.operator[](iButton) = CreateWindow(L"STATIC",
 	                                              buttonTxt.c_str(),
 	                                              windowFlags,
 	                                              0,
@@ -11806,7 +11806,7 @@ auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	return true;
   }
-  if (!ButtonWin->empty() && DrawItem->hwndItem == ButtonWin->operator[](HHID) &&
+  if (!Instance->ButtonWin.empty() && DrawItem->hwndItem == Instance->ButtonWin.operator[](HHID) &&
       DrawItem->itemAction == ODA_DRAWENTIRE) {
 	auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 	if (StateMap->test(StateFlag::HID)) {
@@ -12224,7 +12224,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  ButtonWin                 = &Instance->ButtonWin;
 	  ClipBuffer                = &Instance->ClipBuffer;
 	  ClipPoints                = &Instance->ClipPoints;
 	  ColorBarSize              = &Instance->ColorBarSize;

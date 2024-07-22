@@ -1012,7 +1012,7 @@ void txi::butsid(uint32_t const windowId) {
   auto buttonRect = RECT {};
   chktxnum();
   TextureWindowId = windowId;
-  GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);
+  GetWindowRect(Instance->ButtonWin.operator[](windowId), &buttonRect);
   SideWindowButton = CreateWindow(L"STATIC",
                                   nullptr,
                                   SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -1191,14 +1191,14 @@ void txi::altx() {
 
 void texture::txof() {
   displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
-  thred::redraw(ButtonWin->operator[](HHID));
+  thred::redraw(Instance->ButtonWin.operator[](HHID));
   if (StateMap->test(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
   else {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
   }
-  SetWindowText(ButtonWin->operator[](HTXSPAC), L"");
+  SetWindowText(Instance->ButtonWin.operator[](HTXSPAC), L"");
   savtxt();
   thred::zumhom();
   SelectedTexturePointsList->clear();
@@ -1288,35 +1288,35 @@ void txi::txdelal() {
 }
 
 auto txi::chkbut() -> bool {
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXCLR)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXCLR)) {
 	txdelal();
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXHI)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXHI)) {
 	butsid(HTXHI);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXWID)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXWID)) {
 	butsid(HTXWID);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXSPAC)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXSPAC)) {
 	butsid(HTXSPAC);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXVRT)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXVRT)) {
 	dutxfn(VRTYP);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXHOR)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXHOR)) {
 	dutxfn(HORTYP);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXANG)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXANG)) {
 	dutxfn(ANGTYP);
 	return true;
   }
-  if (WinMsg.hwnd == ButtonWin->operator[](HTXMIR)) {
+  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXMIR)) {
 	dutxmir();
 	return true;
   }
