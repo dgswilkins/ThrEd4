@@ -6361,7 +6361,7 @@ void thred::vubak() {
 
 void thred::insflin(POINT const insertPoint) {
   auto const offset    = POINT {InsertSize.cx / 2, InsertSize.cy / 2};
-  auto&      formLines = *FormLines;
+  auto&      formLines = Instance->FormLines;
   formLines.resize(SQPNTS);
   formLines[0].x = formLines[3].x = formLines[4].x = insertPoint.x - offset.x;
   formLines[1].x = formLines[2].x = insertPoint.x + offset.x;
@@ -6909,7 +6909,7 @@ void thred::ritmov(uint32_t const formIndex) noexcept {
 	}
   }
   else {
-	RubberBandLine->operator[](2) = FormLines->operator[](1);
+	RubberBandLine->operator[](2) = Instance->FormLines.operator[](1);
 	if (form.type == FRMLINE) {
 	  Polyline(StitchWindowDC, &RubberBandLine->operator[](1), 2);
 	}
@@ -7116,7 +7116,7 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   }
   auto const minimumLength = std::sqrt(minLength);
 
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines.resize(SQPNTS);
   for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
 	formLines[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);

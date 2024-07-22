@@ -258,7 +258,6 @@ extern POINT           EndPointCross;
 
 extern HWND FormDataSheet;
 
-extern std::vector<POINT>*    FormLines;
 extern std::vector<FRM_HEAD>* FormList;
 
 extern uint32_t FormMenuChoice;

@@ -787,7 +787,7 @@ void txi::stxlin() {
   StateMap->reset(StateFlag::TXTMOV);
   deorg(offset);
   px2ed(offset, point1);
-  px2ed(FormLines->front(), point0);
+  px2ed(Instance->FormLines.front(), point0);
   dutxlin(point0, point1);
   StateMap->set(StateFlag::RESTCH);
 }
@@ -889,7 +889,7 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
   auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                              (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
   auto const& angledFormVertices = Instance->AngledFormVertices;
   for (auto formLine = formLines.begin(); auto const& vertex : angledFormVertices) {
@@ -929,13 +929,13 @@ void texture::setxfrm() noexcept {
 
 void txi::dutxtlin() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::polyline(StitchWindowDC, FormLines->data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, Instance->FormLines.data(), LNPNTS);
 }
 
 void texture::txtrmov(FRM_HEAD const& textureForm) {
   if (StateMap->test(StateFlag::TXTLIN)) {
 	txi::dutxtlin();
-	txi::deorg(FormLines->operator[](1));
+	txi::deorg(Instance->FormLines.operator[](1));
 	txi::dutxtlin();
 	return;
   }
@@ -956,7 +956,7 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 }
 
 void txi::txtlin() {
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines.clear();
   formLines.resize(2);
   deorg(formLines[0]);

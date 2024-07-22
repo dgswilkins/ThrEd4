@@ -811,7 +811,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
 		wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);
 		StateMap->set(StateFlag::INIT);
-		auto& formLines = *FormLines;
+		auto& formLines = Instance->FormLines;
 		formLines.resize(SQPNTS);
 		formLines[0].x = formLines[3].x = formLines[4].x = SelectedFormsRect.left;
 		formLines[1].x = formLines[2].x = SelectedFormsRect.right;

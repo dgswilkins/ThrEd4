@@ -362,7 +362,7 @@ void satin::satsel() {
   thred::duzrat();
   StartPoint = ClosestVertexToCursor;
   auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
-  FormLines->front() = form::sfCor2px(*itVertex);
+  Instance->FormLines.front() = form::sfCor2px(*itVertex);
   StateMap->reset(StateFlag::SHOCON);
   StateMap->set(StateFlag::SATCNKT);
   if (form.type == FRMFPOLY) {
@@ -1267,7 +1267,7 @@ void satin::satfix() {
 
 void satin::dusat() noexcept {
   auto const  vertexCount = TempPolygon->size();
-  auto const& formLines   = *FormLines;
+  auto const& formLines   = Instance->FormLines;
   auto const* line        = &formLines[vertexCount - 1U];
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
@@ -1284,7 +1284,7 @@ void si::unsat() {
 void satin::drwsat() {
   si::unsat();
   auto const vertexCount = TempPolygon->size();
-  auto&      formLines   = *FormLines;
+  auto&      formLines   = Instance->FormLines;
   formLines.resize(vertexCount + 1U);
   formLines[vertexCount] =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
@@ -1293,7 +1293,7 @@ void satin::drwsat() {
 }
 
 void satin::satpnt0() {
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines.clear();
   formLines.push_back(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
   TempPolygon->push_back(thred::pxCor2stch(WinMsg.pt));
@@ -1303,7 +1303,7 @@ void satin::satpnt0() {
 void satin::satpnt1() {
   si::unsat();
   auto const vertexCount = TempPolygon->size();
-  auto&      formLines   = *FormLines;
+  auto&      formLines   = Instance->FormLines;
   formLines[vertexCount] =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   dusat();
@@ -1418,7 +1418,7 @@ void satin::satzum() {
   form::frmlin(*TempPolygon);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, FormPen);
-  wrap::polyline(StitchWindowMemDC, FormLines->data(), vertexCount);
+  wrap::polyline(StitchWindowMemDC, Instance->FormLines.data(), vertexCount);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   drwsat();
 }

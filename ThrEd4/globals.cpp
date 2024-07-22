@@ -66,7 +66,6 @@ HWND                           DiscardButton             = nullptr; // discard b
 DRAWITEMSTRUCT*                DrawItem                  = nullptr; // for owner-draw windows
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
 HWND                           FormDataSheet             = nullptr; // form data sheet
-std::vector<POINT>*            FormLines                 = nullptr; // used in the form drawing routines
 std::vector<FRM_HEAD>*         FormList                  = nullptr; // a list of form headers
 uint32_t                       FormMenuChoice            = 0U;      // data type for form data form numerical entry
 F_POINT                        FormMoveDelta             = F_POINT {}; // offset for moving forms

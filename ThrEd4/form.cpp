@@ -665,18 +665,19 @@ void fi::frmlin(FRM_HEAD const& form) {
   if (form.vertexCount == 0U) {
 	return;
   }
-  FormLines->clear();
-  FormLines->reserve(form.vertexCount);
+  auto& formLines = Instance->FormLines;
+  formLines.clear();
+  formLines.reserve(form.vertexCount);
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 
   auto itCurrentVertex = itFirstVertex; // intentional copy
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	FormLines->push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
+	formLines.push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
 	                            std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                        (itCurrentVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
 	++itCurrentVertex;
   }
-  FormLines->push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
+  formLines.push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
                               std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
                                           (itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
 }
@@ -686,7 +687,7 @@ void form::frmlin(std::vector<F_POINT> const& vertices) {
   if (vertexMax == 0U) {
 	return;
   }
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines.clear();
   formLines.reserve(vertexMax);
   for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
@@ -702,7 +703,7 @@ void form::frmlin(std::vector<F_POINT> const& vertices) {
 void form::dufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount);
+  wrap::polyline(StitchWindowDC, Instance->FormLines.data(), NewFormVertexCount);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -715,11 +716,12 @@ void form::unfrm() {
 void form::mdufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
+  auto& formLines = Instance->FormLines;
   if (FormList->operator[](ClosestFormToCursor).type == FRMLINE) {
-	wrap::polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount - 1);
+	wrap::polyline(StitchWindowDC, formLines.data(), NewFormVertexCount - 1);
   }
   else {
-	wrap::polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount);
+	wrap::polyline(StitchWindowDC, formLines.data(), NewFormVertexCount);
   }
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
@@ -747,7 +749,7 @@ void form::setfrm() {
   }
   fi::rats();
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-  auto const point    = fi::px2stchf(FormLines->front());
+  auto const point    = fi::px2stchf(Instance->FormLines.front());
   auto const newCount = NewFormVertexCount - 1U; // -1 to account for the last point being the same as the first
   auto const spVertices = gsl::span(*FormVertices).subspan(FormList->back().vertexIndex, newCount);
   auto const delta      = F_POINT {point.x - spVertices.front().x, point.y - spVertices.front().y};
@@ -996,9 +998,10 @@ void fi::drawStartGuide(FRM_HEAD const& form,
                         uint8_t const   layer,
                         unsigned int&   lastPoint) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   SelectObject(StitchWindowMemDC, FormPen);
-  frmpoly(gsl::span(std::addressof(FormLines->operator[](1)), form.wordParam - 1));
+  auto& formLines = Instance->FormLines;
+  frmpoly(gsl::span(std::addressof(formLines.operator[](1)), form.wordParam - 1));
   SelectObject(StitchWindowMemDC, FormPen3px);
-  wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
+  wrap::polyline(StitchWindowMemDC, std::addressof(formLines.operator[](form.wordParam)), LNPNTS);
   SelectObject(StitchWindowMemDC, getLayerPen(layer));
   lastPoint = form.wordParam + 1U;
 }
@@ -1020,19 +1023,20 @@ void fi::drawGuides(FRM_HEAD const& form) {
 }
 
 void fi::drawFormBox(FRM_HEAD const& form) {
+  auto& formLines = Instance->FormLines;
   for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 	if (iVertex == ClosestVertexToCursor) {
-	  frmx(FormLines->operator[](iVertex), StitchWindowMemDC);
+	  frmx(formLines.operator[](iVertex), StitchWindowMemDC);
 	}
 	else {
 	  frmsqr(form.vertexIndex, iVertex);
 	}
   }
   if (ClosestVertexToCursor != 0U) {
-	frmsqr0(FormLines->front());
+	frmsqr0(formLines.front());
   }
   else {
-	frmx(FormLines->front(), StitchWindowMemDC);
+	frmx(formLines.front(), StitchWindowMemDC);
   }
   displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 }
@@ -1057,9 +1061,10 @@ void form::drwfrm() {
   thred::duzrat();
   auto const maxForm = FormList->size();
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
+	auto& formLines = Instance->FormLines;
 	auto const& form = FormList->operator[](iForm);
 	fi::frmlin(form);
-	if (FormLines->empty()) {
+	if (formLines.empty()) {
 	  continue;
 	}
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -1071,7 +1076,7 @@ void form::drwfrm() {
 	if (form.type == SAT) {
 	  if ((form.attribute & FRMEND) != 0U) { // if the form has an end guide, draw it
 		SelectObject(StitchWindowMemDC, FormPen3px);
-		wrap::polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
+		wrap::polyline(StitchWindowMemDC, formLines.data(), LNPNTS);
 		lastPoint = 1;
 	  }
 	  if (form.wordParam != 0U) { // if the form has a start guide, draw it
@@ -1084,7 +1089,7 @@ void form::drwfrm() {
 	SelectObject(StitchWindowMemDC, fi::getLayerPen(layer));
 	if (form.type == FRMLINE) { // if the form is a line, draw it
 	  if (form.vertexCount > 0) {
-		fi::frmpoly(gsl::span(FormLines->data(), form.vertexCount - 1));
+		fi::frmpoly(gsl::span(formLines.data(), form.vertexCount - 1));
 		if (form.fillType == CONTF) { // if the form is a contour fill, draw the fill guide
 		  auto       line           = std::array<POINT, 2> {};
 		  auto const itFirstVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -1098,7 +1103,7 @@ void form::drwfrm() {
 	}
 	else { // if the form is a polygon, draw it
 	  if (form.vertexCount > lastPoint) {
-		fi::frmpoly(gsl::span(std::addressof(FormLines->operator[](lastPoint)), form.vertexCount - lastPoint));
+		fi::frmpoly(gsl::span(std::addressof(formLines.operator[](lastPoint)), form.vertexCount - lastPoint));
 	  }
 	}
 	if (ClosestFormToCursor == iForm &&
@@ -1106,7 +1111,6 @@ void form::drwfrm() {
 	  fi::drawFormBox(form);
 	}
 	else { // if the form is not selected, draw the form
-	  auto& formLines = *FormLines;
 	  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 		fi::frmsqr(form.vertexIndex, iVertex);
 	  }
@@ -1223,7 +1227,7 @@ void form::setmfrm(uint32_t const formIndex) {
   auto const offset =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
              WinMsg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
 	point            = sfCor2px(*itVertex);
@@ -1532,7 +1536,7 @@ void form::frmovlin() {
   }
   fi::frmlin(form);
   auto        previousPoint = prv(form, ClosestVertexToCursor);
-  auto const& formLines     = *FormLines;
+  auto const& formLines     = Instance->FormLines;
   for (auto iPoint = 0U; iPoint < 3U; ++iPoint) {
 	RubberBandLine->operator[](iPoint) = formLines[previousPoint];
 	previousPoint                      = nxt(form, previousPoint);
@@ -5730,7 +5734,7 @@ void form::clrfills() noexcept {
 void fi::ducon() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, FormLines->data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, Instance->FormLines.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5742,7 +5746,7 @@ void fi::uncon() {
 
 void form::drwcon() {
   fi::uncon();
-  auto& formLines = *FormLines;
+  auto& formLines = Instance->FormLines;
   formLines[1]    = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::SHOCON);
   fi::ducon();
@@ -6051,7 +6055,7 @@ void form::rinfrm() {
   fi::frmlin(*FormForInsert);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  auto const& formLines = *FormLines;
+  auto const& formLines = Instance->FormLines;
   if (FormVertexNext != 0U || FormForInsert->type != FRMLINE) {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
@@ -6104,7 +6108,7 @@ void form::setins() {
 	FormVertexNext = nxt(*FormForInsert, FormVertexPrev);
   }
   fi::frmlin(*FormForInsert);
-  InsertLine[0] = FormLines->operator[](FormVertexPrev);
+  InsertLine[0] = Instance->FormLines.operator[](FormVertexPrev);
   InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   StateMap->set(StateFlag::INSFRM);
   duinsf();
@@ -7491,7 +7495,7 @@ void fi::doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, 
   auto const timeDC       = GetDC(timeWindow);
   auto const timeStep     = wrap::toFloat(StitchWindowSize.cx) / rangeX;
   auto       timePosition = 0.0F;
-  auto&      formLines    = *FormLines;
+  auto&      formLines    = Instance->FormLines;
   formLines.clear();
   formLines.push_back(POINT {});
   formLines.push_back(POINT {0, ButtonHeight});
