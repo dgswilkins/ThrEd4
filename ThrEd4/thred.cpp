@@ -915,8 +915,8 @@ void thred::savdo() {
 }
 
 void thi::nunams() {
-  *AuxName = *WorkingFileName;
-  xt::duauxnam(*AuxName);
+  Instance->AuxName = *WorkingFileName;
+  xt::duauxnam(Instance->AuxName);
   *ThrName = *WorkingFileName;
   ThrName->replace_extension(L".thr");
   if (PreviousNames->front() == *ThrName) {
@@ -3278,9 +3278,10 @@ void thi::chk1col() {
 }
 
 void thi::sav() {
-  *AuxName = *WorkingFileName;
-  xt::duauxnam(*AuxName);
-  if (chkattr(*AuxName)) {
+  auto& auxName = Instance->AuxName;
+  auxName = *WorkingFileName;
+  xt::duauxnam(auxName);
+  if (chkattr(auxName)) {
 	return;
   }
   if (StitchBuffer->empty()) {
@@ -3303,23 +3304,23 @@ void thi::sav() {
   auto flag = true;
   switch (IniFile.auxFileType) {
 	case AUXDST: {
-	  flag = DST::saveDST(*AuxName, saveStitches);
+	  flag = DST::saveDST(auxName, saveStitches);
 	  break;
 	}
 #if PESACT
 	case AUXPES: {
-	  flag = PES::savePES(*AuxName, saveStitches);
+	  flag = PES::savePES(auxName, saveStitches);
 	  break;
 	}
 #endif
 	default: {
-	  flag = PCS::savePCS(*AuxName, saveStitches);
+	  flag = PCS::savePCS(auxName, saveStitches);
 	}
   }
   if (flag) {
 	defNam(*WorkingFileName);
 	if (UserFlagMap->test(UserFlag::ROTAUX)) {
-	  displayText::filnopn(IDS_FILROT, *AuxName);
+	  displayText::filnopn(IDS_FILROT, auxName);
 	}
   }
 }
@@ -12223,7 +12224,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  AuxName                   = &Instance->AuxName;
 	  BSequence                 = &Instance->BSequence;
 	  ButtonWin                 = &Instance->ButtonWin;
 	  ClipBuffer                = &Instance->ClipBuffer;

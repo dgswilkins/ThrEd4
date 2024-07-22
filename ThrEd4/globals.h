@@ -229,7 +229,6 @@ extern uint8_t      ActiveColor;
 extern uint8_t      ActiveLayer;
 
 extern uint8_t   AppliqueColor;
-extern fs::path* AuxName;
 
 extern std::vector<B_SEQ_PNT>* BSequence;
 

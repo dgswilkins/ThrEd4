@@ -454,7 +454,7 @@ void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST const newBlock) {
 void pi::pecnam(gsl::span<char> const& label) {
   strncpy(label.data(), "LA:", 3);
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
-  auto       fileStem = utf::utf16ToUtf8(AuxName->stem());
+  auto       fileStem = utf::utf16ToUtf8(Instance->AuxName.stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
