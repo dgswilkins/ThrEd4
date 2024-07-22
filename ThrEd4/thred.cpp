@@ -12224,7 +12224,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  BSequence                 = &Instance->BSequence;
 	  ButtonWin                 = &Instance->ButtonWin;
 	  ClipBuffer                = &Instance->ClipBuffer;
 	  ClipPoints                = &Instance->ClipPoints;

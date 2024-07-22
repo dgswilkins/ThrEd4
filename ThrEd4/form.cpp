@@ -4185,11 +4185,12 @@ void fi::brkdun(std::vector<SMAL_PNT_L> const& lineEndpoints,
                 uint32_t const                 start,
                 uint32_t const                 finish,
                 std::vector<F_POINT>&          workingFormVertices) {
-  BSequence->emplace_back(
+  auto& bSequence = Instance->BSequence;
+  bSequence.emplace_back(
       lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y, 0);
-  BSequence->emplace_back(
+  bSequence.emplace_back(
       lineEndpoints[sortedLineIndices[finish]].x, lineEndpoints[sortedLineIndices[finish]].y, 0);
-  BSequence->emplace_back(
+  bSequence.emplace_back(
       workingFormVertices.operator[](lineEndpoints[sortedLineIndices[start]].line).x,
       workingFormVertices.operator[](lineEndpoints[sortedLineIndices[start]].line).y,
       0);
@@ -4202,18 +4203,20 @@ void fi::duseq1(std::vector<SMAL_PNT_L> const& lineEndpoints,
   auto        index     = sortedLineIndices[sequenceIndex];
   auto const& sequence0 = lineEndpoints[index];
   auto const& sequence1 = lineEndpoints[++index];
-  BSequence->emplace_back(wrap::midl(sequence1.x, sequence0.x), wrap::midl(sequence1.y, sequence0.y), 0);
+  Instance->BSequence.emplace_back(wrap::midl(sequence1.x, sequence0.x), wrap::midl(sequence1.y, sequence0.y), 0);
 }
 
 void fi::movseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
                 std::vector<uint32_t> const&   sortedLineIndices,
                 uint32_t const                 ind) {
   auto lineEndPoint = wrap::next(lineEndpoints.begin(), sortedLineIndices[ind]);
-  BSequence->emplace_back(lineEndPoint->x, lineEndPoint->y, SEQBOT);
+  auto& bSequence    = Instance->BSequence;
+
+  bSequence.emplace_back(lineEndPoint->x, lineEndPoint->y, SEQBOT);
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
   //             and not the next entry in sortedLines
   ++lineEndPoint;
-  BSequence->emplace_back(lineEndPoint->x, lineEndPoint->y, SEQTOP);
+  bSequence.emplace_back(lineEndPoint->x, lineEndPoint->y, SEQTOP);
 }
 
 void fi::brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
@@ -4235,11 +4238,12 @@ void fi::brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	  auto const iLineDec = iLine - 1U;
 	  --savedGroup;
 	  if (lineEndpoints[sortedLineIndices[iLineDec]].group != savedGroup) {
-		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		auto& bSequence = Instance->BSequence;
+		bSequence.emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
 		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
 		                        0);
 		sequenceIndex = iLineDec;
-		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		bSequence.emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
 		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
 		                        0);
 		savedGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
@@ -4263,11 +4267,12 @@ void fi::brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	for (auto iLine = start; iLine <= finish; ++iLine) {
 	  ++savedGroup;
 	  if (lineEndpoints[sortedLineIndices[iLine]].group != savedGroup) {
-		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		auto& bSequence = Instance->BSequence;
+		bSequence.emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
 		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
 		                        0);
 		sequenceIndex = iLine;
-		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		bSequence.emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
 		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
 		                        0);
 		savedGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
@@ -4309,9 +4314,10 @@ void fi::dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
   else {
 	minimumY *= HALF;
   }
-  BSequence->emplace_back(
+  auto& bSequence = Instance->BSequence;
+  bSequence.emplace_back(
       lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y + minimumY, 0);
-  BSequence->emplace_back(lineEndpoints[sortedLineIndices[finish]].x,
+  bSequence.emplace_back(lineEndpoints[sortedLineIndices[finish]].x,
                           lineEndpoints[sortedLineIndices[finish]].y + minimumY,
                           0);
   lastGroup = lineEndpoints[sortedLineIndices[finish]].group;
@@ -4424,14 +4430,16 @@ void fi::durgn(FRM_HEAD const&                form,
   auto const& currentRegion = regionsList[iRegion];
   auto const  sequenceStart = currentRegion.start;
   auto const  sequenceEnd   = currentRegion.end;
+  auto&       bSequence     = Instance->BSequence;
+
   if (sequencePath[pthi].skp || StateMap->testAndReset(StateFlag::BRKFIX)) {
-	if (auto iter = std::prev(BSequence->end()); iter->attribute != SEQBOT) {
+	if (auto iter = std::prev(bSequence.end()); iter->attribute != SEQBOT) {
 	  --iter;
-	  BSequence->emplace_back(iter->x, iter->y, 0);
+	  bSequence.emplace_back(iter->x, iter->y, 0);
 	}
 	// clang-format off
 	auto const  firstLine     = lineEndpoints[sortedLineIndices[sequenceStart]].line;
-	auto const& bpnt          = BSequence->back();
+	auto const& bpnt          = bSequence.back();
 	auto        minimumLength = BIGFLOAT;
 	auto        mindif        = 0U;
 	// clang-format on
@@ -4445,7 +4453,7 @@ void fi::durgn(FRM_HEAD const&                form,
 	  }
 	}
 	if (minimumLength != 0.0F) {
-	  BSequence->emplace_back(
+	  bSequence.emplace_back(
 	      workingFormVertices.operator[](mindif).x, workingFormVertices.operator[](mindif).y, 0);
 	}
 	if (form.vertexCount != 0U) {
@@ -4453,21 +4461,21 @@ void fi::durgn(FRM_HEAD const&                form,
 	  if (auto const bdif = (form.vertexCount - firstLine + mindif) % form.vertexCount; fdif < bdif) {
 		auto ind = form::nxt(form, mindif);
 		while (ind != firstLine) {
-		  BSequence->emplace_back(
+		  bSequence.emplace_back(
 		      workingFormVertices.operator[](ind).x, workingFormVertices.operator[](ind).y, 0);
 		  ind = form::nxt(form, ind);
 		}
-		BSequence->emplace_back(
+		bSequence.emplace_back(
 		    workingFormVertices.operator[](ind).x, workingFormVertices.operator[](ind).y, 0);
 	  }
 	  else {
 		auto ind = form::prv(form, mindif);
 		while (ind != firstLine) {
-		  BSequence->emplace_back(
+		  bSequence.emplace_back(
 		      workingFormVertices.operator[](ind).x, workingFormVertices.operator[](ind).y, 0);
 		  ind = form::prv(form, ind);
 		}
-		BSequence->emplace_back(
+		bSequence.emplace_back(
 		    workingFormVertices.operator[](ind).x, workingFormVertices.operator[](ind).y, 0);
 	  }
 	}
@@ -4711,7 +4719,7 @@ void fi::lcon(FRM_HEAD const&              form,
 	bugColor &= 0xf;
   }
 #else
-  BSequence->clear();
+  Instance->BSequence.clear();
   auto mapIndexSequence = std::vector<uint32_t> {};
   mapIndexSequence.reserve(wrap::toSize(regionCount) + 1U);
   auto pathMap      = std::vector<R_CON> {};
@@ -4844,8 +4852,10 @@ void fi::handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
       17,
   };
 
-  auto const& bNext     = BSequence->operator[](iSequence + 1U);
-  auto const& bPrevious = BSequence->operator[](iSequence - 1U);
+  auto& bSequence = Instance->BSequence;
+
+  auto const& bNext     = bSequence.operator[](iSequence + 1U);
+  auto const& bPrevious = bSequence.operator[](iSequence - 1U);
   auto        delta     = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
   auto const& form      = FormList->operator[](ClosestFormToCursor);
   auto const  rcnt      = iSequence % SEQ_TABLE.size();
@@ -4854,7 +4864,7 @@ void fi::handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
   auto const stitchSpacing2    = LineSpacing * 2;
   auto const userStitchLength9 = UserStitchLength / MAXSIZ;
 
-  auto const rit = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+  auto const rit = std::lround(bSequence.operator[](iSequence).x / stitchSpacing2);
 
   if (delta.y != 0.0F) {
 	slope = delta.x / delta.y;
@@ -4914,7 +4924,9 @@ void fi::handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
       17,
   };
 
-  auto const& bNext = BSequence->operator[](iSequence + 1U);
+  auto&       bSequence = Instance->BSequence;
+
+  auto const& bNext = bSequence.operator[](iSequence + 1U);
   auto        delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
   auto const& form  = FormList->operator[](ClosestFormToCursor);
   auto const  rcnt  = iSequence % SEQ_TABLE.size();
@@ -4923,7 +4935,7 @@ void fi::handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
   auto const stitchSpacing2    = LineSpacing * 2;
   auto const userStitchLength9 = UserStitchLength / MAXSIZ;
 
-  auto const rit = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+  auto const rit = std::lround(bSequence.operator[](iSequence).x / stitchSpacing2);
 
   if (delta.y != 0.0F) {
 	slope = delta.x / delta.y;
@@ -4947,7 +4959,7 @@ void fi::handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
 }
 
 auto fi::handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
-  auto const& bNext = BSequence->operator[](iSequence + 1U);
+  auto const& bNext = Instance->BSequence.operator[](iSequence + 1U);
   auto const  delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 
   StateMap->reset(StateFlag::FILDIR);
@@ -4978,28 +4990,30 @@ auto fi::handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
 }
 
 void fi::bakseq() {
+  auto& bSequence = Instance->BSequence;
+
 #if BUGSEQ
 #else
 #if BUGBAK
 
-  for (auto val : *BSequence) {
+  for (auto val : bSequence) {
 	OSequence->push_back(F_POINT {val.x, val.y});
   }
   FormList->operator[](ClosestFormToCursor).maxFillStitchLen = 6000;
 #else
 
-  auto iSequence = BSequence->size();
+  auto iSequence = bSequence.size();
   if (iSequence != 0U) {
 	--iSequence;
   }
   OSequence->clear();
   StateMap->reset(StateFlag::FILDIR);
-  OSequence->emplace_back(BSequence->operator[](iSequence).x, BSequence->operator[](iSequence).y);
+  OSequence->emplace_back(bSequence.operator[](iSequence).x, bSequence.operator[](iSequence).y);
   if (iSequence != 0U) {
 	--iSequence;
   }
   while (iSequence > 0) {
-	switch (auto& bCurrent = BSequence->operator[](iSequence); bCurrent.attribute) {
+	switch (auto& bCurrent = bSequence.operator[](iSequence); bCurrent.attribute) {
 	  case SEQTOP:
 		handleSeqTop(iSequence, bCurrent);
 		break;
@@ -5087,11 +5101,14 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
 }
 
 void fi::clpfm() {
-  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(BSequence->size()) - 2U; iSequence += 2) {
-	auto const& bSeq0 = BSequence->operator[](iSequence);
-	auto const& bSeq1 = BSequence->operator[](wrap::toSize(iSequence) + 1U);
-	auto const& bSeq2 = BSequence->operator[](wrap::toSize(iSequence) + 2U);
-	auto const& bSeq3 = BSequence->operator[](wrap::toSize(iSequence) + 3U);
+  auto& bSequence = Instance->BSequence;
+  auto  const endIt     = wrap::toUnsigned(bSequence.size()) - 2U;
+
+  for (auto iSequence = 0U; iSequence < endIt; iSequence += 2) {
+	auto const& bSeq0 = bSequence.operator[](iSequence);
+	auto const& bSeq1 = bSequence.operator[](wrap::toSize(iSequence) + 1U);
+	auto const& bSeq2 = bSequence.operator[](wrap::toSize(iSequence) + 2U);
+	auto const& bSeq3 = bSequence.operator[](wrap::toSize(iSequence) + 3U);
 
 	auto const leftLength  = std::hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
 	auto const rightLength = std::hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);

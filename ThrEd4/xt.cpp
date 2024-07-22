@@ -293,13 +293,17 @@ constexpr auto xi::durat(float const start, float const finish, float const feat
 }
 
 void xi::duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, float const featherRatioLocal) noexcept {
-  point = F_POINT {durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal),
-                   durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal)};
+  auto& bSequence = Instance->BSequence;
+
+  point = F_POINT {durat(bSequence.operator[](finish).x, bSequence.operator[](start).x, featherRatioLocal),
+                   durat(bSequence.operator[](finish).y, bSequence.operator[](start).y, featherRatioLocal)};
 }
 
 void xi::durats(uint32_t const iSequence, gsl::not_null<std::vector<F_POINT>*> const sequence, FEATHER& feather) {
-  auto const& bCurrent = BSequence->operator[](iSequence);
-  auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+  auto& bSequence = Instance->BSequence;
+
+  auto const& bCurrent = bSequence.operator[](iSequence);
+  auto const& bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
 
   if (auto const stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
       stitchLength < feather.minStitch) {
@@ -416,10 +420,12 @@ void xi::fthfn(uint32_t const iSequence, FEATHER& feather) {
 }
 
 void xi::ratpnt(uint32_t const iPoint, uint32_t const iNextPoint, F_POINT& point, float const featherRatio) noexcept {
-  auto const& bPoint = BSequence->operator[](iPoint);
+  auto& bSequence = Instance->BSequence;
 
-  point = F_POINT {((BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x),
-                   ((BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y)};
+  auto const& bPoint = bSequence.operator[](iPoint);
+
+  point = F_POINT {((bSequence.operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x),
+                   ((bSequence.operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y)};
 }
 
 auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
@@ -435,8 +441,10 @@ void xi::fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT
   auto currentPoint = F_POINT {};
   auto nextPoint    = F_POINT {};
 
-  auto const& bCurrent = BSequence->operator[](iSequence);
-  auto&       bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+  		auto& bSequence = Instance->BSequence;
+
+  auto const& bCurrent = bSequence.operator[](iSequence);
+  auto&       bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
@@ -468,8 +476,10 @@ void xi::fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT
 }
 
 void xi::fthdfn(uint32_t const iSequence, FEATHER& feather) {
-  auto const& bCurrent = BSequence->operator[](iSequence);
-  auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+  auto& bSequence = Instance->BSequence;
+
+  auto const& bCurrent = bSequence.operator[](iSequence);
+  auto const& bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
@@ -525,55 +535,57 @@ void xt::fthrfn(FRM_HEAD& form) {
   xi::fthvars(form, feather);
   LineSpacing = form.fillSpacing;
   satin::satfil(form);
-  BSequence->front().attribute       = 0;
-  BSequence->operator[](1).attribute = 1;
+  auto& bSequence = Instance->BSequence;
+
+  bSequence.front().attribute       = 0;
+  bSequence.operator[](1).attribute = 1;
   if (feather.phaseIndex == 0U) {
 	feather.phaseIndex = 1U;
   }
-  auto ind = gsl::narrow_cast<uint32_t>(BSequence->size()) / (feather.phaseIndex << 2U);
-  if (auto const res = gsl::narrow_cast<uint32_t>(BSequence->size()) % (feather.phaseIndex << 2U);
+  auto ind = gsl::narrow_cast<uint32_t>(bSequence.size()) / (feather.phaseIndex << 2U);
+  if (auto const res = gsl::narrow_cast<uint32_t>(bSequence.size()) % (feather.phaseIndex << 2U);
       res > feather.phaseIndex << 1U) {
 	++ind;
   }
   constexpr auto FSTEPSZ = 4.0F;
   feather.globalPosition = 0.0F;
-  feather.globalStep  = (FSTEPSZ / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
-  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
+  feather.globalStep  = (FSTEPSZ / gsl::narrow_cast<float>(bSequence.size())) * wrap::toFloat(ind);
+  feather.globalPhase = gsl::narrow_cast<float>(bSequence.size()) / wrap::toFloat(ind);
   feather.globalRatio = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
   feather.globalUp    = feather.globalPhase * feather.globalRatio;
   feather.globalDown  = feather.globalPhase - feather.globalUp;
   form.fillType       = FTHF;
   feather.phase       = 1U;
-  BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
-  BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
+  bSequence.push_back(bSequence.operator[](bSequence.size() - 2U));
+  bSequence.push_back(bSequence.operator[](bSequence.size() - 1U));
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
-	for (ind = 0U; ind < wrap::toUnsigned(BSequence->size()) - 2U; ++ind) {
-	  if (BSequence->operator[](ind).attribute == 0) {
+	for (ind = 0U; ind < wrap::toUnsigned(bSequence.size()) - 2U; ++ind) {
+	  if (bSequence.operator[](ind).attribute == 0) {
 		xi::fthrbfn(ind, feather, featherSequence);
 	  }
 	}
   }
   else {
 	if ((form.extendedAttribute & AT_FTHBTH) != 0U) {
-	  for (ind = 0U; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ++ind) {
-		if (BSequence->operator[](ind).attribute == 0) {
+	  for (ind = 0U; ind <= wrap::toUnsigned(bSequence.size()) - 2U; ++ind) {
+		if (bSequence.operator[](ind).attribute == 0) {
 		  xi::fthdfn(ind, feather);
 		}
 	  }
 	}
 	else {
-	  for (ind = 0U; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ++ind) {
-		if (BSequence->operator[](ind).attribute != 0) {
+	  for (ind = 0U; ind <= wrap::toUnsigned(bSequence.size()) - 2U; ++ind) {
+		if (bSequence.operator[](ind).attribute != 0) {
 		  if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
 			xi::fthfn(ind, feather);
 		  }
 		  else {
-			OSequence->emplace_back(BSequence->operator[](ind).x, BSequence->operator[](ind).y);
+			OSequence->emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
 		  }
 		}
 		else {
 		  if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
-			OSequence->emplace_back(BSequence->operator[](ind).x, BSequence->operator[](ind).y);
+			OSequence->emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
 		  }
 		  else {
 			xi::fthfn(ind, feather);

@@ -923,13 +923,15 @@ void si::satfn(FRM_HEAD const&           form,
 	return;
   }
   auto itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto& bSequence     = Instance->BSequence;
+
   // setup the initial stitch point
   if (!StateMap->testAndSet(StateFlag::SAT1)) {
 	if (StateMap->test(StateFlag::FTHR)) {
 	  if (form.vertexCount != 0U) {
 		// add the first vertex to the bare sequence
 		auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
-		BSequence->emplace_back(itVertex->x, itVertex->y, 0);
+		bSequence.emplace_back(itVertex->x, itVertex->y, 0);
 	  }
 	}
 	else {
@@ -937,9 +939,9 @@ void si::satfn(FRM_HEAD const&           form,
 		// add the first vertices from line1 and line2 to the bare sequence
 		if (form.vertexCount != 0U) {
 		  auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
-		  BSequence->emplace_back(itVertex->x, itVertex->y, 0);
+		  bSequence.emplace_back(itVertex->x, itVertex->y, 0);
 		  itVertex = wrap::next(itFirstVertex, line2Start % form.vertexCount);
-		  BSequence->emplace_back(itVertex->x, itVertex->y, 0);
+		  bSequence.emplace_back(itVertex->x, itVertex->y, 0);
 		}
 	  }
 	  else {
@@ -1027,10 +1029,10 @@ void si::satfn(FRM_HEAD const&           form,
 		line1Point += line1Step;
 		line2Point += line2Step;
 		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-		  BSequence->emplace_back(line1Point.x, line1Point.y, 0);
+		  bSequence.emplace_back(line1Point.x, line1Point.y, 0);
 		}
 		else {
-		  BSequence->emplace_back(line2Point.x, line2Point.y, 1);
+		  bSequence.emplace_back(line2Point.x, line2Point.y, 1);
 		}
 		--line1Count;
 		--line2Count;
@@ -1044,12 +1046,12 @@ void si::satfn(FRM_HEAD const&           form,
 		  line2Point += line2Step;
 		  // zig zag the stitches
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-			BSequence->emplace_back(line1Point.x, line1Point.y, 0);
-			BSequence->emplace_back(line2Point.x, line2Point.y, 1);
+			bSequence.emplace_back(line1Point.x, line1Point.y, 0);
+			bSequence.emplace_back(line2Point.x, line2Point.y, 1);
 		  }
 		  else {
-			BSequence->emplace_back(line2Point.x, line2Point.y, 2);
-			BSequence->emplace_back(line1Point.x, line1Point.y, 3);
+			bSequence.emplace_back(line2Point.x, line2Point.y, 2);
+			bSequence.emplace_back(line1Point.x, line1Point.y, 3);
 		  }
 		  --line1Count;
 		  --line2Count;
@@ -1157,7 +1159,7 @@ void satin::satfil(FRM_HEAD& form) {
   satadj(form);
   LineSpacing /= 2;
   OSequence->clear();
-  BSequence->clear();
+  Instance->BSequence.clear();
   StateMap->reset(StateFlag::SAT1);
   StateMap->reset(StateFlag::FILDIR);
   form.fillType = SATF;

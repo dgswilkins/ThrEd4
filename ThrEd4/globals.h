@@ -230,8 +230,6 @@ extern uint8_t      ActiveLayer;
 
 extern uint8_t   AppliqueColor;
 
-extern std::vector<B_SEQ_PNT>* BSequence;
-
 extern COLORREF BackgroundColor;
 extern float    BorderWidth;
 extern int32_t  ButtonHeight;
