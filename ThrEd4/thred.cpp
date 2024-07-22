@@ -12234,7 +12234,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  DefaultDirectory          = &Instance->DefaultDirectory;
 	  DesignerName              = &Instance->DesignerName;
 	  ExtendedHeader            = &Instance->ExtendedHeader;
-	  FormAngles                = &Instance->FormAngles;
 	  FormControlPoints         = &Instance->FormControlPoints;
 	  FormLines                 = &Instance->FormLines;
 	  FormList                  = &Instance->FormList;

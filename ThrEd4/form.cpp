@@ -1887,7 +1887,8 @@ void fi::bold(FRM_HEAD const& form) {
 }
 
 void form::duangs(FRM_HEAD const& form) {
-  FormAngles->clear();
+  auto& formAngles = Instance->FormAngles;
+  formAngles.clear();
   auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
 	itVertex = wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex);
@@ -1896,9 +1897,9 @@ void form::duangs(FRM_HEAD const& form) {
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto const& thisVertex = itVertex[iVertex];
 	auto const& nextVertex = itVertex[iVertex + 1];
-	FormAngles->push_back(std::atan2(nextVertex.y - thisVertex.y, nextVertex.x - thisVertex.x));
+	formAngles.push_back(std::atan2(nextVertex.y - thisVertex.y, nextVertex.x - thisVertex.x));
   }
-  FormAngles->push_back(std::atan2(itVertex[0].y - itVertex[vMax].y, itVertex[0].x - itVertex[vMax].x));
+  formAngles.push_back(std::atan2(itVertex[0].y - itVertex[vMax].y, itVertex[0].x - itVertex[vMax].x));
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate

@@ -65,7 +65,6 @@ HWND                           DeleteStitchesDialog      = nullptr; // asking us
 HWND                           DiscardButton             = nullptr; // discard button
 DRAWITEMSTRUCT*                DrawItem                  = nullptr; // for owner-draw windows
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
-std::vector<float>*            FormAngles                = nullptr; // angles of a form for satin border fills
 HWND                           FormDataSheet             = nullptr; // form data sheet
 std::vector<POINT>*            FormLines                 = nullptr; // used in the form drawing routines
 std::vector<FRM_HEAD>*         FormList                  = nullptr; // a list of form headers

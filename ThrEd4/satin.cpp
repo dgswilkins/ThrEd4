@@ -764,8 +764,9 @@ void satin::satbrd() {
 void si::satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width) {
   auto const& vertexIndex = form.vertexIndex;
   auto        itVertex    = wrap::next(FormVertices->cbegin(), vertexIndex);
+  auto&       formAngles  = Instance->FormAngles;
   if ((isBlunt & SBLNT) != 0U) {
-	auto step = F_POINT {sin(FormAngles->front()) * width * HALF, cos(FormAngles->front()) * width * HALF};
+	auto step = F_POINT {sin(formAngles.front()) * width * HALF, cos(formAngles.front()) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
 	  step = -step;
 	}
@@ -780,8 +781,8 @@ void si::satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width
   if ((isBlunt & FBLNT) != 0U) {
 	constexpr auto SKIPVL = uint32_t {2U}; // check vertex before last
 
-	auto step = F_POINT {sin(FormAngles->operator[](vertexCount - SKIPVL)) * width * HALF,
-	                     cos(FormAngles->operator[](vertexCount - SKIPVL)) * width * HALF};
+	auto step = F_POINT {sin(formAngles.operator[](vertexCount - SKIPVL)) * width * HALF,
+	                     cos(formAngles.operator[](vertexCount - SKIPVL)) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
 	  step = -step;
 	}
@@ -1479,12 +1480,13 @@ void satin::sbrd(FRM_HEAD const& form) {
 auto si::satOffset(const uint32_t& finish, const uint32_t& start, float const satinWidth) noexcept -> F_POINT {
   constexpr auto SATHRESH = 10.0F;
 
-  auto       angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) * HALF;
+  auto&          formAngles = Instance->FormAngles;
+  auto       angle  = (formAngles.operator[](finish) - formAngles.operator[](start)) * HALF;
   auto const factor = std::clamp(1.0F / cos(angle), -SATHRESH, SATHRESH);
 
   auto const length = satinWidth * factor;
 
-  angle += FormAngles->operator[](start) + PI_FHALF;
+  angle += formAngles.operator[](start) + PI_FHALF;
 
   auto const xVal = length * cos(angle);
   auto const yVal = length * sin(angle);
@@ -1496,7 +1498,7 @@ void si::outfn(FRM_HEAD const& form,
                uint32_t const  finish,
                float const     satinWidth) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   auto const offset =
-      fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT
+      fabs(Instance->FormAngles.operator[](start)) < TNYFLOAT && fabs(Instance->FormAngles.operator[](finish)) < TNYFLOAT
           ? F_POINT {0.0F, satinWidth}
           : satOffset(finish, start, satinWidth);
   auto const itVertex = form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT

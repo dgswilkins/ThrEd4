@@ -255,7 +255,6 @@ extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
 
-extern std::vector<float>* FormAngles;
 
 extern HWND FormDataSheet;
 
