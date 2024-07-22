@@ -54,7 +54,6 @@ int32_t                        ButtonWidthX3             = 0;       // button wi
 float                          ButtonholeCornerLength    = IBFCLEN; // buttonhole corner length
 HWND                           CancelButton              = nullptr; // cancel button
 uint32_t                       Clip                      = 0U;      // pcs format clipboard handle
-std::vector<F_POINT_ATTR>*     ClipBuffer                = nullptr; //
 HGLOBAL                        ClipMemory                = nullptr; // handle to the clipboard memory
 void*                          ClipPointer               = nullptr; // for memory allocation for clipboard data
 std::vector<F_POINT>*          ClipPoints                = nullptr; // main clipboard fill points for forms

@@ -3566,6 +3566,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   if (auto iclpxSize = wrap::toUnsigned(iclpx.size()); iclpxSize != 0U) {
 	--iclpxSize;
 	bool breakFlag = false;
+	auto& clipBuffer = Instance->ClipBuffer;
+
 	for (auto iRegion = 0U; iRegion < iclpxSize; ++iRegion) {
 	  auto regionCrossingStart = iclpx[iRegion];
 	  auto regionCrossingEnd   = iclpx[wrap::toSize(iRegion) + 1U];
@@ -3573,7 +3575,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	  auto clipVerticalOffset = 0.0F;
 	  auto lineSegmentStart   = F_POINT {}; // vertical clipboard line segment start
 	  auto lineSegmentEnd     = F_POINT {}; // vertical clipboard line segment end
-	  auto clipStitchCount    = wrap::toUnsigned(ClipBuffer->size());
+	  auto clipStitchCount    = wrap::toUnsigned(clipBuffer.size());
 	  if (StateMap->test(StateFlag::TXFIL)) {
 		auto const textureLine =
 		    (iRegion + wrap::toUnsigned(clipGrid.left)) % wrap::toUnsigned(form.texture.lines);
@@ -3595,7 +3597,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 		  clipVerticalOffset = wrap::toFloat(iRegion % clipGridOffset) /
 		                       (wrap::toFloat(clipGridOffset) * ClipRectSize.cy);
 		}
-		lineSegmentStart.x = pasteLocation.x + ClipBuffer->front().x;
+		lineSegmentStart.x = pasteLocation.x + clipBuffer.front().x;
 	  }
 	  lineSegmentStart.y = wrap::toFloat(clipGrid.bottom) * ClipRectSize.cy;
 	  if (clipGridOffset != 0U) {
@@ -3604,8 +3606,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	  }
 	  for (auto iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; ++iVerticalGrid) {
 		pasteLocation.y = wrap::toFloat(iVerticalGrid) * ClipRectSize.cy - clipVerticalOffset;
-		if (!ClipBuffer->empty()) {
-		  lineSegmentEnd = pasteLocation + ClipBuffer->front();
+		if (!clipBuffer.empty()) {
+		  lineSegmentEnd = pasteLocation + clipBuffer.front();
 		}
 		else {
 		  lineSegmentEnd = pasteLocation;
@@ -3620,8 +3622,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 			++textureIt;
 		  }
 		  else {
-			lineSegmentEnd = F_POINT {pasteLocation.x + ClipBuffer->operator[](iStitch).x,
-			                          pasteLocation.y + ClipBuffer->operator[](iStitch).y};
+			lineSegmentEnd = F_POINT {pasteLocation.x + clipBuffer.operator[](iStitch).x,
+			                          pasteLocation.y + clipBuffer.operator[](iStitch).y};
 		  }
 
 		  clipStitchPoints.push_back(CLIP_PNT {lineSegmentStart.x, lineSegmentStart.y, 0, 0});
@@ -5090,7 +5092,7 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
                F_POINT const& topRightPoint) {
   auto const topDelta    = topRightPoint - topLeftPoint;
   auto const bottomDelta = bottomRightPoint - bottomLeftPoint;
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : Instance->ClipBuffer) {
 	auto const clipRatio = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
 	auto const topMidpoint =
 	    F_POINT {clipRatio.x * topDelta.x + topLeftPoint.x, clipRatio.y * topDelta.y + topLeftPoint.y};
@@ -6150,7 +6152,9 @@ void form::bord() {
 void fi::fsclp(uint32_t const formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::deleclp(formIndex);
-  auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGECLIP;
   form.clipEntries    = clipSize;
   form.borderClipData = clip::nueclp(formIndex, clipSize);
@@ -6159,7 +6163,7 @@ void fi::fsclp(uint32_t const formIndex) {
   form.borderColor    = ActiveColor;
   form::bsizpar(form);
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.borderClipData);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -7398,9 +7402,11 @@ void fi::filsclp() {
   currentForm.type      = SAT;
   currentForm.fillType  = CLPF;
   currentForm.clipIndex = clip::numclp(ClosestFormToCursor);
-  currentForm.clipCount = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer      = Instance->ClipBuffer;
+
+  currentForm.clipCount = wrap::toUnsigned(clipBuffer.size());
   auto itClipPoints     = wrap::next(ClipPoints->begin(), currentForm.clipIndex);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
   }
@@ -8125,7 +8131,9 @@ void form::boxsel() {
 void fi::fspic(uint32_t const formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::deleclp(formIndex);
-  auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGEPICOT;
   form.clipEntries    = clipSize;
   form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
@@ -8135,7 +8143,7 @@ void fi::fspic(uint32_t const formIndex) {
   form::bsizpar(form);
   form::savplen(ButtonholeCornerLength);
   auto itClipPoints = wrap::next(ClipPoints->begin(), form.borderClipData);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
   }
@@ -8810,13 +8818,15 @@ void form::vrtsclp(uint32_t const formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.clipCount = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  form.clipCount = wrap::toUnsigned(clipBuffer.size());
   form.clipIndex = clip::numclp(formIndex);
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.clipIndex);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -8870,7 +8880,9 @@ void form::horsclp() {
   auto& form = FormList->operator[](ClosestFormToCursor);
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.clipCount      = clipSize;
   form.clipIndex      = clip::numclp(ClosestFormToCursor);
   // ToDo - should this be clipSize + 1?
@@ -8879,7 +8891,7 @@ void form::horsclp() {
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.clipIndex);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -8935,13 +8947,15 @@ void form::angsclp(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.clipIndex = clip::numclp(ClosestFormToCursor);
-  form.clipCount = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  form.clipCount = wrap::toUnsigned(clipBuffer.size());
   form.wordParam = IniFile.fillPhase;
   fi::makpoli();
   form.clipFillAngle = IniFile.fillAngle;
   form.fillSpacing   = IniFile.clipOffset;
   auto itClipPoint   = wrap::next(ClipPoints->begin(), form.clipIndex);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -9197,7 +9211,9 @@ void form::crop() {
 void fi::fsclpx(uint32_t const formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::deleclp(formIndex);
-  auto const clipSize = wrap::toUnsigned(ClipBuffer->size());
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGECLIPX;
   form.clipEntries    = clipSize;
   form.borderClipData = clip::nueclp(formIndex, clipSize);
@@ -9206,7 +9222,7 @@ void fi::fsclpx(uint32_t const formIndex) {
   form.borderColor    = ActiveColor;
   form::bsizpar(form);
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.borderClipData);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }

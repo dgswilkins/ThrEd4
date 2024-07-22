@@ -814,11 +814,13 @@ void xi::fnwlk(FRM_HEAD& form) {
 }
 
 void xi::undclp(float& underlayStitchLen) {
-  ClipBuffer->clear();
-  ClipBuffer->reserve(2);
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  clipBuffer.clear();
+  clipBuffer.reserve(2);
   ClipRectSize = F_LSIZ {0, underlayStitchLen};
-  ClipBuffer->emplace_back(0.0F, 00.0F, 0U);
-  ClipBuffer->emplace_back(0.0F, underlayStitchLen, 0U);
+  clipBuffer.emplace_back(0.0F, 00.0F, 0U);
+  clipBuffer.emplace_back(0.0F, underlayStitchLen, 0U);
 }
 
 void xi::fncwlk(FRM_HEAD& form) {

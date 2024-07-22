@@ -240,8 +240,6 @@ extern float    ButtonholeCornerLength;
 extern HWND     CancelButton;
 extern uint32_t Clip;
 
-extern std::vector<F_POINT_ATTR>* ClipBuffer;
-
 extern HGLOBAL ClipMemory;
 extern void*   ClipPointer;
 

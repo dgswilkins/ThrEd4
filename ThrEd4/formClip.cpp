@@ -619,9 +619,11 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
 	return;
   }
   auto const spClipData = gsl::span {clipStitchData, count};
-  savclp(spClipData[0], ClipBuffer->operator[](0), count);
+  auto&      clipBuffer = Instance->ClipBuffer;
+
+  savclp(spClipData[0], clipBuffer.operator[](0), count);
   for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-	savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
+	savclp(spClipData[iStitch], clipBuffer.operator[](iStitch), 0);
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(Clip, clipHandle);
@@ -967,11 +969,13 @@ void tfc::fpUnClip() {
 }
 
 void tfc::lodclp(uint32_t iStitch) {
-  StitchBuffer->insert(wrap::next(StitchBuffer->begin(), iStitch), ClipBuffer->size(), F_POINT_ATTR {});
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  StitchBuffer->insert(wrap::next(StitchBuffer->begin(), iStitch), clipBuffer.size(), F_POINT_ATTR {});
   ClosestPointIndex  = iStitch;
   auto const originX = wrap::toFloat(ClipOrigin.x);
   auto const originY = wrap::toFloat(ClipOrigin.y);
-  for (auto const& clip : *ClipBuffer) {
+  for (auto const& clip : clipBuffer) {
 	StitchBuffer->operator[](iStitch++) =
 	    F_POINT_ATTR {clip.x + originX,
 	                  clip.y + originY,

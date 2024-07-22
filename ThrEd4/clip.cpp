@@ -223,7 +223,7 @@ auto clip::nueclp(uint32_t const currentForm, uint32_t const count) -> uint32_t 
 }
 
 auto clip::numclp(uint32_t const formIndex) -> uint32_t {
-  auto const clipSize    = wrap::toUnsigned(ClipBuffer->size());
+  auto const clipSize    = wrap::toUnsigned(Instance->ClipBuffer.size());
   auto const find        = ci::findclp(formIndex);
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
@@ -249,19 +249,21 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const 
   if (StateMap->test(StateFlag::NOCLP)) {
 	return;
   }
-  ClipBuffer->clear();
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  clipBuffer.clear();
   if (clipEntries != 0U) {
-	ClipBuffer->reserve(clipEntries);
+	clipBuffer.reserve(clipEntries);
 	for (auto const  clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
                                                        wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
 	     auto const& iClip : clipPoints) {
-	  ClipBuffer->emplace_back(iClip.x, iClip.y, 0);
+	  clipBuffer.emplace_back(iClip.x, iClip.y, 0);
 	}
 	auto minX = BIGFLOAT;
 	auto minY = BIGFLOAT;
 	auto maxX = LOWFLOAT;
 	auto maxY = LOWFLOAT;
-	for (auto const& clip : *ClipBuffer) {
+	for (auto const& clip : clipBuffer) {
 	  minX = std::min(minX, clip.x);
 	  minY = std::min(minY, clip.y);
 	  maxX = std::max(maxX, clip.x);
@@ -277,11 +279,13 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const 
 }
 
 void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept {
-  if (ClipBuffer->empty()) {
+  auto& clipBuffer = Instance->ClipBuffer;
+
+  if (clipBuffer.empty()) {
 	return;
   }
   auto const midpoint = wrap::midl(clipRect.right, clipRect.left);
-  if (auto const& clipBuffer = *ClipBuffer; clipBuffer[0].x > midpoint) {
+  if (clipBuffer[0].x > midpoint) {
 	auto iBuffer = clipBuffer.begin();
 	for (auto& reversed : clipReversedData) {
 	  reversed = F_POINT {clipRect.right - iBuffer->x, iBuffer->y};
@@ -455,7 +459,7 @@ auto ci::clpsid(uint32_t const              vertexIndex,
 void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t const startVertex) {
   OSequence->clear();
   StateMap->reset(StateFlag::CLPBAK);
-  auto const clipStitchCount = ClipBuffer->size();
+  auto const clipStitchCount = Instance->ClipBuffer.size();
   auto       clipFillData    = std::vector<F_POINT> {};
   clipFillData.resize(clipStitchCount);
   auto clipReversedData = std::vector<F_POINT> {};
@@ -727,14 +731,16 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 
 void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   dulast(chainEndPoints);
+  auto& clipBuffer = Instance->ClipBuffer;
+
   if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
-	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
+	std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
 	});
 	return;
   }
-  std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
+  std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
 	return F_POINT {clip.x, (-clip.y)};
   });
 }
@@ -762,7 +768,7 @@ void clip::duxclp(FRM_HEAD const& form) {
   chainEndPoints.reserve(CLRES);
   ci::dufxlen(form, chainEndPoints);
   auto tempClipPoints = std::vector<F_POINT> {};
-  tempClipPoints.reserve(ClipBuffer->size());
+  tempClipPoints.reserve(Instance->ClipBuffer.size());
   ci::clpxadj(tempClipPoints, chainEndPoints);
   OSequence->clear();
   auto constexpr ROTATION_CENTER = F_POINT {};
@@ -792,7 +798,7 @@ void ci::clpcrnr(FRM_HEAD const&       form,
   auto const referencePoint = F_POINT_ATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
   ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
   auto iClip    = clipFillData.begin();
-  for (auto& clip : *ClipBuffer) {
+  for (auto& clip : Instance->ClipBuffer) {
 	*iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	++iClip;
   }
@@ -840,7 +846,7 @@ void ci::picfn(FRM_HEAD const&       form,
 	step           = val;
   }
   auto iClip = clipFillData.begin();
-  for (auto& clip : *ClipBuffer) {
+  for (auto& clip : Instance->ClipBuffer) {
 	*iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	++iClip;
   }
@@ -871,7 +877,7 @@ void ci::picfn(FRM_HEAD const&       form,
 
 void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   auto clipFillData = std::vector<F_POINT> {};
-  clipFillData.resize(ClipBuffer->size());
+  clipFillData.resize(Instance->ClipBuffer.size());
   auto const rotationCenter =
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   OSequence->clear();
