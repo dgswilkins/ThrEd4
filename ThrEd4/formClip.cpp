@@ -915,8 +915,8 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   textureForm           = *clipForm;
   auto*      vertices   = convertFromPtr<F_POINT*>(std::next(clipForm));
   auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
-  AngledFormVertices->clear();
-  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
+  Instance->AngledFormVertices.clear();
+  Instance->AngledFormVertices.insert(Instance->AngledFormVertices.end(), spVertices.begin(), spVertices.end());
   textureForm.vertexIndex = 0;
   StateMap->reset(StateFlag::TXTLIN);
   StateMap->set(StateFlag::TXTCLP);

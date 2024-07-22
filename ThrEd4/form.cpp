@@ -1886,7 +1886,7 @@ void form::duangs(FRM_HEAD const& form) {
   FormAngles->clear();
   auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
-	itVertex = wrap::next(AngledFormVertices->cbegin(), form.vertexIndex);
+	itVertex = wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex);
   }
   auto const vMax = gsl::narrow<ptrdiff_t>(form.vertexCount - 1U);
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
@@ -1926,7 +1926,7 @@ auto form::cisin(FRM_HEAD const& form,
   auto intersection = F_POINT {};
   auto itVertex     = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
-	itVertex = wrap::next(AngledFormVertices->cbegin(), form.vertexIndex);
+	itVertex = wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex);
   }
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const itThisVertex = wrap::next(itVertex, iVertex);
@@ -2759,10 +2759,10 @@ void fi::plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>&
   InsidePoints->push_back(InsidePoints->front());
   OutsidePoints->push_back(OutsidePoints->front());
   for (auto iVertex = 0U; iVertex < angledForm.vertexCount - 1U; ++iVertex) {
-	sprct(*AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U);
+	sprct(Instance->AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
   }
-  sprct(*AngledFormVertices, 0U, fillVerticalRect, angledForm.vertexCount - 1U, 0U);
+  sprct(Instance->AngledFormVertices, 0U, fillVerticalRect, angledForm.vertexCount - 1U, 0U);
   spurct(underlayVerticalRect, fillVerticalRect, angledForm.vertexCount - 1U);
   auto const itVertex = wrap::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
   if ((angledForm.attribute & SBLNT) == 0U) {
@@ -5158,7 +5158,7 @@ void fi::swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	case EDGEPROPSAT: {
 	  if (form.vertexCount > 2) {
 		StateMap->reset(StateFlag::SAT1);
-		plbrd(form, angledForm, *AngledFormVertices);
+		plbrd(form, angledForm, Instance->AngledFormVertices);
 		ritbrd(form);
 	  }
 	  break;
@@ -5241,20 +5241,20 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	}
 	case HORF: { // horizontal fill
 	  rotationAngle = PI_FHALF;
-	  fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
+	  fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, Instance->AngledFormVertices);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(angledForm.vertexCount);
-	  auto const itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
+	  auto const itStartVertex = wrap::next(Instance->AngledFormVertices.cbegin(), angledForm.vertexIndex);
 	  auto const itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
 	}
 	case ANGF: { // angled fill
 	  rotationAngle = PI_FHALF - form.fillAngle;
-	  fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
+	  fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, Instance->AngledFormVertices);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(angledForm.vertexCount);
-	  auto const itStartVertex = wrap::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
+	  auto const itStartVertex = wrap::next(Instance->AngledFormVertices.cbegin(), angledForm.vertexIndex);
 	  auto const itEndVertex   = wrap::next(itStartVertex, angledForm.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
@@ -5274,7 +5274,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	case HCLPF: { // horizontal clip fill
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
-	  horclpfn(textureSegments, angledForm, *AngledFormVertices);
+	  horclpfn(textureSegments, angledForm, Instance->AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
@@ -5282,7 +5282,7 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
 	  StateMap->reset(StateFlag::ISUND);
-	  form::angclpfn(form, textureSegments, *AngledFormVertices);
+	  form::angclpfn(form, textureSegments, Instance->AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
@@ -5299,14 +5299,14 @@ void fi::swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_CO
 	}
 	case TXHORF: { // horizontal fill with texture
 	  texture::setxt(form, textureSegments);
-	  horclpfn(textureSegments, angledForm, *AngledFormVertices);
+	  horclpfn(textureSegments, angledForm, Instance->AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
 	case TXANGF: { // angled fill with texture
 	  texture::setxt(form, textureSegments);
 	  StateMap->reset(StateFlag::ISUND);
-	  form::angclpfn(form, textureSegments, *AngledFormVertices);
+	  form::angclpfn(form, textureSegments, Instance->AngledFormVertices);
 	  doFill = false;
 	  break;
 	}
@@ -5406,7 +5406,7 @@ void form::refilfn(uint32_t const formIndex) {
 	case FRMFPOLY: {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
-	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
+	  xt::chkund(formIndex, textureSegments, Instance->AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
 	  if (form.fillType == 0U) {
 		fi::chkbrd(form);
@@ -5423,7 +5423,7 @@ void form::refilfn(uint32_t const formIndex) {
 	case SAT: {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
-	  xt::chkund(formIndex, textureSegments, *AngledFormVertices);
+	  xt::chkund(formIndex, textureSegments, Instance->AngledFormVertices);
 	  StateMap->reset(StateFlag::ISUND);
 	  fi::swSatFillType(form);
 	  fi::chkbrd(form);

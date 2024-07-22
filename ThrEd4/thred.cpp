@@ -12223,7 +12223,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  AngledFormVertices        = &Instance->AngledFormVertices;
 	  AuxName                   = &Instance->AuxName;
 	  BSequence                 = &Instance->BSequence;
 	  ButtonWin                 = &Instance->ButtonWin;

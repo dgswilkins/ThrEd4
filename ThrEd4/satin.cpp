@@ -1498,7 +1498,7 @@ void si::outfn(FRM_HEAD const& form,
           ? F_POINT {0.0F, satinWidth}
           : satOffset(finish, start, satinWidth);
   auto const itVertex = form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT
-                            ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
+                            ? wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex + finish)
                             : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
 
   InsidePoints->operator[](finish)  = *itVertex - offset;

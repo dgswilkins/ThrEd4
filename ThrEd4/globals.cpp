@@ -45,7 +45,6 @@
 MY_SINGLE*                     Instance                  = nullptr; // main instance
 uint8_t                        ActiveColor               = 0U;      // active color selector
 uint8_t                        ActiveLayer               = 0U;      // active layer
-std::vector<F_POINT>*          AngledFormVertices        = nullptr; // form formOrigin data for angle fills
 uint8_t                        AppliqueColor             = COLORCNT - 1U; // underlay color
 fs::path*                      AuxName                   = nullptr; //
 std::vector<B_SEQ_PNT>*        BSequence                 = nullptr; //

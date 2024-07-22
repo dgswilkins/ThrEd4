@@ -766,7 +766,7 @@ void txi::setxclp(FRM_HEAD const& form) {
 	editorOffset.x -= TextureScreen.formCenter.x;
   }
   editorOffset.y -= TextureScreen.formCenter.y;
-  auto& angledFormVertices = *AngledFormVertices;
+  auto& angledFormVertices = Instance->AngledFormVertices;
   std::ranges::transform(angledFormVertices, angledFormVertices.begin(), [editorOffset](auto& vertex) {
 	return vertex + editorOffset;
   });
@@ -872,13 +872,11 @@ void texture::txtrup() {
 }
 
 void txi::angrct(F_RECTANGLE& rectangle) noexcept {
-  auto const& angledFormVertices = *AngledFormVertices;
-
   auto minX = BIGFLOAT;
   auto minY = BIGFLOAT;
   auto maxX = LOWFLOAT;
   auto maxY = LOWFLOAT;
-  for (auto const& vertex : angledFormVertices) {
+  for (auto const& vertex : Instance->AngledFormVertices) {
 	minX = std::min(minX, vertex.x);
 	minY = std::min(minY, vertex.y);
 	maxX = std::max(maxX, vertex.x);
@@ -893,7 +891,7 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
 
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
-  auto const& angledFormVertices = *AngledFormVertices;
+  auto const& angledFormVertices = Instance->AngledFormVertices;
   for (auto formLine = formLines.begin(); auto const& vertex : angledFormVertices) {
 	ed2px(vertex, *formLine);
 	formLine->x += offset.x;
@@ -912,7 +910,7 @@ void txi::ritxfrm(FRM_HEAD const& textureForm) {
 void texture::setxfrm() noexcept {
   auto angleRect = F_RECTANGLE {};
   txi::angrct(angleRect);
-  auto& angledFormVertices = *AngledFormVertices;
+  auto& angledFormVertices = Instance->AngledFormVertices;
   for (auto& vertex : angledFormVertices) {
 	vertex.x -= angleRect.left;
 	vertex.y -= angleRect.bottom;
@@ -1436,7 +1434,7 @@ void txi::txcntrv(FRM_HEAD const& textureForm) {
 
 void txi::txsiz(float const ratio, FRM_HEAD const& textureForm) {
   ritxfrm(textureForm);
-  for (auto& angledFormVertices = *AngledFormVertices; auto& vertex : angledFormVertices) {
+  for (auto& vertex : Instance->AngledFormVertices) {
 	vertex *= ratio;
   }
   auto angleRect = F_RECTANGLE {};

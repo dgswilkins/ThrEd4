@@ -228,8 +228,6 @@ extern MY_SINGLE*   Instance;
 extern uint8_t      ActiveColor;
 extern uint8_t      ActiveLayer;
 
-extern std::vector<F_POINT>* AngledFormVertices;
-
 extern uint8_t   AppliqueColor;
 extern fs::path* AuxName;
 
