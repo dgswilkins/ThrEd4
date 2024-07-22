@@ -777,10 +777,10 @@ auto thred::adflt(uint32_t const count) -> uint32_t {
 }
 
 auto thred::adclp(uint32_t const count) -> uint32_t {
-  auto const iClipPoint = wrap::toUnsigned(ClipPoints->size());
-  auto const itPoint    = ClipPoints->end();
+  auto const iClipPoint = wrap::toUnsigned(Instance->ClipPoints.size());
+  auto const itPoint    = Instance->ClipPoints.end();
   auto constexpr VAL    = F_POINT {};
-  ClipPoints->insert(itPoint, count, VAL);
+  Instance->ClipPoints.insert(itPoint, count, VAL);
   return iClipPoint;
 }
 
@@ -3105,7 +3105,8 @@ void thi::dubuf(std::vector<char>& buffer) {
   // calculate the design data size
   auto const thredDataSize =
       wrap::sizeofVector(FormList) + vertexCount * wrap::sizeofType(FormVertices) +
-      guideCount * wrap::sizeofType(SatinGuides) + clipDataCount * wrap::sizeofType(ClipPoints) +
+      guideCount * wrap::sizeofType(SatinGuides) +
+      clipDataCount * wrap::sizeofType(Instance->ClipPoints) +
       wrap::sizeofVector(TexturePointsBuffer);
   buffer.reserve(vtxLen + thredDataSize);
   // ToDo - vertexLength overflows a 16 bit integer if there are more than 5446 stitches, so clamp it until version 3
@@ -3114,7 +3115,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   vtxLen = std::min(vtxLen, VTXCLAMP);
   wrap::narrow(stitchHeader.vertexLen, vtxLen);
   wrap::narrow(stitchHeader.dlineLen, wrap::sizeofType(FormVertices) * vertexCount);
-  wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(ClipPoints) * clipDataCount);
+  wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(Instance->ClipPoints) * clipDataCount);
   // write the header to the buffer
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
   ExtendedHeader->auxFormat         = IniFile.auxFileType;
@@ -3169,14 +3170,14 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  }
 	}
 	if (srcForm.isClip()) { // write the clip data to the points buffer
-	  auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.clipIndex);
+	  auto offsetStart = wrap::next(Instance->ClipPoints.cbegin(), srcForm.clipIndex);
 	  for (auto iClip = 0U; iClip < srcForm.clipCount; ++iClip) {
 		points.push_back(*offsetStart);
 		++offsetStart;
 	  }
 	}
 	if (srcForm.isEdgeClipX()) { // write the edge clip data to the points buffer
-	  auto       offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
+	  auto       offsetStart = wrap::next(Instance->ClipPoints.cbegin(), srcForm.borderClipData);
 	  auto const clipCount   = srcForm.clipEntries;
 	  for (auto iClip = 0U; iClip < clipCount; ++iClip) {
 		points.push_back(*offsetStart);
@@ -4078,17 +4079,17 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   SatinGuides->shrink_to_fit();
   if (thredHeader.clipDataCount != 0U) {
-	ClipPoints->resize(thredHeader.clipDataCount);
-	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(ClipPoints);
-	if (!wrap::readFile(fileHandle, ClipPoints->data(), bytesToRead, &bytesRead, L"ReadFile for ClipPoints in readTHRFile")) {
+	Instance->ClipPoints.resize(thredHeader.clipDataCount);
+	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
+	if (!wrap::readFile(fileHandle, Instance->ClipPoints.data(), bytesToRead, &bytesRead, L"ReadFile for ClipPoints in readTHRFile")) {
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
-	  ClipPoints->resize(bytesRead / wrap::sizeofType(ClipPoints));
+	  Instance->ClipPoints.resize(bytesRead / wrap::sizeofType(Instance->ClipPoints));
 	  StateMap->set(StateFlag::BADFIL);
 	}
   }
-  ClipPoints->shrink_to_fit();
+  Instance->ClipPoints.shrink_to_fit();
   if (ExtendedHeader->texturePointCount != 0U) {
 	TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
 	bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(TexturePointsBuffer);
@@ -5066,8 +5067,8 @@ void thred::newFil() {
   FormVertices->shrink_to_fit();
   TexturePointsBuffer->clear();
   TexturePointsBuffer->shrink_to_fit();
-  ClipPoints->clear();
-  ClipPoints->shrink_to_fit();
+  Instance->ClipPoints.clear();
+  Instance->ClipPoints.shrink_to_fit();
   SatinGuides->clear();
   SatinGuides->shrink_to_fit();
   FormList->clear();
@@ -6475,7 +6476,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   if (fileHeader.formCount != 0U) {
 	auto const newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
 	auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
-	auto       clipOffset         = wrap::toUnsigned(ClipPoints->size());
+	auto       clipOffset         = wrap::toUnsigned(Instance->ClipPoints.size());
 	auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
 	if (version < 2) {
 	  auto inFormList = std::vector<FRM_HEAD_O> {};
@@ -6542,7 +6543,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	if (fileHeader.clipDataCount != 0U) {
 	  auto inPointList = std::vector<F_POINT> {};
 	  inPointList.resize(fileHeader.clipDataCount);
-	  auto const bytesToRead = fileHeader.clipDataCount * wrap::sizeofType(ClipPoints);
+	  auto const bytesToRead = fileHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
 	  if (!wrap::readFile(fileHandle, inPointList.data(), bytesToRead, &bytesRead, L"ReadFile for inPointList in insTHR")) {
 		return false;
 	  }
@@ -6550,8 +6551,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		inPointList.resize(bytesRead / wrap::sizeofType(inPointList));
 		StateMap->set(StateFlag::BADFIL);
 	  }
-	  ClipPoints->reserve(ClipPoints->size() + inPointList.size());
-	  ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
+	  Instance->ClipPoints.reserve(Instance->ClipPoints.size() + inPointList.size());
+	  Instance->ClipPoints.insert(Instance->ClipPoints.end(), inPointList.begin(), inPointList.end());
 	}
 	if (thredHeader.texturePointCount != 0U) {
 	  auto inTextureList = std::vector<TX_PNT> {};
@@ -6595,7 +6596,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	if (newSatinGuideIndex != SatinGuides->size()) {
 	  StateMap->set(StateFlag::BADFIL);
 	}
-	if (clipOffset != ClipPoints->size()) {
+	if (clipOffset != Instance->ClipPoints.size()) {
 	  StateMap->set(StateFlag::BADFIL);
 	}
 	if (fileHeader.formCount != 0U) {
@@ -12227,7 +12228,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  ClipPoints                = &Instance->ClipPoints;
 	  ColorBarSize              = &Instance->ColorBarSize;
 	  ColorChangeTable          = &Instance->ColorChangeTable;
 	  DefaultColorWin           = &Instance->DefaultColorWin;

@@ -56,7 +56,6 @@ HWND                           CancelButton              = nullptr; // cancel bu
 uint32_t                       Clip                      = 0U;      // pcs format clipboard handle
 HGLOBAL                        ClipMemory                = nullptr; // handle to the clipboard memory
 void*                          ClipPointer               = nullptr; // for memory allocation for clipboard data
-std::vector<F_POINT>*          ClipPoints                = nullptr; // main clipboard fill points for forms
 F_LSIZ                         ClipRectSize              = {};      // clipboard rectangle size
 CLIP_STITCH*                   ClipStitchData            = nullptr; // for pcs clipboard data
 uint32_t                       ClosestFormToCursor       = 0U;      // closest form to the cursor

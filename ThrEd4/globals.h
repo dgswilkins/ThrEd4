@@ -243,8 +243,6 @@ extern uint32_t Clip;
 extern HGLOBAL ClipMemory;
 extern void*   ClipPointer;
 
-extern std::vector<F_POINT>* ClipPoints;
-
 extern F_LSIZ       ClipRectSize;
 extern CLIP_STITCH* ClipStitchData;
 extern uint32_t     ClosestFormToCursor;

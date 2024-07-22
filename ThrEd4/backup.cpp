@@ -76,7 +76,7 @@ void backup::dudat() {
   auto const formCount = wrap::toUnsigned(FormList->size());
 
   auto const size = wrap::sizeofVector(*FormList) + wrap::sizeofVector(StitchBuffer) +
-                    wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
+                    wrap::sizeofVector(FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
@@ -112,15 +112,15 @@ void backup::dudat() {
 	auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
 	std::ranges::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
   }
-  backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
+  backupData->clipPointCount = wrap::toUnsigned(Instance->ClipPoints.size());
   backupData->clipPoints =
       convertFromPtr<F_POINT*>(std::next(backupData->guide, wrap::toPtrdiff(SatinGuides->size())));
-  if (!ClipPoints->empty()) {
+  if (!Instance->ClipPoints.empty()) {
 	auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
-	std::ranges::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
+	std::ranges::copy(Instance->ClipPoints.cbegin(), Instance->ClipPoints.cend(), spClipPoints.begin());
   }
   backupData->colors =
-      convertFromPtr<COLORREF*>(std::next(backupData->clipPoints, wrap::toPtrdiff(ClipPoints->size())));
+      convertFromPtr<COLORREF*>(std::next(backupData->clipPoints, wrap::toPtrdiff(Instance->ClipPoints.size())));
   {
 	auto const spColors = gsl::span {backupData->colors, COLORCNT};
 	std::ranges::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
@@ -174,10 +174,10 @@ void bui::redbak() {
 	auto const span = gsl::span {undoData->guide, undoData->guideCount};
 	SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
   }
-  ClipPoints->clear();
+  Instance->ClipPoints.clear();
   if (undoData->clipPointCount != 0U) {
 	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
-	ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
+	Instance->ClipPoints.insert(Instance->ClipPoints.end(), span.begin(), span.end());
   }
   constexpr auto UCOLSIZE     = UserColor.size();
   auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};

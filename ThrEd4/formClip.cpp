@@ -146,10 +146,10 @@ auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
   if (form.isEdgeClip()) {
-	clipSize += form.clipEntries * wrap::sizeofType(ClipPoints);
+	clipSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
   }
   if (form.isClipX()) {
-	clipSize += form.clipCount * wrap::sizeofType(ClipPoints);
+	clipSize += form.clipCount * wrap::sizeofType(Instance->ClipPoints);
   }
   if (form.isTexture()) {
 	clipSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
@@ -173,10 +173,10 @@ void fci::sizclp(FRM_HEAD const& form,
 	fileSize += length * wrap::sizeofType(StitchBuffer);
   }
   if (form.isEdgeClip()) {
-	fileSize += form.clipEntries * wrap::sizeofType(ClipPoints);
+	fileSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
   }
   if (form.isClipX()) {
-	fileSize += form.clipCount * wrap::sizeofType(ClipPoints);
+	fileSize += form.clipCount * wrap::sizeofType(Instance->ClipPoints);
   }
   if (form.isTexture()) {
 	fileSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
@@ -224,7 +224,7 @@ void fci::clipSelectedForm() {
   auto  iClip   = 0U;
   if (form.isClipX()) {
 	iClip                = form.clipCount;
-	auto const startMclp = wrap::next(ClipPoints->cbegin(), form.clipIndex);
+	auto const startMclp = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
 	auto const endMclp   = wrap::next(startMclp, iClip);
 
 	auto const mclps = gsl::span {ptrMclp, iClip};
@@ -234,7 +234,7 @@ void fci::clipSelectedForm() {
   iClip           = 0U;
   if (form.isEdgeClipX()) {
 	iClip                = form.clipEntries;
-	auto const startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	auto const startClip = wrap::next(Instance->ClipPoints.cbegin(), form.borderClipData);
 	auto const endClip   = wrap::next(startClip, iClip);
 
 	auto const points = gsl::span {ptrPoints, iClip};
@@ -366,7 +366,7 @@ void fci::clipSelectedForms() {
 	for (auto& selectedForm : *SelectedFormList) {
 	  auto& form = FormList->operator[](selectedForm);
 	  if (form.isClipX()) {
-		auto offsetStart = wrap::next(ClipPoints->cbegin(), form.clipIndex);
+		auto offsetStart = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
 		for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 		  points[pointCount++] = *offsetStart;
 		  ++offsetStart;
@@ -375,7 +375,7 @@ void fci::clipSelectedForms() {
 	  if (!form.isEdgeClip()) {
 		continue;
 	  }
-	  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	  auto offsetStart = wrap::next(Instance->ClipPoints.cbegin(), form.borderClipData);
 	  for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
 		points[pointCount++] = *offsetStart;
 		++offsetStart;
@@ -771,7 +771,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  // clang-format on
 		  if (form.isClipX()) {
 			form.clipIndex   = thred::adclp(form.clipCount);
-			auto offsetStart = wrap::next(ClipPoints->begin(), form.clipIndex);
+			auto offsetStart = wrap::next(Instance->ClipPoints.begin(), form.clipIndex);
 			for (auto iClip = 0U; iClip < form.clipCount; ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
@@ -779,7 +779,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  }
 		  if (form.isEdgeClipX()) {
 			form.borderClipData = thred::adclp(form.clipEntries);
-			auto offsetStart    = wrap::next(ClipPoints->begin(), form.borderClipData);
+			auto offsetStart    = wrap::next(Instance->ClipPoints.begin(), form.borderClipData);
 			for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
 			  *offsetStart = clipData[currentClip++];
 			  ++offsetStart;
@@ -846,15 +846,15 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto clipCount = 0U;
 		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span {ptrClipData, formIter.clipCount};
-			formIter.clipIndex  = wrap::toUnsigned(ClipPoints->size());
-			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
+			formIter.clipIndex  = wrap::toUnsigned(Instance->ClipPoints.size());
+			Instance->ClipPoints.insert(Instance->ClipPoints.end(), clipData.begin(), clipData.end());
 			clipCount += formIter.clipCount;
 		  }
 		  if (formIter.isEdgeClipX()) {
 			ptrClipData             = convertFromPtr<F_POINT*>(wrap::next(ptrClipData, clipCount));
 			auto const clipData     = gsl::span {ptrClipData, formIter.clipEntries};
-			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
-			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
+			formIter.borderClipData = wrap::toUnsigned(Instance->ClipPoints.size());
+			Instance->ClipPoints.insert(Instance->ClipPoints.end(), clipData.begin(), clipData.end());
 			clipCount += formIter.clipEntries;
 		  }
 		  if (formIter.isTexture()) {

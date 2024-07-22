@@ -214,7 +214,7 @@ auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 	if (badData.flt != FormVertices->size()) {
 	  badData.attribute |= BADFLT;
 	}
-	if (badData.clip != ClipPoints->size()) {
+	if (badData.clip != Instance->ClipPoints.size()) {
 	  badData.attribute |= BADCLP;
 	}
 	if (badData.guideCount != SatinGuides->size()) {
@@ -285,7 +285,7 @@ void ri::repflt(std::wstring& repairMessage) {
 	  continue;
 	}
 	FormList->resize(iForm);
-	ClipPoints->resize(badData.clip);
+	Instance->ClipPoints.resize(badData.clip);
 	SatinGuides->resize(badData.guideCount);
 	TexturePointsBuffer->resize(badData.tx);
 	chkfstch();
@@ -300,9 +300,9 @@ void ri::checkClip(const uint32_t&       clipDifference,
                    std::vector<F_POINT>& clipPoint,
                    unsigned int&         clipCount,
                    unsigned int&         badClipCount) {
-  if (wrap::toSize(clipDifference) + form.clipCount < ClipPoints->size()) {
+  if (wrap::toSize(clipDifference) + form.clipCount < Instance->ClipPoints.size()) {
 	clipPoint.resize(clipPoint.size() + form.clipCount);
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.clipIndex);
+	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -310,10 +310,10 @@ void ri::checkClip(const uint32_t&       clipDifference,
 	clipCount += form.clipCount;
 	return;
   }
-  if (clipDifference < ClipPoints->size()) {
+  if (clipDifference < Instance->ClipPoints.size()) {
 	form.clipCount = wrap::toUnsigned(FormVertices->size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipCount);
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.clipIndex);
+	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -330,9 +330,9 @@ void ri::checkEdgeClip(const uint32_t&       clipDifference,
                        std::vector<F_POINT>& clipPoint,
                        unsigned int&         clipCount,
                        unsigned int&         badClipCount) {
-  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
+  if (wrap::toSize(clipDifference) + form.clipEntries < Instance->ClipPoints.size()) {
 	clipPoint.resize(clipPoint.size() + form.clipEntries);
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.borderClipData);
 	auto const endClip     = wrap::next(startClip, form.clipEntries);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -340,10 +340,10 @@ void ri::checkEdgeClip(const uint32_t&       clipDifference,
 	clipCount += form.clipEntries;
 	return;
   }
-  if (clipDifference < ClipPoints->size()) {
+  if (clipDifference < Instance->ClipPoints.size()) {
 	wrap::narrow(form.clipEntries, FormVertices->size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipEntries);
-	auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.borderClipData);
 	auto const endClip     = wrap::next(startClip, form.clipEntries);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -372,7 +372,7 @@ void ri::repclp(std::wstring& repairMessage) {
 	  checkEdgeClip(clipDifference, form, clipPoint, clipCount, badClipCount);
 	}
   }
-  std::ranges::copy(clipPoint, ClipPoints->begin());
+  std::ranges::copy(clipPoint, Instance->ClipPoints.begin());
   if (badClipCount != 0U) {
 	adbad(repairMessage, IDS_CLPDAT, badClipCount);
   }
