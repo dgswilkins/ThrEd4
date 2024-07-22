@@ -1315,7 +1315,7 @@ void form::flipv() {
 	return;
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
-	auto const offset = AllItemsRect->top + AllItemsRect->bottom;
+	auto const offset = Instance->AllItemsRect.top + Instance->AllItemsRect.bottom;
 	for (auto& formVertice : *FormVertices) {
 	  formVertice.y = offset - formVertice.y;
 	}
@@ -6276,13 +6276,13 @@ auto fi::getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR>
   return allItemsRect;
 }
 
-void form::stchrct2px(gsl::not_null<F_RECTANGLE const*> const stitchRect, RECT& screenRect) {
-  auto stitchCoord = F_POINT {stitchRect->left, stitchRect->top};
+void form::stchrct2px(F_RECTANGLE const& stitchRect, RECT& screenRect) {
+  auto stitchCoord = F_POINT {stitchRect.left, stitchRect.top};
   auto screenCoord = POINT {};
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.left = screenCoord.x;
   screenRect.top  = screenCoord.y;
-  stitchCoord     = F_POINT {stitchRect->right, stitchRect->bottom};
+  stitchCoord     = F_POINT {stitchRect.right, stitchRect.bottom};
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.right  = screenCoord.x;
   screenRect.bottom = screenCoord.y;
@@ -6293,7 +6293,7 @@ void form::selal() {
   SelectedFormList->clear();
   StateMap->reset(StateFlag::SELBOX);
   StateMap->reset(StateFlag::GRPSEL);
-  *AllItemsRect = fi::getbig(*FormList, *StitchBuffer);
+  Instance->AllItemsRect = fi::getbig(*FormList, *StitchBuffer);
   ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
@@ -6301,7 +6301,7 @@ void form::selal() {
   NearestCount = 0;
   StateMap->reset(StateFlag::RUNPAT);
   thred::duzrat();
-  stchrct2px(AllItemsRect, SelectedFormsRect);
+  stchrct2px(Instance->AllItemsRect, SelectedFormsRect);
   StateMap->set(StateFlag::BIGBOX);
   StateMap->set(StateFlag::RESTCH);
 }
@@ -7166,7 +7166,7 @@ void form::fliph() {
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
 	thred::savdo();
-	auto const offset = AllItemsRect->right + AllItemsRect->left;
+	auto const offset = Instance->AllItemsRect.right + Instance->AllItemsRect.left;
 	for (auto& formVertice : *FormVertices) {
 	  formVertice.x = offset - formVertice.x;
 	}
@@ -7578,7 +7578,7 @@ auto form::rotpar() -> F_POINT {
 	  break;
 	}
 	if (StateMap->test(StateFlag::BIGBOX)) {
-	  RotationRect = *AllItemsRect;
+	  RotationRect = Instance->AllItemsRect;
 	  break;
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
@@ -8514,9 +8514,10 @@ void form::cntrx() {
 
 void form::centir() {
   StateMap->reset(StateFlag::BIGBOX);
-  *AllItemsRect         = fi::getbig(*FormList, *StitchBuffer);
-  auto const itemCenter = F_POINT {wrap::midl(AllItemsRect->right, AllItemsRect->left),
-                                   wrap::midl(AllItemsRect->top, AllItemsRect->bottom)};
+  auto& allItemsRect = Instance->AllItemsRect;
+  allItemsRect         = fi::getbig(*FormList, *StitchBuffer);
+  auto const itemCenter = F_POINT {wrap::midl(allItemsRect.right, allItemsRect.left),
+                                   wrap::midl(allItemsRect.top, allItemsRect.bottom)};
   auto const hoopCenter =
       F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   auto const delta = F_POINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};

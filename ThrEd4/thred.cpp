@@ -8397,11 +8397,12 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	for (auto& stitch : *StitchBuffer) {
 	  stitch += F_POINT {deltaX, deltaY};
 	}
-	AllItemsRect->bottom += deltaY;
-	AllItemsRect->top += deltaY;
-	AllItemsRect->left += deltaX;
-	AllItemsRect->right += deltaX;
-	form::stchrct2px(AllItemsRect, SelectedFormsRect);
+	auto& allItemsRect = Instance->AllItemsRect;
+	allItemsRect.left += deltaX;
+	allItemsRect.top += deltaY;
+	allItemsRect.right += deltaX;
+	allItemsRect.bottom += deltaY;
+	form::stchrct2px(allItemsRect, SelectedFormsRect);
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
@@ -12222,7 +12223,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  AllItemsRect              = &Instance->AllItemsRect;
 	  AngledFormVertices        = &Instance->AngledFormVertices;
 	  AuxName                   = &Instance->AuxName;
 	  BSequence                 = &Instance->BSequence;

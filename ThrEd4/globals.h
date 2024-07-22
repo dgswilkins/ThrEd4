@@ -227,7 +227,6 @@ class MY_SINGLE
 extern MY_SINGLE*   Instance;
 extern uint8_t      ActiveColor;
 extern uint8_t      ActiveLayer;
-extern F_RECTANGLE* AllItemsRect;
 
 extern std::vector<F_POINT>* AngledFormVertices;
 

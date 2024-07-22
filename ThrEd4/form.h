@@ -159,7 +159,7 @@ void spltfrm();
 void srtbyfrm();
 void srtfrm();
 void stchadj();
-void stchrct2px(gsl::not_null<F_RECTANGLE const*> stitchRect, RECT& screenRect);
+void stchrct2px(F_RECTANGLE const& stitchRect, RECT& screenRect);
 void stchs2frm();
 void tglfrm();
 void unfil();
