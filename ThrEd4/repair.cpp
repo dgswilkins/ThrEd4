@@ -79,10 +79,11 @@ void ri::adbad(std::wstring& repairMessage, uint32_t const code, uint32_t const 
 
 void repair::lodchk() {
   thred::delinf();
-  if (FormList->empty()) {
+  auto& formList = Instance->FormList;
+  if (formList.empty()) {
 	return;
   }
-  for (auto& form : *FormList) {
+  for (auto& form : formList) {
 	if (form.type == 0U) {
 	  form.type = FRMFPOLY;
 	}
@@ -102,7 +103,7 @@ void repair::lodchk() {
 	  form.maxBorderStitchLen = IniFile.maxStitchLength;
 	}
   }
-  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+  auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto& stitch : *StitchBuffer) {
 	if (auto const attribute = stitch.attribute; (attribute & TYPMSK) == TYPFRM) {
 	  if (auto const tform = (attribute & FRMSK) >> FRMSHFT; tform < formMap.size()) {
@@ -114,7 +115,7 @@ void repair::lodchk() {
 	  }
 	}
   }
-  for (auto iForm = 0U; auto& form : *FormList) {
+  for (auto iForm = 0U; auto& form : formList) {
 	if (!formMap.test(iForm)) {
 	  form.fillType = 0;
 	}
@@ -126,7 +127,7 @@ void repair::lodchk() {
 	  formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
   }
-  for (auto iForm = 0U; auto& form : *FormList) {
+  for (auto iForm = 0U; auto& form : formList) {
 	if (!formMap.test(iForm)) {
 	  form.edgeType = 0;
 	}
@@ -181,8 +182,9 @@ void ri::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 
 auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto badData = BAD_COUNTS {};
-  if (!FormList->empty()) {
-	for (auto& form : *FormList) {
+  auto& formList = Instance->FormList;
+  if (!formList.empty()) {
+	for (auto& form : formList) {
 	  if ((badData.attribute & BADFLT) == 0U) {
 		if (form.vertexCount == 0U) {
 		  badData.attribute |= BADFLT;
@@ -243,7 +245,7 @@ void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 }
 
 void ri::chkfstch() noexcept {
-  auto const codedFormIndex = FormList->size() << FRMSHFT;
+  auto const codedFormIndex = Instance->FormList.size() << FRMSHFT;
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & FRMSK) >= codedFormIndex) {
 	  stitch.attribute = NOTFRM;
@@ -254,7 +256,7 @@ void ri::chkfstch() noexcept {
 void ri::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BAD_COUNTS {};
-  auto& formList     = *FormList;
+  auto& formList     = Instance->FormList;
   for (auto const& iForm : formList) {
 	if (iForm.vertexCount != 0U) {
 	  formList[iDestination++] = iForm;
@@ -284,12 +286,12 @@ void ri::repflt(std::wstring& repairMessage) {
 	  ++iForm;
 	  continue;
 	}
-	FormList->resize(iForm);
+	formList.resize(iForm);
 	Instance->ClipPoints.resize(badData.clip);
 	SatinGuides->resize(badData.guideCount);
 	TexturePointsBuffer->resize(badData.tx);
 	chkfstch();
-	adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(FormList->size()));
+	adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(formList.size()));
 	break;
   }
   *FormVertices = std::move(vertexPoint);
@@ -359,7 +361,7 @@ void ri::repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
   auto clipPoint    = std::vector<F_POINT> {};
-  for (auto& form : *FormList) {
+  for (auto& form : Instance->FormList) {
 	// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
 	auto const clipDifference = form.isClip()       ? form.clipIndex
 	                            : form.isEdgeClip() ? form.borderClipData
@@ -381,7 +383,7 @@ void ri::repclp(std::wstring& repairMessage) {
 void ri::repsat() {
   auto guideCount = 0U;
   auto badData    = BAD_COUNTS {};
-  for (auto& form : *FormList) {
+  for (auto& form : Instance->FormList) {
 	if (form.type != SAT || form.satinGuideCount == 0U) {
 	  continue;
 	}
@@ -414,7 +416,7 @@ void ri::repsat() {
 void ri::reptx() {
   auto textureCount = 0U;
   auto badData      = BAD_COUNTS {};
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : Instance->FormList) {
 	if (!iForm.isTexture()) {
 	  continue;
 	}

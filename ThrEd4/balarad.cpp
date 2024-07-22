@@ -131,7 +131,7 @@ void bal::redbal() {
   }
   auto balaradHeader = BAL_HEAD {};
   StitchBuffer->clear();
-  FormList->clear();
+  Instance->FormList.clear();
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const balaradFile =
       CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);

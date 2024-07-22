@@ -73,9 +73,10 @@ void redbak();
 void backup::dudat() {
   auto& bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
   bufferElement.clear();
-  auto const formCount = wrap::toUnsigned(FormList->size());
+  auto& formList = Instance->FormList;
+  auto const formCount = wrap::toUnsigned(formList.size());
 
-  auto const size = wrap::sizeofVector(*FormList) + wrap::sizeofVector(StitchBuffer) +
+  auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(StitchBuffer) +
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
@@ -88,8 +89,8 @@ void backup::dudat() {
   backupData->formCount = formCount;
   backupData->forms     = convertFromPtr<FRM_HEAD*>(std::next(backupData, 1));
   if (formCount != 0) {
-	auto const spForms = gsl::span {backupData->forms, FormList->size()};
-	std::ranges::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
+	auto const spForms = gsl::span {backupData->forms, formList.size()};
+	std::ranges::copy(formList.cbegin(), formList.cend(), spForms.begin());
   }
   backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
   backupData->stitches =
@@ -159,10 +160,12 @@ void bui::redbak() {
 	StateMap->reset(StateFlag::INIT);
   }
   UnzoomedRect = undoData->zoomRect;
-  FormList->clear();
+
+  auto& formList = Instance->FormList;
+  formList.clear();
   if (undoData->formCount != 0U) {
 	auto const span = gsl::span {undoData->forms, undoData->formCount};
-	FormList->insert(FormList->end(), span.begin(), span.end());
+	formList.insert(formList.end(), span.begin(), span.end());
   }
   FormVertices->clear();
   if (undoData->vertexCount != 0U) {

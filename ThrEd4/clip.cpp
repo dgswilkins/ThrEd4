@@ -129,7 +129,8 @@ auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 } // namespace
 
 auto ci::findclp(uint32_t const formIndex) -> uint32_t {
-  for (auto spForms = std::ranges::subrange(FormList->begin(), wrap::next(FormList->begin(), formIndex));
+  auto& formList = Instance->FormList;
+  for (auto spForms = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
        auto& form : spForms | std::views::reverse) {
 	if (form.isEdgeClip()) {
 	  return form.borderClipData + form.clipEntries;
@@ -142,7 +143,8 @@ auto ci::findclp(uint32_t const formIndex) -> uint32_t {
 }
 
 void ci::clpsub(uint32_t const formIndex, uint32_t const cnt) {
-  for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
+  for (auto spForms = std::ranges::subrange(wrap::next(Instance->FormList.begin(), formIndex + 1U),
+                                            Instance->FormList.end());
        auto& form : spForms) {
 	if (form.isClipX()) {
 	  form.clipIndex -= cnt;
@@ -157,7 +159,7 @@ void clip::delmclp(uint32_t const formIndex) {
   if (Instance->ClipPoints.empty()) {
 	return;
   }
-  auto& form = FormList->operator[](formIndex);
+  auto& form = Instance->FormList.operator[](formIndex);
   if (!form.isClip()) {
 	return;
   }
@@ -176,7 +178,7 @@ void clip::deleclp(uint32_t const formIndex) {
   if (Instance->ClipPoints.empty()) {
 	return;
   }
-  auto& form = FormList->operator[](formIndex);
+  auto& form = Instance->FormList.operator[](formIndex);
   if (!form.isEdgeClip()) {
 	return;
   }
@@ -199,19 +201,21 @@ void clip::delclps(uint32_t const formIndex) {
 }
 
 auto clip::nueclp(uint32_t const currentForm, uint32_t const count) -> uint32_t {
+  auto& formList = Instance->FormList;
+
   auto find = ci::findclp(currentForm);
-  if (auto const& form = FormList->operator[](currentForm); form.isClip()) {
+  if (auto const& form = formList.operator[](currentForm); form.isClip()) {
 	find += form.clipCount;
   }
   auto const itClipPoint = wrap::next(Instance->ClipPoints.cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   Instance->ClipPoints.insert(itClipPoint, count, VAL);
-  auto itStart = wrap::next(FormList->begin(), currentForm);
+  auto itStart = wrap::next(formList.begin(), currentForm);
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += count;
   }
   ++itStart;
-  for (auto spForms = std::ranges::subrange(itStart, FormList->end()); auto& form : spForms) {
+  for (auto spForms = std::ranges::subrange(itStart, formList.end()); auto& form : spForms) {
 	if (form.isEdgeClipX()) {
 	  form.borderClipData += count;
 	}
@@ -228,13 +232,15 @@ auto clip::numclp(uint32_t const formIndex) -> uint32_t {
   auto const itClipPoint = wrap::next(Instance->ClipPoints.cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   Instance->ClipPoints.insert(itClipPoint, clipSize, VAL);
-  auto itStart       = wrap::next(FormList->begin(), formIndex);
+  auto& formList = Instance->FormList;
+
+  auto itStart       = wrap::next(formList.begin(), formIndex);
   itStart->clipIndex = find;
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += clipSize;
   }
   ++itStart;
-  for (auto spForms = std::ranges::subrange(itStart, FormList->end()); auto& form : spForms) {
+  for (auto spForms = std::ranges::subrange(itStart, formList.end()); auto& form : spForms) {
 	if (form.isClipX()) {
 	  form.clipIndex += clipSize;
 	}
@@ -398,7 +404,7 @@ void ci::linsid(uint32_t const              vertexIndex,
 }
 
 void clip::clpout(float const width) {
-  auto const& form = FormList->operator[](ClosestFormToCursor);
+  auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
   if (form.type == FRMLINE) {
 	satin::satout(form, width);
 	return;
@@ -734,7 +740,7 @@ void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& cha
   dulast(chainEndPoints);
   auto& clipBuffer = Instance->ClipBuffer;
 
-  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
+  if (auto const& form = Instance->FormList.operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
 	std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
@@ -920,7 +926,7 @@ void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t const start
   auto delta = F_POINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
                         (chainEndPoints[finish].y - chainEndPoints[start].y)};
 
-  auto const& form       = FormList->operator[](ClosestFormToCursor);
+  auto const& form       = Instance->FormList.operator[](ClosestFormToCursor);
   auto const lengthDelta = F_POINT {(delta.x * form.edgeStitchLen), (delta.y * form.edgeStitchLen)};
   auto const angle       = std::atan2(delta.y, delta.x) + PI_FHALF;
   auto const offset      = F_POINT {(cos(angle) * form.borderSize), (sin(angle) * form.borderSize)};
@@ -961,7 +967,7 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   for (auto iPoint = 0U; iPoint < chainLength - 1U; ++iPoint) {
 	duchfn(chainEndPoints, iPoint, iPoint + 1U);
   }
-  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type != FRMLINE) {
+  if (auto const& form = Instance->FormList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
 	duchfn(chainEndPoints, chainLength - 1, 0);
 	OSequence->push_back(chainEndPoints[chainLength]);
 	return;

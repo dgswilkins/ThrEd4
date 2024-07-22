@@ -240,7 +240,7 @@ auto di::clpmsgs(uint32_t const code) -> bool {
 }
 
 void displayText::frm1pnt() {
-  if (FormList->size() == 1) {
+  if (Instance->FormList.size() == 1) {
 	StateMap->set(StateFlag::FORMSEL);
 	ClosestFormToCursor = 0;
   }
@@ -250,10 +250,12 @@ auto displayText::filmsgs(uint32_t const code) -> bool {
   if (!SelectedFormList->empty()) {
 	return di::clpmsgs(code);
   }
-  if (!FormList->empty()) {
+  auto& formList = Instance->FormList;
+
+  if (!formList.empty()) {
 	frm1pnt();
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.vertexCount == 2) {
+	  if (auto const& form = formList.operator[](ClosestFormToCursor); form.vertexCount == 2) {
 		if (code < FML_LIN) {
 		  tabmsg(IDS_FRM3X, false);
 		  return false;

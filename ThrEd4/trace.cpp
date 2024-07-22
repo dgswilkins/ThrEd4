@@ -927,7 +927,7 @@ void ti::dutrac() {
   form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   form.satinGuideCount = 0;
   form.outline();
-  FormList->push_back(form);
+  Instance->FormList.push_back(form);
   StateMap->set(StateFlag::RESTCH);
   StateMap->set(StateFlag::FRMOF);
   form::tglfrm();
@@ -1126,7 +1126,9 @@ void trace::blak() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  if (FormList->empty()) {
+  auto& formList = Instance->FormList;
+
+  if (formList.empty()) {
 	displayText::tabmsg(IDS_FRMNO, false);
 	return;
   }
@@ -1137,7 +1139,7 @@ void trace::blak() {
   if (!StateMap->test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : formList) {
 	bitmap::bfrm(iForm);
   }
   DeleteObject(BlackPen);

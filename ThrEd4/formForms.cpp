@@ -552,7 +552,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 }
 
 void formForms::refrm() {
-  auto& form = FormList->operator[](ClosestFormToCursor);
+  auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   if (StateMap->testAndReset(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
 	StateMap->reset(StateFlag::WASRT);
@@ -743,11 +743,13 @@ void formForms::prfmsg() {
 }
 
 void formForms::frmnum() {
-  if (FormList->empty() || !StateMap->test(StateFlag::FORMSEL)) {
+  auto& formList = Instance->FormList;
+
+  if (formList.empty() || !StateMap->test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);
 	return;
   }
-  displayText::showMessage(IDS_FRML, FormList->size());
+  displayText::showMessage(IDS_FRML, formList.size());
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::ENTRFNUM);
   displayText::numWnd();
@@ -1041,8 +1043,10 @@ void formForms::dasyfrm() {
   }
   StateMap->set(StateFlag::INIT);
   form.outline();
-  FormList->push_back(form);
-  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+  auto& formList = Instance->FormList;
+
+  formList.push_back(form);
+  ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   for (auto iMacroPetal = 0U; iMacroPetal < iVertex; ++iMacroPetal) {
 	itVertex->x -= form.rectangle.left;
 	itVertex->y -= form.rectangle.bottom;
@@ -1181,7 +1185,7 @@ void formForms::setear() {
 
   auto twistStep = IniFile.tearTwistStep;
   form::durpoli(IniFile.formSides);
-  auto&      form             = FormList->back();
+  auto&      form             = Instance->FormList.back();
   auto const formVertexIndex  = form.vertexIndex;
   auto const formVertexCount  = form.vertexCount;
   auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
@@ -1338,7 +1342,9 @@ void formForms::wavfrm() {
   points.reserve(IniFile.wavePoints);
   // reuse regular polygon code to build the template for points
   form::durpoli(IniFile.wavePoints);
-  auto&      form            = FormList->back();
+  auto& formList = Instance->FormList;
+
+  auto&      form            = formList.back();
   auto const formVertexIndex = form.vertexIndex;
   form::mdufrm();
   auto iPoint      = 0U;
@@ -1408,14 +1414,14 @@ void formForms::wavfrm() {
   }
   form.outline();
   auto       vShifted = firstVertex; // copy intended
-  auto const left     = FormList->back().rectangle.left;
-  auto const bottom   = FormList->back().rectangle.bottom;
+  auto const left     = formList.back().rectangle.left;
+  auto const bottom   = formList.back().rectangle.bottom;
   for (auto index = 0U; index < vertexCount; ++index) {
 	vShifted->x -= left;
 	vShifted->y -= bottom;
 	++vShifted;
   }
-  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+  ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
   form::setmfrm(ClosestFormToCursor);

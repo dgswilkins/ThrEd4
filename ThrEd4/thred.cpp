@@ -1150,7 +1150,7 @@ void thi::insadj() {
   StateMap->reset(StateFlag::PRELIN);
   form::refil(ClosestFormToCursor);
   thred::coltab();
-  FormList->operator[](ClosestFormToCursor).outline();
+  Instance->FormList.operator[](ClosestFormToCursor).outline();
 }
 
 void thi::patdun() {
@@ -1323,7 +1323,9 @@ void thred::hupfn() {
   auto checkHoopRect = F_RECTANGLE {}; // for checking the hoop size
   StateMap->reset(StateFlag::HUPCHNG);
   stchrct(checkHoopRect);
-  if (!FormList->empty()) {
+  auto& formList = Instance->FormList;
+
+  if (!formList.empty()) {
 	if (StitchBuffer->empty()) {
 	  auto const itVertex  = FormVertices->cbegin();
 	  checkHoopRect.top    = itVertex->y;
@@ -1368,7 +1370,7 @@ void thred::hupfn() {
   for (auto& formVertice : *FormVertices) {
 	formVertice += delta;
   }
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : formList) {
 	iForm.rectangle.left += delta.x;
 	iForm.rectangle.top += delta.y;
 	iForm.rectangle.right += delta.x;
@@ -1394,9 +1396,11 @@ void thi::setSideWinVal(int const index) {
 
 void thi::chknum() {
   xt::clrstch();
+  auto& formList = Instance->FormList;
+
   if (SideWinMsgIdx != 0U) {
 	if (FormMenuChoice != 0U) { // the form menu is open
-	  auto& form = FormList->operator[](ClosestFormToCursor);
+	  auto& form = formList.operator[](ClosestFormToCursor);
 
 	  auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
@@ -1872,7 +1876,7 @@ void thi::chknum() {
 	  return;
 	}
 	if (StateMap->testAndReset(StateFlag::ENTRFNUM)) { // form number
-	  if (wrap::round<uint32_t>(value) < FormList->size()) {
+	  if (wrap::round<uint32_t>(value) < formList.size()) {
 		form::frmnumfn(ClosestFormToCursor, wrap::round<uint32_t>(value));
 	  }
 	  else {
@@ -2240,7 +2244,7 @@ void thred::ritot(uint32_t const number) {
 }
 
 void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
-  if (auto const& form = FormList->operator[](ClosestFormToCursor);
+  if (auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
       StitchBuffer->empty() || (form.fillType == 0U && form.edgeType == 0U)) {
 	auto const blank = std::wstring {};
 	displayText::butxt(HMAXLEN, blank);
@@ -2493,7 +2497,7 @@ void thred::duzero() {
   }
   auto const minStitch = SmallStitchLength * SmallStitchLength;
   if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+	auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const selectedForm : *SelectedFormList) {
 	  formMap.set(selectedForm);
 	}
@@ -2815,7 +2819,7 @@ void thi::ritlayr() {
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::FRMPSEL)) {
-	  layer = gsl::narrow_cast<decltype(layer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >> 1U;
+	  layer = gsl::narrow_cast<decltype(layer)>(Instance->FormList.operator[](ClosestFormToCursor).attribute & FRMLMSK) >> 1U;
 	}
   }
   if ((layer & FRMMMSK) != 0U) {
@@ -3078,9 +3082,11 @@ void thi::dubuf(std::vector<char>& buffer) {
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
-  if (!FormList->empty()) {
+  auto& formList                    = Instance->FormList;
+
+  if (!formList.empty()) {
 	// count the number of vertices, satin guides, and clip data points in all forms
-	for (auto& iForm : *FormList) {
+	for (auto& iForm : formList) {
 	  vertexCount += iForm.vertexCount;
 	  if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
 		guideCount += iForm.satinGuideCount;
@@ -3094,7 +3100,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	}
   }
   // fill in the header with the values
-  wrap::narrow(stitchHeader.formCount, FormList->size());
+  wrap::narrow(stitchHeader.formCount, formList.size());
   wrap::narrow(stitchHeader.vertexCount, vertexCount);
   wrap::narrow(stitchHeader.dlineCount, guideCount);
   wrap::narrow(stitchHeader.clipDataCount, clipDataCount);
@@ -3104,7 +3110,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   auto vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(StitchBuffer) + formDataOffset;
   // calculate the design data size
   auto const thredDataSize =
-      wrap::sizeofVector(FormList) + vertexCount * wrap::sizeofType(FormVertices) +
+      wrap::sizeofVector(formList) + vertexCount * wrap::sizeofType(FormVertices) +
       guideCount * wrap::sizeofType(SatinGuides) +
       clipDataCount * wrap::sizeofType(Instance->ClipPoints) +
       wrap::sizeofVector(TexturePointsBuffer);
@@ -3139,12 +3145,12 @@ void thi::dubuf(std::vector<char>& buffer) {
 
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
   // if we have no forms then we are done
-  if (FormList->empty()) {
+  if (formList.empty()) {
 	return;
   }
   // reserve space for the form data
   auto outForms = std::vector<FRM_HEAD_OUT> {};
-  outForms.reserve(FormList->size());
+  outForms.reserve(formList.size());
   auto vertices = std::vector<F_POINT> {};
   vertices.reserve(vertexCount);
   auto guides = std::vector<SAT_CON_OUT> {};
@@ -3152,7 +3158,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   auto points = std::vector<F_POINT> {};
   points.reserve(clipDataCount);
   // write the form vertex data to the buffer
-  for (auto& srcForm : *FormList) {
+  for (auto& srcForm : formList) {
 	outForms.emplace_back(srcForm);
 	auto itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
 	for (auto iVertex = 0U; iVertex < srcForm.vertexCount; ++iVertex) {
@@ -3398,7 +3404,7 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
 }
 
 void thred::savAs() {
-  if (StitchBuffer->empty() && FormList->empty() && bitmap::ismap()) {
+  if (StitchBuffer->empty() && Instance->FormList.empty() && bitmap::ismap()) {
 	return;
   }
   auto index = FileIndices {};
@@ -3751,7 +3757,7 @@ void thi::delstch1(uint32_t const iStitch) {
 void thi::prtred(HANDLE fileHandle, uint32_t const code) {
   CloseHandle(fileHandle);
   StateMap->reset(StateFlag::INIT);
-  FormList->clear();
+  Instance->FormList.clear();
   displayText::tabmsg(code, false);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
@@ -4016,6 +4022,8 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	return true;
   }
   StateMap->reset(StateFlag::BADFIL);
+  auto& formList = Instance->FormList;
+
   if (version < 2) {
 	auto formListOriginal = std::vector<FRM_HEAD_O> {};
 	formListOriginal.resize(thredHeader.formCount);
@@ -4028,8 +4036,8 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  formListOriginal.resize(thredHeader.formCount);
 	  StateMap->set(StateFlag::BADFIL);
 	}
-	FormList->reserve(formListOriginal.size());
-	FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
+	formList.reserve(formListOriginal.size());
+	formList.insert(formList.end(), formListOriginal.begin(), formListOriginal.end());
   }
   else {
 	auto inFormList = std::vector<FRM_HEAD_OUT> {};
@@ -4043,10 +4051,10 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  inFormList.resize(thredHeader.formCount);
 	  StateMap->set(StateFlag::BADFIL);
 	}
-	FormList->reserve(inFormList.size());
-	FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+	formList.reserve(inFormList.size());
+	formList.insert(formList.end(), inFormList.begin(), inFormList.end());
   }
-  FormList->shrink_to_fit();
+  formList.shrink_to_fit();
   if (thredHeader.vertexCount != 0U) {
 	FormVertices->resize(thredHeader.vertexCount);
 	bytesToRead = thredHeader.vertexCount * wrap::sizeofType(FormVertices);
@@ -4112,7 +4120,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   auto clipOffset   = 0U;
   auto vertexOffset = 0U;
   auto guideOffset  = 0U;
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : formList) {
 	iForm.vertexIndex = vertexOffset;
 	vertexOffset += iForm.vertexCount;
 	if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
@@ -4158,7 +4166,7 @@ auto thred::getFileHandle(fs::path const& newFileName, HANDLE& fileHandle) -> bo
 void thi::resetState() {
   fnamtabs();
   trace::untrace();
-  if (!FormList->empty()) {
+  if (!Instance->FormList.empty()) {
 	form::delfrms();
   }
   unthum();
@@ -4350,8 +4358,10 @@ void thred::zumin() {
 		stitchPoint = ZoomMarkPoint;
 		break;
 	  }
+	  auto& formList = Instance->FormList;
+
 	  if (StateMap->test(StateFlag::FORMSEL)) { // zoom to the selected form
-		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
+		auto const& boundingRect = formList.operator[](ClosestFormToCursor).rectangle;
 
 		stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
 		                       wrap::midl(boundingRect.top, boundingRect.bottom)};
@@ -4360,7 +4370,7 @@ void thred::zumin() {
 	  if (StateMap->test(StateFlag::FRMPSEL)) { // zoom to the selected form vertex
 		auto const itVertex =
 		    wrap::next(FormVertices->cbegin(),
-		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+		               formList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		stitchPoint = *itVertex;
 		break;
 	  }
@@ -4390,14 +4400,14 @@ void thred::zumin() {
 	  }
 	  if (!SelectedFormList->empty()) { // zoom to the selected forms
 		auto const  firstForm = SelectedFormList->front();
-		auto const& firstRect = FormList->operator[](firstForm).rectangle;
+		auto const& firstRect = formList.operator[](firstForm).rectangle;
 
 		SelectedFormsRect = {std::lround(firstRect.left),
 		                     std::lround(firstRect.top),
 		                     std::lround(firstRect.right),
 		                     std::lround(firstRect.bottom)};
 		for (auto const selectedForm : *SelectedFormList) {
-		  auto const& rect = FormList->operator[](selectedForm).rectangle;
+		  auto const& rect = formList.operator[](selectedForm).rectangle;
 		  if (rect.bottom < wrap::toFloat(SelectedFormsRect.bottom)) {
 			SelectedFormsRect.bottom = std::lround(rect.bottom);
 		  }
@@ -4465,8 +4475,10 @@ void thred::zumout() {
 	  stitchPoint = ZoomMarkPoint;
 	  break;
 	}
+	auto& formList = Instance->FormList;
+
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
+	  auto const& boundingRect = formList.operator[](ClosestFormToCursor).rectangle;
 
 	  stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
 	                         wrap::midl(boundingRect.top, boundingRect.bottom)};
@@ -4475,7 +4487,7 @@ void thred::zumout() {
 	if (StateMap->test(StateFlag::FRMPSEL)) {
 	  auto const itVertex =
 	      wrap::next(FormVertices->cbegin(),
-	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	                 formList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	  stitchPoint = *itVertex;
 	  break;
 	}
@@ -5071,8 +5083,10 @@ void thred::newFil() {
   Instance->ClipPoints.shrink_to_fit();
   SatinGuides->clear();
   SatinGuides->shrink_to_fit();
-  FormList->clear();
-  FormList->shrink_to_fit();
+  auto& formList = Instance->FormList;
+
+  formList.clear();
+  formList.shrink_to_fit();
   resetColorChanges();
   Knots->clear();
   WorkingFileName->clear();
@@ -5417,8 +5431,10 @@ void thi::f1del(uint32_t const formIndex) {
 
 void thred::frmdel() {
   thi::f1del(ClosestFormToCursor);
-  auto const firstForm = FormList->cbegin();
-  FormList->erase(wrap::next(firstForm, ClosestFormToCursor));
+  auto& formList = Instance->FormList;
+
+  auto const firstForm = formList.cbegin();
+  formList.erase(wrap::next(firstForm, ClosestFormToCursor));
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   if (StateMap->testAndReset(StateFlag::DELTO)) {
 	for (auto& stitch : *StitchBuffer) {
@@ -5449,29 +5465,31 @@ void thred::frmdel() {
 	}
   }
   StateMap->reset(StateFlag::FORMSEL);
-  if (ClosestFormToCursor > FormList->size() - 1U) {
+  if (ClosestFormToCursor > formList.size() - 1U) {
 	ClosestFormToCursor = 0U;
   }
 }
 
 void thred::delsfrms() {
-  if (FormList->empty()) {
+  auto& formList = Instance->FormList;
+
+  if (formList.empty()) {
 	return;
   }
   auto formIndices = std::vector<uint32_t> {};
-  formIndices.resize(FormList->size());
-  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+  formIndices.resize(formList.size());
+  auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : *SelectedFormList) {
 	formMap.set(selectedForm);
 	thi::f1del(selectedForm);
   }
   auto       deletedFormCount = 0U;
-  auto       firstForm        = FormList->cbegin();
-  auto const formCount        = FormList->size();
+  auto       firstForm        = formList.cbegin();
+  auto const formCount        = formList.size();
   for (auto iForm = 0U; iForm < formCount; ++iForm) {
 	if (formMap.test(iForm)) {
-	  FormList->erase(wrap::next(firstForm, iForm - deletedFormCount));
-	  firstForm = FormList->cbegin(); // the erase invalidates firstForm
+	  formList.erase(wrap::next(firstForm, iForm - deletedFormCount));
+	  firstForm = formList.cbegin(); // the erase invalidates firstForm
 	  ++deletedFormCount;
 	  continue;
 	}
@@ -5917,7 +5935,7 @@ void thi::setsped() {
 void thred::deltot() {
   DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   TexturePointsBuffer->clear();
-  FormList->clear();
+  Instance->FormList.clear();
   StitchBuffer->clear();
   FormVertices->clear();
   SatinGuides->clear();
@@ -5936,7 +5954,7 @@ auto thi::wastch(uint32_t const& formIndex) -> bool {
 }
 
 auto thi::frmstch() -> bool {
-  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+  auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : *SelectedFormList) {
 	formMap.set(selectedForm);
   }
@@ -5999,9 +6017,11 @@ void thi::handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag) {
 
 void thred::delet() {
   undat();
+  auto& formList = Instance->FormList;
+
   if (StateMap->testAndReset(StateFlag::FPSEL)) {
 	savdo();
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	auto& form = formList.operator[](ClosestFormToCursor);
 	// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
 	// ReSharper disable once CppTemplateArgumentsCanBeDeduced
 	auto vertexMap         = boost::dynamic_bitset<>(form.vertexCount);
@@ -6025,7 +6045,7 @@ void thred::delet() {
 	auto const eraseEnd = wrap::next(eraseStart, form.vertexCount - eraseCount);
 	FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 	auto const nextForm = wrap::toSize(ClosestFormToCursor) + 1U;
-	for (auto iForm = wrap::next(FormList->begin(), nextForm); iForm < FormList->end(); ++iForm) {
+	for (auto iForm = wrap::next(formList.begin(), nextForm); iForm < formList.end(); ++iForm) {
 	  iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1U;
 	}
 	form.vertexCount -= SelectedFormVertices.vertexCount + 1U;
@@ -6093,7 +6113,7 @@ void thred::delet() {
 	}
 	return;
   }
-  if (StateMap->test(StateFlag::FORMSEL) && !FormList->empty()) {
+  if (StateMap->test(StateFlag::FORMSEL) && !formList.empty()) {
 	if (thi::wastch(ClosestFormToCursor)) {
 	  StateMap->set(StateFlag::DELFRM);
 	  displayText::tabmsg(IDS_FDEL, false);
@@ -6135,7 +6155,7 @@ void thred::delet() {
 	return;
   }
   if (StateMap->test(StateFlag::FRMPSEL) || form::closfrm(ClosestFormToCursor)) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	auto& form = formList.operator[](ClosestFormToCursor);
 	switch (form.type) {
 	  case FRMLINE: {
 		if (thi::handleDeleteLineForm(form)) {
@@ -6155,8 +6175,8 @@ void thred::delet() {
 	if (!satinFlag) {
 	  satin::delspnt();
 	}
-	if (ClosestFormToCursor > FormList->size() - 1U) {
-	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	if (ClosestFormToCursor > formList.size() - 1U) {
+	  ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
 	}
 	form.outline();
 	form::refil(ClosestFormToCursor);
@@ -6399,7 +6419,7 @@ void thred::insfil(fs::path& insertedFile) {
   if (PCS::isPCS(insertedFile)) {
 	if (PCS::insPCS(insertedFile, insertedRectangle)) {
 	  // We did not insert forms so ensure that duinsfil does not move forms
-	  InsertedFormIndex   = wrap::toUnsigned(FormList->size());
+	  InsertedFormIndex   = wrap::toUnsigned(Instance->FormList.size());
 	  InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
 	  successFlag         = true;
 	}
@@ -6449,10 +6469,12 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   auto           homscor     = 0U;
   auto           thredHeader = THR_HEAD_EX {};
   auto const     version     = (fileHeader.headerType & FTYPMASK) >> TBYTSHFT;
+  auto&          formList    = Instance->FormList;
+
   if (version != 0U) {
 	gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
 	// ToDo - replace constants with sizes of data structures?
-	homscor = wrap::toUnsigned(FormList->size()) * FRMW +
+	homscor = wrap::toUnsigned(formList.size()) * FRMW +
 	          gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW +
 	          wrap::toUnsigned(FormVertices->size()) * FRMPW + wrap::toUnsigned(StitchBuffer->size()) * STCHW;
 	if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in insTHR")) {
@@ -6472,7 +6494,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
                                                 sizeof(UserColor) + sizeof(CustomColor) + TSSIZE);
   SetFilePointer(fileHandle, formDataOffset, nullptr, FILE_CURRENT);
   InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
-  InsertedFormIndex   = wrap::toUnsigned(FormList->size());
+  InsertedFormIndex   = wrap::toUnsigned(formList.size());
   if (fileHeader.formCount != 0U) {
 	auto const newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
 	auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
@@ -6489,8 +6511,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		inFormList.resize(bytesRead / wrap::sizeofType(inFormList));
 		StateMap->set(StateFlag::BADFIL);
 	  }
-	  FormList->reserve(FormList->size() + inFormList.size());
-	  FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+	  formList.reserve(formList.size() + inFormList.size());
+	  formList.insert(formList.end(), inFormList.begin(), inFormList.end());
 	}
 	else {
 	  auto inFormList = std::vector<FRM_HEAD_OUT> {};
@@ -6503,8 +6525,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		inFormList.resize(bytesRead / wrap::sizeofType(inFormList));
 		StateMap->set(StateFlag::BADFIL);
 	  }
-	  FormList->reserve(FormList->size() + inFormList.size());
-	  FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+	  formList.reserve(formList.size() + inFormList.size());
+	  formList.insert(formList.end(), inFormList.begin(), inFormList.end());
 	}
 	auto vertexOffset = wrap::toUnsigned(FormVertices->size());
 	if (fileHeader.vertexCount != 0U) {
@@ -6569,8 +6591,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
 	}
 	// update the form pointer variables
-	for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(FormList->size()); ++iFormList) {
-	  auto& formIter       = FormList->operator[](iFormList);
+	for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(formList.size()); ++iFormList) {
+	  auto& formIter       = formList.operator[](iFormList);
 	  formIter.vertexIndex = vertexOffset;
 	  vertexOffset += formIter.vertexCount;
 	  if (formIter.type == SAT && formIter.satinGuideCount != 0U) {
@@ -6855,12 +6877,14 @@ void thred::chkrng(F_POINT& range) {
   delinf();
   wrap::narrow(range.x, UnzoomedRect.cx);
   wrap::narrow(range.y, UnzoomedRect.cy);
-  if (!FormList->empty()) {
+  auto& formList = Instance->FormList;
+
+  if (!formList.empty()) {
 	// ToDo - Why do we treat the forms differently?
 	auto iDestination = StitchBuffer->begin();
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) != 0U ||
-	      ((stitch.attribute & TYPMSK) != 0U && (stitch.attribute & FRMSK) >> FRMSHFT < FormList->size())) {
+	      ((stitch.attribute & TYPMSK) != 0U && (stitch.attribute & FRMSK) >> FRMSHFT < formList.size())) {
 		if (stitch.x > range.x) {
 		  stitch.x = range.x - 1.0F;
 		}
@@ -6897,7 +6921,7 @@ void thred::chkrng(F_POINT& range) {
 }
 
 void thred::ritmov(uint32_t const formIndex) noexcept {
-  auto const& form = FormList->operator[](formIndex);
+  auto const& form = Instance->FormList.operator[](formIndex);
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   if (ClosestVertexToCursor != 0U) {
@@ -6946,7 +6970,7 @@ void thi::duprct(FRM_HEAD const& form) {
 
 void thred::setpsel() {
   form::unpsel();
-  auto const& form = FormList->operator[](ClosestFormToCursor);
+  auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
   thi::duprct(form);
   SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
   form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
@@ -6959,9 +6983,11 @@ void thred::setpsel() {
 
 void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
   savdo();
+  auto& formList = Instance->FormList;
+
   if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
-	auto&       form          = FormList->operator[](ClosestFormToCursor);
+	auto&       form          = formList.operator[](ClosestFormToCursor);
 	auto        currentVertex = SelectedFormVertices.start;
 	auto  const vBegin        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
@@ -6983,7 +7009,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
 	for (auto& stitch : *StitchBuffer) {
 	  thi::rotstch(stitch, rotationAngle, rotationCenter);
 	}
-	for (auto& iForm : *FormList) {
+	for (auto& iForm : formList) {
 	  iForm.outline();
 	}
 	form::selal();
@@ -6992,7 +7018,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
   if (StateMap->testAndReset(StateFlag::FRMSROT)) {
 	for (auto const selectedForm : *SelectedFormList) {
 	  // clang-format off
-	  auto& form     = FormList->operator[](selectedForm);
+	  auto& form     = formList.operator[](selectedForm);
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -7006,7 +7032,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
 	return;
   }
   if (StateMap->testAndReset(StateFlag::FRMROT)) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	auto& form = formList.operator[](ClosestFormToCursor);
 
 	auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -7040,7 +7066,7 @@ void thred::showOnlyLayer(uint8_t const play) {
 	return;
   }
   if (StateMap->test(StateFlag::FORMSEL) &&
-      gsl::narrow_cast<decltype(ActiveLayer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >> 1U !=
+      gsl::narrow_cast<decltype(ActiveLayer)>(Instance->FormList.operator[](ClosestFormToCursor).attribute & FRMLMSK) >> 1U !=
           ActiveLayer) {
 	StateMap->reset(StateFlag::FORMSEL);
   }
@@ -7532,10 +7558,12 @@ void thred::selalstch() {
 }
 
 void thred::duinsfil() {
+  auto& formList = Instance->FormList;
+
   auto const stitchPoint = pxCor2stch(WinMsg.pt);
   auto const offset      = F_POINT {stitchPoint.x - InsertCenter.x, stitchPoint.y - InsertCenter.y};
-  for (auto iForm = InsertedFormIndex; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& formRectangle = FormList->operator[](iForm).rectangle;
+  for (auto iForm = InsertedFormIndex; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
+	auto& formRectangle = formList.operator[](iForm).rectangle;
 	formRectangle.bottom += offset.y;
 	formRectangle.top += offset.y;
 	formRectangle.left += offset.x;
@@ -7561,10 +7589,12 @@ void thred::gotbox() {
 }
 
 void thred::nucols() {
-  auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+  auto& formList = Instance->FormList;
+
+  auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   for (auto const selectedForm : *SelectedFormList) {
 	formMap.set(selectedForm);
-	auto& form = FormList->operator[](selectedForm);
+	auto& form = formList.operator[](selectedForm);
 	if (form.fillType != 0U) {
 	  form.fillColor = ActiveColor;
 	  if (form.fillType == FTHF) {
@@ -7676,7 +7706,7 @@ void thi::sidhup() {
 
 void thred::fop() {
   trace::untrace();
-  if (!FormList->empty() || !StitchBuffer->empty()) {
+  if (!Instance->FormList.empty() || !StitchBuffer->empty()) {
 	if (thi::savcmp()) {
 	  thi::nuFil(FileIndices::THR);
 	  showOnlyLayer(0U);
@@ -7923,7 +7953,7 @@ void thred::rotmrk() {
   if (StateMap->test(StateFlag::FORMSEL)) {
 	auto const codedFormIndex = ClosestFormToCursor << FRMSHFT;
 	// clang-format off
-	  auto const& form     = FormList->operator[](ClosestFormToCursor);
+	  auto const& form     = Instance->FormList.operator[](ClosestFormToCursor);
 	  auto        itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	// clang-format on
 	auto const originalAngle = std::atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
@@ -7985,7 +8015,7 @@ void thred::pntmrk() {
   if (StateMap->test(StateFlag::FRMPSEL)) {
 	auto const itVertex =
 	    wrap::next(FormVertices->cbegin(),
-	               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	               Instance->FormList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	dumrk(itVertex->x, itVertex->y);
 	return;
   }
@@ -8077,7 +8107,7 @@ auto thi::chkminus(wchar_t const code) noexcept -> bool {
   if (PreferenceIndex == PRFCLPPHS) { // Clipboard Offset in preferences
 	return true;
   }
-  if (auto const& form = FormList->operator[](ClosestFormToCursor);
+  if (auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
       FormMenuChoice == LFRMSPAC && form.isFanClip()) { // Fill Spacing for fan clip fill
 	return true;
   }
@@ -8146,6 +8176,8 @@ void thred::gsnap() {
 	texture::txsnap();
 	return;
   }
+  auto& formList = Instance->FormList;
+
   if (SelectedFormList->empty()) {
 	if (!StateMap->test(StateFlag::FORMSEL)) {
 	  if (!StateMap->test(StateFlag::GRPSEL)) {
@@ -8159,7 +8191,7 @@ void thred::gsnap() {
 	  return;
 	}
 	savdo();
-	auto& formIter = FormList->operator[](ClosestFormToCursor);
+	auto& formIter = formList.operator[](ClosestFormToCursor);
 	thi::frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	formIter.outline();
 	form::refil(ClosestFormToCursor);
@@ -8169,7 +8201,7 @@ void thred::gsnap() {
   savdo();
   for (auto const selectedForm : *SelectedFormList) {
 	ClosestFormToCursor = selectedForm;
-	auto& formIter      = FormList->operator[](ClosestFormToCursor);
+	auto& formIter      = formList.operator[](ClosestFormToCursor);
 	thi::frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	formIter.outline();
 	form::refil(ClosestFormToCursor);
@@ -8395,8 +8427,10 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
       StateMap->test(StateFlag::GRPSEL) || StateMap->test(StateFlag::SELBOX)) {
 	savdo();
   }
+  auto& formList = Instance->FormList;
+
   if (StateMap->test(StateFlag::BIGBOX)) {
-	for (auto& iForm : *FormList) {
+	for (auto& iForm : formList) {
 	  thi::frmpos(iForm, deltaX, deltaY);
 	}
 	for (auto& stitch : *StitchBuffer) {
@@ -8412,7 +8446,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset(FormList->size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
+	auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	for (auto const selectedForm : *SelectedFormList) {
 	  formMap.set(selectedForm);
 	}
@@ -8422,14 +8456,14 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	  }
 	}
 	for (auto const selectedForm : *SelectedFormList) {
-	  auto& form = FormList->operator[](selectedForm);
+	  auto& form = formList.operator[](selectedForm);
 	  thi::frmpos(form, deltaX, deltaY);
 	}
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (StateMap->test(StateFlag::FORMSEL)) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	auto& form = formList.operator[](ClosestFormToCursor);
 	thi::frmpos(form, deltaX, deltaY);
 	if (form.fillType != 0U || form.edgeType != 0U) {
 	  for (auto& stitch : *StitchBuffer) {
@@ -8530,7 +8564,7 @@ void thred::movchk() {
 	  }
 	}
   }
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : Instance->FormList) {
 	if (iForm.fillType != 0U) {
 	  if (iForm.fillColor == VerticalIndex) {
 		iForm.fillColor = draggedColor;
@@ -8597,7 +8631,7 @@ void thi::inscol() {
 	stitch.attribute &= NCOLMSK;
 	stitch.attribute |= color + 1U;
   }
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : Instance->FormList) {
 	if (iForm.fillType != 0U && iForm.fillColor >= VerticalIndex && iForm.fillColor < nextColor) {
 	  ++iForm.fillColor;
 	}
@@ -8636,7 +8670,7 @@ void thi::delcol() {
 	stitch.attribute &= NCOLMSK;
 	stitch.attribute |= color - 1U;
   }
-  for (auto& iForm : *FormList) {
+  for (auto& iForm : Instance->FormList) {
 	if (iForm.fillType != 0U && iForm.fillColor > VerticalIndex) {
 	  --iForm.fillColor;
 	}
@@ -8686,7 +8720,7 @@ void thred::fixpclp(uint32_t const closestFormToCursor) {
   auto const stitchPoint = pxCor2stch(point);
   auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
   auto const count       = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
-  auto&      form        = FormList->operator[](closestFormToCursor);
+  auto&      form        = Instance->FormList.operator[](closestFormToCursor);
   auto const nextVertex  = form::nxt(form, ClosestVertexToCursor);
   form::fltspac(nextVertex, count);
   form.vertexCount += count;
@@ -8721,7 +8755,7 @@ void thred::selfpnt() {
   SelectedFormVertices.form  = ClosestFormToCursor;
   auto const itVertex =
       wrap::next(FormVertices->cbegin(),
-                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+                 Instance->FormList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
   ritfcor(*itVertex);
   StateMap->set(StateFlag::FRMPSEL);
   StateMap->set(StateFlag::RESTCH);
@@ -8814,30 +8848,32 @@ void thred::qcode() {
 	StitchBuffer->clear();
 	StateMap->reset(StateFlag::INIT);
   }
+  auto& formList = Instance->FormList;
+
   if (StateMap->testAndReset(StateFlag::POLIMOV)) { // aborting form add
-	if (FormList->back().vertexCount != 0U) {
-	  auto const first = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
-	  auto const last  = wrap::next(first, FormList->back().vertexCount);
+	if (formList.back().vertexCount != 0U) {
+	  auto const first = wrap::next(FormVertices->begin(), formList.back().vertexIndex);
+	  auto const last  = wrap::next(first, formList.back().vertexCount);
 	  FormVertices->erase(first, last);
 	}
-	if (FormList->back().satinGuideCount != 0U) {
-	  auto const first = wrap::next(SatinGuides->begin(), FormList->back().satinGuideIndex);
-	  auto const last  = wrap::next(first, FormList->back().satinGuideCount);
+	if (formList.back().satinGuideCount != 0U) {
+	  auto const first = wrap::next(SatinGuides->begin(), formList.back().satinGuideIndex);
+	  auto const last  = wrap::next(first, formList.back().satinGuideCount);
 	  SatinGuides->erase(first, last);
 	}
-	FormList->pop_back();
-	if (!FormList->empty()) {
-	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	formList.pop_back();
+	if (!formList.empty()) {
+	  ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
 	}
   }
   if (StateMap->testAndReset(StateFlag::FUNCLP)) { // aborting form paste
 	backup::bak();
-	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   }
   if (StateMap->testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 	backup::bak();
 	SelectedFormList->clear();
-	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   }
   if (!UserFlagMap->test(UserFlag::MARQ)) {
 	StateMap->reset(StateFlag::GMRK);
@@ -9144,7 +9180,7 @@ auto thred::updateFillColor() -> bool {
 	  break;
 	}
 	if (StateMap->testAndReset(StateFlag::UNDCOL)) {
-	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLMSK;
+	  Instance->FormList.operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLMSK;
 	  form::refilfn(ClosestFormToCursor);
 	  coltab();
 	  break;
@@ -9213,7 +9249,7 @@ auto thred::updatePreferences() -> bool {
 
 auto thred::handleSideWindowActive() -> bool {
   savdo();
-  auto& form = FormList->operator[](ClosestFormToCursor);
+  auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
 	if (auto const iFeather = std::ranges::find_if(FTHRLIST,
 	                                               [](LIST_TYPE const& feather) noexcept -> bool {
@@ -9513,7 +9549,7 @@ auto thred::handleSideWindowActive() -> bool {
 auto thred::handleFormDataSheet() -> bool {
   thi::chknum();
   unsid();
-  auto& form = FormList->operator[](ClosestFormToCursor);
+  auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   while (true) {
 	if (WinMsg.hwnd == ValueWindow->operator[](LTXOF) || WinMsg.hwnd == LabelWindow->operator[](LTXOF)) {
 	  // draw the texture fill spacing window
@@ -11307,7 +11343,7 @@ void thi::doDrwInit() {
   if (StateMap->test(StateFlag::FRMPSEL)) { // if we have selected a point in a form
 	auto const itVertex =
 	    wrap::next(FormVertices->cbegin(),
-	               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	               Instance->FormList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	thred::ritfcor(*itVertex);
   }
   if (!StateMap->test(StateFlag::SELBOX) && !StateMap->test(StateFlag::FRMPSEL)) {
@@ -11357,7 +11393,7 @@ void thi::drwStch() {
       StateMap->test(StateFlag::MOVCNTR)) {
 	thred::ritrot(0, form::rotpar());
   }
-  if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
+  if (!Instance->FormList.empty() && !StateMap->test(StateFlag::FRMOF)) {
 	form::drwfrm();
   }
   if (StateMap->test(StateFlag::INSFRM)) {
@@ -11748,7 +11784,7 @@ auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	if (!StateMap->test(StateFlag::RUNPAT)) {
 	  if (!StateMap->test(StateFlag::HIDSTCH) &&
-	      (!ThrName->empty() || StateMap->test(StateFlag::INIT) || !FormList->empty() ||
+	      (!ThrName->empty() || StateMap->test(StateFlag::INIT) || !Instance->FormList.empty() ||
 	       StateMap->test(StateFlag::SATPNT)) &&
 	      !StateMap->test(StateFlag::BAKSHO)) {
 		drwStch();
@@ -12136,8 +12172,8 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT const message, WPARAM wParam, LPARA
 // ReSharper restore CppParameterMayBeConst
 
 void thi::sachk() {
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (auto const& form = FormList->operator[](iForm); form.type == SAT && form.satinGuideCount != 0U) {
+  for (auto iForm = 0U; iForm < wrap::toUnsigned(Instance->FormList.size()); ++iForm) {
+	if (auto const& form = Instance->FormList.operator[](iForm); form.type == SAT && form.satinGuideCount != 0U) {
 	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {

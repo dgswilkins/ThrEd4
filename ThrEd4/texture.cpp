@@ -1093,7 +1093,9 @@ void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uin
 }
 
 void texture::deltx(uint32_t const formIndex) {
-  auto const itForm = wrap::next(FormList->begin(), formIndex);
+  auto& formList = Instance->FormList;
+
+  auto const itForm = wrap::next(formList.begin(), formIndex);
   auto const itNext = std::next(itForm);
   if (TexturePointsBuffer->empty() || !itForm->isTexture() || itForm->texture.count == 0U) {
 	return;
@@ -1102,12 +1104,12 @@ void texture::deltx(uint32_t const formIndex) {
   // First check to see if the texture is shared between forms
   // check forms before and after current
   auto const flagShared =
-      std::any_of(FormList->begin(),
+      std::any_of(formList.begin(),
                   itForm,
                   [currentIndex](const auto& current) {
 	                return current.isTexture() && current.texture.index == currentIndex;
                   }) ||
-      std::any_of(std::next(itForm), FormList->end(), [currentIndex](const auto& current) {
+      std::any_of(std::next(itForm), formList.end(), [currentIndex](const auto& current) {
 	    return current.isTexture() && current.texture.index == currentIndex;
       });
   // clear the texture info from the form
@@ -1120,14 +1122,14 @@ void texture::deltx(uint32_t const formIndex) {
   textureBuffer.reserve(TexturePointsBuffer->size());
   auto iBuffer = uint16_t {};
   // adjust forms before the current form
-  for (auto spForms = std::ranges::subrange(FormList->begin(), itForm); auto& current : spForms) {
+  for (auto spForms = std::ranges::subrange(formList.begin(), itForm); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
 	txi::doTexAdjust(current, textureBuffer, iBuffer);
   }
   // adjust forms after the current form
-  for (auto spForms = std::ranges::subrange(itNext, FormList->end()); auto& current : spForms) {
+  for (auto spForms = std::ranges::subrange(itNext, formList.end()); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
@@ -1137,10 +1139,12 @@ void texture::deltx(uint32_t const formIndex) {
 }
 
 void txi::nutx(uint32_t const formIndex) {
-  if (FormList->empty()) {
+  auto& formList = Instance->FormList;
+
+  if (formList.empty()) {
 	return;
   }
-  auto& form = FormList->operator[](formIndex);
+  auto& form = formList.operator[](formIndex);
 
   auto index = gsl::narrow_cast<uint16_t>(0U);
   if (form.isTexture()) {
@@ -1148,7 +1152,7 @@ void txi::nutx(uint32_t const formIndex) {
 	texture::deltx(formIndex);
   }
   else {
-	for (auto spForms = std::ranges::subrange(FormList->begin(), wrap::next(FormList->begin(), formIndex));
+	for (auto spForms = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
 	     auto const& current : spForms | std::views::reverse) {
 	  if (current.isTexture()) {
 		auto const& texture = current.texture;
@@ -1161,11 +1165,11 @@ void txi::nutx(uint32_t const formIndex) {
 	return;
   }
   auto const tempPointCount =
-      gsl::narrow<decltype(FormList->back().texture.index)>(TempTexturePoints->size());
+      gsl::narrow<decltype(formList.back().texture.index)>(TempTexturePoints->size());
   std::ranges::sort(*TempTexturePoints, tpComp);
   auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
   TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
-  for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
+  for (auto spForms = std::ranges::subrange(wrap::next(formList.begin(), formIndex + 1U), Instance->FormList.end());
        auto& current : spForms) {
 	if (current.isTexture()) {
 	  current.texture.index += tempPointCount;
@@ -1209,7 +1213,7 @@ void texture::txof() {
 enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
 void txi::txfn(uint32_t const textureType, uint32_t const formIndex) {
-  auto& form = FormList->operator[](formIndex);
+  auto& form = Instance->FormList.operator[](formIndex);
   clip::delmclp(formIndex);
   if (form.satinGuideCount != 0U) {
 	satin::delsac(formIndex);

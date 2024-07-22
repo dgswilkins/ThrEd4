@@ -85,7 +85,9 @@ auto mi::chkok() noexcept -> bool {
 }
 
 auto mi::finrng(uint32_t const find) noexcept -> bool {
-  if (auto const& rectFind = FormList->operator[](find).rectangle;
+  auto& formList = Instance->FormList;
+
+  if (auto const& rectFind = formList.operator[](find).rectangle;
       rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
       rectFind.bottom < StitchRangeRect.bottom || rectFind.top > StitchRangeRect.top) {
 	return false;
@@ -94,7 +96,7 @@ auto mi::finrng(uint32_t const find) noexcept -> bool {
 	return true;
   }
   auto const cod = gsl::narrow_cast<uint8_t>(
-      gsl::narrow_cast<uint8_t>(FormList->operator[](find).attribute & FRMLMSK) >> 1U);
+      gsl::narrow_cast<uint8_t>(formList.operator[](find).attribute & FRMLMSK) >> 1U);
   return cod == 0U || ActiveLayer == cod;
 }
 
@@ -284,7 +286,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::FPUNCLP)) { // pasting points into a form
 	thred::savdo();
 	thred::fixpclp(ClosestFormToCursor);
-	FormList->operator[](ClosestFormToCursor).outline();
+	Instance->FormList.operator[](ClosestFormToCursor).outline();
 	return true;
   }
   if (StateMap->test(StateFlag::FPSEL) && !StateMap->test(StateFlag::FUNCLP) &&
@@ -360,9 +362,11 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	                         stitchPoint.y - wrap::midl(formsRect.top, formsRect.bottom)};
 	auto const clipFormsCount = tfc::getClipFormCount();
 	for (auto iForm = 0U; iForm < clipFormsCount; ++iForm) {
-	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - iForm - 1U);
+	  auto& formList = Instance->FormList;
+
+	  ClosestFormToCursor = wrap::toUnsigned(formList.size() - iForm - 1U);
 	  // clang-format off
-	  auto& form     = FormList->operator[](ClosestFormToCursor);
+	  auto& form     = formList.operator[](ClosestFormToCursor);
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -573,13 +577,15 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	form::setins();
 	return true;
   }
+  auto& formList = Instance->FormList;
+
   if (StateMap->test(StateFlag::FUNCLP)) { // pasting a form
 	StateMap->set(StateFlag::INIT);
 	form::rstfrm();
 	form::refil(ClosestFormToCursor);
 	StateMap->reset(StateFlag::FUNCLP);
 	if (StateMap->testAndReset(StateFlag::FPSEL)) {
-	  FormList->back().outline();
+	  formList.back().outline();
 	}
 	StateMap->set(StateFlag::RESTCH);
 	return true;
@@ -639,7 +645,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  StateMap->set(StateFlag::VCAPT);
 	  return true;
 	}
-	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
+	if (!formList.empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  if (!StateMap->test(StateFlag::INSRT)) {
 		if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 		  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
@@ -767,7 +773,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  return true;
 		}
 		if (StateMap->test(StateFlag::FORMSEL)) { // user has selected a form so only update the color for that form
-		  if (auto& form = FormList->operator[](ClosestFormToCursor);
+		  if (auto& form = formList.operator[](ClosestFormToCursor);
 		      form.fillType != 0U || form.edgeType != 0U ||
 		      (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
 			thred::savdo();
@@ -851,9 +857,11 @@ void mi::moveForms() {
              WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
   form::ratsr();
   FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
+
+  auto& formList = Instance->FormList;
   if (StateMap->test(StateFlag::FPSEL)) { // moving a group of form points
 	// clang-format off
-	  auto&      form            = FormList->operator[](ClosestFormToCursor);
+	  auto&      form            = formList.operator[](ClosestFormToCursor);
 	  auto       iSelectedVertex = SelectedFormVertices.start;
 	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
@@ -870,7 +878,7 @@ void mi::moveForms() {
   else {
 	if (StateMap->test(StateFlag::BIGBOX)) {
 	  thred::savdo();
-	  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	  for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 		form::frmadj(iForm);
 	  }
 	  for (auto& stitch : *StitchBuffer) {
@@ -999,11 +1007,12 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	  }
 	  if (StateMap->testAndReset(StateFlag::NOSEL)) {
 		SelectedFormList->clear();
+		auto& formList = Instance->FormList;
 		// We potentially reserve too much memory, but the cost of reallocation is higher than the
 		// small amount overallocated
-		SelectedFormList->reserve(FormList->size());
+		SelectedFormList->reserve(formList.size());
 		StateMap->reset(StateFlag::FORMSEL);
-		auto const maxForm = wrap::toUnsigned(FormList->size());
+		auto const maxForm = wrap::toUnsigned(formList.size());
 		for (auto iForm = 0U; iForm < maxForm; ++iForm) {
 		  if (mi::finrng(iForm)) {
 			SelectedFormList->push_back(iForm);
@@ -1423,12 +1432,14 @@ auto mouse::handleRightButtonDown() -> bool {
 	texture::txtrbut();
 	return true;
   }
+  auto& formList = Instance->FormList;
+
   if (wrap::pressed(VK_SHIFT)) { // If shift is pressed as well
 	if (form::closfrm(ClosestFormToCursor)) {
 	  if ((StateMap->test(StateFlag::FRMPSEL) || StateMap->test(StateFlag::FPSEL)) &&
 	      SelectedFormVertices.form == ClosestFormToCursor) { // and if we are selecting one of more form points
 		// then we are expanding the selection
-		auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
+		auto const& vertexCount = formList.operator[](ClosestFormToCursor).vertexCount;
 		StateMap->reset(StateFlag::FRMPSEL);
 		StateMap->set(StateFlag::FPSEL);
 		SelectedFormVertices.finish = ClosestVertexToCursor;
@@ -1459,7 +1470,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	return true;
   }
   if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) { // If we are in the thread windows
-	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) { // and we are not in a form
+	if (!formList.empty() && !StateMap->test(StateFlag::FRMOF)) { // and we are not in a form
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm(ClosestFormToCursor)) {

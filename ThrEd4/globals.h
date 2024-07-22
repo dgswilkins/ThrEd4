@@ -255,10 +255,7 @@ extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
 
-
 extern HWND FormDataSheet;
-
-extern std::vector<FRM_HEAD>* FormList;
 
 extern uint32_t FormMenuChoice;
 extern F_POINT  FormMoveDelta;
