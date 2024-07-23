@@ -68,7 +68,6 @@ POINT                          EndPointCross             = {};      // point to 
 HWND                           FormDataSheet             = nullptr; // form data sheet
 uint32_t                       FormMenuChoice            = 0U;      // data type for form data form numerical entry
 F_POINT                        FormMoveDelta             = F_POINT {}; // offset for moving forms
-std::wstring*                  FormOnOff                 = nullptr;
 HPEN                           FormPen                   = nullptr; // form pen
 HPEN                           FormPen3px                = nullptr; // three-pixel form pen
 HPEN                           FormSelectedPen           = nullptr; // form select pen

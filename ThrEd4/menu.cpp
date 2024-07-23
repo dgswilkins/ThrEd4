@@ -239,10 +239,10 @@ void menu::ladj() {
 
 void menu::flipFormOnOff() {
   if (StateMap->testAndFlip(StateFlag::FRMOF)) {
-	FormOnOff->assign(displayText::loadStr(IDS_FRMPLUS));
+	Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMPLUS));
   }
   else {
-	FormOnOff->assign(displayText::loadStr(IDS_FRMINUS));
+	Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMINUS));
 	StateMap->reset(StateFlag::FORMSEL);
 	StateMap->reset(StateFlag::FORMIN);
 	StateMap->reset(StateFlag::MOVFRM);
@@ -261,7 +261,7 @@ void menu::flipFormOnOff() {
 }
 
 void menu::resetFormOnOff() {
-  FormOnOff->assign(displayText::loadStr(IDS_FRMPLUS));
+  Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMPLUS));
   SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
   StateMap->set(StateFlag::DUMEN);
 }

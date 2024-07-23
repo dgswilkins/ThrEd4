@@ -260,8 +260,6 @@ extern HWND FormDataSheet;
 extern uint32_t FormMenuChoice;
 extern F_POINT  FormMoveDelta;
 
-extern std::wstring* FormOnOff;
-
 extern HPEN FormPen3px;
 extern HPEN FormPen;
 extern HPEN FormSelectedPen;

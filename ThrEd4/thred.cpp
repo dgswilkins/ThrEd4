@@ -12271,9 +12271,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  DesignerName              = &Instance->DesignerName;
 	  ExtendedHeader            = &Instance->ExtendedHeader;
 	  FormControlPoints         = &Instance->FormControlPoints;
-	  FormLines                 = &Instance->FormLines;
-	  FormList                  = &Instance->FormList;
-	  FormOnOff                 = &Instance->FormOnOff;
 	  FormVertices              = &Instance->FormVertices;
 	  HomeDirectory             = &Instance->HomeDirectory;
 	  IniFileName               = &Instance->IniFileName;
@@ -12342,7 +12339,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	      nullptr,              // bmpChecked
 	      nullptr,              // bmpUnchecked
 	      0,                    // ItemData
-	      FormOnOff->data(),    // TypeData
+	      Instance->FormOnOff.data(),    // TypeData
 	      1,                    // cch (dummy value since we use SetMenuItemInfo)
 	      nullptr               // bmpItem (available only on Windows 2000 and higher)
 	  };
