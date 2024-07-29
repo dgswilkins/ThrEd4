@@ -73,7 +73,7 @@ void redbak();
 void backup::dudat() {
   auto& bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
   bufferElement.clear();
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
   auto const formCount = wrap::toUnsigned(formList.size());
 
   auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(StitchBuffer) +

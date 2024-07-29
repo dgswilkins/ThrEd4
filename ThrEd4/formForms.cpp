@@ -743,7 +743,7 @@ void formForms::prfmsg() {
 }
 
 void formForms::frmnum() {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (formList.empty() || !StateMap->test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);

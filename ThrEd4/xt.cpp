@@ -997,7 +997,7 @@ void xt::chkund(uint32_t const                formIndex,
 }
 
 void xt::selalfrm() {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   SelectedFormList->reserve(formList.size());
   for (auto formIndex = 0U; formIndex < wrap::toUnsigned(formList.size()); ++formIndex) {

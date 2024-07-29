@@ -1007,7 +1007,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	  }
 	  if (StateMap->testAndReset(StateFlag::NOSEL)) {
 		SelectedFormList->clear();
-		auto& formList = Instance->FormList;
+		auto const& formList = Instance->FormList;
 		// We potentially reserve too much memory, but the cost of reallocation is higher than the
 		// small amount overallocated
 		SelectedFormList->reserve(formList.size());

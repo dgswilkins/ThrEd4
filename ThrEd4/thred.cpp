@@ -6877,7 +6877,7 @@ void thred::chkrng(F_POINT& range) {
   delinf();
   wrap::narrow(range.x, UnzoomedRect.cx);
   wrap::narrow(range.y, UnzoomedRect.cy);
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (!formList.empty()) {
 	// ToDo - Why do we treat the forms differently?

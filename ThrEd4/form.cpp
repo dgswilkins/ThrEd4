@@ -8460,7 +8460,7 @@ void fi::srtf(std::vector<F_POINT_ATTR> const& tempStitchBuffer, uint32_t const 
   if (start == finish) {
 	return;
   }
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   auto stitchHistogram = std::vector<uint32_t> {};
   stitchHistogram.resize(formList.size() << 2U);
@@ -9336,7 +9336,7 @@ void form::filclpx() {
 }
 
 void form::srtfrm() {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (formList.empty() || StitchBuffer->empty()) {
 	return;

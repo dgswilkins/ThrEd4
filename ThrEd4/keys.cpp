@@ -346,7 +346,7 @@ void keys::desiz() {
 	info += displayText::format5(
 	    IDS_STCHS, wrap::toUnsigned(StitchBuffer->size()), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (!formList.empty()) {
 	thred::frmrct(rectangle);
@@ -547,7 +547,7 @@ void kyi::seldwn() {
 	thred::dubox(stitchCoordsInPixels);
 	return;
   }
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (!formList.empty()) {
 	if (StateMap->testAndSet(StateFlag::FORMSEL)) {
@@ -564,7 +564,7 @@ void kyi::seldwn() {
 }
 
 void kyi::selup() {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
   if (wrap::pressed(VK_SHIFT)) {
 	StateMap->reset(StateFlag::SELBOX);
 	if (StateMap->testAndReset(StateFlag::FORMSEL)) {
