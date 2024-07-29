@@ -1548,8 +1548,8 @@ auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
   while (index != 0U) {
 	--index;
 	if (InterleaveSequenceIndices->operator[](index).color == color) {
-	  point = InterleaveSequence->operator[](
-	      InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index - 1U);
+	  auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index;
+	  point = InterleaveSequence->operator[](wrap::toSize(nextIndex) - 1U);
 	  return true;
 	}
   }
