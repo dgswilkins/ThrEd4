@@ -753,8 +753,8 @@ auto xi::gucon(FRM_HEAD const&            form,
   auto iStitch = destination;
   while (startVertex != endVertex) {
 	if (iStitch != 0U) {
-	  if (!util::closeEnough(buffer[iStitch - 1U].x, indentedPoint[startVertex].x) ||
-	      !util::closeEnough(buffer[iStitch - 1U].y, indentedPoint[startVertex].y)) {
+	  if (auto const prevStitch = iStitch - 1U; !util::closeEnough(buffer[prevStitch].x, indentedPoint[startVertex].x) ||
+	      !util::closeEnough(buffer[prevStitch].y, indentedPoint[startVertex].y)) {
 		buffer.emplace_back(indentedPoint[startVertex].x, indentedPoint[startVertex].y, code);
 		++iStitch;
 	  }
