@@ -81,7 +81,6 @@ float                          HorizontalRatio           = 0.0F;    // horizonta
 HWND                           HorizontalScrollBar       = nullptr; // horizontal scroll bar
 INI_FILE                       IniFile                   = {};      // initialization file
 std::array<POINT, 3>           InsertLine                = {};      // the insert line
-std::vector<F_POINT>*          InsidePointList           = nullptr; // list of inside outline points for satin or clipboard fills
 std::vector<F_POINT>*          InsidePoints              = nullptr; // pointer to the list of inside outline points
 std::vector<INS_REC>*          InterleaveSequenceIndices = nullptr; // indices into interleave points
 std::vector<F_POINT>*          InterleaveSequence        = nullptr; // storage for interleave points

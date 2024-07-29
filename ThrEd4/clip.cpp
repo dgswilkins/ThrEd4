@@ -410,11 +410,12 @@ void clip::clpout(float const width) {
 	return;
   }
   satin::satout(form, ClipRectSize.cy);
-  InsidePointList->clear();
+  auto& insidePointList = Instance->InsidePointList;
+  insidePointList.clear();
   auto const itStartVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
-  InsidePointList->insert(InsidePointList->end(), itStartVertex, itEndVertex);
-  InsidePoints = InsidePointList;
+  insidePointList.insert(insidePointList.end(), itStartVertex, itEndVertex);
+  InsidePoints = &insidePointList;
 }
 
 auto ci::clpsid(uint32_t const              vertexIndex,

@@ -12274,7 +12274,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  FormVertices              = &Instance->FormVertices;
 	  HomeDirectory             = &Instance->HomeDirectory; // thred only
 	  IniFileName               = &Instance->IniFileName;   // thred only
-	  InsidePointList           = &Instance->InsidePointList;
 	  InterleaveSequence        = &Instance->InterleaveSequence;
 	  InterleaveSequenceIndices = &Instance->InterleaveSequenceIndices;
 	  Knots                     = &Instance->Knots; // thred only

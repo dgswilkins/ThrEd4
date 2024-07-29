@@ -1439,9 +1439,10 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
   }
   form::duangs(form);
   OutsidePointList->resize(form.vertexCount);
-  InsidePointList->resize(form.vertexCount);
+  auto& insidePointList = Instance->InsidePointList;
+  insidePointList.resize(form.vertexCount);
   OutsidePoints = OutsidePointList;
-  InsidePoints  = InsidePointList;
+  InsidePoints  = &insidePointList;
 
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	constexpr auto DEFWIDTH = 0.1F; // default satin width
@@ -1461,7 +1462,7 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
   StateMap->reset(StateFlag::INDIR);
   if (count < form.vertexCount / 2U) {
 	StateMap->set(StateFlag::INDIR);
-	OutsidePoints = InsidePointList;
+	OutsidePoints = &Instance->InsidePointList;
 	InsidePoints  = OutsidePointList;
   }
 }
