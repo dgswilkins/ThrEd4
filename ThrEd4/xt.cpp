@@ -1593,9 +1593,10 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
        iSequence < InterleaveSequenceIndices->operator[](wrap::toSize(ilData.pins) + 1U).index;
        ++iSequence) {
 	if (ilData.output > 0) {
+	  auto const prevOutput = ilData.output - 1U;
 	  if (auto const& interleave = InterleaveSequence->operator[](iSequence);
-	      !util::closeEnough(interleave.x, buffer[ilData.output - 1U].x) ||
-	      !util::closeEnough(interleave.y, buffer[ilData.output - 1U].y)) {
+	      !util::closeEnough(interleave.x, buffer[prevOutput].x) ||
+	      !util::closeEnough(interleave.y, buffer[prevOutput].y)) {
 		buffer.emplace_back(interleave.x, interleave.y, code);
 		++ilData.output;
 	  }
