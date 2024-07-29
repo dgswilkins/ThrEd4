@@ -8714,18 +8714,20 @@ void thred::set1knot() {
 }
 
 void thred::fixpclp(uint32_t const closestFormToCursor) {
+  auto& interleaveSequence = Instance->InterleaveSequence;
+
   auto const point = POINT {(WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
                             (WinMsg.pt.y + gsl::narrow_cast<decltype(WinMsg.pt.y)>(FormMoveDelta.y))};
-  auto       itIntlvSeq  = std::next(InterleaveSequence->begin());
+  auto       itIntlvSeq  = std::next(interleaveSequence.begin());
   auto const stitchPoint = pxCor2stch(point);
   auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
-  auto const count       = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
+  auto const count       = wrap::toUnsigned(interleaveSequence.size()) - 2U;
   auto&      form        = Instance->FormList.operator[](closestFormToCursor);
   auto const nextVertex  = form::nxt(form, ClosestVertexToCursor);
   form::fltspac(nextVertex, count);
   form.vertexCount += count;
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + nextVertex);
-  for (auto iOutput = size_t {1U}; iOutput < InterleaveSequence->size() - 1U; ++iOutput) {
+  for (auto iOutput = size_t {1U}; iOutput < interleaveSequence.size() - 1U; ++iOutput) {
 	*itVertex = F_POINT {itIntlvSeq->x + offset.x, itIntlvSeq->y + offset.y};
 	++itVertex;
 	++itIntlvSeq;
@@ -12274,7 +12276,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  FormVertices              = &Instance->FormVertices;
 	  HomeDirectory             = &Instance->HomeDirectory; // thred only
 	  IniFileName               = &Instance->IniFileName;   // thred only
-	  InterleaveSequence        = &Instance->InterleaveSequence;
 	  InterleaveSequenceIndices = &Instance->InterleaveSequenceIndices;
 	  Knots                     = &Instance->Knots; // thred only
 	  LabelWindow               = &Instance->LabelWindow;

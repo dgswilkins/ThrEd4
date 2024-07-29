@@ -1564,7 +1564,8 @@ auto fi::ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen
 	length = CLAMP;
   }
 
-  InterleaveSequence->push_back(start);
+  auto& interleaveSequence = Instance->InterleaveSequence;
+  interleaveSequence.push_back(start);
   if (length > MaxStitchLen) {
 	constexpr auto MINSTLEN = 1e-1F; // clamp minimum stitch length
 	if (userStitchLen < MINSTLEN) {
@@ -1582,7 +1583,7 @@ auto fi::ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen
 	auto const step  = F_POINT {delta.x / wrap::toFloat(count), delta.y / wrap::toFloat(count)};
 	auto       point = F_POINT {start.x + step.x, start.y + step.y};
 	for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
-	  InterleaveSequence->push_back(point);
+	  interleaveSequence.push_back(point);
 	  point += step;
 	}
   }
@@ -1612,10 +1613,12 @@ void form::chkseq(bool border) {
   UNREFERENCED_PARAMETER(border);
 
   for (auto val : *OSequence) {
-	InterleaveSequence->push_back(val);
+	Instance->InterleaveSequence.push_back(val);
   }
 #else
-  auto const savedIndex = InterleaveSequence->size();
+  auto& interleaveSequence = Instance->InterleaveSequence;
+
+  auto const savedIndex = interleaveSequence.size();
   auto&      form       = Instance->FormList.operator[](ClosestFormToCursor);
 
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
@@ -1651,7 +1654,7 @@ void form::chkseq(bool border) {
 	  }
 	}
 	if (flag) {
-	  InterleaveSequence->push_back(OSequence->back());
+	  interleaveSequence.push_back(OSequence->back());
 	}
   }
   else {
@@ -1662,17 +1665,17 @@ void form::chkseq(bool border) {
   }
   auto       destination = wrap::toUnsigned(savedIndex + 1U);
   auto const lengthCheck = minimumStitchLength * minimumStitchLength;
-  for (auto iSequence = savedIndex + 1U; iSequence < InterleaveSequence->size(); ++iSequence) {
-	auto const& seq      = InterleaveSequence->operator[](iSequence);
-	auto const& seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
+  for (auto iSequence = savedIndex + 1U; iSequence < interleaveSequence.size(); ++iSequence) {
+	auto const& seq      = interleaveSequence.operator[](iSequence);
+	auto const& seqBack1 = interleaveSequence.operator[](iSequence - 1U);
 	auto const  deltaX   = seq.x - seqBack1.x;
 	auto const  deltaY   = seq.y - seqBack1.y;
 	if (auto const length = deltaX * deltaX + deltaY * deltaY; length > lengthCheck) {
-	  InterleaveSequence->operator[](destination) = seq;
+	  interleaveSequence.operator[](destination) = seq;
 	  ++destination;
 	}
   }
-  InterleaveSequence->resize(destination);
+  interleaveSequence.resize(destination);
 #endif
 }
 
@@ -1682,7 +1685,7 @@ void fi::ritbrd(FRM_HEAD const& form) {
   }
   InterleaveSequenceIndices->emplace_back(INS_REC {TYPBRD,
                                                    gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
-                                                   wrap::toUnsigned(InterleaveSequence->size()),
+                                                   wrap::toUnsigned(Instance->InterleaveSequence.size()),
                                                    I_BRD});
   form::chkseq(true);
 }
@@ -1694,7 +1697,7 @@ void fi::ritapbrd() {
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
   InterleaveSequenceIndices->emplace_back(INS_REC {TYPMSK,
                                                    gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
-                                                   wrap::toUnsigned(InterleaveSequence->size()),
+                                                   wrap::toUnsigned(Instance->InterleaveSequence.size()),
                                                    I_AP});
   form::chkseq(true);
 }
@@ -1704,15 +1707,15 @@ void fi::ritfil(FRM_HEAD& form) {
 	return;
   }
   InterleaveSequenceIndices->emplace_back(INS_REC {
-      TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
+      TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(Instance->InterleaveSequence.size()), I_FIL});
   form::chkseq(false);
 }
 
 auto form::lastch() noexcept -> bool {
-  if (InterleaveSequence->empty()) {
+  if (Instance->InterleaveSequence.empty()) {
 	return false;
   }
-  LastPoint = InterleaveSequence->back();
+  LastPoint = Instance->InterleaveSequence.back();
   return true;
 }
 
@@ -5429,7 +5432,7 @@ void form::refilfn(uint32_t const formIndex) {
   if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U && form.type == FRMLINE && form.fillType != CONTF) {
 	form.type = FRMFPOLY;
   }
-  InterleaveSequence->clear();
+  Instance->InterleaveSequence.clear();
   InterleaveSequenceIndices->clear();
   StateMap->reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};

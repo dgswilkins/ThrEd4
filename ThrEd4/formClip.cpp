@@ -669,16 +669,18 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto& form     = Instance->FormList.operator[](ClosestFormToCursor);
 		  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		  // clang-format on
-		  InterleaveSequence->clear();
-		  InterleaveSequence->reserve(wrap::toSize(ptrFormVertexData->vertexCount) + 3U);
+		  auto& interleaveSequence = Instance->InterleaveSequence;
+
+		  interleaveSequence.clear();
+		  interleaveSequence.reserve(wrap::toSize(ptrFormVertexData->vertexCount) + 3U);
 		  auto const closestIt = wrap::next(itVertex, ClosestVertexToCursor);
-		  InterleaveSequence->push_back(*closestIt);
+		  interleaveSequence.push_back(*closestIt);
 		  auto*      clipData     = convertFromPtr<F_POINT*>(std::next(ptrFormVertexData));
 		  auto const formVertices = gsl::span {clipData, ptrFormVertexData->vertexCount};
-		  InterleaveSequence->insert(InterleaveSequence->end(), formVertices.begin(), formVertices.end());
+		  interleaveSequence.insert(interleaveSequence.end(), formVertices.begin(), formVertices.end());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
 		  auto const nextIt     = wrap::next(itVertex, nextVertex);
-		  InterleaveSequence->push_back(*nextIt);
+		  interleaveSequence.push_back(*nextIt);
 		  fci::setpclp();
 		  StateMap->set(StateFlag::FPUNCLP);
 		  StateMap->set(StateFlag::SHOP);
@@ -935,20 +937,22 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
 }
 
 void fci::setpclp() {
+  auto& interleaveSequence = Instance->InterleaveSequence;
+
   FormVerticesAsLine->clear();
-  auto itIntlvSeq = InterleaveSequence->begin();
+  auto itIntlvSeq = interleaveSequence.begin();
   auto point      = form::sfCor2px(*itIntlvSeq);
   ++itIntlvSeq;
   FormVerticesAsLine->push_back(point);
   point             = form::sfCor2px(*itIntlvSeq);
   auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
                              WinMsg.pt.y - StitchWindowOrigin.y - point.y};
-  for (auto ine = 1U; ine < wrap::toUnsigned(InterleaveSequence->size()) - 1U; ++ine) {
+  for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;
 	FormVerticesAsLine->push_back(POINT {point.x + offset.x, point.y + offset.y});
   }
-  point = form::sfCor2px(InterleaveSequence->back());
+  point = form::sfCor2px(interleaveSequence.back());
   FormVerticesAsLine->push_back(point);
 }
 

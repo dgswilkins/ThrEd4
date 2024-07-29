@@ -83,7 +83,6 @@ INI_FILE                       IniFile                   = {};      // initializ
 std::array<POINT, 3>           InsertLine                = {};      // the insert line
 std::vector<F_POINT>*          InsidePoints              = nullptr; // pointer to the list of inside outline points
 std::vector<INS_REC>*          InterleaveSequenceIndices = nullptr; // indices into interleave points
-std::vector<F_POINT>*          InterleaveSequence        = nullptr; // storage for interleave points
 std::vector<HWND>*             LabelWindow               = nullptr; // text handles for the form data sheet
 F_POINT                        LastPoint                 = F_POINT {}; // last formOrigin written by line connect routine
 float                          LineSpacing               = DEFSPACE * PFGRAN; // stitch spacing in stitch units

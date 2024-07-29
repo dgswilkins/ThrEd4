@@ -278,7 +278,6 @@ extern INI_FILE IniFile;
 extern std::array<POINT, 3>  InsertLine;
 extern std::vector<F_POINT>* InsidePoints;
 extern std::vector<INS_REC>* InterleaveSequenceIndices;
-extern std::vector<F_POINT>* InterleaveSequence;
 extern std::vector<HWND>*    LabelWindow;
 
 extern F_POINT LastPoint;

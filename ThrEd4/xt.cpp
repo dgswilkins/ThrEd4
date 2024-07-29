@@ -507,15 +507,17 @@ void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequen
   if (OSequence->empty()) {
 	return;
   }
+  auto const& interleaveSequence = Instance->InterleaveSequence;
+
   InterleaveSequenceIndices->emplace_back(
-      INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
+      INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
   form::chkseq(false);
   if ((form.extendedAttribute & AT_FTHBLND) == 0U ||
       ~(form.extendedAttribute & (AT_FTHUP | AT_FTHBTH)) == (AT_FTHUP | AT_FTHBTH)) {
 	return;
   }
   InterleaveSequenceIndices->emplace_back(
-      INS_REC {FTHMSK, form.feather.color, wrap::toUnsigned(InterleaveSequence->size()), I_FTH});
+      INS_REC {FTHMSK, form.feather.color, wrap::toUnsigned(interleaveSequence.size()), I_FTH});
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
@@ -679,12 +681,14 @@ void xi::delwlk(uint32_t code) {
 }
 
 void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
+  auto& interleaveSequence = Instance->InterleaveSequence;
+
   if (!OSequence->empty()) {
 	InterleaveSequenceIndices->emplace_back(
-	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
+	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
 #if BUGBAK
 	for (auto val : *OSequence) {
-	  InterleaveSequence->push_back(val);
+	  Instance->InterleaveSequence.push_back(val);
 	}
 #else
 	constexpr auto MAXWLK  = 54.0F; // max underlay/edge walk stitch length
@@ -703,17 +707,17 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 		    F_POINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 		auto point = *sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
-		  InterleaveSequence->push_back(point);
+		  interleaveSequence.push_back(point);
 		  point += step;
 		}
 	  }
 	  else {
-		InterleaveSequence->push_back(*sequence);
+		interleaveSequence.push_back(*sequence);
 	  }
 	  ++sequence;
 	  ++sequenceFwd1;
 	}
-	InterleaveSequence->push_back(OSequence->back());
+	interleaveSequence.push_back(OSequence->back());
 #endif
   }
 }
@@ -1549,7 +1553,7 @@ auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
 	--index;
 	if (InterleaveSequenceIndices->operator[](index).color == color) {
 	  auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index;
-	  point = InterleaveSequence->operator[](wrap::toSize(nextIndex) - 1U);
+	  point = Instance->InterleaveSequence.operator[](wrap::toSize(nextIndex) - 1U);
 	  return true;
 	}
   }
@@ -1557,6 +1561,7 @@ auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
 }
 
 void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
+  auto& interleaveSequence = Instance->InterleaveSequence;
   if (ilData.coloc > ilData.start) {
 	auto const count         = ilData.coloc > StitchBuffer->size()
 	                               ? wrap::toUnsigned(StitchBuffer->size()) - ilData.start
@@ -1575,7 +1580,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	      gucon(form,
 	            buffer,
 	            *itVertex,
-	            InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+	            interleaveSequence.operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 	            ilData.output,
 	            code);
 	}
@@ -1585,7 +1590,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	    gucon(form,
 	          buffer,
 	          point,
-	          InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+	          interleaveSequence.operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 	          ilData.output,
 	          code);
   }
@@ -1594,7 +1599,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
        ++iSequence) {
 	if (ilData.output > 0) {
 	  auto const prevOutput = ilData.output - 1U;
-	  if (auto const& interleave = InterleaveSequence->operator[](iSequence);
+	  if (auto const& interleave = interleaveSequence.operator[](iSequence);
 	      !util::closeEnough(interleave.x, buffer[prevOutput].x) ||
 	      !util::closeEnough(interleave.y, buffer[prevOutput].y)) {
 		buffer.emplace_back(interleave.x, interleave.y, code);
@@ -1602,7 +1607,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	  }
 	}
 	else {
-	  auto const& interleave = InterleaveSequence->operator[](iSequence);
+	  auto const& interleave = interleaveSequence.operator[](iSequence);
 	  buffer.emplace_back(interleave.x, interleave.y, code);
 	  ++ilData.output;
 	}
@@ -1627,13 +1632,15 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
 	StateMap->set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
 	  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillEnd);
-	  ilData.output += gucon(form, buffer, InterleaveSequence->back(), *itVertex, ilData.output, code);
+	  ilData.output += gucon(form, buffer, Instance->InterleaveSequence.back(), *itVertex, ilData.output, code);
 	}
   }
 }
 
 void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
   auto code = 0U;
+  auto& interleaveSequence = Instance->InterleaveSequence;
+
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
 	code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
 	       InterleaveSequenceIndices->operator[](iSequence).color;
@@ -1644,7 +1651,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 		    gucon(form,
 		          *StitchBuffer,
 		          *itVertex,
-		          InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+		          interleaveSequence.operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 		          ilData.output,
 		          code);
 	  }
@@ -1654,7 +1661,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	      gucon(form,
 	            *StitchBuffer,
 	            colpnt,
-	            InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
+	            interleaveSequence.operator[](InterleaveSequenceIndices->operator[](iSequence).index),
 	            ilData.output,
 	            code);
 	}
@@ -1662,7 +1669,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
 	for (auto index = thisIndex; index < nextIndex; ++index) {
 	  if (ilData.output > 0) {
-		auto& interleave = InterleaveSequence->operator[](index);
+		auto& interleave = interleaveSequence.operator[](index);
 		if (auto const& stitch = StitchBuffer->operator[](ilData.output - 1U);
 		    !util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
 		  StitchBuffer->emplace_back(interleave.x, interleave.y, code);
@@ -1670,7 +1677,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 		}
 	  }
 	  else {
-		auto& interleave = InterleaveSequence->operator[](index);
+		auto& interleave = interleaveSequence.operator[](index);
 		StitchBuffer->emplace_back(interleave.x, interleave.y, code);
 		++ilData.output;
 	  }
@@ -1683,7 +1690,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   auto ilData = INT_INFO {};
   StateMap->reset(StateFlag::ISEND);
   auto const& form = Instance->FormList.operator[](formIndex);
-  InterleaveSequenceIndices->emplace_back(INS_REC {0, 0, wrap::toUnsigned(InterleaveSequence->size()), 0});
+  InterleaveSequenceIndices->emplace_back(INS_REC {0, 0, wrap::toUnsigned(Instance->InterleaveSequence.size()), 0});
   ilData.layerIndex =
       gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) | formIndex << FRMSHFT;
   StateMap->reset(StateFlag::DIDSTRT);
