@@ -12852,3 +12852,7 @@ void thred::setLargestStitchVal() {
   setSrchLargest();
   thi::lensadj();
 }
+
+auto thred::getLabelWindow() noexcept -> std::vector<HWND>* {
+  return std::addressof(Instance->LabelWindow);
+}
