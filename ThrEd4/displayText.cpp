@@ -173,7 +173,7 @@ void displayText::tsizmsg(wchar_t const* threadSizeText, float const threadSize)
 }
 
 void displayText::bfilmsg() {
-  showMessage(IDS_BADFIL, WorkingFileName->wstring());
+  showMessage(IDS_BADFIL, Instance->WorkingFileName.wstring());
 }
 
 void displayText::filnopn(uint32_t const code, fs::path const& fileName) {

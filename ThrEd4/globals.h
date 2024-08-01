@@ -392,7 +392,6 @@ extern std::vector<HWND>* ValueWindow;
 
 extern float     VerticalRatio;
 extern HWND      VerticalScrollBar;
-extern fs::path* WorkingFileName;
 
 extern std::array<POINT, SQPNTS> ZoomBoxLine;
 

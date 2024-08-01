@@ -163,7 +163,6 @@ float                          UserStitchLength          = USESIZ * PFGRAN; // u
 std::vector<HWND>*             ValueWindow               = nullptr; // data handles for the form data sheet
 float                          VerticalRatio             = 0.0F;    // vertical ratio between the zoom window and the entire stitch space
 HWND                           VerticalScrollBar         = nullptr; // vertical scroll bar
-fs::path*                      WorkingFileName           = nullptr; //
 std::array<POINT, SQPNTS>      ZoomBoxLine               = {};      // the zoom box
 F_POINT                        ZoomBoxOrigin             = F_POINT {}; // zoom box origin
 float                          ZoomFactor                = 1.0F;    // zoom factor

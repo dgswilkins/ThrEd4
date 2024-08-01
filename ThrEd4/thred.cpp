@@ -916,9 +916,10 @@ void thred::savdo() {
 }
 
 void thi::nunams() {
-  Instance->AuxName = *WorkingFileName;
+  auto& workingFileName = Instance->WorkingFileName;
+  Instance->AuxName     = workingFileName;
   xt::duauxnam(Instance->AuxName);
-  *ThrName = *WorkingFileName;
+  *ThrName = workingFileName;
   ThrName->replace_extension(L".thr");
   if (PreviousNames->front() == *ThrName) {
 	return;
@@ -3211,12 +3212,14 @@ void thi::dubuf(std::vector<char>& buffer) {
 }
 
 void thi::thrsav() {
-  if (chkattr(*WorkingFileName)) {
+  auto& workingFileName = Instance->WorkingFileName;
+
+  if (chkattr(workingFileName)) {
 	return;
   }
   if (!StateMap->testAndReset(StateFlag::IGNAM)) {
 	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-	auto geName   = *WorkingFileName; // intentional copy
+	auto geName   = workingFileName; // intentional copy
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const file = FindFirstFile(geName.wstring().c_str(), &fileData); file != INVALID_HANDLE_VALUE) {
@@ -3287,7 +3290,7 @@ void thi::chk1col() {
 
 void thi::sav() {
   auto& auxName = Instance->AuxName;
-  auxName = *WorkingFileName;
+  auxName = Instance->WorkingFileName;
   xt::duauxnam(auxName);
   if (chkattr(auxName)) {
 	return;
@@ -3326,7 +3329,7 @@ void thi::sav() {
 	}
   }
   if (flag) {
-	defNam(*WorkingFileName);
+	defNam(Instance->WorkingFileName);
 	if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	  displayText::filnopn(IDS_FILROT, auxName);
 	}
@@ -3409,29 +3412,30 @@ void thred::savAs() {
 	return;
   }
   auto index = FileIndices {};
-  if (!thi::getSaveName(*WorkingFileName, index)) {
+  auto& workingFileName = Instance->WorkingFileName;
+  if (!thi::getSaveName(workingFileName, index)) {
 	return;
   }
-  *DefaultDirectory = WorkingFileName->parent_path();
+  *DefaultDirectory = workingFileName.parent_path();
   switch (index) {
 	case FileIndices::THR: {
-	  WorkingFileName->replace_extension(L".thr");
+	  workingFileName.replace_extension(L".thr");
 	  break;
 	}
 	case FileIndices::PCS: {
-	  WorkingFileName->replace_extension(L".pcs");
+	  workingFileName.replace_extension(L".pcs");
 	  menu::setpcs();
 	  break;
 	}
 #if PESACT
 	case FileIndices::PES: {
-	  WorkingFileName->replace_extension(L".pes");
+	  workingFileName.replace_extension(L".pes");
 	  menu::setpes();
 	  break;
 	}
 #endif
 	case FileIndices::DST: {
-	  WorkingFileName->replace_extension(L".dst");
+	  workingFileName.replace_extension(L".dst");
 	  menu::setdst();
 	  break;
 	}
@@ -3451,12 +3455,13 @@ void thred::savAs() {
 }
 
 void thred::save() {
-  if (WorkingFileName->empty()) {
+  auto& workingFileName = Instance->WorkingFileName;
+  if (workingFileName.empty()) {
 	savAs();
 	return;
   }
-  if (WorkingFileName->extension().empty()) {
-	*WorkingFileName /= L".thr";
+  if (workingFileName.extension().empty()) {
+	workingFileName /= L".thr";
   }
   thi::thrsav();
   thi::sav();
@@ -4204,13 +4209,15 @@ void thi::resetState() {
 }
 
 void thi::nuFil(FileIndices const fileIndex) {
+  auto& workingFileName = Instance->WorkingFileName;
+
   // Todo - check filename for validity before using it
-  auto newFileName = *WorkingFileName; // intentional copy
+  auto newFileName = workingFileName; // intentional copy
   if (!StateMap->testAndReset(StateFlag::REDOLD) &&
       !getNewFileName(newFileName, FileStyles::ALL_FILES, fileIndex)) {
 	return;
   }
-  WorkingFileName->assign(newFileName);
+  workingFileName.assign(newFileName);
   defNam(newFileName);
   resetState();
   auto const fileExt = newFileName.extension().wstring();
@@ -5090,7 +5097,7 @@ void thred::newFil() {
   formList.shrink_to_fit();
   resetColorChanges();
   Knots->clear();
-  WorkingFileName->clear();
+  Instance->WorkingFileName.clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	redraw(DefaultColorWin->operator[](iColor));
 	redraw(UserColorWin->operator[](iColor));
@@ -6350,7 +6357,7 @@ void thi::drwmrk(HDC hDC) {
 // ReSharper restore CppParameterMayBeConst
 
 void thred::vubak() {
-  if (WorkingFileName->empty() && !StateMap->test(StateFlag::THUMSHO)) {
+  if (Instance->WorkingFileName.empty() && !StateMap->test(StateFlag::THUMSHO)) {
 	return;
   }
   StateMap->set(StateFlag::ZUMED);
@@ -6689,8 +6696,9 @@ void thi::getbak() {
   }
   unthum();
   StateMap->set(StateFlag::FRMOF);
-  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
-  thred::insfil(*WorkingFileName);
+  auto& workingFileName = Instance->WorkingFileName;
+  workingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
+  thred::insfil(workingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
   }
@@ -6715,7 +6723,7 @@ void thi::rebak() {
 	fs::rename(newFileName, *ThrName);
   }
   fs::rename(safetyFileName, newFileName);
-  *WorkingFileName = *ThrName;
+  Instance->WorkingFileName = *ThrName;
   StateMap->set(StateFlag::REDOLD);
   nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
@@ -8393,7 +8401,7 @@ void thred::delstch() {
 void thred::closfn() {
   deltot();
   Knots->clear();
-  WorkingFileName->clear();
+  Instance->WorkingFileName.clear();
   bitmap::delmap();
   backup::deldu();
   displayText::clrhbut(3);
@@ -10204,7 +10212,7 @@ void thi::handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
 	auto previousName = PreviousNames->begin();
 	for (auto const& iLRU : *LRUPtr) {
 	  if (WinMsg.wParam == iLRU) {
-		*WorkingFileName = *previousName;
+		Instance->WorkingFileName = *previousName;
 		StateMap->set(StateFlag::REDOLD);
 		nuFil(FileIndices::THR);
 	  }
@@ -10393,7 +10401,7 @@ void thi::ducmd() {
   auto const spArgList = gsl::span {ArgList, wrap::toSize(ArgCount)};
   auto const arg1      = std::wstring {spArgList[1]};
   if (arg1.compare(0, 4, L"/F1:") != 0) {
-	WorkingFileName->assign(arg1);
+	Instance->WorkingFileName.assign(arg1);
 	StateMap->set(StateFlag::REDOLD);
 	nuFil(FileIndices::THR);
 	return;
@@ -12312,7 +12320,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  UserPen                   = &Instance->UserPen; // thred only
 	  ValueWindow               = &Instance->ValueWindow;
 	  VersionNames              = &Instance->VersionNames; // thred only
-	  WorkingFileName           = &Instance->WorkingFileName;
 
 	  bal::setBN0(&Instance->BalaradName0);
 	  bal::setBN1(&Instance->BalaradName1);
@@ -12467,7 +12474,9 @@ void thred::initBackPenBrush() noexcept {
 }
 
 auto thred::setFileName() -> fs::path {
-  return WorkingFileName->empty() ? *DefaultDirectory / L"balfil.thr" : *WorkingFileName;
+  auto& workingFileName = Instance->WorkingFileName;
+
+  return workingFileName.empty() ? *DefaultDirectory / L"balfil.thr" : workingFileName;
 }
 
 auto thred::getDesigner() -> std::wstring {

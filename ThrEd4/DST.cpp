@@ -447,9 +447,10 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 }
 
 auto di::colfil() -> bool {
-  *ColorFileName = *WorkingFileName;
-  *RGBFileName   = *WorkingFileName;
-  if (!WorkingFileName->has_extension()) {
+  auto& workingFileName = Instance->WorkingFileName;
+  *ColorFileName = workingFileName;
+  *RGBFileName   = workingFileName;
+  if (!workingFileName.has_extension()) {
 	return false;
   }
   ColorFileName->replace_extension(L"thw");
