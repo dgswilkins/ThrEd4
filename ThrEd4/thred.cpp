@@ -12278,9 +12278,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  IniFileName               = &Instance->IniFileName;   // thred only
 	  InterleaveSequenceIndices = &Instance->InterleaveSequenceIndices;
 	  Knots                     = &Instance->Knots; // thred only
-	  LabelWindow               = &Instance->LabelWindow;
+	  LabelWindow               = &Instance->LabelWindow; // thred only
 	  LRUPtr                    = &Instance->LRUMenuId; // thred only
-	  MenuInfo                  = &Instance->MenuInfo;
 	  MsgBuffer                 = &Instance->MsgBuffer; // thred only
 	  NearestPixel              = &Instance->NearestPixel; // thred only
 	  NearestPoint              = &Instance->NearestPoint; // thred only
@@ -12329,7 +12328,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  tfc::setFVAS(&Instance->FormVerticesAsLine);
 	  thi::redini();
 
-	  *MenuInfo = MENUITEMINFO {
+	  Instance->MenuInfo = MENUITEMINFO {
 	      sizeof(MENUITEMINFO), // Size
 	      MIIM_TYPE,            // Mask
 	      MFT_STRING,           // Type

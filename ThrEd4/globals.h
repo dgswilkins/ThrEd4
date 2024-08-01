@@ -290,8 +290,6 @@ extern HMENU MainMenu;
 extern HWND  MainStitchWin;
 extern float MaxStitchLen;
 
-extern MENUITEMINFO* MenuInfo;
-
 extern float MinStitchLength;
 extern MSG   WinMsg;
 

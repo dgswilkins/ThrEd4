@@ -256,13 +256,13 @@ void menu::flipFormOnOff() {
 	StateMap->reset(StateFlag::FRMPSEL);
 	StateMap->reset(StateFlag::INSFRM);
   }
-  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
+  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(Instance->MenuInfo));
   StateMap->set(StateFlag::DUMEN);
 }
 
 void menu::resetFormOnOff() {
   Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMPLUS));
-  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
+  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(Instance->MenuInfo));
   StateMap->set(StateFlag::DUMEN);
 }
 

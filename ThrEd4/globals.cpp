@@ -90,7 +90,6 @@ std::array<uint32_t, OLDNUM>*  LRUPtr                    = nullptr; // pointer t
 HMENU                          MainMenu                  = nullptr; // main menu
 HWND                           MainStitchWin             = nullptr; // stitch window
 float                          MaxStitchLen              = 0.0F;    // maximum stitch length
-MENUITEMINFO*                  MenuInfo                  = nullptr;
 float                          MinStitchLength           = MINSIZ * PFGRAN; // minimum stitch size
 MSG                            WinMsg                    = {};      // main message loop message
 RECT                           MsgRect                   = {};      // rectangle containing the text message
