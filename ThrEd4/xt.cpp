@@ -508,15 +508,16 @@ void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequen
 	return;
   }
   auto const& interleaveSequence = Instance->InterleaveSequence;
+  auto&       interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
 
-  InterleaveSequenceIndices->emplace_back(
+ interleaveSequenceIndices.emplace_back(
       INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
   form::chkseq(false);
   if ((form.extendedAttribute & AT_FTHBLND) == 0U ||
       ~(form.extendedAttribute & (AT_FTHUP | AT_FTHBTH)) == (AT_FTHUP | AT_FTHBTH)) {
 	return;
   }
-  InterleaveSequenceIndices->emplace_back(
+ interleaveSequenceIndices.emplace_back(
       INS_REC {FTHMSK, form.feather.color, wrap::toUnsigned(interleaveSequence.size()), I_FTH});
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
@@ -684,7 +685,7 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
   if (!OSequence->empty()) {
-	InterleaveSequenceIndices->emplace_back(
+	Instance->InterleaveSequenceIndices.emplace_back(
 	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
 #if BUGBAK
 	for (auto val : *OSequence) {
@@ -1548,11 +1549,13 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 }
 
 auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
-  auto const color = InterleaveSequenceIndices->operator[](index).color;
+  auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+
+  auto const color = interleaveSequenceIndices.operator[](index).color;
   while (index != 0U) {
 	--index;
-	if (InterleaveSequenceIndices->operator[](index).color == color) {
-	  auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index;
+	if (interleaveSequenceIndices.operator[](index).color == color) {
+	  auto const nextIndex = interleaveSequenceIndices.operator[](wrap::toSize(index) + 1U).index;
 	  point = Instance->InterleaveSequence.operator[](wrap::toSize(nextIndex) - 1U);
 	  return true;
 	}
@@ -1573,6 +1576,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	ilData.start += count;
 	ilData.output += count;
   }
+  auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 	  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
@@ -1580,7 +1584,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	      gucon(form,
 	            buffer,
 	            *itVertex,
-	            interleaveSequence.operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+	            interleaveSequence.operator[](interleaveSequenceIndices.operator[](ilData.pins).index),
 	            ilData.output,
 	            code);
 	}
@@ -1590,12 +1594,12 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	    gucon(form,
 	          buffer,
 	          point,
-	          interleaveSequence.operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+	          interleaveSequence.operator[](interleaveSequenceIndices.operator[](ilData.pins).index),
 	          ilData.output,
 	          code);
   }
-  for (auto iSequence = InterleaveSequenceIndices->operator[](ilData.pins).index;
-       iSequence < InterleaveSequenceIndices->operator[](wrap::toSize(ilData.pins) + 1U).index;
+  for (auto iSequence = interleaveSequenceIndices.operator[](ilData.pins).index;
+       iSequence < interleaveSequenceIndices.operator[](wrap::toSize(ilData.pins) + 1U).index;
        ++iSequence) {
 	if (ilData.output > 0) {
 	  auto const prevOutput = ilData.output - 1U;
@@ -1640,10 +1644,11 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
 void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
   auto code = 0U;
   auto& interleaveSequence = Instance->InterleaveSequence;
+  auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
 
-  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
-	code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
-	       InterleaveSequenceIndices->operator[](iSequence).color;
+  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(interleaveSequenceIndices.size() - 1U); ++iSequence) {
+	code = ilData.layerIndex | interleaveSequenceIndices.operator[](iSequence).code |
+	       interleaveSequenceIndices.operator[](iSequence).color;
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 		auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
@@ -1651,7 +1656,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 		    gucon(form,
 		          *StitchBuffer,
 		          *itVertex,
-		          interleaveSequence.operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
+		          interleaveSequence.operator[](interleaveSequenceIndices.operator[](ilData.pins).index),
 		          ilData.output,
 		          code);
 	  }
@@ -1661,12 +1666,12 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	      gucon(form,
 	            *StitchBuffer,
 	            colpnt,
-	            interleaveSequence.operator[](InterleaveSequenceIndices->operator[](iSequence).index),
+	            interleaveSequence.operator[](interleaveSequenceIndices.operator[](iSequence).index),
 	            ilData.output,
 	            code);
 	}
-	auto const nextIndex = InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
-	auto const thisIndex = InterleaveSequenceIndices->operator[](iSequence).index;
+	auto const nextIndex = interleaveSequenceIndices.operator[](wrap::toSize(iSequence) + 1U).index;
+	auto const thisIndex = interleaveSequenceIndices.operator[](iSequence).index;
 	for (auto index = thisIndex; index < nextIndex; ++index) {
 	  if (ilData.output > 0) {
 		auto& interleave = interleaveSequence.operator[](index);
@@ -1690,16 +1695,18 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   auto ilData = INT_INFO {};
   StateMap->reset(StateFlag::ISEND);
   auto const& form = Instance->FormList.operator[](formIndex);
-  InterleaveSequenceIndices->emplace_back(INS_REC {0, 0, wrap::toUnsigned(Instance->InterleaveSequence.size()), 0});
+  auto&       interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+
+  interleaveSequenceIndices.emplace_back(INS_REC {0, 0, wrap::toUnsigned(Instance->InterleaveSequence.size()), 0});
   ilData.layerIndex =
       gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) | formIndex << FRMSHFT;
   StateMap->reset(StateFlag::DIDSTRT);
   if (!StitchBuffer->empty()) {
 	auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
 	auto code             = 0U;
-	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
+	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(interleaveSequenceIndices.size() - 1U); ++iSequence) {
 	  ilData.pins = iSequence;
-	  switch (InterleaveSequenceIndices->operator[](iSequence).seq) {
+	  switch (interleaveSequenceIndices.operator[](iSequence).seq) {
 		case I_AP: {
 		  if ((fillStartsMap & M_FIL) != 0U && fillStartsData[applique] >= ilData.coloc) {
 			ilData.coloc = fillStartsData[applique];
@@ -1741,13 +1748,13 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
 		}
 		default: {
 		  outDebugString(L"default hit in intlv: seq [{}]\n",
-		                 InterleaveSequenceIndices->operator[](iSequence).seq);
+		                 interleaveSequenceIndices.operator[](iSequence).seq);
 		  break;
 		}
 	  }
 	  code = gsl::narrow_cast<uint32_t>(ilData.layerIndex |
-	                                    InterleaveSequenceIndices->operator[](ilData.pins).code |
-	                                    InterleaveSequenceIndices->operator[](ilData.pins).color);
+	                                    interleaveSequenceIndices.operator[](ilData.pins).code |
+	                                    interleaveSequenceIndices.operator[](ilData.pins).color);
 	  xi::duint(form, highStitchBuffer, code, ilData);
 	}
 	xi::chkend(form, highStitchBuffer, code, ilData);

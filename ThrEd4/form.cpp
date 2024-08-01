@@ -1683,7 +1683,7 @@ void fi::ritbrd(FRM_HEAD const& form) {
   if (OSequence->empty()) {
 	return;
   }
-  InterleaveSequenceIndices->emplace_back(INS_REC {TYPBRD,
+  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {TYPBRD,
                                                    gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
                                                    wrap::toUnsigned(Instance->InterleaveSequence.size()),
                                                    I_BRD});
@@ -1695,7 +1695,7 @@ void fi::ritapbrd() {
 	return;
   }
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
-  InterleaveSequenceIndices->emplace_back(INS_REC {TYPMSK,
+  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {TYPMSK,
                                                    gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
                                                    wrap::toUnsigned(Instance->InterleaveSequence.size()),
                                                    I_AP});
@@ -1706,7 +1706,7 @@ void fi::ritfil(FRM_HEAD& form) {
   if (OSequence->empty()) {
 	return;
   }
-  InterleaveSequenceIndices->emplace_back(INS_REC {
+  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {
       TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(Instance->InterleaveSequence.size()), I_FIL});
   form::chkseq(false);
 }
@@ -5433,7 +5433,7 @@ void form::refilfn(uint32_t const formIndex) {
 	form.type = FRMFPOLY;
   }
   Instance->InterleaveSequence.clear();
-  InterleaveSequenceIndices->clear();
+  Instance->InterleaveSequenceIndices.clear();
   StateMap->reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};
   textureSegments.resize(wrap::toSize(form.texture.lines));
