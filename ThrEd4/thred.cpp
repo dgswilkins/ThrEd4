@@ -4358,7 +4358,7 @@ void thred::zumin() {
 		stitchPoint = ZoomMarkPoint;
 		break;
 	  }
-	  auto& formList = Instance->FormList;
+	  auto const& formList = Instance->FormList;
 
 	  if (StateMap->test(StateFlag::FORMSEL)) { // zoom to the selected form
 		auto const& boundingRect = formList.operator[](ClosestFormToCursor).rectangle;
@@ -4475,7 +4475,7 @@ void thred::zumout() {
 	  stitchPoint = ZoomMarkPoint;
 	  break;
 	}
-	auto& formList = Instance->FormList;
+	auto const& formList = Instance->FormList;
 
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto const& boundingRect = formList.operator[](ClosestFormToCursor).rectangle;

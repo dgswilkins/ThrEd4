@@ -85,7 +85,7 @@ auto mi::chkok() noexcept -> bool {
 }
 
 auto mi::finrng(uint32_t const find) noexcept -> bool {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (auto const& rectFind = formList.operator[](find).rectangle;
       rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
@@ -1432,7 +1432,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	texture::txtrbut();
 	return true;
   }
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (wrap::pressed(VK_SHIFT)) { // If shift is pressed as well
 	if (form::closfrm(ClosestFormToCursor)) {

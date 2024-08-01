@@ -1126,7 +1126,7 @@ void trace::blak() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (formList.empty()) {
 	displayText::tabmsg(IDS_FRMNO, false);

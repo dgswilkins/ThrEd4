@@ -621,7 +621,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
 	return;
   }
   auto const spClipData = gsl::span {clipStitchData, count};
-  auto&      clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   savclp(spClipData[0], clipBuffer.operator[](0), count);
   for (auto iStitch = 1U; iStitch < count; ++iStitch) {
@@ -977,7 +977,7 @@ void tfc::fpUnClip() {
 }
 
 void tfc::lodclp(uint32_t iStitch) {
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   StitchBuffer->insert(wrap::next(StitchBuffer->begin(), iStitch), clipBuffer.size(), F_POINT_ATTR {});
   ClosestPointIndex  = iStitch;

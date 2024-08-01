@@ -694,7 +694,7 @@ void ci::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
   listSINEs.reserve(wrap::toSize(form.vertexCount) + 1U);
   auto listCOSINEs = std::vector<float> {};
   listCOSINEs.reserve(form.vertexCount);
-  auto& formAngles = Instance->FormAngles;
+  auto const& formAngles = Instance->FormAngles;
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	listSINEs.push_back(sin(formAngles.operator[](iVertex)));
 	listCOSINEs.push_back(cos(formAngles.operator[](iVertex)));

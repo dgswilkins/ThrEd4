@@ -332,7 +332,7 @@ void satin::satknkt() {
 auto si::satselfn() -> bool {
   auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
-  auto&      formList      = Instance->FormList;
+  auto const& formList      = Instance->FormList;
 
   for (auto& form : formList) {
 	if (auto const layerCode =
@@ -771,7 +771,7 @@ void satin::satbrd() {
 void si::satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width) {
   auto const& vertexIndex = form.vertexIndex;
   auto        itVertex    = wrap::next(FormVertices->cbegin(), vertexIndex);
-  auto&       formAngles  = Instance->FormAngles;
+  auto const&       formAngles  = Instance->FormAngles;
   if ((isBlunt & SBLNT) != 0U) {
 	auto step = F_POINT {sin(formAngles.front()) * width * HALF, cos(formAngles.front()) * width * HALF};
 	if (StateMap->test(StateFlag::INDIR)) {
@@ -1491,7 +1491,7 @@ void satin::sbrd(FRM_HEAD const& form) {
 auto si::satOffset(const uint32_t& finish, const uint32_t& start, float const satinWidth) noexcept -> F_POINT {
   constexpr auto SATHRESH = 10.0F;
 
-  auto&          formAngles = Instance->FormAngles;
+  auto const&          formAngles = Instance->FormAngles;
   auto       angle  = (formAngles.operator[](finish) - formAngles.operator[](start)) * HALF;
   auto const factor = std::clamp(1.0F / cos(angle), -SATHRESH, SATHRESH);
 

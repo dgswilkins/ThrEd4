@@ -720,7 +720,7 @@ void form::unfrm() {
 void form::mdufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  auto& formLines = Instance->FormLines;
+  auto const& formLines = Instance->FormLines;
   if (Instance->FormList.operator[](ClosestFormToCursor).type == FRMLINE) {
 	wrap::polyline(StitchWindowDC, formLines.data(), NewFormVertexCount - 1);
   }
@@ -1029,7 +1029,7 @@ void fi::drawGuides(FRM_HEAD const& form) {
 }
 
 void fi::drawFormBox(FRM_HEAD const& form) {
-  auto& formLines = Instance->FormLines;
+  auto const& formLines = Instance->FormLines;
   for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 	if (iVertex == ClosestVertexToCursor) {
 	  frmx(formLines.operator[](iVertex), StitchWindowMemDC);
@@ -1475,7 +1475,7 @@ auto fi::findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_
 }
 
 auto form::closfrm(uint32_t& formIndex) -> bool {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (formList.empty()) {
 	return false;
@@ -4878,7 +4878,7 @@ void fi::handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
       17,
   };
 
-  auto& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
 
   auto const& bNext     = bSequence.operator[](iSequence + 1U);
   auto const& bPrevious = bSequence.operator[](iSequence - 1U);
@@ -4950,7 +4950,7 @@ void fi::handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
       17,
   };
 
-  auto&       bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
 
   auto const& bNext = bSequence.operator[](iSequence + 1U);
   auto        delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
@@ -5127,7 +5127,7 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
 }
 
 void fi::clpfm() {
-  auto& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
   auto  const endIt     = wrap::toUnsigned(bSequence.size()) - 2U;
 
   for (auto iSequence = 0U; iSequence < endIt; iSequence += 2) {
@@ -5871,7 +5871,7 @@ auto fi::closat(IntersectionStyles& inOutFlag) -> bool {
   auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
 
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
     for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 	auto& formIter = formList.operator[](iForm);
 	if (formIter.vertexCount == 0U) {
@@ -6179,7 +6179,7 @@ void form::bord() {
 void fi::fsclp(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGECLIP;
@@ -7445,7 +7445,7 @@ void fi::filsclp() {
   currentForm.type      = SAT;
   currentForm.fillType  = CLPF;
   currentForm.clipIndex = clip::numclp(ClosestFormToCursor);
-  auto& clipBuffer      = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   currentForm.clipCount = wrap::toUnsigned(clipBuffer.size());
   auto itClipPoints     = wrap::next(Instance->ClipPoints.begin(), currentForm.clipIndex);
@@ -7616,7 +7616,7 @@ void form::snap() {
 }
 
 void fi::dufcntr(F_POINT& center) noexcept {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   auto bigRect = formList.operator[](SelectedFormList->front()).rectangle;
   for (auto const selectedForm : *SelectedFormList) {
@@ -8186,7 +8186,7 @@ void form::boxsel() {
 void fi::fspic(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGEPICOT;
@@ -8360,7 +8360,7 @@ void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
                 uint32_t&              formSourceIndex) {
   auto& dest = destFormList.operator[](formRelocationIndex);
 
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   dest = formList.operator[](formIndex);
   ++formRelocationIndex;
@@ -8881,7 +8881,7 @@ void form::vrtsclp(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   form.clipCount = wrap::toUnsigned(clipBuffer.size());
   form.clipIndex = clip::numclp(formIndex);
@@ -8943,7 +8943,7 @@ void form::horsclp() {
   auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.clipCount      = clipSize;
@@ -9010,7 +9010,7 @@ void form::angsclp(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.clipIndex = clip::numclp(ClosestFormToCursor);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   form.clipCount = wrap::toUnsigned(clipBuffer.size());
   form.wordParam = IniFile.fillPhase;
@@ -9280,7 +9280,7 @@ void form::crop() {
 void fi::fsclpx(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->ClipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGECLIPX;

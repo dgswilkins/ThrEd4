@@ -293,14 +293,14 @@ constexpr auto xi::durat(float const start, float const finish, float const feat
 }
 
 void xi::duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, float const featherRatioLocal) noexcept {
-  auto& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
 
   point = F_POINT {durat(bSequence.operator[](finish).x, bSequence.operator[](start).x, featherRatioLocal),
                    durat(bSequence.operator[](finish).y, bSequence.operator[](start).y, featherRatioLocal)};
 }
 
 void xi::durats(uint32_t const iSequence, gsl::not_null<std::vector<F_POINT>*> const sequence, FEATHER& feather) {
-  auto& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
 
   auto const& bCurrent = bSequence.operator[](iSequence);
   auto const& bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
@@ -420,7 +420,7 @@ void xi::fthfn(uint32_t const iSequence, FEATHER& feather) {
 }
 
 void xi::ratpnt(uint32_t const iPoint, uint32_t const iNextPoint, F_POINT& point, float const featherRatio) noexcept {
-  auto& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
 
   auto const& bPoint = bSequence.operator[](iPoint);
 
@@ -476,7 +476,7 @@ void xi::fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT
 }
 
 void xi::fthdfn(uint32_t const iSequence, FEATHER& feather) {
-  auto& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->BSequence;
 
   auto const& bCurrent = bSequence.operator[](iSequence);
   auto const& bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
@@ -1561,7 +1561,7 @@ auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
 }
 
 void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
-  auto& interleaveSequence = Instance->InterleaveSequence;
+  auto const& interleaveSequence = Instance->InterleaveSequence;
   if (ilData.coloc > ilData.start) {
 	auto const count         = ilData.coloc > StitchBuffer->size()
 	                               ? wrap::toUnsigned(StitchBuffer->size()) - ilData.start
