@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "clipStitch.h"
 #include "EnumMap.h"
-#include "formHeader.h"
 #include "fRectangle.h"
 #include "globals.h"
 #include "iniFile.h"
