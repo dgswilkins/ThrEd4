@@ -250,9 +250,8 @@ auto displayText::filmsgs(uint32_t const code) -> bool {
   if (!SelectedFormList->empty()) {
 	return di::clpmsgs(code);
   }
-  auto& formList = Instance->FormList;
 
-  if (!formList.empty()) {
+  if (auto const& formList = Instance->FormList; !formList.empty()) {
 	frm1pnt();
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  if (auto const& form = formList.operator[](ClosestFormToCursor); form.vertexCount == 2) {

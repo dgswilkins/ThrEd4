@@ -290,8 +290,7 @@ void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedDa
   if (clipBuffer.empty()) {
 	return;
   }
-  auto const midpoint = wrap::midl(clipRect.right, clipRect.left);
-  if (clipBuffer[0].x > midpoint) {
+  if (auto const midpoint = wrap::midl(clipRect.right, clipRect.left); clipBuffer[0].x > midpoint) {
 	auto iBuffer = clipBuffer.begin();
 	for (auto& reversed : clipReversedData) {
 	  reversed = F_POINT {clipRect.right - iBuffer->x, iBuffer->y};

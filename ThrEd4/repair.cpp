@@ -182,8 +182,7 @@ void ri::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 
 auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto badData = BAD_COUNTS {};
-  auto& formList = Instance->FormList;
-  if (!formList.empty()) {
+  if (auto const& formList = Instance->FormList; !formList.empty()) {
 	for (auto& form : formList) {
 	  if ((badData.attribute & BADFLT) == 0U) {
 		if (form.vertexCount == 0U) {

@@ -6877,9 +6877,8 @@ void thred::chkrng(F_POINT& range) {
   delinf();
   wrap::narrow(range.x, UnzoomedRect.cx);
   wrap::narrow(range.y, UnzoomedRect.cy);
-  auto const& formList = Instance->FormList;
 
-  if (!formList.empty()) {
+  if (auto const& formList = Instance->FormList; !formList.empty()) {
 	// ToDo - Why do we treat the forms differently?
 	auto iDestination = StitchBuffer->begin();
 	for (auto& stitch : *StitchBuffer) {

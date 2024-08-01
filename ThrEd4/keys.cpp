@@ -346,9 +346,8 @@ void keys::desiz() {
 	info += displayText::format5(
 	    IDS_STCHS, wrap::toUnsigned(StitchBuffer->size()), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
-  auto const& formList = Instance->FormList;
 
-  if (!formList.empty()) {
+  if (auto const& formList = Instance->FormList; !formList.empty()) {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
@@ -547,9 +546,8 @@ void kyi::seldwn() {
 	thred::dubox(stitchCoordsInPixels);
 	return;
   }
-  auto const& formList = Instance->FormList;
 
-  if (!formList.empty()) {
+  if (auto const& formList = Instance->FormList; !formList.empty()) {
 	if (StateMap->testAndSet(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor != 0U) {
 		--ClosestFormToCursor;
@@ -618,7 +616,7 @@ void kyi::selup() {
 }
 
 void kyi::handleShiftedRightKey() {
-  auto& formList = Instance->FormList;
+  auto const& formList = Instance->FormList;
 
   if (StateMap->test(StateFlag::FPSEL)) {
 	auto const& vertexCount = formList.operator[](ClosestFormToCursor).vertexCount;
@@ -692,7 +690,7 @@ auto kyi::handleRightKey(bool& retflag) -> bool {
 	  }
 	  else {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
-		  auto& formList = Instance->FormList;
+		  auto const& formList = Instance->FormList;
 
 		  ClosestVertexToCursor = form::nxt(formList.operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
