@@ -239,7 +239,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn       = displayText::loadStr(IDS_ON);
   auto const strOff      = displayText::loadStr(IDS_OFF);
-  auto      labelWindowPtr = thred::getLabelWindow();
+  auto*      labelWindowPtr = thred::getLabelWindow();
   auto&      labelWindow    = *labelWindowPtr; 
   auto&      valueWindow = *ValueWindow;
   // set the window coordinates
