@@ -447,7 +447,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 }
 
 auto di::colfil() -> bool {
-  auto& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->WorkingFileName;
   *ColorFileName = workingFileName;
   *RGBFileName   = workingFileName;
   if (!workingFileName.has_extension()) {

@@ -916,7 +916,7 @@ void thred::savdo() {
 }
 
 void thi::nunams() {
-  auto& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->WorkingFileName;
   Instance->AuxName     = workingFileName;
   xt::duauxnam(Instance->AuxName);
   *ThrName = workingFileName;
@@ -3212,7 +3212,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 }
 
 void thi::thrsav() {
-  auto& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->WorkingFileName;
 
   if (chkattr(workingFileName)) {
 	return;
@@ -12474,7 +12474,7 @@ void thred::initBackPenBrush() noexcept {
 }
 
 auto thred::setFileName() -> fs::path {
-  auto& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->WorkingFileName;
 
   return workingFileName.empty() ? *DefaultDirectory / L"balfil.thr" : workingFileName;
 }
