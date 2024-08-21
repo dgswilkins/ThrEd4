@@ -388,8 +388,6 @@ extern ENUM_MAP<UserFlag>* UserFlagMap;
 
 extern float UserStitchLength;
 
-extern std::vector<HWND>* ValueWindow;
-
 extern float     VerticalRatio;
 extern HWND      VerticalScrollBar;
 

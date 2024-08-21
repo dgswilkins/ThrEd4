@@ -241,7 +241,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   auto const strOff      = displayText::loadStr(IDS_OFF);
   auto*      labelWindowPtr = thred::getLabelWindow();
   auto&      labelWindow    = *labelWindowPtr; 
-  auto&      valueWindow = *ValueWindow;
+  auto&      valueWindow = Instance->ValueWindow;
   // set the window coordinates
   ValueWindowCoords.top    = TXTMARG;
   LabelWindowCoords.top    = ValueWindowCoords.top;
@@ -654,7 +654,7 @@ auto ffi::prfnwin(std::wstring const& text) noexcept -> HWND {
 
 void ffi::prflin(std::wstring const& msg, LIST_TYPE const& row) {
   prftwin(displayText::loadStr(row.stringID));
-  ValueWindow->operator[](row.value) = prfnwin(msg);
+  Instance->ValueWindow.operator[](row.value) = prfnwin(msg);
   nxtlinprf();
 }
 

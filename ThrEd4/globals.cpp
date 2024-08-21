@@ -160,7 +160,6 @@ SIZE                           UnzoomedRect              = {};      // size of t
 std::array<COLORREF, COLORCNT> UserColor                 = {};      // user colors
 ENUM_MAP<UserFlag>*            UserFlagMap               = nullptr; // for storage of persistent binary variables set by the user
 float                          UserStitchLength          = USESIZ * PFGRAN; // user selected stitch size
-std::vector<HWND>*             ValueWindow               = nullptr; // data handles for the form data sheet
 float                          VerticalRatio             = 0.0F;    // vertical ratio between the zoom window and the entire stitch space
 HWND                           VerticalScrollBar         = nullptr; // vertical scroll bar
 std::array<POINT, SQPNTS>      ZoomBoxLine               = {};      // the zoom box
