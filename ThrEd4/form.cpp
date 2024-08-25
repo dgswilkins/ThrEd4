@@ -486,7 +486,8 @@ void sprct(std::vector<F_POINT> const& vertices,
            uint32_t                    vertexIndex,
            std::vector<V_RECT_2>&      fillVerticalRect,
            uint32_t                    start,
-           uint32_t                    finish) noexcept(!std::is_same_v<uint32_t, size_t>);
+           uint32_t                    finish,
+           std::vector<F_POINT> const& outsidePoints) noexcept(!std::is_same_v<uint32_t, size_t>);
 void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
             uint32_t                     iRect) noexcept;
@@ -2009,22 +2010,19 @@ auto fi::proj(F_POINT const& point, float const slope, F_POINT const& point0, F_
   return intersectionPoint.x >= xMinimum && intersectionPoint.x <= xMaximum;
 }
 
-auto form::linx(std::vector<F_POINT> const& points, uint32_t const start, uint32_t const finish, F_POINT& intersection) noexcept
+auto form::linx(std::vector<F_POINT> const& points, uint32_t const start, uint32_t const finish, F_POINT& intersection,
+                std::vector<F_POINT> const& outsidePoints) noexcept
     -> bool {
-  if (nullptr == OutsidePoints) {
-	return false;
-  }
-  auto const  delta = F_POINT {(OutsidePoints->operator[](start).x - points[start].x),
-                              (OutsidePoints->operator[](start).y - points[start].y)};
+  auto const  delta = F_POINT {(outsidePoints[start].x - points[start].x), (outsidePoints[start].y - points[start].y)};
   auto const& point = points[start];
 
   if (delta.x == 0.0F && delta.y == 0.0F) {
 	return false;
   }
   if (delta.x != 0.0F) {
-	return fi::proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points[finish], intersection);
+	return fi::proj(point, delta.y / delta.x, outsidePoints[finish], points[finish], intersection);
   }
-  return fi::projv(point.x, points[finish], OutsidePoints->operator[](finish), intersection);
+  return fi::projv(point.x, points[finish], outsidePoints[finish], intersection);
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
@@ -2056,9 +2054,10 @@ void fi::sprct(std::vector<F_POINT> const& vertices,
                uint32_t const              vertexIndex,
                std::vector<V_RECT_2>&      fillVerticalRect,
                uint32_t const              start,
-               uint32_t const              finish) noexcept(!std::is_same_v<uint32_t, size_t>) {
-  auto const& opStart        = OutsidePoints->operator[](start);
-  auto const& opFinish       = OutsidePoints->operator[](finish);
+               uint32_t const              finish,
+               std::vector<F_POINT> const& outsidePoints) noexcept(!std::is_same_v<uint32_t, size_t>) {
+  auto const& opStart        = outsidePoints[start];
+  auto const& opFinish       = outsidePoints[finish];
   auto const& ipStart        = InsidePoints->operator[](start);
   auto const& ipFinish       = InsidePoints->operator[](finish);
   auto const  delta          = F_POINT {(opFinish.x - opStart.x), (opFinish.y - opStart.y)};
@@ -2411,11 +2410,12 @@ void fi::pbrd(FRM_HEAD const& form) {
   auto underlayVerticalRect = std::vector<V_RECT_2> {};
   underlayVerticalRect.resize(form.vertexCount);
   satin::satout(form, form.borderSize);
+  auto const& outsidePoints = *OutsidePoints;
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	sprct(*FormVertices, form.vertexIndex, fillVerticalRect, iVertex, iVertex + 1U);
+	sprct(*FormVertices, form.vertexIndex, fillVerticalRect, iVertex, iVertex + 1U, outsidePoints);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
   }
-  sprct(*FormVertices, form.vertexIndex, fillVerticalRect, form.vertexCount - 1U, 0U);
+  sprct(*FormVertices, form.vertexIndex, fillVerticalRect, form.vertexCount - 1U, 0U, outsidePoints);
   spurct(underlayVerticalRect, fillVerticalRect, form.vertexCount - 1U);
   if ((form.edgeType & EGUND) != 0U) {
 	StateMap->reset(StateFlag::SAT1);
@@ -2782,11 +2782,12 @@ void fi::plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>&
   satin::satout(angledForm, angledForm.borderSize);
   InsidePoints->push_back(InsidePoints->front());
   OutsidePoints->push_back(OutsidePoints->front());
+  auto const& outsidePoints = *OutsidePoints;
   for (auto iVertex = 0U; iVertex < angledForm.vertexCount - 1U; ++iVertex) {
-	sprct(Instance->AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U);
+	sprct(Instance->AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U, outsidePoints);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
   }
-  sprct(Instance->AngledFormVertices, 0U, fillVerticalRect, angledForm.vertexCount - 1U, 0U);
+  sprct(Instance->AngledFormVertices, 0U, fillVerticalRect, angledForm.vertexCount - 1U, 0U, outsidePoints);
   spurct(underlayVerticalRect, fillVerticalRect, angledForm.vertexCount - 1U);
   auto const itVertex = wrap::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
   if ((angledForm.attribute & SBLNT) == 0U) {

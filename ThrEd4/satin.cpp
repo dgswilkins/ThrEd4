@@ -1345,14 +1345,14 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t const start, ui
   }
   if (outerLength > innerLength) {
 	innerFlag = true;
-	if (auto intersection = F_POINT {}; form::linx(insidePoints, start, finish, intersection)) {
+	if (auto intersection = F_POINT {}; form::linx(insidePoints, start, finish, intersection, outsidePoints)) {
 	  innerDelta = F_POINT {};
 	  innerPoint = intersection;
 	}
   }
   else {
 	outerFlag = true;
-	if (auto intersection = F_POINT {}; form::linx(insidePoints, start, finish, intersection)) {
+	if (auto intersection = F_POINT {}; form::linx(insidePoints, start, finish, intersection, outsidePoints)) {
 	  outerDelta = F_POINT {};
 	  outerPoint = intersection;
 	}
