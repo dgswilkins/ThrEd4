@@ -5116,13 +5116,13 @@ void fi::trfrm(F_POINT const& bottomLeftPoint,
   for (auto const& clip : Instance->ClipBuffer) {
 	auto const clipRatio = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
 	auto const topMidpoint =
-	    F_POINT {clipRatio.x * topDelta.x + topLeftPoint.x, clipRatio.y * topDelta.y + topLeftPoint.y};
+	    F_POINT {clipRatio.x * topDelta.x + topLeftPoint.x, clipRatio.x * topDelta.y + topLeftPoint.y};
 
 	auto const bottomMidpoint = F_POINT {clipRatio.x * bottomDelta.x + bottomLeftPoint.x,
-	                                     clipRatio.y * bottomDelta.y + bottomLeftPoint.y};
+	                                     clipRatio.x * bottomDelta.y + bottomLeftPoint.y};
 
 	auto const middleDelta = topMidpoint - bottomMidpoint;
-	OSequence->emplace_back(clipRatio.x * middleDelta.x + bottomMidpoint.x,
+	OSequence->emplace_back(clipRatio.y * middleDelta.x + bottomMidpoint.x,
 	                        clipRatio.y * middleDelta.y + bottomMidpoint.y);
   }
 }
