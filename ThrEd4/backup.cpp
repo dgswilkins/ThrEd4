@@ -78,7 +78,7 @@ void backup::dudat() {
 
   auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(StitchBuffer) +
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
-                    wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
+                    wrap::sizeofVector(Instance->SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
   auto* backupData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
@@ -106,16 +106,16 @@ void backup::dudat() {
 	auto const spVertices = gsl::span {backupData->vertices, FormVertices->size()};
 	std::ranges::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
   }
-  backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
+  backupData->guideCount = wrap::toUnsigned(Instance->SatinGuides.size());
   backupData->guide =
       convertFromPtr<SAT_CON*>(std::next(backupData->vertices, wrap::toPtrdiff(FormVertices->size())));
-  if (!SatinGuides->empty()) {
+  if (!Instance->SatinGuides.empty()) {
 	auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
-	std::ranges::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
+	std::ranges::copy(Instance->SatinGuides.cbegin(), Instance->SatinGuides.cend(), spGuides.begin());
   }
   backupData->clipPointCount = wrap::toUnsigned(Instance->ClipPoints.size());
   backupData->clipPoints =
-      convertFromPtr<F_POINT*>(std::next(backupData->guide, wrap::toPtrdiff(SatinGuides->size())));
+      convertFromPtr<F_POINT*>(std::next(backupData->guide, wrap::toPtrdiff(Instance->SatinGuides.size())));
   if (!Instance->ClipPoints.empty()) {
 	auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
 	std::ranges::copy(Instance->ClipPoints.cbegin(), Instance->ClipPoints.cend(), spClipPoints.begin());
@@ -172,10 +172,10 @@ void bui::redbak() {
 	auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
 	FormVertices->insert(FormVertices->end(), span.begin(), span.end());
   }
-  SatinGuides->clear();
+  Instance->SatinGuides.clear();
   if (undoData->guideCount != 0U) {
 	auto const span = gsl::span {undoData->guide, undoData->guideCount};
-	SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
+	Instance->SatinGuides.insert(Instance->SatinGuides.end(), span.begin(), span.end());
   }
   Instance->ClipPoints.clear();
   if (undoData->clipPointCount != 0U) {

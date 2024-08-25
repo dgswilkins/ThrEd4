@@ -838,7 +838,7 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  OSequence->emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
 	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
-	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
+	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);

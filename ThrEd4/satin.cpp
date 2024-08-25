@@ -88,13 +88,13 @@ auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-l
 void satin::delsac(uint32_t const formIndex) {
   auto& formList    = Instance->FormList;
   auto& currentForm = formList[formIndex];
-  if (SatinGuides->empty() || currentForm.type != SAT || currentForm.satinGuideCount == 0U) {
+  if (Instance->SatinGuides.empty() || currentForm.type != SAT || currentForm.satinGuideCount == 0U) {
 	formList[formIndex].satinGuideCount = 0;
 	return;
   }
-  auto const startGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinGuideIndex);
+  auto const startGuide = wrap::next(Instance->SatinGuides.cbegin(), currentForm.satinGuideIndex);
   auto const endGuide   = wrap::next(startGuide, currentForm.satinGuideCount);
-  SatinGuides->erase(startGuide, endGuide);
+  Instance->SatinGuides.erase(startGuide, endGuide);
   auto const sgCount = currentForm.satinGuideCount;
   std::for_each(std::next(formList.begin(), wrap::toPtrdiff(formIndex + 1U)), formList.end(), [sgCount](auto& iForm) {
 	if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex >= sgCount) {
@@ -108,8 +108,8 @@ void satin::delsac(uint32_t const formIndex) {
 
 void si::sacspac(uint32_t const startGuide, uint32_t const guideCount) {
   auto constexpr VAL = SAT_CON {};
-  auto const itGuide = wrap::next(SatinGuides->cbegin(), startGuide);
-  SatinGuides->insert(itGuide, VAL);
+  auto const itGuide = wrap::next(Instance->SatinGuides.cbegin(), startGuide);
+  Instance->SatinGuides.insert(itGuide, VAL);
   auto& formList = Instance->FormList;
   for (auto formRange =
            std::ranges::subrange(wrap::next(formList.begin(), ClosestFormToCursor + 1U), formList.end());
@@ -151,7 +151,7 @@ void satin::spltsat(uint32_t const guideIndex) {
 	form.vertexIndex += 2;
   }
   auto iOldVertex = 0U;
-  auto const currentGuide = *wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex + guideIndex);
+  auto const currentGuide = *wrap::next(Instance->SatinGuides.begin(), firstForm.satinGuideIndex + guideIndex);
   auto const oldLastVertex = currentGuide.start + (firstForm.vertexCount - currentGuide.finish) + 1U;
   auto       iNewVertex    = oldLastVertex + 1U;
   auto const itFirstVertex = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
@@ -191,7 +191,7 @@ void satin::spltsat(uint32_t const guideIndex) {
   nextForm.vertexIndex  = firstForm.vertexIndex + iOldVertex;
   firstForm.outline();
   nextForm.outline();
-  auto       itGuide      = wrap::next(SatinGuides->begin(), firstForm.satinGuideIndex);
+  auto       itGuide      = wrap::next(Instance->SatinGuides.begin(), firstForm.satinGuideIndex);
   auto const finishOffset = currentGuide.finish - 1U - currentGuide.start;
   for (auto iGuide = 0U; iGuide < guideIndex; ++iGuide) {
 	(itGuide++)->finish -= finishOffset;
@@ -208,8 +208,8 @@ void satin::spltsat(uint32_t const guideIndex) {
 	nextForm.wordParam -= currentGuide.start - 1;
   }
   auto const offset      = firstForm.satinGuideIndex + guideIndex;
-  auto const itThisGuide = wrap::next(SatinGuides->cbegin(), offset);
-  SatinGuides->erase(itThisGuide);
+  auto const itThisGuide = wrap::next(Instance->SatinGuides.cbegin(), offset);
+  Instance->SatinGuides.erase(itThisGuide);
   nextForm.satinGuideIndex  = firstForm.satinGuideIndex + guideIndex;
   nextForm.satinGuideCount  = firstForm.satinGuideCount - guideIndex - 1U;
   firstForm.satinGuideCount = guideIndex;
@@ -309,7 +309,7 @@ void si::satclos() {
   }
   if (form.satinGuideCount != 0U) {
 	sacspac(form.satinGuideIndex + form.satinGuideCount, 1);
-	auto const itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex + form.satinGuideCount);
+	auto const itGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex + form.satinGuideCount);
 	itGuide->start  = closestVertex;
 	itGuide->finish = ClosestVertexToCursor;
 	++form.satinGuideCount;
@@ -317,7 +317,7 @@ void si::satclos() {
 	return;
   }
   form.satinGuideIndex = nusac(ClosestFormToCursor, 1);
-  auto const itGuide   = wrap::next(SatinGuides->begin(), form.satinGuideIndex + initialGuideCount);
+  auto const itGuide   = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex + initialGuideCount);
   itGuide->start       = closestVertex;
   itGuide->finish      = ClosestVertexToCursor;
   form.satinGuideCount = 1;
@@ -375,10 +375,10 @@ void satin::satsel() {
 
 void si::satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t const size) {
   auto const& currentFormGuides = form.satinGuideIndex;
-  auto const  startGuide        = wrap::next(SatinGuides->cbegin(), currentFormGuides);
+  auto const  startGuide        = wrap::next(Instance->SatinGuides.cbegin(), currentFormGuides);
   auto const  endGuide          = wrap::next(startGuide, form.satinGuideCount - size);
-  SatinGuides->erase(startGuide, endGuide);
-  auto const itGuide = wrap::next(SatinGuides->begin(), currentFormGuides);
+  Instance->SatinGuides.erase(startGuide, endGuide);
+  auto const itGuide = wrap::next(Instance->SatinGuides.begin(), currentFormGuides);
   std::ranges::copy(source, itGuide);
 }
 
@@ -409,7 +409,7 @@ void satin::satadj(FRM_HEAD& form) {
   auto const savedGuideCount = form.satinGuideCount;
   auto satinMap = BIT_SET_EX(form.vertexCount); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
   // ensure all guide endpoints are on valid vertices
-  auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+  auto itFirstGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
   for (auto vertexRange = std::ranges::subrange(itFirstGuide, wrap::next(itFirstGuide, form.satinGuideCount));
        auto& guide : vertexRange) {
 	auto const endCount = form.vertexCount - 1;
@@ -426,7 +426,7 @@ void satin::satadj(FRM_HEAD& form) {
   if (currentGuidesCount > iDestination) {
 	outDebugString(L"Removed {} zero distance guides\n", currentGuidesCount - iDestination);
 	si::satcpy(form, interiorGuides, iDestination);
-	itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
+	itFirstGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 	currentGuidesCount = iDestination;
   }
   auto const endGuide = form.wordParam;
@@ -453,7 +453,7 @@ void satin::satadj(FRM_HEAD& form) {
 	if (currentGuidesCount > iDestination) {
 	  outDebugString(L"Removed {} end guides\n", currentGuidesCount - iDestination);
 	  si::satcpy(form, interiorGuides, iDestination);
-	  itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
+	  itFirstGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 	  currentGuidesCount = iDestination;
 	}
 	// remove any guides that start after the end guide
@@ -467,7 +467,7 @@ void satin::satadj(FRM_HEAD& form) {
 	  if (currentGuidesCount > iDestination) {
 		outDebugString(L"Removed {} reversed guides\n", currentGuidesCount - iDestination);
 		si::satcpy(form, interiorGuides, iDestination);
-		itFirstGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex); // iterator may be invalidated by erase
+		itFirstGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex); // iterator may be invalidated by erase
 		form.satinGuideCount = iDestination;
 		currentGuidesCount   = iDestination;
 	  }
@@ -605,7 +605,7 @@ void satin::satadj(FRM_HEAD& form) {
   }
   else {
 	// sort the guides
-	auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+	auto const itStartGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
 	auto const itEndGuide   = wrap::next(itStartGuide, form.satinGuideCount);
 	std::sort(itStartGuide, itEndGuide, scomp);
   }
@@ -622,8 +622,8 @@ void satin::satadj(FRM_HEAD& form) {
 
 void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
   auto const offset  = form.satinGuideIndex + GuideIndex;
-  auto const itGuide = wrap::next(SatinGuides->cbegin(), offset);
-  SatinGuides->erase(itGuide);
+  auto const itGuide = wrap::next(Instance->SatinGuides.cbegin(), offset);
+  Instance->SatinGuides.erase(itGuide);
   std::for_each(wrap::next(Instance->FormList.begin(), ClosestFormToCursor + 1U), Instance->FormList.end(), [](auto& iForm) {
 	if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex != 0U) {
 	  --iForm.satinGuideIndex;
@@ -654,7 +654,7 @@ void satin::delspnt() {
 	  --currentForm.wordParam;
 	}
 	if (currentForm.satinGuideCount != 0U) {
-	  auto const itStartGuide = wrap::next(SatinGuides->begin(), currentForm.satinGuideIndex);
+	  auto const itStartGuide = wrap::next(Instance->SatinGuides.begin(), currentForm.satinGuideIndex);
 	  auto       itGuide      = itStartGuide;
 	  auto       iGuide       = 0U;
 	  while (iGuide < currentForm.satinGuideCount) {
@@ -873,7 +873,7 @@ void satin::ribon() {
   else {
 	newForm.fillType = SATF;
   }
-  auto itGuide = wrap::next(SatinGuides->begin(), newForm.satinGuideIndex);
+  auto itGuide = wrap::next(Instance->SatinGuides.begin(), newForm.satinGuideIndex);
   for (auto iGuide = 0U; iGuide < newForm.satinGuideCount; ++iGuide) {
 	itGuide->start  = iGuide + 2U;
 	itGuide->finish = newForm.vertexCount - iGuide - 1U;
@@ -1127,7 +1127,7 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
   if ((form.attribute & FRMEND) != 0U) {
 	start = 1;
   }
-  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+  auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
   satfn(form, lengths, start, itGuide->start, form.vertexCount, itGuide->finish);
   auto endGuideIndex = form.satinGuideCount;
   if (endGuideIndex != 0U) {
@@ -1531,9 +1531,9 @@ auto si::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noe
 }
 
 auto satin::adsatk(uint32_t const count) -> uint32_t {
-  auto const oldSize = wrap::toUnsigned(SatinGuides->size());
-  auto const dest    = SatinGuides->end();
+  auto const oldSize = wrap::toUnsigned(Instance->SatinGuides.size());
+  auto const dest    = Instance->SatinGuides.end();
   auto constexpr VAL = SAT_CON {};
-  SatinGuides->insert(dest, count, VAL);
+  Instance->SatinGuides.insert(dest, count, VAL);
   return oldSize;
 }

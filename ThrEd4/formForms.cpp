@@ -1022,7 +1022,7 @@ void formForms::dasyfrm() {
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-		auto const itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex + iMacroPetal);
+		auto const itGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex + iMacroPetal);
 		itGuide->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		itGuide->finish = iVertex;
 	  }

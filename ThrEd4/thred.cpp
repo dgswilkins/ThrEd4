@@ -3114,7 +3114,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   // calculate the design data size
   auto const thredDataSize =
       wrap::sizeofVector(formList) + vertexCount * wrap::sizeofType(FormVertices) +
-      guideCount * wrap::sizeofType(SatinGuides) +
+      guideCount * wrap::sizeofType(Instance->SatinGuides) +
       clipDataCount * wrap::sizeofType(Instance->ClipPoints) +
       wrap::sizeofVector(TexturePointsBuffer);
   buffer.reserve(vtxLen + thredDataSize);
@@ -3171,7 +3171,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	if (srcForm.type == SAT) { // write the satin guide data to the guide buffer
 	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
 	  if (srcForm.satinGuideCount != 0U) {
-		auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinGuideIndex);
+		auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), srcForm.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
 		  guides.emplace_back(*itGuide);
 		  ++itGuide;
@@ -4089,10 +4089,10 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
 	  StateMap->set(StateFlag::BADFIL);
 	}
-	SatinGuides->reserve(inGuideList.size());
-	SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
+	Instance->SatinGuides.reserve(inGuideList.size());
+	Instance->SatinGuides.insert(Instance->SatinGuides.end(), inGuideList.begin(), inGuideList.end());
   }
-  SatinGuides->shrink_to_fit();
+  Instance->SatinGuides.shrink_to_fit();
   if (thredHeader.clipDataCount != 0U) {
 	Instance->ClipPoints.resize(thredHeader.clipDataCount);
 	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
@@ -5090,8 +5090,8 @@ void thred::newFil() {
   TexturePointsBuffer->shrink_to_fit();
   Instance->ClipPoints.clear();
   Instance->ClipPoints.shrink_to_fit();
-  SatinGuides->clear();
-  SatinGuides->shrink_to_fit();
+  Instance->SatinGuides.clear();
+  Instance->SatinGuides.shrink_to_fit();
   auto& formList = Instance->FormList;
 
   formList.clear();
@@ -5947,7 +5947,7 @@ void thred::deltot() {
   Instance->FormList.clear();
   StitchBuffer->clear();
   FormVertices->clear();
-  SatinGuides->clear();
+  Instance->SatinGuides.clear();
   StateMap->reset(StateFlag::GMRK);
   rstAll();
   coltab();
@@ -6012,7 +6012,7 @@ void thi::handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag) {
 	}
   }
   if (form.satinGuideCount != 0U) {
-	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
 	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 		satin::delcon(form, iGuide);
@@ -6071,7 +6071,7 @@ void thred::delet() {
 
 	  if (form.satinGuideCount == 0U) {
 		// ToDo - Is there a better way to do this than iterating through?
-		auto itGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+		auto itGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		  auto newGuideVal = 0U;
 		  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -6506,7 +6506,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   InsertedFormIndex   = wrap::toUnsigned(formList.size());
   if (fileHeader.formCount != 0U) {
 	auto const newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
-	auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
+	auto       newSatinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
 	auto       clipOffset         = wrap::toUnsigned(Instance->ClipPoints.size());
 	auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
 	if (version < 2) {
@@ -6555,7 +6555,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	else {
 	  StateMap->set(StateFlag::BADFIL);
 	}
-	auto guideOffset = wrap::toUnsigned(SatinGuides->size());
+	auto guideOffset = wrap::toUnsigned(Instance->SatinGuides.size());
 	if (fileHeader.dlineCount != 0U) {
 	  auto inGuideList = std::vector<SAT_CON_OUT> {};
 	  inGuideList.resize(fileHeader.dlineCount);
@@ -6567,8 +6567,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
 		StateMap->set(StateFlag::BADFIL);
 	  }
-	  SatinGuides->reserve(SatinGuides->size() + inGuideList.size());
-	  SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
+	  Instance->SatinGuides.reserve(Instance->SatinGuides.size() + inGuideList.size());
+	  Instance->SatinGuides.insert(Instance->SatinGuides.end(), inGuideList.begin(), inGuideList.end());
 	  newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
 	}
 	if (fileHeader.clipDataCount != 0U) {
@@ -6624,7 +6624,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	if (newFormVertexIndex != FormVertices->size()) {
 	  StateMap->set(StateFlag::BADFIL);
 	}
-	if (newSatinGuideIndex != SatinGuides->size()) {
+	if (newSatinGuideIndex != Instance->SatinGuides.size()) {
 	  StateMap->set(StateFlag::BADFIL);
 	}
 	if (clipOffset != Instance->ClipPoints.size()) {
@@ -8868,9 +8868,9 @@ void thred::qcode() {
 	  FormVertices->erase(first, last);
 	}
 	if (formList.back().satinGuideCount != 0U) {
-	  auto const first = wrap::next(SatinGuides->begin(), formList.back().satinGuideIndex);
+	  auto const first = wrap::next(Instance->SatinGuides.begin(), formList.back().satinGuideIndex);
 	  auto const last  = wrap::next(first, formList.back().satinGuideCount);
-	  SatinGuides->erase(first, last);
+	  Instance->SatinGuides.erase(first, last);
 	}
 	formList.pop_back();
 	if (!formList.empty()) {
@@ -12188,7 +12188,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT const message, WPARAM wParam, LPARA
 void thi::sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(Instance->FormList.size()); ++iForm) {
 	if (auto const& form = Instance->FormList.operator[](iForm); form.type == SAT && form.satinGuideCount != 0U) {
-	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+	  auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
 		  satin::delsac(iForm);
@@ -12296,7 +12296,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  NearestPoint              = &Instance->NearestPoint; // thred only
 	  OSequence                 = &Instance->OSequence;
 	  PreviousNames             = &Instance->PreviousNames; // thred only
-	  SatinGuides               = &Instance->SatinGuides;
 	  ScrollSize                = &Instance->ScrollSize; // thred only
 	  SearchLine                = &Instance->SearchLine;
 	  SelectedFormList          = &Instance->SelectedFormList;

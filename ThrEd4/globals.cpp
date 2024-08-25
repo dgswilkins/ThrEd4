@@ -108,7 +108,6 @@ HWND                           PreferencesWindow         = nullptr; // preferenc
 uint32_t                       PreviousFormIndex         = 0U;      // previously selected form
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle
-std::vector<SAT_CON>*          SatinGuides               = nullptr; // satin form connects
 int32_t*                       ScreenDPI                 = nullptr; // screen DPI
 int32_t*                       ScrollSize                = nullptr; // Scroll bar width scaled for DPI
 std::vector<POINT>*            SearchLine                = nullptr; // stitch select line

@@ -617,7 +617,7 @@ void form::chkcont() {
 	if (form.satinGuideCount != 0U) {
 	  auto shortestGuideIndex = 0U;
 	  auto minimumLength      = MAXDWORD;
-	  auto itGuide            = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+	  auto itGuide            = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (auto const length = itGuide->finish - itGuide->start; length < minimumLength) {
 		  minimumLength      = length;
@@ -625,7 +625,7 @@ void form::chkcont() {
 		}
 		++itGuide;
 	  }
-	  auto const shortestGuide = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex + shortestGuideIndex);
+	  auto const shortestGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex + shortestGuideIndex);
 
 	  form.fillGuide = *shortestGuide;
 	  satin::delsac(ClosestFormToCursor);
@@ -910,7 +910,7 @@ void form::delfrms() {
   FormVertices->clear();
   Instance->ClipPoints.clear();
   Instance->FormList.clear();
-  SatinGuides->clear();
+  Instance->SatinGuides.clear();
   for (auto& stitch : *StitchBuffer) {
 	stitch.attribute &= NFRM_NTYP;
 	stitch.attribute |= NOTFRM;
@@ -1016,7 +1016,7 @@ void fi::drawStartGuide(FRM_HEAD const& form,
 void fi::drawGuides(FRM_HEAD const& form) {
   auto       line          = std::array<POINT, 2> {};
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-  auto       itGuide       = wrap::next(SatinGuides->cbegin(), form.satinGuideIndex);
+  auto       itGuide       = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
   auto const maxGuide      = form.satinGuideCount;
   for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
 	auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
@@ -5799,7 +5799,7 @@ void form::rotfrm(FRM_HEAD& form, uint32_t const newStartVertex) {
 		form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
 	  }
 	  if (form.satinGuideCount != 0U) {
-		auto const itStartGuide = wrap::next(SatinGuides->begin(), form.satinGuideIndex);
+		auto const itStartGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
 		auto       rotatedIt    = itStartGuide; // intended copy
 		auto       itGuide      = itStartGuide; // intended copy
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
@@ -5925,7 +5925,7 @@ void fi::nufpnt(uint32_t const vertex, FRM_HEAD& formForInsert, F_POINT const st
   auto const itVertex = wrap::next(FormVertices->begin(), formForInsert.vertexIndex + vertex + 1U);
   *itVertex           = stitchPoint;
   if (formForInsert.satinGuideCount != 0U) {
-	auto itGuide = wrap::next(SatinGuides->begin(), formForInsert.satinGuideIndex);
+	auto itGuide = wrap::next(Instance->SatinGuides.begin(), formForInsert.satinGuideIndex);
 	for (auto ind = 0U; ind < formForInsert.satinGuideCount; ++ind) {
 	  if (itGuide->start > vertex) {
 		++itGuide->start;
@@ -7731,10 +7731,10 @@ void fi::adfrm(uint32_t const iForm) {
   FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
   if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
 	auto const originalGuide    = currentForm.satinGuideIndex;
-	currentForm.satinGuideIndex = wrap::toUnsigned(SatinGuides->size());
+	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
 
-	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
-	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
+	auto const itGuides = wrap::next(Instance->SatinGuides.cbegin(), originalGuide);
+	Instance->SatinGuides.insert(Instance->SatinGuides.end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
   }
   if (currentForm.isEdgeClipX()) {
 	auto const originalBCData  = currentForm.borderClipData;
@@ -7805,12 +7805,12 @@ void fi::cplayfn(uint32_t const iForm, uint32_t const layer) {
             wrap::next(FormVertices->begin(), currentForm.vertexIndex));
   if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
 	auto const originalGuide    = currentForm.satinGuideIndex;
-	currentForm.satinGuideIndex = wrap::toUnsigned(SatinGuides->size());
+	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
 
-	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), originalGuide);
+	auto const itStartGuide = wrap::next(Instance->SatinGuides.cbegin(), originalGuide);
 	auto const itEndGuide   = wrap::next(itStartGuide, currentForm.satinGuideCount);
-	auto const destination  = SatinGuides->end();
-	SatinGuides->insert(destination, itStartGuide, itEndGuide);
+	auto const destination  = Instance->SatinGuides.end();
+	Instance->SatinGuides.insert(destination, itStartGuide, itEndGuide);
   }
   currentForm.clipEntries   = 0;
   currentForm.fillType      = 0;
@@ -8370,7 +8370,7 @@ void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
   dest.vertexIndex = formSourceIndex;
   formSourceIndex += dest.vertexCount;
   if (dest.satinGuideCount != 0U) {
-	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), dest.satinGuideIndex);
+	auto const itStartGuide = wrap::next(Instance->SatinGuides.cbegin(), dest.satinGuideIndex);
 	auto const itEndGuide   = wrap::next(itStartGuide, dest.satinGuideCount);
 	tempGuides.insert(tempGuides.end(), itStartGuide, itEndGuide);
 	dest.satinGuideIndex = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
@@ -8409,7 +8409,7 @@ void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
   auto tempFormVertices = std::vector<F_POINT> {};
   tempFormVertices.resize(FormVertices->size());
   auto tempGuides = std::vector<SAT_CON> {};
-  tempGuides.reserve(SatinGuides->size());
+  tempGuides.reserve(Instance->SatinGuides.size());
   auto tempClipPoints = std::vector<F_POINT> {};
   tempClipPoints.reserve(Instance->ClipPoints.size());
   auto formSourceIndex = 0U;
@@ -8425,7 +8425,7 @@ void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
   }
   std::ranges::copy(tempFormList, formList.begin());
   std::ranges::copy(tempFormVertices, FormVertices->begin());
-  std::ranges::copy(tempGuides, SatinGuides->begin());
+  std::ranges::copy(tempGuides, Instance->SatinGuides.begin());
   std::ranges::copy(tempClipPoints, Instance->ClipPoints.begin());
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & SRTYPMSK) == 0U) {
@@ -8827,7 +8827,7 @@ void form::spltfrm() {
 	if (currentForm.satinGuideCount == 0U) {
 	  return;
 	}
-	auto itGuide = wrap::next(SatinGuides->cbegin(), currentForm.satinGuideIndex);
+	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), currentForm.satinGuideIndex);
 	for (auto guideIndex = 0U; guideIndex < currentForm.satinGuideCount; ++guideIndex) {
 	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 		satin::spltsat(guideIndex);
