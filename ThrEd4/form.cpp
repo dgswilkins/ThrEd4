@@ -1493,7 +1493,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 	if (StateMap->test(StateFlag::FRMSAM) && iForm == formIndex) {
 	  continue;
 	}
-	auto& currentForm = formList.operator[](iForm);
+	auto const& currentForm = formList.operator[](iForm);
 	if (auto const formLayer = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
 	    ActiveLayer != 0U && formLayer != 0U && formLayer != layerCoded) {
 	  continue;
@@ -5873,7 +5873,7 @@ auto fi::closat(IntersectionStyles& inOutFlag) -> bool {
 
   auto const& formList = Instance->FormList;
     for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
-	auto& formIter = formList.operator[](iForm);
+	auto const& formIter = formList.operator[](iForm);
 	if (formIter.vertexCount == 0U) {
 	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", gsl::narrow_cast<int>(inOutFlag));
 	}
