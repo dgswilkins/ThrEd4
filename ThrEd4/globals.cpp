@@ -99,7 +99,6 @@ uint32_t                       NewFormVertexCount        = 0U;      // points in
 HWND                           OKButton                  = nullptr; // ok button
 std::vector<F_POINT>*          OSequence                 = nullptr; // temporary storage for sequencing
 bool                           OutLineEverySelectedForm  = false;   // When selecting multiple forms, should we outline every form?
-std::vector<F_POINT>*          OutsidePointList          = nullptr; // list of outside outline points for satin or clipboard fills
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
 wchar_t const*                 PcdClipFormat             = L"PMust_Format";   //
 float                          PicotSpacing              = IPICSPAC;// space between border picots

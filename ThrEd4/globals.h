@@ -303,7 +303,6 @@ extern std::vector<F_POINT>* OSequence;
 
 extern bool OutLineEverySelectedForm;
 
-extern std::vector<F_POINT>* OutsidePointList;
 extern std::vector<F_POINT>* OutsidePoints;
 
 extern wchar_t const* PcdClipFormat;

@@ -12295,7 +12295,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  NearestPixel              = &Instance->NearestPixel; // thred only
 	  NearestPoint              = &Instance->NearestPoint; // thred only
 	  OSequence                 = &Instance->OSequence;
-	  OutsidePointList          = &Instance->OutsidePointList;
 	  PreviousNames             = &Instance->PreviousNames; // thred only
 	  RubberBandLine            = &Instance->RubberBandLine;
 	  SatinGuides               = &Instance->SatinGuides;

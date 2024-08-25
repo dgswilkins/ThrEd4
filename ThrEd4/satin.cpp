@@ -1438,10 +1438,10 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
 	return;
   }
   form::duangs(form);
-  OutsidePointList->resize(form.vertexCount);
+  Instance->OutsidePointList.resize(form.vertexCount);
   auto& insidePointList = Instance->InsidePointList;
   insidePointList.resize(form.vertexCount);
-  OutsidePoints = OutsidePointList;
+  OutsidePoints = std::addressof(Instance->OutsidePointList);
   InsidePoints  = &insidePointList;
 
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
@@ -1463,7 +1463,7 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
   if (count < form.vertexCount / 2U) {
 	StateMap->set(StateFlag::INDIR);
 	OutsidePoints = &Instance->InsidePointList;
-	InsidePoints  = OutsidePointList;
+	InsidePoints  = std::addressof(Instance->OutsidePointList);
   }
 }
 
