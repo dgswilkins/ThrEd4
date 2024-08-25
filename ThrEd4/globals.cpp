@@ -70,7 +70,6 @@ F_POINT                        FormMoveDelta             = F_POINT {}; // offset
 HPEN                           FormPen                   = nullptr; // form pen
 HPEN                           FormPen3px                = nullptr; // three-pixel form pen
 HPEN                           FormSelectedPen           = nullptr; // form select pen
-std::vector<F_POINT>*          FormVertices              = nullptr; // form points
 HWND                           GeneralNumberInputBox     = nullptr; // general number input box
 HPEN                           GridPen                   = nullptr; // pen for stitch grid
 uint32_t                       GroupEndStitch            = 0U;      // higher end of selected stitches

@@ -918,7 +918,7 @@ void formForms::dasyfrm() {
   auto const referencePoint =
       F_POINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
   auto form        = FRM_HEAD {};
-  form.vertexIndex = wrap::toUnsigned(FormVertices->size());
+  form.vertexIndex = wrap::toUnsigned(Instance->FormVertices.size());
   form.attribute   = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
   // Determine the width of a daisy based on the Zoom rectangle and the default width percent.
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
@@ -940,11 +940,11 @@ void formForms::dasyfrm() {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
-	FormVertices->emplace_back(referencePoint.x + diameter * cos(angle),
+	Instance->FormVertices.emplace_back(referencePoint.x + diameter * cos(angle),
 	                           referencePoint.y + diameter * sin(angle));
 	++iVertex;
 	for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; ++iSegment) {
-	  FormVertices->emplace_back(referencePoint.x + holeDiameter * cos(angle),
+	  Instance->FormVertices.emplace_back(referencePoint.x + holeDiameter * cos(angle),
 	                             referencePoint.y + holeDiameter * sin(angle));
 	  ++iVertex;
 	  angle -= holeSegmentAngle;
@@ -1017,7 +1017,7 @@ void formForms::dasyfrm() {
 		  break;
 		}
 	  }
-	  FormVertices->emplace_back(referencePoint.x + cos(angle) * distanceFromDaisyCenter,
+	  Instance->FormVertices.emplace_back(referencePoint.x + cos(angle) * distanceFromDaisyCenter,
 	                             referencePoint.y + sin(angle) * distanceFromDaisyCenter);
 	  ++iVertex;
 	  angle += petalSegmentAngle;
@@ -1028,7 +1028,7 @@ void formForms::dasyfrm() {
 	  }
 	}
   }
-  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
 
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	auto           referenceVertex = wrap::next(itVertex, fref - 1U);
@@ -1189,7 +1189,7 @@ void formForms::setear() {
   auto&      form             = Instance->FormList.back();
   auto const formVertexIndex  = form.vertexIndex;
   auto const formVertexCount  = form.vertexCount;
-  auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
+  auto       firstVertex      = wrap::next(Instance->FormVertices.begin(), formVertexIndex);
   auto       nextVertex       = std::next(firstVertex);
   auto const count            = wrap::toPtrdiff(formVertexCount) / 4;
   auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
@@ -1214,8 +1214,8 @@ void formForms::setear() {
   firstVertex->x += twistStep;
   nextVertex->x += twistStep;
   verticalPosition -= step * HALF;
-  FormVertices->push_back(*firstVertex);
-  firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
+  Instance->FormVertices.push_back(*firstVertex);
+  firstVertex = wrap::next(Instance->FormVertices.begin(), formVertexIndex); // iterator invalidated by push_back
   nextVertex = std::next(firstVertex);
   if (twistStep != 0.0F) {
 	firstVertex->x = nextVertex->x + twistStep / TWSTFACT;
@@ -1350,7 +1350,7 @@ void formForms::wavfrm() {
   form::mdufrm();
   auto iPoint      = 0U;
   auto waveIndex   = IniFile.waveStart;
-  auto firstVertex = wrap::next(FormVertices->begin(), formVertexIndex);
+  auto firstVertex = wrap::next(Instance->FormVertices.begin(), formVertexIndex);
   while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
 	auto const     nextVertex  = wrap::next(firstVertex, iNextVertex);
@@ -1363,8 +1363,8 @@ void formForms::wavfrm() {
   auto       currentPosition = F_POINT {};
   auto const formVerticesSize =
       IniFile.waveLobes * count + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
-  FormVertices->resize(FormVertices->size() + formVerticesSize);
-  firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // resize may invalidate iterator
+  Instance->FormVertices.resize(Instance->FormVertices.size() + formVerticesSize);
+  firstVertex = wrap::next(Instance->FormVertices.begin(), formVertexIndex); // resize may invalidate iterator
 
   auto itVertex = firstVertex; // copy intended
   for (auto iLobe = 0U; iLobe < IniFile.waveLobes; ++iLobe) {

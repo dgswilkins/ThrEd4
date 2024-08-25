@@ -143,8 +143,8 @@ void satin::spltsat(uint32_t const guideIndex) {
   // We are adding two additional vertices when splitting the form
   auto vertexBuffer = std::vector<F_POINT> {};
   vertexBuffer.resize(wrap::toSize(firstForm.vertexCount) + 2U);
-  auto const lastFormVertex = wrap::next(FormVertices->cbegin(), firstForm.vertexIndex + firstForm.vertexCount);
-  FormVertices->insert(lastFormVertex, 2, F_POINT {});
+  auto const lastFormVertex = wrap::next(Instance->FormVertices.cbegin(), firstForm.vertexIndex + firstForm.vertexCount);
+  Instance->FormVertices.insert(lastFormVertex, 2, F_POINT {});
   for (auto formRange = std::ranges::subrange(wrap::next(formList.begin(), ClosestFormToCursor + 2U),
                                               formList.end());
        auto& form : formRange) {
@@ -154,7 +154,7 @@ void satin::spltsat(uint32_t const guideIndex) {
   auto const currentGuide = *wrap::next(Instance->SatinGuides.begin(), firstForm.satinGuideIndex + guideIndex);
   auto const oldLastVertex = currentGuide.start + (firstForm.vertexCount - currentGuide.finish) + 1U;
   auto       iNewVertex    = oldLastVertex + 1U;
-  auto const itFirstVertex = wrap::next(FormVertices->begin(), firstForm.vertexIndex);
+  auto const itFirstVertex = wrap::next(Instance->FormVertices.begin(), firstForm.vertexIndex);
   auto       itVertex      = itFirstVertex; // copy is intended
   for (auto iVertex = 0U; iVertex < firstForm.vertexCount; ++iVertex) {
 	if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
@@ -240,7 +240,7 @@ void si::satclos() {
   auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
   {
 	auto       minimumLength = BIGFLOAT;
-	auto const itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto const itVertex      = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
 	auto const vertexRange = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
@@ -340,7 +340,7 @@ auto si::satselfn() -> bool {
 	    ActiveLayer != 0U && layerCode != 0U && layerCode != ActiveLayer) {
 	  continue;
 	}
-	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
 	auto vertexRange    = std::ranges::subrange(itVertex, wrap::next(itVertex, form.vertexCount));
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
@@ -364,7 +364,7 @@ void satin::satsel() {
   auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   thred::duzrat();
   StartPoint = ClosestVertexToCursor;
-  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
+  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
   Instance->FormLines.front() = form::sfCor2px(*itVertex);
   StateMap->reset(StateFlag::SHOCON);
   StateMap->set(StateFlag::SATCNKT);
@@ -693,8 +693,8 @@ void satin::delspnt() {
 	}
   }
   auto const closestVertexIt =
-      wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
-  FormVertices->erase(closestVertexIt);
+      wrap::next(Instance->FormVertices.cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
+  Instance->FormVertices.erase(closestVertexIt);
   --currentForm.vertexCount;
   if (ClosestVertexToCursor > currentForm.vertexCount - 1) {
 	ClosestVertexToCursor = currentForm.vertexCount - 1U;
@@ -704,7 +704,7 @@ void satin::delspnt() {
 	auto& form = formList.operator[](iForm);
 	--form.vertexIndex;
   }
-  auto const itVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
+  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*itVertex);
   displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
   currentForm.outline();
@@ -770,7 +770,7 @@ void satin::satbrd() {
 
 void si::satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width) {
   auto const& vertexIndex = form.vertexIndex;
-  auto        itVertex    = wrap::next(FormVertices->cbegin(), vertexIndex);
+  auto        itVertex    = wrap::next(Instance->FormVertices.cbegin(), vertexIndex);
   auto const&       formAngles  = Instance->FormAngles;
   if ((isBlunt & SBLNT) != 0U) {
 	auto step = F_POINT {sin(formAngles.front()) * width * HALF, cos(formAngles.front()) * width * HALF};
@@ -835,7 +835,7 @@ void satin::ribon() {
   }
   newForm.vertexIndex    = currentType == FRMLINE ? thred::adflt(currentVertexCount * 2U)
                                                   : thred::adflt(currentVertexCount * 2U + 2U);
-  auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
+  auto const startVertex = wrap::next(Instance->FormVertices.begin(), newForm.vertexIndex);
   auto       itVertex    = startVertex;
   *itVertex++            = OutsidePoints->front();
   itVertex               = std::ranges::copy(*InsidePoints, itVertex).out;
@@ -932,7 +932,7 @@ void si::satfn(FRM_HEAD const&           form,
   if (line1Start != line1End && line2Start == line2End) {
 	return;
   }
-  auto itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto itFirstVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
   auto& bSequence     = Instance->BSequence;
 
   // setup the initial stitch point
@@ -1177,7 +1177,7 @@ void satin::satfil(FRM_HEAD& form) {
   lengths.reserve(wrap::toSize(form.vertexCount) + 1U);
   auto length = 0.0F;
   lengths.push_back(length);
-  auto const itFirstVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+  auto const itFirstVertex    = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
   auto       itPreviousVertex = itFirstVertex;
   auto       itCurrentVertex  = std::next(itPreviousVertex);
   for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
@@ -1259,7 +1259,7 @@ void satin::satfix() {
   }
   if (TempPolygon->size() > minSize) {
 	form.vertexIndex    = thred::adflt(vertexCount);
-	auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto const itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
 	std::ranges::copy(*TempPolygon, itVertex);
 	TempPolygon->clear();
 	form.vertexCount = vertexCount;
@@ -1514,7 +1514,7 @@ void si::outfn(FRM_HEAD const& form,
           : satOffset(finish, start, satinWidth);
   auto const itVertex = form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT
                             ? wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex + finish)
-                            : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+                            : wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + finish);
 
   InsidePoints->operator[](finish)  = *itVertex - offset;
   OutsidePoints->operator[](finish) = *itVertex + offset;

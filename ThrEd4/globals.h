@@ -264,8 +264,6 @@ extern HPEN FormPen3px;
 extern HPEN FormPen;
 extern HPEN FormSelectedPen;
 
-extern std::vector<F_POINT>* FormVertices;
-
 extern HWND     GeneralNumberInputBox;
 extern HPEN     GridPen;
 extern uint32_t GroupEndStitch;

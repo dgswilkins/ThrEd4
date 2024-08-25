@@ -154,7 +154,7 @@ auto floor(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_
 
 void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSize) noexcept;
 
-auto getFormVertices() noexcept -> std::vector<F_POINT>*;
+auto getFormVertices() noexcept -> std::vector<F_POINT>&;
 
 template <class inType>
 auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> float {

@@ -655,7 +655,7 @@ constexpr auto xi::tim2int(FILETIME const time) noexcept -> ULARGE_INTEGER {
 auto xt::insid(FRM_HEAD const& form) -> std::vector<F_POINT>& {
   satin::satout(form, fabs(form.underlayIndent));
   if (form.underlayIndent > 0) {
-	auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  if (!form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
 		InsidePoints->operator[](iVertex) = *itVertex;
@@ -833,13 +833,13 @@ void xi::fncwlk(FRM_HEAD& form) {
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
 	if (form.wordParam != 0U) {
-	  auto const thisVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.wordParam);
+	  auto const thisVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
 	  OSequence->emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
 	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
-	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
@@ -857,13 +857,13 @@ void xi::fncwlk(FRM_HEAD& form) {
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  start = form.fillStart;
 	}
-	auto endVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
+	auto endVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
 	OSequence->push_back(*endVertex);
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < form.vertexCount / 2U; ++iGuide) {
-	  auto const startVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
-	  auto const finishVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+	  auto const startVertex  = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
+	  auto const finishVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + finish);
 	  if (auto const pnt = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
 	                                wrap::midl(finishVertex->y, startVertex->y)};
 	      form::cisin(form, pnt.x, pnt.y)) {
@@ -872,7 +872,7 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  start  = form::nxt(form, start);
 	  finish = form::prv(form, finish);
 	}
-	endVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
+	endVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
 	OSequence->push_back(*endVertex);
   }
   ritwlk(form, CWLKMSK);
@@ -1579,7 +1579,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
   auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
-	  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
+	  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillStart);
 	  ilData.output +=
 	      gucon(form,
 	            buffer,
@@ -1635,7 +1635,7 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
   if (isfil(form)) {
 	StateMap->set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
-	  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillEnd);
+	  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillEnd);
 	  ilData.output += gucon(form, buffer, Instance->InterleaveSequence.back(), *itVertex, ilData.output, code);
 	}
   }
@@ -1651,7 +1651,7 @@ void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	       interleaveSequenceIndices.operator[](iSequence).color;
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
-		auto itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
+		auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillStart);
 		ilData.output +=
 		    gucon(form,
 		          *StitchBuffer,
@@ -2265,7 +2265,7 @@ void xi::fwidfn(uint32_t const formIndex, float const length) {
 
   auto const reference = form.rectangle.left;
   auto const ratio     = length / (form.rectangle.right - reference);
-  auto       itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto       itVertex  = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x = (itVertex->x - reference) * ratio + reference;
 	++itVertex;
@@ -2293,7 +2293,7 @@ void xi::fhifn(uint32_t const formIndex, float const length) {
 
   auto const reference = form.rectangle.bottom;
   auto const ratio     = length / (form.rectangle.top - reference);
-  auto       itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto       itVertex  = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->y = (itVertex->y - reference) * ratio + reference;
 	++itVertex;
@@ -2486,7 +2486,7 @@ void xi::nudfn(F_RECTANGLE const& designSizeRect) noexcept {
   for (auto& stitch : *StitchBuffer) {
 	sadj(stitch, designSizeRatio, designSizeRect);
   }
-  for (auto& formVertice : *FormVertices) {
+  for (auto& formVertice : Instance->FormVertices) {
 	sadj(formVertice, designSizeRatio, designSizeRect);
   }
 }

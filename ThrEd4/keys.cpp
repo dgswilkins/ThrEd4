@@ -695,7 +695,7 @@ auto kyi::handleRightKey(bool& retflag) -> bool {
 		  ClosestVertexToCursor = form::nxt(formList.operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		  auto const itVertex =
-		      wrap::next(FormVertices->cbegin(),
+		      wrap::next(Instance->FormVertices.cbegin(),
 		                 formList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*itVertex);
 		  thred::shftflt(*itVertex);
@@ -790,7 +790,7 @@ auto kyi::handleLeftKey(bool& retflag) -> bool {
 		  auto const& form      = Instance->FormList.operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
-		  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
+		  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*itVertex);
 		  thred::shftflt(*itVertex);
 		  StateMap->set(StateFlag::RESTCH);

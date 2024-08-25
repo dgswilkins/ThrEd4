@@ -624,13 +624,13 @@ inline auto FRM_HEAD::isTexture() const noexcept -> bool {
 
 inline void FRM_HEAD::outline() noexcept(!std::is_same_v<ptrdiff_t, int>) {
   if (vertexCount != 0U) {
-	if (auto const* formVertices = wrap::getFormVertices(); nullptr != formVertices) {
+	if (auto const& formVertices = wrap::getFormVertices(); !formVertices.empty()) {
 	  auto minX = BIGFLOAT;
 	  auto minY = BIGFLOAT;
 	  auto maxX = LOWFLOAT;
 	  auto maxY = LOWFLOAT;
 
-	  for (auto const  spVertices = gsl::span(*formVertices).subspan(vertexIndex, vertexCount);
+	  for (auto const  spVertices = gsl::span(formVertices).subspan(vertexIndex, vertexCount);
 	       auto const& vertex : spVertices) {
 		minX = std::min(minX, vertex.x);
 		maxX = std::max(maxX, vertex.x);
