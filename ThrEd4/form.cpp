@@ -1142,7 +1142,7 @@ void form::drwfrm() {
 	}
 	if (StateMap->test(StateFlag::FRMPMOV)) { // if the user is moving a form point
 	  thred::ritmov(ClosestFormToCursor);
-	  RubberBandLine->operator[](1) =
+	  Instance->RubberBandLine.operator[](1) =
 	      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
@@ -1551,7 +1551,7 @@ void form::frmovlin() {
   auto        previousPoint = prv(form, ClosestVertexToCursor);
   auto const& formLines     = Instance->FormLines;
   for (auto iPoint = 0U; iPoint < 3U; ++iPoint) {
-	RubberBandLine->operator[](iPoint) = formLines[previousPoint];
+	Instance->RubberBandLine.operator[](iPoint) = formLines[previousPoint];
 	previousPoint                      = nxt(form, previousPoint);
   }
   thred::ritmov(ClosestFormToCursor);

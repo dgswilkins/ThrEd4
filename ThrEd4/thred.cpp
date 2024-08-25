@@ -6935,19 +6935,19 @@ void thred::ritmov(uint32_t const formIndex) noexcept {
   SelectObject(StitchWindowDC, FormPen);
   if (ClosestVertexToCursor != 0U) {
 	if (ClosestVertexToCursor == form.vertexCount - 1U && form.type == FRMLINE) {
-	  Polyline(StitchWindowDC, RubberBandLine->data(), 2);
+	  Polyline(StitchWindowDC, Instance->RubberBandLine.data(), 2);
 	}
 	else {
-	  Polyline(StitchWindowDC, RubberBandLine->data(), 3);
+	  Polyline(StitchWindowDC, Instance->RubberBandLine.data(), 3);
 	}
   }
   else {
-	RubberBandLine->operator[](2) = Instance->FormLines.operator[](1);
+	Instance->RubberBandLine.operator[](2) = Instance->FormLines.operator[](1);
 	if (form.type == FRMLINE) {
-	  Polyline(StitchWindowDC, &RubberBandLine->operator[](1), 2);
+	  Polyline(StitchWindowDC, std::addressof(Instance->RubberBandLine.operator[](1)), 2);
 	}
 	else {
-	  Polyline(StitchWindowDC, RubberBandLine->data(), 3);
+	  Polyline(StitchWindowDC, Instance->RubberBandLine.data(), 3);
 	}
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -12296,7 +12296,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  NearestPoint              = &Instance->NearestPoint; // thred only
 	  OSequence                 = &Instance->OSequence;
 	  PreviousNames             = &Instance->PreviousNames; // thred only
-	  RubberBandLine            = &Instance->RubberBandLine;
 	  SatinGuides               = &Instance->SatinGuides;
 	  ScrollSize                = &Instance->ScrollSize; // thred only
 	  SearchLine                = &Instance->SearchLine;

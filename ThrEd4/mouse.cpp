@@ -1325,7 +1325,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::FRMPMOV)) { // If we are moving a form point
 	  mi::unmov();
-	  RubberBandLine->operator[](1) = {WinMsg.pt.x - StitchWindowOrigin.x,
+	  Instance->RubberBandLine.operator[](1) = {WinMsg.pt.x - StitchWindowOrigin.x,
 	                                   WinMsg.pt.y - StitchWindowOrigin.y};
 	  StateMap->set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);

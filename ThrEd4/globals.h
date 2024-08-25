@@ -314,8 +314,6 @@ extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
 extern F_RECTANGLE    RotationRect;
 
-extern std::vector<POINT>* RubberBandLine;
-
 extern std::vector<SAT_CON>* SatinGuides;
 
 extern int32_t* ScreenDPI;
