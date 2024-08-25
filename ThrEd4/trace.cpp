@@ -1139,7 +1139,7 @@ void trace::blak() {
   if (!StateMap->test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
-  for (auto& iForm : formList) {
+  for (auto const& iForm : formList) {
 	bitmap::bfrm(iForm);
   }
   DeleteObject(BlackPen);

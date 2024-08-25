@@ -334,7 +334,7 @@ auto si::satselfn() -> bool {
   auto const stitchPoint   = thred::pxCor2stch(WinMsg.pt);
   auto const& formList      = Instance->FormList;
 
-  for (auto& form : formList) {
+  for (auto const& form : formList) {
 	if (auto const layerCode =
 	        gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
 	    ActiveLayer != 0U && layerCode != 0U && layerCode != ActiveLayer) {
