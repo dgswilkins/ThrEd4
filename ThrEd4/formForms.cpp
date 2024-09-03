@@ -664,7 +664,7 @@ void formForms::prfmsg() {
 	StateMap->set(StateFlag::WASRT);
   }
   StateMap->reset(StateFlag::BIGBOX);
-  SelectedFormList->clear();
+  Instance->SelectedFormList.clear();
   if (FormDataSheet != nullptr) {
 	thred::undat();
 	thred::unsid();

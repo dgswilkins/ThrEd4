@@ -318,7 +318,6 @@ extern int32_t* ScrollSize;
 extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 
-extern std::vector<uint32_t>* SelectedFormList;
 extern FORM_VERTICES          SelectedFormVertices;
 extern std::vector<POINT>*    SelectedFormsLine;
 

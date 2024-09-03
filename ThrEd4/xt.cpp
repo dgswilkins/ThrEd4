@@ -636,7 +636,7 @@ void xt::fethr() {
 	fethrf(ClosestFormToCursor);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  if (Instance->FormList.operator[](selectedForm).vertexCount > 2U) {
 		fethrf(selectedForm);
 	  }
@@ -1004,9 +1004,9 @@ void xt::chkund(uint32_t const                formIndex,
 void xt::selalfrm() {
   auto const& formList = Instance->FormList;
 
-  SelectedFormList->reserve(formList.size());
+  Instance->SelectedFormList.reserve(formList.size());
   for (auto formIndex = 0U; formIndex < wrap::toUnsigned(formList.size()); ++formIndex) {
-	SelectedFormList->push_back(formIndex);
+	Instance->SelectedFormList.push_back(formIndex);
   }
   StateMap->set(StateFlag::RESTCH);
 }
@@ -1793,7 +1793,7 @@ void xi::setundfn(uint32_t const code) {
 	}
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
@@ -1836,7 +1836,7 @@ void xi::notundfn(uint32_t code) {
 	}
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
@@ -1878,7 +1878,7 @@ void xt::dusulen(float const length) {
 	xi::ulenfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::ulenfn(selectedForm, length);
 	}
   }
@@ -1906,7 +1906,7 @@ void xt::duspac(float const spacing) {
 	xi::uspacfn(ClosestFormToCursor, spacing);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::uspacfn(selectedForm, spacing);
 	}
   }
@@ -1928,7 +1928,7 @@ void xt::dufang(float angle) {
 	xi::uangfn(ClosestFormToCursor, angle);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::uangfn(selectedForm, angle);
 	}
   }
@@ -1949,7 +1949,7 @@ void xt::duflen(float const length) {
 	xi::flenfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::flenfn(selectedForm, length);
 	}
   }
@@ -1975,7 +1975,7 @@ void xt::dufspac(float const spacing) {
 	xi::fspacfn(ClosestFormToCursor, spacing);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fspacfn(selectedForm, spacing);
 	}
   }
@@ -1998,7 +1998,7 @@ void xt::dufind(float indent) {
 	xi::findfn(ClosestFormToCursor, indent);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::findfn(selectedForm, indent);
 	}
   }
@@ -2046,7 +2046,7 @@ void xt::dufxang(float angle) {
 	xi::fangfn(ClosestFormToCursor, angle);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fangfn(selectedForm, angle);
 	}
   }
@@ -2072,7 +2072,7 @@ void xt::dundcol(uint8_t color) {
 	xi::ucolfn(ClosestFormToCursor, color);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::ucolfn(selectedForm, color);
 	}
   }
@@ -2097,7 +2097,7 @@ void xt::dufcol(uint8_t color) {
 	xi::fcolfn(ClosestFormToCursor, color);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fcolfn(selectedForm, color);
 	}
   }
@@ -2124,7 +2124,7 @@ void xt::dubcol(uint8_t color) {
 	xi::bcolfn(ClosestFormToCursor, color);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::bcolfn(selectedForm, color);
 	}
   }
@@ -2147,7 +2147,7 @@ void xt::dublen(float const length) {
 	xi::blenfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::blenfn(selectedForm, length);
 	}
   }
@@ -2168,7 +2168,7 @@ void xt::dubspac(float const length) {
 	xi::bspacfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::bspacfn(selectedForm, length);
 	}
   }
@@ -2189,7 +2189,7 @@ void xt::dubmin(float const length) {
 	xi::bminfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::bminfn(selectedForm, length);
 	}
   }
@@ -2210,7 +2210,7 @@ void xt::dubmax(float const length) {
 	xi::bmaxfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::bmaxfn(selectedForm, length);
 	}
   }
@@ -2231,7 +2231,7 @@ void xt::dufmin(float const length) {
 	xi::fminfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fminfn(selectedForm, length);
 	}
   }
@@ -2252,7 +2252,7 @@ void xt::dufmax(float const length) {
 	xi::fmaxfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fmaxfn(selectedForm, length);
 	}
   }
@@ -2280,7 +2280,7 @@ void xt::dufwid(float const length) {
 	xi::fwidfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fwidfn(selectedForm, length);
 	}
   }
@@ -2308,7 +2308,7 @@ void xt::dufhi(float const length) {
 	xi::fhifn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  xi::fhifn(selectedForm, length);
 	}
   }

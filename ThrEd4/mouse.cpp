@@ -334,8 +334,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::MOVMSG)) { // tried to move an edited form
 	if (mi::chkok()) {
 	  thred::savdo();
-	  if (!SelectedFormList->empty()) {
-		for (auto const selectedForm : *SelectedFormList) {
+	  if (!Instance->SelectedFormList.empty()) {
+		for (auto const selectedForm : Instance->SelectedFormList) {
 		  form::refilfn(selectedForm);
 		}
 	  }
@@ -380,7 +380,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (!SelectedFormList->empty() && !StateMap->test(StateFlag::ROTAT) && thred::chkbig(stretchBoxLine, xyRatio)) {
+  if (!Instance->SelectedFormList.empty() && !StateMap->test(StateFlag::ROTAT) && thred::chkbig(stretchBoxLine, xyRatio)) {
 	return true;
   }
   if (StateMap->test(StateFlag::SIDCOL) && thred::inDefaultColorWindows()) {
@@ -765,7 +765,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		thred::redraw(Instance->ButtonWin.operator[](HHID));
 	  }
 	  else {
-		if (!SelectedFormList->empty()) {
+		if (!Instance->SelectedFormList.empty()) {
 		  thred::savdo();
 		  thred::nucols();
 		  thred::coltab();
@@ -888,7 +888,7 @@ void mi::moveForms() {
 	}
 	else {
 	  thred::savdo();
-	  for (auto const selectedForm : *SelectedFormList) {
+	  for (auto const selectedForm : Instance->SelectedFormList) {
 		form::frmadj(selectedForm);
 	  }
 	  form::frmsadj();
@@ -1006,30 +1006,30 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::NOSEL)) {
-		SelectedFormList->clear();
+		Instance->SelectedFormList.clear();
 		auto const& formList = Instance->FormList;
 		// We potentially reserve too much memory, but the cost of reallocation is higher than the
 		// small amount overallocated
-		SelectedFormList->reserve(formList.size());
+		Instance->SelectedFormList.reserve(formList.size());
 		StateMap->reset(StateFlag::FORMSEL);
 		auto const maxForm = wrap::toUnsigned(formList.size());
 		for (auto iForm = 0U; iForm < maxForm; ++iForm) {
 		  if (mi::finrng(iForm)) {
-			SelectedFormList->push_back(iForm);
+			Instance->SelectedFormList.push_back(iForm);
 		  }
 		}
-		if (SelectedFormList->size() == 1) {
+		if (Instance->SelectedFormList.size() == 1) {
 		  ReleaseCapture();
 		  thred::gotbox();
-		  ClosestFormToCursor   = SelectedFormList->front();
+		  ClosestFormToCursor   = Instance->SelectedFormList.front();
 		  ClosestVertexToCursor = 0;
-		  SelectedFormList->clear();
+		  Instance->SelectedFormList.clear();
 		  displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
 		  StateMap->set(StateFlag::RESTCH);
 		  StateMap->set(StateFlag::FORMSEL);
 		  return true;
 		}
-		if (!SelectedFormList->empty()) {
+		if (!Instance->SelectedFormList.empty()) {
 		  thred::gotbox();
 		  return true;
 		}
@@ -1475,7 +1475,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm(ClosestFormToCursor)) {
 		  // ToDo - I don't think this can ever be hit with closfrm
-		  if (!SelectedFormList->empty()) {
+		  if (!Instance->SelectedFormList.empty()) {
 			thred::nuslst(ClosestFormToCursor);
 			StateMap->set(StateFlag::RESTCH);
 			return true;
@@ -1485,7 +1485,7 @@ auto mouse::handleRightButtonDown() -> bool {
 			  std::swap(ClosestFormToCursor, tempIndex);
 			}
 			for (auto iForm = tempIndex; iForm <= ClosestFormToCursor; ++iForm) {
-			  SelectedFormList->push_back(iForm);
+			  Instance->SelectedFormList.push_back(iForm);
 			}
 			StateMap->set(StateFlag::RESTCH);
 			return true;
@@ -1495,14 +1495,14 @@ auto mouse::handleRightButtonDown() -> bool {
 		}
 	  }
 	  if ((WinMsg.wParam & MK_CONTROL) != 0U) { // If control is pressed
-		if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
+		if (Instance->SelectedFormList.empty() && StateMap->test(StateFlag::FORMSEL)) {
 		  StateMap->set(StateFlag::WASEL);
 		  PreviousFormIndex = ClosestFormToCursor;
 		}
 		if (form::closfrm(ClosestFormToCursor)) {
 		  form::nufsel();
 		}
-		if (SelectedFormList->size() > 1) {
+		if (Instance->SelectedFormList.size() > 1) {
 		  std::wstring const blank;
 		  displayText::butxt(HNUM, blank);
 		}
@@ -1516,9 +1516,9 @@ auto mouse::handleRightButtonDown() -> bool {
 		StateMap->reset(StateFlag::FPSEL);
 		form::unpsel();
 		form::ritfrct(ClosestFormToCursor, StitchWindowDC);
-		if (StateMap->testAndReset(StateFlag::FRMPSEL) || !SelectedFormList->empty()) {
+		if (StateMap->testAndReset(StateFlag::FRMPSEL) || !Instance->SelectedFormList.empty()) {
 		  StateMap->set(StateFlag::RESTCH);
-		  SelectedFormList->clear();
+		  Instance->SelectedFormList.clear();
 		}
 		displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
 		thred::lenCalc();
@@ -1526,8 +1526,8 @@ auto mouse::handleRightButtonDown() -> bool {
 		return true;
 	  }
 	  // unselect form, forms or form points
-	  if (!SelectedFormList->empty()) {
-		SelectedFormList->clear();
+	  if (!Instance->SelectedFormList.empty()) {
+		Instance->SelectedFormList.clear();
 	  }
 	  if (StateMap->test(StateFlag::FORMSEL)) {
 		StateMap->set(StateFlag::RESTCH);

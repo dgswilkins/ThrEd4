@@ -1247,7 +1247,7 @@ void txi::dutxfn(uint32_t const textureType) {
 	txfn(textureType, ClosestFormToCursor);
   }
   else {
-	for (auto const& selectedForm : *SelectedFormList) {
+	for (auto const& selectedForm : Instance->SelectedFormList) {
 	  txfn(textureType, selectedForm);
 	}
   }

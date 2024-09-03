@@ -500,10 +500,10 @@ auto kyi::handleEndKey(int32_t& retflag) -> bool {
 void kyi::dufsel() {
   auto start = LastFormSelected > ClosestFormToCursor ? ClosestFormToCursor : LastFormSelected;
   auto const finish = LastFormSelected > ClosestFormToCursor ? LastFormSelected : ClosestFormToCursor;
-  SelectedFormList->clear();
-  SelectedFormList->reserve(wrap::toSize(finish) - start + 1U);
+  Instance->SelectedFormList.clear();
+  Instance->SelectedFormList.reserve(wrap::toSize(finish) - start + 1U);
   while (start <= finish) {
-	SelectedFormList->push_back(start);
+	Instance->SelectedFormList.push_back(start);
 	++start;
   }
 }
@@ -513,16 +513,16 @@ void kyi::seldwn() {
 	StateMap->reset(StateFlag::SELBOX);
 	if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor != 0U) {
-		SelectedFormList->push_back(ClosestFormToCursor);
+		Instance->SelectedFormList.push_back(ClosestFormToCursor);
 		LastFormSelected = ClosestFormToCursor - 1U;
-		SelectedFormList->push_back(LastFormSelected);
+		Instance->SelectedFormList.push_back(LastFormSelected);
 	  }
 	  else {
 		return;
 	  }
 	}
 	else {
-	  if (!SelectedFormList->empty()) {
+	  if (!Instance->SelectedFormList.empty()) {
 		if (LastFormSelected != 0U) {
 		  --LastFormSelected;
 		  dufsel();
@@ -567,16 +567,16 @@ void kyi::selup() {
 	StateMap->reset(StateFlag::SELBOX);
 	if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor < formList.size() - 1U) {
-		SelectedFormList->push_back(ClosestFormToCursor);
+		Instance->SelectedFormList.push_back(ClosestFormToCursor);
 		LastFormSelected = ClosestFormToCursor + 1U;
-		SelectedFormList->push_back(LastFormSelected);
+		Instance->SelectedFormList.push_back(LastFormSelected);
 	  }
 	  else {
 		return;
 	  }
 	}
 	else {
-	  if (!SelectedFormList->empty()) {
+	  if (!Instance->SelectedFormList.empty()) {
 		if (LastFormSelected < formList.size() - 1U) {
 		  ++LastFormSelected;
 		  dufsel();
@@ -1160,7 +1160,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 	  break;
 	}
 	case L'F': {
-	  if (!SelectedFormList->empty()) {
+	  if (!Instance->SelectedFormList.empty()) {
 		PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 		keybd_event('F', 0, 0, 0);
 		break;

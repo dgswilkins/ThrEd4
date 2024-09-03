@@ -1538,7 +1538,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
   auto flag = false;
   switch (wParameter) {
 	case ID_BOLD: { // fill / Border / Bean
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::dubold();
@@ -1578,7 +1578,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_HORCLP: { // fill / Clipboard / Horizontal
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::horclp();
@@ -1586,7 +1586,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_ANGCLP: { // fill / Clipboard / Angle
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::angclp();
@@ -1594,7 +1594,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VRTCLP: { // fill / Clipboard / Vertical
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::vrtclp();
@@ -1627,7 +1627,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_PERP: { // fill / Border / Perpendicular Satin
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::prpbrd(LineSpacing);
@@ -1685,7 +1685,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILL_VERT: { // fill / Vertical
-	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::filvrt();

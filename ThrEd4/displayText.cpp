@@ -247,7 +247,7 @@ void displayText::frm1pnt() {
 }
 
 auto displayText::filmsgs(uint32_t const code) -> bool {
-  if (!SelectedFormList->empty()) {
+  if (!Instance->SelectedFormList.empty()) {
 	return di::clpmsgs(code);
   }
 

@@ -111,7 +111,6 @@ int32_t*                       ScreenDPI                 = nullptr; // screen DP
 int32_t*                       ScrollSize                = nullptr; // Scroll bar width scaled for DPI
 HPEN                           SelectAllPen              = nullptr; // pen for drawing large boxes
 uint32_t                       SelectedFormControlVertex = 0U;      // user selected form control formOrigin
-std::vector<uint32_t>*         SelectedFormList          = nullptr; // a list of selected forms
 FORM_VERTICES                  SelectedFormVertices      = {};      // selected form vertices
 std::vector<POINT>*            SelectedFormsLine         = nullptr; // line derived from the big rectangle
 RECT                           SelectedFormsRect         = {};      // for multiple selections;

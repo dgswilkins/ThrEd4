@@ -215,7 +215,7 @@ void backup::bak() {
   StateMap->reset(StateFlag::FPSEL);
   StateMap->reset(StateFlag::FRMPSEL);
   StateMap->reset(StateFlag::BIGBOX);
-  SelectedFormList->clear();
+  Instance->SelectedFormList.clear();
   thred::undat();
   if (StateMap->testAndReset(StateFlag::PRFACT)) {
 	StateMap->reset(StateFlag::WASRT);

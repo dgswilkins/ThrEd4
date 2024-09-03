@@ -2231,8 +2231,8 @@ void thred::rstAll() {
   }
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::FRMPSEL);
-  if (!SelectedFormList->empty()) {
-	SelectedFormList->clear();
+  if (!Instance->SelectedFormList.empty()) {
+	Instance->SelectedFormList.clear();
   }
   unmsg();
   Instance->SearchLine.clear();
@@ -2499,9 +2499,9 @@ void thred::duzero() {
 	return;
   }
   auto const minStitch = SmallStitchLength * SmallStitchLength;
-  if (!SelectedFormList->empty()) {
+  if (!Instance->SelectedFormList.empty()) {
 	auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  formMap.set(selectedForm);
 	}
 	StateMap->reset(StateFlag::CONTIG);
@@ -4183,8 +4183,8 @@ void thi::resetState() {
   menu::disableRedo();
   thred::unbsho();
   form::frmon();
-  SelectedFormList->clear();
-  SelectedFormList->shrink_to_fit();
+  Instance->SelectedFormList.clear();
+  Instance->SelectedFormList.shrink_to_fit();
   if (StateMap->test(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
 	PreferenceIndex = 0;
@@ -4407,15 +4407,15 @@ void thred::zumin() {
 		}
 		break;
 	  }
-	  if (!SelectedFormList->empty()) { // zoom to the selected forms
-		auto const  firstForm = SelectedFormList->front();
+	  if (!Instance->SelectedFormList.empty()) { // zoom to the selected forms
+		auto const  firstForm = Instance->SelectedFormList.front();
 		auto const& firstRect = formList.operator[](firstForm).rectangle;
 
 		SelectedFormsRect = {std::lround(firstRect.left),
 		                     std::lround(firstRect.top),
 		                     std::lround(firstRect.right),
 		                     std::lround(firstRect.bottom)};
-		for (auto const selectedForm : *SelectedFormList) {
+		for (auto const selectedForm : Instance->SelectedFormList) {
 		  auto const& rect = formList.operator[](selectedForm).rectangle;
 		  if (rect.bottom < wrap::toFloat(SelectedFormsRect.bottom)) {
 			SelectedFormsRect.bottom = std::lround(rect.bottom);
@@ -5395,7 +5395,7 @@ void thred::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
 }
 
 void thred::rot(F_POINT& rotationCenter) {
-  if (!StateMap->test(StateFlag::FORMSEL) && SelectedFormList->empty() && !StateMap->test(StateFlag::BIGBOX) &&
+  if (!StateMap->test(StateFlag::FORMSEL) && Instance->SelectedFormList.empty() && !StateMap->test(StateFlag::BIGBOX) &&
       !StateMap->test(StateFlag::GRPSEL) && !StateMap->test(StateFlag::FPSEL)) {
 	// no rotatable selections found
 	displayText::shoseln(IDS_FGRPF, IDS_ROT);
@@ -5488,7 +5488,7 @@ void thred::delsfrms() {
   auto formIndices = std::vector<uint32_t> {};
   formIndices.resize(formList.size());
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : *SelectedFormList) {
+  for (auto const selectedForm : Instance->SelectedFormList) {
 	formMap.set(selectedForm);
 	thi::f1del(selectedForm);
   }
@@ -5530,7 +5530,7 @@ void thred::delsfrms() {
 	  }
 	}
   }
-  SelectedFormList->clear();
+  Instance->SelectedFormList.clear();
   StateMap->reset(StateFlag::FORMSEL);
   coltab();
   StateMap->set(StateFlag::RESTCH);
@@ -5539,7 +5539,7 @@ void thred::delsfrms() {
 void thred::cut() {
   savdo();
   tfc::duclip();
-  if (!SelectedFormList->empty()) {
+  if (!Instance->SelectedFormList.empty()) {
 	StateMap->set(StateFlag::DELTO);
 	delsfrms();
   }
@@ -5601,8 +5601,8 @@ void thi::formStretch(uint32_t const form) {
 }
 
 void thred::stretch() {
-  if (!SelectedFormList->empty()) {
-	for (auto const selectedForm : *SelectedFormList) {
+  if (!Instance->SelectedFormList.empty()) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  thi::formStretch(selectedForm);
 	}
 	return;
@@ -5964,7 +5964,7 @@ auto thi::wastch(uint32_t const& formIndex) -> bool {
 
 auto thi::frmstch() -> bool {
   auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : *SelectedFormList) {
+  for (auto const selectedForm : Instance->SelectedFormList) {
 	formMap.set(selectedForm);
   }
   return std::ranges::any_of(*StitchBuffer, [&formMap](F_POINT_ATTR const& stitch) -> bool {
@@ -6110,7 +6110,7 @@ void thred::delet() {
   }
   savdo();
   auto satinFlag = false;
-  if (!SelectedFormList->empty()) {
+  if (!Instance->SelectedFormList.empty()) {
 	if (thi::frmstch()) {
 	  StateMap->set(StateFlag::DELSFRMS);
 	  displayText::tabmsg(IDS_DELFRM, false);
@@ -7025,7 +7025,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
 	return;
   }
   if (StateMap->testAndReset(StateFlag::FRMSROT)) {
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  // clang-format off
 	  auto& form     = formList.operator[](selectedForm);
 	  auto  itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
@@ -7084,7 +7084,7 @@ void thred::showOnlyLayer(uint8_t const play) {
       ActiveLayer != ((StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U) {
 	StateMap->reset(StateFlag::SELBOX);
   }
-  SelectedFormList->clear();
+  Instance->SelectedFormList.clear();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -7285,9 +7285,9 @@ void thred::rembig() {
   }
   savdo();
   while (true) {
-	if (!SelectedFormList->empty()) {
+	if (!Instance->SelectedFormList.empty()) {
 	  auto range = RANGE {};
-	  for (auto const selectedForm : *SelectedFormList) {
+	  for (auto const selectedForm : Instance->SelectedFormList) {
 		if (form::frmrng(selectedForm, range)) {
 		  thi::makbig(range.start, range.finish);
 		}
@@ -7601,7 +7601,7 @@ void thred::nucols() {
   auto& formList = Instance->FormList;
 
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : *SelectedFormList) {
+  for (auto const selectedForm : Instance->SelectedFormList) {
 	formMap.set(selectedForm);
 	auto& form = formList.operator[](selectedForm);
 	if (form.fillType != 0U) {
@@ -7915,7 +7915,7 @@ void thred::dumrk(float const xCoord, float const yCoord) {
 }
 
 void thi::gselrng() noexcept {
-  auto const& selectedFormList = *SelectedFormList;
+  auto const& selectedFormList = Instance->SelectedFormList;
   SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
   for (auto const selectedForm : selectedFormList) {
 	if (selectedForm < SelectedFormsRange.start) {
@@ -8032,7 +8032,7 @@ void thred::pntmrk() {
 }
 
 void thred::filfrms() {
-  if (SelectedFormList->empty()) {
+  if (Instance->SelectedFormList.empty()) {
 	if (!StateMap->test(StateFlag::FORMSEL)) {
 	  return;
 	}
@@ -8042,7 +8042,7 @@ void thred::filfrms() {
 	return;
   }
   savdo();
-  for (auto const selectedForm : *SelectedFormList) {
+  for (auto const selectedForm : Instance->SelectedFormList) {
 	form::refilfn(selectedForm);
   }
   StateMap->set(StateFlag::RESTCH);
@@ -8053,24 +8053,24 @@ void thred::nuslst(uint32_t const find) {
   // ToDo - Check this code. Does it do what is intended?
   if (find < SelectedFormsRange.start) {
 	for (auto form = find; form < SelectedFormsRange.finish; ++form) {
-	  SelectedFormList->push_back(form);
+	  Instance->SelectedFormList.push_back(form);
 	}
 	return;
   }
   if (find > SelectedFormsRange.finish) {
 	for (auto form = SelectedFormsRange.start; form <= find; ++form) {
-	  SelectedFormList->push_back(form);
+	  Instance->SelectedFormList.push_back(form);
 	}
 	return;
   }
   for (auto form = SelectedFormsRange.start; form <= find; ++form) {
-	SelectedFormList->push_back(form);
+	Instance->SelectedFormList.push_back(form);
   }
 }
 
 void thi::srchk() {
   StateMap->reset(StateFlag::FORMSEL);
-  SelectedFormList->clear();
+  Instance->SelectedFormList.clear();
   if (StateMap->testAndSet(StateFlag::LENSRCH)) {
 	if (StateMap->test(StateFlag::WASGRP)) {
 	  ClosestPointIndex = GroupStartStitch = PrevGroupStartStitch;
@@ -8187,7 +8187,7 @@ void thred::gsnap() {
   }
   auto& formList = Instance->FormList;
 
-  if (SelectedFormList->empty()) {
+  if (Instance->SelectedFormList.empty()) {
 	if (!StateMap->test(StateFlag::FORMSEL)) {
 	  if (!StateMap->test(StateFlag::GRPSEL)) {
 		displayText::shoseln(IDS_FGRPF, IDS_SNAP2GRD);
@@ -8208,7 +8208,7 @@ void thred::gsnap() {
 	return;
   }
   savdo();
-  for (auto const selectedForm : *SelectedFormList) {
+  for (auto const selectedForm : Instance->SelectedFormList) {
 	ClosestFormToCursor = selectedForm;
 	auto& formIter      = formList.operator[](ClosestFormToCursor);
 	thi::frmsnap(formIter.vertexIndex, formIter.vertexCount);
@@ -8432,7 +8432,7 @@ void thi::frmpos(FRM_HEAD& form, float const deltaX, float const deltaY) noexcep
 }
 
 void thred::nudgfn(float const deltaX, float const deltaY) {
-  if (StateMap->test(StateFlag::BIGBOX) || !SelectedFormList->empty() || StateMap->test(StateFlag::FORMSEL) ||
+  if (StateMap->test(StateFlag::BIGBOX) || !Instance->SelectedFormList.empty() || StateMap->test(StateFlag::FORMSEL) ||
       StateMap->test(StateFlag::GRPSEL) || StateMap->test(StateFlag::SELBOX)) {
 	savdo();
   }
@@ -8454,9 +8454,9 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (!SelectedFormList->empty()) {
+  if (!Instance->SelectedFormList.empty()) {
 	auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  formMap.set(selectedForm);
 	}
 	for (auto& stitch : *StitchBuffer) {
@@ -8464,7 +8464,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 		stitch += F_POINT {deltaX, deltaY};
 	  }
 	}
-	for (auto const selectedForm : *SelectedFormList) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  thi::frmpos(form, deltaX, deltaY);
 	}
@@ -8820,8 +8820,8 @@ auto thred::unselectAll() -> bool {
 	unbsho();
 	return true;
   }
-  if (!SelectedFormList->empty()) {
-	SelectedFormList->clear();
+  if (!Instance->SelectedFormList.empty()) {
+	Instance->SelectedFormList.clear();
 	StateMap->set(StateFlag::RESTCH);
   }
   return false;
@@ -8847,7 +8847,7 @@ void thred::esccode() {
   DestroyWindow(SpeedScrollBar);
   StateMap->reset(StateFlag::GMRK);
   StateMap->reset(StateFlag::FORMSEL);
-  SelectedFormList->clear();
+  Instance->SelectedFormList.clear();
 }
 
 void thred::qcode() {
@@ -8883,7 +8883,7 @@ void thred::qcode() {
   }
   if (StateMap->testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 	backup::bak();
-	SelectedFormList->clear();
+	Instance->SelectedFormList.clear();
 	ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   }
   if (!UserFlagMap->test(UserFlag::MARQ)) {
@@ -10059,8 +10059,8 @@ auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, 
   if (StateMap->testAndReset(StateFlag::MOVMSG)) {
 	if (code == VK_RETURN || code == VK_OEM_3) {
 	  thred::savdo();
-	  if (!SelectedFormList->empty()) {
-		for (auto const selectedForm : *SelectedFormList) {
+	  if (!Instance->SelectedFormList.empty()) {
+		for (auto const selectedForm : Instance->SelectedFormList) {
 		  form::refilfn(selectedForm);
 		}
 	  }
@@ -12296,7 +12296,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  OSequence                 = &Instance->OSequence;
 	  PreviousNames             = &Instance->PreviousNames; // thred only
 	  ScrollSize                = &Instance->ScrollSize; // thred only
-	  SelectedFormList          = &Instance->SelectedFormList;
 	  SelectedFormsLine         = &Instance->SelectedFormsLine;
 	  SelectedPointsLine        = &Instance->SelectedPointsLine;
 	  SideWindow                = &Instance->SideWindow; // thred only

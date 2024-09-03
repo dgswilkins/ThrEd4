@@ -288,7 +288,7 @@ void fci::clipSelectedForms() {
   auto length = 0U;
   auto& formList = Instance->FormList;
 
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	auto& currentForm = formList.operator[](selectedForm);
 	length += sizfclp(currentForm);
   }
@@ -304,24 +304,24 @@ void fci::clipSelectedForms() {
   auto const thrEdClip       = RegisterClipboardFormat(ThrEdClipFormat);
   auto*      clipFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
   clipFormsHeader->clipType  = CLP_FRMS;
-  wrap::narrow(clipFormsHeader->formCount, SelectedFormList->size());
+  wrap::narrow(clipFormsHeader->formCount, Instance->SelectedFormList.size());
   // Skip past the header
   auto*      ptrForms = convertFromPtr<FRM_HEAD*>(std::next(clipFormsHeader));
-  auto const forms    = gsl::span {ptrForms, SelectedFormList->size()};
+  auto const forms    = gsl::span {ptrForms, Instance->SelectedFormList.size()};
   auto       iForm    = 0U;
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	auto& currentForm = formList.operator[](selectedForm);
 	forms[iForm++]    = currentForm;
   }
   // skip past the forms
   auto* ptrFormVertices = convertFromPtr<F_POINT*>(wrap::next(ptrForms, iForm));
   auto  verticesSize    = 0U;
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	verticesSize += formList.operator[](selectedForm).vertexCount;
   }
   auto const formVertices = gsl::span {ptrFormVertices, verticesSize};
   auto       iVertex      = 0U;
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 
 	auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
@@ -333,7 +333,7 @@ void fci::clipSelectedForms() {
   // skip past the vertex list
   auto* ptrGuides  = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, iVertex));
   auto  guidesSize = 0U;
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	if (auto& form = formList.operator[](selectedForm); form.type == SAT && form.satinGuideCount != 0U) {
 	  guidesSize += form.satinGuideCount;
 	}
@@ -341,7 +341,7 @@ void fci::clipSelectedForms() {
   auto guideCount = 0U;
   if (guidesSize != 0U) {
 	auto const guides = gsl::span {ptrGuides, guidesSize};
-	for (auto& selectedForm : *SelectedFormList) {
+	for (auto& selectedForm : Instance->SelectedFormList) {
 	  if (auto& form = formList.operator[](selectedForm); form.type == SAT && form.satinGuideCount != 0U) {
 		auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
@@ -354,7 +354,7 @@ void fci::clipSelectedForms() {
   // skip past the guides
   auto* ptrPoints  = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, guideCount));
   auto  pointsSize = 0U;
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 	if (form.isClipX()) {
 	  pointsSize += form.clipCount;
@@ -366,7 +366,7 @@ void fci::clipSelectedForms() {
   auto pointCount = uint32_t {0U};
   if (pointsSize != 0U) {
 	auto const points = gsl::span {ptrPoints, pointsSize};
-	for (auto& selectedForm : *SelectedFormList) {
+	for (auto& selectedForm : Instance->SelectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (form.isClipX()) {
 		auto offsetStart = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
@@ -389,7 +389,7 @@ void fci::clipSelectedForms() {
   auto* textures     = convertFromPtr<TX_PNT*>(std::next(ptrPoints, wrap::toPtrdiff(pointCount)));
   auto  textureCount = uint16_t {};
   iForm              = 0;
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 	if (!form.isTexture()) {
 	  continue;
@@ -405,7 +405,7 @@ void fci::clipSelectedForms() {
   SetClipboardData(thrEdClip, clipHandle);
 
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto& selectedForm : *SelectedFormList) {
+  for (auto& selectedForm : Instance->SelectedFormList) {
 	formMap.set(selectedForm);
   }
   auto astch = std::vector<F_POINT_ATTR> {};
@@ -535,7 +535,7 @@ void tfc::duclip() {
 	displayText::tabmsg(IDS_INSF, false);
 	return;
   }
-  if (!SelectedFormList->empty()) {
+  if (!Instance->SelectedFormList.empty()) {
 	fci::clipSelectedForms();
 	return;
   }
@@ -809,11 +809,11 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
 		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;
 		form::ratsr();
-		SelectedFormList->clear();
-		SelectedFormList->reserve(ClipFormsCount);
+		Instance->SelectedFormList.clear();
+		Instance->SelectedFormList.reserve(ClipFormsCount);
 		for (auto index = 0U; index < ClipFormsCount; ++index) {
 		  form::fselrct(formOffset + index);
-		  SelectedFormList->push_back(formOffset + index);
+		  Instance->SelectedFormList.push_back(formOffset + index);
 		}
 		wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
 		wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);

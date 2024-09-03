@@ -735,8 +735,8 @@ void satin::satbrd() {
   }
   auto& formList = Instance->FormList;
 
-  if (!SelectedFormList->empty()) {
-	for (auto const selectedForm : *SelectedFormList) {
+  if (!Instance->SelectedFormList.empty()) {
+	for (auto const selectedForm : Instance->SelectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow_cast<decltype(form.attribute)>(SBLNT | FBLNT);
