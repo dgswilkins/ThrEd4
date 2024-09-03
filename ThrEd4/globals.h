@@ -315,8 +315,6 @@ extern F_RECTANGLE    RotationRect;
 extern int32_t* ScreenDPI;
 extern int32_t* ScrollSize;
 
-extern std::vector<POINT>* SearchLine;
-
 extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 

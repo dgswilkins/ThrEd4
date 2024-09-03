@@ -898,8 +898,8 @@ void form::ritfrct(uint32_t const iForm, HDC hDC) {
   SetROP2(StitchWindowDC, R2_COPYPEN);
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	StateMap->reset(StateFlag::SELSHO);
-	SearchLine->clear();
-	SearchLine->shrink_to_fit();
+	Instance->SearchLine.clear();
+	Instance->SearchLine.shrink_to_fit();
 	StateMap->set(StateFlag::RESTCH);
   }
 }

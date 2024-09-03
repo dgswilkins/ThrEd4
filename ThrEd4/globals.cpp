@@ -109,7 +109,6 @@ uint32_t                       PseudoRandomValue         = 0U;      // pseudo-ra
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle
 int32_t*                       ScreenDPI                 = nullptr; // screen DPI
 int32_t*                       ScrollSize                = nullptr; // Scroll bar width scaled for DPI
-std::vector<POINT>*            SearchLine                = nullptr; // stitch select line
 HPEN                           SelectAllPen              = nullptr; // pen for drawing large boxes
 uint32_t                       SelectedFormControlVertex = 0U;      // user selected form control formOrigin
 std::vector<uint32_t>*         SelectedFormList          = nullptr; // a list of selected forms

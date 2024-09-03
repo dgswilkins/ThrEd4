@@ -2235,8 +2235,8 @@ void thred::rstAll() {
 	SelectedFormList->clear();
   }
   unmsg();
-  SearchLine->clear();
-  SearchLine->shrink_to_fit();
+  Instance->SearchLine.clear();
+  Instance->SearchLine.shrink_to_fit();
   FirstWin = nullptr;
   while (EnumChildWindows(MainStitchWin, thi::enumChildProc, 0) != 0) { }
 }
@@ -2584,22 +2584,22 @@ void thred::pgrit() {
 void thi::selin(uint32_t start, uint32_t end, HDC hDC) {
   SelectObject(hDC, GroupSelectPen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  if (!SearchLine->empty()) {
-	wrap::polyline(hDC, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
+  if (!Instance->SearchLine.empty()) {
+	wrap::polyline(hDC, Instance->SearchLine.data(), wrap::toUnsigned(Instance->SearchLine.size()));
   }
   if (start > end) {
 	std::swap(start, end);
   }
-  SearchLine->clear();
+  Instance->SearchLine.clear();
   if (!StitchBuffer->empty()) {
 	auto stitch = wrap::next(StitchBuffer->begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
-	  SearchLine->push_back(POINT {wrap::ceil<int32_t>((stitch->x - ZoomRect.left) * ZoomRatio.x),
+	  Instance->SearchLine.push_back(POINT {wrap::ceil<int32_t>((stitch->x - ZoomRect.left) * ZoomRatio.x),
 	                               wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                                   (stitch->y - ZoomRect.bottom) * ZoomRatio.y)});
 	  ++stitch;
 	}
-	wrap::polyline(hDC, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
+	wrap::polyline(hDC, Instance->SearchLine.data(), wrap::toUnsigned(Instance->SearchLine.size()));
   }
   SetROP2(hDC, R2_COPYPEN);
 }
@@ -4190,8 +4190,8 @@ void thi::resetState() {
 	PreferenceIndex = 0;
   }
   bitmap::resetBmpFile(true);
-  SearchLine->clear();
-  SearchLine->shrink_to_fit();
+  Instance->SearchLine.clear();
+  Instance->SearchLine.shrink_to_fit();
   rstdu();
   thred::unmsg();
   ZoomFactor   = 1;
@@ -5136,8 +5136,8 @@ void thred::rebox() {
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	StateMap->reset(StateFlag::SCROS);
 	StateMap->reset(StateFlag::ECROS);
-	SearchLine->clear();
-	SearchLine->shrink_to_fit();
+	Instance->SearchLine.clear();
+	Instance->SearchLine.shrink_to_fit();
 	StateMap->set(StateFlag::RESTCH);
 	for (auto const& window : *UserColorWin) {
 	  redraw(window);
@@ -11372,7 +11372,7 @@ void thi::doDrwInit() {
 	  cros(ClosestPointIndex);
 	}
 	else {
-	  SearchLine->clear();
+	  Instance->SearchLine.clear();
 	  ducros(StitchWindowMemDC);
 	}
 	thred::selRct(StitchRangeRect);
@@ -12296,7 +12296,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  OSequence                 = &Instance->OSequence;
 	  PreviousNames             = &Instance->PreviousNames; // thred only
 	  ScrollSize                = &Instance->ScrollSize; // thred only
-	  SearchLine                = &Instance->SearchLine;
 	  SelectedFormList          = &Instance->SelectedFormList;
 	  SelectedFormsLine         = &Instance->SelectedFormsLine;
 	  SelectedPointsLine        = &Instance->SelectedPointsLine;
