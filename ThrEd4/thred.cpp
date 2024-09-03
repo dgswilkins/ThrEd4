@@ -12293,7 +12293,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  MsgBuffer                 = &Instance->MsgBuffer; // thred only
 	  NearestPixel              = &Instance->NearestPixel; // thred only
 	  NearestPoint              = &Instance->NearestPoint; // thred only
-	  OSequence                 = &Instance->OSequence;
 	  PreviousNames             = &Instance->PreviousNames; // thred only
 	  ScrollSize                = &Instance->ScrollSize; // thred only
 	  SelectedFormsLine         = &Instance->SelectedFormsLine;

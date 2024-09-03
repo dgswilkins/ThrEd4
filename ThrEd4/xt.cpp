@@ -189,7 +189,7 @@ auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> co
 
 constexpr auto durat(float start, float finish, float featherRatio) -> float;
 
-void durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather);
+void durats(uint32_t iSequence, std::vector<F_POINT>& sequence, FEATHER& feather);
 void durec(O_REC& record) noexcept(!std::is_same_v<ptrdiff_t, int>);
 auto dutyp(uint32_t attribute) noexcept -> uint32_t;
 void duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept;
@@ -299,7 +299,7 @@ void xi::duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, fl
                    durat(bSequence.operator[](finish).y, bSequence.operator[](start).y, featherRatioLocal)};
 }
 
-void xi::durats(uint32_t const iSequence, gsl::not_null<std::vector<F_POINT>*> const sequence, FEATHER& feather) {
+void xi::durats(uint32_t const iSequence, std::vector<F_POINT> &sequence, FEATHER& feather) {
   auto const& bSequence = Instance->BSequence;
 
   auto const& bCurrent = bSequence.operator[](iSequence);
@@ -307,13 +307,13 @@ void xi::durats(uint32_t const iSequence, gsl::not_null<std::vector<F_POINT>*> c
 
   if (auto const stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
       stitchLength < feather.minStitch) {
-	sequence->emplace_back(bCurrent.x, bCurrent.y);
+	sequence.emplace_back(bCurrent.x, bCurrent.y);
   }
   else {
 	feather.ratioLocal       = feather.minStitch / stitchLength;
 	auto const adjustedPoint = F_POINT {durat(bNext.x, bCurrent.x, feather.ratioLocal),
 	                                    durat(bNext.y, bCurrent.y, feather.ratioLocal)};
-	sequence->emplace_back(durat(adjustedPoint.x, bCurrent.x, feather.ratio),
+	sequence.emplace_back(durat(adjustedPoint.x, bCurrent.x, feather.ratio),
 	                       durat(adjustedPoint.y, bCurrent.y, feather.ratio));
   }
 }
@@ -416,7 +416,7 @@ void xi::nurat(FEATHER& feather) noexcept {
 
 void xi::fthfn(uint32_t const iSequence, FEATHER& feather) {
   nurat(feather);
-  durats(iSequence, OSequence, feather);
+  durats(iSequence, Instance->OSequence, feather);
 }
 
 void xi::ratpnt(uint32_t const iPoint, uint32_t const iNextPoint, F_POINT& point, float const featherRatio) noexcept {
@@ -469,8 +469,8 @@ void xi::fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT
 	xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal); // NOLINT(readability-suspicious-call-argument)
   }
   auto const midPoint = midpnt(currentPoint, nextPoint);
-  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-  OSequence->push_back(midPoint);
+  Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
+  Instance->OSequence.push_back(midPoint);
   featherSequence.emplace_back(bNext.x, bNext.y);
   featherSequence.push_back(midPoint);
 }
@@ -483,8 +483,8 @@ void xi::fthdfn(uint32_t const iSequence, FEATHER& feather) {
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
-  OSequence->emplace_back(bCurrent.x, bCurrent.y);
-  OSequence->emplace_back(bNext.x, bNext.y);
+  Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
+  Instance->OSequence.emplace_back(bNext.x, bNext.y);
   if (length <= feather.minStitch) {
 	return;
   }
@@ -494,17 +494,17 @@ void xi::fthdfn(uint32_t const iSequence, FEATHER& feather) {
   feather.ratioLocal = HALF;
   duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
   feather.ratioLocal       = feather.minStitch / length / 2;
-  auto const& sequence     = OSequence->operator[](iSequence);
-  auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+  auto const& sequence     = Instance->OSequence.operator[](iSequence);
+  auto const& sequenceFwd1 = Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U);
   xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
   xratf(adjustedPoint, sequenceFwd1, nextPoint, feather.ratioLocal);
   feather.ratioLocal = feather.ratio;
-  xratf(currentPoint, sequence, OSequence->operator[](iSequence), feather.ratioLocal);
-  xratf(nextPoint, sequenceFwd1, OSequence->operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
+  xratf(currentPoint, sequence, Instance->OSequence.operator[](iSequence), feather.ratioLocal);
+  xratf(nextPoint, sequenceFwd1, Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
 }
 
 void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) {
-  if (OSequence->empty()) {
+  if (Instance->OSequence.empty()) {
 	return;
   }
   auto const& interleaveSequence = Instance->InterleaveSequence;
@@ -522,10 +522,10 @@ void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequen
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
-	OSequence->operator[](iSequence) = featherSequence[iReverseSequence];
+	Instance->OSequence.operator[](iSequence) = featherSequence[iReverseSequence];
 	--iReverseSequence;
   }
-  OSequence->resize(sequenceMax);
+  Instance->OSequence.resize(sequenceMax);
   form::chkseq(false);
 }
 
@@ -583,12 +583,12 @@ void xt::fthrfn(FRM_HEAD& form) {
 			xi::fthfn(ind, feather);
 		  }
 		  else {
-			OSequence->emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
+			Instance->OSequence.emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
 		  }
 		}
 		else {
 		  if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
-			OSequence->emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
+			Instance->OSequence.emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
 		  }
 		  else {
 			xi::fthfn(ind, feather);
@@ -684,11 +684,11 @@ void xi::delwlk(uint32_t code) {
 void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
-  if (!OSequence->empty()) {
+  if (!Instance->OSequence.empty()) {
 	Instance->InterleaveSequenceIndices.emplace_back(
 	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
 #if BUGBAK
-	for (auto val : *OSequence) {
+	for (auto val : Instance->OSequence) {
 	  Instance->InterleaveSequence.push_back(val);
 	}
 #else
@@ -697,8 +697,8 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 	form.underlayStitchLen = std::clamp(form.underlayStitchLen, MINWLK, MAXWLK);
 
 	auto const underlayStitchLength = form.underlayStitchLen;
-	auto const iSeqMax              = OSequence->size() - 1U;
-	auto       sequence             = OSequence->begin();
+	auto const iSeqMax              = Instance->OSequence.size() - 1U;
+	auto       sequence             = Instance->OSequence.begin();
 	auto       sequenceFwd1         = std::next(sequence);
 	for (auto iSequence = size_t {}; iSequence < iSeqMax; ++iSequence) {
 	  auto const delta  = F_POINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
@@ -718,7 +718,7 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 	  ++sequence;
 	  ++sequenceFwd1;
 	}
-	interleaveSequence.push_back(OSequence->back());
+	interleaveSequence.push_back(Instance->OSequence.back());
 #endif
   }
 }
@@ -809,9 +809,9 @@ void xi::fnwlk(FRM_HEAD& form) {
 	++count;
   }
   auto const& walkPoints = xt::insid(form);
-  OSequence->clear();
+  Instance->OSequence.clear();
   while (count != 0U) {
-	OSequence->push_back(walkPoints[start]);
+	Instance->OSequence.push_back(walkPoints[start]);
 	start = form::nxt(form, start);
 	--count;
   }
@@ -829,13 +829,13 @@ void xi::undclp(float& underlayStitchLen) {
 }
 
 void xi::fncwlk(FRM_HEAD& form) {
-  OSequence->clear();
+  Instance->OSequence.clear();
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
 	if (form.wordParam != 0U) {
 	  auto const thisVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
-	  OSequence->emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
+	  Instance->OSequence.emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
 	                          wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
@@ -843,12 +843,12 @@ void xi::fncwlk(FRM_HEAD& form) {
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
-	  OSequence->emplace_back(wrap::midl(finishVertex->x, startVertex->x),
+	  Instance->OSequence.emplace_back(wrap::midl(finishVertex->x, startVertex->x),
 	                          wrap::midl(finishVertex->y, startVertex->y));
 	  --itGuide;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
-	  OSequence->emplace_back(wrap::midl(itVertex[0].x, itVertex[1].x),
+	  Instance->OSequence.emplace_back(wrap::midl(itVertex[0].x, itVertex[1].x),
 	                          wrap::midl(itVertex[0].y, itVertex[1].y));
 	}
   }
@@ -858,7 +858,7 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  start = form.fillStart;
 	}
 	auto endVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
-	OSequence->push_back(*endVertex);
+	Instance->OSequence.push_back(*endVertex);
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < form.vertexCount / 2U; ++iGuide) {
@@ -867,13 +867,13 @@ void xi::fncwlk(FRM_HEAD& form) {
 	  if (auto const pnt = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
 	                                wrap::midl(finishVertex->y, startVertex->y)};
 	      form::cisin(form, pnt.x, pnt.y)) {
-		OSequence->push_back(pnt);
+		Instance->OSequence.push_back(pnt);
 	  }
 	  start  = form::nxt(form, start);
 	  finish = form::prv(form, finish);
 	}
 	endVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
-	OSequence->push_back(*endVertex);
+	Instance->OSequence.push_back(*endVertex);
   }
   ritwlk(form, CWLKMSK);
 }

@@ -297,8 +297,6 @@ extern uint32_t NearestCount;
 extern uint32_t NewFormVertexCount;
 extern HWND     OKButton;
 
-extern std::vector<F_POINT>* OSequence;
-
 extern bool OutLineEverySelectedForm;
 
 extern std::vector<F_POINT>* OutsidePoints;
