@@ -6,7 +6,6 @@
 #include "globals.h"
 #include "iniFile.h"
 #include "point.h"
-#include "satCon.h"
 #include "textureHeader.h"
 #include "ThrEdTypes.h"
 // ReSharper disable CppUnusedIncludeDirective
