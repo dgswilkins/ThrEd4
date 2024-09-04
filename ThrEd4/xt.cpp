@@ -1644,7 +1644,7 @@ void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_
 void xi::addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
   auto code = 0U;
   auto& interleaveSequence = Instance->InterleaveSequence;
-  auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto const& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
 
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(interleaveSequenceIndices.size() - 1U); ++iSequence) {
 	code = ilData.layerIndex | interleaveSequenceIndices.operator[](iSequence).code |

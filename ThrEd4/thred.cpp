@@ -9562,7 +9562,7 @@ auto thred::handleFormDataSheet() -> bool {
   thi::chknum();
   unsid();
   auto& form = Instance->FormList.operator[](ClosestFormToCursor);
-  auto& valueWindow = Instance->ValueWindow;
+  auto const& valueWindow = Instance->ValueWindow;
   while (true) {
 	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == LabelWindow->operator[](LTXOF)) {
 	  // draw the texture fill spacing window
