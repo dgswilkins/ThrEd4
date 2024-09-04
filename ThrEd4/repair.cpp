@@ -31,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-enum Repair : uint32_t { BADFLT = 1U, BADCLP = 1U << 1U, BADSAT = 1U << 2U, BADTX = 1U << 3U };
+enum Repair : uint8_t { BADFLT = 1U, BADCLP = 1U << 1U, BADSAT = 1U << 2U, BADTX = 1U << 3U };
 
 class BAD_COUNTS
 {
@@ -208,7 +208,8 @@ auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 		  chkTxt(form, badData);
 		}
 	  }
-	  if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX)) {
+	  if (auto constexpr CMP = uint32_t {BADFLT | BADCLP} | uint32_t {BADSAT | BADTX};
+	      badData.attribute == CMP) {
 		break;
 	  }
 	}
