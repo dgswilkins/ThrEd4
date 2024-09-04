@@ -70,7 +70,7 @@ constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
 constexpr auto TRBASE   = 0.1F;                 // Trace ratio base
 constexpr auto TROFF    = 1.0F;                 // Trace ratio offset
 
-enum TraceWin : int32_t {
+enum TraceWin : int8_t {
   TRWINROW01 = 15,
   TRWINROW02,
   TRWINROW03,
