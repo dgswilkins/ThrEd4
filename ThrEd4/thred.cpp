@@ -7137,9 +7137,9 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto       minLength = BIGDBL;
   auto const pointToTest =
       POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
-  auto controlPoint = SelectedFormsLine->begin();
+  auto controlPoint = Instance->SelectedFormsLine.begin();
 
-  auto const endPoint = SelectedFormsLine->size();
+  auto const endPoint = Instance->SelectedFormsLine.size();
   for (auto iControlPoint = 0U; iControlPoint < endPoint; ++iControlPoint) {
 	auto const deltaX = pointToTest.x - controlPoint->x;
 	auto const deltaY = pointToTest.y - controlPoint->y;
@@ -7154,12 +7154,12 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto& formLines = Instance->FormLines;
   formLines.resize(SQPNTS);
   for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
-	formLines[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);
+	formLines[iCorner] = Instance->SelectedFormsLine.operator[](wrap::toSize(iCorner) * 2U);
   }
   formLines[4] = formLines[0];
   if (minimumLength < CLOSENUF && !isLine(formLines)) {
 	for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
-	  stretchBoxLine[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);
+	  stretchBoxLine[iCorner] = Instance->SelectedFormsLine.operator[](wrap::toSize(iCorner) * 2U);
 	}
 	stretchBoxLine[4] = stretchBoxLine[0];
 	strtchbox(stretchBoxLine);
@@ -12295,7 +12295,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  NearestPoint              = &Instance->NearestPoint; // thred only
 	  PreviousNames             = &Instance->PreviousNames; // thred only
 	  ScrollSize                = &Instance->ScrollSize; // thred only
-	  SelectedFormsLine         = &Instance->SelectedFormsLine;
 	  SelectedPointsLine        = &Instance->SelectedPointsLine;
 	  SideWindow                = &Instance->SideWindow; // thred only
 	  SideWindowEntryBuffer     = &Instance->SideWindowEntryBuffer; // thred only

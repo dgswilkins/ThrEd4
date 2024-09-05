@@ -317,7 +317,6 @@ extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 
 extern FORM_VERTICES          SelectedFormVertices;
-extern std::vector<POINT>*    SelectedFormsLine;
 
 extern RECT    SelectedFormsRect;
 extern F_POINT SelectedFormsSize;

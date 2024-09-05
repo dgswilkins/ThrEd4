@@ -960,11 +960,11 @@ void form::rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept {
 }
 
 void form::dubig() {
-  rct2sel(SelectedFormsRect, *SelectedFormsLine);
+  rct2sel(SelectedFormsRect, Instance->SelectedFormsLine);
   SelectObject(StitchWindowMemDC, SelectAllPen);
-  wrap::polyline(StitchWindowMemDC, SelectedFormsLine->data(), wrap::toUnsigned(SelectedFormsLine->size()));
-  for (auto iPoint = 0U; iPoint < SelectedFormsLine->size() - 1U; ++iPoint) {
-	selsqr(SelectedFormsLine->operator[](iPoint), StitchWindowMemDC);
+  wrap::polyline(StitchWindowMemDC, Instance->SelectedFormsLine.data(), wrap::toUnsigned(Instance->SelectedFormsLine.size()));
+  for (auto iPoint = 0U; iPoint < Instance->SelectedFormsLine.size() - 1U; ++iPoint) {
+	selsqr(Instance->SelectedFormsLine.operator[](iPoint), StitchWindowMemDC);
   }
 }
 

@@ -110,7 +110,6 @@ int32_t*                       ScrollSize                = nullptr; // Scroll ba
 HPEN                           SelectAllPen              = nullptr; // pen for drawing large boxes
 uint32_t                       SelectedFormControlVertex = 0U;      // user selected form control formOrigin
 FORM_VERTICES                  SelectedFormVertices      = {};      // selected form vertices
-std::vector<POINT>*            SelectedFormsLine         = nullptr; // line derived from the big rectangle
 RECT                           SelectedFormsRect         = {};      // for multiple selections;
 F_POINT                        SelectedFormsSize         = F_POINT {}; // size of multiple select rectangle
 RECT                           SelectedPixelsRect        = {};      // display form vertex select rectangle

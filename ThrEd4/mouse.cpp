@@ -291,7 +291,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   if (Instance->StateMap.test(StateFlag::FPSEL) && !Instance->StateMap.test(StateFlag::FUNCLP) &&
       !Instance->StateMap.test(StateFlag::ROTAT)) {
-	*SelectedFormsLine = *SelectedPointsLine;
+	Instance->SelectedFormsLine = *SelectedPointsLine;
 	SelectedFormsRect  = SelectedPixelsRect;
 	if (thred::chkbig(stretchBoxLine, xyRatio)) {
 	  return true;
