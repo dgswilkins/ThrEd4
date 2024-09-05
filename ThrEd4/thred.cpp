@@ -6982,7 +6982,7 @@ void thred::setpsel() {
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
   thi::duprct(form);
   SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
-  form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
+  form::rct2sel(SelectedPixelsRect, Instance->SelectedPointsLine);
   auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + SelectedFormVertices.finish);
   EndPointCross = form::sfCor2px(*itVertex);
   Instance->StateMap.set(StateFlag::SHOPSEL);
@@ -12295,7 +12295,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  NearestPoint              = &Instance->NearestPoint; // thred only
 	  PreviousNames             = &Instance->PreviousNames; // thred only
 	  ScrollSize                = &Instance->ScrollSize; // thred only
-	  SelectedPointsLine        = &Instance->SelectedPointsLine;
 	  SideWindow                = &Instance->SideWindow; // thred only
 	  SideWindowEntryBuffer     = &Instance->SideWindowEntryBuffer; // thred only
 	  SortBuffer                = &Instance->SortBuffer;            // thred only

@@ -978,9 +978,9 @@ void fi::frmpoly(gsl::span<POINT> const& source) noexcept {
 void form::dupsel(HDC hDC) {
   SelectObject(hDC, FormPen);
   SetROP2(hDC, R2_XORPEN);
-  wrap::polyline(hDC, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
-  for (auto iPoint = 0U; iPoint < SelectedPointsLine->size() - 1U; ++iPoint) {
-	selsqr(SelectedPointsLine->operator[](iPoint), hDC);
+  wrap::polyline(hDC, Instance->SelectedPointsLine.data(), wrap::toUnsigned(Instance->SelectedPointsLine.size()));
+  for (auto iPoint = 0U; iPoint < Instance->SelectedPointsLine.size() - 1U; ++iPoint) {
+	selsqr(Instance->SelectedPointsLine.operator[](iPoint), hDC);
   }
   fi::frmx(EndPointCross, hDC);
 }
@@ -1128,7 +1128,7 @@ void form::drwfrm() {
 	    ClosestFormToCursor == iForm) { // if form points are selected, draw the selection box
 	  dupsel(StitchWindowMemDC);
 	  SelectedPixelsRect = sRct2px(SelectedVerticesRect);
-	  rct2sel(SelectedPixelsRect, *SelectedPointsLine);
+	  rct2sel(SelectedPixelsRect, Instance->SelectedPointsLine);
 	  Instance->StateMap.set(StateFlag::SHOPSEL);
 	  dupsel(StitchWindowMemDC);
 	}

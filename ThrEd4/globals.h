@@ -322,8 +322,6 @@ extern RECT    SelectedFormsRect;
 extern F_POINT SelectedFormsSize;
 extern RECT    SelectedPixelsRect;
 
-extern std::vector<POINT>* SelectedPointsLine;
-
 extern F_RECTANGLE SelectedVerticesRect;
 
 extern float ShowStitchThreshold;
