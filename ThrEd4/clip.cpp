@@ -252,7 +252,7 @@ auto clip::numclp(uint32_t const formIndex) -> uint32_t {
 }
 
 void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const clipEntries) {
-  if (StateMap->test(StateFlag::NOCLP)) {
+  if (Instance->StateMap.test(StateFlag::NOCLP)) {
 	return;
   }
   auto& clipBuffer = Instance->ClipBuffer;
@@ -464,7 +464,7 @@ auto ci::clpsid(uint32_t const              vertexIndex,
 
 void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t const startVertex) {
   Instance->OSequence.clear();
-  StateMap->reset(StateFlag::CLPBAK);
+  Instance->StateMap.reset(StateFlag::CLPBAK);
   auto const clipStitchCount = Instance->ClipBuffer.size();
   auto       clipFillData    = std::vector<F_POINT> {};
   clipFillData.resize(clipStitchCount);
@@ -794,7 +794,7 @@ void ci::clpcrnr(FRM_HEAD const&       form,
                  F_POINT const&        rotationCenter) {
   auto const  nextVertex = form::nxt(form, vertex);
   auto const  itVertex   = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + nextVertex);
-  auto const* points     = StateMap->test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  auto const* points     = Instance->StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (nullptr == points) {
 	return;
   }
@@ -888,7 +888,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   auto const rotationCenter =
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   Instance->OSequence.clear();
-  StateMap->reset(StateFlag::CLPBAK);
+  Instance->StateMap.reset(StateFlag::CLPBAK);
   ClipReference = F_POINT {rotationCenter.y, clipRect.left};
 
   constexpr auto SATWIDTH = 20.0F;
@@ -948,7 +948,7 @@ void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t const start
   chainPoint[2]           = F_POINT {chainEndPoints[finish].x + delta.x / CHFACTOR,
                            chainEndPoints[finish].y + delta.y / CHFACTOR};
   auto chainCount         = CHAINLEN;
-  if (StateMap->test(StateFlag::LINCHN)) {
+  if (Instance->StateMap.test(StateFlag::LINCHN)) {
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
@@ -976,7 +976,7 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   constexpr auto CHLEN = size_t {8U}; // number of stitches in a chain
 
   auto backupAt = CHLEN;
-  if (StateMap->test(StateFlag::LINCHN)) {
+  if (Instance->StateMap.test(StateFlag::LINCHN)) {
 	--backupAt;
   }
   if (Instance->OSequence.size() >= backupAt) {

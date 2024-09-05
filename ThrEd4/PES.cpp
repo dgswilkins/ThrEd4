@@ -686,7 +686,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	++iUserColor;
   }
   auto loc = F_POINT {};
-  StateMap->reset(StateFlag::FILDIR);
+  Instance->StateMap.reset(StateFlag::FILDIR);
   if (bytesRead <= pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2)) + 3U) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
@@ -737,7 +737,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  }
 	  locof *= IPECFACT;
 	  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
-	  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
+	  if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
 		loc.y -= locof;
 		StitchBuffer->emplace_back(loc.x, loc.y, color);
 	  }

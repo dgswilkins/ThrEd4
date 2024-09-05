@@ -124,7 +124,6 @@ std::vector<SEARCH_REC>*       SortBuffer                = nullptr; // sort buff
 uint32_t                       SortIndex                 = 0U;      // index for stitch search
 float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral
 float                          StarRatio                 = STARAT;  // star formOrigin to body ratio
-ENUM_MAP<StateFlag>*           StateMap                  = nullptr; // Flags indicating current run state
 F_POINT                        StitchBmpRatio            = F_POINT {}; // stitch hoop to bitmap ratios
 float                          StitchBoxesThreshold      = STCHBOX; // threshold for drawing stitch boxes
 std::vector<F_POINT_ATTR>*     StitchBuffer              = nullptr; // main stitch buffer

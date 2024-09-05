@@ -338,8 +338,6 @@ extern uint32_t SortIndex;
 extern float    SpiralWrap;
 extern float    StarRatio;
 
-extern ENUM_MAP<StateFlag>* StateMap;
-
 extern F_POINT StitchBmpRatio;
 extern float   StitchBoxesThreshold;
 

@@ -121,29 +121,29 @@ void mni::frmcursel(uint32_t const cursorType) {
 
 void mni::getstpix() {
   displayText::showMessage(IDS_STCHP, IniFile.stitchSizePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::STPXIN);
+  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->StateMap.set(StateFlag::STPXIN);
   displayText::numWnd();
 }
 
 void mni::getfrmpix() {
   displayText::showMessage(IDS_FRMP, IniFile.formVertexSizePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FRMPXIN);
+  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->StateMap.set(StateFlag::FRMPXIN);
   displayText::numWnd();
 }
 
 void mni::getfrmbox() {
   displayText::showMessage(IDS_FRMBOX, IniFile.formBoxSizePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FRMBOXIN);
+  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->StateMap.set(StateFlag::FRMBOXIN);
   displayText::numWnd();
 }
 
 void mni::getnpix() {
   displayText::showMessage(IDS_NUDG, IniFile.nudgePixels);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::PIXIN);
+  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->StateMap.set(StateFlag::PIXIN);
   displayText::numWnd();
 }
 
@@ -160,25 +160,25 @@ void mni::nedof() {
 void mni::shoknot() {
   UserFlagMap->reset(UserFlag::KNOTOF);
   menu::knotmen();
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void mni::hidknot() {
   UserFlagMap->set(UserFlag::KNOTOF);
   menu::knotmen();
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void mni::pcsbsavon() {
   UserFlagMap->reset(UserFlag::BSAVOF);
   menu::bsavmen();
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void mni::pcsbsavof() {
   UserFlagMap->set(UserFlag::BSAVOF);
   menu::bsavmen();
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void menu::setpcs() {
@@ -199,30 +199,30 @@ void menu::setdst() {
 }
 
 void menu::disableRedo() {
-  if (StateMap->testAndReset(StateFlag::REDUSHO)) {
+  if (Instance->StateMap.testAndReset(StateFlag::REDUSHO)) {
 	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-	StateMap->set(StateFlag::DUMEN);
+	Instance->StateMap.set(StateFlag::DUMEN);
   }
 }
 
 void menu::enableRedo() {
-  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
+  if (!Instance->StateMap.testAndSet(StateFlag::REDUSHO)) {
 	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap->set(StateFlag::DUMEN);
+	Instance->StateMap.set(StateFlag::DUMEN);
   }
 }
 
 void menu::disableUndo() {
-  if (StateMap->testAndReset(StateFlag::UNDUSHO)) {
+  if (Instance->StateMap.testAndReset(StateFlag::UNDUSHO)) {
 	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	StateMap->set(StateFlag::DUMEN);
+	Instance->StateMap.set(StateFlag::DUMEN);
   }
 }
 
 void menu::enableUndo() {
-  if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
+  if (!Instance->StateMap.testAndSet(StateFlag::UNDUSHO)) {
 	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap->set(StateFlag::DUMEN);
+	Instance->StateMap.set(StateFlag::DUMEN);
   }
 }
 
@@ -235,36 +235,36 @@ void menu::ladj() {
 	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_ENABLED);
 	}
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::flipFormOnOff() {
-  if (StateMap->testAndFlip(StateFlag::FRMOF)) {
+  if (Instance->StateMap.testAndFlip(StateFlag::FRMOF)) {
 	Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMPLUS));
   }
   else {
 	Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMINUS));
-	StateMap->reset(StateFlag::FORMSEL);
-	StateMap->reset(StateFlag::FORMIN);
-	StateMap->reset(StateFlag::MOVFRM);
-	StateMap->reset(StateFlag::FRMPMOV);
-	StateMap->reset(StateFlag::FRMOV);
-	StateMap->reset(StateFlag::SATIN);
-	StateMap->reset(StateFlag::SATPNT);
-	StateMap->reset(StateFlag::SATCNKT);
-	StateMap->reset(StateFlag::FENDIN);
-	StateMap->reset(StateFlag::DELFRM);
-	StateMap->reset(StateFlag::FRMPSEL);
-	StateMap->reset(StateFlag::INSFRM);
+	Instance->StateMap.reset(StateFlag::FORMSEL);
+	Instance->StateMap.reset(StateFlag::FORMIN);
+	Instance->StateMap.reset(StateFlag::MOVFRM);
+	Instance->StateMap.reset(StateFlag::FRMPMOV);
+	Instance->StateMap.reset(StateFlag::FRMOV);
+	Instance->StateMap.reset(StateFlag::SATIN);
+	Instance->StateMap.reset(StateFlag::SATPNT);
+	Instance->StateMap.reset(StateFlag::SATCNKT);
+	Instance->StateMap.reset(StateFlag::FENDIN);
+	Instance->StateMap.reset(StateFlag::DELFRM);
+	Instance->StateMap.reset(StateFlag::FRMPSEL);
+	Instance->StateMap.reset(StateFlag::INSFRM);
   }
   SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(Instance->MenuInfo));
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::resetFormOnOff() {
   Instance->FormOnOff.assign(displayText::loadStr(IDS_FRMPLUS));
   SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(Instance->MenuInfo));
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::qchk() {
@@ -276,7 +276,7 @@ void menu::qchk() {
 	CheckMenuItem(MainMenu, ID_MARKESC, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_MARKQ, MF_CHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::nedmen() {
@@ -288,7 +288,7 @@ void menu::nedmen() {
 	CheckMenuItem(MainMenu, ID_SETNEDL, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_RSTNEDL, MF_UNCHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::knotmen() {
@@ -300,7 +300,7 @@ void menu::knotmen() {
 	CheckMenuItem(MainMenu, ID_KNOTON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_KNOTOF, MF_UNCHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::bsavmen() {
@@ -312,7 +312,7 @@ void menu::bsavmen() {
 	CheckMenuItem(MainMenu, ID_BSAVON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_BSAVOF, MF_UNCHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::linbmen() {
@@ -324,7 +324,7 @@ void menu::linbmen() {
 	CheckMenuItem(MainMenu, ID_LINBEXACT, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_LINBEVEN, MF_UNCHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::wrnmen() {
@@ -333,7 +333,7 @@ void menu::wrnmen() {
 	code = MF_UNCHECKED;
   }
   CheckMenuItem(MainMenu, ID_WARNOF, code);
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::auxmen() {
@@ -385,7 +385,7 @@ void menu::auxmen() {
 #pragma warning(suppress : 26492) // type.3 Don't use const_cast to cast away const or volatile NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
   filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
   SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> const lruMenuId,
@@ -399,7 +399,7 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> const lruMenuId,
   auto previousName = previousNames->begin();
   for (auto const& iLRU : *lruMenuId) {
 	if (!previousName->empty()) {
-	  if (StateMap->test(StateFlag::SAVAS)) {
+	  if (Instance->StateMap.test(StateFlag::SAVAS)) {
 		AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, iLRU, previousName->wstring().c_str());
 	  }
 	  else {
@@ -416,7 +416,7 @@ void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> const lruMenuId,
 	}
 	++previousName;
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::init() noexcept {
@@ -430,33 +430,33 @@ void menu::init() noexcept {
 
 void menu::resetThreadView() {
   CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-  StateMap->reset(StateFlag::COL);
+  Instance->StateMap.reset(StateFlag::COL);
   CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::vuthrds() {
   if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	StateMap->reset(StateFlag::THRDS);
+	Instance->StateMap.reset(StateFlag::THRDS);
   }
   else {
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	StateMap->set(StateFlag::THRDS);
+	Instance->StateMap.set(StateFlag::THRDS);
   }
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void mni::vuselthr() {
   if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	StateMap->reset(StateFlag::COL);
+	Instance->StateMap.reset(StateFlag::COL);
   }
   else {
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	StateMap->set(StateFlag::COL);
+	Instance->StateMap.set(StateFlag::COL);
   }
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void menu::setGridCols(const COLORREF& color) {
@@ -483,7 +483,7 @@ public:
 	  CheckMenuItem(MainMenu, gridCode.id, MF_UNCHECKED);
 	}
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::duhbit(uint32_t const cod) noexcept {
@@ -492,13 +492,13 @@ void menu::duhbit(uint32_t const cod) noexcept {
 }
 
 void menu::flipHideBitmap() {
-  if (StateMap->testAndFlip(StateFlag::HIDMAP)) {
+  if (Instance->StateMap.testAndFlip(StateFlag::HIDMAP)) {
 	duhbit(MF_UNCHECKED);
   }
   else {
 	duhbit(MF_CHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::rotauxmen() {
@@ -510,7 +510,7 @@ void menu::rotauxmen() {
 	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_CHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::frmcurmen() {
@@ -522,7 +522,7 @@ void menu::frmcurmen() {
 	CheckMenuItem(MainMenu, ID_FRMX, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_FRMBOX, MF_CHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::fil2men() {
@@ -534,7 +534,7 @@ void menu::fil2men() {
 	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_UNCHECKED);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 namespace {
@@ -548,7 +548,7 @@ void menu::chkmen() {
 	                                             : gsl::narrow_cast<UINT>(MF_UNCHECKED);
 	CheckMenuItem(MainMenu, DataCode.at(iCode), code);
   }
-  StateMap->set(StateFlag::DUMEN);
+  Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 auto menu::handleEditMenu(WORD const& wParameter) -> bool {
@@ -730,7 +730,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_2FTHR: { // edit / Convert / to Feather Ribbon
-	  StateMap->set(StateFlag::CNV2FTH);
+	  Instance->StateMap.set(StateFlag::CNV2FTH);
 	  satin::ribon();
 	  flag = true;
 	  break;
@@ -816,22 +816,22 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_CNTRX: { // edit / Center / Both
-	  StateMap->reset(StateFlag::CNTRH);
-	  StateMap->reset(StateFlag::CNTRV);
+	  Instance->StateMap.reset(StateFlag::CNTRH);
+	  Instance->StateMap.reset(StateFlag::CNTRV);
 	  form::cntrx();
 	  flag = true;
 	  break;
 	}
 	case ID_CNTRH: { // edit / Center / Horizontal
-	  StateMap->reset(StateFlag::CNTRH);
-	  StateMap->set(StateFlag::CNTRV);
+	  Instance->StateMap.reset(StateFlag::CNTRH);
+	  Instance->StateMap.set(StateFlag::CNTRV);
 	  form::cntrx();
 	  flag = true;
 	  break;
 	}
 	case ID_CNTRV: { // edit / Center / Vertical
-	  StateMap->set(StateFlag::CNTRH);
-	  StateMap->reset(StateFlag::CNTRV);
+	  Instance->StateMap.set(StateFlag::CNTRH);
+	  Instance->StateMap.reset(StateFlag::CNTRV);
 	  form::cntrx();
 	  flag = true;
 	  break;
@@ -858,7 +858,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
 	  thred::dumrk(wrap::toFloat(UnzoomedRect.cx) * HALF, wrap::toFloat(UnzoomedRect.cy) * HALF);
-	  StateMap->set(StateFlag::RESTCH);
+	  Instance->StateMap.set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -878,7 +878,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_DUPAGAIN: { // edit / Rotate / and Duplicate again
-	  StateMap->reset(StateFlag::ROTCLOCK);
+	  Instance->StateMap.reset(StateFlag::ROTCLOCK);
 	  form::dupfn(IniFile.rotationAngle);
 	  flag = true;
 	  break;
@@ -894,7 +894,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_RIBON: { // edit / Convert / to Satin Ribbon
-	  StateMap->reset(StateFlag::CNV2FTH);
+	  Instance->StateMap.reset(StateFlag::CNV2FTH);
 	  satin::ribon();
 	  flag = true;
 	  break;
@@ -967,7 +967,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	case ID_CHK: { // edit / Check Range
 	  auto stitchRange = F_POINT {};
 	  thred::chkrng(stitchRange);
-	  StateMap->set(StateFlag::RESTCH);
+	  Instance->StateMap.set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -1041,7 +1041,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_ROTDUP: { // edit / Rotate / and Duplicate
-	  StateMap->reset(StateFlag::ROTCLOCK);
+	  Instance->StateMap.reset(StateFlag::ROTCLOCK);
 	  form::rotdup();
 	  flag = true;
 	  break;
@@ -1059,7 +1059,7 @@ auto menu::handleEditMenu(WORD const& wParameter) -> bool {
 	case ID_DELFRMS: { // edit / Delete / All Forms
 	  form::delfrms();
 	  thred::rstAll();
-	  StateMap->set(StateFlag::RESTCH);
+	  Instance->StateMap.set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -1538,7 +1538,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
   auto flag = false;
   switch (wParameter) {
 	case ID_BOLD: { // fill / Border / Bean
-	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::dubold();
@@ -1561,13 +1561,13 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LINCHN: { // fill / Border / Line chain
-	  StateMap->set(StateFlag::LINCHN);
+	  Instance->StateMap.set(StateFlag::LINCHN);
 	  form::chain();
 	  flag = true;
 	  break;
 	}
 	case ID_OPNCHN: { // fill / Border / Open chain
-	  StateMap->reset(StateFlag::LINCHN);
+	  Instance->StateMap.reset(StateFlag::LINCHN);
 	  form::chain();
 	  flag = true;
 	  break;
@@ -1578,7 +1578,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_HORCLP: { // fill / Clipboard / Horizontal
-	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::horclp();
@@ -1586,7 +1586,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_ANGCLP: { // fill / Clipboard / Angle
-	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::angclp();
@@ -1594,7 +1594,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VRTCLP: { // fill / Clipboard / Vertical
-	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::vrtclp();
@@ -1627,7 +1627,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_PERP: { // fill / Border / Perpendicular Satin
-	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::prpbrd(LineSpacing);
@@ -1635,7 +1635,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILANG: { // fill / Angle
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::filangl();
@@ -1643,7 +1643,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_APLIQ: { // fill / Border / Applique
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::apliq();
@@ -1651,7 +1651,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_SATBRD: { // fill / Border / Angle Satin
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  satin::satbrd();
@@ -1664,7 +1664,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILIN: { // fill / Border / Line
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::bord();
@@ -1679,13 +1679,13 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILSAT: { // fill / Fan
-	  StateMap->reset(StateFlag::FTHR);
+	  Instance->StateMap.reset(StateFlag::FTHR);
 	  form::filsat();
 	  flag = true;
 	  break;
 	}
 	case ID_FILL_VERT: { // fill / Vertical
-	  if (StateMap->test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL) || !Instance->SelectedFormList.empty()) {
 		thred::savdo();
 	  }
 	  form::filvrt();
@@ -1693,7 +1693,7 @@ auto menu::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILL_HOR: { // fill / Horizontal
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::filhor();
@@ -1762,13 +1762,13 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
 		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1U);
 	  }
 	  thred::endpnt(stitchCoordsInPixels);
-	  StateMap->set(StateFlag::BAKEND);
-	  StateMap->set(StateFlag::RESTCH);
+	  Instance->StateMap.set(StateFlag::BAKEND);
+	  Instance->StateMap.set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
 	case ID_REDO: { // redo
-	  if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
+	  if (Instance->StateMap.test(StateFlag::BAKACT) && Instance->StateMap.test(StateFlag::REDUSHO)) {
 		backup::redo();
 	  }
 	  flag = true;
@@ -1776,7 +1776,7 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
 	}
 	case ID_FORM: { // Form
 	  form::frmon();
-	  if (StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 		formForms::refrm();
 	  }
 	  else {
@@ -1791,16 +1791,16 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
 	  break;
 	}
 	case ZUMIN: { // in
-	  if (StateMap->test(StateFlag::GMRK) || StateMap->test(StateFlag::SELBOX) ||
-	      StateMap->test(StateFlag::INSRT) || StateMap->test(StateFlag::GRPSEL) ||
-	      StateMap->test(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.test(StateFlag::GMRK) || Instance->StateMap.test(StateFlag::SELBOX) ||
+	      Instance->StateMap.test(StateFlag::INSRT) || Instance->StateMap.test(StateFlag::GRPSEL) ||
+	      Instance->StateMap.test(StateFlag::FORMSEL)) {
 		thred::zumin();
 	  }
 	  else {
-		StateMap->reset(StateFlag::BZUM);
-		StateMap->set(StateFlag::BOXZUM);
-		StateMap->reset(StateFlag::BZUMIN);
-		StateMap->set(StateFlag::VCAPT);
+		Instance->StateMap.reset(StateFlag::BZUM);
+		Instance->StateMap.set(StateFlag::BOXZUM);
+		Instance->StateMap.reset(StateFlag::BZUMIN);
+		Instance->StateMap.set(StateFlag::VCAPT);
 		SetCapture(ThrEdWindow);
 	  }
 	  flag = true;

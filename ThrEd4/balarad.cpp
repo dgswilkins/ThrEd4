@@ -193,8 +193,8 @@ void bal::redbal() {
   thred::initPenBrush();
   thred::coltab();
   thred::redrawColorBar();
-  StateMap->set(StateFlag::INIT);
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::INIT);
+  Instance->StateMap.set(StateFlag::RESTCH);
   CloseHandle(balaradFile);
 }
 

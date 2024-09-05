@@ -140,8 +140,8 @@ void backup::deldu() {
 	bufferElement.clear();
   }
   UndoBufferWriteIndex = 0;
-  StateMap->reset(StateFlag::BAKWRAP);
-  StateMap->reset(StateFlag::BAKACT);
+  Instance->StateMap.reset(StateFlag::BAKWRAP);
+  Instance->StateMap.reset(StateFlag::BAKACT);
 }
 
 void bui::redbak() {
@@ -154,10 +154,10 @@ void bui::redbak() {
   if (undoData->stitchCount != 0U) {
 	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
 	StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
-	StateMap->set(StateFlag::INIT);
+	Instance->StateMap.set(StateFlag::INIT);
   }
   else {
-	StateMap->reset(StateFlag::INIT);
+	Instance->StateMap.reset(StateFlag::INIT);
   }
   UnzoomedRect = undoData->zoomRect;
 
@@ -193,7 +193,7 @@ void bui::redbak() {
 	TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
   }
   thred::coltab();
-  StateMap->set(StateFlag::RESTCH);
+  Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void backup::redo() {
@@ -212,22 +212,22 @@ void backup::redo() {
 
 void backup::bak() {
   thred::unmsg();
-  StateMap->reset(StateFlag::FPSEL);
-  StateMap->reset(StateFlag::FRMPSEL);
-  StateMap->reset(StateFlag::BIGBOX);
+  Instance->StateMap.reset(StateFlag::FPSEL);
+  Instance->StateMap.reset(StateFlag::FRMPSEL);
+  Instance->StateMap.reset(StateFlag::BIGBOX);
   Instance->SelectedFormList.clear();
   thred::undat();
-  if (StateMap->testAndReset(StateFlag::PRFACT)) {
-	StateMap->reset(StateFlag::WASRT);
+  if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
+	Instance->StateMap.reset(StateFlag::WASRT);
 	DestroyWindow(PreferencesWindow);
 	PreferenceIndex = 0;
 	thred::unsid();
   }
-  if (!StateMap->testAndSet(StateFlag::BAKING)) {
+  if (!Instance->StateMap.testAndSet(StateFlag::BAKING)) {
 	dudat();
 	UndoBufferReadIndex = UndoBufferWriteIndex + 1U;
   }
-  if (StateMap->test(StateFlag::BAKWRAP)) {
+  if (Instance->StateMap.test(StateFlag::BAKWRAP)) {
 	--UndoBufferWriteIndex;
 	UndoBufferWriteIndex &= UNDOLEN - 1U;
 	if (auto const previousBufferIndex = UndoBufferWriteIndex - 1U; previousBufferIndex == UndoBufferReadIndex) {
@@ -243,10 +243,10 @@ void backup::bak() {
 	}
   }
   menu::enableRedo();
-  StateMap->reset(StateFlag::FORMSEL);
-  StateMap->reset(StateFlag::GRPSEL);
-  StateMap->reset(StateFlag::SCROS);
-  StateMap->reset(StateFlag::ECROS);
+  Instance->StateMap.reset(StateFlag::FORMSEL);
+  Instance->StateMap.reset(StateFlag::GRPSEL);
+  Instance->StateMap.reset(StateFlag::SCROS);
+  Instance->StateMap.reset(StateFlag::ECROS);
   bui::redbak();
 }
 
@@ -254,6 +254,6 @@ void backup::updateWriteIndex() {
   ++UndoBufferWriteIndex;
   UndoBufferWriteIndex &= UNDOLEN - 1U;
   if (UndoBufferWriteIndex == 0U) {
-	StateMap->set(StateFlag::BAKWRAP);
+	Instance->StateMap.set(StateFlag::BAKWRAP);
   }
 }
