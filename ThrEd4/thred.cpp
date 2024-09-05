@@ -640,7 +640,7 @@ void thred::getdes() noexcept {
 }
 
 auto thi::stlen(uint32_t const iStitch) -> float {
-  auto const currStitch = wrap::next(StitchBuffer->begin(), iStitch);
+  auto const currStitch = wrap::next(Instance->StitchBuffer.begin(), iStitch);
   auto const nextStitch = std::next(currStitch);
   return std::hypot(nextStitch->x - currStitch->x, nextStitch->y - currStitch->y);
 }
@@ -822,7 +822,7 @@ void thi::ritcor(F_POINT_ATTR const& pointAttribute) {
 }
 
 void thi::fndknt() {
-  auto endStitch = wrap::toUnsigned(StitchBuffer->size());
+  auto endStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (endStitch <= 4U) {
 	Knots->clear();
 	return;
@@ -830,7 +830,7 @@ void thi::fndknt() {
   endStitch -= 4U;
   Knots->clear();
   auto const spStitch =
-      std::ranges::subrange(StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), endStitch));
+      std::ranges::subrange(Instance->StitchBuffer.begin(), wrap::next(Instance->StitchBuffer.begin(), endStitch));
   for (auto iStitch = 0; const auto& stitch : spStitch) {
 	if ((stitch.attribute & KNOTMSK) != 0U) {
 	  Knots->emplace_back(iStitch);
@@ -858,18 +858,18 @@ void thred::addColor(uint32_t const stitch, uint32_t const color) {
 
 void thred::coltab() {
   resetColorChanges();
-  if (StitchBuffer->size() <= 1) {
+  if (Instance->StitchBuffer.size() <= 1) {
 	return;
   }
-  auto const firstStitch  = StitchBuffer->begin();
+  auto const firstStitch  = Instance->StitchBuffer.begin();
   auto       currentColor = (firstStitch + 1)->attribute & COLMSK;
   firstStitch->attribute &= NCOLMSK;
   firstStitch->attribute |= currentColor;
-  auto const lastStitch = StitchBuffer->rbegin();
+  auto const lastStitch = Instance->StitchBuffer.rbegin();
   lastStitch->attribute &= NCOLMSK;
   lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
 
-  auto const pEnd = std::prev(StitchBuffer->end());
+  auto const pEnd = std::prev(Instance->StitchBuffer.end());
   for (auto stitchIt = std::next(firstStitch); stitchIt < pEnd; ++stitchIt) {
 	if ((stitchIt->attribute & COLMSK) == currentColor) {
 	  continue;
@@ -885,7 +885,7 @@ void thred::coltab() {
   auto const minY = wrap::toFloat(UnzoomedRect.cy) * -1.0F;
   auto const maxX = wrap::toFloat(UnzoomedRect.cx) * 2.0F;
   auto const maxY = wrap::toFloat(UnzoomedRect.cy) * 2.0F;
-  for (auto iStitch = 0U; auto& stitch : *StitchBuffer) {
+  for (auto iStitch = 0U; auto& stitch : Instance->StitchBuffer) {
 	stitch.x = std::clamp(stitch.x, minX, maxX);
 	stitch.y = std::clamp(stitch.y, minY, maxY);
 
@@ -895,8 +895,8 @@ void thred::coltab() {
 	}
 	++iStitch;
   }
-  addColor(wrap::toUnsigned(StitchBuffer->size()), 0);
-  ClosestPointIndex = std::min(ClosestPointIndex, wrap::toUnsigned(StitchBuffer->size() - 1U));
+  addColor(wrap::toUnsigned(Instance->StitchBuffer.size()), 0);
+  ClosestPointIndex = std::min(ClosestPointIndex, wrap::toUnsigned(Instance->StitchBuffer.size() - 1U));
   thi::fndknt();
 }
 
@@ -954,7 +954,7 @@ void thi::nunams() {
 }
 
 void thred::rngadj() noexcept(std::is_same_v<size_t, uint32_t>) {
-  auto lastStitch = wrap::toUnsigned(StitchBuffer->size());
+  auto lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (lastStitch != 0U) {
 	--lastStitch;
 	ClosestPointIndex = std::min(ClosestPointIndex, lastStitch);
@@ -1206,20 +1206,20 @@ void thred::shft(F_POINT const& delta) noexcept {
 }
 
 auto thred::stch2px1(uint32_t const iStitch) -> POINT {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return POINT {0L, StitchWindowClientRect.bottom};
   }
-  auto const current = wrap::next(StitchBuffer->begin(), iStitch);
+  auto const current = wrap::next(Instance->StitchBuffer.begin(), iStitch);
   return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
                 wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     (current->y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
 void thi::shft2box() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
-  auto const current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+  auto const current     = wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex);
   auto const stitchPoint = F_POINT {current->x, current->y};
   thred::shft(stitchPoint);
   thred::stch2px1(ClosestPointIndex);
@@ -1295,7 +1295,7 @@ void thi::movins() {
   }
   if (Instance->StateMap.test(StateFlag::LIN1)) {
 	Instance->StateMap.test(StateFlag::BAKEND)
-	    ? thred::endpnt(thred::stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U)))
+	    ? thred::endpnt(thred::stch2px1(wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)))
 	    : thred::endpnt(thred::stch2px1(0U));
   }
   else {
@@ -1328,7 +1328,7 @@ void thred::hupfn() {
   auto& formList = Instance->FormList;
 
   if (!formList.empty()) {
-	if (StitchBuffer->empty()) {
+	if (Instance->StitchBuffer.empty()) {
 	  auto const itVertex  = Instance->FormVertices.cbegin();
 	  checkHoopRect.top    = itVertex->y;
 	  checkHoopRect.bottom = itVertex->y;
@@ -1342,7 +1342,7 @@ void thred::hupfn() {
 	  checkHoopRect.top    = std::max(checkHoopRect.top, formVertice.y);
 	}
   }
-  if (StitchBuffer->empty() && Instance->FormVertices.empty() && !Instance->StateMap.test(StateFlag::HUPEX)) {
+  if (Instance->StitchBuffer.empty() && Instance->FormVertices.empty() && !Instance->StateMap.test(StateFlag::HUPEX)) {
 	return;
   }
   if (checkHoopRect.left < 0 || checkHoopRect.right > IniFile.hoopSizeX ||
@@ -1366,7 +1366,7 @@ void thred::hupfn() {
       F_POINT {hoopSize.x * 0.5F + checkHoopRect.left, hoopSize.y * 0.5F + checkHoopRect.bottom};
   auto const hoopCenter = F_POINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
   auto const delta      = F_POINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	stitch += delta;
   }
   for (auto& formVertice : Instance->FormVertices) {
@@ -2248,7 +2248,7 @@ void thred::ritot(uint32_t const number) {
 
 void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   if (auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
-      StitchBuffer->empty() || (form.fillType == 0U && form.edgeType == 0U)) {
+      Instance->StitchBuffer.empty() || (form.fillType == 0U && form.edgeType == 0U)) {
 	auto const blank = std::wstring {};
 	displayText::butxt(HMAXLEN, blank);
 	displayText::butxt(HMINLEN, blank);
@@ -2260,9 +2260,9 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   auto minLength      = BIGFLOAT;
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
-  auto stitchFwd1     = std::next(StitchBuffer->begin());
+  auto stitchFwd1     = std::next(Instance->StitchBuffer.begin());
 
-  auto const spStitches = std::ranges::subrange(StitchBuffer->begin(), StitchBuffer->end() - 2U);
+  auto const spStitches = std::ranges::subrange(Instance->StitchBuffer.begin(), Instance->StitchBuffer.end() - 2U);
   for (auto index = 0U; auto const& stitch : spStitches) {
 	if ((stitch.attribute & FRMSK) != code || (stitch.attribute & NOTFRM) != 0U ||
 	    (stitchFwd1->attribute & FRMSK) != code || (stitchFwd1->attribute & TYPMSK) == 0U) {
@@ -2299,7 +2299,7 @@ void thi::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
 }
 
 void thi::lenfn(uint32_t const startStitch, uint32_t const endStitch, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   auto maxLength      = LOWFLOAT;
@@ -2307,8 +2307,8 @@ void thi::lenfn(uint32_t const startStitch, uint32_t const endStitch, uint32_t& 
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
 
-  auto const firstStitch = std::next(StitchBuffer->begin(), wrap::toPtrdiff(startStitch));
-  auto const spStitches = std::ranges::subrange(firstStitch, wrap::next(StitchBuffer->begin(), endStitch));
+  auto const firstStitch = std::next(Instance->StitchBuffer.begin(), wrap::toPtrdiff(startStitch));
+  auto const spStitches = std::ranges::subrange(firstStitch, wrap::next(Instance->StitchBuffer.begin(), endStitch));
   auto stitchFwd1 = std::next(firstStitch);
   for (auto index = startStitch; auto const& stitch : spStitches) {
 	auto const deltaX = stitchFwd1->x - stitch.x;
@@ -2343,7 +2343,7 @@ void thred::lenCalc() {
   auto static chkVal = 0.0F;
   auto const blank   = std::wstring {};
   if (Instance->StateMap.test(StateFlag::LENSRCH)) {
-	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+	auto const stitch     = wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
 	if (auto const lenMax = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
 	    !util::closeEnough(lenMax, chkVal)) {
@@ -2353,7 +2353,7 @@ void thred::lenCalc() {
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
 	return;
   }
-  if (StitchBuffer->size() <= 1U) {
+  if (Instance->StitchBuffer.size() <= 1U) {
 	displayText::butxt(HMAXLEN, blank);
 	displayText::butxt(HMINLEN, blank);
 	return;
@@ -2368,7 +2368,7 @@ void thred::lenCalc() {
 	thi::lenfn(GroupStartStitch, GroupEndStitch - 1U, LargestStitchIndex, SmallestStitchIndex);
   }
   else {
-	thi::lenfn(0, wrap::toUnsigned(StitchBuffer->size() - 2U), LargestStitchIndex, SmallestStitchIndex);
+	thi::lenfn(0, wrap::toUnsigned(Instance->StitchBuffer.size() - 2U), LargestStitchIndex, SmallestStitchIndex);
   }
 }
 
@@ -2397,11 +2397,11 @@ void thi::delsmal(uint32_t const startStitch, uint32_t const endStitch) {
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	auto iPrevStitch = find1st();
 	auto iStitch     = iPrevStitch + 1U;
-	auto lastStitch  = StitchBuffer->size();
+	auto lastStitch  = Instance->StitchBuffer.size();
 	--lastStitch;
 	while (iStitch < lastStitch && stitchSize > minStitchLength) {
-	  auto const& stitch     = StitchBuffer->operator[](iStitch);
-	  auto const& prevStitch = StitchBuffer->operator[](iPrevStitch);
+	  auto const& stitch     = Instance->StitchBuffer.operator[](iStitch);
+	  auto const& prevStitch = Instance->StitchBuffer.operator[](iPrevStitch);
 	  if ((stitch.attribute & NOTFRM) != 0U ||
 	      (stitch.attribute & FRMSK) != codedAttribute) { // are we still in the selected form?
 		return; // we reached the last stitch in the selected form without seeing a small stitch so don't do anything
@@ -2424,13 +2424,13 @@ void thi::delsmal(uint32_t const startStitch, uint32_t const endStitch) {
 	  return; // we reached the last stitch without seeing a small stitch so don't do anything
 	}
 	auto iOutputStitch = iStitch;
-	auto prevPoint     = StitchBuffer->operator[](startStitch); // intentional copy
-	lastStitch         = StitchBuffer->size();
+	auto prevPoint     = Instance->StitchBuffer.operator[](startStitch); // intentional copy
+	lastStitch         = Instance->StitchBuffer.size();
 	if (lastStitch != 0U) {
 	  --lastStitch;
 	  while (iStitch < lastStitch) {
-		auto const& stitch    = StitchBuffer->operator[](iStitch);
-		auto&       outStitch = StitchBuffer->operator[](iOutputStitch);
+		auto const& stitch    = Instance->StitchBuffer.operator[](iStitch);
+		auto&       outStitch = Instance->StitchBuffer.operator[](iOutputStitch);
 		if ((stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a knot?
 			prevPoint = outStitch;
@@ -2460,42 +2460,42 @@ void thi::delsmal(uint32_t const startStitch, uint32_t const endStitch) {
 	  }
 	}
 	++iOutputStitch;
-	StitchBuffer->erase(wrap::next(StitchBuffer->begin(), iOutputStitch),
-	                    wrap::next(StitchBuffer->begin(), iStitch));
+	Instance->StitchBuffer.erase(wrap::next(Instance->StitchBuffer.begin(), iOutputStitch),
+	                    wrap::next(Instance->StitchBuffer.begin(), iStitch));
 	thred::coltab();
   }
   else {
 	auto iNextStitch = startStitch + 1U;
-	auto prevPoint   = StitchBuffer->operator[](startStitch); // intentional copy
+	auto prevPoint   = Instance->StitchBuffer.operator[](startStitch); // intentional copy
 	for (auto iStitch = iNextStitch; iStitch < endStitch; ++iStitch) {
-	  auto const& stitch = StitchBuffer->operator[](iStitch);
-	  if ((StitchBuffer->operator[](iNextStitch).attribute & KNOTMSK) != 0U) {
-		prevPoint = StitchBuffer->operator[](iNextStitch);
+	  auto const& stitch = Instance->StitchBuffer.operator[](iStitch);
+	  if ((Instance->StitchBuffer.operator[](iNextStitch).attribute & KNOTMSK) != 0U) {
+		prevPoint = Instance->StitchBuffer.operator[](iNextStitch);
 
-		StitchBuffer->operator[](iNextStitch++) = stitch;
+		Instance->StitchBuffer.operator[](iNextStitch++) = stitch;
 	  }
 	  else {
 		auto const deltaX = stitch.x - prevPoint.x;
 		auto const deltaY = stitch.y - prevPoint.y;
 		stitchSize        = deltaX * deltaX + deltaY * deltaY;
 		if (stitchSize > minStitchLength) {
-		  StitchBuffer->operator[](iNextStitch++) = stitch;
+		  Instance->StitchBuffer.operator[](iNextStitch++) = stitch;
 		  prevPoint                               = stitch;
 		}
 	  }
 	}
-	StitchBuffer->erase(wrap::next(StitchBuffer->begin(), iNextStitch),
-	                    wrap::next(StitchBuffer->begin(), endStitch));
+	Instance->StitchBuffer.erase(wrap::next(Instance->StitchBuffer.begin(), iNextStitch),
+	                    wrap::next(Instance->StitchBuffer.begin(), endStitch));
 	thred::coltab();
   }
   thred::rstAll();
-  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+  thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
   thred::lenCalc();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void thred::duzero() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   auto const minStitch = SmallStitchLength * SmallStitchLength;
@@ -2505,9 +2505,9 @@ void thred::duzero() {
 	  formMap.set(selectedForm);
 	}
 	Instance->StateMap.reset(StateFlag::CONTIG);
-	auto iDestination  = StitchBuffer->begin();
-	auto currentStitch = StitchBuffer->front(); // intentional copy
-	for (auto const& iStitch : *StitchBuffer) {
+	auto iDestination  = Instance->StitchBuffer.begin();
+	auto currentStitch = Instance->StitchBuffer.front(); // intentional copy
+	for (auto const& iStitch : Instance->StitchBuffer) {
 	  if ((iStitch.attribute & TYPMSK) == 0U || !formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
 		*iDestination = iStitch;
 		++iDestination;
@@ -2527,7 +2527,7 @@ void thred::duzero() {
 	  *iDestination = iStitch;
 	  ++iDestination;
 	}
-	StitchBuffer->erase(iDestination, StitchBuffer->end());
+	Instance->StitchBuffer.erase(iDestination, Instance->StitchBuffer.end());
 	coltab();
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
@@ -2537,7 +2537,7 @@ void thred::duzero() {
 	thi::delsmal(GroupStartStitch, GroupEndStitch);
   }
   else {
-	thi::delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
+	thi::delsmal(0, wrap::toUnsigned(Instance->StitchBuffer.size()));
   }
 }
 
@@ -2591,8 +2591,8 @@ void thi::selin(uint32_t start, uint32_t end, HDC hDC) {
 	std::swap(start, end);
   }
   Instance->SearchLine.clear();
-  if (!StitchBuffer->empty()) {
-	auto stitch = wrap::next(StitchBuffer->begin(), start);
+  if (!Instance->StitchBuffer.empty()) {
+	auto stitch = wrap::next(Instance->StitchBuffer.begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
 	  Instance->SearchLine.push_back(POINT {wrap::ceil<int32_t>((stitch->x - ZoomRect.left) * ZoomRatio.x),
 	                               wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
@@ -2654,7 +2654,7 @@ void thi::ducros(HDC hDC) {
 // ReSharper restore CppParameterMayBeConst
 
 void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uint32_t>) {
-  if (!StitchBuffer->empty()) {
+  if (!Instance->StitchBuffer.empty()) {
 	auto minX = BIGFLOAT;
 	auto minY = BIGFLOAT;
 	auto maxX = LOWFLOAT;
@@ -2662,8 +2662,8 @@ void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uin
 
 	if (GroupEndStitch != GroupStartStitch) {
 	  for (auto const groupStitchRange =
-	           std::ranges::subrange(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	                                 wrap::next(StitchBuffer->begin(), GroupEndStitch));
+	           std::ranges::subrange(wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
+	                                 wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch));
 	       auto& stitch : groupStitchRange) {
 		minX = std::min(minX, stitch.x);
 		minY = std::min(minY, stitch.y);
@@ -2673,7 +2673,7 @@ void thred::selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uin
 	  sourceRect = F_RECTANGLE {minX, maxY, maxX, minY};
 	}
 	else {
-	  auto const& stitch = StitchBuffer->at(GroupStartStitch);
+	  auto const& stitch = Instance->StitchBuffer.at(GroupStartStitch);
 	  sourceRect         = F_RECTANGLE {stitch.x, stitch.y, stitch.x, stitch.y};
 	}
   }
@@ -2782,8 +2782,8 @@ void thred::grpAdj() {
 
 void thred::nuAct(uint32_t const iStitch) noexcept {
   auto const color = ActiveColor;
-  if (!StitchBuffer->empty()) {
-	ActiveColor = StitchBuffer->operator[](iStitch).attribute & COLMSK;
+  if (!Instance->StitchBuffer.empty()) {
+	ActiveColor = Instance->StitchBuffer.operator[](iStitch).attribute & COLMSK;
   }
   else {
 	ActiveColor = 0;
@@ -2816,8 +2816,8 @@ void thi::ritlayr() {
   auto layer = BIGUINT;
 
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
-	if (!StitchBuffer->empty()) {
-	  layer = (StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT;
+	if (!Instance->StitchBuffer.empty()) {
+	  layer = (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT;
 	}
   }
   else {
@@ -2880,11 +2880,11 @@ void thi::duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t
 }
 
 void thred::dubox(POINT const& stitchCoordsInPixels) {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
-  auto const stitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
-  if (ClosestPointIndex != StitchBuffer->size() - 1U) {
+  auto const stitch = wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex);
+  if (ClosestPointIndex != Instance->StitchBuffer.size() - 1U) {
 	// if the selected point is not at the end then aim at the next point
 	auto const stitchFwd1 = std::next(stitch);
 	RotateAngle           = std::atan2f(stitchFwd1->y - stitch->y, stitchFwd1->x - stitch->x);
@@ -2902,22 +2902,22 @@ void thred::dubox(POINT const& stitchCoordsInPixels) {
 }
 
 auto thred::stch2px(uint32_t const iStitch, POINT& stitchCoordsInPixels) -> bool {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return false;
   }
   stitchCoordsInPixels = {
-      wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
+      wrap::ceil<int32_t>((Instance->StitchBuffer.operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
       wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
-                          (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
+                          (Instance->StitchBuffer.operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
   return stitchCoordsInPixels.x >= 0 && stitchCoordsInPixels.x <= StitchWindowClientRect.right &&
          stitchCoordsInPixels.y >= 0 && stitchCoordsInPixels.y <= StitchWindowClientRect.bottom;
 }
 
 auto thi::stch2px2(uint32_t const iStitch) -> bool {
   auto const stitchCoordsInPixels =
-      POINT {wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
+      POINT {wrap::ceil<int32_t>((Instance->StitchBuffer.operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
              wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
-                                 (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
+                                 (Instance->StitchBuffer.operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
   return stitchCoordsInPixels.x >= 0 && stitchCoordsInPixels.x <= StitchWindowClientRect.right &&
          stitchCoordsInPixels.y >= 0 && stitchCoordsInPixels.y <= StitchWindowClientRect.bottom;
 }
@@ -3078,8 +3078,8 @@ void thi::dubuf(std::vector<char>& buffer) {
 
   stitchHeader.headerType = HDRVERS << TBYTSHFT | THREDSIG;
   stitchHeader.fileLength =
-      wrap::sizeofVector(StitchBuffer) + sizeof(stitchHeader) + bitmap::getBmpNameLength();
-  wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
+      wrap::sizeofVector(Instance->StitchBuffer) + sizeof(stitchHeader) + bitmap::getBmpNameLength();
+  wrap::narrow(stitchHeader.stitchCount, Instance->StitchBuffer.size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
@@ -3110,7 +3110,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   // calculate the offset to the form data entry point
   auto const formDataOffset = bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
                               sizeof(UserColor) + sizeof(CustomColor) + TSSIZE;
-  auto vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(StitchBuffer) + formDataOffset;
+  auto vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(Instance->StitchBuffer) + formDataOffset;
   // calculate the design data size
   auto const thredDataSize =
       wrap::sizeofVector(formList) + vertexCount * wrap::sizeofType(Instance->FormVertices) +
@@ -3133,7 +3133,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   ExtendedHeader->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
   // write the rest of the data to the buffer
   durit(buffer, ExtendedHeader, sizeof(*ExtendedHeader));
-  durit(buffer, StitchBuffer->data(), wrap::sizeofVector(StitchBuffer));
+  durit(buffer, Instance->StitchBuffer.data(), wrap::sizeofVector(Instance->StitchBuffer));
   durit(buffer, bitmap::getBmpNameData(), bitmap::getBmpNameLength());
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
   durit(buffer, UserColor.data(), sizeof(UserColor));
@@ -3281,7 +3281,7 @@ void thi::chk1col() {
 	  continue;
 	}
 	auto const iStitch = ccTableIt->stitchIndex;
-	auto stitchIt = iStitch != 0U ? wrap::next(StitchBuffer->begin(), iStitch - 1U) : StitchBuffer->begin();
+	auto stitchIt = iStitch != 0U ? wrap::next(Instance->StitchBuffer.begin(), iStitch - 1U) : Instance->StitchBuffer.begin();
 	auto const color = stitchIt->attribute & COLMSK;
 	++stitchIt;
 	stitchIt->attribute &= NCOLMSK;
@@ -3296,21 +3296,21 @@ void thi::sav() {
   if (chkattr(auxName)) {
 	return;
   }
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   chk1col();
   thred::coltab();
   auto saveStitches = std::vector<F_POINT_ATTR> {};
-  saveStitches.resize(StitchBuffer->size());
+  saveStitches.resize(Instance->StitchBuffer.size());
   if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
-	for (auto const& stitch : *StitchBuffer) {
+	for (auto const& stitch : Instance->StitchBuffer) {
 	  *iDest++ = F_POINT_ATTR {stitch.y, stitch.x, stitch.attribute};
 	}
   }
   else {
-	std::ranges::copy(*StitchBuffer, saveStitches.begin());
+	std::ranges::copy(Instance->StitchBuffer, saveStitches.begin());
   }
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
@@ -3409,7 +3409,7 @@ auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
 }
 
 void thred::savAs() {
-  if (StitchBuffer->empty() && Instance->FormList.empty() && bitmap::ismap()) {
+  if (Instance->StitchBuffer.empty() && Instance->FormList.empty() && bitmap::ismap()) {
 	return;
   }
   auto index = FileIndices {};
@@ -3751,12 +3751,12 @@ auto thred::inThreadSizeWindows() -> bool {
 }
 
 void thi::delstch1(uint32_t const iStitch) {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
-  StitchBuffer->erase(wrap::next(StitchBuffer->begin(), iStitch));
-  if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size()) - 1U) {
-	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size()) - 1U;
+  Instance->StitchBuffer.erase(wrap::next(Instance->StitchBuffer.begin(), iStitch));
+  if (ClosestPointIndex > wrap::toUnsigned(Instance->StitchBuffer.size()) - 1U) {
+	ClosestPointIndex = wrap::toUnsigned(Instance->StitchBuffer.size()) - 1U;
   }
 }
 
@@ -3962,10 +3962,10 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  StitchBuffer->resize(thredHeader.stitchCount);
+  Instance->StitchBuffer.resize(thredHeader.stitchCount);
   if (thredHeader.stitchCount != 0U) {
-	auto const bytesToRead = thredHeader.stitchCount * wrap::sizeofType(StitchBuffer);
-	if (!wrap::readFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for StitchBuffer in readTHRFile")) {
+	auto const bytesToRead = thredHeader.stitchCount * wrap::sizeofType(Instance->StitchBuffer);
+	if (!wrap::readFile(fileHandle, Instance->StitchBuffer.data(), bytesToRead, &bytesRead, L"ReadFile for StitchBuffer in readTHRFile")) {
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
@@ -3973,7 +3973,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  return false;
 	}
   }
-  StitchBuffer->shrink_to_fit();
+  Instance->StitchBuffer.shrink_to_fit();
   auto bytesToRead = bitmap::getBmpNameLength();
   if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, L"ReadFile for getBmpNameData in readTHRFile")) {
 	return false;
@@ -4255,7 +4255,7 @@ void thi::nuFil(FileIndices const fileIndex) {
   if (bitmap::ismap()) {
 	bitmap::assignUBFilename(*DefaultDirectory);
   }
-  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+  thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
   ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   thred::movStch();
@@ -4279,7 +4279,7 @@ void thi::nuFil(FileIndices const fileIndex) {
 	thred::redraw(iColor);
   }
   thred::redrawColorBar();
-  if (!StitchBuffer->empty()) {
+  if (!Instance->StitchBuffer.empty()) {
 	Instance->StateMap.set(StateFlag::INIT);
   }
   thred::nuAct(0);
@@ -4288,8 +4288,8 @@ void thi::nuFil(FileIndices const fileIndex) {
   ritini();
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
-  if (!StitchBuffer->empty()) {
-	thred::nuAct(StitchBuffer->front().attribute & COLMSK);
+  if (!Instance->StitchBuffer.empty()) {
+	thred::nuAct(Instance->StitchBuffer.front().attribute & COLMSK);
   }
   else {
 	thred::nuAct(0);
@@ -4301,7 +4301,7 @@ void thi::nuFil(FileIndices const fileIndex) {
   Instance->StateMap.set(StateFlag::INIT);
   Instance->StateMap.reset(StateFlag::TRSET);
   if (Instance->StateMap.test(StateFlag::NOTHRFIL)) {
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  stitch.attribute |= NOTFRM;
 	}
   }
@@ -4384,7 +4384,7 @@ void thred::zumin() {
 		break;
 	  }
 	  if (Instance->StateMap.test(StateFlag::SELBOX)) { // zoom to the selected box
-		stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
+		stitchPoint = Instance->StitchBuffer.operator[](ClosestPointIndex);
 		break;
 	  }
 	  if (Instance->StateMap.test(StateFlag::GRPSEL)) { // zoom to the selected group of stitches
@@ -4396,14 +4396,14 @@ void thred::zumin() {
 	  }
 	  if (Instance->StateMap.test(StateFlag::INSRT)) { // zoom to the insert stitch point
 		if (Instance->StateMap.test(StateFlag::LIN1)) {
-		  stitchPoint = Instance->StateMap.test(StateFlag::BAKEND) ? StitchBuffer->back() : StitchBuffer->front();
+		  stitchPoint = Instance->StateMap.test(StateFlag::BAKEND) ? Instance->StitchBuffer.back() : Instance->StitchBuffer.front();
 		}
 		else {
 		  stitchPoint =
-		      F_POINT {wrap::midl(StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).x,
-		                          StitchBuffer->operator[](ClosestPointIndex).x),
-		               wrap::midl(StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).y,
-		                          StitchBuffer->operator[](ClosestPointIndex).y)};
+		      F_POINT {wrap::midl(Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).x,
+		                          Instance->StitchBuffer.operator[](ClosestPointIndex).x),
+		               wrap::midl(Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y,
+		                          Instance->StitchBuffer.operator[](ClosestPointIndex).y)};
 		}
 		break;
 	  }
@@ -4501,7 +4501,7 @@ void thred::zumout() {
 	  break;
 	}
 	if (Instance->StateMap.test(StateFlag::SELBOX) || Instance->StateMap.test(StateFlag::INSRT)) {
-	  stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
+	  stitchPoint = Instance->StitchBuffer.operator[](ClosestPointIndex);
 	  break;
 	}
 	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
@@ -4547,7 +4547,7 @@ void thi::duClos(uint32_t const      startStitch,
                  uint32_t const      stitchCount,
                  F_POINT const&      stitchPoint,
                  std::vector<float>& gapToNearest) noexcept(!std::is_same_v<ptrdiff_t, int>) {
-  auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
+  auto stitch = wrap::next(Instance->StitchBuffer.begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
 	auto const deltaX = stitch->x - stitchPoint.x;
 	auto const deltaY = stitch->y - stitchPoint.y;
@@ -4632,7 +4632,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 	  if (colorIt->colorIndex != ActiveColor) {
 		continue;
 	  }
-	  auto       stitch   = std::next(StitchBuffer->begin(), colorIt->stitchIndex);
+	  auto       stitch   = std::next(Instance->StitchBuffer.begin(), colorIt->stitchIndex);
 	  auto const maxColor = std::next(colorIt)->stitchIndex;
 	  for (auto iStitch = colorIt->stitchIndex; iStitch < maxColor; ++iStitch) {
 		if (stitch->x < ZoomRect.left || stitch->x > ZoomRect.right ||
@@ -4652,7 +4652,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   }
   else {
 	auto currentStitch = 0U;
-	for (auto const& stitch : *StitchBuffer) {
+	for (auto const& stitch : Instance->StitchBuffer) {
 	  if (auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
 	      ActiveLayer != 0U && layer != 0U && layer != ActiveLayer) {
 		++currentStitch;
@@ -4698,32 +4698,32 @@ auto thred::pt2colInd(uint32_t const iStitch) noexcept -> uint32_t {
 }
 
 auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
-  if (auto const formFirstStitch = std::ranges::find_if(*StitchBuffer,
+  if (auto const formFirstStitch = std::ranges::find_if(Instance->StitchBuffer,
                                                         [form](F_POINT_ATTR const& stitch) -> bool {
 	                                                      if ((stitch.attribute & NOTFRM) != 0U) {
 	                                                        return false;
 	                                                      }
 	                                                      return (stitch.attribute & FRMSK) >> FRMSHFT == form;
                                                         });
-      formFirstStitch != StitchBuffer->end()) {
-	return wrap::toUnsigned(std::distance(StitchBuffer->begin(), formFirstStitch));
+      formFirstStitch != Instance->StitchBuffer.end()) {
+	return wrap::toUnsigned(std::distance(Instance->StitchBuffer.begin(), formFirstStitch));
   }
-  return wrap::toUnsigned(StitchBuffer->size() - 1U);
+  return wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
 }
 
 auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
-  if (auto const formFirstStitch = std::find_if(StitchBuffer->rbegin(),
-                                                StitchBuffer->rend(),
+  if (auto const formFirstStitch = std::find_if(Instance->StitchBuffer.rbegin(),
+                                                Instance->StitchBuffer.rend(),
                                                 [form](F_POINT_ATTR const& stitch) -> bool {
 	                                              if ((stitch.attribute & NOTFRM) != 0U) {
 	                                                return false;
 	                                              }
 	                                              return (stitch.attribute & FRMSK) >> FRMSHFT == form;
                                                 });
-      formFirstStitch != StitchBuffer->rend()) {
-	return wrap::toUnsigned(std::distance(formFirstStitch, StitchBuffer->rend()) - 1);
+      formFirstStitch != Instance->StitchBuffer.rend()) {
+	return wrap::toUnsigned(std::distance(formFirstStitch, Instance->StitchBuffer.rend()) - 1);
   }
-  return wrap::toUnsigned(StitchBuffer->size() - 1U);
+  return wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
 }
 
 void thred::toglup() {
@@ -4794,13 +4794,13 @@ void thred::unlin() {
 }
 
 void thred::movbox() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   if (auto stitchCoordsInPixels = POINT {}; stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	unbox();
 #ifdef _DEBUG
-	auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
+	auto const& stitch = Instance->StitchBuffer.operator[](ClosestPointIndex);
 	outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
 	               ClosestPointIndex,
 	               (stitch.attribute & FRMSK) >> FRMSHFT,
@@ -4820,7 +4820,7 @@ void thred::movbox() {
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
   nuAct(ClosestPointIndex);
-  thi::ritcor(StitchBuffer->operator[](ClosestPointIndex));
+  thi::ritcor(Instance->StitchBuffer.operator[](ClosestPointIndex));
 }
 
 auto thi::chkhid(size_t const colorToCheck) -> bool {
@@ -4839,8 +4839,8 @@ If the mouse position is inside the rectangle, the distance from the stitch
  to the select point (SelectedPoint) is calculated.
 
 Find the equation for the line by solving the linear parametric equations using
-stitch = StitchBuffer->operator[](StitchIndex);
-stitchFwd = StitchBuffer->operator[](StitchIndex + 1);
+stitch = Instance->StitchBuffer.operator[](StitchIndex);
+stitchFwd = Instance->StitchBuffer.operator[](StitchIndex + 1);
 
   stitch.x + Slope*stitch.y=offset
   stitchFwd.x + Slope*stitchFwd.y=offset
@@ -4914,10 +4914,10 @@ auto thred::closlin() -> uint32_t {
 	auto stitchCount =
 	    gsl::narrow_cast<ptrdiff_t>(std::abs(ColorChangeTable->operator[](iChange + 1U).stitchIndex -
 	                                         ColorChangeTable->operator[](iChange).stitchIndex));
-	if (ColorChangeTable->operator[](iChange + 1U).stitchIndex == StitchBuffer->size()) {
+	if (ColorChangeTable->operator[](iChange + 1U).stitchIndex == Instance->StitchBuffer.size()) {
 	  --stitchCount;
 	}
-	auto const stitches = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iChange).stitchIndex);
+	auto const stitches = wrap::next(Instance->StitchBuffer.begin(), ColorChangeTable->operator[](iChange).stitchIndex);
 	if (!thi::chkhid(iChange)) {
 	  continue;
 	}
@@ -5015,7 +5015,7 @@ auto thred::closlin() -> uint32_t {
 }
 
 void thred::selCol() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
@@ -5023,29 +5023,29 @@ void thred::selCol() {
                  : Instance->StateMap.test(StateFlag::GRPSEL) ? GroupStitchIndex
                                                      : 0;
   // NOLINTEND(readability-avoid-nested-conditional-operator)
-  if (iStitch > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	iStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  if (iStitch > wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+	iStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
   }
   GroupStitchIndex    = iStitch;
   ClosestPointIndex   = iStitch;
-  auto const stitchIt = wrap::next(StitchBuffer->begin(), iStitch);
+  auto const stitchIt = wrap::next(Instance->StitchBuffer.begin(), iStitch);
   auto const color    = gsl::narrow_cast<uint8_t>(stitchIt->attribute & COLMSK);
   while (ClosestPointIndex != 0U &&
-         gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
+         gsl::narrow_cast<uint8_t>(Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & COLMSK) == color) {
 	--ClosestPointIndex;
   }
-  if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
+  if ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & COLMSK) != color) {
 	++ClosestPointIndex;
   }
-  while (GroupStitchIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
-         (StitchBuffer->operator[](GroupStitchIndex).attribute & COLMSK) == color) {
+  while (GroupStitchIndex < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U) &&
+         (Instance->StitchBuffer.operator[](GroupStitchIndex).attribute & COLMSK) == color) {
 	++GroupStitchIndex;
   }
-  if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
+  if ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & COLMSK) != color) {
 	--ClosestPointIndex;
   }
-  if (GroupStitchIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  if (GroupStitchIndex > wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+	GroupStitchIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
   }
   Instance->StateMap.set(StateFlag::GRPSEL);
   unbox();
@@ -5080,8 +5080,8 @@ void thred::newFil() {
   Instance->StateMap.reset(StateFlag::FORMSEL);
   Instance->StateMap.reset(StateFlag::BAKACT);
   Instance->StateMap.reset(StateFlag::GMRK);
-  StitchBuffer->clear();
-  StitchBuffer->shrink_to_fit();
+  Instance->StitchBuffer.clear();
+  Instance->StitchBuffer.shrink_to_fit();
   DisplayedColorBitmap.reset();
   bitmap::resetBmpFile(true);
   Instance->FormVertices.clear();
@@ -5130,8 +5130,8 @@ void thred::rebox() {
 	dubox(stitchCoordsInPixels);
 	outDebugString(L"rebox:Stitch [{}] form [{}] type [{}]\n",
 	               ClosestPointIndex,
-	               (StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT,
-	               (StitchBuffer->operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT);
+	               (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT,
+	               (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT);
   }
   if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
 	Instance->StateMap.reset(StateFlag::SCROS);
@@ -5143,14 +5143,14 @@ void thred::rebox() {
 	  redraw(window);
 	}
   }
-  thi::ritcor(StitchBuffer->operator[](ClosestPointIndex));
+  thi::ritcor(Instance->StitchBuffer.operator[](ClosestPointIndex));
 }
 
 void thred::delstchm() {
   rngadj();
-  auto const start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-  auto const end   = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
-  StitchBuffer->erase(start, end);
+  auto const start = wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch);
+  auto const end   = wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch + 1U);
+  Instance->StitchBuffer.erase(start, end);
 }
 
 void thi::duclp() noexcept(std::is_same_v<size_t, uint32_t>) {
@@ -5247,7 +5247,7 @@ void thi::setbak(int32_t const penWidth) noexcept {
 // ReSharper disable CppParameterMayBeConst
 void thi::stchbox(uint32_t const iStitch, HDC hDC) {
   auto       line   = std::array<POINT, SQPNTS> {};
-  auto const layer  = (StitchBuffer->operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
+  auto const layer  = (Instance->StitchBuffer.operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
   auto const offset = MulDiv(IniFile.stitchSizePixels, *ScreenDPI, STDDPI);
   if (ActiveLayer != 0U && layer != 0U && layer != ActiveLayer) {
 	return;
@@ -5269,7 +5269,7 @@ void thred::drawCapturedStitchBox() {
 	thi::stchbox(ClosestPointIndex - 1, StitchWindowDC);
   }
   thi::stchbox(ClosestPointIndex, StitchWindowDC);
-  if (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+  if (ClosestPointIndex < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
 	thi::stchbox(ClosestPointIndex + 1, StitchWindowDC);
   }
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -5409,25 +5409,25 @@ void thred::rot(F_POINT& rotationCenter) {
 void thi::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
-  if (auto const firstStitch = std::ranges::find_if(*StitchBuffer,
+  if (auto const firstStitch = std::ranges::find_if(Instance->StitchBuffer,
                                                     [codedForm](F_POINT_ATTR const& stitch) -> bool {
 	                                                  return (stitch.attribute & (FRMSK | NOTFRM)) == codedForm;
                                                     });
-      firstStitch != StitchBuffer->end()) {
+      firstStitch != Instance->StitchBuffer.end()) {
 	// we found the first stitch, so now delete the stitches in the form
-	StitchBuffer->erase(std::remove_if(firstStitch,
-	                                   StitchBuffer->end(),
+	Instance->StitchBuffer.erase(std::remove_if(firstStitch,
+	                                   Instance->StitchBuffer.end(),
 	                                   [codedForm](F_POINT_ATTR const& stitch) -> bool {
 	                                     return (stitch.attribute & FRMSK) == codedForm;
 	                                   }),
-	                    StitchBuffer->end());
+	                    Instance->StitchBuffer.end());
   }
 }
 
 void thi::f1del(uint32_t const formIndex) {
   if (Instance->StateMap.test(StateFlag::DELTO)) {
 	auto const codedForm = formIndex << FRMSHFT;
-	std::erase_if(*StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
+	std::erase_if(Instance->StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
 	  return (stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) == codedForm;
 	});
   }
@@ -5446,7 +5446,7 @@ void thred::frmdel() {
   formList.erase(wrap::next(firstForm, ClosestFormToCursor));
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   if (Instance->StateMap.testAndReset(StateFlag::DELTO)) {
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) != 0U) {
 		continue;
 	  }
@@ -5457,7 +5457,7 @@ void thred::frmdel() {
 	}
   }
   else {
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) != 0U) {
 		continue;
 	  }
@@ -5505,7 +5505,7 @@ void thred::delsfrms() {
 	formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
   }
   if (Instance->StateMap.test(StateFlag::DELTO)) {
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & ALTYPMSK) == 0U) {
 		continue;
 	  }
@@ -5516,7 +5516,7 @@ void thred::delsfrms() {
 	}
   }
   else {
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) != 0U) {
 		continue;
 	  }
@@ -5561,10 +5561,10 @@ void thred::cut() {
 
 // https://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors
 void thi::doStretch(uint32_t const start, uint32_t const end) {
-  auto       firstStitch  = wrap::next(StitchBuffer->begin(), start);
+  auto       firstStitch  = wrap::next(Instance->StitchBuffer.begin(), start);
   auto       centerStitch = std::next(firstStitch);
   auto       lastStitch   = std::next(centerStitch);
-  auto const endStitch    = wrap::next(StitchBuffer->begin(), end);
+  auto const endStitch    = wrap::next(Instance->StitchBuffer.begin(), end);
   thred::savdo();
   while (lastStitch != endStitch) {
 	if ((firstStitch->attribute & COLMSK) == (centerStitch->attribute & COLMSK) &&
@@ -5584,16 +5584,16 @@ void thi::doStretch(uint32_t const start, uint32_t const end) {
 }
 
 void thi::formStretch(uint32_t const form) {
-  auto stitch  = StitchBuffer->begin();
+  auto stitch  = Instance->StitchBuffer.begin();
   auto iStitch = 0U;
-  for (; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
+  for (; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
 	if ((stitch->attribute & FRMSK) >> FRMSHFT == form && (stitch->attribute & TYPFRM) != 0U) {
 	  break;
 	}
 	++stitch;
   }
   auto const firstStitch = iStitch;
-  while (stitch != StitchBuffer->end() && (stitch->attribute & FRMSK) >> FRMSHFT == form) {
+  while (stitch != Instance->StitchBuffer.end() && (stitch->attribute & FRMSK) >> FRMSHFT == form) {
 	++iStitch;
 	++stitch;
   }
@@ -5616,7 +5616,7 @@ void thred::stretch() {
 	thi::doStretch(GroupStartStitch, GroupEndStitch);
 	return;
   }
-  thi::doStretch(0, wrap::toUnsigned(StitchBuffer->size()));
+  thi::doStretch(0, wrap::toUnsigned(Instance->StitchBuffer.size()));
 }
 
 void thred::contract() {
@@ -5634,9 +5634,9 @@ void thred::unpat() {
 }
 
 auto thi::cmpstch(uint32_t const iStitchA, uint32_t const iStitchB) noexcept -> bool {
-  return util::closeEnough(StitchBuffer->operator[](iStitchA).x, StitchBuffer->operator[](iStitchB).x)
-             ? util::closeEnough(StitchBuffer->operator[](iStitchA).y,
-                                 StitchBuffer->operator[](iStitchB).y)
+  return util::closeEnough(Instance->StitchBuffer.operator[](iStitchA).x, Instance->StitchBuffer.operator[](iStitchB).x)
+             ? util::closeEnough(Instance->StitchBuffer.operator[](iStitchA).y,
+                                 Instance->StitchBuffer.operator[](iStitchB).y)
              : false;
 }
 
@@ -5645,20 +5645,20 @@ void thi::ofstch(std::vector<F_POINT_ATTR>& buffer,
                  char const                 offset,
                  F_POINT const&             knotStep,
                  uint32_t                   knotAttribute) {
-  buffer.emplace_back(StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
-                      StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
+  buffer.emplace_back(Instance->StitchBuffer.operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
+                      Instance->StitchBuffer.operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
                       knotAttribute);
 }
 
 void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const finish) {
-  auto const finishIt      = wrap::next(StitchBuffer->begin(), finish);
+  auto const finishIt      = wrap::next(Instance->StitchBuffer.begin(), finish);
   auto       startIt       = finish != 0 ? std::next(finishIt, -1) : finishIt;
   auto const knotAttribute = startIt->attribute | KNOTMSK;
 
   auto deltaX = finishIt->x - startIt->x;
   auto deltaY = finishIt->y - startIt->y;
   auto length = deltaX * deltaX + deltaY * deltaY;
-  while (length == 0.0F && startIt != StitchBuffer->begin()) {
+  while (length == 0.0F && startIt != Instance->StitchBuffer.begin()) {
 	deltaX = finishIt->x - startIt->x;
 	deltaY = finishIt->y - startIt->y;
 	length = deltaX * deltaX + deltaY * deltaY;
@@ -5682,19 +5682,19 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const finish) {
 
 void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const start) {
   constexpr auto KNL      = 2.0F; // knot length
-  auto const     startIt  = wrap::next(StitchBuffer->begin(), start);
+  auto const     startIt  = wrap::next(Instance->StitchBuffer.begin(), start);
   auto           finishIt = std::next(startIt);
   auto           deltaX   = finishIt->x - startIt->x;
   auto           deltaY   = finishIt->y - startIt->y;
   auto           length   = deltaX * deltaX + deltaY * deltaY;
   ++finishIt;
-  while (length < KNL && finishIt != StitchBuffer->end()) {
+  while (length < KNL && finishIt != Instance->StitchBuffer.end()) {
 	deltaX = finishIt->x - startIt->x;
 	deltaY = finishIt->y - startIt->y;
 	length = deltaX * deltaX + deltaY * deltaY;
 	++finishIt;
   }
-  if (finishIt == StitchBuffer->end()) {
+  if (finishIt == Instance->StitchBuffer.end()) {
 	return;
   }
   --finishIt;
@@ -5712,26 +5712,26 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const start) {
 
 void thi::delknt() {
   // delete the knot stitches
-  std::erase_if(*StitchBuffer,
+  std::erase_if(Instance->StitchBuffer,
                 [](F_POINT_ATTR const& stitch) -> bool { return (stitch.attribute & KNOTMSK) != 0U; });
 }
 
 void thred::delknot() {
   // Find the first knot stitch, if any
-  auto const firstStitch = std::ranges::find_if(*StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
+  auto const firstStitch = std::ranges::find_if(Instance->StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
 	return (stitch.attribute & KNOTMSK) != 0U;
   });
-  if (firstStitch == StitchBuffer->end()) {
+  if (firstStitch == Instance->StitchBuffer.end()) {
 	return;
   }
   savdo();
   // delete the knot stitches
-  StitchBuffer->erase(std::remove_if(firstStitch,
-                                     StitchBuffer->end(),
+  Instance->StitchBuffer.erase(std::remove_if(firstStitch,
+                                     Instance->StitchBuffer.end(),
                                      [](F_POINT_ATTR const& stitch) -> bool {
 	                                   return (stitch.attribute & KNOTMSK) != 0U;
                                      }),
-                      StitchBuffer->end());
+                      Instance->StitchBuffer.end());
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -5739,8 +5739,8 @@ void thred::delknot() {
 constexpr auto KNOTLEN = int32_t {54}; // set knots for stitches longer than this
 
 auto thi::kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t {
-  while (start < wrap::toUnsigned(StitchBuffer->size() - 1U) && stlen(start) > KNOTLEN) {
-	buffer.push_back(StitchBuffer->operator[](start++));
+  while (start < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U) && stlen(start) > KNOTLEN) {
+	buffer.push_back(Instance->StitchBuffer.operator[](start++));
   }
   strtknt(buffer, start);
   return start;
@@ -5748,24 +5748,24 @@ auto thi::kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t {
 
 void thi::setknt() {
   auto buffer = std::vector<F_POINT_ATTR> {};
-  buffer.reserve(StitchBuffer->size());
-  buffer.push_back(StitchBuffer->front());
+  buffer.reserve(Instance->StitchBuffer.size());
+  buffer.push_back(Instance->StitchBuffer.front());
   strtknt(buffer, 0);
   auto iStitch = stlen(0) > KNOTLEN ? kjmp(buffer, 1) : 1;
   Instance->StateMap.reset(StateFlag::FILDIR);
-  while (iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	buffer.push_back(StitchBuffer->operator[](iStitch));
+  while (iStitch < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+	buffer.push_back(Instance->StitchBuffer.operator[](iStitch));
 	if (stlen(iStitch) > KNOTLEN) {
 	  endknt(buffer, iStitch);
 	  iStitch = kjmp(buffer, iStitch + 1U);
-	  buffer.push_back(StitchBuffer->operator[](iStitch));
+	  buffer.push_back(Instance->StitchBuffer.operator[](iStitch));
 	}
 	++iStitch;
   }
   Instance->StateMap.set(StateFlag::FILDIR);
   endknt(buffer, iStitch);
   buffer.back().attribute &= ~KNOTMSK;
-  *StitchBuffer = std::move(buffer);
+  Instance->StitchBuffer = std::move(buffer);
 }
 
 auto thi::srchknot(uint32_t const source) -> uint32_t {
@@ -5789,12 +5789,12 @@ auto thi::srchknot(uint32_t const source) -> uint32_t {
 }
 
 void thi::chkncol() {
-  auto initialColor = StitchBuffer->front().attribute & COLMSK;
+  auto initialColor = Instance->StitchBuffer.front().attribute & COLMSK;
   auto buffer       = std::vector<F_POINT_ATTR> {};
-  buffer.reserve(StitchBuffer->size());
+  buffer.reserve(Instance->StitchBuffer.size());
   Instance->StateMap.reset(StateFlag::FILDIR);
   auto iStitch = 0U;
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	if (auto const color = stitch.attribute & COLMSK; color == initialColor) {
 	  buffer.push_back(stitch);
 	}
@@ -5811,11 +5811,11 @@ void thi::chkncol() {
 	}
 	++iStitch;
   }
-  *StitchBuffer = std::move(buffer);
+  Instance->StitchBuffer = std::move(buffer);
 }
 
 void thred::setknots() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   savdo();
@@ -5825,7 +5825,7 @@ void thred::setknots() {
   thi::chkncol();
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
-  ritot(wrap::toUnsigned(StitchBuffer->size()));
+  ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
 }
 
 void thred::hidbit() {
@@ -5842,7 +5842,7 @@ void thi::drwlstch(uint32_t const finish) {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::HID)) {
-	while (RunPoint < finish - 1 && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
+	while (RunPoint < finish - 1 && (Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
 	  ++RunPoint;
 	}
   }
@@ -5853,13 +5853,13 @@ void thi::drwlstch(uint32_t const finish) {
 	  ++RunPoint;
 	}
   }
-  auto const color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
+  auto const color = Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK;
   if (Instance->StateMap.test(StateFlag::ZUMED)) {
 	auto       stitchCoordsInPixels = POINT {};
 	auto const origin               = RunPoint - 1U;
 	auto       flag                 = true;
 	while (wrap::toUnsigned(movieLine.size()) < StitchesPerFrame + 1U && RunPoint < finish - 2U &&
-	       (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+	       (Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK) == color) {
 	  if (thred::stch2px(RunPoint, stitchCoordsInPixels)) {
 		movieLine.push_back(stitchCoordsInPixels);
 		if (flag) {
@@ -5878,7 +5878,7 @@ void thi::drwlstch(uint32_t const finish) {
 	  ++RunPoint;
 	}
 	if (!thred::stch2px(RunPoint, stitchCoordsInPixels)) {
-	  if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+	  if ((Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK) == color) {
 		movieLine.push_back(stitchCoordsInPixels);
 		++RunPoint;
 	  }
@@ -5894,14 +5894,14 @@ void thi::drwlstch(uint32_t const finish) {
 
 	SelectObject(StitchWindowDC, UserPen->operator[](color));
 	while (iMovieFrame < StitchesPerFrame && RunPoint + 1 < finish - 1 &&
-	       (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+	       (Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK) == color) {
 	  movieLine.push_back(thred::stch2px1(RunPoint++));
 	  ++iMovieFrame;
 	}
 	--RunPoint;
 	wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
   }
-  if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & COLMSK) != color) {
+  if ((Instance->StitchBuffer.operator[](wrap::toSize(RunPoint) + 1U).attribute & COLMSK) != color) {
 	++RunPoint;
   }
   displayText::ritnum(IDS_NUMSEL, RunPoint);
@@ -5915,7 +5915,7 @@ void thi::stchout() {
 	drwlstch(GroupEndStitch);
 	return;
   }
-  drwlstch(wrap::toUnsigned(StitchBuffer->size() - 1U));
+  drwlstch(wrap::toUnsigned(Instance->StitchBuffer.size() - 1U));
 }
 
 void thi::setsped() {
@@ -5945,7 +5945,7 @@ void thred::deltot() {
   DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   TexturePointsBuffer->clear();
   Instance->FormList.clear();
-  StitchBuffer->clear();
+  Instance->StitchBuffer.clear();
   Instance->FormVertices.clear();
   Instance->SatinGuides.clear();
   Instance->StateMap.reset(StateFlag::GMRK);
@@ -5957,7 +5957,7 @@ void thred::deltot() {
 }
 
 auto thi::wastch(uint32_t const& formIndex) -> bool {
-  return std::ranges::any_of(*StitchBuffer, [&formIndex](F_POINT_ATTR const& stitch) -> bool {
+  return std::ranges::any_of(Instance->StitchBuffer, [&formIndex](F_POINT_ATTR const& stitch) -> bool {
 	return (stitch.attribute & FRMSK) >> FRMSHFT == formIndex;
   });
 }
@@ -5967,7 +5967,7 @@ auto thi::frmstch() -> bool {
   for (auto const selectedForm : Instance->SelectedFormList) {
 	formMap.set(selectedForm);
   }
-  return std::ranges::any_of(*StitchBuffer, [&formMap](F_POINT_ATTR const& stitch) -> bool {
+  return std::ranges::any_of(Instance->StitchBuffer, [&formMap](F_POINT_ATTR const& stitch) -> bool {
 	return formMap.test((stitch.attribute & FRMSK) >> FRMSHFT);
   });
 }
@@ -6138,14 +6138,14 @@ void thred::delet() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
-	if (StitchBuffer->size() > 2U) {
+	if (Instance->StitchBuffer.size() > 2U) {
 	  thi::delstch1(ClosestPointIndex);
 	  if (!thi::stch2px2(ClosestPointIndex)) {
 		movbox();
 	  }
 	}
 	else {
-	  StitchBuffer->clear();
+	  Instance->StitchBuffer.clear();
 	  Instance->StateMap.reset(StateFlag::SELBOX);
 	}
 	coltab();
@@ -6193,14 +6193,14 @@ void thred::delet() {
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
   if (!satinFlag && closPnt1(ClosestPointIndex)) {
-	if (StitchBuffer->size() > 2U) {
+	if (Instance->StitchBuffer.size() > 2U) {
 	  thi::delstch1(ClosestPointIndex);
 	  if (!thi::stch2px2(ClosestPointIndex)) {
 		movbox();
 	  }
 	}
 	else {
-	  StitchBuffer->clear();
+	  Instance->StitchBuffer.clear();
 	  Instance->StateMap.reset(StateFlag::SELBOX);
 	}
 	coltab();
@@ -6221,7 +6221,7 @@ void thred::movi() {
   else {
 	rstAll();
   }
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   if (MsgWindow != nullptr) {
@@ -6251,8 +6251,8 @@ void thred::movi() {
 	                              nullptr);
   }
   auto const stepCount = Instance->StateMap.test(StateFlag::ZUMED)
-                             ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
-                             : gsl::narrow_cast<float>(StitchBuffer->size());
+                             ? gsl::narrow_cast<float>(Instance->StitchBuffer.size()) * ZoomFactor * ZoomFactor
+                             : gsl::narrow_cast<float>(Instance->StitchBuffer.size());
   if (!Instance->StateMap.test(StateFlag::WASPAT)) {
 	constexpr auto MLEN = 10000.0F; // default movie length (milliseconds)
 	MovieTimeStep       = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
@@ -6419,7 +6419,7 @@ void thred::insfil(fs::path& insertedFile) {
   if (insertedFile.empty()) {
 	thi::getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
   }
-  InsertedStitchIndex = wrap::toUnsigned(StitchBuffer->size());
+  InsertedStitchIndex = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (thi::isthr(insertedFile)) {
 	if (thi::insTHR(insertedFile, insertedRectangle)) {
 	  successFlag = true;
@@ -6481,11 +6481,11 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
   auto&          formList    = Instance->FormList;
 
   if (version != 0U) {
-	gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
+	gethand(Instance->StitchBuffer, wrap::toUnsigned(Instance->StitchBuffer.size()));
 	// ToDo - replace constants with sizes of data structures?
 	homscor = wrap::toUnsigned(formList.size()) * FRMW +
-	          gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW +
-	          wrap::toUnsigned(Instance->FormVertices.size()) * FRMPW + wrap::toUnsigned(StitchBuffer->size()) * STCHW;
+	          gethand(Instance->StitchBuffer, wrap::toUnsigned(Instance->StitchBuffer.size())) * HANDW +
+	          wrap::toUnsigned(Instance->FormVertices.size()) * FRMPW + wrap::toUnsigned(Instance->StitchBuffer.size()) * STCHW;
 	if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in insTHR")) {
 	  return false;
 	}
@@ -6680,8 +6680,8 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
   }
-  auto dest = StitchBuffer->end();
-  StitchBuffer->insert(dest, fileStitchBuffer.cbegin(), fileStitchBuffer.cend());
+  auto dest = Instance->StitchBuffer.end();
+  Instance->StitchBuffer.insert(dest, fileStitchBuffer.cbegin(), fileStitchBuffer.cend());
   CloseHandle(fileHandle);
   return true;
 }
@@ -6788,18 +6788,18 @@ void thred::mv2f() {
 	savdo();
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	// since most of the stitches will be moved into the temp buffer, reserve the space
-	tempStitchBuffer.reserve(StitchBuffer->size());
+	tempStitchBuffer.reserve(Instance->StitchBuffer.size());
 	auto       iLowBuffer = 0U;
 	auto const attribute  = ClosestFormToCursor << FRMSHFT;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) == attribute) {
-		StitchBuffer->operator[](iLowBuffer++) = stitch;
+		Instance->StitchBuffer.operator[](iLowBuffer++) = stitch;
 	  }
 	  else {
 		tempStitchBuffer.push_back(stitch);
 	  }
 	}
-	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
+	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->StitchBuffer.begin(), iLowBuffer));
 	coltab();
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
@@ -6808,18 +6808,18 @@ void thred::mv2f() {
 	savdo();
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	auto const                grpSize = GroupEndStitch + 1U - GroupStartStitch;
-	tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
+	tempStitchBuffer.resize(Instance->StitchBuffer.size() - grpSize);
 	rngadj();
-	std::copy(StitchBuffer->begin(),
-	          wrap::next(StitchBuffer->begin(), GroupStartStitch),
+	std::copy(Instance->StitchBuffer.begin(),
+	          wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
 	          tempStitchBuffer.begin());
-	std::copy(wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
-	          StitchBuffer->end(),
+	std::copy(wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch + 1U),
+	          Instance->StitchBuffer.end(),
 	          wrap::next(tempStitchBuffer.begin(), GroupStartStitch));
-	std::copy(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	          wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
-	          StitchBuffer->begin());
-	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), grpSize));
+	std::copy(wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
+	          wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch + 1U),
+	          Instance->StitchBuffer.begin());
+	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->StitchBuffer.begin(), grpSize));
 	coltab();
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
@@ -6831,15 +6831,15 @@ void thred::mv2b() {
 	auto       tempStitchBuffer = std::vector<F_POINT_ATTR> {};
 	auto       iLowBuffer       = 0U;
 	auto const attribute        = ClosestFormToCursor << FRMSHFT;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) == attribute) {
 		tempStitchBuffer.push_back(stitch);
 	  }
 	  else {
-		StitchBuffer->operator[](iLowBuffer++) = stitch;
+		Instance->StitchBuffer.operator[](iLowBuffer++) = stitch;
 	  }
 	}
-	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
+	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->StitchBuffer.begin(), iLowBuffer));
 	coltab();
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
@@ -6850,13 +6850,13 @@ void thred::mv2b() {
 	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	auto const                grpSize = GroupEndStitch + 1U - GroupStartStitch;
 	tempStitchBuffer.resize(grpSize);
-	std::copy(wrap::next(StitchBuffer->begin(), GroupStartStitch),
-	          wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
+	std::copy(wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
+	          wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch + 1U),
 	          tempStitchBuffer.begin());
-	std::copy(wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
-	          StitchBuffer->end(),
-	          wrap::next(StitchBuffer->begin(), GroupStartStitch));
-	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
+	std::copy(wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch + 1U),
+	          Instance->StitchBuffer.end(),
+	          wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch));
+	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->StitchBuffer.begin(), Instance->StitchBuffer.size() - grpSize));
 	coltab();
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
@@ -6874,7 +6874,7 @@ void thi::infadj(float& xCoordinate, float& yCoordinate) noexcept {
 }
 
 void thred::delinf() noexcept {
-  for (auto& iStitch : *StitchBuffer) {
+  for (auto& iStitch : Instance->StitchBuffer) {
 	thi::infadj(iStitch.x, iStitch.y);
   }
   for (auto& formVertice : Instance->FormVertices) {
@@ -6890,8 +6890,8 @@ void thred::chkrng(F_POINT& range) {
 
   if (auto const& formList = Instance->FormList; !formList.empty()) {
 	// ToDo - Why do we treat the forms differently?
-	auto iDestination = StitchBuffer->begin();
-	for (auto& stitch : *StitchBuffer) {
+	auto iDestination = Instance->StitchBuffer.begin();
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) != 0U ||
 	      ((stitch.attribute & TYPMSK) != 0U && (stitch.attribute & FRMSK) >> FRMSHFT < formList.size())) {
 		if (stitch.x > range.x) {
@@ -6909,11 +6909,11 @@ void thred::chkrng(F_POINT& range) {
 		*iDestination++ = stitch;
 	  }
 	}
-	StitchBuffer->resize(wrap::toSize(std::distance(StitchBuffer->begin(), iDestination)));
+	Instance->StitchBuffer.resize(wrap::toSize(std::distance(Instance->StitchBuffer.begin(), iDestination)));
 	coltab();
 	return;
   }
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	if (stitch.x > range.x) {
 	  stitch.x = range.x - 1.0F;
 	}
@@ -7015,7 +7015,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
 	for (auto& formVertice : Instance->FormVertices) {
 	  rotflt(formVertice, rotationAngle, rotationCenter);
 	}
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  thi::rotstch(stitch, rotationAngle, rotationCenter);
 	}
 	for (auto& iForm : formList) {
@@ -7054,7 +7054,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
 	return;
   }
   for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	thi::rotstch(StitchBuffer->operator[](iStitch), rotationAngle, rotationCenter);
+	thi::rotstch(Instance->StitchBuffer.operator[](iStitch), rotationAngle, rotationCenter);
   }
   rngadj();
   thi::selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
@@ -7081,7 +7081,7 @@ void thred::showOnlyLayer(uint8_t const play) {
   }
   Instance->StateMap.reset(StateFlag::GRPSEL);
   if (Instance->StateMap.test(StateFlag::SELBOX) &&
-      ActiveLayer != ((StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U) {
+      ActiveLayer != ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U) {
 	Instance->StateMap.reset(StateFlag::SELBOX);
   }
   Instance->SelectedFormList.clear();
@@ -7193,31 +7193,31 @@ void thred::delfre() {
   auto currentStitchCount = 0U;
   savdo();
   // ToDo - this loop does not delete all free stitches. look at frmdel as well
-  for (auto const& stitch : *StitchBuffer) {
+  for (auto const& stitch : Instance->StitchBuffer) {
 	if ((stitch.attribute & NOTFRM) == 0U) {
-	  StitchBuffer->operator[](currentStitchCount++) = stitch;
+	  Instance->StitchBuffer.operator[](currentStitchCount++) = stitch;
 	}
   }
-  StitchBuffer->resize(currentStitchCount);
+  Instance->StitchBuffer.resize(currentStitchCount);
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void thred::colchk() noexcept(std::is_same_v<size_t, uint32_t>) {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
-  auto color       = StitchBuffer->front().attribute & COLMSK;
+  auto color       = Instance->StitchBuffer.front().attribute & COLMSK;
   auto startStitch = 0U;
   // ToDo - Can this loop become a ranged for?
-  for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	auto const& stitch = StitchBuffer->operator[](iStitch);
+  for (auto iStitch = 0U; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
+	auto const& stitch = Instance->StitchBuffer.operator[](iStitch);
 	if (color == (stitch.attribute & COLMSK)) {
 	  continue;
 	}
 	if (iStitch - startStitch == 1 && startStitch != 0U) {
 	  auto const prevIndex  = iStitch - 1U;
-	  auto&      prevStitch = StitchBuffer->operator[](prevIndex);
+	  auto&      prevStitch = Instance->StitchBuffer.operator[](prevIndex);
 	  prevStitch.attribute  = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
 	}
 	color       = stitch.attribute & COLMSK;
@@ -7231,7 +7231,7 @@ auto thi::makbig(uint32_t const start, uint32_t finish) -> uint32_t {
   newStitches.reserve(newSize); // we know that we will have at least this number of Stitches
   auto adcnt = 0U;
   --finish;
-  auto stitchIt     = wrap::next(StitchBuffer->begin(), start);
+  auto stitchIt     = wrap::next(Instance->StitchBuffer.begin(), start);
   auto nextStitchIt = stitchIt + 1U;
   for (auto iSource = start; iSource < finish; ++iSource) {
 	auto const delta = F_POINT {nextStitchIt->x - nextStitchIt->x, nextStitchIt->y - nextStitchIt->y};
@@ -7267,16 +7267,16 @@ auto thi::makbig(uint32_t const start, uint32_t finish) -> uint32_t {
   // now copy stitches back up to the end of the original group
   std::copy(newStitches.begin(),
             wrap::next(newStitches.begin(), finish - start),
-            wrap::next(StitchBuffer->begin(), start));
+            wrap::next(Instance->StitchBuffer.begin(), start));
   // and then insert the remainder of the new stitches
-  StitchBuffer->insert(wrap::next(StitchBuffer->begin(), finish),
+  Instance->StitchBuffer.insert(wrap::next(Instance->StitchBuffer.begin(), finish),
                        wrap::next(newStitches.begin(), finish - start),
                        newStitches.end());
   return adcnt;
 }
 
 void thred::rembig() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   if (UserStitchLength >= IniFile.maxStitchLength) {
@@ -7302,7 +7302,7 @@ void thred::rembig() {
 	}
 	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
 	  rngadj();
-	  if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
+	  if (GroupEndStitch < wrap::toUnsigned(Instance->StitchBuffer.size())) {
 		++GroupEndStitch;
 	  }
 	  if (ClosestPointIndex < GroupStitchIndex) {
@@ -7314,7 +7314,7 @@ void thred::rembig() {
 	  grpAdj();
 	  break;
 	}
-	thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
+	thi::makbig(0, wrap::toUnsigned(Instance->StitchBuffer.size()));
 	break;
   }
   coltab();
@@ -7329,7 +7329,7 @@ void thi::duselrng(RANGE& selectedRange) {
 	return;
   }
   selectedRange.start  = 0U;
-  selectedRange.finish = wrap::toUnsigned(StitchBuffer->size());
+  selectedRange.finish = wrap::toUnsigned(Instance->StitchBuffer.size());
 }
 
 void thred::nextSortedStitch(bool const direction) {
@@ -7368,10 +7368,10 @@ void thi::setsrch(bool const end) {
 }
 
 auto thred::inrng(uint32_t const iStitch) noexcept -> bool {
-  if (iStitch >= StitchBuffer->size()) {
+  if (iStitch >= Instance->StitchBuffer.size()) {
 	return false;
   }
-  auto const& stitch = StitchBuffer->operator[](iStitch);
+  auto const& stitch = Instance->StitchBuffer.operator[](iStitch);
   return stitch.x >= StitchRangeRect.left && stitch.x <= StitchRangeRect.right &&
          stitch.y >= StitchRangeRect.bottom && stitch.y <= StitchRangeRect.top;
 }
@@ -7552,11 +7552,11 @@ void thred::thumbBack() {
 }
 
 void thred::selalstch() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   ClosestPointIndex = 0;
-  GroupStitchIndex  = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  GroupStitchIndex  = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
   GroupStartStitch  = ClosestPointIndex;
   GroupEndStitch    = GroupStitchIndex;
   Instance->StateMap.set(StateFlag::GRPSEL);
@@ -7581,8 +7581,8 @@ void thred::duinsfil() {
   for (auto iVertex = InsertedVertexIndex; iVertex < wrap::toUnsigned(Instance->FormVertices.size()); ++iVertex) {
 	Instance->FormVertices.operator[](iVertex) += offset;
   }
-  for (auto iStitch = InsertedStitchIndex; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	StitchBuffer->operator[](iStitch) += offset;
+  for (auto iStitch = InsertedStitchIndex; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
+	Instance->StitchBuffer.operator[](iStitch) += offset;
   }
   Instance->StateMap.reset(StateFlag::FRMOF);
   Instance->StateMap.set(StateFlag::INIT);
@@ -7617,7 +7617,7 @@ void thred::nucols() {
 	  form.underlayColor = ActiveColor;
 	}
   }
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT) && (stitch.attribute & TYPMSK) != TYPMSK) {
 	  stitch.attribute &= NCOLMSK;
 	  stitch.attribute |= ActiveColor;
@@ -7638,7 +7638,7 @@ auto thi::dunum(wchar_t const code) noexcept -> bool {
 }
 
 void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	rectangle = F_RECTANGLE {};
 	return;
   }
@@ -7647,7 +7647,7 @@ void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
   auto maxX = LOWFLOAT;
   auto maxY = LOWFLOAT;
 
-  for (auto const& stitch : *StitchBuffer) {
+  for (auto const& stitch : Instance->StitchBuffer) {
 	minX = std::min(minX, stitch.x);
 	maxX = std::max(maxX, stitch.x);
 	minY = std::min(minY, stitch.y);
@@ -7715,7 +7715,7 @@ void thi::sidhup() {
 
 void thred::fop() {
   trace::untrace();
-  if (!Instance->FormList.empty() || !StitchBuffer->empty()) {
+  if (!Instance->FormList.empty() || !Instance->StitchBuffer.empty()) {
 	if (thi::savcmp()) {
 	  thi::nuFil(FileIndices::THR);
 	  showOnlyLayer(0U);
@@ -7753,30 +7753,30 @@ void thred::clpadj() {
   }
   rngadj();
   auto iStitch          = GroupStartStitch;
-  auto clipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
-                                       StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
-                                       StitchBuffer->operator[](iStitch).x,
-                                       StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
+  auto clipRectAdjusted = F_RECTANGLE {Instance->StitchBuffer.operator[](iStitch).x,
+                                       Instance->StitchBuffer.operator[](wrap::toSize(iStitch) + 1U).y,
+                                       Instance->StitchBuffer.operator[](iStitch).x,
+                                       Instance->StitchBuffer.operator[](wrap::toSize(iStitch) + 1U).y};
   ++iStitch;
   while (iStitch < GroupEndStitch) {
-	thi::clpradj(clipRectAdjusted, StitchBuffer->operator[](iStitch++));
+	thi::clpradj(clipRectAdjusted, Instance->StitchBuffer.operator[](iStitch++));
   }
-  if (StitchBuffer->operator[](iStitch).x < clipRectAdjusted.left) {
-	clipRectAdjusted.left = StitchBuffer->operator[](iStitch).x;
+  if (Instance->StitchBuffer.operator[](iStitch).x < clipRectAdjusted.left) {
+	clipRectAdjusted.left = Instance->StitchBuffer.operator[](iStitch).x;
   }
-  if (StitchBuffer->operator[](iStitch).x > clipRectAdjusted.right) {
-	clipRectAdjusted.right = StitchBuffer->operator[](iStitch).x;
+  if (Instance->StitchBuffer.operator[](iStitch).x > clipRectAdjusted.right) {
+	clipRectAdjusted.right = Instance->StitchBuffer.operator[](iStitch).x;
   }
   auto const clipMiddle = wrap::midl(clipRectAdjusted.right, clipRectAdjusted.left);
-  StitchBuffer->operator[](GroupStartStitch).y = wrap::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
-  StitchBuffer->operator[](GroupEndStitch).y = StitchBuffer->operator[](GroupStartStitch).y;
-  if (StitchBuffer->operator[](GroupStartStitch).x < clipMiddle) {
-	StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.left;
-	StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.right;
+  Instance->StitchBuffer.operator[](GroupStartStitch).y = wrap::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
+  Instance->StitchBuffer.operator[](GroupEndStitch).y = Instance->StitchBuffer.operator[](GroupStartStitch).y;
+  if (Instance->StitchBuffer.operator[](GroupStartStitch).x < clipMiddle) {
+	Instance->StitchBuffer.operator[](GroupStartStitch).x = clipRectAdjusted.left;
+	Instance->StitchBuffer.operator[](GroupEndStitch).x   = clipRectAdjusted.right;
   }
   else {
-	StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.left;
-	StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.right;
+	Instance->StitchBuffer.operator[](GroupEndStitch).x   = clipRectAdjusted.left;
+	Instance->StitchBuffer.operator[](GroupStartStitch).x = clipRectAdjusted.right;
   }
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
@@ -7974,7 +7974,7 @@ void thred::rotmrk() {
 	      thi::nuang(originalAngle, itVertex->x - ZoomMarkPoint.x, itVertex->y - ZoomMarkPoint.y));
 	  ++itVertex;
 	}
-	for (auto const& stitch : *StitchBuffer) {
+	for (auto const& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & FRMSK) == codedFormIndex) {
 		thi::angdif(lowestAngle,
 		            highestAngle,
@@ -7985,14 +7985,14 @@ void thred::rotmrk() {
   else {
 	rngadj();
 	auto const originalAngle =
-	    std::atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
-	               StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
+	    std::atan2(Instance->StitchBuffer.operator[](GroupStartStitch).y - ZoomMarkPoint.y,
+	               Instance->StitchBuffer.operator[](GroupStartStitch).x - ZoomMarkPoint.x);
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
 	  thi::angdif(lowestAngle,
 	              highestAngle,
 	              thi::nuang(originalAngle,
-	                         StitchBuffer->operator[](iStitch).x - ZoomMarkPoint.x,
-	                         StitchBuffer->operator[](iStitch).y - ZoomMarkPoint.y));
+	                         Instance->StitchBuffer.operator[](iStitch).x - ZoomMarkPoint.x,
+	                         Instance->StitchBuffer.operator[](iStitch).y - ZoomMarkPoint.y));
 	}
   }
   auto const tAngle     = highestAngle - lowestAngle;
@@ -8018,7 +8018,7 @@ void thred::rotseg() {
 
 void thred::pntmrk() {
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
-	dumrk(StitchBuffer->operator[](ClosestPointIndex).x, StitchBuffer->operator[](ClosestPointIndex).y);
+	dumrk(Instance->StitchBuffer.operator[](ClosestPointIndex).x, Instance->StitchBuffer.operator[](ClosestPointIndex).y);
 	return;
   }
   if (Instance->StateMap.test(StateFlag::FRMPSEL)) {
@@ -8137,10 +8137,10 @@ void thred::retrac() {
 	++GroupStartStitch;
   }
   auto const count       = GroupEndStitch - GroupStartStitch;
-  auto const insertPoint = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
-  auto const startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
+  auto const insertPoint = wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch + 1U);
+  auto const startPoint = wrap::next(Instance->StitchBuffer.rbegin(), Instance->StitchBuffer.size() - GroupEndStitch);
   auto const endPoint   = wrap::next(startPoint, count);
-  StitchBuffer->insert(insertPoint, startPoint, endPoint);
+  Instance->StitchBuffer.insert(insertPoint, startPoint, endPoint);
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -8163,7 +8163,7 @@ void thred::ovrlay() {
 }
 
 void thi::stchsnap(uint32_t const start, uint32_t const finish) noexcept(!std::is_same_v<ptrdiff_t, int>) {
-  auto pnt = wrap::next(StitchBuffer->begin(), start);
+  auto pnt = wrap::next(Instance->StitchBuffer.begin(), start);
   for (auto i = 0U; i < finish - start; ++i) {
 	pnt->x = rintf(pnt->x / IniFile.gridSize) * IniFile.gridSize;
 	pnt->y = rintf(pnt->y / IniFile.gridSize) * IniFile.gridSize;
@@ -8386,8 +8386,8 @@ void thred::fileLock() noexcept {
 
 void thred::delstch() {
   savdo();
-  StitchBuffer->clear();
-  StitchBuffer->shrink_to_fit();
+  Instance->StitchBuffer.clear();
+  Instance->StitchBuffer.shrink_to_fit();
   TexturePointsBuffer->clear();
   TexturePointsBuffer->shrink_to_fit();
   rstAll();
@@ -8442,7 +8442,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	for (auto& iForm : formList) {
 	  thi::frmpos(iForm, deltaX, deltaY);
 	}
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  stitch += F_POINT {deltaX, deltaY};
 	}
 	auto& allItemsRect = Instance->AllItemsRect;
@@ -8459,7 +8459,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	for (auto const selectedForm : Instance->SelectedFormList) {
 	  formMap.set(selectedForm);
 	}
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 		stitch += F_POINT {deltaX, deltaY};
 	  }
@@ -8475,7 +8475,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	auto& form = formList.operator[](ClosestFormToCursor);
 	thi::frmpos(form, deltaX, deltaY);
 	if (form.fillType != 0U || form.edgeType != 0U) {
-	  for (auto& stitch : *StitchBuffer) {
+	  for (auto& stitch : Instance->StitchBuffer) {
 		if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 		  stitch += F_POINT {deltaX, deltaY};
 		}
@@ -8487,14 +8487,14 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
   if (Instance->StateMap.test(StateFlag::GRPSEL)) {
 	rngadj();
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	  StitchBuffer->operator[](iStitch) += F_POINT {deltaX, deltaY};
+	  Instance->StitchBuffer.operator[](iStitch) += F_POINT {deltaX, deltaY};
 	}
 	grpAdj();
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
   }
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
-	StitchBuffer->operator[](ClosestPointIndex) += F_POINT {deltaX, deltaY};
+	Instance->StitchBuffer.operator[](ClosestPointIndex) += F_POINT {deltaX, deltaY};
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
   }
@@ -8561,7 +8561,7 @@ void thred::movchk() {
   savdo();
   auto const key          = wrap::pressed(VK_SHIFT);
   auto const switchColors = wrap::pressed(VK_CONTROL);
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	if (auto const color = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK); color == VerticalIndex) {
 	  stitch.attribute &= NCOLMSK;
 	  stitch.attribute |= draggedColor;
@@ -8621,7 +8621,7 @@ void thred::movchk() {
 void thi::inscol() {
   auto colorMap = boost::dynamic_bitset<>(COLORCNT);
   VerticalIndex &= COLMSK;
-  for (auto const& stitch : *StitchBuffer) {
+  for (auto const& stitch : Instance->StitchBuffer) {
 	colorMap.set(stitch.attribute & COLMSK);
   }
   if (colorMap.all()) {
@@ -8632,7 +8632,7 @@ void thi::inscol() {
   while (colorMap.test(nextColor)) {
 	--nextColor;
   }
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	auto const color = gsl::narrow<uint8_t>(stitch.attribute & COLMSK);
 	if (color < VerticalIndex || color >= nextColor) {
 	  continue;
@@ -8661,7 +8661,7 @@ void thi::inscol() {
 }
 
 auto thred::usedcol(uint8_t index) -> bool {
-  return std::ranges::any_of(*StitchBuffer, [&index](F_POINT_ATTR const& stitch) -> bool {
+  return std::ranges::any_of(Instance->StitchBuffer, [&index](F_POINT_ATTR const& stitch) -> bool {
 	return (stitch.attribute & COLMSK) == index;
   });
 }
@@ -8671,7 +8671,7 @@ void thi::delcol() {
 	displayText::tabmsg(IDS_COLU, false);
 	return;
   }
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	auto const color = stitch.attribute & COLMSK;
 	if (color <= VerticalIndex) {
 	  continue;
@@ -8700,15 +8700,15 @@ void thi::delcol() {
 
 void thred::set1knot() {
   constexpr auto KNTSTCH = size_t {5U}; // number of stitches in knot
-  if (StitchBuffer->empty() || !Instance->StateMap.test(StateFlag::SELBOX)) {
+  if (Instance->StitchBuffer.empty() || !Instance->StateMap.test(StateFlag::SELBOX)) {
 	displayText::tabmsg(IDS_NOSTCHSEL, false);
 	return;
   }
   savdo();
   auto buffer = std::vector<F_POINT_ATTR> {};
-  buffer.reserve(StitchBuffer->size() + KNTSTCH);
-  buffer.insert(buffer.begin(), StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U));
-  if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+  buffer.reserve(Instance->StitchBuffer.size() + KNTSTCH);
+  buffer.insert(buffer.begin(), Instance->StitchBuffer.begin(), wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex + 1U));
+  if (ClosestPointIndex == wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
 	Instance->StateMap.set(StateFlag::FILDIR);
 	thi::endknt(buffer, ClosestPointIndex);
   }
@@ -8716,8 +8716,8 @@ void thred::set1knot() {
 	thi::strtknt(buffer, ClosestPointIndex);
   }
   buffer.insert(
-      buffer.end(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U), StitchBuffer->end());
-  *StitchBuffer = std::move(buffer);
+      buffer.end(), wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex + 1U), Instance->StitchBuffer.end());
+  Instance->StitchBuffer = std::move(buffer);
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -8855,8 +8855,8 @@ void thred::qcode() {
   Instance->StateMap.reset(StateFlag::HIDMAP);
   Instance->StateMap.reset(StateFlag::FILDIR);
   ReleaseCapture();
-  if (StitchBuffer->size() == 1) {
-	StitchBuffer->clear();
+  if (Instance->StitchBuffer.size() == 1) {
+	Instance->StitchBuffer.clear();
 	Instance->StateMap.reset(StateFlag::INIT);
   }
   auto& formList = Instance->FormList;
@@ -8908,13 +8908,13 @@ void thred::qcode() {
 
 // ReSharper disable CppParameterMayBeConst
 void thi::drwLin(std::vector<POINT>& linePoints, uint32_t const currentStitch, uint32_t const length, HPEN hPen) {
-  if (StitchBuffer->empty() || length == 0) {
+  if (Instance->StitchBuffer.empty() || length == 0) {
 	return;
   }
   if (ActiveLayer != 0U) {
 	linePoints.clear();
   }
-  auto const firstStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
+  auto const firstStitch = wrap::next(Instance->StitchBuffer.cbegin(), currentStitch);
   auto const lastStitch  = wrap::next(firstStitch, length);
   for (auto const rStitches = std::ranges::subrange(firstStitch, lastStitch); auto const& stitch : rStitches) {
 	if (auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
@@ -10880,7 +10880,7 @@ void thi::init() {
   // create brushes
   createBrushes();
   ZoomFactor = 1;
-  StitchBuffer->clear();
+  Instance->StitchBuffer.clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
   menu::ladj();
   auto const pikol = displayText::loadStr(IDS_PIKOL);
@@ -10953,7 +10953,7 @@ void thi::dumov() {
   constexpr auto ABWX = 6;  // Arrow Width
   constexpr auto ABHY = 20; // Arrow length
 
-  auto const sCurr = wrap::next(StitchBuffer->begin(), keys::getMoveAnchor());
+  auto const sCurr = wrap::next(Instance->StitchBuffer.begin(), keys::getMoveAnchor());
   if (sCurr->x < ZoomRect.left || sCurr->x > ZoomRect.right || sCurr->y < ZoomRect.bottom ||
       sCurr->y > ZoomRect.top) {
 	return;
@@ -10961,7 +10961,7 @@ void thi::dumov() {
   auto const sNext          = std::next(sCurr);
   RotateAngle               = std::atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
   auto       arrowBox       = std::array<POINT, ABPOINTS> {};
-  auto const abCenterPixels = sdCor2px(StitchBuffer->operator[](keys::getMoveAnchor()));
+  auto const abCenterPixels = sdCor2px(Instance->StitchBuffer.operator[](keys::getMoveAnchor()));
   arrowBox[ABP0]            = abCenterPixels;
   arrowBox[ABP6]            = abCenterPixels;
   auto offsetFromCenter     = POINT {abCenterPixels.x + ABLX, abCenterPixels.y + ABSX};
@@ -11000,7 +11000,7 @@ void thi::stCor2px(F_POINT_ATTR const& stitch, POINT& point) {
 }
 
 void thi::drwknot() {
-  if (UserFlagMap->test(UserFlag::KNOTOF) || Knots->empty() || StitchBuffer->empty()) {
+  if (UserFlagMap->test(UserFlag::KNOTOF) || Knots->empty() || Instance->StitchBuffer.empty()) {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
@@ -11011,7 +11011,7 @@ void thi::drwknot() {
   auto           kOutline = std::array<POINT, SQPNTS> {};
   auto           tLine    = std::array<POINT, LNPNTS> {};
   for (auto const knot : *Knots) {
-	stCor2px(StitchBuffer->operator[](knot), point);
+	stCor2px(Instance->StitchBuffer.operator[](knot), point);
 	SelectObject(StitchWindowMemDC, KnotPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	kOutline[0].x = kOutline[3].x = kOutline[4].x = point.x - kOffset;
@@ -11130,7 +11130,7 @@ void thi::drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& pre
 }
 
 void thi::doInitZoomed() {
-  if (StitchBuffer->empty()) {
+  if (Instance->StitchBuffer.empty()) {
 	return;
   }
   auto stitchCount = getMaxCount();
@@ -11139,12 +11139,12 @@ void thi::doInitZoomed() {
   Instance->StateMap.reset(StateFlag::LINED);
   Instance->StateMap.reset(StateFlag::LININ);
   // intentional copy of first stitch to initialize previous stitch
-  auto prevStitch = StitchBuffer->front();
+  auto prevStitch = Instance->StitchBuffer.front();
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) { // iterate through all colors
 	if (Instance->StateMap.test(StateFlag::HID) && ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
 	  stitchCount = ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	                ColorChangeTable->operator[](iColor).stitchIndex;
-	  auto const sStart = wrap::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
+	  auto const sStart = wrap::next(Instance->StitchBuffer.begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 	  auto const sEnd = wrap::next(sStart, stitchCount);
 	  // and check if the color is to be displayed in the zoomed view
 	  for (auto sRange = std::ranges::subrange(sStart, sEnd); auto const& iStitch : sRange) {
@@ -11162,7 +11162,7 @@ void thi::doInitZoomed() {
 	              ColorChangeTable->operator[](iColor).stitchIndex;
 	auto const stIndex = ColorChangeTable->operator[](iColor).stitchIndex;
 
-	auto const stStart   = wrap::next(StitchBuffer->begin(), stIndex);
+	auto const stStart   = wrap::next(Instance->StitchBuffer.begin(), stIndex);
 	stitchCount          = chkup(stitchCount, iColor);
 	auto const stitches  = std::ranges::subrange(stStart, wrap::next(stStart, stitchCount));
 	auto const maxYcoord = wrap::toFloat(DrawItem->rcItem.bottom);
@@ -11303,7 +11303,7 @@ void thi::drawStitchBoxes() {
 	  for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
 	       iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
 	       ++iStitch) {
-		if (auto const& stitch = StitchBuffer->operator[](iStitch);
+		if (auto const& stitch = Instance->StitchBuffer.operator[](iStitch);
 		    stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
 		    stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
 		  stchbox(iStitch, StitchWindowMemDC);
@@ -11313,7 +11313,7 @@ void thi::drawStitchBoxes() {
   }
   else {
 	auto iStitch = 0U;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto& stitch : Instance->StitchBuffer) {
 	  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
 	      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
 		stchbox(iStitch, StitchWindowMemDC);
@@ -11347,8 +11347,8 @@ void thi::doDrwInit() {
 	doInitUnzoomed();
   }
   if (Instance->StateMap.test(StateFlag::SELBOX)) { // if we have selected a box which has stitches
-	if (!StitchBuffer->empty()) {
-	  ritcor(StitchBuffer->operator[](ClosestPointIndex));
+	if (!Instance->StitchBuffer.empty()) {
+	  ritcor(Instance->StitchBuffer.operator[](ClosestPointIndex));
 	  if (auto stitchCoordsInPixels = POINT {}; thred::stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 		thred::dubox(stitchCoordsInPixels);
 	  }
@@ -11432,7 +11432,7 @@ void thi::drwStch() {
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
 	displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
   }
-  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+  thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
   if (Instance->StateMap.test(StateFlag::INIT)) {
 	thred::lenCalc();
   }
@@ -11445,7 +11445,7 @@ void thi::drwStch() {
 void thi::dubar() {
   auto colorBarRect = RECT {DrawItem->rcItem.left, 0, DrawItem->rcItem.right, DrawItem->rcItem.bottom};
   auto       indicatorLine = std::array<POINT, 2> {};
-  auto const buffSize      = wrap::toFloat(StitchBuffer->size());
+  auto const buffSize      = wrap::toFloat(Instance->StitchBuffer.size());
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
 	auto const barSectionHeight =
 	    wrap::toFloat(ColorChangeTable->operator[](iColorChange + 1U).stitchIndex) / buffSize;
@@ -11535,7 +11535,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	stitchesToDraw.resize(stitchHeader.stitchCount);
 	auto lines = std::vector<POINT> {};
 	lines.resize(stitchHeader.stitchCount);
-	auto const bytesToRead = stitchHeader.stitchCount * wrap::sizeofType(StitchBuffer);
+	auto const bytesToRead = stitchHeader.stitchCount * wrap::sizeofType(Instance->StitchBuffer);
 	if (!wrap::readFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &bytesRead, L"ReadFile for stitchesToDraw in ritbak")) {
 	  return;
 	}
@@ -11852,7 +11852,7 @@ auto thi::handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	return true;
   }
   if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
-	if (!StitchBuffer->empty()) {
+	if (!Instance->StitchBuffer.empty()) {
 	  dubar();
 	}
 	else {
@@ -12300,7 +12300,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SideWindow                = &Instance->SideWindow; // thred only
 	  SideWindowEntryBuffer     = &Instance->SideWindowEntryBuffer; // thred only
 	  SortBuffer                = &Instance->SortBuffer;            // thred only
-	  StitchBuffer              = &Instance->StitchBuffer;
 	  TempPolygon               = &Instance->TempPolygon;
 	  TextureInputBuffer        = &Instance->textureInputBuffer;
 	  TexturePointsBuffer       = &Instance->TexturePointsBuffer;
@@ -12681,7 +12680,7 @@ void thred::redrawCapturedStitch(uint32_t const closestPointIndexClone) {
   ClosestPointIndex = closestPointIndexClone;
   unbox();
   thi::unboxs();
-  auto const index = StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK;
+  auto const index = Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & COLMSK;
   auto const spTSP = wrap::next(ThreadSizePixels.begin(), index);
   thi::setbak(*spTSP + 3);
   auto linePoints = std::vector<POINT> {};
@@ -12697,8 +12696,8 @@ void thred::redrawCapturedStitch(uint32_t const closestPointIndexClone) {
 	thi::drwLin(linePoints, 0, 2, BackgroundPen);
   }
   else {
-	if (!StitchBuffer->empty()) {
-	  if (auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U); ClosestPointIndex == lastStitch) {
+	if (!Instance->StitchBuffer.empty()) {
+	  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U); ClosestPointIndex == lastStitch) {
 		if (ZoomFactor < STCHBOX) {
 		  SelectObject(StitchWindowDC, LinePen);
 		  thi::stchbox(lastStitch, StitchWindowDC);
@@ -12728,7 +12727,7 @@ void thred::redrawCapturedStitch(uint32_t const closestPointIndexClone) {
 	Instance->StateMap.set(StateFlag::ISDWN);
 	MoveLine0[0] = stch2px1(ClosestPointIndex - 1);
   }
-  auto iStitch = wrap::toUnsigned(StitchBuffer->size());
+  auto iStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (iStitch != 0U) {
 	--iStitch;
   }
@@ -12821,12 +12820,12 @@ void thred::updateMoveLine() {
 
 void thi::fillSortBuffer() {
   SortBuffer->clear();
-  SortBuffer->reserve(StitchBuffer->size());
-  auto stitch     = wrap::next(StitchBuffer->begin(), SelectedRange.start);
+  SortBuffer->reserve(Instance->StitchBuffer.size());
+  auto stitch     = wrap::next(Instance->StitchBuffer.begin(), SelectedRange.start);
   auto nextStitch = wrap::next(stitch, 1);
   auto index      = SelectedRange.start;
 
-  auto const endStitch = wrap::next(StitchBuffer->begin(), SelectedRange.finish);
+  auto const endStitch = wrap::next(Instance->StitchBuffer.begin(), SelectedRange.finish);
   while (nextStitch != endStitch) {
 	auto const deltaX = nextStitch->x - stitch->x;
 	auto const deltaY = nextStitch->y - stitch->y;

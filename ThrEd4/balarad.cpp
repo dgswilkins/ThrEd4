@@ -120,8 +120,8 @@ void bal::setBN2(fs::path* name) noexcept {
 void bali::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
   balaradStitch.push_back(BAL_STITCH {code,
                                       flag,
-                                      (StitchBuffer->operator[](source).x - BalaradOffset.x) * BALRATIO,
-                                      (StitchBuffer->operator[](source).y - BalaradOffset.y) * BALRATIO});
+                                      (Instance->StitchBuffer.operator[](source).x - BalaradOffset.x) * BALRATIO,
+                                      (Instance->StitchBuffer.operator[](source).y - BalaradOffset.y) * BALRATIO});
 }
 
 void bal::redbal() {
@@ -130,7 +130,7 @@ void bal::redbal() {
 	return;
   }
   auto balaradHeader = BAL_HEAD {};
-  StitchBuffer->clear();
+  Instance->StitchBuffer.clear();
   Instance->FormList.clear();
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const balaradFile =
@@ -172,7 +172,7 @@ void bal::redbal() {
   for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 	switch (balaradStitch[iStitch].code) {
 	  case BALNORM: {
-		StitchBuffer->emplace_back(balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
+		Instance->StitchBuffer.emplace_back(balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
 		                           balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
 		                           color);
 		break;
@@ -180,7 +180,7 @@ void bal::redbal() {
 	  case BALSTOP: {
 		color = DST::colmatch(*iBHC++);
 
-		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+		auto const currentStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
 		thred::addColor(currentStitch, color);
 		break;
 	  }
@@ -200,7 +200,7 @@ void bal::redbal() {
 
 void bal::ritbal() {
   auto balaradHeader = BAL_HEAD {};
-  if (!BalaradName0->empty() && !BalaradName1->empty() && !StitchBuffer->empty()) {
+  if (!BalaradName0->empty() && !BalaradName1->empty() && !Instance->StitchBuffer.empty()) {
 	auto outputName = thred::setFileName();
 	outputName.replace_extension(L".thv");
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -209,12 +209,12 @@ void bal::ritbal() {
 	if (balaradFile == INVALID_HANDLE_VALUE) {
 	  return;
 	}
-	auto       color  = gsl::narrow_cast<uint8_t>(StitchBuffer->front().attribute & COLMSK);
+	auto       color  = gsl::narrow_cast<uint8_t>(Instance->StitchBuffer.front().attribute & COLMSK);
 	auto const spBHC  = gsl::span {balaradHeader.color};
 	auto       iBHC   = spBHC.begin();
 	auto const bhcEnd = std::next(spBHC.begin(), UserColor.size());
 	*iBHC             = UserColor.at(color);
-	for (auto const& stitch : *StitchBuffer) {
+	for (auto const& stitch : Instance->StitchBuffer) {
 	  if (auto const stitchColor = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK); color != stitchColor) {
 		color   = stitchColor;
 		*iBHC++ = UserColor.at(color);
@@ -232,10 +232,10 @@ void bal::ritbal() {
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 	BalaradOffset      = F_POINT {IniFile.hoopSizeX * HALF, IniFile.hoopSizeY * HALF};
 	auto balaradStitch = std::vector<BAL_STITCH> {};
-	balaradStitch.reserve(StitchBuffer->size() + 2U);
-	color = StitchBuffer->front().attribute & COLMSK;
+	balaradStitch.reserve(Instance->StitchBuffer.size() + 2U);
+	color = Instance->StitchBuffer.front().attribute & COLMSK;
 	bali::thr2bal(balaradStitch, 0, BALJUMP, 0);
-	for (auto iStitch = 0U; const auto& stitch : *StitchBuffer) {
+	for (auto iStitch = 0U; const auto& stitch : Instance->StitchBuffer) {
 	  bali::thr2bal(balaradStitch, iStitch, BALNORM, 0);
 	  if ((stitch.attribute & COLMSK) != color) {
 		color = stitch.attribute & COLMSK;

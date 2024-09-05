@@ -341,8 +341,6 @@ extern float    StarRatio;
 extern F_POINT StitchBmpRatio;
 extern float   StitchBoxesThreshold;
 
-extern std::vector<F_POINT_ATTR>* StitchBuffer;
-
 extern F_RECTANGLE StitchRangeRect;
 extern RECT        StitchWindowClientRect;
 extern HDC         StitchWindowDC;

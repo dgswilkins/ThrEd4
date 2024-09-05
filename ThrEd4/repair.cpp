@@ -104,7 +104,7 @@ void repair::lodchk() {
 	}
   }
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	if (auto const attribute = stitch.attribute; (attribute & TYPMSK) == TYPFRM) {
 	  if (auto const tform = (attribute & FRMSK) >> FRMSHFT; tform < formMap.size()) {
 		formMap.set(tform);
@@ -122,7 +122,7 @@ void repair::lodchk() {
 	++iForm;
   }
   formMap.reset();
-  for (auto const& stitch : *StitchBuffer) {
+  for (auto const& stitch : Instance->StitchBuffer) {
 	if (auto const attribute = stitch.attribute; (attribute & TYPBRD) != 0U) {
 	  formMap.set((attribute & FRMSK) >> FRMSHFT);
 	}
@@ -246,7 +246,7 @@ void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 
 void ri::chkfstch() noexcept {
   auto const codedFormIndex = Instance->FormList.size() << FRMSHFT;
-  for (auto& stitch : *StitchBuffer) {
+  for (auto& stitch : Instance->StitchBuffer) {
 	if ((stitch.attribute & FRMSK) >= codedFormIndex) {
 	  stitch.attribute = NOTFRM;
 	}

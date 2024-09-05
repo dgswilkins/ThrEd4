@@ -76,7 +76,7 @@ void backup::dudat() {
   auto const& formList = Instance->FormList;
   auto const formCount = wrap::toUnsigned(formList.size());
 
-  auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(StitchBuffer) +
+  auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
                     wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
                     wrap::sizeofVector(Instance->SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
@@ -92,16 +92,16 @@ void backup::dudat() {
 	auto const spForms = gsl::span {backupData->forms, formList.size()};
 	std::ranges::copy(formList.cbegin(), formList.cend(), spForms.begin());
   }
-  backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
+  backupData->stitchCount = wrap::toUnsigned(Instance->StitchBuffer.size());
   backupData->stitches =
       convertFromPtr<F_POINT_ATTR*>(std::next(backupData->forms, wrap::toPtrdiff(formCount)));
-  if (!StitchBuffer->empty()) {
-	auto const spStitches = gsl::span {backupData->stitches, StitchBuffer->size()};
-	std::ranges::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
+  if (!Instance->StitchBuffer.empty()) {
+	auto const spStitches = gsl::span {backupData->stitches, Instance->StitchBuffer.size()};
+	std::ranges::copy(Instance->StitchBuffer.begin(), Instance->StitchBuffer.end(), spStitches.begin());
   }
   backupData->vertexCount = wrap::toUnsigned(Instance->FormVertices.size());
   backupData->vertices =
-      convertFromPtr<F_POINT*>(std::next(backupData->stitches, wrap::toPtrdiff(StitchBuffer->size())));
+      convertFromPtr<F_POINT*>(std::next(backupData->stitches, wrap::toPtrdiff(Instance->StitchBuffer.size())));
   if (!Instance->FormVertices.empty()) {
 	auto const spVertices = gsl::span {backupData->vertices, Instance->FormVertices.size()};
 	std::ranges::copy(Instance->FormVertices.cbegin(), Instance->FormVertices.cend(), spVertices.begin());
@@ -150,10 +150,10 @@ void bui::redbak() {
 	return;
   }
   auto const* undoData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
-  StitchBuffer->clear();
+  Instance->StitchBuffer.clear();
   if (undoData->stitchCount != 0U) {
 	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
-	StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
+	Instance->StitchBuffer.insert(Instance->StitchBuffer.end(), span.begin(), span.end());
 	Instance->StateMap.set(StateFlag::INIT);
   }
   else {

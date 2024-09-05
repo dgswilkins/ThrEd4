@@ -511,13 +511,13 @@ void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t const val) {
 void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
   auto  thisStitch = F_POINT {};
-  rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
+  rpcrd(buffer, thisStitch, Instance->StitchBuffer.front().x, Instance->StitchBuffer.front().y);
   auto iColor     = 1U;
-  auto color      = StitchBuffer->front().attribute & COLMSK;
+  auto color      = Instance->StitchBuffer.front().attribute & COLMSK;
   auto iPEC       = wrap::next(PESequivColors.begin(), color);
   auto iPesColors = pecHeader->pad.begin();
   *iPesColors++   = *iPEC;
-  for (auto const stitchRange = std::ranges::subrange(std::next(StitchBuffer->begin()), StitchBuffer->end());
+  for (auto const stitchRange = std::ranges::subrange(std::next(Instance->StitchBuffer.begin()), Instance->StitchBuffer.end());
        auto const& stitch : stitchRange) {
 	if ((stitch.attribute & COLMSK) != color) {
 	  color = stitch.attribute & COLMSK;
@@ -558,7 +558,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   // write the overall thumbnail
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
-  for (auto const& stitch : *StitchBuffer) {
+  for (auto const& stitch : Instance->StitchBuffer) {
 	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
@@ -568,8 +568,8 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   writeThumbnail(pecBuffer, thumbnail);
   // now write out the individual thread thumbnails
   thumbnail        = IMAGE_WITH_FRAME;
-  auto stitchColor = StitchBuffer->front().attribute & COLMSK;
-  for (auto const& stitch : *StitchBuffer) {
+  auto stitchColor = Instance->StitchBuffer.front().attribute & COLMSK;
+  for (auto const& stitch : Instance->StitchBuffer) {
 	auto const xCoord = wrap::toPtrdiff(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const yCoord = wrap::toPtrdiff(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = std::next(thumbnail.begin(), yCoord);
@@ -695,9 +695,9 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto       color      = 0U;
   auto       iPESstitch = size_t {0U};
   auto const pecCount   = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
-  StitchBuffer->clear();
-  StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
-  StitchBuffer->emplace_back();
+  Instance->StitchBuffer.clear();
+  Instance->StitchBuffer.reserve(pecCount / 2); // we are still reserving a bit more than necessary
+  Instance->StitchBuffer.emplace_back();
   constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
   auto       pesColorIndex = uint32_t {1U};
@@ -739,7 +739,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 	  if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
 		loc.y -= locof;
-		StitchBuffer->emplace_back(loc.x, loc.y, color);
+		Instance->StitchBuffer.emplace_back(loc.x, loc.y, color);
 	  }
 	  else {
 		loc.x += locof;
@@ -808,7 +808,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  ++iPEC;
 	}
   }
-  auto stitchColor  = StitchBuffer->front().attribute & COLMSK;
+  auto stitchColor  = Instance->StitchBuffer.front().attribute & COLMSK;
   auto boundingRect = F_RECTANGLE {};
   thred::stchrct(boundingRect);
   auto const offset      = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
@@ -825,7 +825,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.atfm6        = AT6OFF + designSizeY + hoopSizeY * HALF - designSizeY * HALF;
   auto pesBuffer         = std::vector<uint8_t> {};
   // ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
-  auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
+  auto const pesSize = sizeof(PESSTCHLST) + Instance->StitchBuffer.size() * sizeof(PESTCH) + 1000U;
   pesBuffer.reserve(pesSize);
   auto threadList      = std::vector<PES_COLOR_LIST> {};
   auto blockIndex      = uint16_t {}; // Index into the stitch blocks
@@ -857,8 +857,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pi::ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 0});
   ++blockIndex;
   auto stitchCount = 0U;
-  for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	if (stitchColor == (StitchBuffer->operator[](iStitch).attribute & COLMSK)) {
+  for (auto iStitch = 1U; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
+	if (stitchColor == (Instance->StitchBuffer.operator[](iStitch).attribute & COLMSK)) {
 	  // we are in the same color block, so write the stitch
 	  pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
 	  ++stitchCount;
@@ -874,7 +874,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  blockHeader->setStitchType(stitchCount);
 	  // save the thread/color information
 	  ++pesThreadCount;
-	  stitchColor     = StitchBuffer->operator[](iStitch).attribute & COLMSK;
+	  stitchColor     = Instance->StitchBuffer.operator[](iStitch).attribute & COLMSK;
 	  iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
 	  currentColor    = *iPESequivColors;
 	  threadList.emplace_back(blockIndex, currentColor);
@@ -936,7 +936,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.hnd2[3] = 0x00;
   // NOLINTEND(readability-magic-numbers)
   GroupStartStitch  = 0;
-  GroupEndStitch    = wrap::toUnsigned(StitchBuffer->size() - 1U);
+  GroupEndStitch    = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
   auto bytesWritten = DWORD {};
   if (FALSE == WriteFile(fileHandle, convertFromPtr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr)) {
 	displayText::riter();
@@ -953,7 +953,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   auto pecBuffer = std::vector<uint8_t> {};
   // make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates
   // are 2 bytes and pad by 1000 to account for jumps. Also reserve memory for thumbnails
-  auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + StitchBuffer->size() * 2 + 1000 +
+  auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + Instance->StitchBuffer.size() * 2 + 1000 +
                        (wrap::toSize(pesThreadCount) + 1U) * THUMBHGT * (THUMBWID / 8);
   pecBuffer.reserve(pecSize);
   pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));

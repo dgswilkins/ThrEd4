@@ -1741,7 +1741,7 @@ void texture::setshft() {
   TempTexturePoints->clear();
   auto line = 1U;
   auto txIn = false;
-  for (auto const& stitch : *StitchBuffer) {
+  for (auto const& stitch : Instance->StitchBuffer) {
 	if (txi::inrct(selectionRect, stitch)) {
 	  txIn = true;
 	  TempTexturePoints->push_back(TX_PNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});

@@ -62,7 +62,7 @@ class PCSHEADER // pcs file header structure
   void writeHeader(std::array<COLORREF, COLORCNT> userColor) {
 	m_leadIn     = LEADIN;
 	m_colorCount = COLORCNT;
-	wrap::narrow(m_stitchCount, StitchBuffer->size());
+	wrap::narrow(m_stitchCount, Instance->StitchBuffer.size());
 	auto const spColors = gsl::span {m_colors};
 	std::ranges::copy(userColor, spColors.begin());
   }
@@ -145,7 +145,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	return false;
   }
   auto savcol = COLMSK;
-  pcsStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
+  pcsStitchBuffer.reserve(Instance->StitchBuffer.size() + thred::maxColor());
   for (auto const& stitch : saveStitches) {
 	if ((stitch.attribute & COLMSK) != savcol) {
 	  savcol      = stitch.attribute & COLMSK;
@@ -224,15 +224,15 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
   }
   auto iStitch = uint16_t {};
   auto color   = 0U;
-  StitchBuffer->clear();
-  StitchBuffer->reserve(PCSHeader.getStitchCount());
+  Instance->StitchBuffer.clear();
+  Instance->StitchBuffer.reserve(PCSHeader.getStitchCount());
   for (auto const& stitch : pcsDataBuffer) {
 	if (stitch.tag == 3) {
 	  thred::addColor(iStitch, stitch.fx);
 	  color = NOTFRM | stitch.fx;
 	  continue;
 	}
-	StitchBuffer->emplace_back(wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+	Instance->StitchBuffer.emplace_back(wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
 	                           wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
 	                           color);
 	if (iStitch++ >= PCSHeader.getStitchCount()) {
@@ -369,7 +369,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	return false;
   }
   thred::savdo();
-  StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
+  Instance->StitchBuffer.reserve(Instance->StitchBuffer.size() + pcsStitchCount);
   auto newAttribute = 0U;
 
   auto minX = BIGFLOAT;
@@ -393,7 +393,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	minY = std::min(minY, yVal);
 	maxX = std::max(maxX, xVal);
 	maxY = std::max(maxY, yVal);
-	StitchBuffer->emplace_back(xVal, yVal, newAttribute);
+	Instance->StitchBuffer.emplace_back(xVal, yVal, newAttribute);
   }
   insertedRectangle = F_RECTANGLE {minX, maxY, maxX, minY};
   CloseHandle(fileHandle);

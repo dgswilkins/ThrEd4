@@ -763,7 +763,7 @@ void satin::satbrd() {
 	  si::satsbrd(ClosestFormToCursor);
 	  Instance->StateMap.set(StateFlag::INIT);
 	  thred::coltab();
-	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+	  thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	}
   }

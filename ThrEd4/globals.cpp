@@ -126,7 +126,6 @@ float                          SpiralWrap                = SPIRWRAP;// number of
 float                          StarRatio                 = STARAT;  // star formOrigin to body ratio
 F_POINT                        StitchBmpRatio            = F_POINT {}; // stitch hoop to bitmap ratios
 float                          StitchBoxesThreshold      = STCHBOX; // threshold for drawing stitch boxes
-std::vector<F_POINT_ATTR>*     StitchBuffer              = nullptr; // main stitch buffer
 F_RECTANGLE                    StitchRangeRect           = F_RECTANGLE {}; // stitch range rectangle
 RECT                           StitchWindowClientRect    = {};      // stitch window size,client
 HDC                            StitchWindowDC            = nullptr; // stitch window device context
