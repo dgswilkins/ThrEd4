@@ -37,6 +37,7 @@
 #endif
 
 // Windows Header Files:
+#include <algorithm>
 #include <combaseapi.h>
 #include <commdlg.h>
 #include <errhandlingapi.h>
