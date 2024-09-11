@@ -1684,10 +1684,10 @@ void fi::ritbrd(FRM_HEAD const& form) {
   if (Instance->OSequence.empty()) {
 	return;
   }
-  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {TYPBRD,
-                                                   gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
-                                                   wrap::toUnsigned(Instance->InterleaveSequence.size()),
-                                                   I_BRD});
+  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {.code = TYPBRD,
+                                                   .color = gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
+                                                   .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
+                                                   .seq = I_BRD});
   form::chkseq(true);
 }
 
@@ -1696,10 +1696,10 @@ void fi::ritapbrd() {
 	return;
   }
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
-  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {TYPMSK,
-                                                   gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
-                                                   wrap::toUnsigned(Instance->InterleaveSequence.size()),
-                                                   I_AP});
+  Instance->InterleaveSequenceIndices.emplace_back(INS_REC {.code = TYPMSK,
+                                                   .color = gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
+                                                   .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
+                                                   .seq = I_AP});
   form::chkseq(true);
 }
 
@@ -1708,7 +1708,7 @@ void fi::ritfil(FRM_HEAD& form) {
 	return;
   }
   Instance->InterleaveSequenceIndices.emplace_back(INS_REC {
-      TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(Instance->InterleaveSequence.size()), I_FIL});
+      .code = TYPFRM, .color = gsl::narrow_cast<uint32_t>(form.fillColor), .index = wrap::toUnsigned(Instance->InterleaveSequence.size()), .seq = I_FIL});
   form::chkseq(false);
 }
 
@@ -2640,7 +2640,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 		auto const iNextVertex = (wrap::toSize(iVertex) + 1U) % currentVertexCount; // NOLINT(clang-analyzer-core.DivideZero)
 		if (auto point = F_POINT {};
 		    projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
-		  auto const projected = F_POINT_LINE {point.x, point.y, iVertex};
+		  auto const projected = F_POINT_LINE {.x = point.x, .y = point.y, .line = iVertex};
 		  projectedPoints.push_back(projected);
 		  ++iPoint;
 		}
@@ -2925,7 +2925,7 @@ public:
 	auto itVertex = wrap::next(itFirstVertex, start + 1);
 	for (auto iVertex = start + 1U; iVertex <= finish; ++iVertex) {
 	  auto const delta = F_POINT {itVertex->x - itSelectedVertex->x, itVertex->y - itSelectedVertex->y};
-	  polyLines[selind] = P_VEC {atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
+	  polyLines[selind] = P_VEC {.angle = atan2(delta.y, delta.x), .length = std::hypot(delta.x, delta.y)};
 	  ++selind;
 	  ++itVertex;
 	}
@@ -2975,7 +2975,7 @@ public:
   auto itFinishVertex = wrap::next(itFirstVertex, finish);
   auto itStartVertex  = wrap::next(itFirstVertex, start);
   auto delta = F_POINT {itFinishVertex->x - itStartVertex->x, itFinishVertex->y - itStartVertex->y};
-  auto const reference = P_VEC {std::atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
+  auto const reference = P_VEC {.angle = std::atan2(delta.y, delta.x), .length = std::hypot(delta.x, delta.y)};
   auto       lowStep   = F_POINT {};
   auto       lowPoint  = F_POINT {};
   auto       highStep  = F_POINT {};
@@ -3009,8 +3009,8 @@ public:
 	if (constexpr auto REFFACT = 0.9F; // reduction factor for the reference
 	    reference.length > REFFACT * LineSpacing) {
 	  // and if not, create the sequence for the contour
-	  auto const polyLine = P_VEC {std::atan2(delta.y, delta.x), std::hypot(delta.x, delta.y)};
-	  if (auto const polyDiff = P_VEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
+	  auto const polyLine = P_VEC {.angle = std::atan2(delta.y, delta.x), .length = std::hypot(delta.x, delta.y)};
+	  if (auto const polyDiff = P_VEC {.angle = polyLine.angle - reference.angle, .length = polyLine.length / reference.length};
 	      Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
 		Instance->OSequence.emplace_back(lowPoint);
 		for (auto iVertex = 0U; iVertex < selectedVertexCount - 1; ++iVertex) {
@@ -3146,7 +3146,7 @@ auto fi::isin(FRM_HEAD const&             form,
 }
 
 void fi::inspnt(std::vector<CLIP_PNT>& clipStitchPoints) {
-  auto const clipStitchPoint = CLIP_PNT {clipStitchPoints.back().x, clipStitchPoints.back().y, 0, 0};
+  auto const clipStitchPoint = CLIP_PNT {.x = clipStitchPoints.back().x, .y = clipStitchPoints.back().y, .vertexIndex = 0, .flag = 0};
   clipStitchPoints.back().x =
       wrap::midl(clipStitchPoint.x, clipStitchPoints[clipStitchPoints.size() - 2U].x);
   clipStitchPoints.back().y =
@@ -3304,15 +3304,15 @@ auto fi::clpnseg(std::vector<CLIP_PNT>&      clipStitchPoints,
                  uint32_t const              start,
                  uint32_t const              finish,
                  std::vector<F_POINT> const& currentFormVertices) -> uint32_t {
-  auto const clipSegment = CLIP_SEG {start,
-                                     getlen(clipStitchPoints, lengths, start, currentFormVertices),
-                                     0U,
-                                     clipStitchPoints[start].vertexIndex,
-                                     finish,
-                                     getlen(clipStitchPoints, lengths, finish, currentFormVertices),
-                                     0U,
-                                     clipStitchPoints[finish].vertexIndex,
-                                     0};
+  auto const clipSegment = CLIP_SEG {.start = start,
+                                     .beginLength = getlen(clipStitchPoints, lengths, start, currentFormVertices),
+                                     .beginIndex = 0U,
+                                     .asid = clipStitchPoints[start].vertexIndex,
+                                     .finish = finish,
+                                     .endLength = getlen(clipStitchPoints, lengths, finish, currentFormVertices),
+                                     .endIndex = 0U,
+                                     .zsid = clipStitchPoints[finish].vertexIndex,
+                                     .dun = 0};
   clipSegments.push_back(clipSegment);
   return finish + 1U;
 }
@@ -3563,7 +3563,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 	  start -= wrap::round<uint32_t>(ClipRectSize.cx / clipWidth);
 	}
 	for (auto iSegment = start; iSegment <= finish; ++iSegment) {
-	  regionCrossingData.push_back(V_CLP_X {iSegment, iVertex});
+	  regionCrossingData.push_back(V_CLP_X {.segment = iSegment, .vertex = iVertex});
 	}
   }
   std::ranges::sort(regionCrossingData, vclpComp);
@@ -3647,7 +3647,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 			                          pasteLocation.y + clipBuffer.operator[](iStitch).y};
 		  }
 
-		  clipStitchPoints.push_back(CLIP_PNT {lineSegmentStart.x, lineSegmentStart.y, 0, 0});
+		  clipStitchPoints.push_back(CLIP_PNT {.x = lineSegmentStart.x, .y = lineSegmentStart.y, .vertexIndex = 0, .flag = 0});
 		  if (isin(form, regionCrossingData, lineSegmentStart.x, lineSegmentStart.y, regionCrossingStart, regionCrossingEnd, boundingRect, currentFormVertices)) {
 			if (clipStitchPoints.size() > 1 && clipStitchPoints[clipStitchPoints.size() - 1U].flag == 2) {
 			  inspnt(clipStitchPoints);
@@ -3672,10 +3672,10 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
 		      count != 0U) {
 			auto constexpr CLIPMAXSIZE = size_t {MAXITEMS << 2U};
 			for (auto index = 0U; index < count; ++index) {
-			  clipStitchPoints.push_back({arrayOfClipIntersectData[index]->point.x,
-			                              arrayOfClipIntersectData[index]->point.y,
-			                              arrayOfClipIntersectData[index]->vertexIndex,
-			                              1});
+			  clipStitchPoints.push_back({.x = arrayOfClipIntersectData[index]->point.x,
+			                              .y = arrayOfClipIntersectData[index]->point.y,
+			                              .vertexIndex = arrayOfClipIntersectData[index]->vertexIndex,
+			                              .flag = 1});
 			  if (clipStitchPoints.size() > CLIPMAXSIZE) {
 				breakFlag = true;
 				break;
@@ -3758,8 +3758,8 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   auto sortedLengths = std::vector<LEN_INFO> {};
   sortedLengths.reserve(clipSegments.size() * 2);
   for (auto iSegment = 0U; iSegment < wrap::toUnsigned(clipSegments.size()); ++iSegment) {
-	sortedLengths.push_back(LEN_INFO {iSegment, false, clipSegments[iSegment].beginLength});
-	sortedLengths.push_back(LEN_INFO {iSegment, true, clipSegments[iSegment].endLength});
+	sortedLengths.push_back(LEN_INFO {.index = iSegment, .isEnd = false,.length = clipSegments[iSegment].beginLength});
+	sortedLengths.push_back(LEN_INFO {.index = iSegment, .isEnd = true, .length = clipSegments[iSegment].endLength});
   }
   std::ranges::sort(sortedLengths, lenComp);
   for (auto iSorted = 0U; iSorted < wrap::toUnsigned(sortedLengths.size()); ++iSorted) {
@@ -4776,7 +4776,7 @@ void fi::lcon(FRM_HEAD const&              form,
 	  if (auto const isConnected = regclos(
 	          groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
 	      isConnected) {
-		pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
+		pathMap.push_back(R_CON {.node = iNode, .isConnected = isConnected, .nextGroup = nextGroup});
 		++pathMapIndex;
 		++count;
 	  }
@@ -4792,7 +4792,7 @@ void fi::lcon(FRM_HEAD const&              form,
 		if (auto const isConnected = regclos(
 		        groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
 		    isConnected) {
-		  pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
+		  pathMap.push_back(R_CON {.node = iNode, .isConnected = isConnected, .nextGroup = nextGroup});
 		  ++pathMapIndex;
 		  ++count;
 		}
@@ -4823,7 +4823,7 @@ void fi::lcon(FRM_HEAD const&              form,
 	}
   }
   if (dontSkip) {
-	pathMap.push_back(R_CON {leftRegion, false, 0});
+	pathMap.push_back(R_CON {.node = leftRegion, .isConnected = false, .nextGroup = 0});
 	inPath = pathMapIndex;
   }
   // set the first entry in the temporary path to the leftmost region
@@ -4851,7 +4851,7 @@ void fi::lcon(FRM_HEAD const&              form,
 		wrap::narrow(tmpNode, pathMap[tempPath[iPath].pcon].node);
 	  }
 	}
-	sequencePath.push_back(F_SEQ {tmpNode, 0, tmpSkip});
+	sequencePath.push_back(F_SEQ {.node = tmpNode, .nextGroup = 0, .skp = tmpSkip});
   }
   for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
 	nxtseq(sequencePath, pathMap, mapIndexSequence, iPath);

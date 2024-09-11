@@ -511,14 +511,14 @@ void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequen
   auto&       interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
 
  interleaveSequenceIndices.emplace_back(
-      INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
+      INS_REC {.code = TYPFRM, .color = form.fillColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
   form::chkseq(false);
   if ((form.extendedAttribute & AT_FTHBLND) == 0U ||
       ~(form.extendedAttribute & (AT_FTHUP | AT_FTHBTH)) == (AT_FTHUP | AT_FTHBTH)) {
 	return;
   }
  interleaveSequenceIndices.emplace_back(
-      INS_REC {FTHMSK, form.feather.color, wrap::toUnsigned(interleaveSequence.size()), I_FTH});
+      INS_REC {.code = FTHMSK, .color = form.feather.color, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FTH});
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
@@ -648,7 +648,7 @@ void xt::fethr() {
 }
 
 constexpr auto xi::tim2int(FILETIME const time) noexcept -> ULARGE_INTEGER {
-  auto const largeInt = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
+  auto const largeInt = ULARGE_INTEGER {{.LowPart = time.dwLowDateTime, .HighPart = time.dwHighDateTime}};
   return largeInt;
 }
 
@@ -686,7 +686,7 @@ void xi::ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 
   if (!Instance->OSequence.empty()) {
 	Instance->InterleaveSequenceIndices.emplace_back(
-	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(interleaveSequence.size()), I_FIL});
+	    INS_REC {.code = walkMask, .color = form.underlayColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
 #if BUGBAK
 	for (auto val : Instance->OSequence) {
 	  Instance->InterleaveSequence.push_back(val);
@@ -823,7 +823,7 @@ void xi::undclp(float& underlayStitchLen) {
 
   clipBuffer.clear();
   clipBuffer.reserve(2);
-  ClipRectSize = F_LSIZ {0, underlayStitchLen};
+  ClipRectSize = F_LSIZ {.cx = 0, .cy = underlayStitchLen};
   clipBuffer.emplace_back(0.0F, 00.0F, 0U);
   clipBuffer.emplace_back(0.0F, underlayStitchLen, 0U);
 }
@@ -1245,7 +1245,7 @@ void xt::fsort() {
 	  if ((Instance->StitchBuffer.operator[](iStitch).attribute & SRTMSK) != attribute) {
 		stitchRegion.back().finish    = iStitch;
 		stitchRegion.back().endStitch = iStitch - 1U;
-		stitchRegion.emplace_back(O_REC {iStitch, 0, iStitch, 0, 0, 0, 0, 0});
+		stitchRegion.emplace_back(O_REC {.start = iStitch, .finish = 0, .startStitch = iStitch, .endStitch = 0, .color = 0, .type = 0, .form = 0, .otyp = 0});
 		attribute = Instance->StitchBuffer.operator[](iStitch).attribute & SRTMSK;
 	  }
 	}
@@ -1360,11 +1360,11 @@ class ATFLD
 void xi::duatf(uint32_t ind) {
   // clang-format off
   auto const attribute       = Instance->StitchBuffer.operator[](ind).attribute;
-  auto       attributeFields = ATFLD {(attribute & COLMSK),
-									  ((attribute & FRMSK) >> FRMSHFT),
-									  gsl::narrow_cast<uint32_t>(STITCH_TYPES.at(dutyp(attribute))),
-									  (attribute >> LAYSHFT & MSK3BITS),
-									  0};
+  auto       attributeFields = ATFLD {.color = (attribute & COLMSK),
+									  .form = ((attribute & FRMSK) >> FRMSHFT),
+									  .type  = gsl::narrow_cast<uint32_t>(STITCH_TYPES.at(dutyp(attribute))),
+									  .layer = (attribute >> LAYSHFT & MSK3BITS),
+									  .user = 0};
   // clang-format on
   if ((attribute & 1U << USHFT) != 0U) {
 	attributeFields.user = 1;
@@ -1697,7 +1697,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   auto const& form = Instance->FormList.operator[](formIndex);
   auto&       interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
 
-  interleaveSequenceIndices.emplace_back(INS_REC {0, 0, wrap::toUnsigned(Instance->InterleaveSequence.size()), 0});
+  interleaveSequenceIndices.emplace_back(INS_REC {.code = 0, .color = 0, .index = wrap::toUnsigned(Instance->InterleaveSequence.size()), .seq = 0});
   ilData.layerIndex =
       gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) | formIndex << FRMSHFT;
   Instance->StateMap.reset(StateFlag::DIDSTRT);

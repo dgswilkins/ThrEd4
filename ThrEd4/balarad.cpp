@@ -118,10 +118,10 @@ void bal::setBN2(fs::path* name) noexcept {
 }
 
 void bali::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
-  balaradStitch.push_back(BAL_STITCH {code,
-                                      flag,
-                                      (Instance->StitchBuffer.operator[](source).x - BalaradOffset.x) * BALRATIO,
-                                      (Instance->StitchBuffer.operator[](source).y - BalaradOffset.y) * BALRATIO});
+  balaradStitch.push_back(BAL_STITCH {.code = code,
+                                      .flag = flag,
+                                      .x = (Instance->StitchBuffer.operator[](source).x - BalaradOffset.x) * BALRATIO,
+                                      .y = (Instance->StitchBuffer.operator[](source).y - BalaradOffset.y) * BALRATIO});
 }
 
 void bal::redbal() {
@@ -160,7 +160,7 @@ void bal::redbal() {
   constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
   IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
   IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
-  UnzoomedRect           = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  UnzoomedRect           = {.cx= std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   BalaradOffset          = F_POINT {IniFile.hoopSizeX * HALF, IniFile.hoopSizeY * HALF};
   IniFile.hoopType       = CUSTHUP;
   UserColor.fill(0);

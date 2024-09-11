@@ -649,10 +649,10 @@ auto bi::bitar() -> bool {
   if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
 	return false;
   }
-  BitmapSrcRect = {wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
-                   wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
-                   wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
-                   wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
+  BitmapSrcRect = {.left = wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
+                   .top = wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
+                   .right = wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
+                   .bottom = wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
   if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
 	BitmapSrcRect.right = BitmapWidth;
 	Instance->StateMap.reset(StateFlag::LANDSCAP);
@@ -673,11 +673,11 @@ auto bi::bitar() -> bool {
   auto const bitmapStitchRatio =
       F_POINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
                wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
-  BitmapDstRect = {std::lround(differenceRect.left * bitmapStitchRatio.x),
-                   std::lround(differenceRect.top * bitmapStitchRatio.y),
-                   std::lround(wrap::toFloat(StitchWindowClientRect.right) -
+  BitmapDstRect = {.left = std::lround(differenceRect.left * bitmapStitchRatio.x),
+                   .top = std::lround(differenceRect.top * bitmapStitchRatio.y),
+                   .right = std::lround(wrap::toFloat(StitchWindowClientRect.right) -
                                differenceRect.right * bitmapStitchRatio.x),
-                   std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                   .bottom = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
                                differenceRect.bottom * bitmapStitchRatio.y)};
   return true;
 }

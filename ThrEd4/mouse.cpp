@@ -116,7 +116,7 @@ void mi::rngal() {
   for (; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
 	if (thred::inrng(iStitch)) {
 	  if (!flagInRange) {
-		prng.push_back(RANGE {iStitch, 0U});
+		prng.push_back(RANGE {.start = iStitch, .finish = 0U});
 		flagInRange = true;
 	  }
 	}
@@ -670,7 +670,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			Instance->StitchBuffer.emplace_back(stitchPoint.x, stitchPoint.y, code);
 			thred::duzrat();
 			InsertLine[0] = thred::stch2px1(iStitch);
-			InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+			InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 			thred::coltab();
 			Instance->StateMap.set(StateFlag::RESTCH);
 			return true;
@@ -680,7 +680,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  Instance->StitchBuffer.insert(Instance->StitchBuffer.begin(), F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		  Instance->StitchBuffer.front().attribute &= ~KNOTMSK;
 		  InsertLine[0] = thred::stch2px1(0);
-		  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		  thred::coltab();
 		  Instance->StateMap.set(StateFlag::RESTCH);
 		  return true;
@@ -698,7 +698,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		Instance->StitchBuffer.insert(wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex),
 		                     F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		thred::xlin();
-		InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+		InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		InsertLine[0] = thred::stch2px1(ClosestPointIndex);
 		InsertLine[2] = thred::stch2px1(ClosestPointIndex + 1U);
 		thred::coltab();
@@ -714,7 +714,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	else {
 	  if (thred::inStitchWin()) {
 		thred::savdo();
-		InsertLine[0] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+		InsertLine[0] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1] = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 		Instance->StitchBuffer.emplace_back(stitchPoint.x,
@@ -1296,7 +1296,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (Instance->StateMap.test(StateFlag::INSFRM)) { // If we are inserting points into a form
 	  form::uninsf();
-	  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::SHOINSF);
 	  form::duinsf();
 	  return true;
@@ -1325,8 +1325,8 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (Instance->StateMap.test(StateFlag::FRMPMOV)) { // If we are moving a form point
 	  mi::unmov();
-	  Instance->RubberBandLine.operator[](1) = {WinMsg.pt.x - StitchWindowOrigin.x,
-	                                   WinMsg.pt.y - StitchWindowOrigin.y};
+	  Instance->RubberBandLine.operator[](1) = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+	                                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	  if (thred::inStitchWin()) {
@@ -1390,14 +1390,14 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  if (Instance->StateMap.test(StateFlag::LIN1)) {
 		if (!Instance->StitchBuffer.empty()) {
 		  thred::xlin1();
-		  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		  Instance->StateMap.set(StateFlag::ILIN1);
 		  thred::ilin1();
 		}
 		return true;
 	  }
 	  thred::xlin();
-	  InsertLine[1] = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::ILIN);
 	  thred::ilin();
 	  return true;

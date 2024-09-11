@@ -224,10 +224,14 @@ void di::dstin(uint32_t const number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
   static constexpr auto DST_VALUES = std::array<DSTDAT, 22> {
       {// DST offset values
-       {XCOR, 1},   {XCOR, -1},  {XCOR, 9},   {XCOR, -9}, {YCOR, -9}, {YCOR, 9},
-       {YCOR, -1},  {YCOR, 1},   {XCOR, 3},   {XCOR, -3}, {XCOR, 27}, {XCOR, -27},
-       {YCOR, -27}, {YCOR, 27},  {YCOR, -3},  {YCOR, 3},  {XCOR, 0},  {XCOR, 0},
-       {XCOR, 81},  {XCOR, -81}, {YCOR, -81}, {YCOR, 81}}};
+       {.cor = XCOR, .val = 1},   {.cor = XCOR, .val = -1},  {.cor = XCOR, .val = 9},
+       {.cor = XCOR, .val = -9},  {.cor = YCOR, .val = -9},  {.cor = YCOR, .val = 9},
+       {.cor = YCOR, .val = -1},  {.cor = YCOR, .val = 1},   {.cor = XCOR, .val = 3},
+       {.cor = XCOR, .val = -3},  {.cor = XCOR, .val = 27},  {.cor = XCOR, .val = -27},
+       {.cor = YCOR, .val = -27}, {.cor = YCOR, .val = 27},  {.cor = YCOR, .val = -3},
+       {.cor = YCOR, .val = 3},   {.cor = XCOR, .val = 0},   {.cor = XCOR, .val = 0},
+       {.cor = XCOR, .val = 81},  {.cor = XCOR, .val = -81}, {.cor = YCOR, .val = -81},
+       {.cor = YCOR, .val = 81}}};
 
   auto shift = 1U;
   pout       = POINT {};
@@ -311,12 +315,12 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
   auto const dstSize =
       F_POINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
   IniFile.hoopType = CUSTHUP;
-  UnzoomedRect     = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  UnzoomedRect     = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   if (dstSize.x > wrap::toFloat(UnzoomedRect.cx) || dstSize.y > wrap::toFloat(UnzoomedRect.cy)) {
 	constexpr auto EXPRATIO = 1.1F; // 10% expansion ratio
 	IniFile.hoopSizeX       = dstSize.x * EXPRATIO;
 	IniFile.hoopSizeY       = dstSize.y * EXPRATIO;
-	UnzoomedRect            = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+	UnzoomedRect            = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
   auto const delta =
@@ -372,7 +376,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
 	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
-	  DSTRecords.push_back(DSTREC {0, 0, STOPCODE});
+	  DSTRecords.push_back(DSTREC {.led = 0, .mid = 0, .nd = STOPCODE});
 	  color = stitch.attribute & COLMSK;
 	  iUC   = wrap::next(UserColor.begin(), color);
 	  colorData.push_back(*iUC);
@@ -419,7 +423,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	}
   }
   constexpr auto ENDCODE = uint8_t {0xF3};
-  DSTRecords.push_back(DSTREC {0, 0, ENDCODE});
+  DSTRecords.push_back(DSTREC {.led = 0, .mid = 0, .nd = ENDCODE});
   if (!colfil()) {
 	return;
   }
@@ -467,8 +471,8 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
 }
 
 auto di::coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
-  auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
-  auto color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
+  auto color1 = PEC_COLOR {.r = GetRValue(colorA), .g = GetGValue(colorA), .b = GetBValue(colorA)};
+  auto color2 = PEC_COLOR {.r = GetRValue(colorB), .g = GetGValue(colorB), .b = GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
@@ -1009,9 +1013,9 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
 }
 
 void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t const data) {
-  DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & B1MASK),
-                               gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
-                               gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
+  DSTRecords.push_back(DSTREC {.led = gsl::narrow_cast<uint8_t>(data & B1MASK),
+                               .mid = gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
+                               .nd = gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
 }
 
 auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {

@@ -459,7 +459,7 @@ void txi::dutxtx(uint32_t const index, uint16_t const offsetPixels) noexcept(std
 }
 
 void txi::txrct2rct(TXTR_RECT const& textureRect, RECT& rectangle) noexcept {
-  auto texturePoint = TX_PNT {textureRect.top, textureRect.left};
+  auto texturePoint = TX_PNT {.y = textureRect.top, .line = textureRect.left};
   auto point        = POINT {};
   txt2pix(texturePoint, point);
   rectangle.left    = point.x - IniFile.textureEditorSize;
@@ -565,14 +565,14 @@ void texture::drwtxtr() {
   }
   if (!SelectedTexturePointsList->empty()) {
 	txi::txrct2rct(TextureRect, TexturePixelRect);
-	line[0] = {TexturePixelRect.left, TexturePixelRect.top};
-	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
+	line[0] = {.x = TexturePixelRect.left, .y = TexturePixelRect.top};
+	line[1] = {.x = TexturePixelRect.right, .y = TexturePixelRect.top};
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-	line[1] = {TexturePixelRect.left, TexturePixelRect.bottom};
+	line[1] = {.x = TexturePixelRect.left, .y = TexturePixelRect.bottom};
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-	line[0] = {TexturePixelRect.right, TexturePixelRect.bottom};
+	line[0] = {.x = TexturePixelRect.right, .y = TexturePixelRect.bottom};
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
+	line[1] = {.x = TexturePixelRect.right, .y = TexturePixelRect.top};
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
   for (auto const& selectedPoint : *SelectedTexturePointsList) {
@@ -591,7 +591,7 @@ auto txi::px2txt(POINT const& offset) -> bool {
   if (line < OSCLAMP) {
 	return false;
   }
-  auto txPoint = TX_PNT {0.0F, wrap::round<uint16_t>(line)};
+  auto txPoint = TX_PNT {.y = 0.0F, .line = wrap::round<uint16_t>(line)};
   if (txPoint.line > TextureScreen.lines || offset.y <= TextureScreen.top ||
       offset.y > TextureScreen.bottom) {
 	return false;
@@ -604,7 +604,7 @@ auto txi::px2txt(POINT const& offset) -> bool {
 }
 
 void txi::deorg(POINT& point) noexcept {
-  point = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  point = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 }
 
 auto txi::txbutfn() -> bool {
@@ -701,7 +701,7 @@ void txi::dutxrct(TXTR_RECT& textureRect) noexcept {
 	minY = std::min(minY, texturePoint.y);
 	maxY = std::max(maxY, texturePoint.y);
   }
-  textureRect = TXTR_RECT {minX, maxX, maxY, minY};
+  textureRect = TXTR_RECT {.left = minX, .right = maxX, .top = maxY, .bottom = minY};
 }
 
 auto txi::ed2stch(F_POINT const& point) noexcept -> F_POINT {
@@ -747,7 +747,7 @@ void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
 	if (auto const yOffset =
 	        slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing) + point0.y;
 	    yOffset > 0 && yOffset < TextureScreen.areaHeight) {
-	  TempTexturePoints->push_back(TX_PNT {yOffset, gsl::narrow<uint16_t>(integerStart)});
+	  TempTexturePoints->push_back(TX_PNT {.y = yOffset, .line = gsl::narrow<uint16_t>(integerStart)});
 	}
 	++integerStart;
   }
@@ -816,8 +816,8 @@ void texture::txtrup() {
 	offset.y -= SelectTexturePointsOrigin.y;
 	auto const xMagnitude = abs(offset.x);
 	auto       textureOffset =
-	    TX_OFF {wrap::toFloat(-offset.y) / wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight,
-	            wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) * TextureScreen.editToPixelRatio /
+	    TX_OFF {.y = wrap::toFloat(-offset.y) / wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight,
+	            .line = wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) * TextureScreen.editToPixelRatio /
 	                                TextureScreen.spacing)};
 	if (offset.x < 0) {
 	  textureOffset.line = -textureOffset.line;
@@ -943,7 +943,7 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	if (Instance->StateMap.testAndSet(StateFlag::WASWROT)) {
 	  txi::ritxfrm(textureForm);
 	}
-	TextureCursorLocation = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	txi::ritxfrm(textureForm);
 	return;
   }
@@ -951,7 +951,7 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	return;
   }
   txi::ritxrct();
-  TextureCursorLocation = {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   txi::ritxrct();
 }
 
@@ -1188,7 +1188,7 @@ void txi::altx() {
   }
   for (uint16_t iLine = 1; iLine <= TextureScreen.lines; ++iLine) {
 	if (!txtLines.test(iLine)) {
-	  TempTexturePoints->push_back(TX_PNT {halfHeight, iLine});
+	  TempTexturePoints->push_back(TX_PNT {.y = halfHeight, .line = iLine});
 	}
   }
 }
@@ -1275,7 +1275,7 @@ void txi::dutxmir() {
   for (auto index = 0U; index < iMirrorPoint; ++index) {
 	auto const newLine =
 	    gsl::narrow_cast<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
-	TempTexturePoints->emplace_back(TX_PNT {TempTexturePoints->operator[](index).y, newLine});
+	TempTexturePoints->emplace_back(TX_PNT {.y = TempTexturePoints->operator[](index).y, .line = newLine});
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -1744,7 +1744,7 @@ void texture::setshft() {
   for (auto const& stitch : Instance->StitchBuffer) {
 	if (txi::inrct(selectionRect, stitch)) {
 	  txIn = true;
-	  TempTexturePoints->push_back(TX_PNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
+	  TempTexturePoints->push_back(TX_PNT {.y = (stitch.y - selectionRect.bottom), .line = gsl::narrow<uint16_t>(line)});
 	  continue;
 	}
 	if (txIn) {

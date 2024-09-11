@@ -720,8 +720,8 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 	}
   }
   if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
-	tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
-	                                  gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	tracedPoints.push_back(TRACE_PNT {.x = gsl::narrow<int16_t>(CurrentTracePoint.x),
+	                                  .y = gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	if (tracedPoints.size() >= POINTMAX) {
 	  return false;
 	}
@@ -903,8 +903,8 @@ void ti::dutrac() {
   }
   uint32_t const initialDirection = traceDirection;
   auto           tracedPoints     = std::vector<TRACE_PNT> {};
-  tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
-                                    gsl::narrow<int16_t>(CurrentTracePoint.y)});
+  tracedPoints.push_back(TRACE_PNT {.x = gsl::narrow<int16_t>(CurrentTracePoint.x),
+                                    .y = gsl::narrow<int16_t>(CurrentTracePoint.y)});
   while (trcbit(initialDirection, traceDirection, tracedPoints)) { }
   if (tracedPoints.size() >= POINTMAX) { // too many points
 	displayText::tabmsg(IDS_FRM2L, false);

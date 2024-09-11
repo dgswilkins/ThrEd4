@@ -467,12 +467,12 @@ public:
 	uint32_t col {};
   };
 
-  static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, GRDHI};
-  static constexpr auto GC_MEDIUM  = GRID_COL {ID_GRDMED, GRDMED};
-  static constexpr auto GC_DEFAULT = GRID_COL {ID_GRDEF, GRDDEF};
-  static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, GRDRED};
-  static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, GRDBLU};
-  static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRDGRN};
+  static constexpr auto GC_HIGH    = GRID_COL {.id = ID_GRDHI,  .col = GRDHI};
+  static constexpr auto GC_MEDIUM  = GRID_COL {.id = ID_GRDMED, .col = GRDMED};
+  static constexpr auto GC_DEFAULT = GRID_COL {.id = ID_GRDEF,  .col = GRDDEF};
+  static constexpr auto GC_RED     = GRID_COL {.id = ID_GRDRED, .col = GRDRED};
+  static constexpr auto GC_BLUE    = GRID_COL {.id = ID_GRDBLU, .col = GRDBLU};
+  static constexpr auto GC_GREEN   = GRID_COL {.id = ID_GRDGRN, .col = GRDGRN};
   static constexpr auto GRID_CODES = std::array {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
 
   for (auto const& gridCode : GRID_CODES) {
