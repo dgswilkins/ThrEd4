@@ -43,6 +43,7 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "boost/range/algorithm_ext/iota.hpp"
 #include "fmt/compile.h"
 #include "gsl/narrow"
 #include "gsl/pointers"
@@ -102,7 +103,6 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <numeric>
 #include <ranges>
 #include <stdexcept>
 #include <string>
@@ -676,14 +676,14 @@ void thi::fnamtabs() {
   constexpr auto MAX8B   = uint8_t {127};          // max value of a signed byte
   constexpr auto NDXOFF  = uint8_t {32U};          // index offset
   constexpr auto NAMELEN = NameOrder.size();
-  std::iota(NameOrder.begin(), NameOrder.end(), 0);
+  boost::range::iota(NameOrder, 0);
   PseudoRandomValue = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
 	auto const source      = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
 	auto const destination = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
 	std::swap(*destination, *source);
   }
-  std::iota(NameEncoder.begin(), NameEncoder.end(), NCODOF);
+  boost::range::iota(NameEncoder, NCODOF);
   PseudoRandomValue = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
 	auto const source      = wrap::next(NameEncoder.begin(), form::psg() & MSK7BITS);

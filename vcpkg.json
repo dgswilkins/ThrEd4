@@ -4,12 +4,17 @@
   "version": "4.0.0.0",
   "dependencies": [
     "boost-dynamic-bitset",
+    "boost-range",
     "ms-gsl",
     "fmt"
   ],
   "overrides": [
     {
       "name": "boost-dynamic-bitset",
+      "version": "1.85.0"
+    },
+    {
+      "name": "boost-range",
       "version": "1.85.0"
     },
     {

@@ -28,6 +28,7 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "boost/range/algorithm_ext/iota.hpp"
 #include "gsl/narrow"
 #include "gsl/pointers"
 #include "gsl/span"
@@ -58,7 +59,6 @@
 #include <cstdint>
 #include <iterator>
 #include <memory>
-#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -8489,7 +8489,7 @@ void form::srtbyfrm() {
   color.resize(COLORCNT);
   if (!Instance->FormList.empty()) {
 	thred::savdo();
-	std::iota(color.begin(), color.end(), 1);
+	boost::range::iota(color, 1);
 	color[AppliqueColor]  = 0U;
 	auto tempStitchBuffer = std::vector<F_POINT_ATTR> {};
 	tempStitchBuffer.resize(Instance->StitchBuffer.size());
