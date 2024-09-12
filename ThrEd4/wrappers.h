@@ -167,7 +167,7 @@ auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> fl
 }
 
 template <class outType, class inType>
-auto distance(inType start, inType end) noexcept(std::is_same_v<outType, ptrdiff_t>) -> outType {
+auto distance(inType const& start, inType const& end) noexcept(std::is_same_v<outType, ptrdiff_t>) -> outType {
   if constexpr (std::is_same_v<outType, ptrdiff_t>) {
 	return std::distance(start, end);
   }
@@ -177,7 +177,7 @@ auto distance(inType start, inType end) noexcept(std::is_same_v<outType, ptrdiff
 }
 
 template <class itType, class inType>
-auto next(itType iterator,
+auto next(itType const& iterator,
           inType index) noexcept(!(std::is_same_v<inType, size_t> ||
                                    (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>)))
     -> itType {
