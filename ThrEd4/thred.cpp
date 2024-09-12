@@ -4712,8 +4712,7 @@ auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitc
 }
 
 auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
-  if (auto const formFirstStitch = std::find_if(Instance->StitchBuffer.rbegin(),
-                                                Instance->StitchBuffer.rend(),
+  if (auto const formFirstStitch = std::ranges::find_if(std::ranges::reverse_view(Instance->StitchBuffer),
                                                 [form](F_POINT_ATTR const& stitch) -> bool {
 	                                              if ((stitch.attribute & NOTFRM) != 0U) {
 	                                                return false;
