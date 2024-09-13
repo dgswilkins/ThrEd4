@@ -3,6 +3,7 @@
 // Local Headers
 #include "stdafx.h"
 #include "switches.h"
+#include "gsl/gsl"
 
 namespace fs = std::filesystem;
 

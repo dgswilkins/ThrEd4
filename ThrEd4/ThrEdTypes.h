@@ -6,6 +6,7 @@
 #include "utf8conv.h"
 
 // Open Source headers
+#include "gsl/gsl"
 #ifdef _DEBUG
 #pragma warning(push)
 #pragma warning(disable : 4702) // supress warning for fmt library header
