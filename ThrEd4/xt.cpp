@@ -1549,7 +1549,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 }
 
 auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
-  auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto const& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
 
   auto const color = interleaveSequenceIndices.operator[](index).color;
   while (index != 0U) {
@@ -1576,7 +1576,7 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	ilData.start += count;
 	ilData.output += count;
   }
-  auto& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto const& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	if (!Instance->StateMap.testAndSet(StateFlag::DIDSTRT)) {
 	  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillStart);

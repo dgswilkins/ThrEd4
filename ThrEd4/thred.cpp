@@ -9215,7 +9215,7 @@ auto thred::updateFillColor() -> bool {
 
 auto thred::updatePreferences() -> bool {
   thi::chknum();
-  auto& valueWindow = Instance->ValueWindow;
+  auto const& valueWindow = Instance->ValueWindow;
   if (WinMsg.hwnd == valueWindow.operator[](PRFFILEND)) {
 	if (UserFlagMap->testAndFlip(UserFlag::SQRFIL)) {
 	  SetWindowText(valueWindow.operator[](PRFFILEND), displayText::loadStr(IDS_PNTD).c_str());
@@ -10144,7 +10144,7 @@ auto thi::handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, 
 	  if (PreferenceIndex == PRFGRDCUT + 1 || PreferenceIndex == PRFSBXCUT + 1U) {
 		auto buffer = std::array<wchar_t, 2> {};
 		buffer[0]   = NumericCode;
-		auto& valueWindow = Instance->ValueWindow;
+		auto const& valueWindow = Instance->ValueWindow;
 		if (PreferenceIndex == PRFGRDCUT + 1U) {
 		  ShowStitchThreshold = unthrsh(NumericCode - L'0');
 		  SetWindowText(valueWindow.operator[](PRFGRDCUT), buffer.data());
