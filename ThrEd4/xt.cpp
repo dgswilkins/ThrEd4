@@ -2364,7 +2364,7 @@ void xt::duauxnam(fs::path& auxName) {
 // ReSharper disable CppParameterMayBeConst
 void xi::setstxt(int32_t const stringIndex, float const value, HWND dialog) {
   SetWindowText(GetDlgItem(dialog, stringIndex),
-                fmt::format(FMT_COMPILE(L"{:.2f}"), value * IPFGRAN).c_str());
+                format(FMT_COMPILE(L"{:.2f}"), value * IPFGRAN).c_str());
 }
 // ReSharper restore CppParameterMayBeConst
 

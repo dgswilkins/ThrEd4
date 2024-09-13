@@ -42,7 +42,7 @@ class FMT_WITH_LOC
 template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, Args&&... args) {
   auto       name = utf::utf8ToUtf16(std::string(fwl.loc.file_name()));
   auto       line = fwl.loc.line();
-  auto const strY = fmt::format(FMT_COMPILE(L" {}({}) : {}"), name, line, fwl.strX);
+  auto const strY = format(FMT_COMPILE(L" {}({}) : {}"), name, line, fwl.strX);
   auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
   OutputDebugString(strZ.c_str());
 }
