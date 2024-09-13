@@ -11,7 +11,8 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "boost/dynamic_bitset.hpp"
+#include "boost/dynamic_bitset/dynamic_bitset.hpp"
+#include "boost/range/algorithm_ext/iota.hpp"
 #include "fmt/format.h"
 #include "gsl/gsl"
 #pragma warning(pop)
