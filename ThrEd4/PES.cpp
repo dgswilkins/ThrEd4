@@ -52,9 +52,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#ifdef _WIN64
-#include <cwchar>
-#endif
 #include <filesystem>
 #include <iterator>
 // ReSharper disable CppUnusedIncludeDirective

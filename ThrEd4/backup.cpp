@@ -36,7 +36,6 @@
 #include <WinUser.h>
 
 // Standard Libraries
-#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>

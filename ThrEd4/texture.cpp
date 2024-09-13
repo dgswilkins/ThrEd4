@@ -57,9 +57,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cctype>
-#ifdef _WIN64
-#include <cwchar>
-#endif
 #include <filesystem>
 #include <iterator>
 #include <ranges>

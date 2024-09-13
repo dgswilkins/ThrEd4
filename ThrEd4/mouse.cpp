@@ -50,7 +50,6 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
-#include <ranges>
 #include <string>
 #include <vector>
 

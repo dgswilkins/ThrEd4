@@ -17,7 +17,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "fmt/core.h"
 #include "fmt/format.h"
 #include "gsl/span"
 #include "gsl/util"
