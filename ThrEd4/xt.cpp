@@ -1537,9 +1537,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	auto const spFillArray = gsl::span {fillStartsData};
 	iDestinationStitch     = ind - 1U;
 	while (iDestinationStitch < ind) {
-	  if (spFillArray[iDestinationStitch] > spFillArray[ind]) {
-		spFillArray[ind] = spFillArray[iDestinationStitch];
-	  }
+	  spFillArray[ind] = std::max(spFillArray[iDestinationStitch], spFillArray[ind]);
 	  --iDestinationStitch;
 	}
   }

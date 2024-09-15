@@ -1245,9 +1245,7 @@ void form::setmfrm(uint32_t const formIndex) {
 }
 
 void form::durpoli(uint32_t vertexCount) {
-  if (vertexCount < 3) {
-	vertexCount = 3;
-  }
+  vertexCount          = std::max(vertexCount, 3U);
   auto const stepAngle = PI_F2 / wrap::toFloat(vertexCount);
   // 500 gives us a reasonably sized default
   auto const length = 500.0F / wrap::toFloat(vertexCount) * ZoomFactor *
@@ -1560,18 +1558,16 @@ void form::frmovlin() {
 auto fi::ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen) -> bool {
   auto const delta  = F_POINT {finish.x - start.x, finish.y - start.y};
   auto       length = std::hypot(delta.x, delta.y);
+  constexpr auto CLAMP = 200.0F;
   // This clamp is temporary to avoid overflow when BH corner value is too large. Find a better fix
-  if (constexpr auto CLAMP = 200.0F; length > CLAMP) {
-	length = CLAMP;
-  }
+  length = std::min(length, CLAMP);
 
   auto& interleaveSequence = Instance->InterleaveSequence;
   interleaveSequence.push_back(start);
   if (length > MaxStitchLen) {
 	constexpr auto MINSTLEN = 1e-1F; // clamp minimum stitch length
-	if (userStitchLen < MINSTLEN) {
-	  userStitchLen = MINSTLEN;
-	}
+
+	userStitchLen = std::max(userStitchLen, MINSTLEN);
 	auto count = wrap::ceil<uint32_t>(length / userStitchLen);
 	if (count == 0U) {
 	  count = 1;
@@ -1643,9 +1639,7 @@ void form::chkseq(bool border) {
 	}
   }
   MaxStitchLen = border ? form.maxBorderStitchLen : form.maxFillStitchLen;
-  if (userStitchLen > MaxStitchLen) {
-	userStitchLen = MaxStitchLen;
-  }
+  userStitchLen = std::min(userStitchLen, MaxStitchLen);
   if (!Instance->OSequence.empty()) {
 	bool flag = true;
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->OSequence.size()) - 1U; ++iSequence) {
@@ -1787,9 +1781,8 @@ auto form::getplen() noexcept -> float {
 void form::savplen(float length) {
   auto integerPart = 0.0F;
 
-  if (constexpr auto PCLAMP = 255.0F; length > PCLAMP) {
-	length = PCLAMP;
-  }
+  constexpr auto PCLAMP = 255.0F;
+  length = std::min(length, PCLAMP);
   auto const fractionalPart = std::modf(length, &integerPart);
   auto const frByte         = wrap::floor<uint16_t>(fractionalPart * FRACFACT);
   auto const num            = gsl::narrow<uint32_t>(integerPart);
@@ -3038,9 +3031,7 @@ public:
 	auto itLastVertex = wrap::next(itFirstVertex, form.vertexCount - 1U);
 	Instance->OSequence.push_back(*itLastVertex);
   }
-  if (form.stitchLength < MinStitchLength) {
-	form.stitchLength = MinStitchLength;
-  }
+  form.stitchLength = std::max(form.stitchLength, MinStitchLength);
 }
 
 void fi::duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices) {
@@ -3461,9 +3452,7 @@ void fi::clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, s
   if (form.fillSpacing < 0) {
 	clipNegative = true;
   }
-  if (clipWidth < CLPMINVT) {
-	clipWidth = CLPMINVT;
-  }
+  clipWidth = std::max(clipWidth, CLPMINVT);
   if (Instance->StateMap.test(StateFlag::TXFIL)) {
 	if (!TexturePointsBuffer->empty() &&
 	    form.texture.index + form.texture.count <=
@@ -4130,10 +4119,8 @@ void fi::nxtrgn(std::vector<RG_SEQ>&           tempPath,
 	++pathLength;
 	auto maxPathLength = gsl::narrow<ptrdiff_t>(tempPath.size() - sequencePathIndex);
 
-	if (constexpr auto DEPFACT = 8; // tuneable value. Increasing this increases path discovery time exponentially
-	    maxPathLength > DEPFACT) {
-	  maxPathLength = DEPFACT;
-	}
+	constexpr auto DEPFACT = ptrdiff_t {8}; // tuneable value. Increasing this increases path discovery time exponentially
+	maxPathLength = std::min(maxPathLength, DEPFACT);
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
 	if (pathLength <= maxPathLength) {
 	  continue;
@@ -4330,9 +4317,9 @@ void fi::dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
   auto minimumY = BIGFLOAT;
   for (auto iLine = start; iLine <= finish; ++iLine) {
 	auto const index = wrap::toSize(sortedLineIndices[start]);
-	if (auto const deltaY = lineEndpoints[index + 1U].y - lineEndpoints[index].y; deltaY < minimumY) {
-	  minimumY = deltaY;
-	}
+	auto const deltaY = lineEndpoints[index + 1U].y - lineEndpoints[index].y;
+
+	minimumY = std::min(deltaY, minimumY);
   }
   if (util::closeEnough(minimumY, BIGFLOAT)) {
 	minimumY = 0.0F;
@@ -4529,18 +4516,10 @@ void fi::durgn(FRM_HEAD const&                form,
 	}
 	seqn = wrap::round<decltype(seqn)>((wrap::toDouble(nextGroup) - groupStart) / length + sequenceStart);
   }
-  if (seql < sequenceStart) {
-	seql = sequenceStart;
-  }
-  if (seql > sequenceEnd) {
-	seql = sequenceEnd;
-  }
-  if (seqn < sequenceStart) {
-	seqn = sequenceStart;
-  }
-  if (seqn > sequenceEnd) {
-	seqn = sequenceEnd;
-  }
+  seql = std::max(seql, sequenceStart);
+  seql = std::min(seql, sequenceEnd);
+  seqn = std::max(seqn, sequenceStart);
+  seqn = std::min(seqn, sequenceEnd);
   if (lineEndpoints[sortedLineIndices[seql]].group != lastGroup) {
 	if (seql < sequenceEnd && lineEndpoints[sortedLineIndices[wrap::toSize(seql) + 1U]].group == lastGroup) {
 	  ++seql;
@@ -5418,9 +5397,7 @@ void form::refilfn(uint32_t const formIndex) {
   if (form.fillSpacing < MINSPACE && !form.isClip()) {
 	form.fillSpacing = MINSPACE;
   }
-  if (form.edgeSpacing < MINSPACE) {
-	form.edgeSpacing = MINSPACE;
-  }
+  form.edgeSpacing = std::max(form.edgeSpacing, MINSPACE);
   if (!form.isClip()) {
 	UserStitchLength = form.stitchLength;
   }
@@ -6300,32 +6277,16 @@ auto fi::getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR>
   auto allItemsRect = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
   for (auto const& iForm : formList) {
 	auto const& trct = iForm.rectangle;
-	if (trct.left < allItemsRect.left) {
-	  allItemsRect.left = trct.left;
-	}
-	if (trct.top > allItemsRect.top) {
-	  allItemsRect.top = trct.top;
-	}
-	if (trct.right > allItemsRect.right) {
-	  allItemsRect.right = trct.right;
-	}
-	if (trct.bottom < allItemsRect.bottom) {
-	  allItemsRect.bottom = trct.bottom;
-	}
+	allItemsRect.left = std::min(trct.left, allItemsRect.left);
+	allItemsRect.top  = std::max(trct.top, allItemsRect.top);
+	allItemsRect.right = std::max(trct.right, allItemsRect.right);
+	allItemsRect.bottom = std::min(trct.bottom, allItemsRect.bottom);
   }
   for (auto const& stitch : stitchBuffer) {
-	if (stitch.x < allItemsRect.left) {
-	  allItemsRect.left = stitch.x;
-	}
-	if (stitch.y > allItemsRect.top) {
-	  allItemsRect.top = stitch.y;
-	}
-	if (stitch.x > allItemsRect.right) {
-	  allItemsRect.right = stitch.x;
-	}
-	if (stitch.y < allItemsRect.bottom) {
-	  allItemsRect.bottom = stitch.y;
-	}
+	allItemsRect.left = std::min(stitch.x, allItemsRect.left);
+	allItemsRect.top  = std::max(stitch.y, allItemsRect.top);
+	allItemsRect.right = std::max(stitch.x, allItemsRect.right);
+	allItemsRect.bottom = std::min(stitch.y, allItemsRect.bottom);
   }
   return allItemsRect;
 }
@@ -6907,14 +6868,11 @@ void form::sethup() noexcept {
 }
 
 void form::dustar(uint32_t starCount, float const length) {
-  if (constexpr auto STARMIN = 3U; // minimum star vertices
-      starCount < STARMIN) {
-	starCount = STARMIN;
-  }
-  if (constexpr auto STARMAX = 100U; // maximum star vertices
-      starCount > STARMAX) {
-	starCount = STARMAX;
-  }
+  constexpr auto STARMIN = 3U;   // minimum star vertices
+  constexpr auto STARMAX = 100U; // maximum star vertices
+
+  starCount = std::clamp(starCount, STARMIN, STARMAX);
+
   auto const stepAngle   = PI_F / wrap::toFloat(starCount);
   auto       angle       = stepAngle * HALF + PI_F;
   auto const vertexCount = starCount * 2U;
@@ -6958,14 +6916,11 @@ void form::dustar(uint32_t starCount, float const length) {
 }
 
 void form::duspir(uint32_t stepCount) {
-  if (constexpr auto STEPMIN = 3U; // Spiral step minimum
-      stepCount < STEPMIN) {
-	stepCount = STEPMIN;
-  }
-  if (constexpr auto STEPMAX = 100U; // spiral step maximum
-      stepCount > STEPMAX) {
-	stepCount = STEPMAX;
-  }
+  constexpr auto STEPMIN = 3U;   // Spiral step minimum
+  constexpr auto STEPMAX = 100U; // spiral step maximum
+
+  stepCount = std::clamp(stepCount, STEPMIN, STEPMAX);
+
   auto const stepAngle = PI_F2 / wrap::toFloat(stepCount);
   auto const length    = 800.0F / wrap::toFloat(stepCount) * ZoomFactor *
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
@@ -7016,15 +6971,11 @@ void form::duhart(uint32_t sideCount) {
   constexpr auto HARTANG  = 0.28F; // heart angle in radians
   constexpr auto HARTINFL = 0.7F;  // heart inflection point in radians
   constexpr auto HARTSTEP = 4.5F;
-
+  constexpr auto HSIDEMIN = 6U;   // minimum number of heart vertices
   constexpr auto HSIDEMAX = 100U; // maximum number of heart vertices
-  if (sideCount > HSIDEMAX) {
-	sideCount = HSIDEMAX;
-  }
-  if (constexpr auto HSIDEMIN = 6U; // minimum number of heart vertices
-      sideCount < HSIDEMIN) {
-	sideCount = HSIDEMIN;
-  }
+
+  sideCount               = std::clamp(sideCount, HSIDEMIN, HSIDEMAX);
+
   auto currentForm        = FRM_HEAD {};
   currentForm.vertexIndex = wrap::toUnsigned(Instance->FormVertices.size());
   wrap::narrow(currentForm.attribute, ActiveLayer << 1U);
@@ -7038,9 +6989,7 @@ void form::duhart(uint32_t sideCount) {
   auto iVertex  = ptrdiff_t {};
   auto maximumX = 0.0F;
   while (angle > -PI_F * HARTINFL) {
-	if (point.x > maximumX) {
-	  maximumX = point.x;
-	}
+	maximumX = std::max(point.x, maximumX);
 	Instance->FormVertices.push_back(point);
 	++iVertex;
 	point += F_POINT {length * cos(angle), length * sin(angle)};
@@ -7090,13 +7039,9 @@ void form::duhart(uint32_t sideCount) {
 }
 
 void form::dulens(uint32_t sides) {
-  if (sides < 4) {
-	sides = 4;
-  }
+  sides = std::max(sides, 4U);
 #ifdef LENS48
-  if (sides > 48) {
-	sides = 48;
-  }
+  sides = std::min(sides, 48U);
 #endif
   auto const steps = sides >> 1U;
   // Calculate the angle subtended by the arc of the lens which is determined by the aspect ratio
@@ -7150,10 +7095,8 @@ constexpr auto fi::shreg(float const highValue, float const reference, float con
 }
 
 void form::dueg(uint32_t sides) {
-  if (constexpr auto ESIDEMIN = 8U; // minimum number of egg vertices
-      sides < ESIDEMIN) {
-	sides = ESIDEMIN;
-  }
+  constexpr auto ESIDEMIN = 8U; // minimum number of egg vertices
+  sides = std::max(sides, ESIDEMIN);
   durpoli(sides);
   auto const  halfSides    = gsl::narrow<ptrdiff_t>(sides >> 1U);
   auto const  quarterSides = gsl::narrow<ptrdiff_t>(sides >> 2U);
@@ -7177,14 +7120,9 @@ void form::dueg(uint32_t sides) {
 }
 
 void form::duzig(uint32_t vertices) {
-  if (constexpr auto ZVERTMIN = 3U; // minimum number of zig-zag vertices
-      vertices < ZVERTMIN) {
-	vertices = ZVERTMIN;
-  }
-  if (constexpr auto ZVERTMAX = 100U; // maximum number of zig-zag vertices
-      vertices > ZVERTMAX) {
-	vertices = ZVERTMAX;
-  }
+  constexpr auto ZVERTMIN = 3U; // minimum number of zig-zag vertices
+  constexpr auto ZVERTMAX = 100U; // maximum number of zig-zag vertices
+  vertices = std::clamp(vertices, ZVERTMIN, ZVERTMAX);
   auto newForm        = FRM_HEAD {};
   newForm.vertexIndex = thred::adflt(vertices);
   newForm.vertexCount = vertices;
@@ -7621,18 +7559,10 @@ void fi::dufcntr(F_POINT& center) noexcept {
   auto bigRect = formList.operator[](Instance->SelectedFormList.front()).rectangle;
   for (auto const selectedForm : Instance->SelectedFormList) {
 	auto const formRect = formList.operator[](selectedForm).rectangle;
-	if (formRect.left < bigRect.left) {
-	  bigRect.left = formRect.left;
-	}
-	if (formRect.top > bigRect.top) {
-	  bigRect.top = formRect.top;
-	}
-	if (formRect.right > bigRect.right) {
-	  bigRect.right = formRect.right;
-	}
-	if (formRect.bottom < bigRect.bottom) {
-	  bigRect.bottom = formRect.bottom;
-	}
+	bigRect.left = std::min(formRect.left, bigRect.left);
+	bigRect.top = std::max(formRect.top, bigRect.top);
+	bigRect.right = std::max(formRect.right, bigRect.right);
+	bigRect.bottom = std::min(formRect.bottom, bigRect.bottom);
   }
   center = F_POINT {wrap::midl(bigRect.right, bigRect.left), wrap::midl(bigRect.top, bigRect.bottom)};
 }
@@ -8570,18 +8500,10 @@ void form::cntrx() {
 	auto groupRect = F_RECTANGLE {startStitch.x, startStitch.y, startStitch.x, startStitch.y};
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
 	  auto const& stitch = Instance->StitchBuffer.operator[](iStitch);
-	  if (stitch.x < groupRect.left) {
-		groupRect.left = stitch.x;
-	  }
-	  if (stitch.y > groupRect.top) {
-		groupRect.top = stitch.y;
-	  }
-	  if (stitch.x > groupRect.right) {
-		groupRect.right = stitch.x;
-	  }
-	  if (stitch.y < groupRect.bottom) {
-		groupRect.bottom = stitch.y;
-	  }
+	  groupRect.left = std::min(stitch.x, groupRect.left);
+	  groupRect.top = std::max(stitch.y, groupRect.top);
+	  groupRect.right = std::max(stitch.x, groupRect.right);
+	  groupRect.bottom = std::min(stitch.y, groupRect.bottom);
 	}
 	auto const selectedCenter = F_POINT {wrap::midl(groupRect.right, groupRect.left),
 	                                     wrap::midl(groupRect.top, groupRect.bottom)};
@@ -8703,9 +8625,7 @@ void fi::unbean(uint32_t const start, uint32_t& finish) {
   auto       highStitchBuffer = std::vector<F_POINT_ATTR> {};
   highStitchBuffer.reserve(stitchRange);
   auto lastStitch = finish;
-  if (lastStitch > wrap::toUnsigned(Instance->StitchBuffer.size()) - 3U) {
-	lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size()) - 3U;
-  }
+  lastStitch = std::min(lastStitch, wrap::toUnsigned(Instance->StitchBuffer.size()) - 3U);
   auto iSourceStitch = start;
   for (auto skip = 0U; iSourceStitch <= lastStitch; ++iSourceStitch) {
 	if (skip != 0U) {

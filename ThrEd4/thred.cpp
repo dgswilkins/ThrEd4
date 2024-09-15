@@ -3755,9 +3755,7 @@ void thi::delstch1(uint32_t const iStitch) {
 	return;
   }
   Instance->StitchBuffer.erase(wrap::next(Instance->StitchBuffer.begin(), iStitch));
-  if (ClosestPointIndex > wrap::toUnsigned(Instance->StitchBuffer.size()) - 1U) {
-	ClosestPointIndex = wrap::toUnsigned(Instance->StitchBuffer.size()) - 1U;
-  }
+  ClosestPointIndex = std::min(ClosestPointIndex, wrap::toUnsigned(Instance->StitchBuffer.size()) - 1U);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -4354,9 +4352,7 @@ void thred::zumin() {
   if (!Instance->StateMap.testAndReset(StateFlag::ZUMACT)) {
 	ZoomFactor *= ZUMFCT;
   }
-  if (ZoomFactor < ZoomMin) {
-	ZoomFactor = ZoomMin;
-  }
+  ZoomFactor = std::max(ZoomFactor, ZoomMin);
   if (!Instance->StateMap.testAndSet(StateFlag::ZUMED)) {
 	movStch();
   }
@@ -5022,9 +5018,7 @@ void thred::selCol() {
                  : Instance->StateMap.test(StateFlag::GRPSEL) ? GroupStitchIndex
                                                      : 0;
   // NOLINTEND(readability-avoid-nested-conditional-operator)
-  if (iStitch > wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
-	iStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
-  }
+  iStitch = std::min(iStitch, wrap::toUnsigned(Instance->StitchBuffer.size() - 1U));
   GroupStitchIndex    = iStitch;
   ClosestPointIndex   = iStitch;
   auto const stitchIt = wrap::next(Instance->StitchBuffer.begin(), iStitch);
@@ -5043,9 +5037,7 @@ void thred::selCol() {
   if ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & COLMSK) != color) {
 	--ClosestPointIndex;
   }
-  if (GroupStitchIndex > wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
-	GroupStitchIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
-  }
+  GroupStitchIndex = std::min(GroupStitchIndex, wrap::toUnsigned(Instance->StitchBuffer.size() - 1U));
   Instance->StateMap.set(StateFlag::GRPSEL);
   unbox();
   grpAdj();
@@ -5932,11 +5924,9 @@ void thi::setsped() {
   }
   else {
 	elapsedTimePerFrame = wrap::round<uint32_t>(userTimePerFrame);
-	StitchesPerFrame    = 2;
+	StitchesPerFrame    = 2U;
   }
-  if (StitchesPerFrame < 2) {
-	StitchesPerFrame = 2;
-  }
+  StitchesPerFrame = std::max(StitchesPerFrame, 2U);
   SetTimer(ThrEdWindow, 0, elapsedTimePerFrame, nullptr);
 }
 
@@ -6256,12 +6246,7 @@ void thred::movi() {
 	constexpr auto MLEN = 10000.0F; // default movie length (milliseconds)
 	MovieTimeStep       = wrap::round<decltype(MovieTimeStep)>(MLEN * MOVITIM / stepCount);
   }
-  if (MovieTimeStep < MINDELAY) {
-	MovieTimeStep = MINDELAY;
-  }
-  if (MovieTimeStep > MAXDELAY) {
-	MovieTimeStep = MAXDELAY;
-  }
+  MovieTimeStep = std::clamp(MovieTimeStep, MINDELAY, MAXDELAY);
   auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
   scrollInfo.cbSize = sizeof(scrollInfo);
   scrollInfo.fMask  = SIF_ALL;
@@ -6313,18 +6298,10 @@ void thred::redclp() {
 	                              clipBuffer.back().y)
 	                      .c_str());
 #endif
-	if (clipBuffer.back().x < clipRect.left) {
-	  clipRect.left = clipBuffer.back().x;
-	}
-	if (clipBuffer.back().x > clipRect.right) {
-	  clipRect.right = clipBuffer.back().x;
-	}
-	if (clipBuffer.back().y < clipRect.bottom) {
-	  clipRect.bottom = clipBuffer.back().y;
-	}
-	if (clipBuffer.back().y > clipRect.top) {
-	  clipRect.top = clipBuffer.back().y;
-	}
+	clipRect.left = std::min(clipBuffer.back().x, clipRect.left);
+	clipRect.right = std::max(clipBuffer.back().x, clipRect.right);
+	clipRect.bottom = std::min(clipBuffer.back().y, clipRect.bottom);
+	clipRect.top = std::max(clipBuffer.back().y, clipRect.top);
 	++iCSD;
   }
   clipBuffer.front().attribute = ActiveColor | codedLayer;
@@ -6896,15 +6873,11 @@ void thred::chkrng(F_POINT& range) {
 		if (stitch.x > range.x) {
 		  stitch.x = range.x - 1.0F;
 		}
-		if (stitch.x < 0) {
-		  stitch.x = 0;
-		}
+		stitch.x = std::max(stitch.x, 0.0F);
 		if (stitch.y > range.y) {
 		  stitch.y = range.y - 1.0F;
 		}
-		if (stitch.y < 0) {
-		  stitch.y = 0;
-		}
+		stitch.y = std::max(stitch.y, 0.0F);
 		*iDestination++ = stitch;
 	  }
 	}
@@ -6916,15 +6889,11 @@ void thred::chkrng(F_POINT& range) {
 	if (stitch.x > range.x) {
 	  stitch.x = range.x - 1.0F;
 	}
-	if (stitch.x < 0) {
-	  stitch.x = 0;
-	}
+	stitch.x = std::max(stitch.x, 0.0F);
 	if (stitch.y > range.y) {
 	  stitch.y = range.y - 1.0F;
 	}
-	if (stitch.y < 0) {
-	  stitch.y = 0;
-	}
+	stitch.y = std::max(stitch.y, 0.0F);
   }
 }
 
@@ -6960,18 +6929,10 @@ void thi::duprct(FRM_HEAD const& form) {
   currentVertex                                          = form::pdir(form, currentVertex);
   for (auto iVertex = 0U; iVertex < SelectedFormVertices.vertexCount; ++iVertex) {
 	itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + currentVertex);
-	if (itVertex->x < SelectedVerticesRect.left) {
-	  SelectedVerticesRect.left = itVertex->x;
-	}
-	if (itVertex->x > SelectedVerticesRect.right) {
-	  SelectedVerticesRect.right = itVertex->x;
-	}
-	if (itVertex->y < SelectedVerticesRect.bottom) {
-	  SelectedVerticesRect.bottom = itVertex->y;
-	}
-	if (itVertex->y > SelectedVerticesRect.top) {
-	  SelectedVerticesRect.top = itVertex->y;
-	}
+	SelectedVerticesRect.left = std::min(itVertex->x, SelectedVerticesRect.left);
+	SelectedVerticesRect.right = std::max(itVertex->x, SelectedVerticesRect.right);
+	SelectedVerticesRect.bottom = std::min(itVertex->y, SelectedVerticesRect.bottom);
+	SelectedVerticesRect.top = std::max(itVertex->y, SelectedVerticesRect.top);
 	currentVertex = form::pdir(form, currentVertex);
   }
 }
@@ -7731,18 +7692,10 @@ void thred::fop() {
 }
 
 void thi::clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept {
-  if (stitch.x < clipRectAdjusted.left) {
-	clipRectAdjusted.left = stitch.x;
-  }
-  if (stitch.x > clipRectAdjusted.right) {
-	clipRectAdjusted.right = stitch.x;
-  }
-  if (stitch.y < clipRectAdjusted.bottom) {
-	clipRectAdjusted.bottom = stitch.y;
-  }
-  if (stitch.y > clipRectAdjusted.top) {
-	clipRectAdjusted.top = stitch.y;
-  }
+  clipRectAdjusted.left = std::min(stitch.x, clipRectAdjusted.left);
+  clipRectAdjusted.right = std::max(stitch.x, clipRectAdjusted.right);
+  clipRectAdjusted.bottom = std::min(stitch.y, clipRectAdjusted.bottom);
+  clipRectAdjusted.top = std::max(stitch.y, clipRectAdjusted.top);
 }
 
 void thred::clpadj() {
@@ -7760,12 +7713,8 @@ void thred::clpadj() {
   while (iStitch < GroupEndStitch) {
 	thi::clpradj(clipRectAdjusted, Instance->StitchBuffer.operator[](iStitch++));
   }
-  if (Instance->StitchBuffer.operator[](iStitch).x < clipRectAdjusted.left) {
-	clipRectAdjusted.left = Instance->StitchBuffer.operator[](iStitch).x;
-  }
-  if (Instance->StitchBuffer.operator[](iStitch).x > clipRectAdjusted.right) {
-	clipRectAdjusted.right = Instance->StitchBuffer.operator[](iStitch).x;
-  }
+  clipRectAdjusted.left = std::min(Instance->StitchBuffer.operator[](iStitch).x, clipRectAdjusted.left);
+  clipRectAdjusted.right = std::max(Instance->StitchBuffer.operator[](iStitch).x, clipRectAdjusted.right);
   auto const clipMiddle = wrap::midl(clipRectAdjusted.right, clipRectAdjusted.left);
   Instance->StitchBuffer.operator[](GroupStartStitch).y = wrap::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
   Instance->StitchBuffer.operator[](GroupEndStitch).y = Instance->StitchBuffer.operator[](GroupStartStitch).y;
@@ -7917,12 +7866,8 @@ void thi::gselrng() noexcept {
   auto const& selectedFormList = Instance->SelectedFormList;
   SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
   for (auto const selectedForm : selectedFormList) {
-	if (selectedForm < SelectedFormsRange.start) {
-	  SelectedFormsRange.start = selectedForm;
-	}
-	if (selectedForm > SelectedFormsRange.finish) {
-	  SelectedFormsRange.finish = selectedForm;
-	}
+	SelectedFormsRange.start = std::min(selectedForm, SelectedFormsRange.start);
+	SelectedFormsRange.finish = std::max(selectedForm, SelectedFormsRange.finish);
   }
 }
 
@@ -7945,9 +7890,7 @@ void thi::angdif(float& lowestAngle, float& highestAngle, float const angle) noe
 	highestAngle = angle;
 	return;
   }
-  if (angle < lowestAngle) {
-	lowestAngle = angle;
-  }
+  lowestAngle = std::min(angle, lowestAngle);
 }
 
 void thred::rotmrk() {
@@ -9003,9 +8946,7 @@ void thi::handleFeatherIDOK(HWND hwndlg) {
   IniFile.featherMinStitchSize = wrap::wcsToFloat(buf.data()) * PFGRAN;
   GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf.data(), HBUFSIZ);
   wrap::wcsToULong(IniFile.featherCount, buf.data());
-  if (IniFile.featherCount < 1) {
-	IniFile.featherCount = 1;
-  }
+  IniFile.featherCount = std::max(IniFile.featherCount, uint16_t {1});
   EndDialog(hwndlg, TRUE);
 }
 // ReSharper restore CppParameterMayBeConst
@@ -10520,9 +10461,7 @@ void thi::redini() {
 	  BackgroundColor = IniFile.backgroundColor;
 	  bitmap::setBitmapColor(IniFile.bitmapColor);
 	  MinStitchLength = IniFile.minStitchLength;
-	  if (IniFile.showStitchThreshold < 0) {
-		IniFile.showStitchThreshold = 0;
-	  }
+	  IniFile.showStitchThreshold = std::max(IniFile.showStitchThreshold, 0.0F);
 	  constexpr auto SSTCLAMP = 9.0F; // clamp the show stitch threshold to this value
 
 	  IniFile.showStitchThreshold = std::min(IniFile.showStitchThreshold, SSTCLAMP);
@@ -10625,46 +10564,19 @@ void thi::redini() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const deviceContext = GetDC(nullptr);
   ScreenSizePixels = {.cx= GetDeviceCaps(deviceContext, HORZRES), .cy = GetDeviceCaps(deviceContext, VERTRES)};
-  if (IniFile.initialWindowCoords.left < 0) {
-	IniFile.initialWindowCoords.left = 0;
-  }
-  if (IniFile.initialWindowCoords.top < 0) {
-	IniFile.initialWindowCoords.top = 0;
-  }
-  if (auto const adjustedWidth = ScreenSizePixels.cx - 30; IniFile.initialWindowCoords.right > adjustedWidth) {
-	IniFile.initialWindowCoords.right = adjustedWidth;
-  }
-  if (IniFile.initialWindowCoords.bottom > ScreenSizePixels.cy) {
-	IniFile.initialWindowCoords.bottom = ScreenSizePixels.cy;
-  }
+  IniFile.initialWindowCoords.left = std::max(IniFile.initialWindowCoords.left, 0L);
+  IniFile.initialWindowCoords.top = std::max(IniFile.initialWindowCoords.top, 0L);
+  auto const adjustedWidth = ScreenSizePixels.cx - 30;
+  IniFile.initialWindowCoords.right = std::min(IniFile.initialWindowCoords.right, adjustedWidth);
+  IniFile.initialWindowCoords.bottom = std::min(IniFile.initialWindowCoords.bottom, ScreenSizePixels.cy);
 }
 
 void thi::chkirct() noexcept {
   auto const screenLimits = SIZE {ScreenSizePixels.cx - 1, ScreenSizePixels.cy - 1};
-  if (IniFile.initialWindowCoords.left > screenLimits.cx) {
-	IniFile.initialWindowCoords.left = screenLimits.cx;
-  }
-  if (IniFile.initialWindowCoords.right > screenLimits.cx) {
-	IniFile.initialWindowCoords.right = screenLimits.cx;
-  }
-  if (IniFile.initialWindowCoords.left < 0) {
-	IniFile.initialWindowCoords.left = 0;
-  }
-  if (IniFile.initialWindowCoords.right < 0) {
-	IniFile.initialWindowCoords.right = 0;
-  }
-  if (IniFile.initialWindowCoords.top > screenLimits.cy) {
-	IniFile.initialWindowCoords.top = screenLimits.cy;
-  }
-  if (IniFile.initialWindowCoords.bottom > screenLimits.cy) {
-	IniFile.initialWindowCoords.bottom = screenLimits.cy;
-  }
-  if (IniFile.initialWindowCoords.top < 0) {
-	IniFile.initialWindowCoords.top = 0;
-  }
-  if (IniFile.initialWindowCoords.bottom < 0) {
-	IniFile.initialWindowCoords.bottom = 0;
-  }
+  IniFile.initialWindowCoords.left   = std::clamp(IniFile.initialWindowCoords.left, 0L, screenLimits.cx);
+  IniFile.initialWindowCoords.right  = std::clamp(IniFile.initialWindowCoords.right, 0L, screenLimits.cx);
+  IniFile.initialWindowCoords.top    = std::clamp(IniFile.initialWindowCoords.top, 0L, screenLimits.cy);
+  IniFile.initialWindowCoords.bottom = std::clamp(IniFile.initialWindowCoords.bottom, 0L, screenLimits.cy);
   constexpr auto MINWINSZ = LONG {300}; // if the minimum window dimension is less than this, resize
   if (IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left < MINWINSZ) {
 	IniFile.initialWindowCoords.left  = 0;
@@ -11075,11 +10987,9 @@ void thi::drawBackground() {
 auto thi::getMaxCount() -> uint32_t {
   auto maxCount = uint32_t {0U};
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	if (auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
-	                                                  ColorChangeTable->operator[](iColor).stitchIndex);
-	    deltaCount > maxCount) {
-	  maxCount = deltaCount;
-	}
+	auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+	                                              ColorChangeTable->operator[](iColor).stitchIndex);
+	maxCount = std::max(deltaCount, maxCount);
   }
   return maxCount;
 }
@@ -11635,9 +11545,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
   auto lines    = std::vector<POINT> {};
   auto maxLines = 0U;
   for (auto iForm = 0U; iForm < stitchHeader.formCount; ++iForm) {
-	if (formList[iForm].vertexCount > maxLines) {
-	  maxLines = formList[iForm].vertexCount;
-	}
+	maxLines = std::max(formList[iForm].vertexCount, maxLines);
   }
   lines.resize(wrap::toSize(maxLines) + 1U);
   auto iVertex = 0U;
@@ -12009,9 +11917,7 @@ auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPA
 	case SB_LINELEFT: {
 	  if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 		MovieTimeStep += SPEDLIN;
-		if (MovieTimeStep > MAXDELAY) {
-		  MovieTimeStep = MAXDELAY;
-		}
+		MovieTimeStep = std::min(MovieTimeStep, MAXDELAY);
 		setsped();
 		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 	  }
@@ -12028,9 +11934,7 @@ auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPA
 	case SB_LINERIGHT: {
 	  if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 		MovieTimeStep -= SPEDLIN;
-		if (MovieTimeStep < MINDELAY) {
-		  MovieTimeStep = MINDELAY;
-		}
+		MovieTimeStep = std::max(MovieTimeStep, MINDELAY);
 		setsped();
 		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 	  }
@@ -12047,9 +11951,7 @@ auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPA
 	case SB_PAGELEFT: {
 	  if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 		MovieTimeStep += SPEDPAG;
-		if (MovieTimeStep < MINDELAY) {
-		  MovieTimeStep = MINDELAY;
-		}
+		MovieTimeStep = std::max(MovieTimeStep, MINDELAY);
 		setsped();
 		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 	  }
@@ -12061,9 +11963,7 @@ auto thi::handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPA
 	case SB_PAGERIGHT: {
 	  if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 		MovieTimeStep -= SPEDPAG;
-		if (MovieTimeStep < MINDELAY) {
-		  MovieTimeStep = MINDELAY;
-		}
+		MovieTimeStep = std::max(MovieTimeStep, MINDELAY);
 		setsped();
 		SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 	  }

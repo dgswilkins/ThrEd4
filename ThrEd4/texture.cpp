@@ -726,18 +726,14 @@ void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
   if (integerFinish < 0) {
 	return;
   }
-  if (integerStart < 1) {
-	integerStart = 1;
-  }
+  integerStart = std::max(integerStart, 1);
   if (integerFinish == 0) {
 	++integerFinish;
   }
   if (integerStart == TextureScreen.lines + 1) {
 	--integerStart;
   }
-  if (integerFinish > TextureScreen.lines) {
-	integerFinish = TextureScreen.lines;
-  }
+  integerFinish = std::min(integerFinish, gsl::narrow_cast<int32_t>(TextureScreen.lines));
   auto const lineRange = wrap::toSize(integerFinish - integerStart);
   TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
   while (integerStart <= integerFinish) {

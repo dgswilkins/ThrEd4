@@ -1085,9 +1085,7 @@ void trace::dutrnum1() {
   Instance->StateMap.reset(StateFlag::NUMIN);
   Instance->StateMap.reset(StateFlag::TRNIN1);
   auto traceLength = thred::getMsgBufferValue();
-  if (traceLength > MAXSIZ) {
-	traceLength = MAXSIZ;
-  }
+  traceLength = std::min(traceLength, MAXSIZ);
   if (Instance->StateMap.test(StateFlag::TRNUP)) {
 	IniFile.traceLength = traceLength * PFGRAN;
 	ti::trcstpnum();
@@ -1393,6 +1391,7 @@ void trace::traceNumberInput(wchar_t const NumericCode) {
   *itTraceInputBuffer++   = NumericCode;
   *itTraceInputBuffer     = 0;
   ++TraceMsgIndex;
+  // ToDo - should this be uint8_t?
   auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD));
   switch (TraceMsgIndex) {
 	case 2: {
@@ -1403,9 +1402,7 @@ void trace::traceNumberInput(wchar_t const NumericCode) {
 	  break;
 	}
 	case 3: {
-	  if (traceColor > BYTEMAXV) {
-		traceColor = BYTEMAXV;
-	  }
+	  traceColor = std::min(traceColor, uint32_t {BYTEMAXV});
 	  ti::dutrnum0(traceColor);
 	  break;
 	}

@@ -165,9 +165,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
-  if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
-	fileHeaderSize = sizeof(BITMAPV4HEADER);
-  }
+  fileHeaderSize = std::min(fileHeaderSize, sizeof(BITMAPV4HEADER));
   if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
 	return;
   }

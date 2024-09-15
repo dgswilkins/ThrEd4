@@ -90,12 +90,8 @@ void displayText::shoMsg(std::wstring const& message, bool const top) {
   auto messageSize = SIZE {};
   for (auto& string : strings) {
 	wrap::getTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
-	if (textSize.cx > messageSize.cx) {
-	  messageSize.cx = textSize.cx;
-	}
-	if (textSize.cy > messageSize.cy) {
-	  messageSize.cy = textSize.cy;
-	}
+	messageSize.cx = std::max(textSize.cx, messageSize.cx);
+	messageSize.cy = std::max(textSize.cy, messageSize.cy);
   }
   messageSize.cy *= gsl::narrow<int32_t>(strings.size());
   auto mainRect = RECT {};

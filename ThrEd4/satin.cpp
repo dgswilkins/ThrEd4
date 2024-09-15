@@ -269,9 +269,7 @@ void si::satclos() {
 	}
 	if (closestVertex >= form.vertexCount - 2U) {
 	  closestVertex = form.vertexCount - 2U;
-	  if (StartPoint >= form.vertexCount - 2U) {
-		StartPoint = form.vertexCount - 2U;
-	  }
+	  StartPoint = std::min(StartPoint, form.vertexCount - 2U);
 	}
 	if (closestVertex - StartPoint < 2U) {
 	  closestVertex = StartPoint + 2U;
@@ -539,9 +537,7 @@ void satin::satadj(FRM_HEAD& form) {
 	for (auto iGuide = 0U; iGuide < currentGuidesCount; ++iGuide) {
 	  auto iForward = itGuide->finish;
 	  auto iReverse = iForward;
-	  if (iForward > form.vertexCount - 1U) {
-		iForward = form.vertexCount - 1U;
-	  }
+	  iForward = std::min(iForward, form.vertexCount - 1U);
 	  if (satinMap.test_set(iForward)) {
 		if (iForward < form.vertexCount - 1U) {
 		  ++iForward;
@@ -591,18 +587,12 @@ void satin::satadj(FRM_HEAD& form) {
 	  }
 	}
 	auto iGuide = wrap::distance<uint32_t>(itFirstGuide, itGuide);
-	if (iGuide < currentGuidesCount) {
-	  iGuide = currentGuidesCount;
-	}
+	iGuide = std::max(iGuide, currentGuidesCount);
 	currentGuidesCount = iGuide;
 	auto const end0    = form.vertexCount - endGuide - 2U;
 	auto const end1    = endGuide - 2U;
-	if (currentGuidesCount > end0) {
-	  currentGuidesCount = end0;
-	}
-	if (currentGuidesCount > end1) {
-	  currentGuidesCount = end1;
-	}
+	currentGuidesCount = std::min(currentGuidesCount, end0);
+	currentGuidesCount = std::min(currentGuidesCount, end1);
   }
   else {
 	// sort the guides
