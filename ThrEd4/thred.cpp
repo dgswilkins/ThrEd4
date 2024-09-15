@@ -6399,7 +6399,7 @@ void thred::insflin(POINT const insertPoint) {
 
 auto thi::isthr(fs::path const& thredPath) -> bool {
   auto const extention = thredPath.extension().wstring();
-  return extention.compare(0, 3, L".th") == 0;
+  return extention.starts_with(L".th");
 }
 
 auto thi::gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t const stitchCount) noexcept -> uint32_t {
@@ -10403,7 +10403,7 @@ void thi::ducmd() {
   }
   auto const spArgList = gsl::span {ArgList, wrap::toSize(ArgCount)};
   auto const arg1      = std::wstring {spArgList[1]};
-  if (arg1.compare(0, 4, L"/F1:") != 0) {
+  if (!arg1.starts_with(L"/F1:")) {
 	Instance->WorkingFileName.assign(arg1);
 	Instance->StateMap.set(StateFlag::REDOLD);
 	nuFil(FileIndices::THR);
@@ -10424,7 +10424,7 @@ void thi::ducmd() {
 	return;
   }
   auto const arg2 = std::wstring {spArgList[2]};
-  if (arg2.compare(0, 4, L"/F2:") != 0) {
+  if (!arg2.starts_with(L"/F2:")) {
 	return;
   }
   balaradFileName = *HomeDirectory / arg2.substr(4);

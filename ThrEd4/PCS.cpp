@@ -329,7 +329,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 auto PCS::isPCS(fs::path const& path) -> bool {
   auto extention = path.extension().wstring();
   std::ranges::transform(extention, extention.begin(), towlower);
-  return extention.compare(0, 4, L".pcs") == 0;
+  return extention.starts_with(L".pcs");
 }
 
 auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
