@@ -496,7 +496,7 @@ void texture::drwtxtr() {
 	outDebugString(L"[{}] texture points erased\n", erased);
 #else
 	// ReSharper disable CppClangTidyClangDiagnosticUnusedValue
-	DBG_UNREFERENCED_LOCAL_VARIABLE(erased);
+	DBG_UNREFERENCED_LOCAL_VARIABLE(erased); // NOLINT(clang-diagnostic-unused-value)
 	// ReSharper restore CppClangTidyClangDiagnosticUnusedValue
 #endif
   }
