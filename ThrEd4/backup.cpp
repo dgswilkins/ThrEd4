@@ -62,15 +62,67 @@ class BACK_HEAD // Backup header
   SIZE          zoomRect {};
 };
 
-// Main Variables
 namespace {
+// Main Variables
 auto UndoBufferWriteIndex = uint32_t {}; // undo storage pointer
 auto UndoBufferReadIndex  = uint32_t {}; // undo retrieval pointers
-} // namespace
-
-namespace bui {
+// Definitions
 void redbak();
-} // namespace bui
+
+// Functions
+void redbak() {
+  auto bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
+  if (bufferElement.empty()) {
+	return;
+  }
+  auto const* undoData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
+  Instance->StitchBuffer.clear();
+  if (undoData->stitchCount != 0U) {
+	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
+	Instance->StitchBuffer.insert(Instance->StitchBuffer.end(), span.begin(), span.end());
+	Instance->StateMap.set(StateFlag::INIT);
+  }
+  else {
+	Instance->StateMap.reset(StateFlag::INIT);
+  }
+  UnzoomedRect = undoData->zoomRect;
+
+  auto& formList = Instance->FormList;
+  formList.clear();
+  if (undoData->formCount != 0U) {
+	auto const span = gsl::span {undoData->forms, undoData->formCount};
+	formList.insert(formList.end(), span.begin(), span.end());
+  }
+  Instance->FormVertices.clear();
+  if (undoData->vertexCount != 0U) {
+	auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
+	Instance->FormVertices.insert(Instance->FormVertices.end(), span.begin(), span.end());
+  }
+  Instance->SatinGuides.clear();
+  if (undoData->guideCount != 0U) {
+	auto const span = gsl::span {undoData->guide, undoData->guideCount};
+	Instance->SatinGuides.insert(Instance->SatinGuides.end(), span.begin(), span.end());
+  }
+  Instance->ClipPoints.clear();
+  if (undoData->clipPointCount != 0U) {
+	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
+	Instance->ClipPoints.insert(Instance->ClipPoints.end(), span.begin(), span.end());
+  }
+  constexpr auto UCOLSIZE     = UserColor.size();
+  auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+  auto const     spUserColors = gsl::span {UserColor};
+  std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
+  thred::refreshColors();
+  TexturePointsBuffer->clear();
+  if (undoData->texturePointCount != 0U) {
+	auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
+	TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
+  }
+  thred::coltab();
+  Instance->StateMap.set(StateFlag::RESTCH);
+}
+
+} // namespace
 
 #pragma warning(push)
 void backup::dudat() {
@@ -147,58 +199,6 @@ void backup::deldu() {
   Instance->StateMap.reset(StateFlag::BAKACT);
 }
 
-void bui::redbak() {
-  auto bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
-  if (bufferElement.empty()) {
-	return;
-  }
-  auto const* undoData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
-  Instance->StitchBuffer.clear();
-  if (undoData->stitchCount != 0U) {
-	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
-	Instance->StitchBuffer.insert(Instance->StitchBuffer.end(), span.begin(), span.end());
-	Instance->StateMap.set(StateFlag::INIT);
-  }
-  else {
-	Instance->StateMap.reset(StateFlag::INIT);
-  }
-  UnzoomedRect = undoData->zoomRect;
-
-  auto& formList = Instance->FormList;
-  formList.clear();
-  if (undoData->formCount != 0U) {
-	auto const span = gsl::span {undoData->forms, undoData->formCount};
-	formList.insert(formList.end(), span.begin(), span.end());
-  }
-  Instance->FormVertices.clear();
-  if (undoData->vertexCount != 0U) {
-	auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
-	Instance->FormVertices.insert(Instance->FormVertices.end(), span.begin(), span.end());
-  }
-  Instance->SatinGuides.clear();
-  if (undoData->guideCount != 0U) {
-	auto const span = gsl::span {undoData->guide, undoData->guideCount};
-	Instance->SatinGuides.insert(Instance->SatinGuides.end(), span.begin(), span.end());
-  }
-  Instance->ClipPoints.clear();
-  if (undoData->clipPointCount != 0U) {
-	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
-	Instance->ClipPoints.insert(Instance->ClipPoints.end(), span.begin(), span.end());
-  }
-  constexpr auto UCOLSIZE     = UserColor.size();
-  auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
-  auto const     spUserColors = gsl::span {UserColor};
-  std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
-  thred::refreshColors();
-  TexturePointsBuffer->clear();
-  if (undoData->texturePointCount != 0U) {
-	auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
-	TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
-  }
-  thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
-}
-
 void backup::redo() {
   ++UndoBufferWriteIndex;
   UndoBufferWriteIndex &= UNDOLEN - 1U;
@@ -210,7 +210,7 @@ void backup::redo() {
 	menu::enableRedo();
   }
   menu::enableUndo();
-  bui::redbak();
+  redbak();
 }
 
 void backup::bak() {
@@ -250,7 +250,7 @@ void backup::bak() {
   Instance->StateMap.reset(StateFlag::GRPSEL);
   Instance->StateMap.reset(StateFlag::SCROS);
   Instance->StateMap.reset(StateFlag::ECROS);
-  bui::redbak();
+  redbak();
 }
 
 void backup::updateWriteIndex() {
