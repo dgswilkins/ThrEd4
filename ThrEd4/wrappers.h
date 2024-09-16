@@ -178,7 +178,7 @@ auto distance(inType const& start, inType const& end) noexcept(std::is_same_v<ou
 
 template <class itType, class inType>
 auto next(itType const& iterator,
-          inType index) noexcept(!(std::is_same_v<inType, size_t> ||
+          inType        index) noexcept(!(std::is_same_v<inType, size_t> ||
                                    (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>)))
     -> itType {
   static_assert(std::is_same_v<inType, size_t> || std::is_same_v<inType, uint32_t> ||

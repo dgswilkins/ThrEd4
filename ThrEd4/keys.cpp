@@ -386,8 +386,9 @@ auto kyi::handleHomeKey(bool& retflag) -> bool {
 	return true;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	auto iColor = Instance->StateMap.testAndReset(StateFlag::SELBOX) ? thred::pt2colInd(ClosestPointIndex)
-	                                                        : thred::pt2colInd(GroupStitchIndex);
+	auto iColor = Instance->StateMap.testAndReset(StateFlag::SELBOX)
+	                  ? thred::pt2colInd(ClosestPointIndex)
+	                  : thred::pt2colInd(GroupStitchIndex);
 	if (Instance->StateMap.testAndReset(StateFlag::SELBOX)) {
 	  Instance->StateMap.set(StateFlag::GRPSEL);
 	}
@@ -459,8 +460,9 @@ auto kyi::handleEndKey(int32_t& retflag) -> bool {
 	return false;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	auto const iColor = Instance->StateMap.testAndReset(StateFlag::SELBOX) ? thred::pt2colInd(ClosestPointIndex)
-	                                                              : thred::pt2colInd(GroupStitchIndex);
+	auto const iColor = Instance->StateMap.testAndReset(StateFlag::SELBOX)
+	                        ? thred::pt2colInd(ClosestPointIndex)
+	                        : thred::pt2colInd(GroupStitchIndex);
 	if (Instance->StateMap.testAndReset(StateFlag::SELBOX)) {
 	  Instance->StateMap.set(StateFlag::GRPSEL);
 	}
@@ -538,7 +540,8 @@ void kyi::seldwn() {
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
 	thred::unbox();
 	auto const attribute = Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK;
-	while (ClosestPointIndex != 0U && (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
+	while (ClosestPointIndex != 0U &&
+	       (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 	  --ClosestPointIndex;
 	}
 	auto stitchCoordsInPixels = POINT {};
@@ -654,7 +657,8 @@ void kyi::handleShiftedRightKey() {
 	  Instance->StateMap.reset(StateFlag::FORMSEL);
 	  if (Instance->StateMap.testAndReset(StateFlag::SELBOX)) {
 		if (!Instance->StitchBuffer.empty()) {
-		  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U); ClosestPointIndex < lastStitch) {
+		  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		      ClosestPointIndex < lastStitch) {
 			Instance->StateMap.set(StateFlag::GRPSEL);
 			GroupStitchIndex = ClosestPointIndex + 1U;
 		  }
@@ -662,7 +666,8 @@ void kyi::handleShiftedRightKey() {
 	  }
 	  else {
 		if (!Instance->StitchBuffer.empty()) {
-		  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U); GroupStitchIndex < lastStitch) {
+		  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		      GroupStitchIndex < lastStitch) {
 			++GroupStitchIndex;
 			thred::nuAct(GroupStitchIndex);
 		  }
@@ -790,7 +795,8 @@ auto kyi::handleLeftKey(bool& retflag) -> bool {
 		  auto const& form      = Instance->FormList.operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
-		  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
+		  auto const itVertex =
+		      wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*itVertex);
 		  thred::shftflt(*itVertex);
 		  Instance->StateMap.set(StateFlag::RESTCH);
@@ -1039,7 +1045,8 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 		kyi::istch();
 	  }
 	  thred::unbox();
-	  if (Instance->StateMap.testAndReset(StateFlag::GRPSEL) || Instance->StateMap.testAndReset(StateFlag::FORMSEL)) {
+	  if (Instance->StateMap.testAndReset(StateFlag::GRPSEL) ||
+	      Instance->StateMap.testAndReset(StateFlag::FORMSEL)) {
 		Instance->StateMap.set(StateFlag::RESTCH);
 	  }
 	  break;

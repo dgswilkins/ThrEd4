@@ -319,7 +319,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	constexpr auto EXPRATIO = 1.1F; // 10% expansion ratio
 	IniFile.hoopSizeX       = dstSize.x * EXPRATIO;
 	IniFile.hoopSizeY       = dstSize.y * EXPRATIO;
-	UnzoomedRect            = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
+	UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
   auto const delta =
@@ -383,8 +383,8 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
-	auto const count    = absoluteLengths.cx > absoluteLengths.cy ? (absoluteLengths.cx / DSTMAX) + 1
-	                                                              : (absoluteLengths.cy / DSTMAX) + 1;
+	auto const count = absoluteLengths.cx > absoluteLengths.cy ? (absoluteLengths.cx / DSTMAX) + 1
+	                                                           : (absoluteLengths.cy / DSTMAX) + 1;
 	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
 
 	auto difference = SIZE {};
@@ -451,6 +451,7 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 
 auto di::colfil() -> bool {
   auto const& workingFileName = Instance->WorkingFileName;
+
   *ColorFileName = workingFileName;
   *RGBFileName   = workingFileName;
   if (!workingFileName.has_extension()) {
@@ -1014,7 +1015,7 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
 void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t const data) {
   DSTRecords.push_back(DSTREC {.led = gsl::narrow_cast<uint8_t>(data & B1MASK),
                                .mid = gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
-                               .nd = gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
+                               .nd  = gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
 }
 
 auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {

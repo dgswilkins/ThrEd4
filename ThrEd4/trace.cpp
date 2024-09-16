@@ -814,9 +814,9 @@ void ti::dutrac() {
   }
   auto const bmpSR = bitmap::getBmpStitchRatio();
   CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
-  CurrentTracePoint.x       = std::min(CurrentTracePoint.x, bitmap::getBitmapWidth());
-  CurrentTracePoint.y       = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
-  auto const savedPoint     = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
+  CurrentTracePoint.x   = std::min(CurrentTracePoint.x, bitmap::getBitmapWidth());
+  CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
+  auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   auto       traceDirection = 0U;
   if (!TracedEdges->test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
@@ -1085,7 +1085,7 @@ void trace::dutrnum1() {
   Instance->StateMap.reset(StateFlag::NUMIN);
   Instance->StateMap.reset(StateFlag::TRNIN1);
   auto traceLength = thred::getMsgBufferValue();
-  traceLength = std::min(traceLength, MAXSIZ);
+  traceLength      = std::min(traceLength, MAXSIZ);
   if (Instance->StateMap.test(StateFlag::TRNUP)) {
 	IniFile.traceLength = traceLength * PFGRAN;
 	ti::trcstpnum();
@@ -1283,8 +1283,8 @@ void ti::durct(uint32_t const shift, RECT const& traceControlRect, RECT& traceHi
   auto       ratio         = wrap::toFloat(lowerColor) * CCRATIO;
   traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
   traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
-  traceMiddleMask.top    = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
-  ratio                  = wrap::toFloat(upperColor) * CCRATIO;
+  traceMiddleMask.top = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
+  ratio               = wrap::toFloat(upperColor) * CCRATIO;
   traceMiddleMask.bottom = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
   Instance->StateMap.reset(StateFlag::DUHI);
   Instance->StateMap.reset(StateFlag::DULO);

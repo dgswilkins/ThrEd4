@@ -208,8 +208,7 @@ auto ri::frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 		  chkTxt(form, badData);
 		}
 	  }
-	  if (auto constexpr CMP = uint32_t {BADFLT | BADCLP} | uint32_t {BADSAT | BADTX};
-	      badData.attribute == CMP) {
+	  if (auto constexpr CMP = uint32_t {BADFLT | BADCLP} | uint32_t {BADSAT | BADTX}; badData.attribute == CMP) {
 		break;
 	  }
 	}

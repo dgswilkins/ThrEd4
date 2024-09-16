@@ -201,8 +201,8 @@ void displayText::butxt(uint32_t const iButton, std::wstring const& buttonText) 
 }
 
 void displayText::clrhbut(uint32_t const startButton) {
-  for (auto const spButtons =
-           std::ranges::subrange(wrap::next(Instance->ButtonWin.begin(), startButton), Instance->ButtonWin.end());
+  for (auto const spButtons = std::ranges::subrange(wrap::next(Instance->ButtonWin.begin(), startButton),
+                                                    Instance->ButtonWin.end());
        auto const iButton : spButtons) { // NOLINT(readability-qualified-auto)
 	SetWindowText(iButton, L"");
   }

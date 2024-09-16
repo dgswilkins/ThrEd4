@@ -18,8 +18,8 @@
 #include <filesystem>
 
 constexpr auto OLDVER   = wchar_t {4}; // number of old file versions kept
-constexpr auto RES_SIZE = 26;  // reserved for expansion in the ThrEd v1.0 header
-constexpr auto UNDOLEN = 16U; // UndoBuffer length
+constexpr auto RES_SIZE = 26;          // reserved for expansion in the ThrEd v1.0 header
+constexpr auto UNDOLEN  = 16U;         // UndoBuffer length
 
 class FORM_VERTICES
 {
@@ -73,15 +73,15 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto COLSIZ         = int32_t {12}; // logical pixel width of the color bar
-	constexpr auto MSGSIZ = uint32_t {8192U}; // size of the message buffer
-	constexpr auto NERCNT         = 4U;               // number of entries in the near array;
-	constexpr auto SCROLSIZ       = int32_t {12};     // logical pixel width of a scroll bar
-	constexpr auto SWCOUNT        = 16U;              // number of side windows to create/track
-	constexpr auto SWBLEN         = 11U; // Side Window buffer length including the zero terminator
-	constexpr auto ITXBUFSZ       = uint32_t {16U}; // texture buffer depth
-	constexpr auto TSSSIZ         = size_t {32U};   // size of the message buffer
-	ColorBarSize           = COLSIZ;
+	constexpr auto COLSIZ   = int32_t {12};     // logical pixel width of the color bar
+	constexpr auto MSGSIZ   = uint32_t {8192U}; // size of the message buffer
+	constexpr auto NERCNT   = 4U;               // number of entries in the near array;
+	constexpr auto SCROLSIZ = int32_t {12};     // logical pixel width of a scroll bar
+	constexpr auto SWCOUNT  = 16U;              // number of side windows to create/track
+	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
+	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
+	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
+	ColorBarSize            = COLSIZ;
 	FormControlPoints.resize(OUTPNTS);
 	DefaultColorWin.resize(COLORCNT);
 	LabelWindow.resize(LASTLIN);
@@ -199,7 +199,7 @@ class MY_SINGLE
   private:
   MY_SINGLE()  = default;
   ~MY_SINGLE() = default;
-  
+
   // file menu items
   enum FileMenuItems : uint8_t {
 	FM_NEW,
@@ -224,11 +224,11 @@ class MY_SINGLE
   };
 };
 
-extern MY_SINGLE*   Instance;
-extern uint8_t      ActiveColor;
-extern uint8_t      ActiveLayer;
+extern MY_SINGLE* Instance;
+extern uint8_t    ActiveColor;
+extern uint8_t    ActiveLayer;
 
-extern uint8_t   AppliqueColor;
+extern uint8_t AppliqueColor;
 
 extern COLORREF BackgroundColor;
 extern float    BorderWidth;
@@ -316,7 +316,7 @@ extern int32_t* ScrollSize;
 extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 
-extern FORM_VERTICES          SelectedFormVertices;
+extern FORM_VERTICES SelectedFormVertices;
 
 extern RECT    SelectedFormsRect;
 extern F_POINT SelectedFormsSize;
@@ -369,8 +369,8 @@ extern ENUM_MAP<UserFlag>* UserFlagMap;
 
 extern float UserStitchLength;
 
-extern float     VerticalRatio;
-extern HWND      VerticalScrollBar;
+extern float VerticalRatio;
+extern HWND  VerticalScrollBar;
 
 extern std::array<POINT, SQPNTS> ZoomBoxLine;
 

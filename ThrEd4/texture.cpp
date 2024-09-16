@@ -733,7 +733,7 @@ void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
   if (integerStart == TextureScreen.lines + 1) {
 	--integerStart;
   }
-  integerFinish = std::min(integerFinish, gsl::narrow_cast<int32_t>(TextureScreen.lines));
+  integerFinish        = std::min(integerFinish, gsl::narrow_cast<int32_t>(TextureScreen.lines));
   auto const lineRange = wrap::toSize(integerFinish - integerStart);
   TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
   while (integerStart <= integerFinish) {
@@ -810,8 +810,8 @@ void texture::txtrup() {
 	auto const xMagnitude = abs(offset.x);
 	auto       textureOffset =
 	    TX_OFF {.y = wrap::toFloat(-offset.y) / wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight,
-	            .line = wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) * TextureScreen.editToPixelRatio /
-	                                TextureScreen.spacing)};
+	            .line = wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) *
+	                                        TextureScreen.editToPixelRatio / TextureScreen.spacing)};
 	if (offset.x < 0) {
 	  textureOffset.line = -textureOffset.line;
 	}
@@ -936,7 +936,8 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	if (Instance->StateMap.testAndSet(StateFlag::WASWROT)) {
 	  txi::ritxfrm(textureForm);
 	}
-	TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+	TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+	                         .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	txi::ritxfrm(textureForm);
 	return;
   }
@@ -944,7 +945,8 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 	return;
   }
   txi::ritxrct();
-  TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+  TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+                           .y = WinMsg.pt.y - StitchWindowOrigin.y};
   txi::ritxrct();
 }
 
@@ -1162,7 +1164,8 @@ void txi::nutx(uint32_t const formIndex) {
   std::ranges::sort(*TempTexturePoints, tpComp);
   auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
   TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
-  for (auto spForms = std::ranges::subrange(wrap::next(formList.begin(), formIndex + 1U), Instance->FormList.end());
+  for (auto spForms =
+           std::ranges::subrange(wrap::next(formList.begin(), formIndex + 1U), Instance->FormList.end());
        auto& current : spForms) {
 	if (current.isTexture()) {
 	  current.texture.index += tempPointCount;
@@ -1737,7 +1740,8 @@ void texture::setshft() {
   for (auto const& stitch : Instance->StitchBuffer) {
 	if (txi::inrct(selectionRect, stitch)) {
 	  txIn = true;
-	  TempTexturePoints->push_back(TX_PNT {.y = (stitch.y - selectionRect.bottom), .line = gsl::narrow<uint16_t>(line)});
+	  TempTexturePoints->push_back(
+	      TX_PNT {.y = (stitch.y - selectionRect.bottom), .line = gsl::narrow<uint16_t>(line)});
 	  continue;
 	}
 	if (txIn) {

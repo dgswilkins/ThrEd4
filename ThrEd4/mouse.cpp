@@ -224,14 +224,16 @@ auto mouse::handleEitherButtonDown() -> bool {
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U &&
 	      (Instance->StateMap.test(StateFlag::SELBOX) || Instance->StateMap.test(StateFlag::GRPSEL))) {
 		thred::unbox();
-		GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
+		GroupStitchIndex =
+		    wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
 		Instance->StateMap.set(StateFlag::GRPSEL);
 		thred::grpAdj();
 		thred::nuAct(GroupStitchIndex);
 		Instance->StateMap.set(StateFlag::RESTCH);
 	  }
 	  else {
-		ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
+		ClosestPointIndex =
+		    wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
 		thred::nuAct(ClosestPointIndex);
 		thred::movbox();
 		if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
@@ -242,7 +244,8 @@ auto mouse::handleEitherButtonDown() -> bool {
 	  }
 	}
 	else {
-	  ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
+	  ClosestPointIndex =
+	      wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
 	  thred::nuAct(ClosestPointIndex);
 	  thred::rstAll();
 	  Instance->StateMap.set(StateFlag::SELBOX);
@@ -294,7 +297,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (Instance->StateMap.test(StateFlag::FPSEL) && !Instance->StateMap.test(StateFlag::FUNCLP) &&
       !Instance->StateMap.test(StateFlag::ROTAT)) {
 	Instance->SelectedFormsLine = Instance->SelectedPointsLine;
-	SelectedFormsRect  = SelectedPixelsRect;
+	SelectedFormsRect           = SelectedPixelsRect;
 	if (thred::chkbig(stretchBoxLine, xyRatio)) {
 	  return true;
 	}
@@ -382,7 +385,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return true;
   }
-  if (!Instance->SelectedFormList.empty() && !Instance->StateMap.test(StateFlag::ROTAT) && thred::chkbig(stretchBoxLine, xyRatio)) {
+  if (!Instance->SelectedFormList.empty() && !Instance->StateMap.test(StateFlag::ROTAT) &&
+      thred::chkbig(stretchBoxLine, xyRatio)) {
 	return true;
   }
   if (Instance->StateMap.test(StateFlag::SIDCOL) && thred::inDefaultColorWindows()) {
@@ -564,7 +568,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   if (PreferenceIndex == PRFAPPCOL + 1 && thred::inDefaultColorWindows()) {
 	AppliqueColor = thred::getVerticalIndex();
-	SetWindowText(Instance->ValueWindow.operator[](PRFAPPCOL), format(FMT_COMPILE(L"{}"), AppliqueColor).c_str());
+	SetWindowText(Instance->ValueWindow.operator[](PRFAPPCOL),
+	              format(FMT_COMPILE(L"{}"), AppliqueColor).c_str());
 	thred::unsid();
 	return true;
   }
@@ -672,17 +677,20 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			Instance->StitchBuffer.emplace_back(stitchPoint.x, stitchPoint.y, code);
 			thred::duzrat();
 			InsertLine[0] = thred::stch2px1(iStitch);
-			InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+			InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+			                 .y = WinMsg.pt.y - StitchWindowOrigin.y};
 			thred::coltab();
 			Instance->StateMap.set(StateFlag::RESTCH);
 			return true;
 		  }
 
 		  thred::xlin1();
-		  Instance->StitchBuffer.insert(Instance->StitchBuffer.begin(), F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
+		  Instance->StitchBuffer.insert(Instance->StitchBuffer.begin(),
+		                                F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		  Instance->StitchBuffer.front().attribute &= ~KNOTMSK;
 		  InsertLine[0] = thred::stch2px1(0);
-		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+		                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		  thred::coltab();
 		  Instance->StateMap.set(StateFlag::RESTCH);
 		  return true;
@@ -698,9 +706,10 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		++ClosestPointIndex;
 		thred::savdo();
 		Instance->StitchBuffer.insert(wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex),
-		                     F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
+		                              F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		thred::xlin();
-		InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+		InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+		                 .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		InsertLine[0] = thred::stch2px1(ClosestPointIndex);
 		InsertLine[2] = thred::stch2px1(ClosestPointIndex + 1U);
 		thred::coltab();
@@ -716,13 +725,14 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	else {
 	  if (thred::inStitchWin()) {
 		thred::savdo();
-		InsertLine[0] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
-		InsertLine[1] = InsertLine[0];
+		InsertLine[0]          = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+		                          .y = WinMsg.pt.y - StitchWindowOrigin.y};
+		InsertLine[1]          = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
-		Instance->StitchBuffer.emplace_back(stitchPoint.x,
-		                           stitchPoint.y,
-		                           USMSK | ActiveColor |
-		                               gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM);
+		Instance->StitchBuffer.emplace_back(
+		    stitchPoint.x,
+		    stitchPoint.y,
+		    USMSK | ActiveColor | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM);
 		thred::addColor(0, ActiveColor);
 		Instance->StateMap.set(StateFlag::LIN1);
 		Instance->StateMap.set(StateFlag::INSRT);
@@ -1070,7 +1080,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	  std::swap(ZoomBoxOrigin.y, stitchPoint.y);
 	}
 	auto newSize = F_POINT {stitchPoint.x - ZoomBoxOrigin.x, stitchPoint.y - ZoomBoxOrigin.y};
-	stitchPoint  = F_POINT {ZoomBoxOrigin.x + (newSize.x * HALF), ZoomBoxOrigin.y + (newSize.y * HALF)};
+	stitchPoint = F_POINT {ZoomBoxOrigin.x + (newSize.x * HALF), ZoomBoxOrigin.y + (newSize.y * HALF)};
 	auto const saveFactor = ZoomFactor;
 	ZoomFactor            = thred::updateZoomFactor(newSize);
 	if (ZoomFactor < thred::getZoomMin()) {
@@ -1298,7 +1308,8 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (Instance->StateMap.test(StateFlag::INSFRM)) { // If we are inserting points into a form
 	  form::uninsf();
-	  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+	  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+	                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::SHOINSF);
 	  form::duinsf();
 	  return true;
@@ -1328,7 +1339,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (Instance->StateMap.test(StateFlag::FRMPMOV)) { // If we are moving a form point
 	  mi::unmov();
 	  Instance->RubberBandLine.operator[](1) = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
-	                                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
+	                                            .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	  if (thred::inStitchWin()) {
@@ -1392,14 +1403,16 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  if (Instance->StateMap.test(StateFlag::LIN1)) {
 		if (!Instance->StitchBuffer.empty()) {
 		  thred::xlin1();
-		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+		                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		  Instance->StateMap.set(StateFlag::ILIN1);
 		  thred::ilin1();
 		}
 		return true;
 	  }
 	  thred::xlin();
-	  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
+	  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
+	                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::ILIN);
 	  thred::ilin();
 	  return true;
@@ -1471,7 +1484,8 @@ auto mouse::handleRightButtonDown() -> bool {
   if (thred::unselectAll()) {
 	return true;
   }
-  if (thred::inStitchWin() && !(Instance->StateMap.test(StateFlag::SIZSEL) && thred::inChangeThreadWindows())) { // If we are in the thread windows
+  if (thred::inStitchWin() && !(Instance->StateMap.test(StateFlag::SIZSEL) &&
+                                thred::inChangeThreadWindows())) { // If we are in the thread windows
 	if (!formList.empty() && !Instance->StateMap.test(StateFlag::FRMOF)) { // and we are not in a form
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		auto tempIndex = ClosestFormToCursor;

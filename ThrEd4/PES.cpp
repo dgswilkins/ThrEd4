@@ -404,7 +404,8 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 // clang-format on
 
 auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-  auto color = PEC_COLOR {.r = GetRValue(referenceColor), .g = GetGValue(referenceColor), .b = GetBValue(referenceColor)};
+  auto color = PEC_COLOR {
+      .r = GetRValue(referenceColor), .g = GetGValue(referenceColor), .b = GetBValue(referenceColor)};
   auto const& translatedColor = PES_THREAD.at(colorIndex).getColor();
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
@@ -424,7 +425,8 @@ void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POIN
   if (nullptr == pesStitch) {
 	throw std::runtime_error("Failed to convert PESTCH pointer");
   }
-  auto const scaledStitch = F_POINT {(-stitch.x * IPECFACT) + offset.x, (stitch.y * IPECFACT) - offset.y};
+  auto const scaledStitch =
+      F_POINT {(-stitch.x * IPECFACT) + offset.x, (stitch.y * IPECFACT) - offset.y};
   *pesStitch = scaledStitch;
 }
 
@@ -514,7 +516,8 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto iPEC       = wrap::next(PESequivColors.begin(), color);
   auto iPesColors = pecHeader->pad.begin();
   *iPesColors++   = *iPEC;
-  for (auto const stitchRange = std::ranges::subrange(std::next(Instance->StitchBuffer.begin()), Instance->StitchBuffer.end());
+  for (auto const  stitchRange = std::ranges::subrange(std::next(Instance->StitchBuffer.begin()),
+                                                      Instance->StitchBuffer.end());
        auto const& stitch : stitchRange) {
 	if ((stitch.attribute & COLMSK) != color) {
 	  color = stitch.attribute & COLMSK;
@@ -950,8 +953,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   auto pecBuffer = std::vector<uint8_t> {};
   // make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates
   // are 2 bytes and pad by 1000 to account for jumps. Also reserve memory for thumbnails
-  auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + (Instance->StitchBuffer.size() * 2) + 1000 +
-                       ((wrap::toSize(pesThreadCount) + 1U) * THUMBHGT * (THUMBWID / 8));
+  auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + (Instance->StitchBuffer.size() * 2) +
+                       1000 + ((wrap::toSize(pesThreadCount) + 1U) * THUMBHGT * (THUMBWID / 8));
   pecBuffer.reserve(pecSize);
   pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
   auto*      pecHeader = convertFromPtr<PECHDR*>(pecBuffer.data());

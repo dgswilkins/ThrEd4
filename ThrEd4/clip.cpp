@@ -143,7 +143,7 @@ auto ci::findclp(uint32_t const formIndex) -> uint32_t {
 }
 
 void ci::clpsub(uint32_t const formIndex, uint32_t const cnt) {
-  for (auto spForms = std::ranges::subrange(wrap::next(Instance->FormList.begin(), formIndex + 1U),
+  for (auto  spForms = std::ranges::subrange(wrap::next(Instance->FormList.begin(), formIndex + 1U),
                                             Instance->FormList.end());
        auto& form : spForms) {
 	if (form.isClipX()) {
@@ -260,8 +260,9 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const 
   clipBuffer.clear();
   if (clipEntries != 0U) {
 	clipBuffer.reserve(clipEntries);
-	for (auto const  clipPoints = std::ranges::subrange(wrap::next(Instance->ClipPoints.begin(), clipIndex),
-                                                       wrap::next(Instance->ClipPoints.begin(), clipIndex + clipEntries));
+	for (auto const clipPoints =
+	         std::ranges::subrange(wrap::next(Instance->ClipPoints.begin(), clipIndex),
+	                               wrap::next(Instance->ClipPoints.begin(), clipIndex + clipEntries));
 	     auto const& iClip : clipPoints) {
 	  clipBuffer.emplace_back(iClip.x, iClip.y, 0);
 	}
@@ -342,9 +343,10 @@ auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) 
   if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(Instance->OSequence.size()))) {
 	return false;
   }
-  std::ranges::transform(clipFillData, std::back_inserter(Instance->OSequence), [&adjustedPoint](auto const& data) noexcept {
-	return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
-  });
+  std::ranges::transform(
+      clipFillData, std::back_inserter(Instance->OSequence), [&adjustedPoint](auto const& data) noexcept {
+	    return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
+      });
   return true;
 }
 
@@ -356,7 +358,7 @@ void ci::lincrnr(uint32_t const              vertexIndex,
                  uint32_t const              currentSide,
                  F_POINT&                    stitchPoint,
                  F_POINT const&              borderClipReference) {
-  auto const itVertex     = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + currentSide + 2);
+  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + currentSide + 2);
   auto       moveToCoords = *itVertex; // intended copy
   if (!nupnt(clipAngle, moveToCoords, stitchPoint)) {
 	return;
@@ -793,8 +795,8 @@ void ci::clpcrnr(FRM_HEAD const&       form,
                  uint32_t const        vertex,
                  F_POINT const&        rotationCenter) {
   auto const  nextVertex = form::nxt(form, vertex);
-  auto const  itVertex   = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + nextVertex);
-  auto const* points     = Instance->StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  auto const  itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + nextVertex);
+  auto const* points   = Instance->StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (nullptr == points) {
 	return;
   }
@@ -830,7 +832,7 @@ void ci::picfn(FRM_HEAD const&       form,
                uint32_t const        finish,
                float                 spacing,
                F_POINT const&        rotationCenter) {
-  auto const itStartVertex  = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
+  auto const itStartVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
   auto const itFinishVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + finish);
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};

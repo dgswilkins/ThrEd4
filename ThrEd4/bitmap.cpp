@@ -165,7 +165,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
-  fileHeaderSize = std::min(fileHeaderSize, sizeof(BITMAPV4HEADER));
+  fileHeaderSize      = std::min(fileHeaderSize, sizeof(BITMAPV4HEADER));
   if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
 	return;
   }
@@ -648,9 +648,9 @@ auto bi::bitar() -> bool {
   if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
 	return false;
   }
-  BitmapSrcRect = {.left = wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
-                   .top = wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
-                   .right = wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
+  BitmapSrcRect = {.left   = wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
+                   .top    = wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
+                   .right  = wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
                    .bottom = wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
   if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
 	BitmapSrcRect.right = BitmapWidth;
@@ -672,12 +672,12 @@ auto bi::bitar() -> bool {
   auto const bitmapStitchRatio =
       F_POINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
                wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
-  BitmapDstRect = {.left = std::lround(differenceRect.left * bitmapStitchRatio.x),
-                   .top = std::lround(differenceRect.top * bitmapStitchRatio.y),
-                   .right = std::lround(wrap::toFloat(StitchWindowClientRect.right) -
-                               (differenceRect.right * bitmapStitchRatio.x)),
+  BitmapDstRect = {.left   = std::lround(differenceRect.left * bitmapStitchRatio.x),
+                   .top    = std::lround(differenceRect.top * bitmapStitchRatio.y),
+                   .right  = std::lround(wrap::toFloat(StitchWindowClientRect.right) -
+                                        (differenceRect.right * bitmapStitchRatio.x)),
                    .bottom = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-                               (differenceRect.bottom * bitmapStitchRatio.y))};
+                                         (differenceRect.bottom * bitmapStitchRatio.y))};
   return true;
 }
 

@@ -105,9 +105,11 @@ void insat();
 void ispcdclp();
 void join();
 auto lastch() noexcept -> bool;
-auto linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection,
-          std::vector<F_POINT> const& outsidePoints) noexcept
-    -> bool;
+auto linx(std::vector<F_POINT> const& points,
+          uint32_t                    start,
+          uint32_t                    finish,
+          F_POINT&                    intersection,
+          std::vector<F_POINT> const& outsidePoints) noexcept -> bool;
 void mdufrm() noexcept;
 void movlayr(uint32_t layer);
 void munfrm();
