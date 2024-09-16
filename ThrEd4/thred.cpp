@@ -3888,7 +3888,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles const fileTypes, File
 
 auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
   auto eCode = std::error_code {};
-  size       = file_size(newFileName, eCode);
+  size       = file_size(newFileName, eCode); // NOLINT
   if (eCode != std::error_code {}) {
 	// ToDo - find better error message
 	displayText::filnopn(IDS_FNOPN, newFileName);

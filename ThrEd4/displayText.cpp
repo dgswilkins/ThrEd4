@@ -38,6 +38,7 @@
 #include <WinUser.h>
 
 // Standard Libraries
+#include <algorithm>
 #include <cstdint>
 #include <filesystem>
 // ReSharper disable CppUnusedIncludeDirective

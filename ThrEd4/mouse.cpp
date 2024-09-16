@@ -50,7 +50,9 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+// ReSharper disable CppUnusedIncludeDirective
 #include <ranges>
+// ReSharper restore CppUnusedIncludeDirective
 #include <string>
 #include <vector>
 

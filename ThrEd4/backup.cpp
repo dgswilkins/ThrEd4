@@ -36,10 +36,12 @@
 #include <WinUser.h>
 
 // Standard Libraries
+// ReSharper disable CppUnusedIncludeDirective
+#include <algorithm>
+// ReSharper restore CppUnusedIncludeDirective
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <xutility>
 
 class BACK_HEAD // Backup header
 {
