@@ -459,7 +459,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   // label and fill the border color field
   labelWindow[LBRDCOL] = txtwin(displayText::loadStr(IDS_TXT8), LabelWindowCoords);
   valueWindow[LBRDCOL] =
-      numwin(format(FMT_COMPILE(L"{}"), form.borderColor & COLMSK + 1U), ValueWindowCoords);
+      numwin(format(FMT_COMPILE(L"{}"), form.borderColor & (COLMSK + 1U)), ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   if ((EDGE_ARRAY.at(edgeIdx) & BESPAC) != 0) {
 	// label and fill the border spacing field
@@ -940,12 +940,12 @@ void formForms::dasyfrm() {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
-	Instance->FormVertices.emplace_back(referencePoint.x + diameter * cos(angle),
-	                           referencePoint.y + diameter * sin(angle));
+	Instance->FormVertices.emplace_back(referencePoint.x + (diameter * cos(angle)),
+	                           referencePoint.y + (diameter * sin(angle)));
 	++iVertex;
 	for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; ++iSegment) {
-	  Instance->FormVertices.emplace_back(referencePoint.x + holeDiameter * cos(angle),
-	                             referencePoint.y + holeDiameter * sin(angle));
+	  Instance->FormVertices.emplace_back(referencePoint.x + (holeDiameter * cos(angle)),
+	                             referencePoint.y + (holeDiameter * sin(angle)));
 	  ++iVertex;
 	  angle -= holeSegmentAngle;
 	}
@@ -1017,8 +1017,8 @@ void formForms::dasyfrm() {
 		  break;
 		}
 	  }
-	  Instance->FormVertices.emplace_back(referencePoint.x + cos(angle) * distanceFromDaisyCenter,
-	                             referencePoint.y + sin(angle) * distanceFromDaisyCenter);
+	  Instance->FormVertices.emplace_back(referencePoint.x + (cos(angle) * distanceFromDaisyCenter),
+	                             referencePoint.y + (sin(angle) * distanceFromDaisyCenter));
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
@@ -1362,7 +1362,7 @@ void formForms::wavfrm() {
   auto const count           = iPoint;
   auto       currentPosition = F_POINT {};
   auto const formVerticesSize =
-      IniFile.waveLobes * count + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
+      (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
   Instance->FormVertices.resize(Instance->FormVertices.size() + formVerticesSize);
   firstVertex = wrap::next(Instance->FormVertices.begin(), formVertexIndex); // resize may invalidate iterator
 

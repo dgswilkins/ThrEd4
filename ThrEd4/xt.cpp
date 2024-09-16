@@ -289,7 +289,7 @@ void xi::fthvars(FRM_HEAD const& form, FEATHER& feather) {
 }
 
 constexpr auto xi::durat(float const start, float const finish, float const featherRatio) -> float {
-  return (finish - start) * featherRatio + start;
+  return ((finish - start) * featherRatio) + start;
 }
 
 void xi::duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, float const featherRatioLocal) noexcept {
@@ -376,7 +376,7 @@ void xi::nurat(FEATHER& feather) noexcept {
 	}
 	case FTHSIN: {
 	  if (remainder > feather.globalRatio) {
-		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F + PI_F) * HALF + HALF;
+		feather.ratio = sin(((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F) + PI_F) * HALF + HALF;
 	  }
 	  else {
 		feather.ratio = sin(remainder / feather.globalRatio * PI_F) * HALF + HALF;
@@ -424,8 +424,8 @@ void xi::ratpnt(uint32_t const iPoint, uint32_t const iNextPoint, F_POINT& point
 
   auto const& bPoint = bSequence.operator[](iPoint);
 
-  point = F_POINT {((bSequence.operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x),
-                   ((bSequence.operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y)};
+  point = F_POINT {(((bSequence.operator[](iNextPoint).x - bPoint.x) * featherRatio) + bPoint.x),
+                   (((bSequence.operator[](iNextPoint).y - bPoint.y) * featherRatio) + bPoint.y)};
 }
 
 auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
@@ -433,8 +433,8 @@ auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> 
 }
 
 void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float const featherRatioLocal) noexcept {
-  point = F_POINT {((endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x),
-                   ((endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y)};
+  point = F_POINT {(((endPoint.x - startPoint.x) * featherRatioLocal) + startPoint.x),
+                   (((endPoint.y - startPoint.y) * featherRatioLocal) + startPoint.y)};
 }
 
 void xi::fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {

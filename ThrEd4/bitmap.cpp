@@ -675,9 +675,9 @@ auto bi::bitar() -> bool {
   BitmapDstRect = {.left = std::lround(differenceRect.left * bitmapStitchRatio.x),
                    .top = std::lround(differenceRect.top * bitmapStitchRatio.y),
                    .right = std::lround(wrap::toFloat(StitchWindowClientRect.right) -
-                               differenceRect.right * bitmapStitchRatio.x),
+                               (differenceRect.right * bitmapStitchRatio.x)),
                    .bottom = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-                               differenceRect.bottom * bitmapStitchRatio.y)};
+                               (differenceRect.bottom * bitmapStitchRatio.y))};
   return true;
 }
 
@@ -729,7 +729,7 @@ auto bi::stch2bit(F_POINT& point) -> POINT {
 	point.y -= wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y;
   }
   return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
-                wrap::round<LONG>(wrap::toFloat(BitmapHeight) - BmpStitchRatio.y * point.y)};
+                wrap::round<LONG>(wrap::toFloat(BitmapHeight) - (BmpStitchRatio.y * point.y))};
 }
 
 void bi::pxlin(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {

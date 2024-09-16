@@ -323,8 +323,8 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	displayText::hsizmsg();
   }
   auto const delta =
-      F_POINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
-               (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
+      F_POINT {((wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F) - mimimumCoordinate.x,
+               ((wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F) - mimimumCoordinate.y};
   for (auto& iStitch : Instance->StitchBuffer) {
 	iStitch += delta;
   }
@@ -383,8 +383,8 @@ void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
-	auto const count    = absoluteLengths.cx > absoluteLengths.cy ? absoluteLengths.cx / DSTMAX + 1
-	                                                              : absoluteLengths.cy / DSTMAX + 1;
+	auto const count    = absoluteLengths.cx > absoluteLengths.cy ? (absoluteLengths.cx / DSTMAX) + 1
+	                                                              : (absoluteLengths.cy / DSTMAX) + 1;
 	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
 
 	auto difference = SIZE {};
@@ -478,8 +478,8 @@ auto di::coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
   auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // NOLINTBEGIN(readability-magic-numbers)
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat(((512 + meanR) * deltaR * deltaR / 256) + 4 * deltaG * deltaG +
-                                                     (767 - meanR) * deltaB * deltaB / 256)));
+  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat(((512 + meanR) * deltaR * deltaR / 256) + (4 * deltaG * deltaG) +
+                                                     ((767 - meanR) * deltaB * deltaB / 256))));
   // NOLINTEND(readability-magic-numbers)
 }
 

@@ -159,10 +159,10 @@ auto getFormVertices() noexcept -> std::vector<F_POINT>&;
 template <class inType>
 auto midl(inType high, inType low) noexcept(std::is_same_v<inType, float>) -> float {
   if constexpr (std::is_same_v<inType, float>) {
-	return (high - low) * HALF + low;
+	return ((high - low) * HALF) + low;
   }
   else {
-	return (wrap::toFloat(high) - wrap::toFloat(low)) * HALF + wrap::toFloat(low);
+	return ((wrap::toFloat(high) - wrap::toFloat(low)) * HALF) + wrap::toFloat(low);
   }
 }
 

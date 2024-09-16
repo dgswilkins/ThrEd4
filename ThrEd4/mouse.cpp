@@ -1070,7 +1070,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	  std::swap(ZoomBoxOrigin.y, stitchPoint.y);
 	}
 	auto newSize = F_POINT {stitchPoint.x - ZoomBoxOrigin.x, stitchPoint.y - ZoomBoxOrigin.y};
-	stitchPoint  = F_POINT {ZoomBoxOrigin.x + newSize.x * HALF, ZoomBoxOrigin.y + newSize.y * HALF};
+	stitchPoint  = F_POINT {ZoomBoxOrigin.x + (newSize.x * HALF), ZoomBoxOrigin.y + (newSize.y * HALF)};
 	auto const saveFactor = ZoomFactor;
 	ZoomFactor            = thred::updateZoomFactor(newSize);
 	if (ZoomFactor < thred::getZoomMin()) {

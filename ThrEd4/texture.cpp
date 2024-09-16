@@ -428,7 +428,7 @@ void txi::txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept {
                   TextureScreen.editToPixelRatio);
   screenPoint.y =
       std::lround(wrap::toFloat(TextureScreen.height) -
-                  texturePoint.y / TextureScreen.areaHeight * wrap::toFloat(TextureScreen.height) +
+                  (texturePoint.y / TextureScreen.areaHeight * wrap::toFloat(TextureScreen.height)) +
                   wrap::toFloat(TextureScreen.top));
 }
 
@@ -471,12 +471,12 @@ void txi::txrct2rct(TXTR_RECT const& textureRect, RECT& rectangle) noexcept {
 void txi::ed2px(F_POINT const& editPoint, POINT& point) noexcept {
   point = POINT {std::lround(editPoint.x / TextureScreen.editToPixelRatio),
                  std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-                             editPoint.y / TextureScreen.editToPixelRatio)};
+                             (editPoint.y / TextureScreen.editToPixelRatio))};
 }
 
 void txi::px2ed(POINT const& point, F_POINT& editPoint) noexcept {
   editPoint = F_POINT {wrap::toFloat(point.x) * TextureScreen.editToPixelRatio,
-                       TextureScreen.screenHeight - wrap::toFloat(point.y) * TextureScreen.editToPixelRatio};
+                       TextureScreen.screenHeight - (wrap::toFloat(point.y) * TextureScreen.editToPixelRatio)};
 }
 
 void texture::drwtxtr() {
@@ -522,7 +522,7 @@ void texture::drwtxtr() {
   TextureScreen.yOffset = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, GridPen);
-  auto const gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0F);
+  auto const gridLineCount = wrap::floor<uint32_t>((TextureScreen.areaHeight / IniFile.gridSize) + 1.0F);
   auto textureRecord = TX_PNT {};
   line[0].x          = 0;
   line[1].x          = StitchWindowClientRect.right;
@@ -646,7 +646,7 @@ auto txi::txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t,
 	txt2pix(TempTexturePoints->operator[](iPoint), point);
 	auto const deltaX = point.x - reference.x;
 	auto const deltaY = point.y - reference.y;
-	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
+	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length < minimumLength) {
 	  minimumLength       = length;
 	  closestTexturePoint = iPoint;
 	}
@@ -738,7 +738,7 @@ void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
   TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
   while (integerStart <= integerFinish) {
 	if (auto const yOffset =
-	        slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing) + point0.y;
+	        (slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing)) + point0.y;
 	    yOffset > 0 && yOffset < TextureScreen.areaHeight) {
 	  TempTexturePoints->push_back(TX_PNT {.y = yOffset, .line = gsl::narrow<uint16_t>(integerStart)});
 	}

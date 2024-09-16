@@ -232,8 +232,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  color = NOTFRM | stitch.fx;
 	  continue;
 	}
-	Instance->StitchBuffer.emplace_back(wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
-	                           wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
+	Instance->StitchBuffer.emplace_back(wrap::toFloat(stitch.x) + (wrap::toFloat(stitch.fx) / FRACFACT),
+	                           wrap::toFloat(stitch.y) + (wrap::toFloat(stitch.fy) / FRACFACT),
 	                           color);
 	if (iStitch++ >= PCSHeader.getStitchCount()) {
 	  break;
@@ -386,8 +386,8 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  skipStitch   = true;
 	  continue;
 	}
-	auto xVal = wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT;
-	auto yVal = wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT;
+	auto xVal = wrap::toFloat(stitch.x) + (wrap::toFloat(stitch.fx) / FRACFACT);
+	auto yVal = wrap::toFloat(stitch.y) + (wrap::toFloat(stitch.fy) / FRACFACT);
 
 	minX = std::min(minX, xVal);
 	minY = std::min(minY, yVal);

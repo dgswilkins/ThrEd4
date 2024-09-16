@@ -467,9 +467,9 @@ void trace::trace() {
 	}
 	auto const bmpSR = bitmap::getBmpStitchRatio();
 	auto const bitmapPoint =
-	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y - 1.0F)};
+	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround((bmpSR.y * stitchPoint.y) - 1.0F)};
 
-	auto const color = spTBD[wrap::toSize(bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x)] ^ 0xffffffU;
+	auto const color = spTBD[wrap::toSize((bitmapPoint.y * bitmap::getBitmapWidth()) + bitmapPoint.x)] ^ 0xffffffU;
 	if (Instance->StateMap.test(StateFlag::TRCUP)) {
 	  UpPixelColor   = color;
 	  DownPixelColor = PENWHITE;
@@ -615,7 +615,7 @@ void trace::tracedg() {
 
 auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
     -> bool {
-  auto pixelIndex = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
+  auto pixelIndex = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
   switch (traceDirection) {
 	case TRCR: { // was tracing right
@@ -786,7 +786,7 @@ void ti::decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
 	        std::hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
 	    traceLengthSum1 > traceLength * IniFile.traceRatio) {
 	  dst.emplace_back(wrap::toFloat(itTP->x) * StitchBmpRatio.x,
-	                   wrap::toFloat(itTP->y) * StitchBmpRatio.y + landscapeOffset1);
+	                   (wrap::toFloat(itTP->y) * StitchBmpRatio.y) + landscapeOffset1);
 
 	  itNext          = itTP;
 	  itTP1           = itTP;
@@ -816,7 +816,7 @@ void ti::dutrac() {
   CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
   CurrentTracePoint.x       = std::min(CurrentTracePoint.x, bitmap::getBitmapWidth());
   CurrentTracePoint.y       = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
-  auto const savedPoint     = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
+  auto const savedPoint     = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   auto       traceDirection = 0U;
   if (!TracedEdges->test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
@@ -825,7 +825,7 @@ void ti::dutrac() {
 	while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
 	  ++point;
 	}
-	auto const right = point < limit ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
+	auto const right = point < limit ? point - (CurrentTracePoint.y * bitmap::getBitmapWidth())
 	                                 : bitmap::getBitmapWidth();
 	point            = savedPoint;
 	limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
@@ -1283,9 +1283,9 @@ void ti::durct(uint32_t const shift, RECT const& traceControlRect, RECT& traceHi
   auto       ratio         = wrap::toFloat(lowerColor) * CCRATIO;
   traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
   traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
-  traceMiddleMask.top    = std::lround(controlHeight * ratio + wrap::toFloat(traceControlRect.top));
+  traceMiddleMask.top    = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
   ratio                  = wrap::toFloat(upperColor) * CCRATIO;
-  traceMiddleMask.bottom = std::lround(controlHeight * ratio + wrap::toFloat(traceControlRect.top));
+  traceMiddleMask.bottom = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
   Instance->StateMap.reset(StateFlag::DUHI);
   Instance->StateMap.reset(StateFlag::DULO);
   if (lowerColor != 0U) {

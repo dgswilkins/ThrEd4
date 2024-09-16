@@ -172,8 +172,8 @@ void bal::redbal() {
   for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 	switch (balaradStitch[iStitch].code) {
 	  case BALNORM: {
-		Instance->StitchBuffer.emplace_back(balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
-		                           balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
+		Instance->StitchBuffer.emplace_back((balaradStitch[iStitch].x * IBALRAT) + BalaradOffset.x,
+		                           (balaradStitch[iStitch].y * IBALRAT) + BalaradOffset.y,
 		                           color);
 		break;
 	  }

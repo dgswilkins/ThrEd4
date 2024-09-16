@@ -246,7 +246,7 @@ void si::satclos() {
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
 	  auto const deltaY = stitchPoint.y - vertex.y;
-	  if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
+	  if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length < minimumLength) {
 		minimumLength         = length;
 		ClosestVertexToCursor = iVertex;
 	  }
@@ -344,7 +344,7 @@ auto si::satselfn() -> bool {
 	for (auto iVertex = 0U; auto const& vertex : vertexRange) {
 	  auto const deltaX = stitchPoint.x - vertex.x;
 	  auto const deltaY = stitchPoint.y - vertex.y;
-	  if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
+	  if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length < minimumLength) {
 		minimumLength = length;
 		ClosestFormToCursor =
 		    wrap::toUnsigned(&form - formList.data()); // index of the form. Possible with vectors
@@ -825,7 +825,7 @@ void satin::ribon() {
 	si::satends(formList.operator[](ClosestFormToCursor), isBlunt, BorderWidth);
   }
   newForm.vertexIndex    = currentType == FRMLINE ? thred::adflt(currentVertexCount * 2U)
-                                                  : thred::adflt(currentVertexCount * 2U + 2U);
+                                                  : thred::adflt((currentVertexCount * 2U) + 2U);
   auto const startVertex = wrap::next(Instance->FormVertices.begin(), newForm.vertexIndex);
   auto       itVertex    = startVertex;
   *itVertex++            = OutsidePoints->front();
@@ -1137,7 +1137,7 @@ void si::satmf(FRM_HEAD const& form, std::vector<float> const& lengths) {
   else {
 	if (itEndGuide->finish - itEndGuide->start > 2) {
 	  auto const length =
-	      (lengths[itEndGuide->finish] - lengths[itEndGuide->start]) / 2 + lengths[itEndGuide->start];
+	      ((lengths[itEndGuide->finish] - lengths[itEndGuide->start]) / 2) + lengths[itEndGuide->start];
 	  auto iVertex = itEndGuide->start;
 	  while (length > lengths[iVertex]) {
 		++iVertex;
@@ -1516,7 +1516,7 @@ auto si::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noe
   return std::ranges::any_of(satinBackup, [&](auto const& backup) {
 	auto const deltaX = backup.x - pnt.x;
 	auto const deltaY = backup.y - pnt.y;
-	auto const length = deltaX * deltaX + deltaY * deltaY;
+	auto const length = (deltaX * deltaX) + (deltaY * deltaY);
 	return length < lenCheck;
   });
 }

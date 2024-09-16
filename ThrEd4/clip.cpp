@@ -593,7 +593,7 @@ void ci::fxlen(FRM_HEAD const&           form,
        auto const& iVertex : spVertices) {
 	auto const deltaX = iVertex.x - itFirstVertex->x;
 	auto const deltaY = iVertex.y - itFirstVertex->y;
-	if (auto const length = deltaX * deltaX + deltaY * deltaY; length > minimumLength) {
+	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length > minimumLength) {
 	  flag = false;
 	  break;
 	}
@@ -716,7 +716,7 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   for (auto index = 0U; auto const& iPoint : chainEndPoints) {
 	auto const deltaX = LastPoint.x - iPoint.x;
 	auto const deltaY = LastPoint.y - iPoint.y;
-	if (auto const length = deltaX * deltaX + deltaY * deltaY; length < minimumLength) {
+	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length < minimumLength) {
 	  minimumLength = length;
 	  minimumIndex  = index;
 	}
@@ -945,8 +945,8 @@ void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t const start
 	                 chainEndPoints[finish].y - chainEndPoints[finish - 1U].y};
   }
   constexpr auto CHFACTOR = 4.0F; // Chain factor
-  chainPoint[2]           = F_POINT {chainEndPoints[finish].x + delta.x / CHFACTOR,
-                           chainEndPoints[finish].y + delta.y / CHFACTOR};
+  chainPoint[2]           = F_POINT {chainEndPoints[finish].x + (delta.x / CHFACTOR),
+                           chainEndPoints[finish].y + (delta.y / CHFACTOR)};
   auto chainCount         = CHAINLEN;
   if (Instance->StateMap.test(StateFlag::LINCHN)) {
 	--chainCount;

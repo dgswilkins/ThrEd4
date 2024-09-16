@@ -412,7 +412,7 @@ auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> u
   auto const deltaB = gsl::narrow_cast<int32_t>(color.b) - gsl::narrow_cast<int32_t>(translatedColor.b);
   // NOLINTBEGIN(readability-magic-numbers)
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NO LINTNEXTLINE(readability-magic-numbers)
-  return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
+  return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + (4 * deltaG * deltaG) +
                                          (((767 - meanR) * deltaB * deltaB) / 256)));
   // NOLINTEND(readability-magic-numbers)
 }
@@ -424,7 +424,7 @@ void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POIN
   if (nullptr == pesStitch) {
 	throw std::runtime_error("Failed to convert PESTCH pointer");
   }
-  auto const scaledStitch = F_POINT {-stitch.x * IPECFACT + offset.x, stitch.y * IPECFACT - offset.y};
+  auto const scaledStitch = F_POINT {(-stitch.x * IPECFACT) + offset.x, (stitch.y * IPECFACT) - offset.y};
   *pesStitch = scaledStitch;
 }
 
@@ -822,7 +822,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.atfm6        = AT6OFF + designSizeY + hoopSizeY * HALF - designSizeY * HALF;
   auto pesBuffer         = std::vector<uint8_t> {};
   // ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
-  auto const pesSize = sizeof(PESSTCHLST) + Instance->StitchBuffer.size() * sizeof(PESTCH) + 1000U;
+  auto const pesSize = sizeof(PESSTCHLST) + (Instance->StitchBuffer.size() * sizeof(PESTCH)) + 1000U;
   pesBuffer.reserve(pesSize);
   auto threadList      = std::vector<PES_COLOR_LIST> {};
   auto blockIndex      = uint16_t {}; // Index into the stitch blocks
@@ -908,7 +908,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   *colorIndex = gsl::narrow_cast<uint16_t>(pesThreadCount);
   for (auto paletteIndex = 0U; paletteIndex < pesThreadCount; ++paletteIndex) {
 	lastIndex = pesBuffer.size();
-	pesBuffer.resize(lastIndex + 2 * sizeof(uint16_t));
+	pesBuffer.resize(lastIndex + (2 * sizeof(uint16_t)));
 	auto* colorEntry = convertFromPtr<uint16_t*>(&pesBuffer[lastIndex]);
 	if (colorEntry == nullptr) {
 	  CloseHandle(fileHandle);
@@ -950,8 +950,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   auto pecBuffer = std::vector<uint8_t> {};
   // make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates
   // are 2 bytes and pad by 1000 to account for jumps. Also reserve memory for thumbnails
-  auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + Instance->StitchBuffer.size() * 2 + 1000 +
-                       (wrap::toSize(pesThreadCount) + 1U) * THUMBHGT * (THUMBWID / 8);
+  auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + (Instance->StitchBuffer.size() * 2) + 1000 +
+                       ((wrap::toSize(pesThreadCount) + 1U) * THUMBHGT * (THUMBWID / 8));
   pecBuffer.reserve(pecSize);
   pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
   auto*      pecHeader = convertFromPtr<PECHDR*>(pecBuffer.data());

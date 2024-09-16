@@ -142,7 +142,7 @@ auto fci::getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
 
 auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto clipSize =
-      wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->FormVertices);
+      wrap::toUnsigned(sizeof(FORM_CLIP)) + (form.vertexCount * wrap::sizeofType(Instance->FormVertices));
   if (form.type == SAT && form.satinGuideCount != 0U) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
   }
@@ -257,7 +257,7 @@ void fci::clipSelectedForm() {
 	return;
   }
   Clip       = RegisterClipboardFormat(PcdClipFormat);
-  clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
+  clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
 	return;
@@ -427,7 +427,7 @@ void fci::clipSelectedForms() {
 	return;
   }
   Clip       = RegisterClipboardFormat(PcdClipFormat);
-  clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
+  clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
 	return;
@@ -452,7 +452,7 @@ void fci::clipSelectedForms() {
 void fci::clipSelectedPoints() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const clipHandle = GlobalAlloc(
-      GHND, (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT) + sizeof(FORM_VERTEX_CLIP));
+      GHND, ((wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT)) + sizeof(FORM_VERTEX_CLIP));
   if (clipHandle == nullptr) {
 	return;
   }
@@ -496,7 +496,7 @@ void fci::clipSelectedStitches() {
 	auto const length  = GroupEndStitch - GroupStartStitch;
 	auto       iSource = GroupStartStitch;
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
+	auto const clipHandle = GlobalAlloc(GHND, (length * sizeof(CLIP_STITCH)) + 2U);
 	if (clipHandle == nullptr) {
 	  return;
 	}
@@ -611,7 +611,7 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   EmptyClipboard();
   Clip = RegisterClipboardFormat(PcdClipFormat);
 
-  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
+  auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
   if (nullptr == clipHandle) {
 	CloseClipboard();
 	return;
@@ -656,8 +656,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 	      ptrFormVertexData->clipType == CLP_FRMPS) {
 		thred::duzrat();
 		auto const byteCount =
-		    sizeof(*ptrFormVertexData) + (wrap::toSize(ptrFormVertexData->vertexCount) + 1U) *
-		                                     wrap::sizeofType(Instance->FormVertices);
+		    sizeof(*ptrFormVertexData) + ((wrap::toSize(ptrFormVertexData->vertexCount) + 1U) *
+		                                     wrap::sizeofType(Instance->FormVertices));
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const ptrClip        = convertFromPtr<uint8_t*>(clipPointer);
 		auto const  clips          = gsl::span {ptrClip, byteCount};
