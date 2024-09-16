@@ -115,13 +115,57 @@ class PCS_STITCH
 constexpr auto LARGE_HOOP = F_POINT {LHUPX, LHUPY};
 constexpr auto SMALL_HOOP = F_POINT {SHUPX, SHUPY};
 
-// PCS internal namespace
-namespace pci {
-auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
-} // namespace pci
-
 namespace {
 auto PCSHeader = PCSHEADER {}; // pcs file header
+
+// Definitions
+auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
+
+// Functions
+auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
+  auto minX = stitches[0].x;
+  auto minY = stitches[0].y;
+  auto maxX = stitches[0].x;
+  auto maxY = stitches[0].y;
+
+  for (const auto& stitch : stitches) {
+	minX = std::min(minX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxX = std::max(maxX, stitch.x);
+	maxY = std::max(maxY, stitch.y);
+  }
+
+  auto const boundingSize = F_POINT {maxX - minX, maxY - minY};
+  if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
+	displayText::tabmsg(IDS_PFAF2L, false);
+	return false;
+  }
+  auto const largeFlag =
+      boundingSize.x > SHUPX || boundingSize.y > SHUPY ||
+      (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
+  auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
+  PCSHeader.setHoopType(largeFlag);
+  auto delta = F_POINT {};
+  if (maxX > hoopSize.x) {
+	delta.x = hoopSize.x - maxX;
+  }
+  if (maxY > hoopSize.y) {
+	delta.y = hoopSize.y - maxY;
+  }
+  if (minX < 0) {
+	delta.x = -minX;
+  }
+  if (minY < 0) {
+	delta.y = -minY;
+  }
+  if (delta.x != 0.0F || delta.y != 0.0F) {
+	for (auto& offsetStitch : stitches) {
+	  offsetStitch += delta;
+	}
+  }
+  return true;
+}
+
 } // namespace
 
 auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
@@ -134,7 +178,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
   }
   auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
   PCSHeader.writeHeader(UserColor);
-  if (!pci::pcshup(saveStitches)) {
+  if (!pcshup(saveStitches)) {
 	CloseHandle(fileHandle);
 	return false;
   }
@@ -279,50 +323,6 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
   IniFile.hoopSizeX = SHUPX;
   IniFile.hoopSizeY = SHUPY;
   CloseHandle(fileHandle);
-  return true;
-}
-
-auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
-  auto minX = stitches[0].x;
-  auto minY = stitches[0].y;
-  auto maxX = stitches[0].x;
-  auto maxY = stitches[0].y;
-
-  for (const auto& stitch : stitches) {
-	minX = std::min(minX, stitch.x);
-	minY = std::min(minY, stitch.y);
-	maxX = std::max(maxX, stitch.x);
-	maxY = std::max(maxY, stitch.y);
-  }
-
-  auto const boundingSize = F_POINT {maxX - minX, maxY - minY};
-  if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
-	displayText::tabmsg(IDS_PFAF2L, false);
-	return false;
-  }
-  auto const largeFlag =
-      boundingSize.x > SHUPX || boundingSize.y > SHUPY ||
-      (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
-  auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
-  PCSHeader.setHoopType(largeFlag);
-  auto delta = F_POINT {};
-  if (maxX > hoopSize.x) {
-	delta.x = hoopSize.x - maxX;
-  }
-  if (maxY > hoopSize.y) {
-	delta.y = hoopSize.y - maxY;
-  }
-  if (minX < 0) {
-	delta.x = -minX;
-  }
-  if (minY < 0) {
-	delta.y = -minY;
-  }
-  if (delta.x != 0.0F || delta.y != 0.0F) {
-	for (auto& offsetStitch : stitches) {
-	  offsetStitch += delta;
-	}
-  }
   return true;
 }
 
