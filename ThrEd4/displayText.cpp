@@ -351,7 +351,7 @@ void displayText::savdisc() {
   CancelButton  = CreateWindow(L"STATIC",
                               displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                              2 * ButtonWidthX3 + 25,
+                              (2 * ButtonWidthX3) + 25,
                               MsgRect.bottom + 15,
                               ButtonWidthX3,
                               ButtonHeight,
