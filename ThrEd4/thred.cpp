@@ -3917,21 +3917,21 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto bytesRead   = DWORD {};
   auto thredHeader = THR_HEAD {};
-  if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in readTHRFile")) {
+  if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in readTHRFile")) { // check is we even have a file
 	return false;
   }
-  if ((thredHeader.headerType & SIGMASK) != THREDSIG) {
+  if ((thredHeader.headerType & SIGMASK) != THREDSIG) { // does the file have the correct signature
 	prtred(fileHandle, IDS_NOTHR);
 	return false;
   }
-  if (bytesRead != sizeof(thredHeader)) {
+  if (bytesRead != sizeof(thredHeader)) { // is there enough data in the file to read the header
 	prtred(fileHandle, IDS_SHRTF);
 	return false;
   }
   auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
   auto const spIDN   = gsl::span {IniFile.designerName};
   DesignerName->assign(utf::utf8ToUtf16(std::string(spIDN.data())));
-  switch (version) {
+  switch (version) { // handle the different versions of the file format
 	case 0: {
 	  if (thredHeader.hoopType == SMALHUP) {
 		IniFile.hoopSizeX = SHUPX;
@@ -3953,7 +3953,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  if (!wrap::readFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &bytesRead, L"ReadFile for ExtendedHeader in readTHRFile")) {
 		return false;
 	  }
-	  if (bytesRead != sizeof(*ExtendedHeader)) {
+	  if (bytesRead != sizeof(*ExtendedHeader)) { // is there enough data in the file to read the extended header
 		prtred(fileHandle, IDS_SHRTF);
 		return false;
 	  }
@@ -3972,7 +3972,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
   UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   Instance->StitchBuffer.resize(thredHeader.stitchCount);
-  if (thredHeader.stitchCount != 0U) {
+  if (thredHeader.stitchCount != 0U) { // read the stitch buffer if there are stitches
 	auto const bytesToRead = thredHeader.stitchCount * wrap::sizeofType(Instance->StitchBuffer);
 	if (!wrap::readFile(fileHandle, Instance->StitchBuffer.data(), bytesToRead, &bytesRead, L"ReadFile for StitchBuffer in readTHRFile")) {
 	  return false;
@@ -3987,7 +3987,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, L"ReadFile for getBmpNameData in readTHRFile")) {
 	return false;
   }
-  if (bytesRead != bytesToRead) {
+  if (bytesRead != bytesToRead) { // if we can't read the bitmap name, reset the bitmap and return
 	bitmap::resetBmpFile(true);
 	prtred(fileHandle, IDS_PRT);
 	return false;
@@ -3996,7 +3996,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, &BackgroundColor, bytesToRead, &bytesRead, L"ReadFile for BackgroundColor in readTHRFile")) {
 	return false;
   }
-  if (bytesRead != bytesToRead) {
+  if (bytesRead != bytesToRead) { // if we can't read the background color, default it and return
 	BackgroundColor = IniFile.backgroundColor;
 	prtred(fileHandle, IDS_PRT);
 	return false;
@@ -4006,7 +4006,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, L"ReadFile for UserColor in readTHRFile")) {
 	return false;
   }
-  if (bytesRead != bytesToRead) {
+  if (bytesRead != bytesToRead) { // if we can't read the user colors, default them and return
 	UserColor = DEFAULT_COLORS;
 	prtred(fileHandle, IDS_PRT);
 	return false;
@@ -4015,7 +4015,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, L"ReadFile for CustomColor in readTHRFile")) {
 	return false;
   }
-  if (bytesRead != bytesToRead) {
+  if (bytesRead != bytesToRead) { // if we can't read the custom colors, default them and return
 	CustomColor = DEFAULT_COLORS;
 	prtred(fileHandle, IDS_PRT);
 	return false;
@@ -4024,7 +4024,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, msgBuffer.data(), sizeof(msgBuffer), &bytesRead, L"ReadFile for msgBuffer in readTHRFile")) {
 	return false;
   }
-  if (bytesRead != TSSIZE) {
+  if (bytesRead != TSSIZE) { // if we can't read the thread size buffer, bail
 	prtred(fileHandle, IDS_PRT);
 	return false;
   }
@@ -4047,7 +4047,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	if (!wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in readTHRFile")) {
 	  return false;
 	}
-	if (bytesRead != bytesToRead) {
+	if (bytesRead != bytesToRead) { // if the header and available data don't match, resize the form list with the data we do have but set the bad file flag
 	  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(formListOriginal));
 	  formListOriginal.resize(thredHeader.formCount);
 	  Instance->StateMap.set(StateFlag::BADFIL);
@@ -4059,10 +4059,10 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	auto inFormList = std::vector<FRM_HEAD_OUT> {};
 	inFormList.resize(thredHeader.formCount);
 	bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
-	if (!wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in readTHRFile")) {
+	if (!wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in readTHRFile")) { // read the form list
 	  return false;
 	}
-	if (bytesRead != bytesToRead) {
+	if (bytesRead != bytesToRead) { 
 	  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(inFormList));
 	  inFormList.resize(thredHeader.formCount);
 	  Instance->StateMap.set(StateFlag::BADFIL);
@@ -4071,7 +4071,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	formList.insert(formList.end(), inFormList.begin(), inFormList.end());
   }
   formList.shrink_to_fit();
-  if (thredHeader.vertexCount != 0U) {
+  if (thredHeader.vertexCount != 0U) { // read the form vertices
 	Instance->FormVertices.resize(thredHeader.vertexCount);
 	bytesToRead = thredHeader.vertexCount * wrap::sizeofType(Instance->FormVertices);
 	if (!wrap::readFile(fileHandle, Instance->FormVertices.data(), bytesToRead, &bytesRead, L"ReadFile for FormVertices in readTHRFile")) {
@@ -4088,7 +4088,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	return false;
   }
   Instance->FormVertices.shrink_to_fit();
-  if (thredHeader.dlineCount != 0U) {
+  if (thredHeader.dlineCount != 0U) { // read the satin guide list
 	auto inGuideList = std::vector<SAT_CON_OUT>(thredHeader.dlineCount);
 	bytesToRead      = thredHeader.dlineCount * wrap::sizeofType(inGuideList);
 	if (!wrap::readFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, L"ReadFile for inGuideList in readTHRFile")) {
@@ -4102,7 +4102,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	Instance->SatinGuides.insert(Instance->SatinGuides.end(), inGuideList.begin(), inGuideList.end());
   }
   Instance->SatinGuides.shrink_to_fit();
-  if (thredHeader.clipDataCount != 0U) {
+  if (thredHeader.clipDataCount != 0U) { // read the clip points
 	Instance->ClipPoints.resize(thredHeader.clipDataCount);
 	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
 	if (!wrap::readFile(fileHandle, Instance->ClipPoints.data(), bytesToRead, &bytesRead, L"ReadFile for ClipPoints in readTHRFile")) {
@@ -4114,7 +4114,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	}
   }
   Instance->ClipPoints.shrink_to_fit();
-  if (ExtendedHeader->texturePointCount != 0U) {
+  if (ExtendedHeader->texturePointCount != 0U) { // read the texture points
 	TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
 	bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(TexturePointsBuffer);
 	if (!wrap::readFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for TexturePointsBuffer in readTHRFile")) {
