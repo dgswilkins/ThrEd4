@@ -60,7 +60,7 @@
 #include <string>
 #include <vector>
 
-// menus
+// menu internal namespace
 namespace {
 auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
 auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
@@ -75,10 +75,8 @@ constexpr auto GRDDEF = uint32_t {0x202020U}; // grid default color
 constexpr auto GRDRED = uint32_t {0xff2020U}; // grid red color
 constexpr auto GRDBLU = uint32_t {0x20ff20U}; // grid green color
 constexpr auto GRDGRN = uint32_t {0x2020ffU}; // grid blue color
-} // namespace
 
-// menu internal namespace
-namespace mni {
+// Definitions
 void fil2sel(uint32_t stat);
 void frmcursel(uint32_t cursorType);
 void getfrmbox();
@@ -93,9 +91,9 @@ void pcsbsavon();
 void rotauxsel(uint32_t stat);
 void shoknot();
 void vuselthr();
-} // namespace mni
 
-void mni::fil2sel(uint32_t const stat) {
+// Functions
+void fil2sel(uint32_t const stat) {
   UserFlagMap->set(UserFlag::FIL2OF);
   if (stat != 0U) {
 	UserFlagMap->reset(UserFlag::FIL2OF);
@@ -103,15 +101,7 @@ void mni::fil2sel(uint32_t const stat) {
   menu::fil2men();
 }
 
-void mni::rotauxsel(uint32_t const stat) {
-  UserFlagMap->set(UserFlag::ROTAUX);
-  if (stat == 0U) {
-	UserFlagMap->reset(UserFlag::ROTAUX);
-  }
-  menu::rotauxmen();
-}
-
-void mni::frmcursel(uint32_t const cursorType) {
+void frmcursel(uint32_t const cursorType) {
   UserFlagMap->set(UserFlag::FRMX);
   if (cursorType == 0U) {
 	UserFlagMap->reset(UserFlag::FRMX);
@@ -119,67 +109,88 @@ void mni::frmcursel(uint32_t const cursorType) {
   menu::frmcurmen();
 }
 
-void mni::getstpix() {
-  displayText::showMessage(IDS_STCHP, IniFile.stitchSizePixels);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::STPXIN);
-  displayText::numWnd();
-}
-
-void mni::getfrmpix() {
-  displayText::showMessage(IDS_FRMP, IniFile.formVertexSizePixels);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::FRMPXIN);
-  displayText::numWnd();
-}
-
-void mni::getfrmbox() {
+void getfrmbox() {
   displayText::showMessage(IDS_FRMBOX, IniFile.formBoxSizePixels);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::FRMBOXIN);
   displayText::numWnd();
 }
 
-void mni::getnpix() {
+void getfrmpix() {
+  displayText::showMessage(IDS_FRMP, IniFile.formVertexSizePixels);
+  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->StateMap.set(StateFlag::FRMPXIN);
+  displayText::numWnd();
+}
+
+void getnpix() {
   displayText::showMessage(IDS_NUDG, IniFile.nudgePixels);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::PIXIN);
   displayText::numWnd();
 }
 
-void mni::nedon() {
-  UserFlagMap->reset(UserFlag::NEDOF);
-  menu::nedmen();
+void getstpix() {
+  displayText::showMessage(IDS_STCHP, IniFile.stitchSizePixels);
+  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->StateMap.set(StateFlag::STPXIN);
+  displayText::numWnd();
 }
 
-void mni::nedof() {
-  UserFlagMap->set(UserFlag::NEDOF);
-  menu::nedmen();
-}
-
-void mni::shoknot() {
-  UserFlagMap->reset(UserFlag::KNOTOF);
-  menu::knotmen();
-  Instance->StateMap.set(StateFlag::RESTCH);
-}
-
-void mni::hidknot() {
+void hidknot() {
   UserFlagMap->set(UserFlag::KNOTOF);
   menu::knotmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
-void mni::pcsbsavon() {
+void nedof() {
+  UserFlagMap->set(UserFlag::NEDOF);
+  menu::nedmen();
+}
+
+void nedon() {
+  UserFlagMap->reset(UserFlag::NEDOF);
+  menu::nedmen();
+}
+
+void pcsbsavof() {
+  UserFlagMap->set(UserFlag::BSAVOF);
+  menu::bsavmen();
+  Instance->StateMap.set(StateFlag::RESTCH);
+}
+
+void pcsbsavon() {
   UserFlagMap->reset(UserFlag::BSAVOF);
   menu::bsavmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
-void mni::pcsbsavof() {
-  UserFlagMap->set(UserFlag::BSAVOF);
-  menu::bsavmen();
+void rotauxsel(uint32_t const stat) {
+  UserFlagMap->set(UserFlag::ROTAUX);
+  if (stat == 0U) {
+	UserFlagMap->reset(UserFlag::ROTAUX);
+  }
+  menu::rotauxmen();
+}
+
+void shoknot() {
+  UserFlagMap->reset(UserFlag::KNOTOF);
+  menu::knotmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
+
+void vuselthr() {
+  if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
+	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+	Instance->StateMap.reset(StateFlag::COL);
+  }
+  else {
+	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
+	Instance->StateMap.set(StateFlag::COL);
+  }
+  Instance->StateMap.set(StateFlag::RESTCH);
+}
+} // namespace
 
 void menu::setpcs() {
   IniFile.auxFileType = AUXPCS;
@@ -443,18 +454,6 @@ void menu::vuthrds() {
   else {
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED);
 	Instance->StateMap.set(StateFlag::THRDS);
-  }
-  Instance->StateMap.set(StateFlag::RESTCH);
-}
-
-void mni::vuselthr() {
-  if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	Instance->StateMap.reset(StateFlag::COL);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	Instance->StateMap.set(StateFlag::COL);
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -1155,12 +1154,12 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FIL2SEL_ON: { // view / Set / Fill at Select / On
-	  mni::fil2sel(1);
+	  fil2sel(1);
 	  flag = true;
 	  break;
 	}
 	case ID_FIL2SEL_OFF: { // view / Set / Fill at Select / Off
-	  mni::fil2sel(0);
+	  fil2sel(0);
 	  flag = true;
 	  break;
 	}
@@ -1185,37 +1184,37 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FRMX: { // view / Set / Form Cursor / Cross
-	  mni::frmcursel(1);
+	  frmcursel(1);
 	  flag = true;
 	  break;
 	}
 	case ID_FRMBOX: { // view / Set / Form Cursor / Box
-	  mni::frmcursel(0);
+	  frmcursel(0);
 	  flag = true;
 	  break;
 	}
 	case ID_ROTAUXON: { // view / Set / Rotate Machine File / On
-	  mni::rotauxsel(1);
+	  rotauxsel(1);
 	  flag = true;
 	  break;
 	}
 	case ID_ROTAUXOFF: { // view / Set / Rotate Machine File / Off
-	  mni::rotauxsel(0);
+	  rotauxsel(0);
 	  flag = true;
 	  break;
 	}
 	case ID_STCHPIX: { // view / Set / Point Size / Stitch Point Boxes
-	  mni::getstpix();
+	  getstpix();
 	  flag = true;
 	  break;
 	}
 	case ID_FRMPIX: { // view / Set / Point Size / Form Point Triangles
-	  mni::getfrmpix();
+	  getfrmpix();
 	  flag = true;
 	  break;
 	}
 	case ID_FRMPBOX: { // view / Set / Point Size / Form Box
-	  mni::getfrmbox();
+	  getfrmbox();
 	  flag = true;
 	  break;
 	}
@@ -1237,7 +1236,7 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_NUDGPIX: { // view / Set / Nudge Pixels
-	  mni::getnpix();
+	  getnpix();
 	  flag = true;
 	  break;
 	}
@@ -1284,32 +1283,32 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_BSAVON: { // view / Set / PCS Bitmap Save / On
-	  mni::pcsbsavon();
+	  pcsbsavon();
 	  flag = true;
 	  break;
 	}
 	case ID_BSAVOF: { // view / Set / PCS Bitmap Save / Off
-	  mni::pcsbsavof();
+	  pcsbsavof();
 	  flag = true;
 	  break;
 	}
 	case ID_KNOTON: { // view / Knots / On
-	  mni::shoknot();
+	  shoknot();
 	  flag = true;
 	  break;
 	}
 	case ID_KNOTOF: { // view / Knots / Off
-	  mni::hidknot();
+	  hidknot();
 	  flag = true;
 	  break;
 	}
 	case ID_RSTNEDL: { // view / Set / Needle Cursor / Off
-	  mni::nedof();
+	  nedof();
 	  flag = true;
 	  break;
 	}
 	case ID_SETNEDL: { // view / Set / Needle Cursor / On
-	  mni::nedon();
+	  nedon();
 	  flag = true;
 	  break;
 	}
@@ -1346,7 +1345,7 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VUSELTHRDS: { // view / Show Threads for Selected Color
-	  mni::vuselthr();
+	  vuselthr();
 	  flag = true;
 	  break;
 	}
