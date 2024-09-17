@@ -124,69 +124,27 @@ class DSTHED // dst file header
 // NOLINTEND(readability-magic-numbers)
 #pragma pack(pop)
 
-// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
-#pragma warning(push)
-#pragma warning(disable : 4996)
-// ReSharper disable CppDeprecatedEntity
-void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset) {
-  // dstHeader fields are fixed width, so use strncpy in its intended way.
-  // Use sizeof to ensure no overrun if the format string is wrong length
-  strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
-  std::ranges::fill(m_desc, ' ');
-  auto const convAuxName  = utf::utf16ToUtf8(auxName);
-  auto const spDstHdrDesc = gsl::span {m_desc};
-  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
-	auto const name   = convAuxName.substr(pos + 1);
-	auto       itChar = spDstHdrDesc.begin();
-	for (auto const& iDHD : name) {
-	  if (iDHD != '.' && itChar != spDstHdrDesc.end()) {
-		*itChar = iDHD;
-	  }
-	  else {
-		break;
-	  }
-	  ++itChar;
-	}
-  }
-  constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
-  spDstHdrDesc.back() = CAR;
+class DSTDAT
+{
+  public:
+  char cor {};
+  char val {};
+};
 
-  auto const recs   = fmt::format(FMT_STRING("{:7d}\r"), dstRecSize);
-  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().x);
-  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().x);
-  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().y);
-  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().y);
-  // clang-format off
-  strncpy(m_recshed.data(),  "ST:",          m_recshed.size());
-  strncpy(m_recs.data(),     recs.c_str(),   m_recs.size());
-  strncpy(m_cohed.data(),    "CO:",          m_cohed.size());
-  strncpy(m_co.data(),       "  0\xd",       m_co.size());
-  strncpy(m_xplushed.data(), "+X:",          m_xplushed.size());
-  strncpy(m_xplus.data(),    xplus.c_str(),  m_xplus.size());
-  strncpy(m_xminhed.data(),  "-X:",          m_xminhed.size());
-  strncpy(m_xmin.data(),     xminus.c_str(), m_xmin.size());
-  strncpy(m_yplushed.data(), "+Y:",          m_yplushed.size());
-  strncpy(m_yplus.data(),    yplus.c_str(),  m_yplus.size());
-  strncpy(m_yminhed.data(),  "-Y:",          m_yminhed.size());
-  strncpy(m_ymin.data(),     yminus.c_str(), m_ymin.size());
-  strncpy(m_axhed.data(),    "AX:",          m_axhed.size());
-  strncpy(m_ax.data(),       "-    0\r",     m_ax.size());
-  strncpy(m_ayhed.data(),    "AY:",          m_ayhed.size());
-  strncpy(m_ay.data(),       "+    0\r",     m_ay.size());
-  strncpy(m_mxhed.data(),    "MX:",          m_mxhed.size());
-  strncpy(m_mx.data(),       "+    0\r",     m_mx.size());
-  strncpy(m_myhed.data(),    "MY:",          m_myhed.size());
-  strncpy(m_my.data(),       "+    0\r",     m_my.size());
-  strncpy(m_pdhed.data(),    "PD",           m_pdhed.size());
-  strncpy(m_pd.data(),       "******\r",     m_pd.size());
-  strncpy(m_eof.data(),      "\x1a",         m_eof.size());
-  // clang-format on
-  std::ranges::fill(m_res, ' ');
-}
-// ReSharper restore CppDeprecatedEntity
-#pragma warning(pop)
+// DST internal namespace
+namespace {
+auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
+auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
 
-namespace di {
+constexpr auto COLVER        = uint32_t {0x776874U};            // color file version
+constexpr auto DSTMAX        = 121L;        // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTSCALE      = 3.0F / 5.0F; // DST stitch scaling factor
+constexpr auto IDSTSCALE     = 5.0F / 3.0F; // Inverse DST stitch scaling factor
+// constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
+constexpr auto TYPJMP = 0x830000U; // dst jump stitch mask
+constexpr auto TYPREG = 0x030000U; // dst regular stitch mask
+
+// Definitions
 auto coldis(COLORREF colorA, COLORREF colorB) -> DWORD;
 auto colfil() -> bool;
 void dstin(uint32_t number, POINT& pout) noexcept;
@@ -195,29 +153,36 @@ auto dtrn(DSTREC* dpnt) -> uint32_t;
 auto dudbits(SIZE const& dif) -> uint32_t;
 void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
 void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
-} // namespace di
 
-constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
-constexpr auto DSTMAX    = 121L;                 // maximum stitch/jump length of 121 in DST format
-constexpr auto DSTSCALE  = 3.0F / 5.0F;          // DST stitch scaling factor
-constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling factor
-// constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
-constexpr auto TYPJMP = 0x830000U; // dst jump stitch mask
-constexpr auto TYPREG = 0x030000U; // dst regular stitch mask
+// Functions
+auto coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
+  auto color1 = PEC_COLOR {.r = GetRValue(colorA), .g = GetGValue(colorA), .b = GetBValue(colorA)};
+  auto color2 = PEC_COLOR {.r = GetRValue(colorB), .g = GetGValue(colorB), .b = GetBValue(colorB)};
+  auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
+  auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
+  auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
+  auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
+  // NOLINTBEGIN(readability-magic-numbers)
+  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
+  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat(((512 + meanR) * deltaR * deltaR / 256) + (4 * deltaG * deltaG) +
+                                                     ((767 - meanR) * deltaB * deltaB / 256))));
+  // NOLINTEND(readability-magic-numbers)
+}
 
-namespace {
-auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
-auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
-} // namespace
+auto colfil() -> bool {
+  auto const& workingFileName = Instance->WorkingFileName;
 
-class DSTDAT
-{
-  public:
-  char cor {};
-  char val {};
-};
+  *ColorFileName = workingFileName;
+  *RGBFileName   = workingFileName;
+  if (!workingFileName.has_extension()) {
+	return false;
+  }
+  ColorFileName->replace_extension(L"thw");
+  RGBFileName->replace_extension(L"rgb");
+  return true;
+}
 
-void di::dstin(uint32_t const number, POINT& pout) noexcept {
+void dstin(uint32_t const number, POINT& pout) noexcept {
   constexpr auto XCOR = char {0};
   constexpr auto YCOR = char {1};
   // ToDo - what is this code doing?
@@ -247,7 +212,7 @@ void di::dstin(uint32_t const number, POINT& pout) noexcept {
   }
 }
 
-void di::dstran(std::vector<DSTREC>& DSTData) {
+void dstran(std::vector<DSTREC>& DSTData) {
   auto bytesRead = DWORD {};
   auto colors    = std::vector<uint32_t> {};
   if (colfil()) {
@@ -330,191 +295,11 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
   }
 }
 
-auto di::dtrn(DSTREC* dpnt) -> uint32_t {
+auto dtrn(DSTREC* dpnt) -> uint32_t {
   return *convertFromPtr<uint32_t*>(dpnt);
 }
 
-void di::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
-  auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
-  dstStitchBuffer.resize(Instance->StitchBuffer.size());
-  auto colorData = std::vector<uint32_t> {};
-  // there could be as many colors as there are stitches
-  // but we only need to reserve a reasonable number
-  constexpr auto DSTRES = size_t {32U}; // testing shows this to be a good value
-  colorData.reserve(DSTRES);
-  colorData.push_back(COLVER);
-  colorData.push_back(BackgroundColor);
-  auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
-  auto       iUC   = wrap::next(UserColor.begin(), index);
-  colorData.push_back(*iUC);
-  auto destination = dstStitchBuffer.begin();
-  for (auto const& stitch : stitches) {
-	*destination++ = F_POINT_ATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
-  }
-  auto minX = BIGFLOAT;
-  auto minY = BIGFLOAT;
-  auto maxX = LOWFLOAT;
-  auto maxY = LOWFLOAT;
-  for (auto const& stitch : dstStitchBuffer) {
-	minX = std::min(minX, stitch.x);
-	minY = std::min(minY, stitch.y);
-	maxX = std::max(maxX, stitch.x);
-	maxY = std::max(maxY, stitch.y);
-  }
-  constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
-  minX -= MARGIN;
-  maxX += MARGIN;
-  minY -= MARGIN;
-  maxY += MARGIN;
-  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)), std::lround(wrap::midl(maxY, minY))};
-  DSTOffsetData.setPositive({std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
-                             std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
-  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),
-                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - minY)});
-  auto color = dstStitchBuffer[0].attribute & COLMSK;
-  for (auto const& stitch : dstStitchBuffer) {
-	if (color != (stitch.attribute & COLMSK)) {
-	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
-	  DSTRecords.push_back(DSTREC {.led = 0, .mid = 0, .nd = STOPCODE});
-	  color = stitch.attribute & COLMSK;
-	  iUC   = wrap::next(UserColor.begin(), color);
-	  colorData.push_back(*iUC);
-	}
-	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
-                         std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
-	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
-	auto const count = absoluteLengths.cx > absoluteLengths.cy ? (absoluteLengths.cx / DSTMAX) + 1
-	                                                           : (absoluteLengths.cy / DSTMAX) + 1;
-	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
-
-	auto difference = SIZE {};
-	while (lengths.cx != 0 || lengths.cy != 0) {
-	  auto dstType = TYPREG;
-	  if (abs(lengths.cx) > stepSize.cx) {
-		dstType = TYPJMP;
-		if (lengths.cx > 0) {
-		  difference.cx = stepSize.cx;
-		}
-		else {
-		  difference.cx = -stepSize.cx;
-		}
-	  }
-	  else {
-		difference.cx = lengths.cx;
-	  }
-	  if (abs(lengths.cy) > stepSize.cy) {
-		dstType = TYPJMP;
-		if (lengths.cy > 0) {
-		  difference.cy = stepSize.cy;
-		}
-		else {
-		  difference.cy = -stepSize.cy;
-		}
-	  }
-	  else {
-		difference.cy = lengths.cy;
-	  }
-	  savdst(DSTRecords, dudbits(difference) | dstType);
-	  centerCoordinate.x += difference.cx;
-	  centerCoordinate.y += difference.cy;
-	  lengths.cx -= difference.cx;
-	  lengths.cy -= difference.cy;
-	}
-  }
-  constexpr auto ENDCODE = uint8_t {0xF3};
-  DSTRecords.push_back(DSTREC {.led = 0, .mid = 0, .nd = ENDCODE});
-  if (!colfil()) {
-	return;
-  }
-  auto bytesWritten = DWORD {};
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto colorFile =
-      CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-  if (colorFile != INVALID_HANDLE_VALUE) {
-	wrap::writeFile(colorFile,
-	                colorData.data(),
-	                wrap::toUnsigned(colorData.size() * wrap::sizeofType(colorData)),
-	                &bytesWritten,
-	                nullptr);
-  }
-  CloseHandle(colorFile);
-  colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-  if (colorFile != INVALID_HANDLE_VALUE) {
-	wrap::writeFile(colorFile,
-	                &colorData[2],
-	                wrap::toUnsigned((colorData.size() - 2U) * wrap::sizeofType(colorData)),
-	                &bytesWritten,
-	                nullptr);
-  }
-  CloseHandle(colorFile);
-}
-
-auto di::colfil() -> bool {
-  auto const& workingFileName = Instance->WorkingFileName;
-
-  *ColorFileName = workingFileName;
-  *RGBFileName   = workingFileName;
-  if (!workingFileName.has_extension()) {
-	return false;
-  }
-  ColorFileName->replace_extension(L"thw");
-  RGBFileName->replace_extension(L"rgb");
-  return true;
-}
-
-void DST::setColFilename(fs::path* directory) noexcept {
-  ColorFileName = directory;
-}
-
-void DST::setRGBFilename(fs::path* directory) noexcept {
-  RGBFileName = directory;
-}
-
-auto di::coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
-  auto color1 = PEC_COLOR {.r = GetRValue(colorA), .g = GetGValue(colorA), .b = GetBValue(colorA)};
-  auto color2 = PEC_COLOR {.r = GetRValue(colorB), .g = GetGValue(colorB), .b = GetBValue(colorB)};
-  auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
-  auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
-  auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
-  auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
-  // NOLINTBEGIN(readability-magic-numbers)
-  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat(((512 + meanR) * deltaR * deltaR / 256) + (4 * deltaG * deltaG) +
-                                                     ((767 - meanR) * deltaB * deltaB / 256))));
-  // NOLINTEND(readability-magic-numbers)
-}
-
-auto DST::colmatch(COLORREF const color) -> uint32_t {
-  if (auto const colorChanges = thred::maxColor() + 1U; colorChanges < UserColor.size()) {
-	auto iUserColor = UserColor.begin();
-	for (auto iColor = 0U; iColor < colorChanges; ++iColor) {
-	  if (color == *iUserColor) {
-		return iColor;
-	  }
-	  ++iUserColor;
-	}
-	*iUserColor = color;
-	return wrap::toUnsigned(colorChanges);
-  }
-  auto minDistance = BIGDWORD;
-  auto iDistance   = uint32_t {};
-  auto iUserColor  = UserColor.begin();
-  for (auto iColor = 0U; iColor < UserColor.size(); ++iColor) {
-	auto const distance = di::coldis(color, *iUserColor);
-	if (distance == 0U) {
-	  return iColor;
-	}
-	iDistance = 0U;
-	if (distance < minDistance) {
-	  iDistance   = iColor;
-	  minDistance = distance;
-	}
-	++iUserColor;
-  }
-  return iDistance;
-}
-
-auto di::dudbits(SIZE const& dif) -> uint32_t {
+auto dudbits(SIZE const& dif) -> uint32_t {
   static constexpr auto DSTLEN = 243U; // -121 to 121
   static constexpr auto X_DST  = std::array<uint32_t, DSTLEN> {
       0x090a0a, //-121
@@ -1012,10 +797,226 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
   return X_DST.at(wrap::toSize(xOffset)) | Y_DST.at(wrap::toSize(yOffset));
 }
 
-void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t const data) {
+void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
+  auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
+  dstStitchBuffer.resize(Instance->StitchBuffer.size());
+  auto colorData = std::vector<uint32_t> {};
+  // there could be as many colors as there are stitches
+  // but we only need to reserve a reasonable number
+  constexpr auto DSTRES = size_t {32U}; // testing shows this to be a good value
+  colorData.reserve(DSTRES);
+  colorData.push_back(COLVER);
+  colorData.push_back(BackgroundColor);
+  auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
+  auto       iUC   = wrap::next(UserColor.begin(), index);
+  colorData.push_back(*iUC);
+  auto destination = dstStitchBuffer.begin();
+  for (auto const& stitch : stitches) {
+	*destination++ = F_POINT_ATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
+  }
+  auto minX = BIGFLOAT;
+  auto minY = BIGFLOAT;
+  auto maxX = LOWFLOAT;
+  auto maxY = LOWFLOAT;
+  for (auto const& stitch : dstStitchBuffer) {
+	minX = std::min(minX, stitch.x);
+	minY = std::min(minY, stitch.y);
+	maxX = std::max(maxX, stitch.x);
+	maxY = std::max(maxY, stitch.y);
+  }
+  constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
+  minX -= MARGIN;
+  maxX += MARGIN;
+  minY -= MARGIN;
+  maxY += MARGIN;
+  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)), std::lround(wrap::midl(maxY, minY))};
+  DSTOffsetData.setPositive({std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
+                             std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
+  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),
+                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - minY)});
+  auto color = dstStitchBuffer[0].attribute & COLMSK;
+  for (auto const& stitch : dstStitchBuffer) {
+	if (color != (stitch.attribute & COLMSK)) {
+	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
+	  DSTRecords.push_back(DSTREC {.led = 0, .mid = 0, .nd = STOPCODE});
+	  color = stitch.attribute & COLMSK;
+	  iUC   = wrap::next(UserColor.begin(), color);
+	  colorData.push_back(*iUC);
+	}
+	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
+                         std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
+	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
+	auto const count = absoluteLengths.cx > absoluteLengths.cy ? (absoluteLengths.cx / DSTMAX) + 1
+	                                                           : (absoluteLengths.cy / DSTMAX) + 1;
+	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
+
+	auto difference = SIZE {};
+	while (lengths.cx != 0 || lengths.cy != 0) {
+	  auto dstType = TYPREG;
+	  if (abs(lengths.cx) > stepSize.cx) {
+		dstType = TYPJMP;
+		if (lengths.cx > 0) {
+		  difference.cx = stepSize.cx;
+		}
+		else {
+		  difference.cx = -stepSize.cx;
+		}
+	  }
+	  else {
+		difference.cx = lengths.cx;
+	  }
+	  if (abs(lengths.cy) > stepSize.cy) {
+		dstType = TYPJMP;
+		if (lengths.cy > 0) {
+		  difference.cy = stepSize.cy;
+		}
+		else {
+		  difference.cy = -stepSize.cy;
+		}
+	  }
+	  else {
+		difference.cy = lengths.cy;
+	  }
+	  savdst(DSTRecords, dudbits(difference) | dstType);
+	  centerCoordinate.x += difference.cx;
+	  centerCoordinate.y += difference.cy;
+	  lengths.cx -= difference.cx;
+	  lengths.cy -= difference.cy;
+	}
+  }
+  constexpr auto ENDCODE = uint8_t {0xF3};
+  DSTRecords.push_back(DSTREC {.led = 0, .mid = 0, .nd = ENDCODE});
+  if (!colfil()) {
+	return;
+  }
+  auto bytesWritten = DWORD {};
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto colorFile =
+      CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  if (colorFile != INVALID_HANDLE_VALUE) {
+	wrap::writeFile(colorFile,
+	                colorData.data(),
+	                wrap::toUnsigned(colorData.size() * wrap::sizeofType(colorData)),
+	                &bytesWritten,
+	                nullptr);
+  }
+  CloseHandle(colorFile);
+  colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  if (colorFile != INVALID_HANDLE_VALUE) {
+	wrap::writeFile(colorFile,
+	                &colorData[2],
+	                wrap::toUnsigned((colorData.size() - 2U) * wrap::sizeofType(colorData)),
+	                &bytesWritten,
+	                nullptr);
+  }
+  CloseHandle(colorFile);
+}
+
+void savdst(std::vector<DSTREC>& DSTRecords, uint32_t const data) {
   DSTRecords.push_back(DSTREC {.led = gsl::narrow_cast<uint8_t>(data & B1MASK),
                                .mid = gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
                                .nd  = gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
+}
+} // namespace
+
+// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
+#pragma warning(push)
+#pragma warning(disable : 4996)
+// ReSharper disable CppDeprecatedEntity
+void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset) {
+  // dstHeader fields are fixed width, so use strncpy in its intended way.
+  // Use sizeof to ensure no overrun if the format string is wrong length
+  strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
+  std::ranges::fill(m_desc, ' ');
+  auto const convAuxName  = utf::utf16ToUtf8(auxName);
+  auto const spDstHdrDesc = gsl::span {m_desc};
+  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
+	auto const name   = convAuxName.substr(pos + 1);
+	auto       itChar = spDstHdrDesc.begin();
+	for (auto const& iDHD : name) {
+	  if (iDHD != '.' && itChar != spDstHdrDesc.end()) {
+		*itChar = iDHD;
+	  }
+	  else {
+		break;
+	  }
+	  ++itChar;
+	}
+  }
+  constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
+  spDstHdrDesc.back() = CAR;
+
+  auto const recs   = fmt::format(FMT_STRING("{:7d}\r"), dstRecSize);
+  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().x);
+  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().x);
+  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().y);
+  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().y);
+  // clang-format off
+  strncpy(m_recshed.data(),  "ST:",          m_recshed.size());
+  strncpy(m_recs.data(),     recs.c_str(),   m_recs.size());
+  strncpy(m_cohed.data(),    "CO:",          m_cohed.size());
+  strncpy(m_co.data(),       "  0\xd",       m_co.size());
+  strncpy(m_xplushed.data(), "+X:",          m_xplushed.size());
+  strncpy(m_xplus.data(),    xplus.c_str(),  m_xplus.size());
+  strncpy(m_xminhed.data(),  "-X:",          m_xminhed.size());
+  strncpy(m_xmin.data(),     xminus.c_str(), m_xmin.size());
+  strncpy(m_yplushed.data(), "+Y:",          m_yplushed.size());
+  strncpy(m_yplus.data(),    yplus.c_str(),  m_yplus.size());
+  strncpy(m_yminhed.data(),  "-Y:",          m_yminhed.size());
+  strncpy(m_ymin.data(),     yminus.c_str(), m_ymin.size());
+  strncpy(m_axhed.data(),    "AX:",          m_axhed.size());
+  strncpy(m_ax.data(),       "-    0\r",     m_ax.size());
+  strncpy(m_ayhed.data(),    "AY:",          m_ayhed.size());
+  strncpy(m_ay.data(),       "+    0\r",     m_ay.size());
+  strncpy(m_mxhed.data(),    "MX:",          m_mxhed.size());
+  strncpy(m_mx.data(),       "+    0\r",     m_mx.size());
+  strncpy(m_myhed.data(),    "MY:",          m_myhed.size());
+  strncpy(m_my.data(),       "+    0\r",     m_my.size());
+  strncpy(m_pdhed.data(),    "PD",           m_pdhed.size());
+  strncpy(m_pd.data(),       "******\r",     m_pd.size());
+  strncpy(m_eof.data(),      "\x1a",         m_eof.size());
+  // clang-format on
+  std::ranges::fill(m_res, ' ');
+}
+// ReSharper restore CppDeprecatedEntity
+#pragma warning(pop)
+
+void DST::setColFilename(fs::path* directory) noexcept {
+  ColorFileName = directory;
+}
+
+void DST::setRGBFilename(fs::path* directory) noexcept {
+  RGBFileName = directory;
+}
+
+auto DST::colmatch(COLORREF const color) -> uint32_t {
+  if (auto const colorChanges = thred::maxColor() + 1U; colorChanges < UserColor.size()) {
+	auto iUserColor = UserColor.begin();
+	for (auto iColor = 0U; iColor < colorChanges; ++iColor) {
+	  if (color == *iUserColor) {
+		return iColor;
+	  }
+	  ++iUserColor;
+	}
+	*iUserColor = color;
+	return wrap::toUnsigned(colorChanges);
+  }
+  auto minDistance = BIGDWORD;
+  auto iDistance   = uint32_t {};
+  auto iUserColor  = UserColor.begin();
+  for (auto iColor = 0U; iColor < UserColor.size(); ++iColor) {
+	auto const distance = coldis(color, *iUserColor);
+	if (distance == 0U) {
+	  return iColor;
+	}
+	iDistance = 0U;
+	if (distance < minDistance) {
+	  iDistance   = iColor;
+	  minDistance = distance;
+	}
+	++iUserColor;
+  }
+  return iDistance;
 }
 
 auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
@@ -1049,7 +1050,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   if (!wrap::readFile(fileHandle, dstData.data(), fileSize, &bytesRead, L"ReadFile for dstData in readDSTFile")) {
 	return false;
   }
-  di::dstran(dstData);
+  dstran(dstData);
   IniFile.auxFileType = AUXDST;
   CloseHandle(fileHandle);
   return true;
@@ -1069,7 +1070,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto RECRES = size_t {128U}; // testing shows this to be a good value
   dstRecords.reserve(Instance->StitchBuffer.size() + RECRES);
   auto dstOffset = DST_OFFSETS {};
-  di::ritdst(dstOffset, dstRecords, saveStitches);
+  ritdst(dstOffset, dstRecords, saveStitches);
   auto dstHeader = DSTHED {};
   dstHeader.writeDSTHeader(auxName, dstRecSize, dstOffset);
   auto bytesWritten = DWORD {};
