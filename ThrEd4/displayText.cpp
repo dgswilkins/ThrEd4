@@ -49,12 +49,43 @@
 #include <vector>
 
 // displayText internal namespace
-namespace di {
+namespace {
+// Definitions
 void bxtxt(uint32_t iButton, uint32_t iMessage);
 auto clpmsgs(uint32_t code) -> bool;
 void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
 void sdmsg();
-} // namespace di
+
+// Functions
+void bxtxt(uint32_t const iButton, uint32_t const iMessage) {
+  SetWindowText(Instance->ButtonWin.operator[](iButton), displayText::loadStr(iMessage).c_str());
+}
+
+auto clpmsgs(uint32_t const code) -> bool {
+  form::ispcdclp();
+  if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !Instance->StateMap.test(StateFlag::WASPCDCLP)) {
+	displayText::tabmsg(IDS_CLPS, false);
+	return false;
+  }
+  return true;
+}
+
+// ReSharper disable CppParameterMayBeConst
+auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
+  SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
+  return TRUE;
+}
+// ReSharper restore CppParameterMayBeConst
+
+void hlpflt(uint32_t const iButton, uint32_t const iMessage, float const data) {
+  auto const fmtStr = displayText::format(iMessage, data);
+  SetWindowText(Instance->ButtonWin.operator[](iButton), fmtStr.c_str());
+}
+
+void sdmsg() {
+  displayText::showMessage(IDS_SAVDISC, ThrName->wstring());
+}
+} // namespace
 
 auto displayText::loadStr(uint32_t const stringID) -> std::wstring {
   auto* pBuf  = gsl::narrow_cast<wchar_t*>(nullptr);
@@ -227,15 +258,6 @@ void displayText::shoseln(uint32_t const code0, uint32_t const code1) {
   shoMsg(format2(IDS_SHOSEL, msg0, msg1), false);
 }
 
-auto di::clpmsgs(uint32_t const code) -> bool {
-  form::ispcdclp();
-  if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !Instance->StateMap.test(StateFlag::WASPCDCLP)) {
-	displayText::tabmsg(IDS_CLPS, false);
-	return false;
-  }
-  return true;
-}
-
 void displayText::frm1pnt() {
   if (Instance->FormList.size() == 1) {
 	Instance->StateMap.set(StateFlag::FORMSEL);
@@ -245,7 +267,7 @@ void displayText::frm1pnt() {
 
 auto displayText::filmsgs(uint32_t const code) -> bool {
   if (!Instance->SelectedFormList.empty()) {
-	return di::clpmsgs(code);
+	return clpmsgs(code);
   }
 
   if (auto const& formList = Instance->FormList; !formList.empty()) {
@@ -262,7 +284,7 @@ auto displayText::filmsgs(uint32_t const code) -> bool {
 		  return false;
 		}
 	  }
-	  return di::clpmsgs(code);
+	  return clpmsgs(code);
 	}
 
 	tabmsg(IDS_FILSEL, false);
@@ -278,10 +300,6 @@ void displayText::grpmsg() {
 
 void displayText::grpmsg1() {
   tabmsg(IDS_NOGRP, false);
-}
-
-void di::sdmsg() {
-  displayText::showMessage(IDS_SAVDISC, ThrName->wstring());
 }
 
 void displayText::alrotmsg() {
@@ -323,7 +341,7 @@ void displayText::okcan() {
 }
 
 void displayText::savdisc() {
-  di::sdmsg();
+  sdmsg();
   Instance->StateMap.reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
   OKButton      = CreateWindow(L"STATIC",
@@ -361,15 +379,6 @@ void displayText::savdisc() {
                               nullptr);
 }
 
-namespace {
-// ReSharper disable CppParameterMayBeConst
-auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
-  SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
-  return TRUE;
-}
-// ReSharper restore CppParameterMayBeConst
-} // namespace
-
 // ReSharper disable CppParameterMayBeConst
 void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = getThrEdFont(FONTSIZE);
@@ -398,24 +407,15 @@ void displayText::tomsg() {
   updateWinFont(MainStitchWin);
 }
 
-void di::bxtxt(uint32_t const iButton, uint32_t const iMessage) {
-  SetWindowText(Instance->ButtonWin.operator[](iButton), displayText::loadStr(iMessage).c_str());
-}
-
-void di::hlpflt(uint32_t const iButton, uint32_t const iMessage, float const data) {
-  auto const fmtStr = displayText::format(iMessage, data);
-  SetWindowText(Instance->ButtonWin.operator[](iButton), fmtStr.c_str());
-}
-
 void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
-  di::bxtxt(HTXCLR, IDS_CLEAR);
-  di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight * IPFGRAN);
+  bxtxt(HTXCLR, IDS_CLEAR);
+  hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight * IPFGRAN);
   thred::redraw(Instance->ButtonWin.operator[](HTXWID));
-  di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing * IPFGRAN);
-  di::bxtxt(HTXVRT, IDS_TXVRT);
-  di::bxtxt(HTXHOR, IDS_TXHOR);
-  di::bxtxt(HTXANG, IDS_TXANG);
-  di::bxtxt(HTXMIR, IDS_TXMIR);
+  hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing * IPFGRAN);
+  bxtxt(HTXVRT, IDS_TXVRT);
+  bxtxt(HTXHOR, IDS_TXHOR);
+  bxtxt(HTXANG, IDS_TXANG);
+  bxtxt(HTXMIR, IDS_TXMIR);
   auto constexpr INDEX = HTXMIR + 1U;
   SetWindowText(Instance->ButtonWin.operator[](INDEX), L"");
 }
