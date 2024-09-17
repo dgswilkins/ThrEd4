@@ -76,27 +76,6 @@ constexpr auto BPP24   = DWORD {24U};                                   // 24 bi
 constexpr auto BPP32   = DWORD {32U};                                   // 32 bits per pixel
 
 // bitmap internal namespace
-namespace bi {
-auto binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool;
-auto bitar() -> bool;
-void bitlin(gsl::span<uint8_t> const&  source,
-            gsl::span<uint32_t> const& destination,
-            COLORREF                   foreground,
-            COLORREF                   background) noexcept;
-void bitsiz();
-
-constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
-auto getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP;
-constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
-
-auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
-void movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept;
-auto nuBit() noexcept -> BOOL;
-void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
-auto saveName(fs::path& fileName);
-auto stch2bit(F_POINT& point) -> POINT;
-} // namespace bi
-
 namespace {
 auto BitmapBackgroundColors = gsl::narrow_cast<std::vector<COLORREF>*>(nullptr); // for the bitmap color dialog box
 auto BitmapColor          = BITCOL;                                              // bitmap color
@@ -118,151 +97,80 @@ auto TraceBitmap          = HBITMAP {};          // trace bitmap
 auto TraceDC              = HDC {};              // trace device context
 auto UTF16BMPname         = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
 auto UTF8BMPname          = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
-} // namespace
 
-constexpr auto bi::fswap(COLORREF const color) noexcept -> COLORREF {
-  // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
-  // it a portable version
-  auto const swapped = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
-                       ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
-  return swapped >> BPB;
-}
+// Definitions
+auto binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool;
+auto bitar() -> bool;
+void bitlin(gsl::span<uint8_t> const&  source,
+            gsl::span<uint32_t> const& destination,
+            COLORREF                   foreground,
+            COLORREF                   background) noexcept;
+void bitsiz();
 
-// ReSharper disable CppParameterMayBeConst
-auto bi::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> const ppvBits) -> HBITMAP {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
-  auto const bitmap =
-      CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (*ppvBits != nullptr) {
-	return bitmap;
-  }
-  throw std::runtime_error("CreateDIBSection failed");
-}
-// ReSharper restore CppParameterMayBeConst
+constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
+auto getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP;
+constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
-void bitmap::bfil(COLORREF const& backgroundColor) {
-  auto const inverseBackgroundColor = bi::fswap(backgroundColor);
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto hBitmapFile =
-      CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (hBitmapFile == INVALID_HANDLE_VALUE) {
-	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
-	CloseHandle(hBitmapFile);
-	resetBmpFile(true);
-	return;
-  }
-  auto bytesRead = DWORD {};
-  if (!wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
-	auto errorCode = GetLastError();
-	CloseHandle(hBitmapFile);
-	resetBmpFile(true);
-	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil", errorCode);
-	return;
-  }
-  // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
-  if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType != MB_SIG) {
-	resetBmpFile(true);
-	return;
-  }
-  auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
-  fileHeaderSize      = std::min(fileHeaderSize, sizeof(BITMAPV4HEADER));
-  if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
-	return;
-  }
-  if (!bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
-	CloseHandle(hBitmapFile);
-	resetBmpFile(true);
-	displayText::tabmsg(IDS_BMAP, false);
-	return;
-  }
-  if (!Instance->StateMap.testAndReset(StateFlag::WASESC)) {
-	Instance->StateMap.reset(StateFlag::TRSET);
-  }
-  BitmapWidth  = BitmapFileHeaderV4.bV4Width;
-  BitmapHeight = BitmapFileHeaderV4.bV4Height;
-  Instance->StateMap.set(StateFlag::INIT);
-  ZoomRect.left   = 0.0F;
-  ZoomRect.bottom = 0.0F;
-  wrap::narrow_cast(ZoomRect.right, UnzoomedRect.cx);
-  wrap::narrow_cast(ZoomRect.top, UnzoomedRect.cy);
-  BitmapDC = CreateCompatibleDC(StitchWindowDC);
-  if (BitmapFileHeaderV4.bV4BitCount == 1) {
-	Instance->StateMap.set(StateFlag::MONOMAP);
-	constexpr auto SR5 = uint8_t {5}; // Shift Right
+auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
+void movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept;
+auto nuBit() noexcept -> BOOL;
+void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
+auto saveName(fs::path& fileName);
+auto stch2bit(F_POINT& point) -> POINT;
 
-	auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> SR5) << 2U;
-	if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
-	  bitmapWidthBytes += 4U;
-	}
-	auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
-	auto monoBitmapData = std::vector<uint8_t> {};
-	monoBitmapData.resize(bitmapSizeBytes);
-	if (!wrap::readFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, L"ReadFile for monoBitmapData in bfil")) {
-	  return;
-	}
-	CloseHandle(hBitmapFile);
-	auto const flag       = bi::binv(monoBitmapData);
-	auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
-	auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
-	BitmapInfoHeader      = {};
-	BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
-	BitmapInfoHeader.biWidth       = BitmapWidth;
-	BitmapInfoHeader.biHeight      = BitmapHeight;
-	BitmapInfoHeader.biPlanes      = 1U;
-	BitmapInfoHeader.biBitCount    = BPP32;
-	BitmapInfoHeader.biCompression = BI_RGB;
-	BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const bitmap = bi::getBitmap(BitmapDC, &BitmapInfo, &bits);
-	// Synchronize
-	GdiFlush();
-	auto const spMBD     = gsl::span(monoBitmapData);
-	auto const spBits    = gsl::span(bits, wrap::toSize(BitmapWidth * BitmapHeight));
-	auto       srcOffset = 0U;
-	auto       dstOffset = 0U;
-	auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
-	for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-	  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
-	  auto const spLineDst = spBits.subspan(dstOffset, wrap::toSize(BitmapWidth));
-	  bi::bitlin(spLineSrc, spLineDst, foreground, background);
-	  srcOffset += bitmapWidthBytes;
-	  dstOffset += wrap::toUnsigned(BitmapWidth);
-	}
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC); deviceContext != nullptr) {
-	  SelectObject(deviceContext, bitmap);
-	  hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
-	  SelectObject(BitmapDC, hBitmapFile);
-	  BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
-	  DeleteObject(bitmap);
-	  DeleteObject(deviceContext);
-	}
-  }
-  else {
-	CloseHandle(hBitmapFile);
-	Instance->StateMap.reset(StateFlag::MONOMAP);
-	hBitmapFile = LoadImage(
-	    ThrEdInstance, UTF16BMPname->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
-	SelectObject(BitmapDC, hBitmapFile);
-	Instance->StateMap.set(StateFlag::RESTCH);
-  }
-  bi::bitsiz();
-  trace::initColorRef();
-  Instance->StateMap.reset(StateFlag::HIDMAP);
-}
-
+// Functions
 // Get a rough estimate of whether black or white
 // is dominant in the monochrome bitmap
-auto bi::binv(const std::vector<uint8_t>& monoBitmapData) noexcept -> bool {
+auto binv(const std::vector<uint8_t>& monoBitmapData) noexcept -> bool {
   auto const whiteBits = gsl::narrow_cast<size_t>(std::ranges::count(monoBitmapData, UCHAR_MAX));
   return whiteBits > monoBitmapData.size() >> 1U;
 }
 
-void bi::bitlin(gsl::span<uint8_t> const&  source,
-                gsl::span<uint32_t> const& destination,
-                COLORREF const             foreground,
-                COLORREF const             background) noexcept {
+auto bitar() -> bool {
+  auto const zoomedInRect = F_RECTANGLE {ZoomRect.left,
+                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
+                                         ZoomRect.right,
+                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.bottom)};
+  if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
+	return false;
+  }
+  BitmapSrcRect = {.left   = wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
+                   .top    = wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
+                   .right  = wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
+                   .bottom = wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
+  if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
+	BitmapSrcRect.right = BitmapWidth;
+	Instance->StateMap.reset(StateFlag::LANDSCAP);
+  }
+  if (BitmapSrcRect.bottom > BitmapHeight) {
+	BitmapSrcRect.bottom = BitmapHeight;
+	Instance->StateMap.set(StateFlag::LANDSCAP);
+  }
+  auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
+                                        wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
+                                        wrap::toFloat(BitmapSrcRect.right) * StitchBmpRatio.x,
+                                        wrap::toFloat(BitmapSrcRect.bottom) * StitchBmpRatio.y};
+
+  auto const differenceRect = F_RECTANGLE {backingRect.left - zoomedInRect.left,
+                                           backingRect.top - zoomedInRect.top,
+                                           zoomedInRect.right - backingRect.right,
+                                           zoomedInRect.bottom - backingRect.bottom};
+  auto const bitmapStitchRatio =
+      F_POINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
+               wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
+  BitmapDstRect = {.left   = std::lround(differenceRect.left * bitmapStitchRatio.x),
+                   .top    = std::lround(differenceRect.top * bitmapStitchRatio.y),
+                   .right  = std::lround(wrap::toFloat(StitchWindowClientRect.right) -
+                                        (differenceRect.right * bitmapStitchRatio.x)),
+                   .bottom = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                         (differenceRect.bottom * bitmapStitchRatio.y))};
+  return true;
+}
+
+void bitlin(gsl::span<uint8_t> const&  source,
+            gsl::span<uint32_t> const& destination,
+            COLORREF const             foreground,
+            COLORREF const             background) noexcept {
   auto dst = destination.begin();
   for (auto const subSource = source.subspan(0, source.size() - 1U); auto const& src : subSource) {
 	auto bits = std::bitset<CHAR_BIT>(src);
@@ -282,7 +190,7 @@ void bi::bitlin(gsl::span<uint8_t> const&  source,
   }
 }
 
-void bi::bitsiz() {
+void bitsiz() {
   auto const screenAspectRatio =
       gsl::narrow<float>(UnzoomedRect.cx) / gsl::narrow<float>(UnzoomedRect.cy);
   if (auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
@@ -300,7 +208,27 @@ void bi::bitsiz() {
                             (BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight))};
 }
 
-constexpr auto bi::gudtyp(WORD const bitCount) noexcept -> bool {
+constexpr auto fswap(COLORREF const color) noexcept -> COLORREF {
+  // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
+  // it a portable version
+  auto const swapped = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
+                       ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
+  return swapped >> BPB;
+}
+
+// ReSharper disable CppParameterMayBeConst
+auto getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> const ppvBits) -> HBITMAP {
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
+  auto const bitmap =
+      CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  if (*ppvBits != nullptr) {
+	return bitmap;
+  }
+  throw std::runtime_error("CreateDIBSection failed");
+}
+// ReSharper restore CppParameterMayBeConst
+
+constexpr auto gudtyp(WORD const bitCount) noexcept -> bool {
   switch (bitCount) {
 	case 1U:
 	case BPP24:
@@ -311,100 +239,7 @@ constexpr auto bi::gudtyp(WORD const bitCount) noexcept -> bool {
   }
 }
 
-void bitmap::resetBmpFile(bool const reset) {
-  if (!ismap()) {
-	return;
-  }
-  DeleteObject(BitmapFileHandle);
-  ReleaseDC(ThrEdWindow, BitmapDC);
-  if (reset) {
-	UTF8BMPname.fill(0);
-  }
-}
-
-auto bi::saveName(fs::path& fileName) {
-  auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-  auto hResult = CoCreateInstance(
-      CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  if (FAILED(hResult) || nullptr == pFileSave) {
-	return false;
-  }
-  constexpr auto FILTER_FILE_TYPES = std::array {FLTBMP, FLTALL};
-  hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
-  hResult += pFileSave->SetFileTypeIndex(0);
-  hResult += pFileSave->SetTitle(L"Save Bitmap");
-  auto const bmpName = UTF16BMPname->filename().wstring();
-  hResult += pFileSave->SetFileName(bmpName.c_str());
-  hResult += pFileSave->SetDefaultExtension(L"bmp");
-  if (FAILED(hResult)) {
-	return false;
-  }
-  hResult = pFileSave->Show(nullptr);
-  if (FAILED(hResult)) {
-	return false;
-  }
-  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-  hResult     = pFileSave->GetResult(&pItem);
-  if (FAILED(hResult) || nullptr == pItem) {
-	return false;
-  }
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto pszFilePath = PWSTR {nullptr};
-  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-  if (FAILED(hResult)) {
-	return false;
-  }
-  fileName.assign(pszFilePath);
-  CoTaskMemFree(pszFilePath);
-  return true;
-}
-
-void bitmap::savmap() {
-  if (ismap() && nullptr != TraceBitmapData) {
-	displayText::tabmsg(IDS_SHOMAP, false);
-	return;
-  }
-  if (Instance->StateMap.test(StateFlag::MONOMAP)) {
-	displayText::tabmsg(IDS_SAVMAP, false);
-	return;
-  }
-  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
-	displayText::tabmsg(IDS_MAPCHG, false);
-	return;
-  }
-  auto fileName = fs::path {};
-  if (!bi::saveName(fileName)) {
-	return;
-  }
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const hBitmap =
-      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-  if (hBitmap == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(*UTF16BMPname);
-	return;
-  }
-  auto bytesWritten = DWORD {};
-  WriteFile(hBitmap, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesWritten, nullptr);
-  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
-  auto buffer = std::vector<uint8_t> {};
-  buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
-  auto const spTrace = gsl::span(TraceBitmapData, wrap::toSize(BitmapWidth * BitmapHeight));
-  bi::movmap(spTrace, buffer);
-  WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
-  CloseHandle(hBitmap);
-}
-
-// Move unpacked 24BPP data into packed 24BPP data
-void bi::movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept {
-  auto destination = buffer.begin();
-  for (auto const& iTBD : src) {
-	*gsl::narrow_cast<uint32_t*>(gsl::narrow_cast<void*>(&(*destination))) = iTBD;
-	destination += 3;
-  }
-}
-
-auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
+auto loadName(fs::path const& directory, fs::path& fileName) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
@@ -456,8 +291,246 @@ auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
   return true;
 }
 
+// Move unpacked 24BPP data into packed 24BPP data
+void movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept {
+  auto destination = buffer.begin();
+  for (auto const& iTBD : src) {
+	*gsl::narrow_cast<uint32_t*>(gsl::narrow_cast<void*>(&(*destination))) = iTBD;
+	destination += 3;
+  }
+}
+
+auto nuBit() noexcept -> BOOL {
+  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
+  BitMapColorStruct.hwndOwner      = ThrEdWindow;
+  BitMapColorStruct.lCustData      = 0;
+  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors->data();
+  BitMapColorStruct.lpfnHook       = nullptr;
+  BitMapColorStruct.lpTemplateName = nullptr;
+  BitMapColorStruct.rgbResult      = BitmapColor;
+  BitMapColorStruct.lStructSize    = sizeof(BitMapColorStruct);
+  return ChooseColor(&BitMapColorStruct);
+}
+
+void pxlin(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {
+  auto       line     = std::array<POINT, 2> {};
+  auto const vertexIt = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+  auto const vStart   = wrap::next(vertexIt, start);
+  auto const vFinish  = wrap::next(vertexIt, finish);
+
+  line[0] = stch2bit(*vStart);
+  line[1] = stch2bit(*vFinish);
+  wrap::polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
+}
+
+auto saveName(fs::path& fileName) {
+  auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
+  auto hResult = CoCreateInstance(
+      CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  if (FAILED(hResult) || nullptr == pFileSave) {
+	return false;
+  }
+  constexpr auto FILTER_FILE_TYPES = std::array {FLTBMP, FLTALL};
+  hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+  hResult += pFileSave->SetFileTypeIndex(0);
+  hResult += pFileSave->SetTitle(L"Save Bitmap");
+  auto const bmpName = UTF16BMPname->filename().wstring();
+  hResult += pFileSave->SetFileName(bmpName.c_str());
+  hResult += pFileSave->SetDefaultExtension(L"bmp");
+  if (FAILED(hResult)) {
+	return false;
+  }
+  hResult = pFileSave->Show(nullptr);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+  hResult     = pFileSave->GetResult(&pItem);
+  if (FAILED(hResult) || nullptr == pItem) {
+	return false;
+  }
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto pszFilePath = PWSTR {nullptr};
+  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+  if (FAILED(hResult)) {
+	return false;
+  }
+  fileName.assign(pszFilePath);
+  CoTaskMemFree(pszFilePath);
+  return true;
+}
+
+auto stch2bit(F_POINT& point) -> POINT {
+  if (Instance->StateMap.test(StateFlag::LANDSCAP)) {
+	point.y -= wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y;
+  }
+  return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
+                wrap::round<LONG>(wrap::toFloat(BitmapHeight) - (BmpStitchRatio.y * point.y))};
+}
+} // namespace
+
+void bitmap::bfil(COLORREF const& backgroundColor) {
+  auto const inverseBackgroundColor = fswap(backgroundColor);
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto hBitmapFile =
+      CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  if (hBitmapFile == INVALID_HANDLE_VALUE) {
+	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
+	CloseHandle(hBitmapFile);
+	resetBmpFile(true);
+	return;
+  }
+  auto bytesRead = DWORD {};
+  if (!wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
+	auto errorCode = GetLastError();
+	CloseHandle(hBitmapFile);
+	resetBmpFile(true);
+	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil", errorCode);
+	return;
+  }
+  // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
+  if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType != MB_SIG) {
+	resetBmpFile(true);
+	return;
+  }
+  auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
+  fileHeaderSize      = std::min(fileHeaderSize, sizeof(BITMAPV4HEADER));
+  if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
+	return;
+  }
+  if (!gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
+	CloseHandle(hBitmapFile);
+	resetBmpFile(true);
+	displayText::tabmsg(IDS_BMAP, false);
+	return;
+  }
+  if (!Instance->StateMap.testAndReset(StateFlag::WASESC)) {
+	Instance->StateMap.reset(StateFlag::TRSET);
+  }
+  BitmapWidth  = BitmapFileHeaderV4.bV4Width;
+  BitmapHeight = BitmapFileHeaderV4.bV4Height;
+  Instance->StateMap.set(StateFlag::INIT);
+  ZoomRect.left   = 0.0F;
+  ZoomRect.bottom = 0.0F;
+  wrap::narrow_cast(ZoomRect.right, UnzoomedRect.cx);
+  wrap::narrow_cast(ZoomRect.top, UnzoomedRect.cy);
+  BitmapDC = CreateCompatibleDC(StitchWindowDC);
+  if (BitmapFileHeaderV4.bV4BitCount == 1) {
+	Instance->StateMap.set(StateFlag::MONOMAP);
+	constexpr auto SR5 = uint8_t {5}; // Shift Right
+
+	auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> SR5) << 2U;
+	if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
+	  bitmapWidthBytes += 4U;
+	}
+	auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
+	auto monoBitmapData = std::vector<uint8_t> {};
+	monoBitmapData.resize(bitmapSizeBytes);
+	if (!wrap::readFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, L"ReadFile for monoBitmapData in bfil")) {
+	  return;
+	}
+	CloseHandle(hBitmapFile);
+	auto const flag       = binv(monoBitmapData);
+	auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
+	auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
+	BitmapInfoHeader      = {};
+	BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
+	BitmapInfoHeader.biWidth       = BitmapWidth;
+	BitmapInfoHeader.biHeight      = BitmapHeight;
+	BitmapInfoHeader.biPlanes      = 1U;
+	BitmapInfoHeader.biBitCount    = BPP32;
+	BitmapInfoHeader.biCompression = BI_RGB;
+	BitmapInfo.bmiHeader           = BitmapInfoHeader;
+	auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto const bitmap = getBitmap(BitmapDC, &BitmapInfo, &bits);
+	// Synchronize
+	GdiFlush();
+	auto const spMBD     = gsl::span(monoBitmapData);
+	auto const spBits    = gsl::span(bits, wrap::toSize(BitmapWidth * BitmapHeight));
+	auto       srcOffset = 0U;
+	auto       dstOffset = 0U;
+	auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
+	for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
+	  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
+	  auto const spLineDst = spBits.subspan(dstOffset, wrap::toSize(BitmapWidth));
+	  bitlin(spLineSrc, spLineDst, foreground, background);
+	  srcOffset += bitmapWidthBytes;
+	  dstOffset += wrap::toUnsigned(BitmapWidth);
+	}
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC); deviceContext != nullptr) {
+	  SelectObject(deviceContext, bitmap);
+	  hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
+	  SelectObject(BitmapDC, hBitmapFile);
+	  BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
+	  DeleteObject(bitmap);
+	  DeleteObject(deviceContext);
+	}
+  }
+  else {
+	CloseHandle(hBitmapFile);
+	Instance->StateMap.reset(StateFlag::MONOMAP);
+	hBitmapFile = LoadImage(
+	    ThrEdInstance, UTF16BMPname->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+	SelectObject(BitmapDC, hBitmapFile);
+	Instance->StateMap.set(StateFlag::RESTCH);
+  }
+  bitsiz();
+  trace::initColorRef();
+  Instance->StateMap.reset(StateFlag::HIDMAP);
+}
+
+void bitmap::resetBmpFile(bool const reset) {
+  if (!ismap()) {
+	return;
+  }
+  DeleteObject(BitmapFileHandle);
+  ReleaseDC(ThrEdWindow, BitmapDC);
+  if (reset) {
+	UTF8BMPname.fill(0);
+  }
+}
+
+void bitmap::savmap() {
+  if (ismap() && nullptr != TraceBitmapData) {
+	displayText::tabmsg(IDS_SHOMAP, false);
+	return;
+  }
+  if (Instance->StateMap.test(StateFlag::MONOMAP)) {
+	displayText::tabmsg(IDS_SAVMAP, false);
+	return;
+  }
+  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
+	displayText::tabmsg(IDS_MAPCHG, false);
+	return;
+  }
+  auto fileName = fs::path {};
+  if (!saveName(fileName)) {
+	return;
+  }
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const hBitmap =
+      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  if (hBitmap == INVALID_HANDLE_VALUE) {
+	displayText::crmsg(*UTF16BMPname);
+	return;
+  }
+  auto bytesWritten = DWORD {};
+  WriteFile(hBitmap, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesWritten, nullptr);
+  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
+  auto buffer = std::vector<uint8_t> {};
+  buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
+  auto const spTrace = gsl::span(TraceBitmapData, wrap::toSize(BitmapWidth * BitmapHeight));
+  movmap(spTrace, buffer);
+  WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
+  CloseHandle(hBitmap);
+}
+
 void bitmap::lodbmp(fs::path const& directory) {
-  if (!bi::loadName(directory, *UTF16BMPname)) {
+  if (!loadName(directory, *UTF16BMPname)) {
 	return;
   }
   resetBmpFile(false);
@@ -484,23 +557,11 @@ void bitmap::lodbmp(fs::path const& directory) {
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
-auto bi::nuBit() noexcept -> BOOL {
-  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
-  BitMapColorStruct.hwndOwner      = ThrEdWindow;
-  BitMapColorStruct.lCustData      = 0;
-  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors->data();
-  BitMapColorStruct.lpfnHook       = nullptr;
-  BitMapColorStruct.lpTemplateName = nullptr;
-  BitMapColorStruct.rgbResult      = BitmapColor;
-  BitMapColorStruct.lStructSize    = sizeof(BitMapColorStruct);
-  return ChooseColor(&BitMapColorStruct);
-}
-
 void bitmap::setBmpColor() {
-  if (bi::nuBit() == 0U) {
+  if (nuBit() == 0U) {
 	return;
   }
-  BitmapColor = bi::fswap(BitMapColorStruct.rgbResult);
+  BitmapColor = fswap(BitMapColorStruct.rgbResult);
   if (ismap()) {
 	bfil(BackgroundColor);
   }
@@ -624,7 +685,7 @@ void bitmap::drawBmpBackground() {
   if (Instance->StateMap.test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }
-  if (!bi::bitar()) {
+  if (!bitar()) {
 	return;
   }
   StretchBlt(StitchWindowMemDC,
@@ -638,47 +699,6 @@ void bitmap::drawBmpBackground() {
              BitmapSrcRect.right - BitmapSrcRect.left,
              BitmapSrcRect.bottom - BitmapSrcRect.top,
              SRCCOPY);
-}
-
-auto bi::bitar() -> bool {
-  auto const zoomedInRect = F_RECTANGLE {ZoomRect.left,
-                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
-                                         ZoomRect.right,
-                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.bottom)};
-  if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
-	return false;
-  }
-  BitmapSrcRect = {.left   = wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
-                   .top    = wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
-                   .right  = wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
-                   .bottom = wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
-  if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
-	BitmapSrcRect.right = BitmapWidth;
-	Instance->StateMap.reset(StateFlag::LANDSCAP);
-  }
-  if (BitmapSrcRect.bottom > BitmapHeight) {
-	BitmapSrcRect.bottom = BitmapHeight;
-	Instance->StateMap.set(StateFlag::LANDSCAP);
-  }
-  auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
-                                        wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
-                                        wrap::toFloat(BitmapSrcRect.right) * StitchBmpRatio.x,
-                                        wrap::toFloat(BitmapSrcRect.bottom) * StitchBmpRatio.y};
-
-  auto const differenceRect = F_RECTANGLE {backingRect.left - zoomedInRect.left,
-                                           backingRect.top - zoomedInRect.top,
-                                           zoomedInRect.right - backingRect.right,
-                                           zoomedInRect.bottom - backingRect.bottom};
-  auto const bitmapStitchRatio =
-      F_POINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
-               wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
-  BitmapDstRect = {.left   = std::lround(differenceRect.left * bitmapStitchRatio.x),
-                   .top    = std::lround(differenceRect.top * bitmapStitchRatio.y),
-                   .right  = std::lround(wrap::toFloat(StitchWindowClientRect.right) -
-                                        (differenceRect.right * bitmapStitchRatio.x)),
-                   .bottom = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
-                                         (differenceRect.bottom * bitmapStitchRatio.y))};
-  return true;
 }
 
 auto bitmap::getrmap() -> uint32_t {
@@ -695,7 +715,7 @@ auto bitmap::getrmap() -> uint32_t {
                                         0U};
 
   auto const info = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
-  TraceBitmap     = bi::getBitmap(BitmapDC, &info, &TraceBitmapData);
+  TraceBitmap     = getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
   auto bitmapSize = 0U;
   if (TraceDC != nullptr) {
@@ -724,34 +744,14 @@ void bitmap::bitbltBitmap() noexcept {
   BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
 }
 
-auto bi::stch2bit(F_POINT& point) -> POINT {
-  if (Instance->StateMap.test(StateFlag::LANDSCAP)) {
-	point.y -= wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y;
-  }
-  return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
-                wrap::round<LONG>(wrap::toFloat(BitmapHeight) - (BmpStitchRatio.y * point.y))};
-}
-
-void bi::pxlin(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {
-  auto       line     = std::array<POINT, 2> {};
-  auto const vertexIt = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
-  auto const vStart   = wrap::next(vertexIt, start);
-  auto const vFinish  = wrap::next(vertexIt, finish);
-
-  line[0] = stch2bit(*vStart);
-  line[1] = stch2bit(*vFinish);
-  wrap::polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
-  wrap::polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
-}
-
 void bitmap::bfrm(FRM_HEAD const& form) {
   if (form.vertexCount == 0U) {
 	return;
   }
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	bi::pxlin(form, iVertex, iVertex + 1U);
+	pxlin(form, iVertex, iVertex + 1U);
   }
   if (form.type != FRMLINE) {
-	bi::pxlin(form, form.vertexCount - 1U, 0);
+	pxlin(form, form.vertexCount - 1U, 0);
   }
 }
