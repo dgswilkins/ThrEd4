@@ -76,22 +76,27 @@ class BAL_HEAD // balarad file header
 };
 #pragma pack(pop)
 
-namespace bali {
-void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
-} // namespace bali
-
-// main variables
+// balarad namespace
 namespace {
-auto BalaradOffset = F_POINT {};                           // balarad offset
-auto BalaradName0  = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
-auto BalaradName1  = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
-auto BalaradName2  = gsl::narrow_cast<fs::path*>(nullptr);
-} // namespace
-
 constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
 constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
 constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
 constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
+
+auto BalaradOffset = F_POINT {};                           // balarad offset
+auto BalaradName0  = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
+auto BalaradName1  = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
+auto BalaradName2  = gsl::narrow_cast<fs::path*>(nullptr);
+
+// Functions
+void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
+  balaradStitch.push_back(
+      BAL_STITCH {.code = code,
+                  .flag = flag,
+                  .x = (Instance->StitchBuffer.operator[](source).x - BalaradOffset.x) * BALRATIO,
+                  .y = (Instance->StitchBuffer.operator[](source).y - BalaradOffset.y) * BALRATIO});
+}
+} // namespace bali
 
 auto bal::getBN0() noexcept -> fs::path* {
   return BalaradName0;
@@ -115,14 +120,6 @@ void bal::setBN1(fs::path* name) noexcept {
 
 void bal::setBN2(fs::path* name) noexcept {
   BalaradName2 = name;
-}
-
-void bali::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
-  balaradStitch.push_back(
-      BAL_STITCH {.code = code,
-                  .flag = flag,
-                  .x = (Instance->StitchBuffer.operator[](source).x - BalaradOffset.x) * BALRATIO,
-                  .y = (Instance->StitchBuffer.operator[](source).y - BalaradOffset.y) * BALRATIO});
 }
 
 void bal::redbal() {
@@ -235,12 +232,12 @@ void bal::ritbal() {
 	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(Instance->StitchBuffer.size() + 2U);
 	color = Instance->StitchBuffer.front().attribute & COLMSK;
-	bali::thr2bal(balaradStitch, 0, BALJUMP, 0);
+	thr2bal(balaradStitch, 0, BALJUMP, 0);
 	for (auto iStitch = 0U; const auto& stitch : Instance->StitchBuffer) {
-	  bali::thr2bal(balaradStitch, iStitch, BALNORM, 0);
+	  thr2bal(balaradStitch, iStitch, BALNORM, 0);
 	  if ((stitch.attribute & COLMSK) != color) {
 		color = stitch.attribute & COLMSK;
-		bali::thr2bal(balaradStitch, iStitch, BALSTOP, color);
+		thr2bal(balaradStitch, iStitch, BALSTOP, color);
 	  }
 	  ++iStitch;
 	}
