@@ -718,7 +718,7 @@ void selup() {
 void setMoveAnchor(uint32_t const source) noexcept {
   MoveAnchor = source;
 }
-} // namespace kyi
+} // namespace
 
 auto keys::getMoveAnchor() noexcept -> uint32_t {
   return MoveAnchor;
