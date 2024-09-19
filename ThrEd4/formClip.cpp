@@ -88,7 +88,13 @@ class FORM_VERTEX_CLIP // form points clipboard header
 };
 #pragma pack(pop)
 
-namespace fci {
+namespace {
+auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
+auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
+auto FormVerticesAsLine =
+    gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
+
+// Definitions
 void clipSelectedForm();
 void clipSelectedForms();
 void clipSelectedPoints();
@@ -106,85 +112,9 @@ void sizclp(FRM_HEAD const& form,
             uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>);
 auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t;
 void unpclp();
-} // namespace fci
 
-// main variables
-namespace {
-auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
-auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
-auto FormVerticesAsLine =
-    gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
-} // namespace
-
-auto tfc::getClipFormCount() noexcept -> uint32_t {
-  return ClipFormsCount;
-}
-
-void tfc::setFVAS(std::vector<POINT>* source) noexcept {
-  FormVerticesAsLine = source;
-}
-
-void tfc::setClipOrigin(POINT const source) noexcept {
-  ClipOrigin = source;
-}
-
-auto fci::getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
-  if (clipMemory == nullptr) {
-	return nullptr;
-  }
-  auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipMemory);
-  if (clipFormHeader->clipType == CLP_FRM) {
-	auto* clipForm = &clipFormHeader->form;
-	return clipForm;
-  }
-  return nullptr;
-}
-
-auto fci::sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
-  auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) +
-                  (form.vertexCount * wrap::sizeofType(Instance->FormVertices));
-  if (form.type == SAT && form.satinGuideCount != 0U) {
-	clipSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
-  }
-  if (form.isEdgeClip()) {
-	clipSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
-  }
-  if (form.isClipX()) {
-	clipSize += form.clipCount * wrap::sizeofType(Instance->ClipPoints);
-  }
-  if (form.isTexture()) {
-	clipSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
-  }
-  return clipSize;
-}
-
-void fci::sizclp(FRM_HEAD const& form,
-                 uint32_t&       formFirstStitchIndex,
-                 uint32_t&       formStitchCount,
-                 uint32_t&       length,
-                 uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>) {
-  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->FormVertices);
-  length = fileSize;
-  if (form.type == SAT && form.satinGuideCount != 0U) {
-	fileSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
-  }
-  if (form.fillType != 0U || form.edgeType != 0U) {
-	formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
-	length += formStitchCount;
-	fileSize += length * wrap::sizeofType(Instance->StitchBuffer);
-  }
-  if (form.isEdgeClip()) {
-	fileSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
-  }
-  if (form.isClipX()) {
-	fileSize += form.clipCount * wrap::sizeofType(Instance->ClipPoints);
-  }
-  if (form.isTexture()) {
-	fileSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
-  }
-}
-
-void fci::clipSelectedForm() {
+// Functions
+void clipSelectedForm() {
   auto        firstStitch = 0U; // points to the first stitch in a form
   auto        stitchCount = 0U;
   auto        length      = 0U;
@@ -284,7 +214,7 @@ void fci::clipSelectedForm() {
   CloseClipboard();
 }
 
-void fci::clipSelectedForms() {
+void clipSelectedForms() {
   auto  length   = 0U;
   auto& formList = Instance->FormList;
 
@@ -449,7 +379,7 @@ void fci::clipSelectedForms() {
   CloseClipboard();
 }
 
-void fci::clipSelectedPoints() {
+void clipSelectedPoints() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const clipHandle = GlobalAlloc(
       GHND, ((wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT)) + sizeof(FORM_VERTEX_CLIP));
@@ -482,7 +412,7 @@ void fci::clipSelectedPoints() {
   CloseClipboard();
 }
 
-void fci::clipSelectedStitches() {
+void clipSelectedStitches() {
   thred::rngadj();
   if (GroupStartStitch != GroupEndStitch) {
 	LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
@@ -528,30 +458,14 @@ void fci::clipSelectedStitches() {
   }
 }
 
-void tfc::duclip() {
-  if (Instance->StateMap.test(StateFlag::FPSEL)) {
-	fci::clipSelectedPoints();
-	return;
-  }
-  if (Instance->StateMap.test(StateFlag::BIGBOX)) {
-	displayText::tabmsg(IDS_INSF, false);
-	return;
-  }
-  if (!Instance->SelectedFormList.empty()) {
-	fci::clipSelectedForms();
-	return;
-  }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
-	fci::clipSelectedForm();
-	return;
-  }
-  if (Instance->StitchBuffer.empty() || !Instance->StateMap.test(StateFlag::GRPSEL)) {
-	return;
-  }
-  fci::clipSelectedStitches();
+void dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
+  SetROP2(StitchWindowDC, R2_XORPEN);
+  SelectObject(StitchWindowDC, FormPen);
+  wrap::polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
+  SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
-auto fci::frmcnt(uint32_t const iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t {
+auto frmcnt(uint32_t const iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t {
   auto const codedAttribute = iForm << FRMSHFT;
   auto       iStitch        = Instance->StitchBuffer.begin();
   auto       stitchCount    = 0U;
@@ -579,18 +493,19 @@ auto fci::frmcnt(uint32_t const iForm, uint32_t& formFirstStitchIndex) noexcept 
   return stitchCount;
 }
 
-void fci::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const led) {
-  auto integer    = 0.0F;
-  destination.led = led;
-  auto fractional = std::modf(source.x - LowerLeftStitch.x, &integer);
-  destination.fx  = wrap::floor<decltype(destination.fx)>(fractional * FRACFACT);
-  wrap::narrow(destination.x, integer);
-  fractional     = std::modf(source.y - LowerLeftStitch.y, &integer);
-  destination.fy = wrap::floor<decltype(destination.fy)>(fractional * FRACFACT);
-  wrap::narrow(destination.y, integer);
+auto getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
+  if (clipMemory == nullptr) {
+	return nullptr;
+  }
+  auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipMemory);
+  if (clipFormHeader->clipType == CLP_FRM) {
+	auto* clipForm = &clipFormHeader->form;
+	return clipForm;
+  }
+  return nullptr;
 }
 
-void fci::rtrclpfn(FRM_HEAD const& form) {
+void rtrclpfn(FRM_HEAD const& form) {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
@@ -635,6 +550,124 @@ void fci::rtrclpfn(FRM_HEAD const& form) {
   CloseClipboard();
 }
 
+void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const led) {
+  auto integer    = 0.0F;
+  destination.led = led;
+  auto fractional = std::modf(source.x - LowerLeftStitch.x, &integer);
+  destination.fx  = wrap::floor<decltype(destination.fx)>(fractional * FRACFACT);
+  wrap::narrow(destination.x, integer);
+  fractional     = std::modf(source.y - LowerLeftStitch.y, &integer);
+  destination.fy = wrap::floor<decltype(destination.fy)>(fractional * FRACFACT);
+  wrap::narrow(destination.y, integer);
+}
+
+void setpclp() {
+  auto& interleaveSequence = Instance->InterleaveSequence;
+
+  FormVerticesAsLine->clear();
+  auto itIntlvSeq = interleaveSequence.begin();
+  auto point      = form::sfCor2px(*itIntlvSeq);
+  ++itIntlvSeq;
+  FormVerticesAsLine->push_back(point);
+  point             = form::sfCor2px(*itIntlvSeq);
+  auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
+                             WinMsg.pt.y - StitchWindowOrigin.y - point.y};
+  for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
+	point = form::sfCor2px(*itIntlvSeq);
+	++itIntlvSeq;
+	FormVerticesAsLine->push_back(POINT {point.x + offset.x, point.y + offset.y});
+  }
+  point = form::sfCor2px(interleaveSequence.back());
+  FormVerticesAsLine->push_back(point);
+}
+
+void sizclp(FRM_HEAD const& form,
+                 uint32_t&       formFirstStitchIndex,
+                 uint32_t&       formStitchCount,
+                 uint32_t&       length,
+                 uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>) {
+  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->FormVertices);
+  length = fileSize;
+  if (form.type == SAT && form.satinGuideCount != 0U) {
+	fileSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
+  }
+  if (form.fillType != 0U || form.edgeType != 0U) {
+	formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
+	length += formStitchCount;
+	fileSize += length * wrap::sizeofType(Instance->StitchBuffer);
+  }
+  if (form.isEdgeClip()) {
+	fileSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
+  }
+  if (form.isClipX()) {
+	fileSize += form.clipCount * wrap::sizeofType(Instance->ClipPoints);
+  }
+  if (form.isTexture()) {
+	fileSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
+  }
+}
+
+auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
+  auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) +
+                  (form.vertexCount * wrap::sizeofType(Instance->FormVertices));
+  if (form.type == SAT && form.satinGuideCount != 0U) {
+	clipSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
+  }
+  if (form.isEdgeClip()) {
+	clipSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
+  }
+  if (form.isClipX()) {
+	clipSize += form.clipCount * wrap::sizeofType(Instance->ClipPoints);
+  }
+  if (form.isTexture()) {
+	clipSize += form.texture.count * wrap::sizeofType(TexturePointsBuffer);
+  }
+  return clipSize;
+}
+
+void unpclp() {
+  if (Instance->StateMap.testAndReset(StateFlag::SHOP)) {
+	dupclp();
+  }
+}
+
+} // namespace fci
+
+auto tfc::getClipFormCount() noexcept -> uint32_t {
+  return ClipFormsCount;
+}
+
+void tfc::setFVAS(std::vector<POINT>* source) noexcept {
+  FormVerticesAsLine = source;
+}
+
+void tfc::setClipOrigin(POINT const source) noexcept {
+  ClipOrigin = source;
+}
+
+void tfc::duclip() {
+  if (Instance->StateMap.test(StateFlag::FPSEL)) {
+	clipSelectedPoints();
+	return;
+  }
+  if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+	displayText::tabmsg(IDS_INSF, false);
+	return;
+  }
+  if (!Instance->SelectedFormList.empty()) {
+	clipSelectedForms();
+	return;
+  }
+  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	clipSelectedForm();
+	return;
+  }
+  if (Instance->StitchBuffer.empty() || !Instance->StateMap.test(StateFlag::GRPSEL)) {
+	return;
+  }
+  clipSelectedStitches();
+}
+
 void tfc::rtrclp() {
   if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
 	return;
@@ -643,7 +676,7 @@ void tfc::rtrclp() {
 	texture::rtrtx(form);
   }
   else {
-	fci::rtrclpfn(form);
+	rtrclpfn(form);
   }
 }
 
@@ -684,10 +717,10 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
 		  auto const nextIt     = wrap::next(itVertex, nextVertex);
 		  interleaveSequence.push_back(*nextIt);
-		  fci::setpclp();
+		  setpclp();
 		  Instance->StateMap.set(StateFlag::FPUNCLP);
 		  Instance->StateMap.set(StateFlag::SHOP);
-		  fci::dupclp();
+		  dupclp();
 		}
 		else {
 		  FormMoveDelta = F_POINT {};
@@ -919,7 +952,7 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   if (nullptr == clipMemory) {
 	return;
   }
-  auto* clipForm = fci::getClipForm(clipMemory);
+  auto* clipForm = getClipForm(clipMemory);
   if (nullptr == clipForm) {
 	GlobalUnlock(clipMemory);
 	return;
@@ -941,44 +974,11 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   Instance->StateMap.reset(StateFlag::WASWROT);
 }
 
-void fci::setpclp() {
-  auto& interleaveSequence = Instance->InterleaveSequence;
-
-  FormVerticesAsLine->clear();
-  auto itIntlvSeq = interleaveSequence.begin();
-  auto point      = form::sfCor2px(*itIntlvSeq);
-  ++itIntlvSeq;
-  FormVerticesAsLine->push_back(point);
-  point             = form::sfCor2px(*itIntlvSeq);
-  auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
-                             WinMsg.pt.y - StitchWindowOrigin.y - point.y};
-  for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
-	point = form::sfCor2px(*itIntlvSeq);
-	++itIntlvSeq;
-	FormVerticesAsLine->push_back(POINT {point.x + offset.x, point.y + offset.y});
-  }
-  point = form::sfCor2px(interleaveSequence.back());
-  FormVerticesAsLine->push_back(point);
-}
-
-void fci::dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
-  SetROP2(StitchWindowDC, R2_XORPEN);
-  SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
-  SetROP2(StitchWindowDC, R2_COPYPEN);
-}
-
-void fci::unpclp() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOP)) {
-	dupclp();
-  }
-}
-
 void tfc::fpUnClip() {
-  fci::unpclp();
-  fci::setpclp();
+  unpclp();
+  setpclp();
   Instance->StateMap.set(StateFlag::SHOP);
-  fci::dupclp();
+  dupclp();
 }
 
 void tfc::lodclp(uint32_t iStitch) {
