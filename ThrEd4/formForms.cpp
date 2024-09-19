@@ -104,8 +104,21 @@ enum DaisyStyles : uint8_t { // daisy form types
   DHART                      // Heart shape
 };
 
-// formForms Internal namespace
-namespace ffi {
+namespace {
+auto LabelWindowCoords            = RECT {}; // location of left windows in the form data sheet
+auto LabelWindowSize              = SIZE {}; // size of the left windows in the form data sheet
+auto ValueWindowCoords            = RECT {}; // location of right windows in the form data sheet
+auto ValueWindowSize              = SIZE {}; // size of the right windows in the form data sheet
+auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
+    IDS_DAZCRV,
+    IDS_DAZSAW,
+    IDS_DAZRMP,
+    IDS_DAZRAG,
+    IDS_DAZCOG,
+    IDS_DAZHART,
+};
+
+// Definitions
 void chkdaz();
 
 auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
@@ -135,32 +148,9 @@ auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
 void wavinit(HWND hwndlg);
 
 auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
-} // namespace ffi
 
-namespace {
-auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
-auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
-auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
-auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
-} // namespace
-
-auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
-    IDS_DAZCRV,
-    IDS_DAZSAW,
-    IDS_DAZRMP,
-    IDS_DAZRAG,
-    IDS_DAZCOG,
-    IDS_DAZHART,
-};
-
-void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std::is_same_v<size_t, uint32_t>) {
-  auto labelSize = SIZE {};
-  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
-  textSize.cx = std::max(textSize.cx, labelSize.cx);
-  textSize.cy = std::max(textSize.cy, labelSize.cy);
-}
-
-auto ffi::maxwid() -> SIZE {
+// Functions
+auto maxwid() -> SIZE {
   auto textSize = SIZE {};
   for (auto const& item : PREFLIST) {
 	formForms::maxtsiz(displayText::loadStr(item.stringID), textSize);
@@ -168,7 +158,7 @@ auto ffi::maxwid() -> SIZE {
   return textSize;
 }
 
-auto ffi::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
+auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
   if (Instance->StateMap.test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
@@ -186,7 +176,7 @@ auto ffi::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
                       nullptr);
 }
 
-auto ffi::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
+auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
   if (Instance->StateMap.test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
@@ -204,7 +194,7 @@ auto ffi::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
                       nullptr);
 }
 
-auto ffi::numwin(std::wstring const& winName, RECT const& location) -> HWND {
+auto numwin(std::wstring const& winName, RECT const& location) -> HWND {
   if (Instance->StateMap.test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
@@ -222,19 +212,19 @@ auto ffi::numwin(std::wstring const& winName, RECT const& location) -> HWND {
                       nullptr);
 }
 
-void ffi::nxtlin(uint32_t& formMenuEntryCount) noexcept {
+void nxtlin(uint32_t& formMenuEntryCount) noexcept {
   ++formMenuEntryCount;
   nxtlinprf();
 }
 
-void ffi::nxtlinprf() noexcept {
+void nxtlinprf() noexcept {
   LabelWindowCoords.top += LabelWindowSize.cy;
   LabelWindowCoords.bottom += LabelWindowSize.cy;
   ValueWindowCoords.top += ValueWindowSize.cy;
   ValueWindowCoords.bottom += ValueWindowSize.cy;
 }
 
-void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
+void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   static constexpr auto EDGE_ARRAY = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn          = displayText::loadStr(IDS_ON);
@@ -545,6 +535,387 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   }
 }
 
+void prftwin(std::wstring const& text) noexcept {
+  CreateWindow(L"STATIC",
+               text.c_str(),
+               WS_CHILD | WS_VISIBLE,
+               LabelWindowCoords.left,
+               LabelWindowCoords.top,
+               LabelWindowCoords.right - LabelWindowCoords.left,
+               LabelWindowCoords.bottom - LabelWindowCoords.top,
+               PreferencesWindow,
+               nullptr,
+               ThrEdInstance,
+               nullptr);
+}
+
+auto prfnwin(std::wstring const& text) noexcept -> HWND {
+  return CreateWindow(L"STATIC",
+                      text.c_str(),
+                      SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
+                      ValueWindowCoords.left,
+                      ValueWindowCoords.top,
+                      ValueWindowCoords.right - ValueWindowCoords.left,
+                      ValueWindowCoords.bottom - ValueWindowCoords.top,
+                      PreferencesWindow,
+                      nullptr,
+                      ThrEdInstance,
+                      nullptr);
+}
+
+void prflin(std::wstring const& msg, LIST_TYPE const& row) {
+  prftwin(displayText::loadStr(row.stringID));
+  Instance->ValueWindow.operator[](row.value) = prfnwin(msg);
+  nxtlinprf();
+}
+
+void chkdaz() {
+  IniFile.daisyPetalPoints = std::max(IniFile.daisyPetalPoints, 1U);
+  IniFile.daisyInnerCount  = std::max(IniFile.daisyInnerCount, 1U);
+  IniFile.daisyPetalCount  = std::max(IniFile.daisyPetalCount, 1U);
+  IniFile.daisyHeartCount =
+      std::min(IniFile.daisyHeartCount, gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints));
+}
+
+// ReSharper disable CppParameterMayBeConst
+void initdaz(HWND hWinDialog) {
+  chkdaz();
+  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS),
+                format(FMT_COMPILE(L"{}"), IniFile.daisyPetalPoints).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT),
+                format(FMT_COMPILE(L"{}"), IniFile.daisyHeartCount).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN),
+                format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyDiameter).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ),
+                format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyHoleDiameter).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS),
+                format(FMT_COMPILE(L"{}"), IniFile.daisyInnerCount).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS),
+                format(FMT_COMPILE(L"{}"), IniFile.daisyPetalCount).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN),
+                format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyPetalLen).c_str());
+  auto flag = 1U;
+  if (!UserFlagMap->test(UserFlag::DAZHOL)) {
+	flag = 0U;
+  }
+  CheckDlgButton(hWinDialog, IDC_HOLE, flag);
+  flag = 1U;
+  if (!UserFlagMap->test(UserFlag::DAZD)) {
+	flag = 0U;
+  }
+  CheckDlgButton(hWinDialog, IDC_DLIN, flag);
+  for (auto const& daisyTypeString : DAISY_TYPE_STRINGS) {
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
+	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP),
+	            CB_ADDSTRING,
+	            0,
+	            reinterpret_cast<LPARAM>(displayText::loadStr(daisyTypeString).c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  }
+  SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void handleDaisyIDOK(HWND hwndlg) {
+  auto buffer = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyPetalPoints, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyHeartCount, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
+  IniFile.daisyDiameter = wrap::wcsToFloat(buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
+  IniFile.daisyHoleDiameter = wrap::wcsToFloat(buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyInnerCount, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.daisyPetalCount, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
+  IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
+  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
+	UserFlagMap->set(UserFlag::DAZHOL);
+  }
+  else {
+	UserFlagMap->reset(UserFlag::DAZHOL);
+  }
+  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
+	UserFlagMap->set(UserFlag::DAZD);
+  }
+  else {
+	UserFlagMap->reset(UserFlag::DAZD);
+  }
+  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
+  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
+	auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
+	if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
+	  IniFile.daisyBorderType = iType;
+	  break;
+	}
+  }
+  chkdaz();
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+auto handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
+  switch (LOWORD(wparam)) {
+	case IDCANCEL: {
+	  EndDialog(hwndlg, FALSE);
+	  return true;
+	}
+	case IDOK:
+	  handleDaisyIDOK(hwndlg);
+	  EndDialog(hwndlg, TRUE);
+	  break;
+	case IDC_DAZRST: {
+	  IniFile.dazdef();
+	  UserFlagMap->set(UserFlag::DAZHOL);
+	  UserFlagMap->set(UserFlag::DAZD);
+	  initdaz(hwndlg);
+	  break;
+	}
+	case IDC_DLIN: {
+	  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
+		CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
+	  }
+	  break;
+	}
+	case IDC_HOLE: {
+	  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) == 0U) {
+		CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
+	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
+	  break;
+	}
+  }
+  return false;
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
+  UNREFERENCED_PARAMETER(lparam);
+  switch (umsg) {
+	case WM_INITDIALOG: {
+	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+	  initdaz(hwndlg);
+	  break;
+	}
+	case WM_COMMAND: {
+	  if (handleDaisyWMCOMMAND(wparam, hwndlg)) {
+		return TRUE;
+	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
+	  break;
+	}
+  }
+  return FALSE;
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void initTearDlg(HWND hwndlg) {
+  SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), format(FMT_COMPILE(L"{:d}"), IniFile.formSides).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT),
+                format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTailLength).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP),
+                format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTwistStep * IPFGRAN).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT),
+                format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTwistRatio).c_str());
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void handleTearIDOK(HWND hwndlg) {
+  auto buffer = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.formSides, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
+  IniFile.tearTailLength = wrap::wcsToFloat(buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
+  IniFile.tearTwistStep = wrap::wcsToFloat(buffer.data()) * PFGRAN;
+  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
+  IniFile.tearTwistRatio = wrap::wcsToFloat(buffer.data());
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void handleTearDefault(HWND hwndlg) {
+  constexpr auto TEARSIDES    = uint16_t {20U};
+  constexpr auto TEARTAILFACT = 1.1F;
+  constexpr auto TEARTWIST    = 1.6F;
+  IniFile.formSides           = TEARSIDES;
+  IniFile.tearTailLength      = TEARTAILFACT;
+  IniFile.tearTwistStep       = 0.0F;
+  IniFile.tearTwistRatio      = TEARTWIST;
+  initTearDlg(hwndlg);
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void handlePaisleyDefault(HWND hwndlg) {
+  constexpr auto PAISSIDES    = uint16_t {24U};
+  constexpr auto PAISTAILFACT = 1.15F;
+  constexpr auto PAISSTEP     = 0.3F;
+  constexpr auto PAISTWIST    = 1.8F;
+  IniFile.formSides           = PAISSIDES;
+  IniFile.tearTailLength      = PAISTAILFACT;
+  IniFile.tearTwistStep       = PAISSTEP * PFGRAN;
+  IniFile.tearTwistRatio      = PAISTWIST;
+  initTearDlg(hwndlg);
+}
+// ReSharper restore CppParameterMayBeConst
+
+void handleTearInit(HWND hwndlg) {
+  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+#ifdef TESTCODE
+  auto const uDpi     = GetDpiForWindow(hwndlg);
+  RECT       rcClient = {};
+  GetWindowRect(hwndlg, &rcClient);
+  auto uWidth  = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
+  auto uHeight = MulDiv((rcClient.bottom - rcClient.top), uDpi, 96);
+  SetWindowPos(hwndlg, nullptr, rcClient.left, rcClient.top, uWidth, uHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+
+  auto hFont = displayText::getThrEdFont(400);
+  EnumChildWindows(
+      hwndlg,
+      [](HWND p_hWnd, LPARAM lParam) -> BOOL {
+	    SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+	    return TRUE;
+      },
+      (LPARAM)hFont);
+#endif // !TESTCODE
+  initTearDlg(hwndlg);
+}
+
+// ReSharper disable CppParameterMayBeConst
+auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
+  UNREFERENCED_PARAMETER(lparam);
+  switch (umsg) {
+	case WM_INITDIALOG:
+	  handleTearInit(hwndlg);
+	  break;
+	case WM_COMMAND: {
+	  switch (LOWORD(wparam)) {
+		case IDCANCEL: {
+		  EndDialog(hwndlg, FALSE);
+		  return TRUE;
+		}
+		case IDOK:
+		  handleTearIDOK(hwndlg);
+		  EndDialog(hwndlg, TRUE);
+		  break;
+		case IDC_DEFTEAR:
+		  handleTearDefault(hwndlg);
+		  break;
+		case IDC_DEFPAIS:
+		  handlePaisleyDefault(hwndlg);
+		  break;
+		default: {
+		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
+		  break;
+		}
+	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"umsg [{}] not handled in tearprc\n", umsg);
+	  break;
+	}
+  }
+  return FALSE;
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void wavinit(HWND hwndlg) {
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), format(FMT_COMPILE(L"{:d}"), IniFile.wavePoints).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), format(FMT_COMPILE(L"{:d}"), IniFile.waveStart).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), format(FMT_COMPILE(L"{:d}"), IniFile.waveEnd).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), format(FMT_COMPILE(L"{:d}"), IniFile.waveLobes).c_str());
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+void handleWaveIDOK(HWND hwndlg) {
+  auto buffer = std::array<wchar_t, HBUFSIZ> {};
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.wavePoints, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.waveStart, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.waveEnd, buffer.data());
+  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
+  wrap::wcsToULong(IniFile.waveLobes, buffer.data());
+
+  constexpr auto WPCLAMP = uint16_t {100U}; // max number of points in a wave form
+  IniFile.wavePoints     = std::clamp(IniFile.wavePoints, uint16_t {3U}, WPCLAMP);
+  if (IniFile.waveStart == IniFile.waveEnd) {
+	IniFile.waveEnd += IniFile.wavePoints >> 2U;
+  }
+  IniFile.waveStart %= IniFile.wavePoints;
+  IniFile.waveEnd %= IniFile.wavePoints;
+}
+// ReSharper restore CppParameterMayBeConst
+
+// ReSharper disable CppParameterMayBeConst
+auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
+  UNREFERENCED_PARAMETER(lparam);
+  switch (umsg) {
+	case WM_INITDIALOG: {
+	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
+	  wavinit(hwndlg);
+	  break;
+	}
+	case WM_COMMAND: {
+	  switch (LOWORD(wparam)) {
+		case IDCANCEL: {
+		  EndDialog(hwndlg, FALSE);
+		  return TRUE;
+		}
+		case IDOK:
+		  handleWaveIDOK(hwndlg);
+		  EndDialog(hwndlg, TRUE);
+		  break;
+		case IDC_DEFWAV: {
+		  IniFile.wavePoints = IWAVPNTS;
+		  IniFile.waveStart  = IWAVSTRT;
+		  IniFile.waveEnd    = IWAVEND;
+		  IniFile.waveLobes  = IWAVS;
+		  wavinit(hwndlg);
+		  break;
+		}
+		default: {
+		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
+		  break;
+		}
+	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"umsg [{}] not handled in wavprc\n", umsg);
+	  break;
+	}
+  }
+  return FALSE;
+}
+// ReSharper restore CppParameterMayBeConst
+
+} // namespace
+
+void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std::is_same_v<size_t, uint32_t>) {
+  auto labelSize = SIZE {};
+  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
+  textSize.cx = std::max(textSize.cx, labelSize.cx);
+  textSize.cy = std::max(textSize.cy, labelSize.cy);
+}
+
 void formForms::refrm() {
   auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
@@ -554,7 +925,7 @@ void formForms::refrm() {
   LabelWindowSize = ValueWindowSize = {};
   Instance->StateMap.set(StateFlag::REFCNT); // don't create windows - just size them
   auto formMenuEntryCount = 0U;
-  ffi::refrmfn(form, formMenuEntryCount);
+  refrmfn(form, formMenuEntryCount);
   if (FormDataSheet != nullptr) {
 	DestroyWindow(FormDataSheet);
   }
@@ -570,7 +941,7 @@ void formForms::refrm() {
                                ThrEdInstance,
                                nullptr);
   Instance->StateMap.reset(StateFlag::REFCNT); // this time create the windows
-  ffi::refrmfn(form, formMenuEntryCount);
+  refrmfn(form, formMenuEntryCount);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -617,40 +988,6 @@ void formForms::prfsid(HWND wnd) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-void ffi::prftwin(std::wstring const& text) noexcept {
-  CreateWindow(L"STATIC",
-               text.c_str(),
-               WS_CHILD | WS_VISIBLE,
-               LabelWindowCoords.left,
-               LabelWindowCoords.top,
-               LabelWindowCoords.right - LabelWindowCoords.left,
-               LabelWindowCoords.bottom - LabelWindowCoords.top,
-               PreferencesWindow,
-               nullptr,
-               ThrEdInstance,
-               nullptr);
-}
-
-auto ffi::prfnwin(std::wstring const& text) noexcept -> HWND {
-  return CreateWindow(L"STATIC",
-                      text.c_str(),
-                      SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
-                      ValueWindowCoords.left,
-                      ValueWindowCoords.top,
-                      ValueWindowCoords.right - ValueWindowCoords.left,
-                      ValueWindowCoords.bottom - ValueWindowCoords.top,
-                      PreferencesWindow,
-                      nullptr,
-                      ThrEdInstance,
-                      nullptr);
-}
-
-void ffi::prflin(std::wstring const& msg, LIST_TYPE const& row) {
-  prftwin(displayText::loadStr(row.stringID));
-  Instance->ValueWindow.operator[](row.value) = prfnwin(msg);
-  nxtlinprf();
-}
-
 void formForms::prfmsg() {
   auto preferenceRect = RECT {};
   if (Instance->StateMap.testAndReset(StateFlag::INSRT)) {
@@ -667,7 +1004,7 @@ void formForms::prfmsg() {
   LabelWindowSize.cy = 0;
   ValueWindowSize.cx = 0;
   ValueWindowSize.cy = 0;
-  LabelWindowSize    = ffi::maxwid();
+  LabelWindowSize    = maxwid();
   LabelWindowSize.cx += TXTMARG2;
   maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
@@ -694,43 +1031,43 @@ void formForms::prfmsg() {
   ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.cx;
   ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   auto row                = PREFLIST.begin();
-  ffi::prflin(format(FMT_COMPILE(L"{}"), AppliqueColor + 1U), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.AppStitchLen * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), BorderWidth * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), ButtonholeCornerLength * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainSpace * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainRatio), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.clipOffset * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{}"), IniFile.fillPhase), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.eggRatio), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.fillAngle * RADDEGF), *row++);
+  prflin(format(FMT_COMPILE(L"{}"), AppliqueColor + 1U), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.AppStitchLen * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), BorderWidth * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), ButtonholeCornerLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainSpace * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainRatio), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.clipOffset * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{}"), IniFile.fillPhase), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.eggRatio), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.fillAngle * RADDEGF), *row++);
   auto choice = UserFlagMap->test(UserFlag::SQRFIL) ? displayText::loadStr(IDS_SQR)
                                                     : displayText::loadStr(IDS_PNTD);
-  ffi::prflin(choice, *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(ShowStitchThreshold)), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
+  prflin(choice, *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(ShowStitchThreshold)), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
-  ffi::prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
-              *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.cursorNudgeStep), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), PicotSpacing * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
+         *row++);
+  prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.cursorNudgeStep), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), PicotSpacing * IPFGRAN), *row++);
   choice = UserFlagMap->test(UserFlag::BLUNT) ? displayText::loadStr(IDS_BLUNT)
                                               : displayText::loadStr(IDS_TAPR);
-  ffi::prflin(choice, *row++);
+  prflin(choice, *row++);
   choice = UserFlagMap->test(UserFlag::DUND) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
-  ffi::prflin(choice, *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), SmallStitchLength * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), SpiralWrap), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), StarRatio), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(StitchBoxesThreshold)), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.maxStitchLength * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), UserStitchLength * IPFGRAN), *row++);
-  ffi::prflin(format(FMT_COMPILE(L"{:.2f}"), MinStitchLength * IPFGRAN), *row);
+  prflin(choice, *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), SmallStitchLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), SpiralWrap), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), StarRatio), *row++);
+  prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(StitchBoxesThreshold)), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.maxStitchLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), UserStitchLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), MinStitchLength * IPFGRAN), *row);
   Instance->StateMap.set(StateFlag::PRFACT);
   ReleaseDC(ThrEdWindow, preferenceDC);
 }
@@ -748,161 +1085,11 @@ void formForms::frmnum() {
   displayText::numWnd();
 }
 
-void ffi::chkdaz() {
-  IniFile.daisyPetalPoints = std::max(IniFile.daisyPetalPoints, 1U);
-  IniFile.daisyInnerCount  = std::max(IniFile.daisyInnerCount, 1U);
-  IniFile.daisyPetalCount  = std::max(IniFile.daisyPetalCount, 1U);
-  IniFile.daisyHeartCount =
-      std::min(IniFile.daisyHeartCount, gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints));
-}
-
-// ReSharper disable CppParameterMayBeConst
-void ffi::initdaz(HWND hWinDialog) {
-  chkdaz();
-  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS),
-                format(FMT_COMPILE(L"{}"), IniFile.daisyPetalPoints).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT),
-                format(FMT_COMPILE(L"{}"), IniFile.daisyHeartCount).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN),
-                format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyDiameter).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ),
-                format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyHoleDiameter).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS),
-                format(FMT_COMPILE(L"{}"), IniFile.daisyInnerCount).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS),
-                format(FMT_COMPILE(L"{}"), IniFile.daisyPetalCount).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN),
-                format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyPetalLen).c_str());
-  auto flag = 1U;
-  if (!UserFlagMap->test(UserFlag::DAZHOL)) {
-	flag = 0U;
-  }
-  CheckDlgButton(hWinDialog, IDC_HOLE, flag);
-  flag = 1U;
-  if (!UserFlagMap->test(UserFlag::DAZD)) {
-	flag = 0U;
-  }
-  CheckDlgButton(hWinDialog, IDC_DLIN, flag);
-  for (auto const& daisyTypeString : DAISY_TYPE_STRINGS) {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP),
-	            CB_ADDSTRING,
-	            0,
-	            reinterpret_cast<LPARAM>(displayText::loadStr(daisyTypeString).c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-  }
-  SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-void ffi::handleDaisyIDOK(HWND hwndlg) {
-  auto buffer = std::array<wchar_t, HBUFSIZ> {};
-  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.daisyPetalPoints, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.daisyHeartCount, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
-  IniFile.daisyDiameter = wrap::wcsToFloat(buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
-  IniFile.daisyHoleDiameter = wrap::wcsToFloat(buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.daisyInnerCount, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.daisyPetalCount, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
-  IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
-  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
-	UserFlagMap->set(UserFlag::DAZHOL);
-  }
-  else {
-	UserFlagMap->reset(UserFlag::DAZHOL);
-  }
-  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
-	UserFlagMap->set(UserFlag::DAZD);
-  }
-  else {
-	UserFlagMap->reset(UserFlag::DAZD);
-  }
-  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
-  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
-	auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
-	if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
-	  IniFile.daisyBorderType = iType;
-	  break;
-	}
-  }
-  chkdaz();
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-auto ffi::handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
-  switch (LOWORD(wparam)) {
-	case IDCANCEL: {
-	  EndDialog(hwndlg, FALSE);
-	  return true;
-	}
-	case IDOK:
-	  handleDaisyIDOK(hwndlg);
-	  EndDialog(hwndlg, TRUE);
-	  break;
-	case IDC_DAZRST: {
-	  IniFile.dazdef();
-	  UserFlagMap->set(UserFlag::DAZHOL);
-	  UserFlagMap->set(UserFlag::DAZD);
-	  initdaz(hwndlg);
-	  break;
-	}
-	case IDC_DLIN: {
-	  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
-		CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
-	  }
-	  break;
-	}
-	case IDC_HOLE: {
-	  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) == 0U) {
-		CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
-	  }
-	  break;
-	}
-	default: {
-	  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
-	  break;
-	}
-  }
-  return false;
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
-  UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) {
-	case WM_INITDIALOG: {
-	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-	  initdaz(hwndlg);
-	  break;
-	}
-	case WM_COMMAND: {
-	  if (handleDaisyWMCOMMAND(wparam, hwndlg)) {
-		return TRUE;
-	  }
-	  break;
-	}
-	default: {
-	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
-	  break;
-	}
-  }
-  return FALSE;
-}
-// ReSharper restore CppParameterMayBeConst
-
 void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
   // set the daisy form parameters
-  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, &ffi::dasyproc);
+  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, &dasyproc);
       nResult < 1) {
 	Instance->StateMap.reset(StateFlag::FORMIN);
 	return;
@@ -1052,123 +1239,9 @@ void formForms::dasyfrm() {
   form::mdufrm();
 }
 
-// ReSharper disable CppParameterMayBeConst
-void ffi::initTearDlg(HWND hwndlg) {
-  SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), format(FMT_COMPILE(L"{:d}"), IniFile.formSides).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT),
-                format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTailLength).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP),
-                format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTwistStep * IPFGRAN).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT),
-                format(FMT_COMPILE(L"{:.3f}"), IniFile.tearTwistRatio).c_str());
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-void ffi::handleTearIDOK(HWND hwndlg) {
-  auto buffer = std::array<wchar_t, HBUFSIZ> {};
-  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.formSides, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
-  IniFile.tearTailLength = wrap::wcsToFloat(buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
-  IniFile.tearTwistStep = wrap::wcsToFloat(buffer.data()) * PFGRAN;
-  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
-  IniFile.tearTwistRatio = wrap::wcsToFloat(buffer.data());
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-void ffi::handleTearDefault(HWND hwndlg) {
-  constexpr auto TEARSIDES    = uint16_t {20U};
-  constexpr auto TEARTAILFACT = 1.1F;
-  constexpr auto TEARTWIST    = 1.6F;
-  IniFile.formSides           = TEARSIDES;
-  IniFile.tearTailLength      = TEARTAILFACT;
-  IniFile.tearTwistStep       = 0.0F;
-  IniFile.tearTwistRatio      = TEARTWIST;
-  initTearDlg(hwndlg);
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-void ffi::handlePaisleyDefault(HWND hwndlg) {
-  constexpr auto PAISSIDES    = uint16_t {24U};
-  constexpr auto PAISTAILFACT = 1.15F;
-  constexpr auto PAISSTEP     = 0.3F;
-  constexpr auto PAISTWIST    = 1.8F;
-  IniFile.formSides           = PAISSIDES;
-  IniFile.tearTailLength      = PAISTAILFACT;
-  IniFile.tearTwistStep       = PAISSTEP * PFGRAN;
-  IniFile.tearTwistRatio      = PAISTWIST;
-  initTearDlg(hwndlg);
-}
-// ReSharper restore CppParameterMayBeConst
-
-void ffi::handleTearInit(HWND hwndlg) {
-  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-#ifdef TESTCODE
-  auto const uDpi     = GetDpiForWindow(hwndlg);
-  RECT       rcClient = {};
-  GetWindowRect(hwndlg, &rcClient);
-  auto uWidth  = MulDiv((rcClient.right - rcClient.left), uDpi, 96);
-  auto uHeight = MulDiv((rcClient.bottom - rcClient.top), uDpi, 96);
-  SetWindowPos(hwndlg, nullptr, rcClient.left, rcClient.top, uWidth, uHeight, SWP_NOZORDER | SWP_NOACTIVATE);
-
-  auto hFont = displayText::getThrEdFont(400);
-  EnumChildWindows(
-      hwndlg,
-      [](HWND p_hWnd, LPARAM lParam) -> BOOL {
-	    SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
-	    return TRUE;
-      },
-      (LPARAM)hFont);
-#endif // !TESTCODE
-  initTearDlg(hwndlg);
-}
-
-// ReSharper disable CppParameterMayBeConst
-auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
-  UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) {
-	case WM_INITDIALOG:
-	  handleTearInit(hwndlg);
-	  break;
-	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) {
-		case IDCANCEL: {
-		  EndDialog(hwndlg, FALSE);
-		  return TRUE;
-		}
-		case IDOK:
-		  handleTearIDOK(hwndlg);
-		  EndDialog(hwndlg, TRUE);
-		  break;
-		case IDC_DEFTEAR:
-		  handleTearDefault(hwndlg);
-		  break;
-		case IDC_DEFPAIS:
-		  handlePaisleyDefault(hwndlg);
-		  break;
-		default: {
-		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
-		  break;
-		}
-	  }
-	  break;
-	}
-	default: {
-	  outDebugString(L"umsg [{}] not handled in tearprc\n", umsg);
-	  break;
-	}
-  }
-  return FALSE;
-}
-// ReSharper restore CppParameterMayBeConst
-
 void formForms::setear() {
   thred::unmsg();
-  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, &ffi::tearprc);
+  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, &tearprc);
       nResult <= 0) {
 	return;
   }
@@ -1247,83 +1320,9 @@ void formForms::setear() {
   }
 }
 
-// ReSharper disable CppParameterMayBeConst
-void ffi::wavinit(HWND hwndlg) {
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), format(FMT_COMPILE(L"{:d}"), IniFile.wavePoints).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), format(FMT_COMPILE(L"{:d}"), IniFile.waveStart).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), format(FMT_COMPILE(L"{:d}"), IniFile.waveEnd).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), format(FMT_COMPILE(L"{:d}"), IniFile.waveLobes).c_str());
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-void ffi::handleWaveIDOK(HWND hwndlg) {
-  auto buffer = std::array<wchar_t, HBUFSIZ> {};
-  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.wavePoints, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.waveStart, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.waveEnd, buffer.data());
-  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
-  wrap::wcsToULong(IniFile.waveLobes, buffer.data());
-
-  constexpr auto WPCLAMP = uint16_t {100U}; // max number of points in a wave form
-  IniFile.wavePoints     = std::clamp(IniFile.wavePoints, uint16_t {3U}, WPCLAMP);
-  if (IniFile.waveStart == IniFile.waveEnd) {
-	IniFile.waveEnd += IniFile.wavePoints >> 2U;
-  }
-  IniFile.waveStart %= IniFile.wavePoints;
-  IniFile.waveEnd %= IniFile.wavePoints;
-}
-// ReSharper restore CppParameterMayBeConst
-
-// ReSharper disable CppParameterMayBeConst
-auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
-  UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) {
-	case WM_INITDIALOG: {
-	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-	  wavinit(hwndlg);
-	  break;
-	}
-	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) {
-		case IDCANCEL: {
-		  EndDialog(hwndlg, FALSE);
-		  return TRUE;
-		}
-		case IDOK:
-		  handleWaveIDOK(hwndlg);
-		  EndDialog(hwndlg, TRUE);
-		  break;
-		case IDC_DEFWAV: {
-		  IniFile.wavePoints = IWAVPNTS;
-		  IniFile.waveStart  = IWAVSTRT;
-		  IniFile.waveEnd    = IWAVEND;
-		  IniFile.waveLobes  = IWAVS;
-		  wavinit(hwndlg);
-		  break;
-		}
-		default: {
-		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
-		  break;
-		}
-	  }
-	  break;
-	}
-	default: {
-	  outDebugString(L"umsg [{}] not handled in wavprc\n", umsg);
-	  break;
-	}
-  }
-  return FALSE;
-}
-// ReSharper restore CppParameterMayBeConst
-
 void formForms::wavfrm() {
   thred::unmsg();
-  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, &ffi::wavprc);
+  if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, &wavprc);
       nResult <= 0) {
 	return;
   }

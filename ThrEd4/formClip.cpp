@@ -631,7 +631,7 @@ void unpclp() {
   }
 }
 
-} // namespace fci
+} // namespace
 
 auto tfc::getClipFormCount() noexcept -> uint32_t {
   return ClipFormsCount;
