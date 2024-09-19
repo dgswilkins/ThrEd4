@@ -96,7 +96,7 @@ void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint
                   .x = (Instance->StitchBuffer.operator[](source).x - BalaradOffset.x) * BALRATIO,
                   .y = (Instance->StitchBuffer.operator[](source).y - BalaradOffset.y) * BALRATIO});
 }
-} // namespace bali
+} // namespace
 
 auto bal::getBN0() noexcept -> fs::path* {
   return BalaradName0;
