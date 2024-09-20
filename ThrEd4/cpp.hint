@@ -5,3 +5,10 @@
 #define GSL_SUPPRESS(x) [[gsl::suppress("x")]]
 #define _DEBUG
 #define CALLBACK
+#define IDC_DESWID
+#define IDC_DESHI
+#define UNREFERENCED_PARAMETER(P) _Prefast_unreferenced_parameter_impl_("PREfast", ((void) (P), 0))
+#define UNREFERENCED_PARAMETER(P) (P)
+#define UNREFERENCED_PARAMETER(P) { (P) = (P); }
+#define TRUE
+#define IDS_NUMPNT
