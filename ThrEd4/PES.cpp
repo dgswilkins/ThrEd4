@@ -264,92 +264,77 @@ constexpr auto IPECFACT = 3.0F / 5.0F;       // inverse PEC format scale factor
 constexpr auto PECFACT  = 5.0F / 3.0F;       // PEC format scale factor
 constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value positive
 
-namespace pi {
-auto dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t;
-void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta);
-void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
-void pecImage(std::vector<uint8_t>& pecBuffer);
-void pecdat(std::vector<uint8_t>& buffer);
-void pecnam(gsl::span<char> const& label);
-auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
-void ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset);
-void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
-void ritpesCode(std::vector<uint8_t>& buffer);
-void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float srcY);
-void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
-} // namespace pi
-
+// PES internal namespace
 namespace {
 auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
-} // namespace
 
-static constexpr auto INDEX00 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
-static constexpr auto INDEX01 = THREAD {{.r = 0x1a, .g = 0x0a, .b = 0x94}, "Prussian Blue", "ETP007"};
-static constexpr auto INDEX02 = THREAD {{.r = 0x0f, .g = 0x75, .b = 0xff}, "Blue", "ETP405"};
-static constexpr auto INDEX03 = THREAD {{.r = 0x00, .g = 0x93, .b = 0x4c}, "Teal Green", "ETP534"};
-static constexpr auto INDEX04 = THREAD {{.r = 0xba, .g = 0xbd, .b = 0xfe}, "Corn Flower Blue", "ETP070"};
-static constexpr auto INDEX05 = THREAD {{.r = 0xec, .g = 0x00, .b = 0x00}, "Red", "ETP800"};
-static constexpr auto INDEX06 = THREAD {{.r = 0xe4, .g = 0x99, .b = 0x5a}, "Reddish Brown", "ETP337"};
-static constexpr auto INDEX07 = THREAD {{.r = 0xcc, .g = 0x48, .b = 0xab}, "Magenta", "ETP620"};
-static constexpr auto INDEX08 = THREAD {{.r = 0xfd, .g = 0xc4, .b = 0xfa}, "Light Lilac", "ETP810"};
-static constexpr auto INDEX09 = THREAD {{.r = 0xdd, .g = 0x84, .b = 0xcd}, "Lilac", "ETP612"};
-static constexpr auto INDEX10 = THREAD {{.r = 0x6b, .g = 0xd3, .b = 0x8a}, "Mint Green", "ETP502"};
-static constexpr auto INDEX11 = THREAD {{.r = 0xe4, .g = 0xa9, .b = 0x45}, "Deep Gold", "ETP214"};
-static constexpr auto INDEX12 = THREAD {{.r = 0xff, .g = 0xbd, .b = 0x42}, "Orange", "ETP208"};
-static constexpr auto INDEX13 = THREAD {{.r = 0xff, .g = 0xe6, .b = 0x00}, "Yellow", "ETP205"};
-static constexpr auto INDEX14 = THREAD {{.r = 0x6c, .g = 0xd9, .b = 0x00}, "Lime Green", "ETP513"};
-static constexpr auto INDEX15 = THREAD {{.r = 0xc1, .g = 0xa9, .b = 0x41}, "Brass", "ETP328"};
-static constexpr auto INDEX16 = THREAD {{.r = 0xb5, .g = 0xad, .b = 0x97}, "Silver", "ETP005"};
-static constexpr auto INDEX17 = THREAD {{.r = 0xba, .g = 0x9c, .b = 0x5f}, "Russet Brown", "ETP330"};
-static constexpr auto INDEX18 = THREAD {{.r = 0xfa, .g = 0xf5, .b = 0x9e}, "Cream Brown", "ETP010"};
-static constexpr auto INDEX19 = THREAD {{.r = 0x80, .g = 0x80, .b = 0x80}, "Pewter", "ETP704"};
-static constexpr auto INDEX20 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Black", "ETP900"};
-static constexpr auto INDEX21 = THREAD {{.r = 0x00, .g = 0x1c, .b = 0xdf}, "Ultramarine", "ETP406"};
-static constexpr auto INDEX22 = THREAD {{.r = 0xdf, .g = 0x00, .b = 0xb8}, "Royal Purple", "ETP869"};
-static constexpr auto INDEX23 = THREAD {{.r = 0x62, .g = 0x62, .b = 0x62}, "Dark Gray", "ETP707"};
-static constexpr auto INDEX24 = THREAD {{.r = 0x69, .g = 0x26, .b = 0x0d}, "Dark Brown", "ETP058"};
-static constexpr auto INDEX25 = THREAD {{.r = 0xff, .g = 0x00, .b = 0x60}, "Deep Rose", "ETP086"};
-static constexpr auto INDEX26 = THREAD {{.r = 0xbf, .g = 0x82, .b = 0x00}, "Light Brown", "ETP323"};
-static constexpr auto INDEX27 = THREAD {{.r = 0xf3, .g = 0x91, .b = 0x78}, "Salmon Pink", "ETP079"};
-static constexpr auto INDEX28 = THREAD {{.r = 0xff, .g = 0x68, .b = 0x05}, "Vermilion", "ETP030"};
-static constexpr auto INDEX29 = THREAD {{.r = 0xf0, .g = 0xf0, .b = 0xf0}, "White", "ETP001"};
-static constexpr auto INDEX30 = THREAD {{.r = 0xc8, .g = 0x32, .b = 0xcd}, "Violet", "ETP613"};
-static constexpr auto INDEX31 = THREAD {{.r = 0xb0, .g = 0xbf, .b = 0x9b}, "Seacrest", "ETP542"};
-static constexpr auto INDEX32 = THREAD {{.r = 0x65, .g = 0xbf, .b = 0xeb}, "Sky Blue", "ETP019"};
-static constexpr auto INDEX33 = THREAD {{.r = 0xff, .g = 0xba, .b = 0x04}, "Pumpkin", "ETP126"};
-static constexpr auto INDEX34 = THREAD {{.r = 0xff, .g = 0xf0, .b = 0x6c}, "Cream Yellow", "ETP010"};
-static constexpr auto INDEX35 = THREAD {{.r = 0xfe, .g = 0xca, .b = 0x15}, "Khaki", "ETP348"};
-static constexpr auto INDEX36 = THREAD {{.r = 0xf3, .g = 0x81, .b = 0x01}, "Clay Brown", "ETP339"};
-static constexpr auto INDEX37 = THREAD {{.r = 0x37, .g = 0xa9, .b = 0x23}, "Leaf Green", "ETP509"};
-static constexpr auto INDEX38 = THREAD {{.r = 0x23, .g = 0x46, .b = 0x5f}, "Peacock Blue", "ETP405"};
-static constexpr auto INDEX39 = THREAD {{.r = 0xa6, .g = 0xa6, .b = 0x95}, "Gray", "ETP707"};
-static constexpr auto INDEX40 = THREAD {{.r = 0xce, .g = 0xbf, .b = 0xa6}, "Warm Gray", "ETP399"};
-static constexpr auto INDEX41 = THREAD {{.r = 0x96, .g = 0xaa, .b = 0x02}, "Dark Olive", "ETP517"};
-static constexpr auto INDEX42 = THREAD {{.r = 0xff, .g = 0xe3, .b = 0xc6}, "Linen", "ETP307"};
-static constexpr auto INDEX43 = THREAD {{.r = 0xff, .g = 0x99, .b = 0xd7}, "Pink", "ETP085"};
-static constexpr auto INDEX44 = THREAD {{.r = 0x00, .g = 0x70, .b = 0x04}, "Deep Green", "ETP808"};
-static constexpr auto INDEX45 = THREAD {{.r = 0xed, .g = 0xcc, .b = 0xfb}, "Lavender", "ETP804"};
-static constexpr auto INDEX46 = THREAD {{.r = 0xc0, .g = 0x89, .b = 0xd8}, "Wisteria Violet", "ETP607"};
-static constexpr auto INDEX47 = THREAD {{.r = 0xe7, .g = 0xd9, .b = 0xb4}, "Beige", "ETP843"};
-static constexpr auto INDEX48 = THREAD {{.r = 0xe9, .g = 0x0e, .b = 0x86}, "Carmine", "ETP807"};
-static constexpr auto INDEX49 = THREAD {{.r = 0xcf, .g = 0x68, .b = 0x29}, "Amber Red", "ETP333"};
-static constexpr auto INDEX50 = THREAD {{.r = 0x40, .g = 0x86, .b = 0x15}, "Olive Green", "ETP519"};
-static constexpr auto INDEX51 = THREAD {{.r = 0xdb, .g = 0x17, .b = 0x97}, "Dark Fuchsia", "ETP107"};
-static constexpr auto INDEX52 = THREAD {{.r = 0xff, .g = 0xa7, .b = 0x04}, "Tangerine", "ETP209"};
-static constexpr auto INDEX53 = THREAD {{.r = 0xb9, .g = 0xff, .b = 0xff}, "Light Blue", "ETP017"};
-static constexpr auto INDEX54 = THREAD {{.r = 0x22, .g = 0x89, .b = 0x27}, "Emerald Green", "ETP507"};
-static constexpr auto INDEX55 = THREAD {{.r = 0xb6, .g = 0x12, .b = 0xcd}, "Purple", "ETP614"};
-static constexpr auto INDEX56 = THREAD {{.r = 0x00, .g = 0xaa, .b = 0x00}, "Moss Green", "ETP515"};
-static constexpr auto INDEX57 = THREAD {{.r = 0xfe, .g = 0xa9, .b = 0xdc}, "Flesh Pink", "ETP124"};
-static constexpr auto INDEX58 = THREAD {{.r = 0xfe, .g = 0xd5, .b = 0x10}, "Harvest Gold", "ETP206"};
-static constexpr auto INDEX59 = THREAD {{.r = 0x00, .g = 0x97, .b = 0xdf}, "Electric Blue", "ETP420"};
-static constexpr auto INDEX60 = THREAD {{.r = 0xff, .g = 0xff, .b = 0x84}, "Lemon Yellow", "ETP205"};
-static constexpr auto INDEX61 = THREAD {{.r = 0xcf, .g = 0xe7, .b = 0x74}, "Fresh Green", "ETP027"};
-static constexpr auto INDEX62 = THREAD {{.r = 0xff, .g = 0xc8, .b = 0x64}, "Applique Material", ""};
-static constexpr auto INDEX63 = THREAD {{.r = 0xff, .g = 0xc8, .b = 0xc8}, "Applique Position", ""};
-static constexpr auto INDEX64 = THREAD {{.r = 0xff, .g = 0xc8, .b = 0xc8}, "Applique", ""};
+constexpr auto INDEX00        = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
+constexpr auto INDEX01 = THREAD {{.r = 0x1a, .g = 0x0a, .b = 0x94}, "Prussian Blue", "ETP007"};
+constexpr auto INDEX02 = THREAD {{.r = 0x0f, .g = 0x75, .b = 0xff}, "Blue", "ETP405"};
+constexpr auto INDEX03 = THREAD {{.r = 0x00, .g = 0x93, .b = 0x4c}, "Teal Green", "ETP534"};
+constexpr auto INDEX04 = THREAD {{.r = 0xba, .g = 0xbd, .b = 0xfe}, "Corn Flower Blue", "ETP070"};
+constexpr auto INDEX05 = THREAD {{.r = 0xec, .g = 0x00, .b = 0x00}, "Red", "ETP800"};
+constexpr auto INDEX06 = THREAD {{.r = 0xe4, .g = 0x99, .b = 0x5a}, "Reddish Brown", "ETP337"};
+constexpr auto INDEX07 = THREAD {{.r = 0xcc, .g = 0x48, .b = 0xab}, "Magenta", "ETP620"};
+constexpr auto INDEX08 = THREAD {{.r = 0xfd, .g = 0xc4, .b = 0xfa}, "Light Lilac", "ETP810"};
+constexpr auto INDEX09 = THREAD {{.r = 0xdd, .g = 0x84, .b = 0xcd}, "Lilac", "ETP612"};
+constexpr auto INDEX10 = THREAD {{.r = 0x6b, .g = 0xd3, .b = 0x8a}, "Mint Green", "ETP502"};
+constexpr auto INDEX11 = THREAD {{.r = 0xe4, .g = 0xa9, .b = 0x45}, "Deep Gold", "ETP214"};
+constexpr auto INDEX12 = THREAD {{.r = 0xff, .g = 0xbd, .b = 0x42}, "Orange", "ETP208"};
+constexpr auto INDEX13 = THREAD {{.r = 0xff, .g = 0xe6, .b = 0x00}, "Yellow", "ETP205"};
+constexpr auto INDEX14 = THREAD {{.r = 0x6c, .g = 0xd9, .b = 0x00}, "Lime Green", "ETP513"};
+constexpr auto INDEX15 = THREAD {{.r = 0xc1, .g = 0xa9, .b = 0x41}, "Brass", "ETP328"};
+constexpr auto INDEX16 = THREAD {{.r = 0xb5, .g = 0xad, .b = 0x97}, "Silver", "ETP005"};
+constexpr auto INDEX17 = THREAD {{.r = 0xba, .g = 0x9c, .b = 0x5f}, "Russet Brown", "ETP330"};
+constexpr auto INDEX18 = THREAD {{.r = 0xfa, .g = 0xf5, .b = 0x9e}, "Cream Brown", "ETP010"};
+constexpr auto INDEX19 = THREAD {{.r = 0x80, .g = 0x80, .b = 0x80}, "Pewter", "ETP704"};
+constexpr auto INDEX20 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Black", "ETP900"};
+constexpr auto INDEX21 = THREAD {{.r = 0x00, .g = 0x1c, .b = 0xdf}, "Ultramarine", "ETP406"};
+constexpr auto INDEX22 = THREAD {{.r = 0xdf, .g = 0x00, .b = 0xb8}, "Royal Purple", "ETP869"};
+constexpr auto INDEX23 = THREAD {{.r = 0x62, .g = 0x62, .b = 0x62}, "Dark Gray", "ETP707"};
+constexpr auto INDEX24 = THREAD {{.r = 0x69, .g = 0x26, .b = 0x0d}, "Dark Brown", "ETP058"};
+constexpr auto INDEX25 = THREAD {{.r = 0xff, .g = 0x00, .b = 0x60}, "Deep Rose", "ETP086"};
+constexpr auto INDEX26 = THREAD {{.r = 0xbf, .g = 0x82, .b = 0x00}, "Light Brown", "ETP323"};
+constexpr auto INDEX27 = THREAD {{.r = 0xf3, .g = 0x91, .b = 0x78}, "Salmon Pink", "ETP079"};
+constexpr auto INDEX28 = THREAD {{.r = 0xff, .g = 0x68, .b = 0x05}, "Vermilion", "ETP030"};
+constexpr auto INDEX29 = THREAD {{.r = 0xf0, .g = 0xf0, .b = 0xf0}, "White", "ETP001"};
+constexpr auto INDEX30 = THREAD {{.r = 0xc8, .g = 0x32, .b = 0xcd}, "Violet", "ETP613"};
+constexpr auto INDEX31 = THREAD {{.r = 0xb0, .g = 0xbf, .b = 0x9b}, "Seacrest", "ETP542"};
+constexpr auto INDEX32 = THREAD {{.r = 0x65, .g = 0xbf, .b = 0xeb}, "Sky Blue", "ETP019"};
+constexpr auto INDEX33 = THREAD {{.r = 0xff, .g = 0xba, .b = 0x04}, "Pumpkin", "ETP126"};
+constexpr auto INDEX34 = THREAD {{.r = 0xff, .g = 0xf0, .b = 0x6c}, "Cream Yellow", "ETP010"};
+constexpr auto INDEX35 = THREAD {{.r = 0xfe, .g = 0xca, .b = 0x15}, "Khaki", "ETP348"};
+constexpr auto INDEX36 = THREAD {{.r = 0xf3, .g = 0x81, .b = 0x01}, "Clay Brown", "ETP339"};
+constexpr auto INDEX37 = THREAD {{.r = 0x37, .g = 0xa9, .b = 0x23}, "Leaf Green", "ETP509"};
+constexpr auto INDEX38 = THREAD {{.r = 0x23, .g = 0x46, .b = 0x5f}, "Peacock Blue", "ETP405"};
+constexpr auto INDEX39 = THREAD {{.r = 0xa6, .g = 0xa6, .b = 0x95}, "Gray", "ETP707"};
+constexpr auto INDEX40 = THREAD {{.r = 0xce, .g = 0xbf, .b = 0xa6}, "Warm Gray", "ETP399"};
+constexpr auto INDEX41 = THREAD {{.r = 0x96, .g = 0xaa, .b = 0x02}, "Dark Olive", "ETP517"};
+constexpr auto INDEX42 = THREAD {{.r = 0xff, .g = 0xe3, .b = 0xc6}, "Linen", "ETP307"};
+constexpr auto INDEX43 = THREAD {{.r = 0xff, .g = 0x99, .b = 0xd7}, "Pink", "ETP085"};
+constexpr auto INDEX44 = THREAD {{.r = 0x00, .g = 0x70, .b = 0x04}, "Deep Green", "ETP808"};
+constexpr auto INDEX45 = THREAD {{.r = 0xed, .g = 0xcc, .b = 0xfb}, "Lavender", "ETP804"};
+constexpr auto INDEX46 = THREAD {{.r = 0xc0, .g = 0x89, .b = 0xd8}, "Wisteria Violet", "ETP607"};
+constexpr auto INDEX47 = THREAD {{.r = 0xe7, .g = 0xd9, .b = 0xb4}, "Beige", "ETP843"};
+constexpr auto INDEX48 = THREAD {{.r = 0xe9, .g = 0x0e, .b = 0x86}, "Carmine", "ETP807"};
+constexpr auto INDEX49 = THREAD {{.r = 0xcf, .g = 0x68, .b = 0x29}, "Amber Red", "ETP333"};
+constexpr auto INDEX50 = THREAD {{.r = 0x40, .g = 0x86, .b = 0x15}, "Olive Green", "ETP519"};
+constexpr auto INDEX51 = THREAD {{.r = 0xdb, .g = 0x17, .b = 0x97}, "Dark Fuchsia", "ETP107"};
+constexpr auto INDEX52 = THREAD {{.r = 0xff, .g = 0xa7, .b = 0x04}, "Tangerine", "ETP209"};
+constexpr auto INDEX53 = THREAD {{.r = 0xb9, .g = 0xff, .b = 0xff}, "Light Blue", "ETP017"};
+constexpr auto INDEX54 = THREAD {{.r = 0x22, .g = 0x89, .b = 0x27}, "Emerald Green", "ETP507"};
+constexpr auto INDEX55 = THREAD {{.r = 0xb6, .g = 0x12, .b = 0xcd}, "Purple", "ETP614"};
+constexpr auto INDEX56 = THREAD {{.r = 0x00, .g = 0xaa, .b = 0x00}, "Moss Green", "ETP515"};
+constexpr auto INDEX57 = THREAD {{.r = 0xfe, .g = 0xa9, .b = 0xdc}, "Flesh Pink", "ETP124"};
+constexpr auto INDEX58 = THREAD {{.r = 0xfe, .g = 0xd5, .b = 0x10}, "Harvest Gold", "ETP206"};
+constexpr auto INDEX59 = THREAD {{.r = 0x00, .g = 0x97, .b = 0xdf}, "Electric Blue", "ETP420"};
+constexpr auto INDEX60 = THREAD {{.r = 0xff, .g = 0xff, .b = 0x84}, "Lemon Yellow", "ETP205"};
+constexpr auto INDEX61 = THREAD {{.r = 0xcf, .g = 0xe7, .b = 0x74}, "Fresh Green", "ETP027"};
+constexpr auto INDEX62 = THREAD {{.r = 0xff, .g = 0xc8, .b = 0x64}, "Applique Material", ""};
+constexpr auto INDEX63 = THREAD {{.r = 0xff, .g = 0xc8, .b = 0xc8}, "Applique Position", ""};
+constexpr auto INDEX64 = THREAD {{.r = 0xff, .g = 0xc8, .b = 0xc8}, "Applique", ""};
 
-static constexpr auto PES_THREAD = std::array {
+constexpr auto PES_THREAD = std::array {
     INDEX00, INDEX01, INDEX02, INDEX03, INDEX04, INDEX05, INDEX06, INDEX07, INDEX08, INDEX09,
     INDEX10, INDEX11, INDEX12, INDEX13, INDEX14, INDEX15, INDEX16, INDEX17, INDEX18, INDEX19,
     INDEX20, INDEX21, INDEX22, INDEX23, INDEX24, INDEX25, INDEX26, INDEX27, INDEX28, INDEX29,
@@ -361,7 +346,7 @@ static constexpr auto PES_THREAD = std::array {
 constexpr auto THTYPCNT = PES_THREAD.size(); // Count of thread colors available in the PES format
 
 // clang-format off
-static constexpr auto IMAGE_WITH_FRAME = imgArray{{ 
+constexpr auto IMAGE_WITH_FRAME = imgArray{{ 
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
 	{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
@@ -403,67 +388,43 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 }};
 // clang-format on
 
-auto pi::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-  auto color = PEC_COLOR {
-      .r = GetRValue(referenceColor), .g = GetGValue(referenceColor), .b = GetBValue(referenceColor)};
-  auto const& translatedColor = PES_THREAD.at(colorIndex).getColor();
-  auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
-  auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
-  auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
-  auto const deltaB = gsl::narrow_cast<int32_t>(color.b) - gsl::narrow_cast<int32_t>(translatedColor.b);
-  // NOLINTBEGIN(readability-magic-numbers)
-  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NO LINTNEXTLINE(readability-magic-numbers)
-  return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + (4 * deltaG * deltaG) +
-                                         (((767 - meanR) * deltaB * deltaB) / 256)));
-  // NOLINTEND(readability-magic-numbers)
-}
+// Definitions
+auto dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t;
+void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta);
+void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
+void pecImage(std::vector<uint8_t>& pecBuffer);
+void pecdat(std::vector<uint8_t>& buffer);
+void pecnam(gsl::span<char> const& label);
+auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
+void ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset);
+void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
+void ritpesCode(std::vector<uint8_t>& buffer);
+void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float srcY);
+void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 
-void pi::ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset) {
-  auto const oldSize = buffer.size();
-  buffer.resize(oldSize + sizeof(PESTCH));
-  auto* pesStitch = convertFromPtr<PESTCH*>(&buffer[oldSize]);
-  if (nullptr == pesStitch) {
-	throw std::runtime_error("Failed to convert PESTCH pointer");
+// Functions
+auto dupcol(gsl::span<uint8_t> const& pesColors, uint32_t const activeColor, uint32_t& index) -> uint32_t {
+  auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
+  auto const  color       = threadColor.getRGB();
+  auto        iUserColor  = UserColor.cbegin();
+  for (auto iColor = 0U; iColor < activeColor; ++iColor) {
+	if (*iUserColor == color) {
+	  return iColor;
+	}
+	++iUserColor;
   }
-  auto const scaledStitch =
-      F_POINT {(-stitch.x * IPECFACT) + offset.x, (stitch.y * IPECFACT) - offset.y};
-  *pesStitch = scaledStitch;
-}
-
-void pi::ritpesCode(std::vector<uint8_t>& buffer) {
-  constexpr auto ENDCODE = uint16_t {0x8003U}; // Block end code
-  auto const     oldSize = buffer.size();
-  buffer.resize(oldSize + sizeof(uint16_t));
-  if (auto* contCode = convertFromPtr<uint16_t*>(&buffer[oldSize]); contCode != nullptr) {
-	*contCode = ENDCODE;
+  auto minimumDistance = BIGUINT;
+  auto matchIndex      = 0U;
+  for (auto iColor = 1U; iColor < activeColor; ++iColor) {
+	if (auto const matchDistance = pesmtch(color, pesColors[iColor]); matchDistance < minimumDistance) {
+	  minimumDistance = matchDistance;
+	  matchIndex      = iColor;
+	}
   }
+  return matchIndex;
 }
 
-void pi::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST const newBlock) {
-  auto const oldSize = buffer.size();
-  buffer.resize(oldSize + sizeof(PESSTCHLST));
-  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&buffer[oldSize]);
-  *blockHeader      = newBlock;
-}
-
-// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
-#pragma warning(push)
-#pragma warning(disable : 4996)
-// ReSharper disable CppDeprecatedEntity
-void pi::pecnam(gsl::span<char> const& label) {
-  strncpy(label.data(), "LA:", 3);
-  auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
-  auto       fileStem = utf::utf16ToUtf8(Instance->AuxName.stem());
-  if (fileStem.size() < lblSize) {
-	fileStem += std::string(lblSize - fileStem.size(), ' ');
-  }
-  auto* ptr = std::next(label.data(), 3U);
-  strncpy(ptr, fileStem.c_str(), lblSize);
-}
-// ReSharper restore CppDeprecatedEntity
-#pragma warning(pop)
-
-void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t const delta) {
+void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t const delta) {
   constexpr auto MSK11BIT  = uint32_t {0x7FFU}; // used to mask the value to 11 bits
   auto           outputVal = gsl::narrow_cast<uint32_t>(std::abs(delta)) & MSK11BIT;
   if (delta < 0) {
@@ -478,28 +439,7 @@ void pi::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t const delta) {
   buffer.push_back(lowerByte);
 }
 
-void pi::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float const srcX, float const srcY) {
-  constexpr auto DELTAMAX = int32_t {63};  // maximum value of the delta
-  constexpr auto DELTAMIN = int32_t {-64}; // minimum value of the delta
-
-  auto const deltaX = std::lround(srcX * PECFACT);
-  auto const deltaY = -std::lround(srcY * PECFACT);
-  if (deltaX < DELTAMAX && deltaX > DELTAMIN && deltaY < DELTAMAX && deltaY > DELTAMIN) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto const xVal = gsl::narrow<uint8_t>(deltaX & MSK7BITS);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto const yVal = gsl::narrow<uint8_t>(deltaY & MSK7BITS);
-	buffer.push_back(xVal);
-	buffer.push_back(yVal);
-  }
-  else {
-	pecEncodeInt(buffer, deltaX);
-	pecEncodeInt(buffer, deltaY);
-  }
-  thisStitch += F_POINT {deltaX, -deltaY} * IPECFACT;
-}
-
-void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t const val) {
+void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t const val) {
   // NOLINTBEGIN(readability-magic-numbers)
   buffer.push_back(0xfe);
   buffer.push_back(0xb0);
@@ -507,51 +447,7 @@ void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t const val) {
   // NOLINTEND(readability-magic-numbers)
 }
 
-void pi::pecdat(std::vector<uint8_t>& buffer) {
-  auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
-  auto  thisStitch = F_POINT {};
-  rpcrd(buffer, thisStitch, Instance->StitchBuffer.front().x, Instance->StitchBuffer.front().y);
-  auto iColor     = 1U;
-  auto color      = Instance->StitchBuffer.front().attribute & COLMSK;
-  auto iPEC       = wrap::next(PESequivColors.begin(), color);
-  auto iPesColors = pecHeader->pad.begin();
-  *iPesColors++   = *iPEC;
-  for (auto const  stitchRange = std::ranges::subrange(std::next(Instance->StitchBuffer.begin()),
-                                                      Instance->StitchBuffer.end());
-       auto const& stitch : stitchRange) {
-	if ((stitch.attribute & COLMSK) != color) {
-	  color = stitch.attribute & COLMSK;
-	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
-	  iPEC          = wrap::next(PESequivColors.begin(), color);
-	  *iPesColors++ = *iPEC;
-	  ++iColor;
-	}
-	auto const xDelta = stitch.x - thisStitch.x;
-	auto const yDelta = stitch.y - thisStitch.y;
-	rpcrd(buffer, thisStitch, xDelta, yDelta);
-  }
-  // add the end marker
-  // NOLINTBEGIN(readability-magic-numbers)
-  buffer.push_back(0xffU);
-  buffer.push_back(0x00U);
-  // NOLINTEND(readability-magic-numbers)
-}
-
-void pi::writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image) {
-  for (auto const& imageRow : image) {
-	auto const& iRow = imageRow;
-	for (auto iPixel = iRow.begin(); iPixel != iRow.end();) {
-	  auto output = uint8_t {};
-	  for (auto bitPosition = 0U; bitPosition < BTSPBYTE; ++bitPosition) {
-		output |= gsl::narrow_cast<uint8_t>(*iPixel << bitPosition);
-		++iPixel;
-	  }
-	  buffer.push_back(output);
-	}
-  }
-}
-
-void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
+void pecImage(std::vector<uint8_t>& pecBuffer) {
   auto       thumbnail = IMAGE_WITH_FRAME;
   auto const yFactor   = 31.0F / IniFile.hoopSizeY;
   auto const xFactor   = 40.0F / IniFile.hoopSizeX;
@@ -587,26 +483,132 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   writeThumbnail(pecBuffer, thumbnail);
 }
 
-auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t const activeColor, uint32_t& index) -> uint32_t {
-  auto const& threadColor = PES_THREAD.at(pesColors[index++] % THTYPCNT);
-  auto const  color       = threadColor.getRGB();
-  auto        iUserColor  = UserColor.cbegin();
-  for (auto iColor = 0U; iColor < activeColor; ++iColor) {
-	if (*iUserColor == color) {
-	  return iColor;
+void pecdat(std::vector<uint8_t>& buffer) {
+  auto* pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
+  auto  thisStitch = F_POINT {};
+  rpcrd(buffer, thisStitch, Instance->StitchBuffer.front().x, Instance->StitchBuffer.front().y);
+  auto iColor     = 1U;
+  auto color      = Instance->StitchBuffer.front().attribute & COLMSK;
+  auto iPEC       = wrap::next(PESequivColors.begin(), color);
+  auto iPesColors = pecHeader->pad.begin();
+  *iPesColors++   = *iPEC;
+  for (auto const  stitchRange = std::ranges::subrange(std::next(Instance->StitchBuffer.begin()),
+                                                      Instance->StitchBuffer.end());
+       auto const& stitch : stitchRange) {
+	if ((stitch.attribute & COLMSK) != color) {
+	  color = stitch.attribute & COLMSK;
+	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
+	  iPEC          = wrap::next(PESequivColors.begin(), color);
+	  *iPesColors++ = *iPEC;
+	  ++iColor;
 	}
-	++iUserColor;
+	auto const xDelta = stitch.x - thisStitch.x;
+	auto const yDelta = stitch.y - thisStitch.y;
+	rpcrd(buffer, thisStitch, xDelta, yDelta);
   }
-  auto minimumDistance = BIGUINT;
-  auto matchIndex      = 0U;
-  for (auto iColor = 1U; iColor < activeColor; ++iColor) {
-	if (auto const matchDistance = pesmtch(color, pesColors[iColor]); matchDistance < minimumDistance) {
-	  minimumDistance = matchDistance;
-	  matchIndex      = iColor;
-	}
-  }
-  return matchIndex;
+  // add the end marker
+  // NOLINTBEGIN(readability-magic-numbers)
+  buffer.push_back(0xffU);
+  buffer.push_back(0x00U);
+  // NOLINTEND(readability-magic-numbers)
 }
+
+// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
+#pragma warning(push)
+#pragma warning(disable : 4996)
+// ReSharper disable CppDeprecatedEntity
+void pecnam(gsl::span<char> const& label) {
+  strncpy(label.data(), "LA:", 3);
+  auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
+  auto       fileStem = utf::utf16ToUtf8(Instance->AuxName.stem());
+  if (fileStem.size() < lblSize) {
+	fileStem += std::string(lblSize - fileStem.size(), ' ');
+  }
+  auto* ptr = std::next(label.data(), 3U);
+  strncpy(ptr, fileStem.c_str(), lblSize);
+}
+// ReSharper restore CppDeprecatedEntity
+#pragma warning(pop)
+
+auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
+  auto color = PEC_COLOR {
+      .r = GetRValue(referenceColor), .g = GetGValue(referenceColor), .b = GetBValue(referenceColor)};
+  auto const& translatedColor = PES_THREAD.at(colorIndex).getColor();
+  auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
+  auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
+  auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
+  auto const deltaB = gsl::narrow_cast<int32_t>(color.b) - gsl::narrow_cast<int32_t>(translatedColor.b);
+  // NOLINTBEGIN(readability-magic-numbers)
+  // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula NO LINTNEXTLINE(readability-magic-numbers)
+  return wrap::round<uint32_t>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + (4 * deltaG * deltaG) +
+                                         (((767 - meanR) * deltaB * deltaB) / 256)));
+  // NOLINTEND(readability-magic-numbers)
+}
+
+void ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset) {
+  auto const oldSize = buffer.size();
+  buffer.resize(oldSize + sizeof(PESTCH));
+  auto* pesStitch = convertFromPtr<PESTCH*>(&buffer[oldSize]);
+  if (nullptr == pesStitch) {
+	throw std::runtime_error("Failed to convert PESTCH pointer");
+  }
+  auto const scaledStitch =
+      F_POINT {(-stitch.x * IPECFACT) + offset.x, (stitch.y * IPECFACT) - offset.y};
+  *pesStitch = scaledStitch;
+}
+
+void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST const newBlock) {
+  auto const oldSize = buffer.size();
+  buffer.resize(oldSize + sizeof(PESSTCHLST));
+  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&buffer[oldSize]);
+  *blockHeader      = newBlock;
+}
+
+void ritpesCode(std::vector<uint8_t>& buffer) {
+  constexpr auto ENDCODE = uint16_t {0x8003U}; // Block end code
+  auto const     oldSize = buffer.size();
+  buffer.resize(oldSize + sizeof(uint16_t));
+  if (auto* contCode = convertFromPtr<uint16_t*>(&buffer[oldSize]); contCode != nullptr) {
+	*contCode = ENDCODE;
+  }
+}
+
+void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float const srcX, float const srcY) {
+  constexpr auto DELTAMAX = int32_t {63};  // maximum value of the delta
+  constexpr auto DELTAMIN = int32_t {-64}; // minimum value of the delta
+
+  auto const deltaX = std::lround(srcX * PECFACT);
+  auto const deltaY = -std::lround(srcY * PECFACT);
+  if (deltaX < DELTAMAX && deltaX > DELTAMIN && deltaY < DELTAMAX && deltaY > DELTAMIN) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	auto const xVal = gsl::narrow<uint8_t>(deltaX & MSK7BITS);
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	auto const yVal = gsl::narrow<uint8_t>(deltaY & MSK7BITS);
+	buffer.push_back(xVal);
+	buffer.push_back(yVal);
+  }
+  else {
+	pecEncodeInt(buffer, deltaX);
+	pecEncodeInt(buffer, deltaY);
+  }
+  thisStitch += F_POINT {deltaX, -deltaY} * IPECFACT;
+}
+
+void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image) {
+  for (auto const& imageRow : image) {
+	auto const& iRow = imageRow;
+	for (auto iPixel = iRow.begin(); iPixel != iRow.end();) {
+	  auto output = uint8_t {};
+	  for (auto bitPosition = 0U; bitPosition < BTSPBYTE; ++bitPosition) {
+		output |= gsl::narrow_cast<uint8_t>(*iPixel << bitPosition);
+		++iPixel;
+	  }
+	  buffer.push_back(output);
+	}
+  }
+}
+
+} // namespace
 
 auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto fileSize = uintmax_t {};
@@ -709,7 +711,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	}
 	// check for color change NOLINTNEXTLINE(readability-magic-numbers)
 	if (pesStitches[iPESstitch] == 0xfe && pesStitches[iPESstitch + 1U] == 0xb0) {
-	  color = pi::dupcol(pesColors, wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
+	  color = dupcol(pesColors, wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
 	  iPESstitch += 2;
 	}
 	else {
@@ -799,7 +801,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  auto matchIndex = 0U;
 	  auto matchMin   = BIGUINT;
 	  for (auto iColorMatch = 1U; iColorMatch < THTYPCNT; ++iColorMatch) {
-		if (auto const match = pi::pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch)); match < matchMin) {
+		if (auto const match = pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch)); match < matchMin) {
 		  matchIndex = iColorMatch;
 		  matchMin   = match;
 		}
@@ -834,38 +836,38 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   threadList.emplace_back(blockIndex, currentColor);
   pesBuffer.resize(sizeof(PESSTCHLST));
   // first block is a jump in place
-  pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
+  ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
   ++blockIndex;
-  pi::ritpes(pesBuffer, saveStitches[0], offset);
-  pi::ritpes(pesBuffer, saveStitches[0], offset);
-  pi::ritpesCode(pesBuffer);
+  ritpes(pesBuffer, saveStitches[0], offset);
+  ritpes(pesBuffer, saveStitches[0], offset);
+  ritpesCode(pesBuffer);
   // then a normal stitch in place
-  pi::ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 2});
+  ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 2});
   ++blockIndex;
-  pi::ritpes(pesBuffer, saveStitches[0], offset);
-  pi::ritpes(pesBuffer, saveStitches[0], offset);
-  pi::ritpesCode(pesBuffer);
+  ritpes(pesBuffer, saveStitches[0], offset);
+  ritpes(pesBuffer, saveStitches[0], offset);
+  ritpesCode(pesBuffer);
   // then a jump to the first location
-  pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
+  ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
   ++blockIndex;
-  pi::ritpes(pesBuffer, saveStitches[0], offset);
-  pi::ritpes(pesBuffer, saveStitches[1], offset);
-  pi::ritpesCode(pesBuffer);
+  ritpes(pesBuffer, saveStitches[0], offset);
+  ritpes(pesBuffer, saveStitches[1], offset);
+  ritpesCode(pesBuffer);
   // now stitch out.
   auto pesThreadCount = 0U;
   auto lastIndex      = pesBuffer.size();
-  pi::ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 0});
+  ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 0});
   ++blockIndex;
   auto stitchCount = 0U;
   for (auto iStitch = 1U; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
 	if (stitchColor == (Instance->StitchBuffer.operator[](iStitch).attribute & COLMSK)) {
 	  // we are in the same color block, so write the stitch
-	  pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
+	  ritpes(pesBuffer, saveStitches[iStitch], offset);
 	  ++stitchCount;
 	}
 	else {
 	  // write stitch
-	  pi::ritpesCode(pesBuffer);
+	  ritpesCode(pesBuffer);
 	  // close out the previous block
 	  auto* blockHeader = convertFromPtr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 	  if (nullptr == blockHeader) {
@@ -879,18 +881,18 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  currentColor    = *iPESequivColors;
 	  threadList.emplace_back(blockIndex, currentColor);
 	  // then create the jump block
-	  pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
+	  ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
 	  ++blockIndex;
 	  auto const prevStitch = iStitch - 1U;
-	  pi::ritpes(pesBuffer, saveStitches[prevStitch], offset);
-	  pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
-	  pi::ritpesCode(pesBuffer);
+	  ritpes(pesBuffer, saveStitches[prevStitch], offset);
+	  ritpes(pesBuffer, saveStitches[iStitch], offset);
+	  ritpesCode(pesBuffer);
 	  // and finally start the next block
 	  stitchCount = 0U;
 	  lastIndex   = pesBuffer.size();
-	  pi::ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 0});
+	  ritpesBlock(pesBuffer, PESSTCHLST {0, currentColor, 0});
 	  ++blockIndex;
-	  pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
+	  ritpes(pesBuffer, saveStitches[iStitch], offset);
 	  ++stitchCount;
 	}
   }
@@ -959,7 +961,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
   auto*      pecHeader = convertFromPtr<PECHDR*>(pecBuffer.data());
   auto const spPHL     = gsl::span {pecHeader->label};
-  pi::pecnam(spPHL);
+  pecnam(spPHL);
   auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
   auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
   std::fill(fstart, fend, ' ');
@@ -970,7 +972,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pecHeader->hnd1        = 0x00ff;
   pecHeader->thumbHeight = THUMBHGT;
   pecHeader->thumbWidth  = THUMBWID / BTSPBYTE;
-  pi::pecdat(pecBuffer);
+  pecdat(pecBuffer);
   auto* pecHeader2            = convertFromPtr<PECHDR2*>(&pecBuffer[sizeof(PECHDR)]);
   pecHeader2->unknown1        = 0;
   pecHeader2->thumbnailOffset = gsl::narrow<uint16_t>(pecBuffer.size() - sizeof(PECHDR));
@@ -995,7 +997,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
                      gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt & LOWBMASK) << PECSHIFT);
   pecHeader2->yMin = gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt & HIGHBMSK) >> PECSHIFT) |
                      gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt & LOWBMASK) << PECSHIFT);
-  pi::pecImage(pecBuffer);
+  pecImage(pecBuffer);
   if (FALSE == WriteFile(fileHandle, pecBuffer.data(), wrap::toUnsigned(pecBuffer.size()), &bytesWritten, nullptr)) {
 	displayText::riter();
 	CloseHandle(fileHandle);
