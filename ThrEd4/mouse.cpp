@@ -56,6 +56,7 @@
 #include <string>
 #include <vector>
 
+// mouse internal namespace
 namespace {
 // cursors
 auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
@@ -68,9 +69,7 @@ auto NeedleRightDownCursor = gsl::narrow_cast<HCURSOR>(nullptr); // right down n
 auto ArrowCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // arrow
 auto CrossCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // cross
 
-} // namespace
-
-namespace mi {
+// Definitions
 auto chkok() noexcept -> bool;
 auto finrng(uint32_t find) noexcept -> bool;
 void moveForms();
@@ -80,13 +79,13 @@ constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 void rngal();
 void unmov();
 void updateCursor();
-} // namespace mi
 
-auto mi::chkok() noexcept -> bool {
+// Functions
+auto chkok() noexcept -> bool {
   return thred::chkwnd(OKButton);
 }
 
-auto mi::finrng(uint32_t const find) noexcept -> bool {
+auto finrng(uint32_t const find) noexcept -> bool {
   auto const& formList = Instance->FormList;
 
   if (auto const& rectFind = formList.operator[](find).rectangle;
@@ -102,11 +101,57 @@ auto mi::finrng(uint32_t const find) noexcept -> bool {
   return cod == 0U || ActiveLayer == cod;
 }
 
-constexpr auto mi::nxtcrnr(uint32_t const corner) -> uint32_t {
+void moveForms() {
+  auto const point =
+      POINT {WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x - SelectedFormsRect.left,
+             WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
+  form::ratsr();
+  FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
+
+  auto& formList = Instance->FormList;
+  if (Instance->StateMap.test(StateFlag::FPSEL)) { // moving a group of form points
+	// clang-format off
+	  auto&      form            = formList.operator[](ClosestFormToCursor);
+	  auto       iSelectedVertex = SelectedFormVertices.start;
+	  auto const itVertex        = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+	// clang-format on
+	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
+	  auto const thisIt = wrap::next(itVertex, iSelectedVertex);
+	  *thisIt += FormMoveDelta;
+	  iSelectedVertex = form::pdir(form, iSelectedVertex);
+	}
+	thred::setpsel();
+	form.outline();
+	form::refil(ClosestFormToCursor);
+	Instance->StateMap.set(StateFlag::RESTCH);
+  }
+  else {
+	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+	  thred::savdo();
+	  for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
+		form::frmadj(iForm);
+	  }
+	  for (auto& stitch : Instance->StitchBuffer) {
+		stitch += FormMoveDelta;
+	  }
+	  form::selal();
+	}
+	else {
+	  thred::savdo();
+	  for (auto const selectedForm : Instance->SelectedFormList) {
+		form::frmadj(selectedForm);
+	  }
+	  form::frmsadj();
+	  Instance->StateMap.set(StateFlag::RESTCH);
+	}
+  }
+}
+
+constexpr auto nxtcrnr(uint32_t const corner) -> uint32_t {
   return (corner + 1U) & 3U;
 }
 
-void mi::rngal() {
+void rngal() {
   if (Instance->StateMap.testAndReset(StateFlag::WASFPNT)) {
 	return;
   }
@@ -151,11 +196,45 @@ void mi::rngal() {
   thred::gotbox();
 }
 
-void mi::unmov() {
+void unmov() {
   if (Instance->StateMap.testAndReset(StateFlag::SHOMOV)) {
 	thred::ritmov(ClosestFormToCursor);
   }
 }
+
+void updateCursor() {
+  if (UserFlagMap->test(UserFlag::NEDOF)) {
+	wrap::setCursor(CrossCursor);
+  }
+  else {
+	if (Instance->StateMap.test(StateFlag::LIN1)) {
+	  wrap::setCursor(NeedleUpCursor);
+	}
+	else {
+	  if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).x >
+	      Instance->StitchBuffer.operator[](ClosestPointIndex).x) {
+		if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
+		    Instance->StitchBuffer.operator[](ClosestPointIndex).y) {
+		  wrap::setCursor(NeedleLeftUpCursor);
+		}
+		else {
+		  wrap::setCursor(NeedleLeftDownCursor);
+		}
+	  }
+	  else {
+		if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
+		    Instance->StitchBuffer.operator[](ClosestPointIndex).y) {
+		  wrap::setCursor(NeedleRightUpCursor);
+		}
+		else {
+		  wrap::setCursor(NeedleRightDownCursor);
+		}
+	  }
+	}
+  }
+}
+
+} // namespace
 
 auto mouse::getArrowCursor() noexcept -> HCURSOR {
   return ArrowCursor;
@@ -189,7 +268,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	GetWindowRect(FormDataSheet, &formDataRect);
   }
   if (Instance->StateMap.testAndReset(StateFlag::THUMON)) {
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::save();
 	  thred::thumbak();
 	  thred::unmsg();
@@ -319,7 +398,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->StateMap.testAndReset(StateFlag::DELSFRMS)) { // deleting a group of forms
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::savdo();
 	  Instance->StateMap.reset(StateFlag::DELTO);
 	}
@@ -337,7 +416,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->StateMap.testAndReset(StateFlag::MOVMSG)) { // tried to move an edited form
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::savdo();
 	  if (!Instance->SelectedFormList.empty()) {
 		for (auto const selectedForm : Instance->SelectedFormList) {
@@ -393,7 +472,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return thred::updateFillColor();
   }
   if (Instance->StateMap.testAndReset(StateFlag::OSAV)) { // trying to load a new form
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::save();
 	  thred::nuTHRfile();
 	  thred::unmsg();
@@ -408,7 +487,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->StateMap.testAndReset(StateFlag::FCLOS)) {
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::save();
 	}
 	else {
@@ -420,7 +499,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->StateMap.testAndReset(StateFlag::SAVEX)) {
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::save();
 	  thred::reldun();
 	}
@@ -467,7 +546,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
   }
   if (Instance->StateMap.testAndReset(StateFlag::NEWBAK)) { // starting a new design
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::unmsg();
 	  thred::save();
 	  thred::newFil();
@@ -482,14 +561,14 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->StateMap.testAndReset(StateFlag::PRGMSG)) { // deleting backups
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::deldir();
 	  return true;
 	}
   }
   if (Instance->StateMap.test(StateFlag::DELFRM)) { // deleting a form
 	auto code = 0;
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::savdo();
 	  Instance->StateMap.reset(StateFlag::DELTO);
 	  code = 1;
@@ -513,7 +592,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->StateMap.test(StateFlag::FILMSG)) { // user wants to remove an edited fill
-	if (mi::chkok()) {
+	if (chkok()) {
 	  thred::savdo();
 	  form::unfil();
 	  thred::coltab();
@@ -863,52 +942,6 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   return false;
 }
 
-void mi::moveForms() {
-  auto const point =
-      POINT {WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x - SelectedFormsRect.left,
-             WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
-  form::ratsr();
-  FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
-
-  auto& formList = Instance->FormList;
-  if (Instance->StateMap.test(StateFlag::FPSEL)) { // moving a group of form points
-	// clang-format off
-	  auto&      form            = formList.operator[](ClosestFormToCursor);
-	  auto       iSelectedVertex = SelectedFormVertices.start;
-	  auto const itVertex        = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
-	// clang-format on
-	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-	  auto const thisIt = wrap::next(itVertex, iSelectedVertex);
-	  *thisIt += FormMoveDelta;
-	  iSelectedVertex = form::pdir(form, iSelectedVertex);
-	}
-	thred::setpsel();
-	form.outline();
-	form::refil(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::RESTCH);
-  }
-  else {
-	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
-	  thred::savdo();
-	  for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
-		form::frmadj(iForm);
-	  }
-	  for (auto& stitch : Instance->StitchBuffer) {
-		stitch += FormMoveDelta;
-	  }
-	  form::selal();
-	}
-	else {
-	  thred::savdo();
-	  for (auto const selectedForm : Instance->SelectedFormList) {
-		form::frmadj(selectedForm);
-	  }
-	  form::frmsadj();
-	  Instance->StateMap.set(StateFlag::RESTCH);
-	}
-  }
-}
-
 auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F_POINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
@@ -924,7 +957,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
   thred::movchk();
   if (Instance->StateMap.testAndReset(StateFlag::MOVFRMS)) { // moving forms or form points
 	thred::savdo();
-	mi::moveForms();
+	moveForms();
 	return true;
   }
   if (Instance->StateMap.testAndReset(StateFlag::EXPAND)) { // expanding a form
@@ -1026,7 +1059,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 		Instance->StateMap.reset(StateFlag::FORMSEL);
 		auto const maxForm = wrap::toUnsigned(formList.size());
 		for (auto iForm = 0U; iForm < maxForm; ++iForm) {
-		  if (mi::finrng(iForm)) {
+		  if (finrng(iForm)) {
 			Instance->SelectedFormList.push_back(iForm);
 		  }
 		}
@@ -1068,7 +1101,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 		}
 	  }
 	  if (!Instance->StateMap.test(StateFlag::INSRT)) {
-		mi::rngal();
+		rngal();
 	  }
 	  return true;
 	}
@@ -1099,38 +1132,6 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
   }
   retflag = false;
   return false;
-}
-
-void mi::updateCursor() {
-  if (UserFlagMap->test(UserFlag::NEDOF)) {
-	wrap::setCursor(CrossCursor);
-  }
-  else {
-	if (Instance->StateMap.test(StateFlag::LIN1)) {
-	  wrap::setCursor(NeedleUpCursor);
-	}
-	else {
-	  if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).x >
-	      Instance->StitchBuffer.operator[](ClosestPointIndex).x) {
-		if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
-		    Instance->StitchBuffer.operator[](ClosestPointIndex).y) {
-		  wrap::setCursor(NeedleLeftUpCursor);
-		}
-		else {
-		  wrap::setCursor(NeedleLeftDownCursor);
-		}
-	  }
-	  else {
-		if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
-		    Instance->StitchBuffer.operator[](ClosestPointIndex).y) {
-		  wrap::setCursor(NeedleRightUpCursor);
-		}
-		else {
-		  wrap::setCursor(NeedleRightDownCursor);
-		}
-	  }
-	}
-  }
 }
 
 auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
@@ -1167,7 +1168,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		break;
 	  }
 	  if (Instance->StateMap.test(StateFlag::INSRT)) { // If we are inserting a stitch
-		mi::updateCursor();
+		updateCursor();
 		break;
 	  }
 	  if (Instance->StateMap.test(StateFlag::BZUMIN) || Instance->StateMap.test(StateFlag::BOXZUM) ||
@@ -1254,12 +1255,12 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		  newSize.y = (wrap::toFloat(stretchBoxLine[iSide].x) - newSize.x) / xyRatio +
 		              wrap::toFloat(stretchBoxLine[iSide].y);
 		}
-		iSide                   = mi::nxtcrnr(iSide);
+		iSide                   = nxtcrnr(iSide);
 		stretchBoxLine[iSide].y = std::lround(newSize.y);
-		iSide                   = mi::nxtcrnr(iSide);
+		iSide                   = nxtcrnr(iSide);
 		stretchBoxLine[iSide].x = std::lround(newSize.x);
 		stretchBoxLine[iSide].y = std::lround(newSize.y);
-		iSide                   = mi::nxtcrnr(iSide);
+		iSide                   = nxtcrnr(iSide);
 		stretchBoxLine[iSide].x = std::lround(newSize.x);
 	  }
 	  else {
@@ -1271,12 +1272,12 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		  newSize.y = (newSize.x - wrap::toFloat(stretchBoxLine[iSide].x)) / xyRatio +
 		              wrap::toFloat(stretchBoxLine[iSide].y);
 		}
-		iSide                   = mi::nxtcrnr(iSide);
+		iSide                   = nxtcrnr(iSide);
 		stretchBoxLine[iSide].x = std::lround(newSize.x);
-		iSide                   = mi::nxtcrnr(iSide);
+		iSide                   = nxtcrnr(iSide);
 		stretchBoxLine[iSide].x = std::lround(newSize.x);
 		stretchBoxLine[iSide].y = std::lround(newSize.y);
-		iSide                   = mi::nxtcrnr(iSide);
+		iSide                   = nxtcrnr(iSide);
 		stretchBoxLine[iSide].y = std::lround(newSize.y);
 	  }
 	  stretchBoxLine[4] = stretchBoxLine[0];
@@ -1290,7 +1291,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	                              ? WinMsg.pt.x - StitchWindowOrigin.x
 	                              : WinMsg.pt.y - StitchWindowOrigin.y;
 	  auto const dst        = (SelectedFormControlVertex + 2U) % 4U;
-	  auto const code       = mi::nxtcrnr(dst);
+	  auto const code       = nxtcrnr(dst);
 	  for (auto iSide = 0U; iSide < 4; ++iSide) {
 		if (iSide != dst && iSide != code) {
 		  if ((SelectedFormControlVertex & 1U) != 0U) {
@@ -1337,7 +1338,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
 	if (Instance->StateMap.test(StateFlag::FRMPMOV)) { // If we are moving a form point
-	  mi::unmov();
+	  unmov();
 	  Instance->RubberBandLine.operator[](1) = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
 	                                            .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::SHOMOV);
