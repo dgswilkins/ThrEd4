@@ -181,9 +181,9 @@ namespace {
 auto DesignSize = F_POINT {};                        // design size
 auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
 
-constexpr auto FSED       = uint32_t {1340007303U};            // feather sequence seed
+constexpr auto FSED = uint32_t {1340007303U}; // feather sequence seed
 
-//Definitions
+// Definitions
 void addNewStitches(INT_INFO& ilData, const FRM_HEAD& form);
 void bcolfn(uint32_t formIndex, uint8_t color);
 void blenfn(uint32_t formIndex, float length);

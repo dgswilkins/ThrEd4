@@ -466,9 +466,9 @@ public:
 	uint32_t col {};
   };
 
-  static constexpr auto GC_HIGH    = GRID_COL {.id = ID_GRDHI,  .col = GRDHI};
+  static constexpr auto GC_HIGH    = GRID_COL {.id = ID_GRDHI, .col = GRDHI};
   static constexpr auto GC_MEDIUM  = GRID_COL {.id = ID_GRDMED, .col = GRDMED};
-  static constexpr auto GC_DEFAULT = GRID_COL {.id = ID_GRDEF,  .col = GRDDEF};
+  static constexpr auto GC_DEFAULT = GRID_COL {.id = ID_GRDEF, .col = GRDDEF};
   static constexpr auto GC_RED     = GRID_COL {.id = ID_GRDRED, .col = GRDRED};
   static constexpr auto GC_BLUE    = GRID_COL {.id = ID_GRDBLU, .col = GRDBLU};
   static constexpr auto GC_GREEN   = GRID_COL {.id = ID_GRDGRN, .col = GRDGRN};

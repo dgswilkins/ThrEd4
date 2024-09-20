@@ -7167,18 +7167,6 @@ void handle_program_memory_depletion() {
 
 } // namespace
 
-// // ReSharper disable CppParameterMayBeConst
-// void shownd(HWND hwnd) noexcept {
-//   ShowWindow(hwnd, SW_SHOW);
-// }
-// // ReSharper restore CppParameterMayBeConst
-// 
-// // ReSharper disable CppParameterMayBeConst
-// void hidwnd(HWND hwnd) noexcept {
-//   ShowWindow(hwnd, SW_HIDE);
-// }
-// // ReSharper restore CppParameterMayBeConst
-
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin->begin();
   auto iUserColorWin    = UserColorWin->begin();
@@ -10631,17 +10619,16 @@ void thred::rotmrk() {
 	auto const originalAngle = std::atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
 	++itVertex;
 	for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-	  angdif(
-	      lowestAngle,
-	      highestAngle,
-	      nuang(originalAngle, itVertex->x - ZoomMarkPoint.x, itVertex->y - ZoomMarkPoint.y));
+	  angdif(lowestAngle,
+	         highestAngle,
+	         nuang(originalAngle, itVertex->x - ZoomMarkPoint.x, itVertex->y - ZoomMarkPoint.y));
 	  ++itVertex;
 	}
 	for (auto const& stitch : Instance->StitchBuffer) {
 	  if ((stitch.attribute & FRMSK) == codedFormIndex) {
 		angdif(lowestAngle,
-		            highestAngle,
-		            nuang(originalAngle, stitch.x - ZoomMarkPoint.x, stitch.y - ZoomMarkPoint.y));
+		       highestAngle,
+		       nuang(originalAngle, stitch.x - ZoomMarkPoint.x, stitch.y - ZoomMarkPoint.y));
 	  }
 	}
   }
@@ -10652,10 +10639,10 @@ void thred::rotmrk() {
 	               Instance->StitchBuffer.operator[](GroupStartStitch).x - ZoomMarkPoint.x);
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
 	  angdif(lowestAngle,
-	              highestAngle,
-	              nuang(originalAngle,
-	                         Instance->StitchBuffer.operator[](iStitch).x - ZoomMarkPoint.x,
-	                         Instance->StitchBuffer.operator[](iStitch).y - ZoomMarkPoint.y));
+	         highestAngle,
+	         nuang(originalAngle,
+	               Instance->StitchBuffer.operator[](iStitch).x - ZoomMarkPoint.x,
+	               Instance->StitchBuffer.operator[](iStitch).y - ZoomMarkPoint.y));
 	}
   }
   auto const tAngle     = highestAngle - lowestAngle;

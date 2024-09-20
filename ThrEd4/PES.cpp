@@ -268,7 +268,7 @@ constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value posit
 namespace {
 auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
 
-constexpr auto INDEX00        = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
+constexpr auto INDEX00 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
 constexpr auto INDEX01 = THREAD {{.r = 0x1a, .g = 0x0a, .b = 0x94}, "Prussian Blue", "ETP007"};
 constexpr auto INDEX02 = THREAD {{.r = 0x0f, .g = 0x75, .b = 0xff}, "Blue", "ETP405"};
 constexpr auto INDEX03 = THREAD {{.r = 0x00, .g = 0x93, .b = 0x4c}, "Teal Green", "ETP534"};

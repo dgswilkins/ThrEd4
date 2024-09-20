@@ -115,9 +115,9 @@ auto nusac(uint32_t const formIndex, uint32_t const guideCount) -> uint32_t {
 }
 
 void outfn(FRM_HEAD const& form,
-               uint32_t const  start,
-               uint32_t const  finish,
-               float const     satinWidth) noexcept(!std::is_same_v<ptrdiff_t, int>) {
+           uint32_t const  start,
+           uint32_t const  finish,
+           float const     satinWidth) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   auto const offset   = fabs(Instance->FormAngles.operator[](start)) < TNYFLOAT &&
                               fabs(Instance->FormAngles.operator[](finish)) < TNYFLOAT
                             ? F_POINT {0.0F, satinWidth}
@@ -277,11 +277,11 @@ void satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width) {
 }
 
 void satfn(FRM_HEAD const&           form,
-               std::vector<float> const& lengths,
-               uint32_t                  line1Start,
-               uint32_t                  line1End,
-               uint32_t                  line2Start,
-               uint32_t                  line2End) {
+           std::vector<float> const& lengths,
+           uint32_t                  line1Start,
+           uint32_t                  line1End,
+           uint32_t                  line2Start,
+           uint32_t                  line2End) {
   // check for zero length lines
   if (line1Start != line1End && line2Start == line2End) {
 	return;

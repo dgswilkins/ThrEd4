@@ -681,8 +681,8 @@ void frmpoly(gsl::span<POINT> const& source) noexcept {
 }
 
 void drawStartGuide(FRM_HEAD const& form,
-                        uint8_t const   layer,
-                        unsigned int&   lastPoint) noexcept(!std::is_same_v<ptrdiff_t, int>) {
+                    uint8_t const   layer,
+                    unsigned int&   lastPoint) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   SelectObject(StitchWindowMemDC, FormPen);
   auto& formLines = Instance->FormLines;
   frmpoly(gsl::span(std::addressof(formLines.operator[](1)), form.wordParam - 1));
@@ -1045,11 +1045,11 @@ auto projh(float const yCoordinate, F_POINT const& point0, F_POINT const& point1
 }
 
 void sprct(std::vector<F_POINT> const& vertices,
-               uint32_t const              vertexIndex,
-               std::vector<V_RECT_2>&      fillVerticalRect,
-               uint32_t const              start,
-               uint32_t const              finish,
-               std::vector<F_POINT> const& outsidePoints) noexcept(!std::is_same_v<uint32_t, size_t>) {
+           uint32_t const              vertexIndex,
+           std::vector<V_RECT_2>&      fillVerticalRect,
+           uint32_t const              start,
+           uint32_t const              finish,
+           std::vector<F_POINT> const& outsidePoints) noexcept(!std::is_same_v<uint32_t, size_t>) {
   auto const& opStart        = outsidePoints[start];
   auto const& opFinish       = outsidePoints[finish];
   auto const& ipStart        = InsidePoints->operator[](start);
@@ -1133,10 +1133,7 @@ void sprct(std::vector<F_POINT> const& vertices,
   }
 }
 
-void spurfn(F_POINT const& innerPoint,
-                F_POINT const& outerPoint,
-                F_POINT&       underlayInnerPoint,
-                F_POINT&       underlayOuterPoint) noexcept {
+void spurfn(F_POINT const& innerPoint, F_POINT const& outerPoint, F_POINT& underlayInnerPoint, F_POINT& underlayOuterPoint) noexcept {
   auto const     delta  = F_POINT {outerPoint.x - innerPoint.x, outerPoint.y - innerPoint.y};
   constexpr auto DIURAT = (1.0F - URAT) / 2.0F;
   constexpr auto DOURAT = ((1.0F - URAT) / 2.0F) + URAT;
@@ -1146,8 +1143,8 @@ void spurfn(F_POINT const& innerPoint,
 }
 
 void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
-                std::vector<V_RECT_2> const& fillVerticalRect,
-                uint32_t const               iRect) noexcept {
+            std::vector<V_RECT_2> const& fillVerticalRect,
+            uint32_t const               iRect) noexcept {
   auto const& fRect  = fillVerticalRect[iRect];
   auto&       ulRect = underlayVerticalRect[iRect];
   spurfn(fRect.aipnt, fRect.aopnt, ulRect.aipnt, ulRect.aopnt);
@@ -1191,10 +1188,10 @@ void duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1
 }
 
 void pfn(std::vector<V_RECT_2> const& underlayVerticalRect,
-             std::vector<V_RECT_2> const& fillVerticalRect,
-             uint32_t const               startVertex,
-             std::vector<V_RECT_2> const& vrct,
-             float const                  width) {
+         std::vector<V_RECT_2> const& fillVerticalRect,
+         uint32_t const               startVertex,
+         std::vector<V_RECT_2> const& vrct,
+         float const                  width) {
   // clang-format off
   auto const& form          = Instance->FormList.operator[](ClosestFormToCursor);
   auto        currentVertex = startVertex;
@@ -1435,8 +1432,8 @@ void chkbrd(FRM_HEAD const& form) {
 }
 
 void fnvrt(std::vector<F_POINT>&    currentFillVertices,
-               std::vector<uint32_t>&   groupIndexSequence,
-               std::vector<SMAL_PNT_L>& lineEndpoints) {
+           std::vector<uint32_t>&   groupIndexSequence,
+           std::vector<SMAL_PNT_L>& lineEndpoints) {
   if (!currentFillVertices.empty()) {
 	auto const mmTuple =
 	    std::ranges::minmax_element(currentFillVertices, [](F_POINT const& first, F_POINT const& second) {
@@ -1516,11 +1513,11 @@ void fnvrt(std::vector<F_POINT>&    currentFillVertices,
 }
 
 void fnang(std::vector<uint32_t>&   groupIndexSequence,
-               std::vector<SMAL_PNT_L>& lineEndpoints,
-               float const              rotationAngle,
-               F_POINT&                 rotationCenter,
-               FRM_HEAD&                angledForm,
-               std::vector<F_POINT>&    angledFormVertices) {
+           std::vector<SMAL_PNT_L>& lineEndpoints,
+           float const              rotationAngle,
+           F_POINT&                 rotationCenter,
+           FRM_HEAD&                angledForm,
+           std::vector<F_POINT>&    angledFormVertices) {
   angledForm = Instance->FormList.operator[](ClosestFormToCursor);
 
   auto const& angRect = angledForm.rectangle;
@@ -1538,11 +1535,11 @@ void fnang(std::vector<uint32_t>&   groupIndexSequence,
 }
 
 void fnhor(std::vector<uint32_t>&   groupIndexSequence,
-               std::vector<SMAL_PNT_L>& lineEndpoints,
-               float const              rotationAngle,
-               F_POINT&                 rotationCenter,
-               FRM_HEAD&                angledForm,
-               std::vector<F_POINT>&    angledFormVertices) {
+           std::vector<SMAL_PNT_L>& lineEndpoints,
+           float const              rotationAngle,
+           F_POINT&                 rotationCenter,
+           FRM_HEAD&                angledForm,
+           std::vector<F_POINT>&    angledFormVertices) {
   angledForm = Instance->FormList.operator[](ClosestFormToCursor);
 
   auto const& angRect = angledForm.rectangle;
@@ -1584,11 +1581,11 @@ void prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& an
 }
 
 void plfn(FRM_HEAD const&              form,
-              std::vector<V_RECT_2> const& underlayVerticalRect,
-              std::vector<V_RECT_2> const& fillVerticalRect,
-              std::vector<V_RECT_2> const& prct,
-              float const                  width,
-              F_POINT&                     stitchPoint) {
+          std::vector<V_RECT_2> const& underlayVerticalRect,
+          std::vector<V_RECT_2> const& fillVerticalRect,
+          std::vector<V_RECT_2> const& prct,
+          float const                  width,
+          F_POINT&                     stitchPoint) {
   duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt, stitchPoint);
   duspnd(form.edgeStitchLen, underlayVerticalRect, fillVerticalRect, 1, 2, width, stitchPoint);
   for (auto iVertex = 2U; iVertex < form.vertexCount - 4U; ++iVertex) {
@@ -1939,14 +1936,13 @@ auto vclpComp(V_CLP_X const& vclpx1, V_CLP_X const& vclpx2) noexcept -> bool {
 }
 
 auto isin(FRM_HEAD const&             form,
-              std::vector<V_CLP_X> const& regionCrossingData,
-              float const                 xCoordinate,
-              float const                 yCoordinate,
-              uint32_t const              regionCrossingStart,
-              uint32_t const              regionCrossingEnd,
-              F_RECTANGLE const&          boundingRect,
-              std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>)
-    -> bool {
+          std::vector<V_CLP_X> const& regionCrossingData,
+          float const                 xCoordinate,
+          float const                 yCoordinate,
+          uint32_t const              regionCrossingStart,
+          uint32_t const              regionCrossingEnd,
+          F_RECTANGLE const&          boundingRect,
+          std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool {
   auto count = 0U;
   auto point = F_POINT {};
   if (xCoordinate < boundingRect.left) {
@@ -2000,13 +1996,12 @@ void inspnt(std::vector<CLIP_PNT>& clipStitchPoints) {
 }
 
 auto isect(uint32_t const vertex0,
-               uint32_t const vertex1,
-               F_POINT&       intersection,
-               float&         length,
-               F_POINT const& lineSegmentStart,
-               F_POINT const& lineSegmentEnd,
-               std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>)
-    -> bool {
+           uint32_t const vertex1,
+           F_POINT&       intersection,
+           float&         length,
+           F_POINT const& lineSegmentStart,
+           F_POINT const& lineSegmentEnd,
+           std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool {
   auto const delta =
       F_POINT {(lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y)};
   auto       tempIntersection = F_POINT {};
@@ -2054,8 +2049,8 @@ auto isect(uint32_t const vertex0,
   return flag;
 }
 
-auto clipComp(const gsl::not_null<CLIP_SORT const*> arg1,
-                  const gsl::not_null<CLIP_SORT const*> arg2) noexcept -> bool {
+auto clipComp(const gsl::not_null<CLIP_SORT const*> arg1, const gsl::not_null<CLIP_SORT const*> arg2) noexcept
+    -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   auto const local1 = arg1->segmentLength;
   auto const local2 = arg2->segmentLength;
@@ -2068,23 +2063,21 @@ auto clipComp(const gsl::not_null<CLIP_SORT const*> arg1,
   return false;
 }
 
-void mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData,
-                uint32_t const           destination,
-                uint32_t const           source) noexcept {
+void mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData, uint32_t const destination, uint32_t const source) noexcept {
   if (destination != source) {
 	arrayOfClipIntersectData[destination] = arrayOfClipIntersectData[source];
   }
 }
 
 auto insect(FRM_HEAD const&             form,
-                std::vector<CLIP_SORT>&     clipIntersectData,
-                std::vector<V_CLP_X> const& regionCrossingData,
-                std::vector<CLIP_SORT*>&    arrayOfClipIntersectData,
-                uint32_t const              regionCrossingStart,
-                uint32_t const              regionCrossingEnd,
-                F_POINT const&              lineSegmentStart,
-                F_POINT const&              lineSegmentEnd,
-                std::vector<F_POINT> const& currentFormVertices) -> uint32_t {
+            std::vector<CLIP_SORT>&     clipIntersectData,
+            std::vector<V_CLP_X> const& regionCrossingData,
+            std::vector<CLIP_SORT*>&    arrayOfClipIntersectData,
+            uint32_t const              regionCrossingStart,
+            uint32_t const              regionCrossingEnd,
+            F_POINT const&              lineSegmentStart,
+            F_POINT const&              lineSegmentEnd,
+            std::vector<F_POINT> const& currentFormVertices) -> uint32_t {
   auto iIntersection = 0U;
   auto count         = 0U;
   arrayOfClipIntersectData.clear();
@@ -2132,10 +2125,9 @@ auto insect(FRM_HEAD const&             form,
 }
 
 auto getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
-                std::vector<float> const& lengths,
-                uint32_t const            iPoint,
-                std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<ptrdiff_t, int>)
-    -> float {
+            std::vector<float> const& lengths,
+            uint32_t const            iPoint,
+            std::vector<F_POINT> const& currentFormVertices) noexcept(!std::is_same_v<ptrdiff_t, int>) -> float {
   clipStitchPoints[iPoint].vertexIndex %= currentFormVertices.size();
   auto const itVertex = wrap::next(currentFormVertices.cbegin(), clipStitchPoints[iPoint].vertexIndex);
   return lengths[clipStitchPoints[iPoint].vertexIndex] +
@@ -2143,11 +2135,11 @@ auto getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
 }
 
 auto clpnseg(std::vector<CLIP_PNT>&      clipStitchPoints,
-                 std::vector<CLIP_SEG>&      clipSegments,
-                 std::vector<float> const&   lengths,
-                 uint32_t const              start,
-                 uint32_t const              finish,
-                 std::vector<F_POINT> const& currentFormVertices) -> uint32_t {
+             std::vector<CLIP_SEG>&      clipSegments,
+             std::vector<float> const&   lengths,
+             uint32_t const              start,
+             uint32_t const              finish,
+             std::vector<F_POINT> const& currentFormVertices) -> uint32_t {
   auto const clipSegment =
       CLIP_SEG {.start       = start,
                 .beginLength = getlen(clipStitchPoints, lengths, start, currentFormVertices),
@@ -2175,11 +2167,11 @@ auto lenComp(LEN_INFO const& arg1, LEN_INFO const& arg2) noexcept -> bool {
 }
 
 void ritseg(FRM_HEAD const&              form,
-                std::vector<CLIP_PNT> const& clipStitchPoints,
-                std::vector<CLIP_SEG>&       clipSegments,
-                uint32_t const               currentSegmentIndex,
-                uint32_t&                    clipIntersectSide,
-                std::vector<F_POINT> const&  currentFormVertices) {
+            std::vector<CLIP_PNT> const& clipStitchPoints,
+            std::vector<CLIP_SEG>&       clipSegments,
+            uint32_t const               currentSegmentIndex,
+            uint32_t&                    clipIntersectSide,
+            std::vector<F_POINT> const&  currentFormVertices) {
   auto isPointedEnd = true;
   if ((form.extendedAttribute & AT_SQR) != 0U) {
 	isPointedEnd = false;
@@ -2220,9 +2212,9 @@ void ritseg(FRM_HEAD const&              form,
 }
 
 auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
-                std::vector<LEN_INFO> const& sortedLengths,
-                uint32_t const               sind,
-                uint32_t&                    outIndex) -> bool {
+            std::vector<LEN_INFO> const& sortedLengths,
+            uint32_t const               sind,
+            uint32_t&                    outIndex) -> bool {
   auto       index        = 1U;
   auto const indexDoubled = wrap::toUnsigned(clipSegments.size()) * 2U;
   Instance->StateMap.reset(StateFlag::FILDIR);
@@ -2244,8 +2236,8 @@ auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
 }
 
 auto nucseg(std::vector<CLIP_SEG> const& clipSegments,
-                std::vector<LEN_INFO> const& sortedLengths,
-                uint32_t&                    currentSegmentIndex) -> bool {
+            std::vector<LEN_INFO> const& sortedLengths,
+            uint32_t&                    currentSegmentIndex) -> bool {
   auto const index    = Instance->StateMap.test(StateFlag::FILDIR)
                             ? clipSegments[currentSegmentIndex].endIndex
                             : clipSegments[currentSegmentIndex].beginIndex;
@@ -2667,9 +2659,7 @@ void angout(FRM_HEAD& angledForm) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   angledForm.rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
 }
 
-void horclpfn(std::vector<RNG_COUNT> const& textureSegments,
-                  FRM_HEAD&                     angledForm,
-                  std::vector<F_POINT>&         angledFormVertices) {
+void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices) {
   angledForm = Instance->FormList.operator[](ClosestFormToCursor);
   auto const rotationCenter = F_POINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
                                        wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
@@ -2688,9 +2678,9 @@ void horclpfn(std::vector<RNG_COUNT> const& textureSegments,
 }
 
 auto isclos(std::vector<SMAL_PNT_L> const& lineEndpoints,
-                uint32_t                       line0Index,
-                uint32_t                       line1Index,
-                float const                    gapToClosestRegion) noexcept -> bool {
+            uint32_t                       line0Index,
+            uint32_t                       line1Index,
+            float const                    gapToClosestRegion) noexcept -> bool {
   auto const low0 = lineEndpoints[line0Index].y - gapToClosestRegion;
   auto const low1 = lineEndpoints[line1Index].y - gapToClosestRegion;
   if (auto const high0 = lineEndpoints[++line0Index].y + gapToClosestRegion; high0 < low1) {
@@ -2703,12 +2693,12 @@ auto isclos(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 auto lnclos(std::vector<uint32_t> const&   groupIndexSequence,
-                std::vector<SMAL_PNT_L> const& lineEndpoints,
-                uint32_t const                 group0,
-                uint32_t const                 line0,
-                uint32_t const                 group1,
-                uint32_t const                 line1,
-                float const gapToClosestRegion) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
+            std::vector<SMAL_PNT_L> const& lineEndpoints,
+            uint32_t const                 group0,
+            uint32_t const                 line0,
+            uint32_t const                 group1,
+            uint32_t const                 line1,
+            float const gapToClosestRegion) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
   auto const lineEndPoint0 = wrap::next(lineEndpoints.begin(), groupIndexSequence[group0]);
   if (group1 > groupIndexSequence.size() - 2U) {
 	return false;
@@ -2739,13 +2729,13 @@ auto lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 }
 
 auto regclos(std::vector<uint32_t> const&   groupIndexSequence,
-                 std::vector<SMAL_PNT_L> const& lineEndpoints,
-                 std::vector<uint32_t> const&   sortedLineIndices,
-                 uint32_t const                 iRegion0,
-                 uint32_t const                 iRegion1,
-                 std::vector<REGION> const&     regionsList,
-                 float const                    gapToClosestRegion,
-                 uint32_t& nextGroup) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
+             std::vector<SMAL_PNT_L> const& lineEndpoints,
+             std::vector<uint32_t> const&   sortedLineIndices,
+             uint32_t const                 iRegion0,
+             uint32_t const                 iRegion1,
+             std::vector<REGION> const&     regionsList,
+             float const                    gapToClosestRegion,
+             uint32_t& nextGroup) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
   auto const  lineStart0Index    = sortedLineIndices[regionsList[iRegion0].start];
   auto const  lineStart1Index    = sortedLineIndices[regionsList[iRegion1].start];
   auto const& lineEndPoint0Start = lineEndpoints[lineStart0Index];
@@ -2813,12 +2803,12 @@ auto unvis(boost::dynamic_bitset<> const& visitedRegions, int32_t& visitedIndex)
 }
 
 auto notdun(std::vector<RG_SEQ>&           tempPath,
-                std::vector<R_CON> const&      pathMap,
-                std::vector<uint32_t> const&   mapIndexSequence,
-                boost::dynamic_bitset<> const& visitedRegions,
-                ptrdiff_t const                pathLength,
-                uint32_t                       doneRegion,
-                uint32_t const                 sequencePathIndex) -> bool {
+            std::vector<R_CON> const&      pathMap,
+            std::vector<uint32_t> const&   mapIndexSequence,
+            boost::dynamic_bitset<> const& visitedRegions,
+            ptrdiff_t const                pathLength,
+            uint32_t                       doneRegion,
+            uint32_t const                 sequencePathIndex) -> bool {
   auto previousLevel = pathLength;
   if (previousLevel != 0U) {
 	--previousLevel;
@@ -2878,10 +2868,10 @@ auto notdun(std::vector<RG_SEQ>&           tempPath,
 }
 
 auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
-                std::vector<uint32_t> const&         sortedLineIndices,
-                uint32_t const                       iRegion,
-                std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
-                std::vector<REGION> const&           regionsList) noexcept -> float {
+            std::vector<uint32_t> const&         sortedLineIndices,
+            uint32_t const                       iRegion,
+            std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
+            std::vector<REGION> const&           regionsList) noexcept -> float {
   std::array<SMAL_PNT_L, SQRCORNS> corners;
 
   auto index = sortedLineIndices[regionsList[iRegion].start];
@@ -2904,16 +2894,16 @@ auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
 }
 
 void nxtrgn(std::vector<RG_SEQ>&           tempPath,
-                std::vector<R_CON> const&      pathMap,
-                std::vector<uint32_t> const&   mapIndexSequence,
-                boost::dynamic_bitset<>&       visitedRegions,
-                std::vector<SMAL_PNT_L> const& lineEndpoints,
-                std::vector<uint32_t> const&   sortedLineIndices,
-                std::vector<REGION> const&     regionsList,
-                uint32_t&                      doneRegion,
-                uint32_t const                 pathMapIndex,
-                uint32_t&                      sequencePathIndex,
-                int32_t const                  visitedIndex) {
+            std::vector<R_CON> const&      pathMap,
+            std::vector<uint32_t> const&   mapIndexSequence,
+            boost::dynamic_bitset<>&       visitedRegions,
+            std::vector<SMAL_PNT_L> const& lineEndpoints,
+            std::vector<uint32_t> const&   sortedLineIndices,
+            std::vector<REGION> const&     regionsList,
+            uint32_t&                      doneRegion,
+            uint32_t const                 pathMapIndex,
+            uint32_t&                      sequencePathIndex,
+            int32_t const                  visitedIndex) {
   std::array<F_POINT, SQRCORNS> lastRegionCorners;
 
   auto pathLength = ptrdiff_t {1}; // length of the path to the region
@@ -2976,9 +2966,9 @@ void nxtrgn(std::vector<RG_SEQ>&           tempPath,
 }
 
 void nxtseq(std::vector<F_SEQ>&          sequencePath,
-                std::vector<R_CON> const&    pathMap,
-                std::vector<uint32_t> const& mapIndexSequence,
-                uint32_t const               pathIndex) {
+            std::vector<R_CON> const&    pathMap,
+            std::vector<uint32_t> const& mapIndexSequence,
+            uint32_t const               pathIndex) {
   if (wrap::toSize(pathIndex) + 1U >= sequencePath.size()) {
 	sequencePath[pathIndex].nextGroup = 0;
 	return;
@@ -2997,10 +2987,10 @@ void nxtseq(std::vector<F_SEQ>&          sequencePath,
 }
 
 void brkdun(std::vector<SMAL_PNT_L> const& lineEndpoints,
-                std::vector<uint32_t> const&   sortedLineIndices,
-                uint32_t const                 start,
-                uint32_t const                 finish,
-                std::vector<F_POINT>&          workingFormVertices) {
+            std::vector<uint32_t> const&   sortedLineIndices,
+            uint32_t const                 start,
+            uint32_t const                 finish,
+            std::vector<F_POINT>&          workingFormVertices) {
   auto& bSequence = Instance->BSequence;
   bSequence.emplace_back(
       lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y, 0);
@@ -3014,8 +3004,8 @@ void brkdun(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 void duseq1(std::vector<SMAL_PNT_L> const& lineEndpoints,
-                std::vector<uint32_t> const&   sortedLineIndices,
-                uint32_t const                 sequenceIndex) {
+            std::vector<uint32_t> const&   sortedLineIndices,
+            uint32_t const                 sequenceIndex) {
   auto        index     = sortedLineIndices[sequenceIndex];
   auto const& sequence0 = lineEndpoints[index];
   auto const& sequence1 = lineEndpoints[++index];
@@ -3024,8 +3014,8 @@ void duseq1(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 void movseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
-                std::vector<uint32_t> const&   sortedLineIndices,
-                uint32_t const                 ind) {
+            std::vector<uint32_t> const&   sortedLineIndices,
+            uint32_t const                 ind) {
   auto  lineEndPoint = wrap::next(lineEndpoints.begin(), sortedLineIndices[ind]);
   auto& bSequence    = Instance->BSequence;
 
@@ -3037,12 +3027,12 @@ void movseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
-                std::vector<uint32_t> const&   sortedLineIndices,
-                uint32_t const                 start,
-                uint32_t const                 finish,
-                boost::dynamic_bitset<>&       sequenceMap,
-                uint32_t&                      lastGroup,
-                uint32_t&                      sequenceIndex) {
+            std::vector<uint32_t> const&   sortedLineIndices,
+            uint32_t const                 start,
+            uint32_t const                 finish,
+            boost::dynamic_bitset<>&       sequenceMap,
+            uint32_t&                      lastGroup,
+            uint32_t&                      sequenceIndex) {
   Instance->StateMap.reset(StateFlag::SEQDUN);
   if (sequenceIndex > lineEndpoints.size()) {
 	sequenceIndex = start;
@@ -3114,10 +3104,10 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 void dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
-                std::vector<uint32_t> const&   sortedLineIndices,
-                uint32_t const                 start,
-                uint32_t const                 finish,
-                uint32_t&                      lastGroup) {
+            std::vector<uint32_t> const&   sortedLineIndices,
+            uint32_t const                 start,
+            uint32_t const                 finish,
+            uint32_t&                      lastGroup) {
   auto minimumY = BIGFLOAT;
   for (auto iLine = start; iLine <= finish; ++iLine) {
 	auto const index  = wrap::toSize(sortedLineIndices[start]);
@@ -3141,12 +3131,12 @@ void dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
-               std::vector<uint32_t> const&   sortedLineIndices,
-               uint32_t const                 start,
-               uint32_t const                 finish,
-               boost::dynamic_bitset<>&       sequenceMap,
-               uint32_t&                      lastGroup,
-               uint32_t&                      sequenceIndex) {
+           std::vector<uint32_t> const&   sortedLineIndices,
+           uint32_t const                 start,
+           uint32_t const                 finish,
+           boost::dynamic_bitset<>&       sequenceMap,
+           uint32_t&                      lastGroup,
+           uint32_t&                      sequenceIndex) {
   auto savedTopLine = lineEndpoints[wrap::toSize(sortedLineIndices[start]) + 1U].line;
   Instance->StateMap.reset(StateFlag::SEQDUN);
   bool flag = false;
@@ -3230,16 +3220,16 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 }
 
 void durgn(FRM_HEAD const&                form,
-               std::vector<F_SEQ> const&      sequencePath,
-               boost::dynamic_bitset<>&       visitedRegions,
-               std::vector<SMAL_PNT_L> const& lineEndpoints,
-               std::vector<uint32_t> const&   sortedLineIndices,
-               uint32_t const                 pthi,
-               uint32_t const                 lineCount,
-               std::vector<REGION> const&     regionsList,
-               uint32_t&                      lastGroup,
-               uint32_t const                 sequencePathIndex,
-               std::vector<F_POINT>&          workingFormVertices) {
+           std::vector<F_SEQ> const&      sequencePath,
+           boost::dynamic_bitset<>&       visitedRegions,
+           std::vector<SMAL_PNT_L> const& lineEndpoints,
+           std::vector<uint32_t> const&   sortedLineIndices,
+           uint32_t const                 pthi,
+           uint32_t const                 lineCount,
+           std::vector<REGION> const&     regionsList,
+           uint32_t&                      lastGroup,
+           uint32_t const                 sequencePathIndex,
+           std::vector<F_POINT>&          workingFormVertices) {
   // ReSharper disable once CppTemplateArgumentsCanBeDeduced
   auto        sequenceMap   = boost::dynamic_bitset<>(lineCount);
   auto        nextGroup     = gsl::narrow_cast<uint32_t>(sequencePath[pthi].nextGroup);
@@ -3429,7 +3419,7 @@ void durgn(FRM_HEAD const&                form,
 }
 
 auto compLines(std::tuple<uint32_t, SMAL_PNT_L*> const& arg3,
-                   std::tuple<uint32_t, SMAL_PNT_L*> const& arg4) noexcept -> bool {
+               std::tuple<uint32_t, SMAL_PNT_L*> const& arg4) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   auto const* arg1 = std::get<SMAL_PNT_L*>(arg3);
   auto const* arg2 = std::get<SMAL_PNT_L*>(arg4);
@@ -3471,9 +3461,9 @@ auto getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uin
 }
 
 void lcon(FRM_HEAD const&              form,
-              std::vector<uint32_t> const& groupIndexSequence,
-              std::vector<SMAL_PNT_L>&     lineEndpoints,
-              std::vector<F_POINT>&        workingFormVertices) {
+          std::vector<uint32_t> const& groupIndexSequence,
+          std::vector<SMAL_PNT_L>&     lineEndpoints,
+          std::vector<F_POINT>&        workingFormVertices) {
 #if BUGSEQ
   UNREFERENCED_PARAMETER(groupIndexSequence);
 #endif
@@ -3995,12 +3985,12 @@ void spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t const start, 
 }
 
 void duspnd(float const                  stitchLen,
-                std::vector<V_RECT_2> const& underlayVerticalRect,
-                std::vector<V_RECT_2> const& fillVerticalRect,
-                uint32_t const               start,
-                uint32_t const               finish,
-                float const                  width,
-                F_POINT&                     stitchPoint) {
+            std::vector<V_RECT_2> const& underlayVerticalRect,
+            std::vector<V_RECT_2> const& fillVerticalRect,
+            uint32_t const               start,
+            uint32_t const               finish,
+            float const                  width,
+            F_POINT&                     stitchPoint) {
   if (!Instance->StateMap.test(StateFlag::UND)) {
 	spend(fillVerticalRect, start, finish, stitchPoint);
 	return;
@@ -4041,9 +4031,9 @@ void duspnd(float const                  stitchLen,
 }
 
 void trfrm(F_POINT const& bottomLeftPoint,
-               F_POINT const& topLeftPoint,
-               F_POINT const& bottomRightPoint,
-               F_POINT const& topRightPoint) {
+           F_POINT const& topLeftPoint,
+           F_POINT const& bottomRightPoint,
+           F_POINT const& topRightPoint) {
   auto const topDelta    = topRightPoint - topLeftPoint;
   auto const bottomDelta = bottomRightPoint - bottomLeftPoint;
   for (auto const& clip : Instance->ClipBuffer) {
@@ -5030,12 +5020,12 @@ void shrnks() {
 }
 
 void dufdat(std::vector<F_POINT>&  tempClipPoints,
-                std::vector<SAT_CON>&  tempGuides,
-                std::vector<F_POINT>&  destFormVertices,
-                std::vector<FRM_HEAD>& destFormList,
-                uint32_t const         formIndex,
-                uint32_t&              formRelocationIndex,
-                uint32_t&              formSourceIndex) {
+            std::vector<SAT_CON>&  tempGuides,
+            std::vector<F_POINT>&  destFormVertices,
+            std::vector<FRM_HEAD>& destFormList,
+            uint32_t const         formIndex,
+            uint32_t&              formRelocationIndex,
+            uint32_t&              formSourceIndex) {
   auto& dest = destFormList.operator[](formRelocationIndex);
 
   auto const& formList = Instance->FormList;
@@ -6100,8 +6090,8 @@ void form::chkseq(bool border) {
 	bool flag = true;
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->OSequence.size()) - 1U; ++iSequence) {
 	  if (!ritlin(Instance->OSequence.operator[](iSequence),
-	                  Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U),
-	                  userStitchLen)) {
+	              Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U),
+	              userStitchLen)) {
 		flag = false;
 		break;
 	  }
