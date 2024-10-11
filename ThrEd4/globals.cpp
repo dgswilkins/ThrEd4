@@ -130,7 +130,6 @@ HDC                            StitchWindowDC            = nullptr; // stitch wi
 HDC                            StitchWindowMemDC         = nullptr; // stitch window memory device context
 POINT                          StitchWindowOrigin        = {};      // offset origin of the stitch window
 SIZE                           StitchWindowSize          = {};      // size of the stitch window in pixels
-std::wstring*                  TextureInputBuffer        = nullptr; // texture fill number buffer
 std::vector<TX_PNT>*           TexturePointsBuffer       = nullptr; // buffer for textured fill points
 wchar_t const*                 ThrEdClipFormat           = L"threditor"; //
 HINSTANCE                      ThrEdInstance             = {};      // main instance handle

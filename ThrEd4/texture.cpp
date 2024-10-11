@@ -522,7 +522,7 @@ void txcntrv(FRM_HEAD const& textureForm) {
 }
 
 void txdelal() {
-  TextureInputBuffer->clear();
+  Instance->textureInputBuffer.clear();
   DestroyWindow(SideWindowButton);
   SideWindowButton = nullptr;
   Instance->StateMap.set(StateFlag::RESTCH);
@@ -880,11 +880,11 @@ auto chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t, uin
 
 void chktxnum() {
   auto value = 0.0F;
-  if (!TextureInputBuffer->empty()) {
-	value = std::stof(*TextureInputBuffer);
+  if (!Instance->textureInputBuffer.empty()) {
+	value = std::stof(Instance->textureInputBuffer);
   }
   if (value != 0.0F) {
-	TextureInputBuffer->clear();
+	Instance->textureInputBuffer.clear();
 	value *= PFGRAN;
 	switch (TextureWindowId) {
 	  case HTXHI: {
@@ -1548,8 +1548,8 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  }
 	  case VK_BACK: // backspace
 	  {
-		if (!TextureInputBuffer->empty()) {
-		  TextureInputBuffer->pop_back();
+		if (!Instance->textureInputBuffer.empty()) {
+		  Instance->textureInputBuffer.pop_back();
 		}
 		flag = false;
 		break;
@@ -1562,13 +1562,13 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	if (flag) {
 	  auto character = wchar_t {};
 	  if (constexpr auto BUFFLEN = 8U;
-	      TextureInputBuffer->size() < BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
+	      Instance->textureInputBuffer.size() < BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
 		if (txdig(keyCode, character)) {
-		  TextureInputBuffer->push_back(character);
+		  Instance->textureInputBuffer.push_back(character);
 		}
 	  }
 	}
-	SetWindowText(SideWindowButton, TextureInputBuffer->c_str());
+	SetWindowText(SideWindowButton, Instance->textureInputBuffer.c_str());
 	return;
   }
   switch (keyCode) {

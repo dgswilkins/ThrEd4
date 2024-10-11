@@ -12245,7 +12245,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SideWindow            = &Instance->SideWindow;            // thred only
 	  SideWindowEntryBuffer = &Instance->SideWindowEntryBuffer; // thred only
 	  SortBuffer            = &Instance->SortBuffer;            // thred only
-	  TextureInputBuffer    = &Instance->textureInputBuffer;
 	  TexturePointsBuffer   = &Instance->TexturePointsBuffer;
 	  ThrName               = &Instance->ThrName;
 	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
