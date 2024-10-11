@@ -2420,7 +2420,7 @@ void dubuf(std::vector<char>& buffer) {
   auto const thredDataSize =
       wrap::sizeofVector(formList) + (vertexCount * wrap::sizeofType(Instance->FormVertices)) +
       (guideCount * wrap::sizeofType(Instance->SatinGuides)) +
-      (clipDataCount * wrap::sizeofType(Instance->ClipPoints)) + wrap::sizeofVector(TexturePointsBuffer);
+      (clipDataCount * wrap::sizeofType(Instance->ClipPoints)) + wrap::sizeofVector(Instance->TexturePointsBuffer);
   buffer.reserve(vtxLen + thredDataSize);
   // ToDo - vertexLength overflows a 16 bit integer if there are more than 5446 stitches, so clamp it until version 3
   constexpr auto VTXCLAMP =
@@ -2434,7 +2434,7 @@ void dubuf(std::vector<char>& buffer) {
   ExtendedHeader->auxFormat         = IniFile.auxFileType;
   ExtendedHeader->hoopSizeX         = IniFile.hoopSizeX;
   ExtendedHeader->hoopSizeY         = IniFile.hoopSizeY;
-  ExtendedHeader->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
+  ExtendedHeader->texturePointCount = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
   // write the rest of the data to the buffer
   durit(buffer, ExtendedHeader, sizeof(*ExtendedHeader));
   durit(buffer, Instance->StitchBuffer.data(), wrap::sizeofVector(Instance->StitchBuffer));
@@ -2511,8 +2511,8 @@ void dubuf(std::vector<char>& buffer) {
   if (!points.empty()) {
 	durit(buffer, points.data(), wrap::sizeofVector(points));
   }
-  if (!TexturePointsBuffer->empty()) {
-	durit(buffer, TexturePointsBuffer->data(), wrap::sizeofVector(TexturePointsBuffer));
+  if (!Instance->TexturePointsBuffer.empty()) {
+	durit(buffer, Instance->TexturePointsBuffer.data(), wrap::sizeofVector(Instance->TexturePointsBuffer));
   }
 }
 
@@ -4193,7 +4193,7 @@ void init() {
   auto const deviceContext   = GetDC(nullptr);
   auto const screenHalfWidth = GetDeviceCaps(deviceContext, HORZRES) / 2;
   ReleaseDC(nullptr, deviceContext);
-  TexturePointsBuffer->clear();
+  Instance->TexturePointsBuffer.clear();
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
   MainMenu   = GetMenu(ThrEdWindow);
   auto wRect = RECT {};
@@ -4519,7 +4519,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	auto const newFormVertexIndex = wrap::toUnsigned(Instance->FormVertices.size());
 	auto       newSatinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
 	auto       clipOffset         = wrap::toUnsigned(Instance->ClipPoints.size());
-	auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
+	auto       textureOffset      = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
 	if (version < 2) {
 	  auto inFormList = std::vector<FRM_HEAD_O> {};
 	  inFormList.resize(fileHeader.formCount);
@@ -4608,8 +4608,8 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 		inTextureList.resize(bytesRead / wrap::sizeofType(inTextureList));
 		Instance->StateMap.set(StateFlag::BADFIL);
 	  }
-	  TexturePointsBuffer->reserve(TexturePointsBuffer->size() + inTextureList.size());
-	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
+	  Instance->TexturePointsBuffer.reserve(Instance->TexturePointsBuffer.size() + inTextureList.size());
+	  Instance->TexturePointsBuffer.insert(Instance->TexturePointsBuffer.end(), inTextureList.begin(), inTextureList.end());
 	}
 	// update the form pointer variables
 	for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(formList.size()); ++iFormList) {
@@ -5554,20 +5554,20 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   Instance->ClipPoints.shrink_to_fit();
   if (ExtendedHeader->texturePointCount != 0U) { // read the texture points
-	TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
-	bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(TexturePointsBuffer);
-	if (!wrap::readFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &bytesRead, L"ReadFile for TexturePointsBuffer in readTHRFile")) {
+	Instance->TexturePointsBuffer.resize(ExtendedHeader->texturePointCount);
+	bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(Instance->TexturePointsBuffer);
+	if (!wrap::readFile(fileHandle, Instance->TexturePointsBuffer.data(), bytesToRead, &bytesRead, L"ReadFile for TexturePointsBuffer in readTHRFile")) {
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
-	  TexturePointsBuffer->resize(bytesRead / wrap::sizeofType(TexturePointsBuffer));
+	  Instance->TexturePointsBuffer.resize(bytesRead / wrap::sizeofType(Instance->TexturePointsBuffer));
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
   }
   else {
-	TexturePointsBuffer->clear();
+	Instance->TexturePointsBuffer.clear();
   }
-  TexturePointsBuffer->shrink_to_fit();
+  Instance->TexturePointsBuffer.shrink_to_fit();
   if (Instance->StateMap.testAndReset(StateFlag::BADFIL)) {
 	displayText::bfilmsg();
   }
@@ -5817,7 +5817,7 @@ void resetState() {
   unthum();
   thred::unbsho();
   bitmap::resetBmpFile(true);
-  TexturePointsBuffer->clear();
+  Instance->TexturePointsBuffer.clear();
   menu::disableRedo();
   thred::unbsho();
   form::frmon();
@@ -8806,8 +8806,8 @@ void thred::newFil() {
   bitmap::resetBmpFile(true);
   Instance->FormVertices.clear();
   Instance->FormVertices.shrink_to_fit();
-  TexturePointsBuffer->clear();
-  TexturePointsBuffer->shrink_to_fit();
+  Instance->TexturePointsBuffer.clear();
+  Instance->TexturePointsBuffer.shrink_to_fit();
   Instance->ClipPoints.clear();
   Instance->ClipPoints.shrink_to_fit();
   Instance->SatinGuides.clear();
@@ -9262,7 +9262,7 @@ void thred::hidbit() {
 
 void thred::deltot() {
   DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
-  TexturePointsBuffer->clear();
+  Instance->TexturePointsBuffer.clear();
   Instance->FormList.clear();
   Instance->StitchBuffer.clear();
   Instance->FormVertices.clear();
@@ -10806,8 +10806,8 @@ void thred::delstch() {
   savdo();
   Instance->StitchBuffer.clear();
   Instance->StitchBuffer.shrink_to_fit();
-  TexturePointsBuffer->clear();
-  TexturePointsBuffer->shrink_to_fit();
+  Instance->TexturePointsBuffer.clear();
+  Instance->TexturePointsBuffer.shrink_to_fit();
   rstAll();
   form::clrfills();
   resetColorChanges();
@@ -12245,7 +12245,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SideWindow            = &Instance->SideWindow;            // thred only
 	  SideWindowEntryBuffer = &Instance->SideWindowEntryBuffer; // thred only
 	  SortBuffer            = &Instance->SortBuffer;            // thred only
-	  TexturePointsBuffer   = &Instance->TexturePointsBuffer;
 	  ThrName               = &Instance->ThrName;
 	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
 	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only

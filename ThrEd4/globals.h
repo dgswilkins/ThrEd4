@@ -345,8 +345,6 @@ extern HDC         StitchWindowMemDC;
 extern POINT       StitchWindowOrigin;
 extern SIZE        StitchWindowSize;
 
-extern std::vector<TX_PNT>*  TexturePointsBuffer;
-
 extern wchar_t const* ThrEdClipFormat;
 extern HINSTANCE      ThrEdInstance;
 extern HWND           ThrEdWindow;

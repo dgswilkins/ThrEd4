@@ -113,10 +113,10 @@ void redbak() {
   auto const     spUserColors = gsl::span {UserColor};
   std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
   thred::refreshColors();
-  TexturePointsBuffer->clear();
+  Instance->TexturePointsBuffer.clear();
   if (undoData->texturePointCount != 0U) {
 	auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
-	TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
+	Instance->TexturePointsBuffer.insert(Instance->TexturePointsBuffer.end(), span.begin(), span.end());
   }
   thred::coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
@@ -133,7 +133,7 @@ void backup::dudat() {
 
   auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
                     wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
-                    wrap::sizeofVector(Instance->SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
+                    wrap::sizeofVector(Instance->SatinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
   auto* backupData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
@@ -182,10 +182,10 @@ void backup::dudat() {
 	std::ranges::copy(UserColor, spColors.begin());
   }
   backupData->texturePoints     = convertFromPtr<TX_PNT*>(std::next(backupData->colors, COLORCNT));
-  backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
-  if (!TexturePointsBuffer->empty()) {
+  backupData->texturePointCount = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
+  if (!Instance->TexturePointsBuffer.empty()) {
 	auto const spTexturePoints = gsl::span {backupData->texturePoints, backupData->texturePointCount};
-	std::ranges::copy(*TexturePointsBuffer, spTexturePoints.begin());
+	std::ranges::copy(Instance->TexturePointsBuffer, spTexturePoints.begin());
   }
 }
 #pragma warning(pop)

@@ -2277,9 +2277,9 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
   }
   clipWidth = std::max(clipWidth, CLPMINVT);
   if (Instance->StateMap.test(StateFlag::TXFIL)) {
-	if (!TexturePointsBuffer->empty() &&
+	if (!Instance->TexturePointsBuffer.empty() &&
 	    form.texture.index + form.texture.count <=
-	        gsl::narrow<decltype(form.texture.index)>(TexturePointsBuffer->size())) {
+	        gsl::narrow<decltype(form.texture.index)>(Instance->TexturePointsBuffer.size())) {
 	  clipWidth = form.fillSpacing;
 	}
 	else {
@@ -2394,7 +2394,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
   constexpr auto CSPRES = size_t {1000U};
   clipStitchPoints.reserve(CSPRES);
   auto pasteLocation = F_POINT {};
-  auto texture       = TexturePointsBuffer->begin();
+  auto texture       = Instance->TexturePointsBuffer.begin();
   if (auto iclpxSize = wrap::toUnsigned(iclpx.size()); iclpxSize != 0U) {
 	--iclpxSize;
 	bool  breakFlag  = false;
@@ -2413,7 +2413,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 		    (iRegion + wrap::toUnsigned(clipGrid.left)) % wrap::toUnsigned(form.texture.lines);
 		clipStitchCount = wrap::toUnsigned(textureSegments[textureLine].stitchCount);
 
-		texture = wrap::next(TexturePointsBuffer->begin(),
+		texture = wrap::next(Instance->TexturePointsBuffer.begin(),
 		                     form.texture.index + textureSegments[textureLine].line);
 
 		lineSegmentStart.x = pasteLocation.x;

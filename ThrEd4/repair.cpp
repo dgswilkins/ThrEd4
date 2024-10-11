@@ -269,7 +269,7 @@ auto frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 	if (badData.guideCount != Instance->SatinGuides.size()) {
 	  badData.attribute |= BADSAT;
 	}
-	if (badData.tx != TexturePointsBuffer->size()) {
+	if (badData.tx != Instance->TexturePointsBuffer.size()) {
 	  badData.attribute |= BADTX;
 	}
   }
@@ -335,7 +335,7 @@ void repflt(std::wstring& repairMessage) {
 	formList.resize(iForm);
 	Instance->ClipPoints.resize(badData.clip);
 	Instance->SatinGuides.resize(badData.guideCount);
-	TexturePointsBuffer->resize(badData.tx);
+	Instance->TexturePointsBuffer.resize(badData.tx);
 	chkfstch();
 	adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(formList.size()));
 	break;
@@ -383,22 +383,22 @@ void reptx() {
 	if (!iForm.isTexture()) {
 	  continue;
 	}
-	if (wrap::toUnsigned(TexturePointsBuffer->size()) >
+	if (wrap::toUnsigned(Instance->TexturePointsBuffer.size()) >
 	    wrap::toUnsigned(iForm.texture.index) + iForm.texture.count) {
-	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), iForm.texture.index);
+	  auto const startTexture = wrap::next(Instance->TexturePointsBuffer.cbegin(), iForm.texture.index);
 	  auto const endTexture   = wrap::next(startTexture, iForm.texture.count);
-	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
+	  auto const destination  = wrap::next(Instance->TexturePointsBuffer.begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(iForm.texture.index, textureCount);
 	  textureCount += iForm.texture.count;
 	  bcup(iForm, badData);
 	  continue;
 	}
-	if (TexturePointsBuffer->size() > iForm.texture.index) {
-	  wrap::narrow(iForm.texture.count, TexturePointsBuffer->size() - iForm.texture.index);
-	  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), iForm.texture.index);
+	if (Instance->TexturePointsBuffer.size() > iForm.texture.index) {
+	  wrap::narrow(iForm.texture.count, Instance->TexturePointsBuffer.size() - iForm.texture.index);
+	  auto const startTexture = wrap::next(Instance->TexturePointsBuffer.cbegin(), iForm.texture.index);
 	  auto const endTexture   = wrap::next(startTexture, iForm.texture.count);
-	  auto const destination  = wrap::next(TexturePointsBuffer->begin(), textureCount);
+	  auto const destination  = wrap::next(Instance->TexturePointsBuffer.begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(iForm.texture.index, textureCount);
 	  bcup(iForm, badData);
@@ -407,7 +407,7 @@ void reptx() {
 	}
 	iForm.fillType = 0;
   }
-  TexturePointsBuffer->resize(textureCount);
+  Instance->TexturePointsBuffer.resize(textureCount);
 }
 
 } // namespace
