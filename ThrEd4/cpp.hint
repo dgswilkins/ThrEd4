@@ -1,14 +1,47 @@
 // Hint files help the Visual Studio IDE interpret Visual C++ identifiers
 // such as names of functions and macros.
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
-#define GSL_SUPPRESS(x) [[gsl::suppress(x)]]
-#define GSL_SUPPRESS(x) [[gsl::suppress("x")]]
-#define _DEBUG
+#define BUGBAK
+#define BUGSEQ
 #define CALLBACK
-#define IDC_DESWID
+#define CLPVU
+#define CreateWindow
+#define EN_CHANGE
+#define FALSE
+#define FMT_COMPILE(s) FMT_STRING(s)
+#define FMT_COMPILE(s) FMT_STRING_IMPL(s, fmt::compiled_string, explicit)
+#define GSL_SUPPRESS(x) [[gsl::suppress("x")]]
+#define GSL_SUPPRESS(x) [[gsl::suppress(x)]]
+#define GetWindowText
+#define IDCANCEL
 #define IDC_DESHI
-#define UNREFERENCED_PARAMETER(P) _Prefast_unreferenced_parameter_impl_("PREfast", ((void) (P), 0))
-#define UNREFERENCED_PARAMETER(P) (P)
-#define UNREFERENCED_PARAMETER(P) { (P) = (P); }
-#define TRUE
+#define IDC_DESWID
+#define IDC_DUASP
+#define IDC_REFILF
+#define IDOK
+#define IDS_EGG
+#define IDS_HEART
+#define IDS_LENS
 #define IDS_NUMPNT
+#define IDS_REGP
+#define IDS_ROTA
+#define IDS_SPIR
+#define IDS_STAR
+#define IDS_ZIG
+#define LOWORD(l) ((WORD)(((DWORD_PTR)(l)) & 0xffff))
+#define MAXDWORD
+#define R2_COPYPEN
+#define R2_XORPEN
+#define SendMessage
+#define SetWindowText
+#define TRUE
+#define UNREFERENCED_PARAMETER(P) (P)
+#define UNREFERENCED_PARAMETER(P) _Prefast_unreferenced_parameter_impl_("PREfast", ((void) (P), 0))
+#define UNREFERENCED_PARAMETER(P) { (P) = (P); }
+#define WM_COMMAND
+#define WM_INITDIALOG
+#define WM_SETFOCUS
+#define WS_BORDER
+#define WS_CHILD
+#define WS_VISIBLE
+#define _DEBUG
