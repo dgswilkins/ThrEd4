@@ -345,7 +345,6 @@ extern HDC         StitchWindowMemDC;
 extern POINT       StitchWindowOrigin;
 extern SIZE        StitchWindowSize;
 
-extern std::vector<F_POINT>* TempPolygon;
 extern std::wstring*         TextureInputBuffer;
 extern std::vector<TX_PNT>*  TexturePointsBuffer;
 
