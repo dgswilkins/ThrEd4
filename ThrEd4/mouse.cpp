@@ -203,7 +203,7 @@ void unmov() {
 }
 
 void updateCursor() {
-  if (UserFlagMap->test(UserFlag::NEDOF)) {
+  if (Instance->UserFlagMap.test(UserFlag::NEDOF)) {
 	wrap::setCursor(CrossCursor);
   }
   else {
@@ -620,10 +620,10 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto const iFillType = (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
 	  if (Instance->StateMap.testAndReset(StateFlag::FENDIN)) {
 		if (iFillType == 3) {
-		  UserFlagMap->reset(UserFlag::SQRFIL);
+		  Instance->UserFlagMap.reset(UserFlag::SQRFIL);
 		}
 		if (iFillType == 4) {
-		  UserFlagMap->set(UserFlag::SQRFIL);
+		  Instance->UserFlagMap.set(UserFlag::SQRFIL);
 		}
 	  }
 	  else {
@@ -1159,7 +1159,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		break;
 	  }
 	  if (!Instance->StateMap.test(StateFlag::INIT)) { // If we are not inserting a stitch
-		if (UserFlagMap->test(UserFlag::NEDOF)) {
+		if (Instance->UserFlagMap.test(UserFlag::NEDOF)) {
 		  wrap::setCursor(CrossCursor);
 		}
 		else {
@@ -1178,7 +1178,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (Instance->StateMap.test(StateFlag::SATIN) || Instance->StateMap.test(StateFlag::SATPNT) ||
 	      Instance->StateMap.test(StateFlag::INSFRM)) { // If we are inserting a satin form or a satin point
-		if (UserFlagMap->test(UserFlag::FRMX)) {
+		if (Instance->UserFlagMap.test(UserFlag::FRMX)) {
 		  wrap::setCursor(CrossCursor);
 		}
 		else {

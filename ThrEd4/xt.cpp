@@ -1057,10 +1057,10 @@ auto handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 	case IDOK: {
 	  DesignSize = F_POINT {getstxt(IDC_DESWID, hwndlg), getstxt(IDC_DESHI, hwndlg)};
 	  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
-		UserFlagMap->set(UserFlag::CHREF);
+		Instance->UserFlagMap.set(UserFlag::CHREF);
 	  }
 	  else {
-		UserFlagMap->reset(UserFlag::CHREF);
+		Instance->UserFlagMap.reset(UserFlag::CHREF);
 	  }
 	  EndDialog(hwndlg, TRUE);
 	  break;
@@ -1103,7 +1103,7 @@ void handleSetsWMINITDIALOG(HWND hwndlg) {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
   setstxt(IDC_DESWID, DesignSize.x, hwndlg);
   setstxt(IDC_DESHI, DesignSize.y, hwndlg);
-  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap->test(UserFlag::CHREF)));
+  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(Instance->UserFlagMap.test(UserFlag::CHREF)));
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -1941,7 +1941,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 
   auto const appliqueColor = gsl::narrow_cast<uint32_t>(form.borderColor >> FRMSHFT);
   for (auto iSourceStitch = 0U; iSourceStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iSourceStitch) {
-	if (!UserFlagMap->test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX) &&
+	if (!Instance->UserFlagMap.test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX) &&
 	    iSourceStitch == ClosestPointIndex) {
 	  ClosestPointIndex = iDestinationStitch;
 	}
@@ -2073,7 +2073,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	  --iDestinationStitch;
 	}
   }
-  if (!UserFlagMap->test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX)) {
+  if (!Instance->UserFlagMap.test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX)) {
 	std::ranges::fill(fillStartsData, ClosestPointIndex);
   }
 }
@@ -2549,7 +2549,7 @@ void xt::nudsiz() {
 	flag              = 1;
   }
   nudfn(designSizeRect);
-  if (UserFlagMap->test(UserFlag::CHREF)) {
+  if (Instance->UserFlagMap.test(UserFlag::CHREF)) {
 	form::refilal();
   }
   if (flag != 0) {
@@ -2604,7 +2604,7 @@ void xt::clrstch() noexcept {
 }
 
 void xt::chgwrn() {
-  UserFlagMap->flip(UserFlag::WRNOF);
+  Instance->UserFlagMap.flip(UserFlag::WRNOF);
   menu::wrnmen();
 }
 

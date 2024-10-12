@@ -615,7 +615,7 @@ auto chk2of() -> bool {
   if (!Instance->StateMap.test(StateFlag::SELBOX)) {
 	return false;
   }
-  if (UserFlagMap->test(UserFlag::FIL2OF)) {
+  if (Instance->UserFlagMap.test(UserFlag::FIL2OF)) {
 	return false;
   }
   return true;
@@ -2176,7 +2176,7 @@ void drwStch() {
 }
 
 void drwknot() {
-  if (UserFlagMap->test(UserFlag::KNOTOF) || Knots->empty() || Instance->StitchBuffer.empty()) {
+  if (Instance->UserFlagMap.test(UserFlag::KNOTOF) || Knots->empty() || Instance->StitchBuffer.empty()) {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
@@ -3553,7 +3553,7 @@ auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 
 // ReSharper disable CppParameterMayBeConst
 void handleSizeRestored(HWND p_hWnd) {
-  UserFlagMap->reset(UserFlag::SAVMAX);
+  Instance->UserFlagMap.reset(UserFlag::SAVMAX);
   chkirct();
   if (Instance->StateMap.testAndSet(StateFlag::SIZED)) {
 	auto       screenCenterOffset = LONG {};
@@ -4073,11 +4073,11 @@ void handleWndProcWMSIZE(HWND p_hWnd, WPARAM const wParam) {
   GetClientRect(p_hWnd, &ThredWindowRect);
   switch (wParam) {
 	case SIZE_MAXIMIZED: {
-	  UserFlagMap->set(UserFlag::SAVMAX);
+	  Instance->UserFlagMap.set(UserFlag::SAVMAX);
 	  break;
 	}
 	case SIZE_MINIMIZED: {
-	  UserFlagMap->reset(UserFlag::SAVMAX);
+	  Instance->UserFlagMap.reset(UserFlag::SAVMAX);
 	  break;
 	}
 	case SIZE_RESTORED: {
@@ -4222,7 +4222,7 @@ void init() {
   StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
   StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
   chkirct();
-  if (!UserFlagMap->test(UserFlag::SAVMAX)) {
+  if (!Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
 	MoveWindow(ThrEdWindow,
 	           IniFile.initialWindowCoords.left,
 	           IniFile.initialWindowCoords.top,
@@ -5718,7 +5718,7 @@ void redini() {
 	  }
 	  {
 		auto const tmp = ENUM_MAP<UserFlag>(IniFile.userFlagMap);
-		*UserFlagMap   = tmp;
+		Instance->UserFlagMap   = tmp;
 	  }
 	  if (IniFile.borderWidth != 0.0F) {
 		BorderWidth = IniFile.borderWidth;
@@ -6137,7 +6137,7 @@ void ritini() {
   IniFile.smallStitchLength      = SmallStitchLength;
   IniFile.stitchBoxesThreshold   = StitchBoxesThreshold;
   IniFile.stitchSpace            = LineSpacing;
-  IniFile.userFlagMap            = UserFlagMap->to_ulong();
+  IniFile.userFlagMap            = Instance->UserFlagMap.to_ulong();
   IniFile.borderWidth            = BorderWidth;
   IniFile.appliqueColor          = AppliqueColor;
   IniFile.snapLength             = SnapLength;
@@ -6145,7 +6145,7 @@ void ritini() {
   IniFile.spiralWrap             = SpiralWrap;
   IniFile.buttonholeCornerLength = ButtonholeCornerLength;
   IniFile.picotSpace             = PicotSpacing;
-  if (!UserFlagMap->test(UserFlag::SAVMAX)) {
+  if (!Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
 	auto windowRect = RECT {};
 	GetWindowRect(ThrEdWindow, &windowRect);
 	IniFile.initialWindowCoords.left   = windowRect.left;
@@ -6340,7 +6340,7 @@ void sav() {
   thred::coltab();
   auto saveStitches = std::vector<F_POINT_ATTR> {};
   saveStitches.resize(Instance->StitchBuffer.size());
-  if (UserFlagMap->test(UserFlag::ROTAUX)) {
+  if (Instance->UserFlagMap.test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
 	for (auto const& stitch : Instance->StitchBuffer) {
 	  *iDest++ = F_POINT_ATTR {stitch.y, stitch.x, stitch.attribute};
@@ -6368,7 +6368,7 @@ void sav() {
   }
   if (flag) {
 	defNam(Instance->WorkingFileName);
-	if (UserFlagMap->test(UserFlag::ROTAUX)) {
+	if (Instance->UserFlagMap.test(UserFlag::ROTAUX)) {
 	  displayText::filnopn(IDS_FILROT, auxName);
 	}
   }
@@ -10482,7 +10482,7 @@ void thred::defpref() {
   constexpr auto DEFBPIX = uint16_t {4U}; // default form box pixels
   constexpr auto DEFANG  = 0.7853981F;    // default fill angle, 45 degrees
 
-  UserFlagMap->reset();
+  Instance->UserFlagMap.reset();
   // NOLINTBEGIN(readability-magic-numbers)
   UserColor = {0x00000000,
                0x002dffff,
@@ -10538,8 +10538,8 @@ void thred::defpref() {
 
   bitmap::setBmpBackColor();
   IniFile.dazdef();
-  UserFlagMap->set(UserFlag::DAZHOL);
-  UserFlagMap->set(UserFlag::DAZD);
+  Instance->UserFlagMap.set(UserFlag::DAZHOL);
+  Instance->UserFlagMap.set(UserFlag::DAZD);
   AppliqueColor          = COLORCNT - 1U;
   IniFile.AppStitchLen   = APSPAC;
   BorderWidth            = BRDWID;
@@ -10547,7 +10547,7 @@ void thred::defpref() {
   IniFile.chainSpace     = CHSDEF;
   IniFile.chainRatio     = CHRDEF;
   IniFile.fillAngle      = DEFANG;
-  UserFlagMap->reset(UserFlag::SQRFIL);
+  Instance->UserFlagMap.reset(UserFlag::SQRFIL);
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
   IniFile.gridSize        = 2.0F * PFGRAN; // 2mm default spacing NOLINT(readability-magic-numbers)
@@ -10556,7 +10556,7 @@ void thred::defpref() {
   IniFile.hoopSizeY       = LHUPY;
   IniFile.cursorNudgeStep = NUGINI;
   IniFile.nudgePixels     = DEFPIX;
-  UserFlagMap->set(UserFlag::BLUNT);
+  Instance->UserFlagMap.set(UserFlag::BLUNT);
   SmallStitchLength       = SMALSIZ * PFGRAN;
   SnapLength              = SNPLEN * PFGRAN;
   SpiralWrap              = SPIRWRAP;
@@ -10575,7 +10575,7 @@ void thred::defpref() {
 	IniFile.customHoopY = LHUPY;
   }
   PicotSpacing = IPICSPAC;
-  UserFlagMap->set(UserFlag::FIL2OF);
+  Instance->UserFlagMap.set(UserFlag::FIL2OF);
   menu::fil2men();
   BackgroundColor = 0xa8c4b1; // lighter Dark Sea green NOLINT(readability-magic-numbers)
   UnzoomedRect.cx = std::lround(IniFile.hoopSizeX);
@@ -11207,7 +11207,7 @@ void thred::qcode() {
 	Instance->SelectedFormList.clear();
 	ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   }
-  if (!UserFlagMap->test(UserFlag::MARQ)) {
+  if (!Instance->UserFlagMap.test(UserFlag::MARQ)) {
 	Instance->StateMap.reset(StateFlag::GMRK);
   }
   if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
@@ -11391,7 +11391,7 @@ auto thred::updatePreferences() -> bool {
   chknum();
   auto const& valueWindow = Instance->ValueWindow;
   if (WinMsg.hwnd == valueWindow.operator[](PRFFILEND)) {
-	if (UserFlagMap->testAndFlip(UserFlag::SQRFIL)) {
+	if (Instance->UserFlagMap.testAndFlip(UserFlag::SQRFIL)) {
 	  SetWindowText(valueWindow.operator[](PRFFILEND), displayText::loadStr(IDS_PNTD).c_str());
 	}
 	else {
@@ -11400,7 +11400,7 @@ auto thred::updatePreferences() -> bool {
 	return true;
   }
   if (WinMsg.hwnd == valueWindow.operator[](PRFSATEND)) {
-	if (UserFlagMap->testAndFlip(UserFlag::BLUNT)) {
+	if (Instance->UserFlagMap.testAndFlip(UserFlag::BLUNT)) {
 	  SetWindowText(valueWindow.operator[](PRFSATEND), displayText::loadStr(IDS_TAPR).c_str());
 	}
 	else {
@@ -11409,7 +11409,7 @@ auto thred::updatePreferences() -> bool {
 	return true;
   }
   if (WinMsg.hwnd == valueWindow.operator[](PRFSATUND)) {
-	if (UserFlagMap->testAndFlip(UserFlag::DUND)) {
+	if (Instance->UserFlagMap.testAndFlip(UserFlag::DUND)) {
 	  SetWindowText(valueWindow.operator[](PRFSATUND), displayText::loadStr(IDS_OFF).c_str());
 	}
 	else {
@@ -11546,7 +11546,7 @@ auto thred::handleSideWindowActive() -> bool {
   }
   if ((form.edgeType & NEGUND) == EDGEAPPL) {
 	form.edgeType = EDGEANGSAT;
-	if (UserFlagMap->test(UserFlag::DUND)) {
+	if (Instance->UserFlagMap.test(UserFlag::DUND)) {
 	  form.edgeType |= EGUND;
 	}
   }
@@ -12249,7 +12249,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only
 	  Thumbnails            = &Instance->Thumbnails;            // thred only
 	  UserColorWin          = &Instance->UserColorWin; // thred only
-	  UserFlagMap           = &Instance->UserFlagMap;
 	  UserPen               = &Instance->UserPen;      // thred only
 	  VersionNames          = &Instance->VersionNames; // thred only
 
@@ -12317,7 +12316,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  *ScrollSize   = MulDiv(*ScrollSize, *ScreenDPI, STDDPI);
 	  *ColorBarSize = MulDiv(*ColorBarSize, *ScreenDPI, STDDPI);
 	  init();
-	  if (UserFlagMap->test(UserFlag::SAVMAX)) {
+	  if (Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
 	  }
 	  else {

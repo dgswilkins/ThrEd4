@@ -429,7 +429,7 @@ void satfn(FRM_HEAD const&           form,
 		  // check the direction of the stitches and reverse line 1 or line 2
 		  // depending on the flag for square ends
 		  if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
-			if (UserFlagMap->test(UserFlag::SQRFIL)) {
+			if (Instance->UserFlagMap.test(UserFlag::SQRFIL)) {
 			  form::filinu(line2Point, stitchPoint);
 			  stitchPoint = line2Point;
 			}
@@ -437,7 +437,7 @@ void satfn(FRM_HEAD const&           form,
 			stitchPoint = line1Point;
 		  }
 		  else {
-			if (UserFlagMap->test(UserFlag::SQRFIL)) {
+			if (Instance->UserFlagMap.test(UserFlag::SQRFIL)) {
 			  form::filinu(line1Point, stitchPoint);
 			  stitchPoint = line1Point;
 			}
@@ -538,7 +538,7 @@ void satsbrd(uint32_t const formIndex) {
   auto& currentForm = Instance->FormList.operator[](formIndex);
   clip::deleclp(ClosestFormToCursor);
   currentForm.edgeType = EDGEANGSAT;
-  if (UserFlagMap->test(UserFlag::DUND)) {
+  if (Instance->UserFlagMap.test(UserFlag::DUND)) {
 	currentForm.edgeType |= EGUND;
   }
   form::bsizpar(currentForm);
@@ -1158,7 +1158,7 @@ void satin::satbrd() {
   if (!Instance->SelectedFormList.empty()) {
 	for (auto const selectedForm : Instance->SelectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
-	  if (UserFlagMap->test(UserFlag::BLUNT)) {
+	  if (Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow_cast<decltype(form.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -1173,7 +1173,7 @@ void satin::satbrd() {
   else {
 	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	  auto& form = formList.operator[](ClosestFormToCursor);
-	  if (UserFlagMap->test(UserFlag::BLUNT)) {
+	  if (Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow<decltype(form.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -1215,7 +1215,7 @@ void satin::ribon() {
   if (currentType == FRMLINE) {
 	// Set blunt flags
 	auto isBlunt = 0U;
-	if (UserFlagMap->test(UserFlag::BLUNT)) {
+	if (Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 	  isBlunt = SBLNT | FBLNT;
 	}
 	satends(formList.operator[](ClosestFormToCursor), isBlunt, BorderWidth);

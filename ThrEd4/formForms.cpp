@@ -595,12 +595,12 @@ void initdaz(HWND hWinDialog) {
   SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN),
                 format(FMT_COMPILE(L"{:.2f}"), IniFile.daisyPetalLen).c_str());
   auto flag = 1U;
-  if (!UserFlagMap->test(UserFlag::DAZHOL)) {
+  if (!Instance->UserFlagMap.test(UserFlag::DAZHOL)) {
 	flag = 0U;
   }
   CheckDlgButton(hWinDialog, IDC_HOLE, flag);
   flag = 1U;
-  if (!UserFlagMap->test(UserFlag::DAZD)) {
+  if (!Instance->UserFlagMap.test(UserFlag::DAZD)) {
 	flag = 0U;
   }
   CheckDlgButton(hWinDialog, IDC_DLIN, flag);
@@ -633,16 +633,16 @@ void handleDaisyIDOK(HWND hwndlg) {
   GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
   IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
   if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
-	UserFlagMap->set(UserFlag::DAZHOL);
+	Instance->UserFlagMap.set(UserFlag::DAZHOL);
   }
   else {
-	UserFlagMap->reset(UserFlag::DAZHOL);
+	Instance->UserFlagMap.reset(UserFlag::DAZHOL);
   }
   if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
-	UserFlagMap->set(UserFlag::DAZD);
+	Instance->UserFlagMap.set(UserFlag::DAZD);
   }
   else {
-	UserFlagMap->reset(UserFlag::DAZD);
+	Instance->UserFlagMap.reset(UserFlag::DAZD);
   }
   GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
   for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
@@ -669,8 +669,8 @@ auto handleDaisyWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 	  break;
 	case IDC_DAZRST: {
 	  IniFile.dazdef();
-	  UserFlagMap->set(UserFlag::DAZHOL);
-	  UserFlagMap->set(UserFlag::DAZD);
+	  Instance->UserFlagMap.set(UserFlag::DAZHOL);
+	  Instance->UserFlagMap.set(UserFlag::DAZD);
 	  initdaz(hwndlg);
 	  break;
 	}
@@ -1041,7 +1041,7 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{}"), IniFile.fillPhase), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.eggRatio), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.fillAngle * RADDEGF), *row++);
-  auto choice = UserFlagMap->test(UserFlag::SQRFIL) ? displayText::loadStr(IDS_SQR)
+  auto choice = Instance->UserFlagMap.test(UserFlag::SQRFIL) ? displayText::loadStr(IDS_SQR)
                                                     : displayText::loadStr(IDS_PNTD);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
@@ -1055,10 +1055,10 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.cursorNudgeStep), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), PicotSpacing * IPFGRAN), *row++);
-  choice = UserFlagMap->test(UserFlag::BLUNT) ? displayText::loadStr(IDS_BLUNT)
+  choice = Instance->UserFlagMap.test(UserFlag::BLUNT) ? displayText::loadStr(IDS_BLUNT)
                                               : displayText::loadStr(IDS_TAPR);
   prflin(choice, *row++);
-  choice = UserFlagMap->test(UserFlag::DUND) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
+  choice = Instance->UserFlagMap.test(UserFlag::DUND) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SmallStitchLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
@@ -1115,7 +1115,7 @@ void formForms::dasyfrm() {
   form.type    = FRMFPOLY;
   auto iVertex = 0U;
   auto fref    = 0U;
-  if (UserFlagMap->test(UserFlag::DAZHOL)) { // add the hole at the center of the daisy
+  if (Instance->UserFlagMap.test(UserFlag::DAZHOL)) { // add the hole at the center of the daisy
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
@@ -1139,7 +1139,7 @@ void formForms::dasyfrm() {
   }
   auto const petalSegmentAngle = PI_F2 / wrap::toFloat(petalVertexCount);
   auto const deltaPetalAngle   = PI_F / wrap::toFloat(IniFile.daisyPetalPoints);
-  if (UserFlagMap->test(UserFlag::DAZD)) { // add the satin guides
+  if (Instance->UserFlagMap.test(UserFlag::DAZD)) { // add the satin guides
 	form.satinGuideCount = IniFile.daisyPetalCount - 1U;
 	form.wordParam       = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
 	form.satinGuideIndex = satin::adsatk(IniFile.daisyPetalCount - 1);
@@ -1200,7 +1200,7 @@ void formForms::dasyfrm() {
 	                                      referencePoint.y + (sin(angle) * distanceFromDaisyCenter));
 	  ++iVertex;
 	  angle += petalSegmentAngle;
-	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
+	  if (Instance->UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
 		auto const itGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex + iMacroPetal);
 		itGuide->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		itGuide->finish = iVertex;
@@ -1209,7 +1209,7 @@ void formForms::dasyfrm() {
   }
   auto itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
 
-  if (UserFlagMap->test(UserFlag::DAZHOL)) {
+  if (Instance->UserFlagMap.test(UserFlag::DAZHOL)) {
 	auto           referenceVertex = wrap::next(itVertex, fref - 1U);
 	constexpr auto HOLEMARG        = 0.01F; // hole margin offset
 	referenceVertex->y += HOLEMARG;
@@ -1217,7 +1217,7 @@ void formForms::dasyfrm() {
 	referenceVertex->y += HOLEMARG;
   }
   form.vertexCount = iVertex;
-  if (UserFlagMap->test(UserFlag::DAZD)) {
+  if (Instance->UserFlagMap.test(UserFlag::DAZD)) {
 	form.type      = SAT;
 	form.attribute = 1;
   }

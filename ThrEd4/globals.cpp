@@ -138,7 +138,6 @@ uint32_t*                      TraceBitmapData           = nullptr; // trace bit
 
 SIZE                           UnzoomedRect              = {};      // size of the unzoomed stitch window
 std::array<COLORREF, COLORCNT> UserColor                 = {};      // user colors
-ENUM_MAP<UserFlag>*            UserFlagMap               = nullptr; // for storage of persistent binary variables set by the user
 float                          UserStitchLength          = USESIZ * PFGRAN; // user selected stitch size
 float                          VerticalRatio             = 0.0F;    // vertical ratio between the zoom window and the entire stitch space
 HWND                           VerticalScrollBar         = nullptr; // vertical scroll bar

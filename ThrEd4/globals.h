@@ -355,8 +355,6 @@ extern SIZE UnzoomedRect;
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 
-extern ENUM_MAP<UserFlag>* UserFlagMap;
-
 extern float UserStitchLength;
 
 extern float VerticalRatio;

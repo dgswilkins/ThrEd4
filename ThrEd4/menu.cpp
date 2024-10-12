@@ -94,17 +94,17 @@ void vuselthr();
 
 // Functions
 void fil2sel(uint32_t const stat) {
-  UserFlagMap->set(UserFlag::FIL2OF);
+  Instance->UserFlagMap.set(UserFlag::FIL2OF);
   if (stat != 0U) {
-	UserFlagMap->reset(UserFlag::FIL2OF);
+	Instance->UserFlagMap.reset(UserFlag::FIL2OF);
   }
   menu::fil2men();
 }
 
 void frmcursel(uint32_t const cursorType) {
-  UserFlagMap->set(UserFlag::FRMX);
+  Instance->UserFlagMap.set(UserFlag::FRMX);
   if (cursorType == 0U) {
-	UserFlagMap->reset(UserFlag::FRMX);
+	Instance->UserFlagMap.reset(UserFlag::FRMX);
   }
   menu::frmcurmen();
 }
@@ -138,43 +138,43 @@ void getstpix() {
 }
 
 void hidknot() {
-  UserFlagMap->set(UserFlag::KNOTOF);
+  Instance->UserFlagMap.set(UserFlag::KNOTOF);
   menu::knotmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void nedof() {
-  UserFlagMap->set(UserFlag::NEDOF);
+  Instance->UserFlagMap.set(UserFlag::NEDOF);
   menu::nedmen();
 }
 
 void nedon() {
-  UserFlagMap->reset(UserFlag::NEDOF);
+  Instance->UserFlagMap.reset(UserFlag::NEDOF);
   menu::nedmen();
 }
 
 void pcsbsavof() {
-  UserFlagMap->set(UserFlag::BSAVOF);
+  Instance->UserFlagMap.set(UserFlag::BSAVOF);
   menu::bsavmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void pcsbsavon() {
-  UserFlagMap->reset(UserFlag::BSAVOF);
+  Instance->UserFlagMap.reset(UserFlag::BSAVOF);
   menu::bsavmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void rotauxsel(uint32_t const stat) {
-  UserFlagMap->set(UserFlag::ROTAUX);
+  Instance->UserFlagMap.set(UserFlag::ROTAUX);
   if (stat == 0U) {
-	UserFlagMap->reset(UserFlag::ROTAUX);
+	Instance->UserFlagMap.reset(UserFlag::ROTAUX);
   }
   menu::rotauxmen();
 }
 
 void shoknot() {
-  UserFlagMap->reset(UserFlag::KNOTOF);
+  Instance->UserFlagMap.reset(UserFlag::KNOTOF);
   menu::knotmen();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -279,7 +279,7 @@ void menu::resetFormOnOff() {
 }
 
 void menu::qchk() {
-  if (UserFlagMap->test(UserFlag::MARQ)) {
+  if (Instance->UserFlagMap.test(UserFlag::MARQ)) {
 	CheckMenuItem(MainMenu, ID_MARKESC, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_MARKQ, MF_UNCHECKED);
   }
@@ -291,7 +291,7 @@ void menu::qchk() {
 }
 
 void menu::nedmen() {
-  if (UserFlagMap->test(UserFlag::NEDOF)) {
+  if (Instance->UserFlagMap.test(UserFlag::NEDOF)) {
 	CheckMenuItem(MainMenu, ID_SETNEDL, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_RSTNEDL, MF_CHECKED);
   }
@@ -303,7 +303,7 @@ void menu::nedmen() {
 }
 
 void menu::knotmen() {
-  if (UserFlagMap->test(UserFlag::KNOTOF)) {
+  if (Instance->UserFlagMap.test(UserFlag::KNOTOF)) {
 	CheckMenuItem(MainMenu, ID_KNOTON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_KNOTOF, MF_CHECKED);
   }
@@ -315,7 +315,7 @@ void menu::knotmen() {
 }
 
 void menu::bsavmen() {
-  if (UserFlagMap->test(UserFlag::BSAVOF)) {
+  if (Instance->UserFlagMap.test(UserFlag::BSAVOF)) {
 	CheckMenuItem(MainMenu, ID_BSAVON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_BSAVOF, MF_CHECKED);
   }
@@ -327,7 +327,7 @@ void menu::bsavmen() {
 }
 
 void menu::linbmen() {
-  if (UserFlagMap->test(UserFlag::LINSPAC)) {
+  if (Instance->UserFlagMap.test(UserFlag::LINSPAC)) {
 	CheckMenuItem(MainMenu, ID_LINBEXACT, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_LINBEVEN, MF_CHECKED);
   }
@@ -340,7 +340,7 @@ void menu::linbmen() {
 
 void menu::wrnmen() {
   auto code = UINT {MF_CHECKED};
-  if (UserFlagMap->test(UserFlag::WRNOF)) {
+  if (Instance->UserFlagMap.test(UserFlag::WRNOF)) {
 	code = MF_UNCHECKED;
   }
   CheckMenuItem(MainMenu, ID_WARNOF, code);
@@ -501,7 +501,7 @@ void menu::flipHideBitmap() {
 }
 
 void menu::rotauxmen() {
-  if (UserFlagMap->test(UserFlag::ROTAUX)) {
+  if (Instance->UserFlagMap.test(UserFlag::ROTAUX)) {
 	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_UNCHECKED);
   }
@@ -513,7 +513,7 @@ void menu::rotauxmen() {
 }
 
 void menu::frmcurmen() {
-  if (UserFlagMap->test(UserFlag::FRMX)) {
+  if (Instance->UserFlagMap.test(UserFlag::FRMX)) {
 	CheckMenuItem(MainMenu, ID_FRMX, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_FRMBOX, MF_UNCHECKED);
   }
@@ -525,7 +525,7 @@ void menu::frmcurmen() {
 }
 
 void menu::fil2men() {
-  if (UserFlagMap->test(UserFlag::FIL2OF)) {
+  if (Instance->UserFlagMap.test(UserFlag::FIL2OF)) {
 	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_CHECKED);
   }
@@ -1224,13 +1224,13 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_MARKESC: { // view / Set / Retrieve Mark / Escape
-	  UserFlagMap->set(UserFlag::MARQ);
+	  Instance->UserFlagMap.set(UserFlag::MARQ);
 	  qchk();
 	  flag = true;
 	  break;
 	}
 	case ID_MARKQ: { // view / Set / Retrieve Mark / Q
-	  UserFlagMap->reset(UserFlag::MARQ);
+	  Instance->UserFlagMap.reset(UserFlag::MARQ);
 	  qchk();
 	  flag = true;
 	  break;
@@ -1271,13 +1271,13 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LINBEXACT: { // view / Set / Line Border Spacing / Exact
-	  UserFlagMap->reset(UserFlag::LINSPAC);
+	  Instance->UserFlagMap.reset(UserFlag::LINSPAC);
 	  linbmen();
 	  flag = true;
 	  break;
 	}
 	case ID_LINBEVEN: { // view / Set / Line Border Spacing / Even
-	  UserFlagMap->set(UserFlag::LINSPAC);
+	  Instance->UserFlagMap.set(UserFlag::LINSPAC);
 	  linbmen();
 	  flag = true;
 	  break;

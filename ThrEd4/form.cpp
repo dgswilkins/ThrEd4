@@ -915,11 +915,11 @@ void bdrlin(uint32_t const vertexIndex, uint32_t const start, uint32_t const fin
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
   auto const length      = std::hypot(delta.x, delta.y);
-  auto       stitchCount = UserFlagMap->test(UserFlag::LINSPAC)
+  auto       stitchCount = Instance->UserFlagMap.test(UserFlag::LINSPAC)
                                ? wrap::ceil<uint32_t>(length / stitchSize)
                                : wrap::round<uint32_t>(((length - stitchSize * HALF) / stitchSize) + 1.0F);
   auto       step        = F_POINT {};
-  if (UserFlagMap->test(UserFlag::LINSPAC)) {
+  if (Instance->UserFlagMap.test(UserFlag::LINSPAC)) {
 	if (stitchCount != 0U) {
 	  step = delta / wrap::toFloat(stitchCount);
 	}
@@ -4341,7 +4341,7 @@ void fsvrt() {
   form.fillType    = VRTF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
   form::refilfn(ClosestFormToCursor);
 }
 
@@ -4355,7 +4355,7 @@ void fshor(FRM_HEAD& form) {
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
   form.fillAngle = PI_FHALF;
-  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
   form::refil(ClosestFormToCursor);
 }
 
@@ -4369,7 +4369,7 @@ void fsangl(FRM_HEAD& form) {
   form.fillAngle   = IniFile.fillAngle;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
   form::refil(ClosestFormToCursor);
 }
 
@@ -4515,7 +4515,7 @@ void sapliq(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
   form.edgeType = EDGEAPPL;
-  if (UserFlagMap->test(UserFlag::DUND)) {
+  if (Instance->UserFlagMap.test(UserFlag::DUND)) {
 	form.edgeType |= EGUND;
   }
   form.edgeSpacing = LineSpacing * HALF;
@@ -4660,7 +4660,7 @@ void prpsbrd(uint32_t const formIndex) {
   }
   clip::deleclp(formIndex);
   form.edgeType = EDGEPROPSAT;
-  if (UserFlagMap->test(UserFlag::DUND)) {
+  if (Instance->UserFlagMap.test(UserFlag::DUND)) {
 	form.edgeType |= EGUND;
   }
   form::bsizpar(form);
@@ -4904,7 +4904,7 @@ void cplayfn(uint32_t const iForm, uint32_t const layer) {
   currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
-  currentForm.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
+  currentForm.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
   formList.push_back(currentForm);
 }
 
@@ -6454,7 +6454,7 @@ void form::refilfn(uint32_t const formIndex) {
 }
 
 void form::refil(uint32_t const formIndex) {
-  if (UserFlagMap->test(UserFlag::WRNOF)) {
+  if (Instance->UserFlagMap.test(UserFlag::WRNOF)) {
 	refilfn(formIndex);
 	return;
   }
@@ -6835,7 +6835,7 @@ void form::unfil() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
-	if (!Instance->StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap->test(UserFlag::WRNOF)) {
+	if (!Instance->StateMap.testAndReset(StateFlag::IGNOR) && !Instance->UserFlagMap.test(UserFlag::WRNOF)) {
 	  if (auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
 	      std::ranges::any_of(Instance->StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
 		    return (stitch.attribute & NOTFRM) == 0U && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
@@ -7026,7 +7026,7 @@ void form::apliq() {
 
   if (!Instance->SelectedFormList.empty()) {
 	for (auto const selectedForm : Instance->SelectedFormList) {
-	  if (auto& currentForm = formList.operator[](selectedForm); UserFlagMap->test(UserFlag::BLUNT)) {
+	  if (auto& currentForm = formList.operator[](selectedForm); Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -7040,7 +7040,7 @@ void form::apliq() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
-	if (auto& currentForm = formList.operator[](ClosestFormToCursor); UserFlagMap->test(UserFlag::BLUNT)) {
+	if (auto& currentForm = formList.operator[](ClosestFormToCursor); Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	}
 	else {
@@ -7928,7 +7928,7 @@ void form::prpbrd(float const borderStitchSpacing) {
 	for (auto const selectedForm : Instance->SelectedFormList) {
 	  auto& currentForm      = Instance->FormList.operator[](selectedForm);
 	  currentForm.borderSize = LineSpacing;
-	  if (UserFlagMap->test(UserFlag::BLUNT)) {
+	  if (Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -7944,7 +7944,7 @@ void form::prpbrd(float const borderStitchSpacing) {
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	if (auto& currentForm = Instance->FormList.operator[](ClosestFormToCursor);
-	    UserFlagMap->test(UserFlag::BLUNT)) {
+	    Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	}
 	else {

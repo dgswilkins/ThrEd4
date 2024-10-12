@@ -556,7 +556,7 @@ void txfn(uint32_t const textureType, uint32_t const formIndex) {
   }
   texture::savtxt();
   nutx(formIndex);
-  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
   switch (textureType) {
 	case VRTYP: {
 	  txvrt(form);
