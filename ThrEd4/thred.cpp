@@ -244,7 +244,7 @@ auto RunPoint            = uint32_t {}; // point for animating stitchout
 auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
 auto MovieTimeStep       = int32_t {};  // time delay for stitchout
 auto LastKeyCode         = std::numeric_limits<wchar_t>::max(); // last key code
-auto VersionNames = gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
+auto VersionNames        = std::vector<fs::path> {}; // temporary storage for old file version names
 auto FileVersionIndex = uint8_t {};                     // points to old version to be read
 auto StitchArrow      = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
 auto SelectedRange    = RANGE {}; // first and last stitch for min/max stitch select
@@ -2819,8 +2819,8 @@ void dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& windowSiz
 
 void duver(fs::path const& name) {
   if (auto const version = wrap::toSize(tolower(name.extension().wstring().back()) - 'r');
-      version < VersionNames->size()) {
-	VersionNames->operator[](version) = name;
+      version < VersionNames.size()) {
+	VersionNames.operator[](version) = name;
   }
 }
 
@@ -6993,7 +6993,7 @@ void thrsav() {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const file = FindFirstFile(geName.wstring().c_str(), &fileData); file != INVALID_HANDLE_VALUE) {
 	  Instance->StateMap.reset(StateFlag::CMPDO);
-	  for (auto& version : *VersionNames) {
+	  for (auto& version : VersionNames) {
 		version.clear();
 	  }
 	  auto& fileName = fileData.cFileName;
@@ -7002,16 +7002,16 @@ void thrsav() {
 		duver(DefaultDirectory / std::begin(fileName));
 	  }
 	  FindClose(file);
-	  fs::remove(VersionNames->back());
-	  for (auto iBackup = VersionNames->size() - 1U; iBackup > 0; --iBackup) {
-		if (!VersionNames->operator[](iBackup - 1U).empty()) {
-		  auto newFileName = VersionNames->operator[](iBackup - 1U); // copy intended
+	  fs::remove(VersionNames.back());
+	  for (auto iBackup = VersionNames.size() - 1U; iBackup > 0; --iBackup) {
+		if (!VersionNames.operator[](iBackup - 1U).empty()) {
+		  auto newFileName = VersionNames.operator[](iBackup - 1U); // copy intended
 
 		  auto ext   = newFileName.extension().wstring();
 		  ext.back() = gsl::narrow<wchar_t>(iBackup - 1) + 's';
 		  newFileName.replace_extension(ext);
 		  auto eCode = std::error_code {};
-		  fs::rename(VersionNames->operator[](iBackup - 1U), newFileName, eCode);
+		  fs::rename(VersionNames.operator[](iBackup - 1U), newFileName, eCode);
 		  auto const msg = eCode.message();
 		  if (eCode != std::error_code {}) {
 			// ToDo - find better error message
@@ -12272,7 +12272,10 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ThumbnailSearchString.reserve(TSSSIZ);
 	  UserColorWin.resize(COLORCNT);
 	  UserPen.resize(COLORCNT);
-	  VersionNames          = &Instance->VersionNames; // thred only
+	  VersionNames.reserve(OLDVER);
+	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
+		VersionNames.emplace_back(L"");
+	  }
 
 	  bal::setBN0(&Instance->BalaradName0);
 	  bal::setBN1(&Instance->BalaradName1);

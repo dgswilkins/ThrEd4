@@ -79,10 +79,6 @@ class MY_SINGLE
 	SelectedPointsLine.resize(OUTPNTS);
 	TextureHistory.resize(ITXBUFSZ);
 	ValueWindow.resize(LASTLIN);
-	VersionNames.reserve(OLDVER);
-	for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-	  VersionNames.emplace_back(L"");
-	}
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
@@ -136,7 +132,6 @@ class MY_SINGLE
   fs::path              UserBMPFileName;
   ENUM_MAP<UserFlag>    UserFlagMap = ENUM_MAP<UserFlag> {0};
   std::vector<HWND>     ValueWindow;
-  std::vector<fs::path> VersionNames;
   fs::path              WorkingFileName;
   std::wstring          textureInputBuffer;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
