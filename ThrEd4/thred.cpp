@@ -12278,7 +12278,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		VersionNames.emplace_back(L"");
 	  }
 
-	  bitmap::setUBfilename(&Instance->userBMPFileName);
 	  texture::initTextures(
 	      &Instance->TempTexturePoints, &Instance->SelectedTexturePointsList, &Instance->TextureHistory);
 	  tfc::setFVAS(&Instance->FormVerticesAsLine);

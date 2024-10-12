@@ -123,7 +123,6 @@ class MY_SINGLE
 
   std::array<std::vector<uint32_t>, UNDOLEN> UndoBuffer;
 
-  fs::path           userBMPFileName;
   ENUM_MAP<UserFlag> userFlagMap = ENUM_MAP<UserFlag> {0};
   std::vector<HWND>  valueWindow;
   fs::path           WorkingFileName;

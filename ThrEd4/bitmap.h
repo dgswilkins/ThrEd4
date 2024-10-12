@@ -49,5 +49,4 @@ void setBitmapColor(COLORREF const& newColor) noexcept;
 void setBitmapPen(HPEN pen) noexcept;
 void setBmpBackColor();
 void setBmpColor();
-void setUBfilename(fs::path* fileName) noexcept;
 } // namespace bitmap

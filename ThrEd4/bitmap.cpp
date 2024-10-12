@@ -95,7 +95,7 @@ auto BitmapWidth          = LONG {};             // bitmap width
 auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
 auto TraceBitmap          = HBITMAP {};          // trace bitmap
 auto TraceDC              = HDC {};              // trace device context
-auto UTF16BMPname         = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
+auto UTF16BMPname           = fs::path {};         // bitmap file name from user load
 auto UTF8BMPname          = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
 
 // Definitions
@@ -336,7 +336,7 @@ auto saveName(fs::path& fileName) {
   hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
   hResult += pFileSave->SetFileTypeIndex(0);
   hResult += pFileSave->SetTitle(L"Save Bitmap");
-  auto const bmpName = UTF16BMPname->filename().wstring();
+  auto const bmpName = UTF16BMPname.filename().wstring();
   hResult += pFileSave->SetFileName(bmpName.c_str());
   hResult += pFileSave->SetDefaultExtension(L"bmp");
   if (FAILED(hResult)) {
@@ -375,9 +375,9 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   auto const inverseBackgroundColor = fswap(backgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto hBitmapFile =
-      CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+      CreateFile(UTF16BMPname.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
-	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
+	displayText::showMessage(IDS_UNOPEN, UTF16BMPname.wstring());
 	CloseHandle(hBitmapFile);
 	resetBmpFile(true);
 	return;
@@ -474,7 +474,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	CloseHandle(hBitmapFile);
 	Instance->StateMap.reset(StateFlag::MONOMAP);
 	hBitmapFile = LoadImage(
-	    ThrEdInstance, UTF16BMPname->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+	    ThrEdInstance, UTF16BMPname.wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 	SelectObject(BitmapDC, hBitmapFile);
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
@@ -515,7 +515,7 @@ void bitmap::savmap() {
   auto const hBitmap =
       CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (hBitmap == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(*UTF16BMPname);
+	displayText::crmsg(UTF16BMPname);
 	return;
   }
   auto bytesWritten = DWORD {};
@@ -530,20 +530,20 @@ void bitmap::savmap() {
 }
 
 void bitmap::lodbmp(fs::path const& directory) {
-  if (!loadName(directory, *UTF16BMPname)) {
+  if (!loadName(directory, UTF16BMPname)) {
 	return;
   }
   resetBmpFile(false);
   trace::untrace();
 #if USE_SHORT_NAME
-  auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), nullptr, 0);
+  auto const pleng = GetShortPathName(UTF16BMPname.wstring().c_str(), nullptr, 0);
   auto       dest  = std::vector<wchar_t> {};
   dest.resize(pleng);
-  GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
+  GetShortPathName(UTF16BMPname.wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
   auto const filePart = fs::path {dest.data()};
   auto       saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
 #else
-  auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());
+  auto const saveFile = utf::utf16ToUtf8(UTF16BMPname.filename().wstring());
 #endif
   if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	std::ranges::copy(saveFile, UTF8BMPname.begin());
@@ -569,15 +569,11 @@ void bitmap::setBmpColor() {
   thred::zumhom();
 }
 
-void bitmap::setUBfilename(fs::path* fileName) noexcept {
-  UTF16BMPname = fileName;
-}
-
 void bitmap::assignUBFilename(fs::path const& directory) {
   current_path(directory);
   auto const bmpFileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
   auto const fullPath    = directory / bmpFileName;
-  UTF16BMPname->assign(fullPath);
+  UTF16BMPname.assign(fullPath);
   bfil(BackgroundColor);
 }
 
