@@ -328,7 +328,7 @@ auto BoxOffset = std::array<int32_t, 4> {};
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
 auto DefaultDirectory = fs::path {};
 auto IniFileName      = fs::path {}; //.ini file name
-auto PreviousNames    = gsl::narrow_cast<std::vector<fs::path>*>(nullptr);
+auto PreviousNames    = std::vector<fs::path> {};
 auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
 
 auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
@@ -3237,7 +3237,7 @@ void gselrng() noexcept {
 
 void handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
   {
-	auto previousName = PreviousNames->begin();
+	auto previousName = PreviousNames.begin();
 	for (auto const& iLRU : LRUMenuId) {
 	  if (WinMsg.wParam == iLRU) {
 		Instance->WorkingFileName = *previousName;
@@ -5246,16 +5246,16 @@ void nunams() {
   xt::duauxnam(Instance->AuxName);
   Instance->ThrName = workingFileName;
   Instance->ThrName.replace_extension(L".thr");
-  if (PreviousNames->front() == Instance->ThrName) {
+  if (PreviousNames.front() == Instance->ThrName) {
 	return;
   }
   auto flag = true;
-  for (auto spNames = std::ranges::subrange(std::next(PreviousNames->begin()), PreviousNames->end());
+  for (auto spNames = std::ranges::subrange(std::next(PreviousNames.begin()), PreviousNames.end());
        auto& previousName : spNames) {
 	if (previousName != Instance->ThrName) {
 	  continue;
 	}
-	std::swap(PreviousNames->front(), previousName);
+	std::swap(PreviousNames.front(), previousName);
 	flag = false;
 	break;
   }
@@ -5263,7 +5263,7 @@ void nunams() {
 	menu::redfils(LRUMenuId, PreviousNames);
 	return;
   }
-  for (auto& previousName : *PreviousNames) {
+  for (auto& previousName : PreviousNames) {
 	if (!previousName.empty()) {
 	  continue;
 	}
@@ -5272,8 +5272,8 @@ void nunams() {
 	break;
   }
   if (flag) {
-	PreviousNames->insert(PreviousNames->begin(), Instance->ThrName);
-	PreviousNames->pop_back();
+	PreviousNames.insert(PreviousNames.begin(), Instance->ThrName);
+	PreviousNames.pop_back();
   }
   menu::redfils(LRUMenuId, PreviousNames);
 }
@@ -5699,7 +5699,7 @@ void redini() {
 	  auto const directory = utf::utf8ToUtf16(std::string(IniFile.defaultDirectory.data()));
 	  DefaultDirectory.assign(directory);
 	  {
-		auto previousName = PreviousNames->begin();
+		auto previousName = PreviousNames.begin();
 		for (auto const& prevName : IniFile.prevNames) {
 		  if (strlen(prevName.data()) != 0U) {
 			previousName->assign(utf::utf8ToUtf16(std::string(prevName.data())));
@@ -6125,7 +6125,7 @@ void ritini() {
   std::ranges::fill(IniFile.defaultDirectory, FILLCHAR);
   auto const spIDD = gsl::span {IniFile.defaultDirectory};
   std::ranges::copy(directory, spIDD.begin());
-  auto previousName = PreviousNames->begin();
+  auto previousName = PreviousNames.begin();
   for (auto& prevName : IniFile.prevNames) {
 	std::ranges::fill(prevName, FILLCHAR);
 	if (!previousName->empty()) {
@@ -12258,7 +12258,10 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  MsgBuffer.reserve(MSGSIZ);
 	  NearestPixel.resize(NERCNT);
 	  NearestPoint.resize(NERCNT);
-	  PreviousNames         = &Instance->PreviousNames;         // thred only
+	  PreviousNames.reserve(OLDNUM);
+	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
+		PreviousNames.emplace_back(L"");
+	  }
 	  ScrollSize            = &Instance->ScrollSize;            // thred only
 	  SideWindow            = &Instance->SideWindow;            // thred only
 	  SideWindowEntryBuffer = &Instance->SideWindowEntryBuffer; // thred only

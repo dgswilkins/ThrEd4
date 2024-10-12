@@ -90,11 +90,7 @@ class MY_SINGLE
 	UserColorWin.resize(COLORCNT);
 	UserPen.resize(COLORCNT);
 	ValueWindow.resize(LASTLIN);
-	PreviousNames.reserve(OLDNUM);
 	VersionNames.reserve(OLDVER);
-	for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
-	  PreviousNames.emplace_back(L"");
-	}
 	for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
 	  VersionNames.emplace_back(L"");
 	}
@@ -128,7 +124,6 @@ class MY_SINGLE
   MENUITEMINFO              MenuInfo = MENUITEMINFO {};
   std::vector<F_POINT>      OSequence;
   std::vector<F_POINT>      OutsidePointList;
-  std::vector<fs::path>     PreviousNames;
   fs::path                  RGBFileName;
   std::vector<POINT>        RubberBandLine;
   std::vector<SAT_CON>      SatinGuides;
