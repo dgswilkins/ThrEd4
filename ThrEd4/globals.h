@@ -74,12 +74,10 @@ class MY_SINGLE
 
   void initialize() {
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
-	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
 	RubberBandLine.resize(3U);
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
 	TextureHistory.resize(ITXBUFSZ);
-	ThumbnailSearchString.reserve(TSSSIZ);
 	UserColorWin.resize(COLORCNT);
 	UserPen.resize(COLORCNT);
 	ValueWindow.resize(LASTLIN);
@@ -132,7 +130,6 @@ class MY_SINGLE
   std::vector<TX_HIST>      TextureHistory;
   std::vector<TX_PNT>       TexturePointsBuffer;
   fs::path                  ThrName;
-  std::vector<wchar_t>      ThumbnailSearchString;
   std::vector<std::wstring> Thumbnails;
   boost::dynamic_bitset<>   TracedEdges;
   boost::dynamic_bitset<>   TracedMap;

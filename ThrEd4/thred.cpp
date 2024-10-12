@@ -207,6 +207,7 @@ constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
+constexpr auto TSSSIZ   = size_t {32U};         // size of the thumbnail search buffer
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
 auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
@@ -340,8 +341,7 @@ auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails s
 auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
 auto ThumbnailIndex        = uint32_t {}; // index into the thumbnail filname table
 
-auto ThumbnailSearchString =
-    gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // storage for the thumbnail search string
+auto ThumbnailSearchString = std::vector<wchar_t> {}; // storage for the thumbnail search string
 
 auto InsertedVertexIndex = uint32_t {};                  // saved vertex pointer for inserting files
 auto InsertedFormIndex   = uint32_t {};                  // saved form pointer for inserting files
@@ -5302,10 +5302,10 @@ void nuselrct() {
 
 void nuthum(wchar_t const character) {
   Instance->StateMap.set(StateFlag::RESTCH);
-  ThumbnailSearchString->back() = character;
-  ThumbnailSearchString->push_back(0);
+  ThumbnailSearchString.back() = character;
+  ThumbnailSearchString.push_back(0);
 
-  auto const txt = std::wstring(ThumbnailSearchString->data());
+  auto const txt = std::wstring(ThumbnailSearchString.data());
   displayText::butxt(HBOXSEL, txt);
   ThumbnailIndex = 0;
   thred::nuthsel();
@@ -10245,8 +10245,8 @@ void thred::thumnail() {
 	rthumnam(iThumbnail++);
   }
   Instance->StateMap.set(StateFlag::THUMSHO);
-  ThumbnailSearchString->clear();
-  ThumbnailSearchString->push_back(0);
+  ThumbnailSearchString.clear();
+  ThumbnailSearchString.push_back(0);
   SetWindowText(Instance->ButtonWin.operator[](HBOXSEL), L"");
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
@@ -10260,12 +10260,12 @@ void thred::nuthsel() {
   }
   auto const savedIndex = ThumbnailIndex;
   auto       iThumbnail = uint32_t {};
-  auto const length     = wcslen(ThumbnailSearchString->data());
+  auto const length     = wcslen(ThumbnailSearchString.data());
   Instance->StateMap.set(StateFlag::RESTCH);
   if (length != 0U) {
 	auto itHWndBV = BackupViewer.begin();
 	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
-	  if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+	  if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 		redraw(*itHWndBV);
 		++itHWndBV;
@@ -10300,11 +10300,11 @@ void thred::nuthbak(uint32_t count) {
 	return;
   }
   constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
-  if (auto const length = wcslen(ThumbnailSearchString->data()); length != 0U) {
+  if (auto const length = wcslen(ThumbnailSearchString.data()); length != 0U) {
 	while (count != 0U && ThumbnailIndex < MAXFORMS) {
 	  if (ThumbnailIndex != 0U) {
 		--ThumbnailIndex;
-		if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		  --count;
 		}
 	  }
@@ -10323,14 +10323,14 @@ void thred::nuthbak(uint32_t count) {
 }
 
 void thred::thumbBack() {
-  if (ThumbnailSearchString->size() <= 1) {
+  if (ThumbnailSearchString.size() <= 1) {
 	return;
   }
   Instance->StateMap.set(StateFlag::RESTCH);
-  ThumbnailSearchString->pop_back();
-  ThumbnailSearchString->back() = 0;
+  ThumbnailSearchString.pop_back();
+  ThumbnailSearchString.back() = 0;
   ThumbnailIndex                = 0;
-  auto const txt                = std::wstring(ThumbnailSearchString->data());
+  auto const txt                = std::wstring(ThumbnailSearchString.data());
   displayText::butxt(HBOXSEL, txt);
   nuthsel();
 }
@@ -12269,7 +12269,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SideWindow.resize(SWCOUNT);
 	  SideWindowEntryBuffer.resize(SWBLEN);
 	  ThreadSizeWin.resize(COLORCNT);
-	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only
+	  ThumbnailSearchString.reserve(TSSSIZ);
 	  Thumbnails            = &Instance->Thumbnails;            // thred only
 	  UserColorWin          = &Instance->UserColorWin; // thred only
 	  UserPen               = &Instance->UserPen;      // thred only
