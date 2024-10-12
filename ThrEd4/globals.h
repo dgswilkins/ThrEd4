@@ -241,10 +241,8 @@ extern HWND     CancelButton;
 extern uint32_t Clip;
 
 extern HGLOBAL ClipMemory;
-extern void*   ClipPointer;
 
 extern F_LSIZ       ClipRectSize;
-extern CLIP_STITCH* ClipStitchData;
 extern uint32_t     ClosestFormToCursor;
 extern uint32_t     ClosestPointIndex;
 extern uint32_t     ClosestVertexToCursor;
@@ -304,7 +302,6 @@ extern std::vector<F_POINT>* OutsidePoints;
 extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;
 extern uint32_t       PreferenceIndex;
-extern int32_t        PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
 extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
