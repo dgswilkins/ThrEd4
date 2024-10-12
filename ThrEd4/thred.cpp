@@ -2451,7 +2451,7 @@ void dubuf(std::vector<char>& buffer) {
   auto const thredDataSize = wrap::sizeofVector(formList) +
                              (vertexCount * wrap::sizeofType(Instance->FormVertices)) +
                              (guideCount * wrap::sizeofType(Instance->satinGuides)) +
-                             (clipDataCount * wrap::sizeofType(Instance->ClipPoints)) +
+                             (clipDataCount * wrap::sizeofType(Instance->clipPoints)) +
                              wrap::sizeofVector(Instance->TexturePointsBuffer);
   buffer.reserve(vtxLen + thredDataSize);
   // ToDo - vertexLength overflows a 16 bit integer if there are more than 5446 stitches, so clamp it until version 3
@@ -2460,7 +2460,7 @@ void dubuf(std::vector<char>& buffer) {
   vtxLen = std::min(vtxLen, VTXCLAMP);
   wrap::narrow(stitchHeader.vertexLen, vtxLen);
   wrap::narrow(stitchHeader.dlineLen, wrap::sizeofType(Instance->FormVertices) * vertexCount);
-  wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(Instance->ClipPoints) * clipDataCount);
+  wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(Instance->clipPoints) * clipDataCount);
   // write the header to the buffer
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
   ExtendedHeader.auxFormat         = IniFile.auxFileType;
@@ -2515,14 +2515,14 @@ void dubuf(std::vector<char>& buffer) {
 	  }
 	}
 	if (srcForm.isClip()) { // write the clip data to the points buffer
-	  auto offsetStart = wrap::next(Instance->ClipPoints.cbegin(), srcForm.clipIndex);
+	  auto offsetStart = wrap::next(Instance->clipPoints.cbegin(), srcForm.clipIndex);
 	  for (auto iClip = 0U; iClip < srcForm.clipCount; ++iClip) {
 		points.push_back(*offsetStart);
 		++offsetStart;
 	  }
 	}
 	if (srcForm.isEdgeClipX()) { // write the edge clip data to the points buffer
-	  auto       offsetStart = wrap::next(Instance->ClipPoints.cbegin(), srcForm.borderClipData);
+	  auto       offsetStart = wrap::next(Instance->clipPoints.cbegin(), srcForm.borderClipData);
 	  auto const clipCount   = srcForm.clipEntries;
 	  for (auto iClip = 0U; iClip < clipCount; ++iClip) {
 		points.push_back(*offsetStart);
@@ -4550,7 +4550,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
   if (fileHeader.formCount != 0U) {
 	auto const newFormVertexIndex = wrap::toUnsigned(Instance->FormVertices.size());
 	auto       newSatinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
-	auto       clipOffset         = wrap::toUnsigned(Instance->ClipPoints.size());
+	auto       clipOffset         = wrap::toUnsigned(Instance->clipPoints.size());
 	auto       textureOffset      = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
 	if (version < 2) {
 	  auto inFormList = std::vector<FRM_HEAD_O> {};
@@ -4618,7 +4618,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	if (fileHeader.clipDataCount != 0U) {
 	  auto inPointList = std::vector<F_POINT> {};
 	  inPointList.resize(fileHeader.clipDataCount);
-	  auto const bytesToRead = fileHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
+	  auto const bytesToRead = fileHeader.clipDataCount * wrap::sizeofType(Instance->clipPoints);
 	  if (!wrap::readFile(fileHandle, inPointList.data(), bytesToRead, &bytesRead, L"ReadFile for inPointList in insTHR")) {
 		return false;
 	  }
@@ -4626,8 +4626,8 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 		inPointList.resize(bytesRead / wrap::sizeofType(inPointList));
 		Instance->StateMap.set(StateFlag::BADFIL);
 	  }
-	  Instance->ClipPoints.reserve(Instance->ClipPoints.size() + inPointList.size());
-	  Instance->ClipPoints.insert(Instance->ClipPoints.end(), inPointList.begin(), inPointList.end());
+	  Instance->clipPoints.reserve(Instance->clipPoints.size() + inPointList.size());
+	  Instance->clipPoints.insert(Instance->clipPoints.end(), inPointList.begin(), inPointList.end());
 	}
 	if (thredHeader.texturePointCount != 0U) {
 	  auto inTextureList = std::vector<TX_PNT> {};
@@ -4672,7 +4672,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	if (newSatinGuideIndex != Instance->satinGuides.size()) {
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
-	if (clipOffset != Instance->ClipPoints.size()) {
+	if (clipOffset != Instance->clipPoints.size()) {
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
 	if (fileHeader.formCount != 0U) {
@@ -5575,17 +5575,17 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   Instance->satinGuides.shrink_to_fit();
   if (thredHeader.clipDataCount != 0U) { // read the clip points
-	Instance->ClipPoints.resize(thredHeader.clipDataCount);
-	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
-	if (!wrap::readFile(fileHandle, Instance->ClipPoints.data(), bytesToRead, &bytesRead, L"ReadFile for ClipPoints in readTHRFile")) {
+	Instance->clipPoints.resize(thredHeader.clipDataCount);
+	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->clipPoints);
+	if (!wrap::readFile(fileHandle, Instance->clipPoints.data(), bytesToRead, &bytesRead, L"ReadFile for clipPoints in readTHRFile")) {
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
-	  Instance->ClipPoints.resize(bytesRead / wrap::sizeofType(Instance->ClipPoints));
+	  Instance->clipPoints.resize(bytesRead / wrap::sizeofType(Instance->clipPoints));
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
   }
-  Instance->ClipPoints.shrink_to_fit();
+  Instance->clipPoints.shrink_to_fit();
   if (ExtendedHeader.texturePointCount != 0U) { // read the texture points
 	Instance->TexturePointsBuffer.resize(ExtendedHeader.texturePointCount);
 	bytesToRead = ExtendedHeader.texturePointCount * wrap::sizeofType(Instance->TexturePointsBuffer);
@@ -7270,10 +7270,10 @@ auto thred::adflt(uint32_t const count) -> uint32_t {
 }
 
 auto thred::adclp(uint32_t const count) -> uint32_t {
-  auto const iClipPoint = wrap::toUnsigned(Instance->ClipPoints.size());
-  auto const itPoint    = Instance->ClipPoints.end();
+  auto const iClipPoint = wrap::toUnsigned(Instance->clipPoints.size());
+  auto const itPoint    = Instance->clipPoints.end();
   auto constexpr VAL    = F_POINT {};
-  Instance->ClipPoints.insert(itPoint, count, VAL);
+  Instance->clipPoints.insert(itPoint, count, VAL);
   return iClipPoint;
 }
 
@@ -8841,8 +8841,8 @@ void thred::newFil() {
   Instance->FormVertices.shrink_to_fit();
   Instance->TexturePointsBuffer.clear();
   Instance->TexturePointsBuffer.shrink_to_fit();
-  Instance->ClipPoints.clear();
-  Instance->ClipPoints.shrink_to_fit();
+  Instance->clipPoints.clear();
+  Instance->clipPoints.shrink_to_fit();
   Instance->satinGuides.clear();
   Instance->satinGuides.shrink_to_fit();
   auto& formList = Instance->FormList;

@@ -535,19 +535,19 @@ void adfrm(uint32_t const iForm) {
   }
   if (currentForm.isEdgeClipX()) {
 	auto const originalBCData  = currentForm.borderClipData;
-	currentForm.borderClipData = wrap::toUnsigned(Instance->ClipPoints.size());
+	currentForm.borderClipData = wrap::toUnsigned(Instance->clipPoints.size());
 
-	auto const itClipPoints = wrap::next(Instance->ClipPoints.cbegin(), originalBCData);
-	Instance->ClipPoints.insert(
-	    Instance->ClipPoints.end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipEntries));
+	auto const itClipPoints = wrap::next(Instance->clipPoints.cbegin(), originalBCData);
+	Instance->clipPoints.insert(
+	    Instance->clipPoints.end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipEntries));
   }
   if (currentForm.isClipX()) {
 	auto const originalClip = currentForm.clipIndex;
-	currentForm.clipIndex   = wrap::toUnsigned(Instance->ClipPoints.size());
+	currentForm.clipIndex   = wrap::toUnsigned(Instance->clipPoints.size());
 
-	auto const itClipPoints = wrap::next(Instance->ClipPoints.cbegin(), originalClip);
-	Instance->ClipPoints.insert(
-	    Instance->ClipPoints.end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipCount));
+	auto const itClipPoints = wrap::next(Instance->clipPoints.cbegin(), originalClip);
+	Instance->clipPoints.insert(
+	    Instance->clipPoints.end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipCount));
   }
   formList.push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
@@ -4502,7 +4502,7 @@ void fsclp(uint32_t const formIndex) {
   form.edgeSpacing    = ClipRectSize.cx;
   form.borderColor    = ActiveColor;
   form::bsizpar(form);
-  auto itClipPoint = wrap::next(Instance->ClipPoints.begin(), form.borderClipData);
+  auto itClipPoint = wrap::next(Instance->clipPoints.begin(), form.borderClipData);
   for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
@@ -4692,7 +4692,7 @@ void filsclp() {
   auto const& clipBuffer = Instance->clipBuffer;
 
   currentForm.clipCount = wrap::toUnsigned(clipBuffer.size());
-  auto itClipPoints     = wrap::next(Instance->ClipPoints.begin(), currentForm.clipIndex);
+  auto itClipPoints     = wrap::next(Instance->clipPoints.begin(), currentForm.clipIndex);
   for (auto const& clip : clipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
@@ -4964,7 +4964,7 @@ void fspic(uint32_t const formIndex) {
   form.borderColor    = ActiveColor;
   form::bsizpar(form);
   form::savplen(ButtonholeCornerLength);
-  auto itClipPoints = wrap::next(Instance->ClipPoints.begin(), form.borderClipData);
+  auto itClipPoints = wrap::next(Instance->clipPoints.begin(), form.borderClipData);
   for (auto const& clip : clipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
@@ -5044,13 +5044,13 @@ void dufdat(std::vector<F_POINT>&  tempClipPoints,
   }
   auto const& form = formList.operator[](formIndex);
   if (form.isEdgeClipX()) {
-	auto const itStartClip = wrap::next(Instance->ClipPoints.cbegin(), dest.borderClipData);
+	auto const itStartClip = wrap::next(Instance->clipPoints.cbegin(), dest.borderClipData);
 	auto const itEndClip   = wrap::next(itStartClip, dest.clipEntries);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
 	dest.borderClipData = wrap::toUnsigned(tempClipPoints.size() - dest.clipEntries);
   }
   if (form.isClipX()) {
-	auto const itStartClip = wrap::next(Instance->ClipPoints.cbegin(), dest.clipIndex);
+	auto const itStartClip = wrap::next(Instance->clipPoints.cbegin(), dest.clipIndex);
 	auto const itEndClip   = wrap::next(itStartClip, dest.clipCount);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
 	dest.clipIndex = wrap::toUnsigned(tempClipPoints.size() - dest.clipCount);
@@ -5232,7 +5232,7 @@ void fsclpx(uint32_t const formIndex) {
   form.edgeSpacing    = ClipRectSize.cx;
   form.borderColor    = ActiveColor;
   form::bsizpar(form);
-  auto itClipPoint = wrap::next(Instance->ClipPoints.begin(), form.borderClipData);
+  auto itClipPoint = wrap::next(Instance->clipPoints.begin(), form.borderClipData);
   for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
@@ -5547,7 +5547,7 @@ void form::ritfrct(uint32_t const iForm, HDC hDC) {
 void form::delfrms() {
   thred::savdo();
   Instance->FormVertices.clear();
-  Instance->ClipPoints.clear();
+  Instance->clipPoints.clear();
   Instance->FormList.clear();
   Instance->satinGuides.clear();
   for (auto& stitch : Instance->StitchBuffer) {
@@ -6664,7 +6664,7 @@ void form::clrfills() noexcept {
 	iForm.attribute &= NFRECONT;
 	iForm.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
   }
-  Instance->ClipPoints.clear();
+  Instance->clipPoints.clear();
 }
 
 void form::drwcon() {
@@ -8576,7 +8576,7 @@ void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
   auto tempGuides = std::vector<SAT_CON> {};
   tempGuides.reserve(Instance->satinGuides.size());
   auto tempClipPoints = std::vector<F_POINT> {};
-  tempClipPoints.reserve(Instance->ClipPoints.size());
+  tempClipPoints.reserve(Instance->clipPoints.size());
   auto formSourceIndex = 0U;
   for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 	if (iForm == newFormIndex) {
@@ -8591,7 +8591,7 @@ void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
   std::ranges::copy(tempFormList, formList.begin());
   std::ranges::copy(tempFormVertices, Instance->FormVertices.begin());
   std::ranges::copy(tempGuides, Instance->satinGuides.begin());
-  std::ranges::copy(tempClipPoints, Instance->ClipPoints.begin());
+  std::ranges::copy(tempClipPoints, Instance->clipPoints.begin());
   for (auto& stitch : Instance->StitchBuffer) {
 	if ((stitch.attribute & SRTYPMSK) == 0U) {
 	  continue;
@@ -8806,9 +8806,9 @@ void form::debean() {
 }
 
 void form::clpspac(uint32_t const insertPoint, uint32_t const count) {
-  auto const itStartClip = wrap::next(Instance->ClipPoints.cbegin(), insertPoint);
+  auto const itStartClip = wrap::next(Instance->clipPoints.cbegin(), insertPoint);
   auto const itEndClip   = wrap::next(itStartClip, count);
-  Instance->ClipPoints.insert(itStartClip, itStartClip, itEndClip);
+  Instance->clipPoints.insert(itStartClip, itStartClip, itEndClip);
 }
 
 void form::stchadj() {
@@ -8900,7 +8900,7 @@ void form::vrtsclp(uint32_t const formIndex) {
   form.wordParam = IniFile.fillPhase;
   makpoli();
   form.fillSpacing = IniFile.clipOffset;
-  auto itClipPoint = wrap::next(Instance->ClipPoints.begin(), form.clipIndex);
+  auto itClipPoint = wrap::next(Instance->clipPoints.begin(), form.clipIndex);
   for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
@@ -8965,7 +8965,7 @@ void form::horsclp() {
   form.wordParam = IniFile.fillPhase;
   makpoli();
   form.fillSpacing = IniFile.clipOffset;
-  auto itClipPoint = wrap::next(Instance->ClipPoints.begin(), form.clipIndex);
+  auto itClipPoint = wrap::next(Instance->clipPoints.begin(), form.clipIndex);
   for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
@@ -9029,7 +9029,7 @@ void form::angsclp(FRM_HEAD& form) {
   makpoli();
   form.clipFillAngle = IniFile.fillAngle;
   form.fillSpacing   = IniFile.clipOffset;
-  auto itClipPoint   = wrap::next(Instance->ClipPoints.begin(), form.clipIndex);
+  auto itClipPoint   = wrap::next(Instance->clipPoints.begin(), form.clipIndex);
   for (auto const& clip : clipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;

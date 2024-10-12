@@ -746,7 +746,7 @@ void xclpfn(std::vector<F_POINT> const& tempClipPoints,
 } // namespace
 
 void clip::delmclp(uint32_t const formIndex) {
-  if (Instance->ClipPoints.empty()) {
+  if (Instance->clipPoints.empty()) {
 	return;
   }
   auto& form = Instance->FormList.operator[](formIndex);
@@ -754,9 +754,9 @@ void clip::delmclp(uint32_t const formIndex) {
 	return;
   }
   auto const destIndex   = findclp(formIndex);
-  auto const itStartClip = wrap::next(Instance->ClipPoints.cbegin(), destIndex);
+  auto const itStartClip = wrap::next(Instance->clipPoints.cbegin(), destIndex);
   auto const itEndClip   = wrap::next(itStartClip, form.clipCount);
-  Instance->ClipPoints.erase(itStartClip, itEndClip);
+  Instance->clipPoints.erase(itStartClip, itEndClip);
   if (form.isEdgeClip()) {
 	form.borderClipData -= form.clipCount;
   }
@@ -765,7 +765,7 @@ void clip::delmclp(uint32_t const formIndex) {
 }
 
 void clip::deleclp(uint32_t const formIndex) {
-  if (Instance->ClipPoints.empty()) {
+  if (Instance->clipPoints.empty()) {
 	return;
   }
   auto& form = Instance->FormList.operator[](formIndex);
@@ -776,9 +776,9 @@ void clip::deleclp(uint32_t const formIndex) {
   if (form.isClipX()) {
 	destIndex += form.clipCount;
   }
-  auto const itStartClip = wrap::next(Instance->ClipPoints.cbegin(), destIndex);
+  auto const itStartClip = wrap::next(Instance->clipPoints.cbegin(), destIndex);
   auto const itEndClip   = wrap::next(itStartClip, form.clipEntries);
-  Instance->ClipPoints.erase(itStartClip, itEndClip);
+  Instance->clipPoints.erase(itStartClip, itEndClip);
   clpsub(formIndex, form.clipEntries);
   form.clipEntries    = 0;
   form.borderClipData = 0;
@@ -797,9 +797,9 @@ auto clip::nueclp(uint32_t const currentForm, uint32_t const count) -> uint32_t 
   if (auto const& form = formList.operator[](currentForm); form.isClip()) {
 	find += form.clipCount;
   }
-  auto const itClipPoint = wrap::next(Instance->ClipPoints.cbegin(), find);
+  auto const itClipPoint = wrap::next(Instance->clipPoints.cbegin(), find);
   auto constexpr VAL     = F_POINT {};
-  Instance->ClipPoints.insert(itClipPoint, count, VAL);
+  Instance->clipPoints.insert(itClipPoint, count, VAL);
   auto itStart = wrap::next(formList.begin(), currentForm);
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += count;
@@ -819,9 +819,9 @@ auto clip::nueclp(uint32_t const currentForm, uint32_t const count) -> uint32_t 
 auto clip::numclp(uint32_t const formIndex) -> uint32_t {
   auto const clipSize    = wrap::toUnsigned(Instance->clipBuffer.size());
   auto const find        = findclp(formIndex);
-  auto const itClipPoint = wrap::next(Instance->ClipPoints.cbegin(), find);
+  auto const itClipPoint = wrap::next(Instance->clipPoints.cbegin(), find);
   auto constexpr VAL     = F_POINT {};
-  Instance->ClipPoints.insert(itClipPoint, clipSize, VAL);
+  Instance->clipPoints.insert(itClipPoint, clipSize, VAL);
   auto& formList = Instance->FormList;
 
   auto itStart       = wrap::next(formList.begin(), formIndex);
@@ -851,8 +851,8 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const 
   if (clipEntries != 0U) {
 	clipBuffer.reserve(clipEntries);
 	for (auto const clipPoints =
-	         std::ranges::subrange(wrap::next(Instance->ClipPoints.begin(), clipIndex),
-	                               wrap::next(Instance->ClipPoints.begin(), clipIndex + clipEntries));
+	         std::ranges::subrange(wrap::next(Instance->clipPoints.begin(), clipIndex),
+	                               wrap::next(Instance->clipPoints.begin(), clipIndex + clipEntries));
 	     auto const& iClip : clipPoints) {
 	  clipBuffer.emplace_back(iClip.x, iClip.y, 0);
 	}

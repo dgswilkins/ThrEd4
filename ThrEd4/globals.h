@@ -89,7 +89,7 @@ class MY_SINGLE
   std::vector<B_SEQ_PNT>    bSequence;
   std::vector<HWND>         buttonWin;
   std::vector<F_POINT_ATTR> clipBuffer;
-  std::vector<F_POINT>      ClipPoints;
+  std::vector<F_POINT>      clipPoints;
   fs::path                  ColorFileName;
   int32_t                   DPI = 0;
   std::vector<float>        formAngles;

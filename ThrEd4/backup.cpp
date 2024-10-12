@@ -103,10 +103,10 @@ void redbak() {
 	auto const span = gsl::span {undoData->guide, undoData->guideCount};
 	Instance->satinGuides.insert(Instance->satinGuides.end(), span.begin(), span.end());
   }
-  Instance->ClipPoints.clear();
+  Instance->clipPoints.clear();
   if (undoData->clipPointCount != 0U) {
 	auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
-	Instance->ClipPoints.insert(Instance->ClipPoints.end(), span.begin(), span.end());
+	Instance->clipPoints.insert(Instance->clipPoints.end(), span.begin(), span.end());
   }
   constexpr auto UCOLSIZE     = UserColor.size();
   auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
@@ -133,7 +133,7 @@ void backup::dudat() {
 
   auto const size =
       wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
-      wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
+      wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->clipPoints) +
       wrap::sizeofVector(Instance->satinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
       wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
@@ -169,15 +169,15 @@ void backup::dudat() {
 	auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
 	std::ranges::copy(Instance->satinGuides, spGuides.begin());
   }
-  backupData->clipPointCount = wrap::toUnsigned(Instance->ClipPoints.size());
+  backupData->clipPointCount = wrap::toUnsigned(Instance->clipPoints.size());
   backupData->clipPoints =
       convertFromPtr<F_POINT*>(std::next(backupData->guide, wrap::toPtrdiff(Instance->satinGuides.size())));
-  if (!Instance->ClipPoints.empty()) {
+  if (!Instance->clipPoints.empty()) {
 	auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
-	std::ranges::copy(Instance->ClipPoints, spClipPoints.begin());
+	std::ranges::copy(Instance->clipPoints, spClipPoints.begin());
   }
   backupData->colors = convertFromPtr<COLORREF*>(
-      std::next(backupData->clipPoints, wrap::toPtrdiff(Instance->ClipPoints.size())));
+      std::next(backupData->clipPoints, wrap::toPtrdiff(Instance->clipPoints.size())));
   {
 	auto const spColors = gsl::span {backupData->colors, COLORCNT};
 	std::ranges::copy(UserColor, spColors.begin());

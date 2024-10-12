@@ -98,9 +98,9 @@ void checkClip(const uint32_t&       clipDifference,
                std::vector<F_POINT>& clipPoint,
                unsigned int&         clipCount,
                unsigned int&         badClipCount) {
-  if (wrap::toSize(clipDifference) + form.clipCount < Instance->ClipPoints.size()) {
+  if (wrap::toSize(clipDifference) + form.clipCount < Instance->clipPoints.size()) {
 	clipPoint.resize(clipPoint.size() + form.clipCount);
-	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
+	auto const startClip   = wrap::next(Instance->clipPoints.cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -108,10 +108,10 @@ void checkClip(const uint32_t&       clipDifference,
 	clipCount += form.clipCount;
 	return;
   }
-  if (clipDifference < Instance->ClipPoints.size()) {
+  if (clipDifference < Instance->clipPoints.size()) {
 	form.clipCount = wrap::toUnsigned(Instance->FormVertices.size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipCount);
-	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
+	auto const startClip   = wrap::next(Instance->clipPoints.cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -128,9 +128,9 @@ void checkEdgeClip(const uint32_t&       clipDifference,
                    std::vector<F_POINT>& clipPoint,
                    unsigned int&         clipCount,
                    unsigned int&         badClipCount) {
-  if (wrap::toSize(clipDifference) + form.clipEntries < Instance->ClipPoints.size()) {
+  if (wrap::toSize(clipDifference) + form.clipEntries < Instance->clipPoints.size()) {
 	clipPoint.resize(clipPoint.size() + form.clipEntries);
-	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.borderClipData);
+	auto const startClip   = wrap::next(Instance->clipPoints.cbegin(), form.borderClipData);
 	auto const endClip     = wrap::next(startClip, form.clipEntries);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -138,10 +138,10 @@ void checkEdgeClip(const uint32_t&       clipDifference,
 	clipCount += form.clipEntries;
 	return;
   }
-  if (clipDifference < Instance->ClipPoints.size()) {
+  if (clipDifference < Instance->clipPoints.size()) {
 	wrap::narrow(form.clipEntries, Instance->FormVertices.size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipEntries);
-	auto const startClip   = wrap::next(Instance->ClipPoints.cbegin(), form.borderClipData);
+	auto const startClip   = wrap::next(Instance->clipPoints.cbegin(), form.borderClipData);
 	auto const endClip     = wrap::next(startClip, form.clipEntries);
 	auto const destination = wrap::next(clipPoint.begin(), clipCount);
 	std::copy(startClip, endClip, destination);
@@ -263,7 +263,7 @@ auto frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 	if (badData.flt != Instance->FormVertices.size()) {
 	  badData.attribute |= BADFLT;
 	}
-	if (badData.clip != Instance->ClipPoints.size()) {
+	if (badData.clip != Instance->clipPoints.size()) {
 	  badData.attribute |= BADCLP;
 	}
 	if (badData.guideCount != Instance->satinGuides.size()) {
@@ -293,7 +293,7 @@ void repclp(std::wstring& repairMessage) {
 	  checkEdgeClip(clipDifference, form, clipPoint, clipCount, badClipCount);
 	}
   }
-  std::ranges::copy(clipPoint, Instance->ClipPoints.begin());
+  std::ranges::copy(clipPoint, Instance->clipPoints.begin());
   if (badClipCount != 0U) {
 	adbad(repairMessage, IDS_CLPDAT, badClipCount);
   }
@@ -333,7 +333,7 @@ void repflt(std::wstring& repairMessage) {
 	  continue;
 	}
 	formList.resize(iForm);
-	Instance->ClipPoints.resize(badData.clip);
+	Instance->clipPoints.resize(badData.clip);
 	Instance->satinGuides.resize(badData.guideCount);
 	Instance->TexturePointsBuffer.resize(badData.tx);
 	chkfstch();
