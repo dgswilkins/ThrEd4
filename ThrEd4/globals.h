@@ -127,7 +127,6 @@ class MY_SINGLE
   std::wstring              FormOnOff;
   std::vector<F_POINT>      FormVertices;
   std::vector<POINT>        FormVerticesAsLine;
-  fs::path                  IniFileName;
   std::vector<F_POINT>      InsidePointList;
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      InterleaveSequenceIndices;

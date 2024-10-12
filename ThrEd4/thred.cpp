@@ -300,7 +300,7 @@ auto BoxOffset = std::array<int32_t, 4> {};
 
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
 auto DefaultDirectory = fs::path {};
-auto IniFileName      = gsl::narrow_cast<fs::path*>(nullptr); //.ini file name
+auto IniFileName      = fs::path {}; //.ini file name
 auto PreviousNames    = gsl::narrow_cast<std::vector<fs::path>*>(nullptr);
 auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
 
@@ -5648,11 +5648,11 @@ void redfnam(std::wstring& designerName) {
 
 void redini() {
   duhom();
-  *IniFileName = HomeDirectory;
-  *IniFileName /= L"thred.ini";
+  IniFileName = HomeDirectory;
+  IniFileName /= L"thred.ini";
   // NOLINTNEXTLINE(readability-qualified-auto)
   if (auto const iniFileHandle =
-          CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+          CreateFile(IniFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
       iniFileHandle == INVALID_HANDLE_VALUE) {
 	setPrefs();
   }
@@ -5663,9 +5663,9 @@ void redini() {
 	}
 	CloseHandle(iniFileHandle);
 	if (bytesRead < sizeof(IniFile)) {
-	  auto newFileName = *IniFileName; // intentional copy
+	  auto newFileName = IniFileName; // intentional copy
 	  newFileName.replace_filename("thred-ini.bak");
-	  fs::rename(*IniFileName, newFileName);
+	  fs::rename(IniFileName, newFileName);
 	  setPrefs();
 	}
 	else {
@@ -6155,7 +6155,7 @@ void ritini() {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const iniFileHandle = CreateFile(
-      IniFileName->wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      IniFileName.wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (iniFileHandle != INVALID_HANDLE_VALUE) {
 	auto bytesRead = DWORD {};
 	WriteFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
@@ -12227,7 +12227,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
 	DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
-	  IniFileName           = &Instance->IniFileName;           // thred only
 	  Knots                 = &Instance->Knots;                 // thred only
 	  LabelWindow           = &Instance->LabelWindow;           // thred only
 	  LRUPtr                = &Instance->LRUMenuId;             // thred only
