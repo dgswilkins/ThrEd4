@@ -77,7 +77,6 @@ HWND                           HorizontalScrollBar       = nullptr; // horizonta
 INI_FILE                       IniFile                   = {};      // initialization file
 std::array<POINT, 3>           InsertLine                = {};      // the insert line
 std::vector<F_POINT>*          InsidePoints              = nullptr; // pointer to the list of inside outline points
-std::vector<HWND>*             LabelWindow               = nullptr; // text handles for the form data sheet
 F_POINT                        LastPoint                 = F_POINT {}; // last formOrigin written by line connect routine
 float                          LineSpacing               = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 F_POINT                        LowerLeftStitch           = F_POINT {}; // lower left formOrigin in a form

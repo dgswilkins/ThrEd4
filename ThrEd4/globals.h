@@ -80,7 +80,6 @@ class MY_SINGLE
 	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
-	LabelWindow.resize(LASTLIN);
 	MsgBuffer.reserve(MSGSIZ);
 	NearestPixel.resize(NERCNT);
 	NearestPoint.resize(NERCNT);
@@ -130,7 +129,6 @@ class MY_SINGLE
   std::vector<F_POINT>      InsidePointList;
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      InterleaveSequenceIndices;
-  std::vector<HWND>         LabelWindow;
 
   std::array<uint32_t, OLDNUM> LRUMenuId = {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
 
@@ -260,7 +258,6 @@ extern INI_FILE IniFile;
 
 extern std::array<POINT, 3>  InsertLine;
 extern std::vector<F_POINT>* InsidePoints;
-extern std::vector<HWND>*    LabelWindow;
 
 extern F_POINT LastPoint;
 extern float   LineSpacing;

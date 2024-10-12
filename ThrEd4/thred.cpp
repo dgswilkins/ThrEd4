@@ -181,7 +181,8 @@ constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeter
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
-auto FormControlPoints = std::vector<POINT> {}; // form control rectangle in pixel coordinates
+auto LabelWindow         = std::vector<HWND> {};  // text handles for the form data sheet
+auto FormControlPoints   = std::vector<POINT> {}; // form control rectangle in pixel coordinates
 auto ExtendedHeader  = THR_HEAD_EX {};              // ThrEd file header extension
 auto DesignerName    = std::wstring {};                          // designer name in clear
 auto ArgCount        = int32_t {};                               // command line argument count
@@ -11737,66 +11738,66 @@ auto thred::handleFormDataSheet() -> bool {
   auto&       form        = Instance->FormList.operator[](ClosestFormToCursor);
   auto const& valueWindow = Instance->ValueWindow;
   while (true) {
-	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == LabelWindow->operator[](LTXOF)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == LabelWindow.operator[](LTXOF)) {
 	  // draw the texture fill spacing window
 	  FormMenuChoice = LTXOF;
 	  formForms::sidwnd(valueWindow.operator[](LTXOF));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUSPAC) || WinMsg.hwnd == LabelWindow->operator[](LUSPAC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUSPAC) || WinMsg.hwnd == LabelWindow.operator[](LUSPAC)) {
 	  // draw the underlay spacing window
 	  FormMenuChoice = LUSPAC;
 	  formForms::sidwnd(valueWindow.operator[](LUSPAC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUANG) || WinMsg.hwnd == LabelWindow->operator[](LUANG)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUANG) || WinMsg.hwnd == LabelWindow.operator[](LUANG)) {
 	  // draw the underlay angle window
 	  FormMenuChoice = LUANG;
 	  formForms::sidwnd(valueWindow.operator[](LUANG));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LULEN) || WinMsg.hwnd == LabelWindow->operator[](LULEN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LULEN) || WinMsg.hwnd == LabelWindow.operator[](LULEN)) {
 	  // draw the underlay length window
 	  FormMenuChoice = LULEN;
 	  formForms::sidwnd(valueWindow.operator[](LULEN));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LWLKIND) || WinMsg.hwnd == LabelWindow->operator[](LWLKIND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LWLKIND) || WinMsg.hwnd == LabelWindow.operator[](LWLKIND)) {
 	  // draw the edge walk/underlay indent window
 	  FormMenuChoice = LWLKIND;
 	  formForms::sidwnd(valueWindow.operator[](LWLKIND));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHSIZ) || WinMsg.hwnd == LabelWindow->operator[](LFTHSIZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHSIZ) || WinMsg.hwnd == LabelWindow.operator[](LFTHSIZ)) {
 	  FormMenuChoice = LFTHSIZ;
 	  formForms::sidwnd(valueWindow.operator[](LFTHSIZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHNUM) || WinMsg.hwnd == LabelWindow->operator[](LFTHNUM)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHNUM) || WinMsg.hwnd == LabelWindow.operator[](LFTHNUM)) {
 	  // draw the feather number window
 	  FormMenuChoice = LFTHNUM;
 	  formForms::sidwnd(valueWindow.operator[](LFTHNUM));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHFLR) || WinMsg.hwnd == LabelWindow->operator[](LFTHFLR)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHFLR) || WinMsg.hwnd == LabelWindow.operator[](LFTHFLR)) {
 	  // draw the feather floor window
 	  FormMenuChoice = LFTHFLR;
 	  formForms::sidwnd(valueWindow.operator[](LFTHFLR));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHUPCNT) || WinMsg.hwnd == LabelWindow->operator[](LFTHUPCNT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHUPCNT) || WinMsg.hwnd == LabelWindow.operator[](LFTHUPCNT)) {
 	  // draw the feather up count window
 	  FormMenuChoice = LFTHUPCNT;
 	  formForms::sidwnd(valueWindow.operator[](LFTHUPCNT));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHDWNCNT) || WinMsg.hwnd == LabelWindow->operator[](LFTHDWNCNT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHDWNCNT) || WinMsg.hwnd == LabelWindow.operator[](LFTHDWNCNT)) {
 	  // draw the feather down count window
 	  FormMenuChoice = LFTHDWNCNT;
 	  formForms::sidwnd(valueWindow.operator[](LFTHDWNCNT));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHBLND) || WinMsg.hwnd == LabelWindow->operator[](LFTHBLND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHBLND) || WinMsg.hwnd == LabelWindow.operator[](LFTHBLND)) {
 	  // draw the feather blend window
 	  form.extendedAttribute ^= AT_FTHBLND;
 	  formForms::refrm();
@@ -11805,7 +11806,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHUP) || WinMsg.hwnd == LabelWindow->operator[](LFTHUP)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHUP) || WinMsg.hwnd == LabelWindow.operator[](LFTHUP)) {
 	  // draw the feather up or down window
 	  form.extendedAttribute ^= AT_FTHUP;
 	  form::refil(ClosestFormToCursor);
@@ -11814,7 +11815,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHBTH) || WinMsg.hwnd == LabelWindow->operator[](LFTHBTH)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHBTH) || WinMsg.hwnd == LabelWindow.operator[](LFTHBTH)) {
 	  // draw the feather both window
 	  form.extendedAttribute ^= AT_FTHBTH;
 	  formForms::refrm();
@@ -11823,13 +11824,13 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHTYP) || WinMsg.hwnd == LabelWindow->operator[](LFTHTYP)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHTYP) || WinMsg.hwnd == LabelWindow.operator[](LFTHTYP)) {
 	  // draw the feather fill type window
 	  FormMenuChoice = LFTHTYP;
 	  sidmsg(form, valueWindow.operator[](LFTHTYP));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRM) || WinMsg.hwnd == LabelWindow->operator[](LFRM)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRM) || WinMsg.hwnd == LabelWindow.operator[](LFRM)) {
 	  // draw the form type window
 	  savdo();
 	  form::unfil();
@@ -11844,28 +11845,28 @@ auto thred::handleFormDataSheet() -> bool {
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LLAYR) || WinMsg.hwnd == LabelWindow->operator[](LLAYR)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LLAYR) || WinMsg.hwnd == LabelWindow.operator[](LLAYR)) {
 	  // draw the layer window
 	  FormMenuChoice = LLAYR;
 	  Instance->StateMap.reset(StateFlag::FILTYP);
 	  sidmsg(form, valueWindow.operator[](LLAYR));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMFIL) || WinMsg.hwnd == LabelWindow->operator[](LFRMFIL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMFIL) || WinMsg.hwnd == LabelWindow.operator[](LFRMFIL)) {
 	  // draw the fill type window
 	  Instance->StateMap.reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
 	  sidmsg(form, valueWindow.operator[](LFRMFIL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMCOL) || WinMsg.hwnd == LabelWindow->operator[](LFRMCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMCOL) || WinMsg.hwnd == LabelWindow.operator[](LFRMCOL)) {
 	  // draw the fill color window
 	  FormMenuChoice = LFRMCOL;
 	  formForms::sidwnd(valueWindow.operator[](LFRMCOL));
 	  Instance->StateMap.set(StateFlag::SIDCOL);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUNDCOL) || WinMsg.hwnd == LabelWindow->operator[](LUNDCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUNDCOL) || WinMsg.hwnd == LabelWindow.operator[](LUNDCOL)) {
 	  // draw the underlay color window
 	  FormMenuChoice = LUNDCOL;
 	  formForms::sidwnd(valueWindow.operator[](LUNDCOL));
@@ -11873,7 +11874,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::UNDCOL);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHCOL) || WinMsg.hwnd == LabelWindow->operator[](LFTHCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHCOL) || WinMsg.hwnd == LabelWindow.operator[](LFTHCOL)) {
 	  // draw the feather color window
 	  FormMenuChoice = LFTHCOL;
 	  formForms::sidwnd(valueWindow.operator[](LFTHCOL));
@@ -11881,26 +11882,26 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::FTHSID);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMSPAC) || WinMsg.hwnd == LabelWindow->operator[](LFRMSPAC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMSPAC) || WinMsg.hwnd == LabelWindow.operator[](LFRMSPAC)) {
 	  // draw the form spacing window
 	  FormMenuChoice = LFRMSPAC;
 	  formForms::sidwnd(valueWindow.operator[](LFRMSPAC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMLEN) || WinMsg.hwnd == LabelWindow->operator[](LFRMLEN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMLEN) || WinMsg.hwnd == LabelWindow.operator[](LFRMLEN)) {
 	  // draw the form stitch length window
 	  FormMenuChoice = LFRMLEN;
 	  formForms::sidwnd(valueWindow.operator[](LFRMLEN));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRD) || WinMsg.hwnd == LabelWindow->operator[](LBRD)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRD) || WinMsg.hwnd == LabelWindow.operator[](LBRD)) {
 	  // draw the border window
 	  Instance->StateMap.set(StateFlag::FILTYP);
 	  sidmsg(form, valueWindow.operator[](LBRD));
 	  Instance->StateMap.set(StateFlag::BRDACT);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDCOL) || WinMsg.hwnd == LabelWindow->operator[](LBRDCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDCOL) || WinMsg.hwnd == LabelWindow.operator[](LBRDCOL)) {
 	  // draw the border color window
 	  FormMenuChoice = LBRDCOL;
 	  formForms::sidwnd(valueWindow.operator[](LBRDCOL));
@@ -11908,25 +11909,25 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::BRDSID);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDSPAC) || WinMsg.hwnd == LabelWindow->operator[](LBRDSPAC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDSPAC) || WinMsg.hwnd == LabelWindow.operator[](LBRDSPAC)) {
 	  // draw the border stitch spacing window
 	  FormMenuChoice = LBRDSPAC;
 	  formForms::sidwnd(valueWindow.operator[](LBRDSPAC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDLEN) || WinMsg.hwnd == LabelWindow->operator[](LBRDLEN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDLEN) || WinMsg.hwnd == LabelWindow.operator[](LBRDLEN)) {
 	  // draw the border stitch length window
 	  FormMenuChoice = LBRDLEN;
 	  formForms::sidwnd(valueWindow.operator[](LBRDLEN));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDSIZ) || WinMsg.hwnd == LabelWindow->operator[](LBRDSIZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDSIZ) || WinMsg.hwnd == LabelWindow.operator[](LBRDSIZ)) {
 	  // draw the border stitch size window
 	  FormMenuChoice = LBRDSIZ;
 	  formForms::sidwnd(valueWindow.operator[](LBRDSIZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LAPCOL) || WinMsg.hwnd == LabelWindow->operator[](LAPCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LAPCOL) || WinMsg.hwnd == LabelWindow.operator[](LAPCOL)) {
 	  // draw the applique color window
 	  FormMenuChoice = LAPCOL;
 	  Instance->StateMap.set(StateFlag::SIDCOL);
@@ -11934,13 +11935,13 @@ auto thred::handleFormDataSheet() -> bool {
 	  formForms::sidwnd(valueWindow.operator[](LAPCOL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBCSIZ) || WinMsg.hwnd == LabelWindow->operator[](LBCSIZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBCSIZ) || WinMsg.hwnd == LabelWindow.operator[](LBCSIZ)) {
 	  // draw the buttonhole corner size window
 	  FormMenuChoice = LBCSIZ;
 	  formForms::sidwnd(valueWindow.operator[](LBCSIZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBSTRT) || WinMsg.hwnd == LabelWindow->operator[](LBSTRT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBSTRT) || WinMsg.hwnd == LabelWindow.operator[](LBSTRT)) {
 	  // draw the satin start style window
 	  auto const code     = form.attribute & SBLNT;
 	  auto const bluntStr = displayText::loadStr(code != 0U ? IDS_TAPR : IDS_BLUNT);
@@ -11956,7 +11957,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBFIN) || WinMsg.hwnd == LabelWindow->operator[](LBFIN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBFIN) || WinMsg.hwnd == LabelWindow.operator[](LBFIN)) {
 	  // draw the satin finish style window
 	  auto const code     = form.attribute & FBLNT;
 	  auto const bluntStr = displayText::loadStr(code != 0U ? IDS_TAPR : IDS_BLUNT);
@@ -11972,19 +11973,19 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMANG) || WinMsg.hwnd == LabelWindow->operator[](LFRMANG)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMANG) || WinMsg.hwnd == LabelWindow.operator[](LFRMANG)) {
 	  // draw the form fill angle window
 	  FormMenuChoice = LFRMANG;
 	  formForms::sidwnd(valueWindow.operator[](LFRMANG));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDPIC) || WinMsg.hwnd == LabelWindow->operator[](LBRDPIC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDPIC) || WinMsg.hwnd == LabelWindow.operator[](LBRDPIC)) {
 	  // draw the picot spacing window
 	  FormMenuChoice = LBRDPIC;
 	  formForms::sidwnd(valueWindow.operator[](LBRDPIC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDUND) || WinMsg.hwnd == LabelWindow->operator[](LBRDUND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDUND) || WinMsg.hwnd == LabelWindow.operator[](LBRDUND)) {
 	  // draw the border underlay window
 	  form.edgeType ^= EGUND;
 	  form::refil(ClosestFormToCursor);
@@ -11993,92 +11994,92 @@ auto thred::handleFormDataSheet() -> bool {
 	  SetWindowText(valueWindow.operator[](LBRDUND), bUndStr.c_str());
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LSACANG) || WinMsg.hwnd == LabelWindow->operator[](LSACANG)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LSACANG) || WinMsg.hwnd == LabelWindow.operator[](LSACANG)) {
 	  // draw the clipboard fill angle window
 	  FormMenuChoice = LSACANG;
 	  formForms::sidwnd(valueWindow.operator[](LSACANG));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMFAZ) || WinMsg.hwnd == LabelWindow->operator[](LFRMFAZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMFAZ) || WinMsg.hwnd == LabelWindow.operator[](LFRMFAZ)) {
 	  // draw the form fill phase window
 	  FormMenuChoice = LFRMFAZ;
 	  formForms::sidwnd(valueWindow.operator[](LFRMFAZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDPOS) || WinMsg.hwnd == LabelWindow->operator[](LBRDPOS)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDPOS) || WinMsg.hwnd == LabelWindow.operator[](LBRDPOS)) {
 	  // draw the chain position window
 	  FormMenuChoice = LBRDPOS;
 	  formForms::sidwnd(valueWindow.operator[](LBRDPOS));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBFILSQR) || WinMsg.hwnd == LabelWindow->operator[](LBFILSQR)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBFILSQR) || WinMsg.hwnd == LabelWindow.operator[](LBFILSQR)) {
 	  // draw the form fill ends square window
 	  xt::dubit(form, AT_SQR);
 	  auto const choice = displayText::loadStr((form.extendedAttribute & AT_SQR) == 0U ? IDS_PNTD : IDS_SQR);
 	  SetWindowText(valueWindow.operator[](LBFILSQR), choice.c_str());
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFSTRT) || WinMsg.hwnd == LabelWindow->operator[](LFSTRT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFSTRT) || WinMsg.hwnd == LabelWindow.operator[](LFSTRT)) {
 	  // draw the form fill start on/off window
 	  xt::dubit(form, AT_STRT);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LDSTRT) || WinMsg.hwnd == LabelWindow->operator[](LDSTRT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LDSTRT) || WinMsg.hwnd == LabelWindow.operator[](LDSTRT)) {
 	  // draw the form fill start window
 	  FormMenuChoice = LDSTRT;
 	  formForms::sidwnd(valueWindow.operator[](LDSTRT));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFEND) || WinMsg.hwnd == LabelWindow->operator[](LFEND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFEND) || WinMsg.hwnd == LabelWindow.operator[](LFEND)) {
 	  // draw the form fill end on/off window
 	  xt::dubit(form, AT_END);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LDEND) || WinMsg.hwnd == LabelWindow->operator[](LDEND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LDEND) || WinMsg.hwnd == LabelWindow.operator[](LDEND)) {
 	  // draw the form fill end window
 	  FormMenuChoice = LDEND;
 	  formForms::sidwnd(valueWindow.operator[](LDEND));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LWALK) || WinMsg.hwnd == LabelWindow->operator[](LWALK)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LWALK) || WinMsg.hwnd == LabelWindow.operator[](LWALK)) {
 	  // draw the edge walk window
 	  xt::dubit(form, AT_WALK);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LCWLK) || WinMsg.hwnd == LabelWindow->operator[](LCWLK)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LCWLK) || WinMsg.hwnd == LabelWindow.operator[](LCWLK)) {
 	  // draw the center walk window
 	  xt::dubit(form, AT_CWLK);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUND) || WinMsg.hwnd == LabelWindow->operator[](LUND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUND) || WinMsg.hwnd == LabelWindow.operator[](LUND)) {
 	  // draw the underlay window
 	  xt::dubit(form, AT_UND);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMAXFIL) || WinMsg.hwnd == LabelWindow->operator[](LMAXFIL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMAXFIL) || WinMsg.hwnd == LabelWindow.operator[](LMAXFIL)) {
 	  // draw the maximum fill stitch length window
 	  FormMenuChoice = LMAXFIL;
 	  formForms::sidwnd(valueWindow.operator[](LMAXFIL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMINFIL) || WinMsg.hwnd == LabelWindow->operator[](LMINFIL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMINFIL) || WinMsg.hwnd == LabelWindow.operator[](LMINFIL)) {
 	  // draw the minimum fill stitch length window
 	  FormMenuChoice = LMINFIL;
 	  formForms::sidwnd(valueWindow.operator[](LMINFIL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMAXBRD) || WinMsg.hwnd == LabelWindow->operator[](LMAXBRD)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMAXBRD) || WinMsg.hwnd == LabelWindow.operator[](LMAXBRD)) {
 	  // draw the maximum border stitch length window
 	  FormMenuChoice = LMAXBRD;
 	  formForms::sidwnd(valueWindow.operator[](LMAXBRD));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMINBRD) || WinMsg.hwnd == LabelWindow->operator[](LMINBRD)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMINBRD) || WinMsg.hwnd == LabelWindow.operator[](LMINBRD)) {
 	  // draw the minimum border stitch length window
 	  FormMenuChoice = LMINBRD;
 	  formForms::sidwnd(valueWindow.operator[](LMINBRD));
@@ -12227,8 +12228,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
 	DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
-	  LabelWindow           = &Instance->LabelWindow;           // thred only
-	  LRUPtr                = &Instance->LRUMenuId;             // thred only
+	LabelWindow.resize(LASTLIN);
+	LRUPtr                = &Instance->LRUMenuId;             // thred only
 	  MsgBuffer             = &Instance->MsgBuffer;             // thred only
 	  NearestPixel          = &Instance->NearestPixel;          // thred only
 	  NearestPoint          = &Instance->NearestPoint;          // thred only
@@ -12765,6 +12766,6 @@ void thred::setLargestStitchVal() {
   lensadj();
 }
 
-auto thred::getLabelWindow() noexcept -> std::vector<HWND>* {
-  return std::addressof(Instance->LabelWindow);
+auto thred::getLabelWindow() noexcept -> std::vector<HWND>& {
+  return LabelWindow;
 }

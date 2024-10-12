@@ -229,8 +229,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn          = displayText::loadStr(IDS_ON);
   auto const strOff         = displayText::loadStr(IDS_OFF);
-  auto*      labelWindowPtr = thred::getLabelWindow();
-  auto&      labelWindow    = *labelWindowPtr;
+  auto&      labelWindow    = thred::getLabelWindow();
   auto&      valueWindow    = Instance->ValueWindow;
   // set the window coordinates
   ValueWindowCoords.top    = TXTMARG;

@@ -79,7 +79,7 @@ auto getFileHandle(fs::path const& newFileName, HANDLE& fileHandle) -> bool;
 auto getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool;
 auto getFormControlPoints() noexcept -> std::vector<POINT>&;
 auto getHomeDir() noexcept -> fs::path&;
-auto getLabelWindow() noexcept -> std::vector<HWND>*;
+auto getLabelWindow() noexcept -> std::vector<HWND>&;
 auto getMsgBufferValue() -> float;
 auto getRotationHandleAngle() noexcept -> float;
 auto getUserPen(uint32_t iPen) noexcept -> HPEN;
