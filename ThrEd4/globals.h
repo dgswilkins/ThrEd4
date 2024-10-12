@@ -87,7 +87,6 @@ class MY_SINGLE
   fs::path                  auxName;
   std::vector<COLORREF>     bitmapBackgroundColor;
   std::vector<B_SEQ_PNT>    bSequence;
-  fs::path                  BalaradName0;
   fs::path                  BalaradName1;
   fs::path                  BalaradName2;
   std::vector<HWND>         buttonWin;

@@ -84,7 +84,7 @@ constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
 constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
 
 auto BalaradOffset = F_POINT {};                           // balarad offset
-auto BalaradName0  = gsl::narrow_cast<fs::path*>(nullptr); // balarad semaphore file
+auto BalaradName0  = fs::path {};                          // balarad semaphore file
 auto BalaradName1  = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
 auto BalaradName2  = gsl::narrow_cast<fs::path*>(nullptr);
 
@@ -98,7 +98,7 @@ void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint
 }
 } // namespace
 
-auto bal::getBN0() noexcept -> fs::path* {
+auto bal::getBN0() noexcept -> fs::path& {
   return BalaradName0;
 }
 
@@ -108,10 +108,6 @@ auto bal::getBN1() noexcept -> fs::path* {
 
 auto bal::getBN2() noexcept -> fs::path* {
   return BalaradName2;
-}
-
-void bal::setBN0(fs::path* name) noexcept {
-  BalaradName0 = name;
 }
 
 void bal::setBN1(fs::path* name) noexcept {
@@ -198,7 +194,7 @@ void bal::redbal() {
 
 void bal::ritbal() {
   auto balaradHeader = BAL_HEAD {};
-  if (!BalaradName0->empty() && !BalaradName1->empty() && !Instance->StitchBuffer.empty()) {
+  if (!BalaradName0.empty() && !BalaradName1->empty() && !Instance->StitchBuffer.empty()) {
 	auto outputName = thred::setFileName();
 	outputName.replace_extension(L".thv");
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -257,7 +253,7 @@ void bal::ritbal() {
 	  CloseHandle(balaradFile);
 	}
   }
-  if (!BalaradName0->empty()) {
-	fs::remove(*BalaradName0);
+  if (!BalaradName0.empty()) {
+	fs::remove(BalaradName0);
   }
 }

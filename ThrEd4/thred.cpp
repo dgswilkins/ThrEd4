@@ -2575,9 +2575,9 @@ void ducmd() {
 	return;
   }
   CloseHandle(balaradFile);
-  gsl::not_null const balaradName0 = bal::getBN0();
+  auto& balaradName0 = bal::getBN0();
 
-  *balaradName0 = balaradFileName;
+  balaradName0 = balaradFileName;
   if (ArgCount <= 2) {
 	return;
   }
@@ -8076,7 +8076,7 @@ void thred::dun() {
   unbsho();
   rstAll();
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
-  if (gsl::not_null const balaradName0 = bal::getBN0(); savcmp() || !balaradName0->empty()) {
+  if (auto const& balaradName0 = bal::getBN0(); savcmp() || !balaradName0.empty()) {
 	reldun();
 	return;
   }
@@ -12278,7 +12278,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		VersionNames.emplace_back(L"");
 	  }
 
-	  bal::setBN0(&Instance->BalaradName0);
 	  bal::setBN1(&Instance->BalaradName1);
 	  bal::setBN2(&Instance->BalaradName2);
 	  bitmap::setBBCV(&Instance->bitmapBackgroundColor);
