@@ -77,7 +77,7 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 
 // bitmap internal namespace
 namespace {
-auto BitmapBackgroundColors = gsl::narrow_cast<std::vector<COLORREF>*>(nullptr); // for the bitmap color dialog box
+auto BitmapBackgroundColors = std::vector<COLORREF> {}; // for the bitmap color dialog box
 auto BitmapColor          = BITCOL;                                              // bitmap color
 auto BitMapColorStruct    = CHOOSECOLOR {};
 auto BitmapDC             = HDC {};    // bitmap device context
@@ -304,7 +304,7 @@ auto nuBit() noexcept -> BOOL {
   BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
   BitMapColorStruct.lCustData      = 0;
-  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors->data();
+  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors.data();
   BitMapColorStruct.lpfnHook       = nullptr;
   BitMapColorStruct.lpTemplateName = nullptr;
   BitMapColorStruct.rgbResult      = BitmapColor;
@@ -569,10 +569,6 @@ void bitmap::setBmpColor() {
   thred::zumhom();
 }
 
-void bitmap::setBBCV(std::vector<COLORREF>* value) noexcept {
-  BitmapBackgroundColors = value;
-}
-
 void bitmap::setUBfilename(fs::path* fileName) noexcept {
   UTF16BMPname = fileName;
 }
@@ -590,7 +586,7 @@ auto bitmap::getBitmapSizeinStitches() noexcept -> F_POINT {
 }
 
 auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
-  return BitmapBackgroundColors->operator[](index);
+  return BitmapBackgroundColors.operator[](index);
 }
 
 void bitmap::setBmpBackColor() {
@@ -610,9 +606,9 @@ void bitmap::setBmpBackColor() {
                                                                   0x0043377b,
                                                                   0x00b799ae,
                                                                   0x0054667a};
-  BitmapBackgroundColors->clear();
-  BitmapBackgroundColors->resize(DEFAULT_COLORS.size());
-  std::ranges::copy(DEFAULT_COLORS, BitmapBackgroundColors->begin());
+  BitmapBackgroundColors.clear();
+  BitmapBackgroundColors.resize(DEFAULT_COLORS.size());
+  std::ranges::copy(DEFAULT_COLORS, BitmapBackgroundColors.begin());
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {

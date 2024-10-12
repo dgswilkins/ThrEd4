@@ -85,7 +85,6 @@ class MY_SINGLE
   F_RECTANGLE               allItemsRect;
   std::vector<F_POINT>      angledFormVertices;
   fs::path                  auxName;
-  std::vector<COLORREF>     bitmapBackgroundColor;
   std::vector<B_SEQ_PNT>    bSequence;
   std::vector<HWND>         buttonWin;
   std::vector<F_POINT_ATTR> clipBuffer;
