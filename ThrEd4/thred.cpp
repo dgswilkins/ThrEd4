@@ -196,6 +196,7 @@ constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
 constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
 constexpr auto MINZUMF  = float {MINZUM};         // minimum zoom in stitch points
 constexpr auto MSGSIZ   = uint32_t {8192U};       // size of the message buffer
+constexpr auto NERCNT   = 4U;                     // number of entries in the nearestxxx arrays;
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
@@ -222,7 +223,7 @@ auto CurrentStitchIndex  = uint32_t {}; // pointer to the current selection for 
 auto ThredDC             = gsl::narrow_cast<HDC>(nullptr); // main device context handle
 auto ScreenSizePixels    = SIZE {};                        // screen size in pixels
 auto StitchWindowAbsRect = RECT {};                        // stitch window size,absolute
-auto NearestPixel        = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // selected points
+auto NearestPixel        = std::vector<POINT> {};          // selected points
 auto NearestPoint = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of the closest points
 auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
 auto PrevGroupEndStitch      = uint32_t {}; // higher end of previous selection
@@ -588,7 +589,7 @@ void barnam(HWND window, uint32_t const iThumbnail) {
 void box(uint32_t const iNearest, HDC hDC) {
   auto const itBoxWidth     = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth       = *itBoxWidth;
-  auto const itNearestPixel = wrap::next(NearestPixel->begin(), iNearest);
+  auto const itNearestPixel = wrap::next(NearestPixel.begin(), iNearest);
   auto const npx            = itNearestPixel->x;
   auto const npy            = itNearestPixel->y;
   auto       line           = std::array<POINT, SQPNTS> {};
@@ -8372,7 +8373,7 @@ void thred::closPnt() {
   for (auto const& iNear : *NearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
 	  NearestPoint->operator[](NearestCount)   = iNear;
-	  NearestPixel->operator[](NearestCount++) = stitchCoordsInPixels;
+	  NearestPixel.operator[](NearestCount++) = stitchCoordsInPixels;
 	}
   }
   boxs();
@@ -8391,7 +8392,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   }
   if (NearestCount != 0) {
 	auto itBoxOffset = BoxOffset.begin();
-	auto npi         = NearestPixel->begin();
+	auto npi         = NearestPixel.begin();
 	auto npo         = NearestPoint->begin();
 	for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
 	  auto const offset = *itBoxOffset++;
@@ -12255,7 +12256,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  FormControlPoints.resize(OUTPNTS);
 	LabelWindow.resize(LASTLIN);
 	  MsgBuffer.reserve(MSGSIZ);
-	  NearestPixel          = &Instance->NearestPixel;          // thred only
+	  NearestPixel.resize(NERCNT);
 	  NearestPoint          = &Instance->NearestPoint;          // thred only
 	  PreviousNames         = &Instance->PreviousNames;         // thred only
 	  ScrollSize            = &Instance->ScrollSize;            // thred only
