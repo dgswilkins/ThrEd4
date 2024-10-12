@@ -10,6 +10,5 @@ void redbal();
 void ritbal();
 auto getBN0() noexcept -> fs::path&;
 auto getBN1() noexcept -> fs::path&;
-auto getBN2() noexcept -> fs::path*;
-void setBN2(fs::path* name) noexcept;
+auto getBN2() noexcept -> fs::path&;
 } // namespace bal

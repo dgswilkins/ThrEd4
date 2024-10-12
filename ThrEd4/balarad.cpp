@@ -86,7 +86,7 @@ constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
 auto BalaradOffset = F_POINT {};                           // balarad offset
 auto BalaradName0  = fs::path {};                          // balarad semaphore file
 auto BalaradName1  = fs::path {};                          // balarad data file
-auto BalaradName2  = gsl::narrow_cast<fs::path*>(nullptr);
+auto BalaradName2  = fs::path {};
 
 // Functions
 void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
@@ -106,17 +106,13 @@ auto bal::getBN1() noexcept -> fs::path& {
   return BalaradName1;
 }
 
-auto bal::getBN2() noexcept -> fs::path* {
+auto bal::getBN2() noexcept -> fs::path& {
   return BalaradName2;
-}
-
-void bal::setBN2(fs::path* name) noexcept {
-  BalaradName2 = name;
 }
 
 void bal::redbal() {
   auto fileSize = uintmax_t {};
-  if (!thred::getFileSize(*BalaradName2, fileSize)) {
+  if (!thred::getFileSize(BalaradName2, fileSize)) {
 	return;
   }
   auto balaradHeader = BAL_HEAD {};
@@ -124,7 +120,7 @@ void bal::redbal() {
   Instance->FormList.clear();
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const balaradFile =
-      CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+      CreateFile(BalaradName2.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (balaradFile == INVALID_HANDLE_VALUE) {
 	return;
   }

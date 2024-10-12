@@ -2602,8 +2602,8 @@ void ducmd() {
   }
   if (bytesRead != 0U) {
 	readBuffer.resize(bytesRead);
-	gsl::not_null const balaradName2 = bal::getBN2();
-	balaradName2->assign(readBuffer.data());
+	auto& balaradName2 = bal::getBN2();
+	balaradName2.assign(readBuffer.data());
 	bal::redbal();
   }
   CloseHandle(balaradFile);
@@ -12278,7 +12278,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		VersionNames.emplace_back(L"");
 	  }
 
-	  bal::setBN2(&Instance->BalaradName2);
 	  bitmap::setBBCV(&Instance->bitmapBackgroundColor);
 	  bitmap::setUBfilename(&Instance->userBMPFileName);
 	  DST::setColFilename(&Instance->ColorFileName);
