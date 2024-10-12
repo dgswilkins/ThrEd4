@@ -83,7 +83,7 @@ void hlpflt(uint32_t const iButton, uint32_t const iMessage, float const data) {
 }
 
 void sdmsg() {
-  displayText::showMessage(IDS_SAVDISC, ThrName->wstring());
+  displayText::showMessage(IDS_SAVDISC, Instance->ThrName.wstring());
 }
 } // namespace
 

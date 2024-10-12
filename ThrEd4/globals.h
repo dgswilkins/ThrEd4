@@ -348,7 +348,6 @@ extern SIZE        StitchWindowSize;
 extern wchar_t const* ThrEdClipFormat;
 extern HINSTANCE      ThrEdInstance;
 extern HWND           ThrEdWindow;
-extern fs::path*      ThrName;
 extern POINT          ThredWindowOrigin;
 extern uint32_t*      TraceBitmapData;
 

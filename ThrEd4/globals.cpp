@@ -133,7 +133,6 @@ SIZE                           StitchWindowSize          = {};      // size of t
 wchar_t const*                 ThrEdClipFormat           = L"threditor"; //
 HINSTANCE                      ThrEdInstance             = {};      // main instance handle
 HWND                           ThrEdWindow               = nullptr; // main window handle
-fs::path*                      ThrName                   = nullptr; //
 POINT                          ThredWindowOrigin         = {};      // offset origin of the main window
 uint32_t*                      TraceBitmapData           = nullptr; // trace bitmap data
 boost::dynamic_bitset<>*       TracedEdges               = nullptr; // detected edges of trace areas

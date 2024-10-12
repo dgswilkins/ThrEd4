@@ -552,7 +552,7 @@ void bitmap::lodbmp(fs::path const& directory) {
   else {
 	// THR version 2 file can only store a 16 character filename
 	// Give the user a little more info why the bitmap has not been loaded
-	displayText::showMessage(IDS_BMPLONG, ThrName->wstring());
+	displayText::showMessage(IDS_BMPLONG, Instance->ThrName.wstring());
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
