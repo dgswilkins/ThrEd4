@@ -133,7 +133,7 @@ class DSTDAT
 
 // DST internal namespace
 namespace {
-auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
+auto ColorFileName = fs::path {};                     //.thw file name
 auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
 
 constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
@@ -175,9 +175,9 @@ auto colfil() -> bool {
 	return false;
   }
 
-  *ColorFileName = workingFileName;
+  ColorFileName = workingFileName;
   *RGBFileName   = workingFileName;
-  ColorFileName->replace_extension(L"thw");
+  ColorFileName.replace_extension(L"thw");
   RGBFileName->replace_extension(L"rgb");
   return true;
 }
@@ -218,7 +218,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
   if (colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const colorFile =
-	        CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	        CreateFile(ColorFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	    colorFile != INVALID_HANDLE_VALUE) {
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
@@ -892,7 +892,7 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
   auto bytesWritten = DWORD {};
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto colorFile =
-      CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      CreateFile(ColorFileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                colorData.data(),
@@ -980,10 +980,6 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
 }
 // ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
-
-void DST::setColFilename(fs::path* directory) noexcept {
-  ColorFileName = directory;
-}
 
 void DST::setRGBFilename(fs::path* directory) noexcept {
   RGBFileName = directory;

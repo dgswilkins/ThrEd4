@@ -90,7 +90,6 @@ class MY_SINGLE
   std::vector<HWND>         buttonWin;
   std::vector<F_POINT_ATTR> clipBuffer;
   std::vector<F_POINT>      clipPoints;
-  fs::path                  ColorFileName;
   int32_t                   DPI = 0;
   std::vector<float>        formAngles;
   std::vector<POINT>        FormControlPoints;
