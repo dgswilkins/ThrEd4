@@ -8372,8 +8372,8 @@ void thred::closPnt() {
   auto stitchCoordsInPixels = POINT {};
   for (auto const& iNear : NearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
-	  NearestPoint.operator[](NearestCount)   = iNear;
 	  NearestPixel.operator[](NearestCount++) = stitchCoordsInPixels;
+	  NearestPoint.operator[](NearestCount)   = iNear;
 	}
   }
   boxs();
