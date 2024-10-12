@@ -78,7 +78,6 @@ class MY_SINGLE
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
 	TextureHistory.resize(ITXBUFSZ);
-	UserColorWin.resize(COLORCNT);
 	UserPen.resize(COLORCNT);
 	ValueWindow.resize(LASTLIN);
 	VersionNames.reserve(OLDVER);
@@ -136,7 +135,6 @@ class MY_SINGLE
   std::array<std::vector<uint32_t>, UNDOLEN> UndoBuffer;
 
   fs::path              UserBMPFileName;
-  std::vector<HWND>     UserColorWin;
   ENUM_MAP<UserFlag>    UserFlagMap = ENUM_MAP<UserFlag> {0};
   std::vector<HPEN>     UserPen;
   std::vector<HWND>     ValueWindow;

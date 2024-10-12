@@ -291,7 +291,7 @@ auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 auto DefaultColorWin = std::vector<HWND> {};                          // default color windows
-auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
+auto UserColorWin    = std::vector<HWND> {};     // user color windows
 auto SideWindow      = std::vector<HWND> {};                          // side message windows
 auto ThreadSizeWin   = std::vector<HWND> {};                          // thread size windows
 
@@ -3919,7 +3919,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  }
 	  return true;
 	}
-	if (DrawItem->hwndItem == UserColorWin->operator[](iColor)) {
+	if (DrawItem->hwndItem == UserColorWin.operator[](iColor)) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 	  if (iColor == ActiveColor) {
 		SelectObject(DrawItem->hDC, CrossPen);
@@ -4855,7 +4855,7 @@ void makCol() noexcept {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont        = displayText::getThrEdFont(FONTSIZE);
   auto       dcw          = DefaultColorWin.begin();
-  auto       ucw          = UserColorWin->begin();
+  auto       ucw          = UserColorWin.begin();
   auto       itThreadSize = ThreadSize.begin();
   auto       yOffset      = int32_t {};
 
@@ -5154,7 +5154,7 @@ void nuFil(FileIndices const fileIndex) {
 	buffer[0] = *itThreadSize++;
 	SetWindowText(*tsw++, buffer.data());
   }
-  for (auto const& iColor : *UserColorWin) {
+  for (auto const& iColor : UserColorWin) {
 	thred::redraw(iColor);
   }
   thred::redrawColorBar();
@@ -5322,7 +5322,7 @@ void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t const iSource, char cons
 auto oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	if (DefaultColorWin.operator[](iColor) == window ||
-	    UserColorWin->operator[](iColor) == window || ThreadSizeWin.operator[](iColor) == window) {
+	    UserColorWin.operator[](iColor) == window || ThreadSizeWin.operator[](iColor) == window) {
 	  return false;
 	}
   }
@@ -7200,7 +7200,7 @@ void handle_program_memory_depletion() {
 
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin.begin();
-  auto iUserColorWin    = UserColorWin->begin();
+  auto iUserColorWin    = UserColorWin.begin();
   for (auto const& iThreadSizeWin : ThreadSizeWin) {
 	hidwnd(*iDefaultColorWin++);
 	hidwnd(*iUserColorWin++);
@@ -7210,7 +7210,7 @@ void thred::hideColorWin() noexcept {
 
 void thred::showColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin.begin();
-  auto iUserColorWin    = UserColorWin->begin();
+  auto iUserColorWin    = UserColorWin.begin();
   for (auto const& iThreadSizeWin : ThreadSizeWin) {
 	shownd(*iDefaultColorWin++);
 	shownd(*iUserColorWin++);
@@ -7943,8 +7943,8 @@ void thred::nuAct(uint32_t const iStitch) noexcept {
   else {
 	ActiveColor = 0;
   }
-  redraw(UserColorWin->operator[](color));
-  redraw(UserColorWin->operator[](ActiveColor));
+  redraw(UserColorWin.operator[](color));
+  redraw(UserColorWin.operator[](ActiveColor));
 }
 
 void thred::nuPen(HPEN& pen, int32_t const width, COLORREF const color) noexcept {
@@ -8103,7 +8103,7 @@ auto thred::inThreadWindows() -> bool {
 }
 
 auto thred::inUserColorWindows() -> bool {
-  return chkMsgs(WinMsg.pt, UserColorWin->front(), UserColorWin->back());
+  return chkMsgs(WinMsg.pt, UserColorWin.front(), UserColorWin.back());
 }
 
 auto thred::inThreadSizeWindows() -> bool {
@@ -8852,7 +8852,7 @@ void thred::newFil() {
   Instance->WorkingFileName.clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	redraw(DefaultColorWin.operator[](iColor));
-	redraw(UserColorWin->operator[](iColor));
+	redraw(UserColorWin.operator[](iColor));
 	redraw(ThreadSizeWin.operator[](iColor));
   }
   zumhom();
@@ -8890,7 +8890,7 @@ void thred::rebox() {
 	Instance->SearchLine.clear();
 	Instance->SearchLine.shrink_to_fit();
 	Instance->StateMap.set(StateFlag::RESTCH);
-	for (auto const& window : *UserColorWin) {
+	for (auto const& window : UserColorWin) {
 	  redraw(window);
 	}
   }
@@ -10976,7 +10976,7 @@ void thred::nuscol(size_t const iColor) {
   nuPen(*itUserPen, 1, *itUserColor);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *itUserColor);
-  redraw(UserColorWin->operator[](iColor));
+  redraw(UserColorWin.operator[](iColor));
 }
 
 void thred::movchk() {
@@ -12270,7 +12270,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SideWindowEntryBuffer.resize(SWBLEN);
 	  ThreadSizeWin.resize(COLORCNT);
 	  ThumbnailSearchString.reserve(TSSSIZ);
-	  UserColorWin          = &Instance->UserColorWin; // thred only
+	  UserColorWin.resize(COLORCNT);
 	  UserPen               = &Instance->UserPen;      // thred only
 	  VersionNames          = &Instance->VersionNames; // thred only
 
@@ -12403,7 +12403,7 @@ void thred::refreshColors() noexcept {
 	++itUserPen;
 	++ucb;
   }
-  for (auto const& iColor : *UserColorWin) {
+  for (auto const& iColor : UserColorWin) {
 	redraw(iColor);
   }
 }
@@ -12449,13 +12449,13 @@ auto thred::getFormControlPoints() noexcept -> std::vector<POINT>& {
 }
 
 void thred::chkInsCol() {
-  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin->back())) { // check if point is in any of the color windows
+  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin.back())) { // check if point is in any of the color windows
 	inscol();
   }
 }
 
 void thred::chkDelCol() {
-  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin->back())) {
+  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin.back())) {
 	delcol();
   }
   else {
@@ -12479,7 +12479,7 @@ void thred::resetColors() {
   auto ucb         = UserColorBrush.begin();
   auto itUserColor = UserColor.begin();
   auto itUserPen   = UserPen->begin();
-  auto ucw         = UserColorWin->begin();
+  auto ucw         = UserColorWin.begin();
   for (auto const& color : DEFAULT_COLORS) {
 	*itUserColor = color;
 	nuBrush(*ucb, *itUserColor);
@@ -12621,7 +12621,7 @@ void thred::updateUserColor() {
 	nuPen(*itUserPen, 1, *itUserColor);
 	auto const ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
 	nuBrush(*ucb, *itUserColor);
-	redraw(UserColorWin->operator[](VerticalIndex));
+	redraw(UserColorWin.operator[](VerticalIndex));
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
 }
@@ -12629,8 +12629,8 @@ void thred::updateUserColor() {
 void thred::switchUserColors() noexcept {
   auto const code = ActiveColor;
   ActiveColor     = VerticalIndex & COLMSK;
-  redraw(UserColorWin->operator[](code));
-  redraw(UserColorWin->operator[](ActiveColor));
+  redraw(UserColorWin.operator[](code));
+  redraw(UserColorWin.operator[](ActiveColor));
 }
 
 // ToDo - rename this to something more appropriate
