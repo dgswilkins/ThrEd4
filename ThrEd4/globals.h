@@ -130,7 +130,6 @@ class MY_SINGLE
   std::vector<TX_HIST>      TextureHistory;
   std::vector<TX_PNT>       TexturePointsBuffer;
   fs::path                  ThrName;
-  std::vector<std::wstring> Thumbnails;
   boost::dynamic_bitset<>   TracedEdges;
   boost::dynamic_bitset<>   TracedMap;
 

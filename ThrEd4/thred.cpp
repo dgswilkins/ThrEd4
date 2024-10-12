@@ -334,7 +334,7 @@ auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculat
 auto DefaultDirectory = fs::path {};
 auto IniFileName      = fs::path {}; //.ini file name
 auto PreviousNames    = std::vector<fs::path> {};
-auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
+auto Thumbnails       = std::vector<std::wstring> {}; // vector of thumbnail names
 
 auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
 
@@ -581,7 +581,7 @@ void barnam(HWND window, uint32_t const iThumbnail) {
 	SetWindowText(window, L"");
 	return;
   }
-  auto const thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected.at(iThumbnail)).data());
+  auto const thumbPath = fs::path(Thumbnails.operator[](ThumbnailsSelected.at(iThumbnail)).data());
   constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
   auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
@@ -3095,7 +3095,7 @@ void getbak() {
   unthum();
   Instance->StateMap.set(StateFlag::FRMOF);
   auto& workingFileName = Instance->WorkingFileName;
-  workingFileName = DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
+  workingFileName = DefaultDirectory / Thumbnails.operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(workingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
@@ -3943,7 +3943,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
 		if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
-		  ritbak(Thumbnails->operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
+		  ritbak(Thumbnails.operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
 		  rthumnam(iThumb);
 		  return true;
 		}
@@ -10226,16 +10226,16 @@ void thred::thumnail() {
 	unthum();
 	return;
   }
-  Thumbnails->clear();
+  Thumbnails.clear();
   auto& fileName = fileData.cFileName;
-  Thumbnails->push_back(std::wstring(std::begin(fileName)));
+  Thumbnails.push_back(std::wstring(std::begin(fileName)));
   while (FindNextFile(file, &fileData)) {
-	Thumbnails->push_back(std::wstring(std::begin(fileName)));
+	Thumbnails.push_back(std::wstring(std::begin(fileName)));
   }
   FindClose(file);
-  std::ranges::sort(*Thumbnails);
+  std::ranges::sort(Thumbnails);
   auto       iThumbnail = 0U;
-  auto const thumbSize  = Thumbnails->size();
+  auto const thumbSize  = Thumbnails.size();
   while (iThumbnail < 4 && iThumbnail < thumbSize) {
 	ThumbnailsSelected.at(iThumbnail) = iThumbnail;
 	++iThumbnail;
@@ -10255,7 +10255,7 @@ void thred::thumnail() {
 }
 
 void thred::nuthsel() {
-  if (ThumbnailIndex >= Thumbnails->size()) {
+  if (ThumbnailIndex >= Thumbnails.size()) {
 	return;
   }
   auto const savedIndex = ThumbnailIndex;
@@ -10264,8 +10264,8 @@ void thred::nuthsel() {
   Instance->StateMap.set(StateFlag::RESTCH);
   if (length != 0U) {
 	auto itHWndBV = BackupViewer.begin();
-	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
-	  if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails.size()) { // there are 4 quadrants
+	  if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
 		ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 		redraw(*itHWndBV);
 		++itHWndBV;
@@ -10276,7 +10276,7 @@ void thred::nuthsel() {
   }
   else {
 	auto itHWndBV = BackupViewer.begin();
-	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
+	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails.size()) { // there are 4 quadrants
 	  ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 	  redraw(*itHWndBV);
 	  ++itHWndBV;
@@ -10304,7 +10304,7 @@ void thred::nuthbak(uint32_t count) {
 	while (count != 0U && ThumbnailIndex < MAXFORMS) {
 	  if (ThumbnailIndex != 0U) {
 		--ThumbnailIndex;
-		if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
 		  --count;
 		}
 	  }
@@ -12146,7 +12146,7 @@ void thred::thumbHome() {
 }
 
 void thred::thumbEnd() {
-  ThumbnailIndex = wrap::toUnsigned(Thumbnails->size());
+  ThumbnailIndex = wrap::toUnsigned(Thumbnails.size());
   nuthbak(QUADRT);
 }
 
@@ -12270,7 +12270,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SideWindowEntryBuffer.resize(SWBLEN);
 	  ThreadSizeWin.resize(COLORCNT);
 	  ThumbnailSearchString.reserve(TSSSIZ);
-	  Thumbnails            = &Instance->Thumbnails;            // thred only
 	  UserColorWin          = &Instance->UserColorWin; // thred only
 	  UserPen               = &Instance->UserPen;      // thred only
 	  VersionNames          = &Instance->VersionNames; // thred only
