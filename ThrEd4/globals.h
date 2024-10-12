@@ -73,7 +73,6 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto COLSIZ   = int32_t {12};     // logical pixel width of the color bar
 	constexpr auto MSGSIZ   = uint32_t {8192U}; // size of the message buffer
 	constexpr auto NERCNT   = 4U;               // number of entries in the near array;
 	constexpr auto SCROLSIZ = int32_t {12};     // logical pixel width of a scroll bar
@@ -81,7 +80,6 @@ class MY_SINGLE
 	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
-	ColorBarSize            = COLSIZ;
 	FormControlPoints.resize(OUTPNTS);
 	DefaultColorWin.resize(COLORCNT);
 	LabelWindow.resize(LASTLIN);
@@ -122,7 +120,6 @@ class MY_SINGLE
   std::vector<HWND>         ButtonWin;
   std::vector<F_POINT_ATTR> ClipBuffer;
   std::vector<F_POINT>      ClipPoints;
-  int32_t                   ColorBarSize = 0;
   fs::path                  ColorFileName;
   std::vector<COL_CHANGE>   ColorChangeTable;
   std::vector<HWND>         DefaultColorWin;

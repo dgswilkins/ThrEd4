@@ -154,6 +154,7 @@ namespace {
 constexpr auto ARROWPNT = 3U;            // points required to draw arrow
 constexpr auto CHSDEF   = 24.0F;         // default chain stitch length
 constexpr auto CHRDEF   = 0.25;          // default chain stitch ratio
+constexpr auto COLSIZ   = int32_t {12};  // logical pixel width of the color bar
 constexpr auto DEFPIX   = uint16_t {2U}; // default nudge pixels
 constexpr auto DEFULEN  = 12.0F;         // default underlay stitch length
 constexpr auto DNDLEN   = 256U;          // designer name decoding table length
@@ -187,7 +188,7 @@ auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer nam
 auto ArgCount        = int32_t {};                               // command line argument count
 auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr);       // command line argument array
 auto ThredWindowRect = RECT {};                                  // main window size
-auto ColorBarSize    = gsl::narrow_cast<int32_t*>(nullptr);      // Color bar width scaled for DPI
+auto ColorBarSize    = COLSIZ;                               // Color bar width scaled for DPI
 auto ColorBarRect    = RECT {};                                  // color bar rectangle
 auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which ThrEd was executed
 auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
@@ -4338,9 +4339,9 @@ void init() {
   ColorBar = CreateWindow(L"STATIC",
                           L"",
                           SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                          ThredWindowRect.right - *ColorBarSize,
+                          ThredWindowRect.right - ColorBarSize,
                           0,
-                          *ColorBarSize,
+                          ColorBarSize,
                           ThredWindowRect.bottom,
                           ThrEdWindow,
                           nullptr,
@@ -6811,14 +6812,14 @@ void stchPars() {
           ? std::lround(wrap::toFloat(ThredWindowRect.bottom - (*ScrollSize * 2)) * aspectRatio)
           : std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
 
-  if (StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + *ColorBarSize < ThredWindowRect.right) {
+  if (StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + ColorBarSize < ThredWindowRect.right) {
 	StitchWindowSize.cy =
 	    Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)
 	        ? ThredWindowRect.bottom - (*ScrollSize * 2)
 	        : ThredWindowRect.bottom - *ScrollSize;
   }
   else {
-	StitchWindowSize = {.cx = ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize,
+	StitchWindowSize = {.cx = ThredWindowRect.right - ButtonWidthX3 - ColorBarSize,
 	                    .cy = ThredWindowRect.bottom - ThredWindowRect.top};
 	auto const sizeX = wrap::toFloat(StitchWindowSize.cx);
 	auto const sizeY = wrap::toFloat(StitchWindowSize.cy);
@@ -7377,7 +7378,7 @@ void thred::redraw(HWND window) noexcept {
 // ReSharper restore CppParameterMayBeConst
 
 void thred::movStch() {
-  auto clientSize = SIZE {(ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + *ColorBarSize)),
+  auto clientSize = SIZE {(ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + ColorBarSize)),
                           ThredWindowRect.bottom};
   auto verticalOffset = 0;
   unboxs();
@@ -7408,7 +7409,7 @@ void thred::movStch() {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, *ScrollSize, TRUE);
 	}
   }
-  MoveWindow(ColorBar, ThredWindowRect.right - *ColorBarSize, 0, *ColorBarSize, ThredWindowRect.bottom, TRUE);
+  MoveWindow(ColorBar, ThredWindowRect.right - ColorBarSize, 0, ColorBarSize, ThredWindowRect.bottom, TRUE);
   nuRct();
   redrawColorBar();
 }
@@ -12225,7 +12226,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  ColorBarSize          = &Instance->ColorBarSize;          // thred only
 	  ColorChangeTable      = &Instance->ColorChangeTable;      // thred only
 	  DefaultColorWin       = &Instance->DefaultColorWin;       // thred only
 	  DefaultDirectory      = &Instance->DefaultDirectory;      // thred only
@@ -12314,7 +12314,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ScreenDPI     = &Instance->DPI;
 	  *ScreenDPI    = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
 	  *ScrollSize   = MulDiv(*ScrollSize, *ScreenDPI, STDDPI);
-	  *ColorBarSize = MulDiv(*ColorBarSize, *ScreenDPI, STDDPI);
+	  ColorBarSize = MulDiv(ColorBarSize, *ScreenDPI, STDDPI);
 	  init();
 	  if (Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
