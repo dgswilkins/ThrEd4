@@ -79,7 +79,6 @@ class MY_SINGLE
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
 	TextureHistory.resize(ITXBUFSZ);
-	ThreadSizeWin.resize(COLORCNT);
 	ThumbnailSearchString.reserve(TSSSIZ);
 	UserColorWin.resize(COLORCNT);
 	UserPen.resize(COLORCNT);
@@ -133,7 +132,6 @@ class MY_SINGLE
   std::vector<TX_HIST>      TextureHistory;
   std::vector<TX_PNT>       TexturePointsBuffer;
   fs::path                  ThrName;
-  std::vector<HWND>         ThreadSizeWin;
   std::vector<wchar_t>      ThumbnailSearchString;
   std::vector<std::wstring> Thumbnails;
   boost::dynamic_bitset<>   TracedEdges;

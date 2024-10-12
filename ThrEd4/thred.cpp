@@ -292,7 +292,7 @@ auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file vie
 auto DefaultColorWin = std::vector<HWND> {};                          // default color windows
 auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
 auto SideWindow      = std::vector<HWND> {};                          // side message windows
-auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
+auto ThreadSizeWin   = std::vector<HWND> {};                          // thread size windows
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 auto DisplayedColorBitmap =
@@ -4859,7 +4859,7 @@ void makCol() noexcept {
   auto       itThreadSize = ThreadSize.begin();
   auto       yOffset      = int32_t {};
 
-  for (auto& tsw : *ThreadSizeWin) {
+  for (auto& tsw : ThreadSizeWin) {
 	*dcw = CreateWindow(L"STATIC",
 	                    nullptr,
 	                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -5145,7 +5145,7 @@ void nuFil(FileIndices const fileIndex) {
   auto itUserPen    = UserPen->begin();
   auto ucb          = UserColorBrush.begin();
   auto itThreadSize = ThreadSize.begin();
-  auto tsw          = ThreadSizeWin->begin();
+  auto tsw          = ThreadSizeWin.begin();
   for (auto const& color : UserColor) {
 	thred::nuPen(*itUserPen, 1, color);
 	++itUserPen;
@@ -5322,7 +5322,7 @@ void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t const iSource, char cons
 auto oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	if (DefaultColorWin.operator[](iColor) == window ||
-	    UserColorWin->operator[](iColor) == window || ThreadSizeWin->operator[](iColor) == window) {
+	    UserColorWin->operator[](iColor) == window || ThreadSizeWin.operator[](iColor) == window) {
 	  return false;
 	}
   }
@@ -7201,7 +7201,7 @@ void handle_program_memory_depletion() {
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin.begin();
   auto iUserColorWin    = UserColorWin->begin();
-  for (auto const& iThreadSizeWin : *ThreadSizeWin) {
+  for (auto const& iThreadSizeWin : ThreadSizeWin) {
 	hidwnd(*iDefaultColorWin++);
 	hidwnd(*iUserColorWin++);
 	hidwnd(iThreadSizeWin);
@@ -7211,7 +7211,7 @@ void thred::hideColorWin() noexcept {
 void thred::showColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin.begin();
   auto iUserColorWin    = UserColorWin->begin();
-  for (auto const& iThreadSizeWin : *ThreadSizeWin) {
+  for (auto const& iThreadSizeWin : ThreadSizeWin) {
 	shownd(*iDefaultColorWin++);
 	shownd(*iUserColorWin++);
 	shownd(iThreadSizeWin);
@@ -8099,7 +8099,7 @@ auto thred::inChangeThreadWindows() -> bool {
 }
 
 auto thred::inThreadWindows() -> bool {
-  return chkMsgs(WinMsg.pt, ThreadSizeWin->front(), ThreadSizeWin->back());
+  return chkMsgs(WinMsg.pt, ThreadSizeWin.front(), ThreadSizeWin.back());
 }
 
 auto thred::inUserColorWindows() -> bool {
@@ -8107,7 +8107,7 @@ auto thred::inUserColorWindows() -> bool {
 }
 
 auto thred::inThreadSizeWindows() -> bool {
-  return chkMsgs(WinMsg.pt, ThreadSizeWin->front(), ThreadSizeWin->back());
+  return chkMsgs(WinMsg.pt, ThreadSizeWin.front(), ThreadSizeWin.back());
 }
 
 auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
@@ -8853,7 +8853,7 @@ void thred::newFil() {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	redraw(DefaultColorWin.operator[](iColor));
 	redraw(UserColorWin->operator[](iColor));
-	redraw(ThreadSizeWin->operator[](iColor));
+	redraw(ThreadSizeWin.operator[](iColor));
   }
   zumhom();
 }
@@ -12268,7 +12268,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 	  SideWindow.resize(SWCOUNT);
 	  SideWindowEntryBuffer.resize(SWBLEN);
-	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
+	  ThreadSizeWin.resize(COLORCNT);
 	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only
 	  Thumbnails            = &Instance->Thumbnails;            // thred only
 	  UserColorWin          = &Instance->UserColorWin; // thred only
@@ -12584,7 +12584,7 @@ void thred::updateThreadSize(uint32_t const threadSizeSelected) {
   auto buffer             = std::array<wchar_t, 3> {};
   buffer[0]               = *itThreadSize;
   buffer[1]               = L'0';
-  auto const tsw          = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
+  auto const tsw          = wrap::next(ThreadSizeWin.begin(), threadSizeSelected);
   SetWindowText(*tsw, buffer.data());
   Instance->StateMap.set(StateFlag::RESTCH);
   destroyChangeThreadSizeWindows();
