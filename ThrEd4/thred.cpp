@@ -181,8 +181,7 @@ constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeter
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
-auto FormControlPoints =
-    gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
+auto FormControlPoints = std::vector<POINT> {}; // form control rectangle in pixel coordinates
 auto ExtendedHeader  = THR_HEAD_EX {};              // ThrEd file header extension
 auto DesignerName    = std::wstring {};                          // designer name in clear
 auto ArgCount        = int32_t {};                               // command line argument count
@@ -2753,9 +2752,9 @@ void durot() noexcept(std::is_same_v<size_t, uint32_t>) {
 void dusel(HDC hDC) {
   SetROP2(hDC, R2_NOTXORPEN);
   SelectObject(hDC, LinePen);
-  wrap::polyline(hDC, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1U));
-  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(FormControlPoints->size() - 1U); ++iPoint) {
-	form::selsqr(FormControlPoints->operator[](iPoint), hDC);
+  wrap::polyline(hDC, FormControlPoints.data(), wrap::toUnsigned(FormControlPoints.size() - 1U));
+  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(FormControlPoints.size() - 1U); ++iPoint) {
+	form::selsqr(FormControlPoints.operator[](iPoint), hDC);
   }
   SetROP2(hDC, R2_COPYPEN);
 }
@@ -5254,7 +5253,7 @@ void nunams() {
 
 void nuselrct() {
   auto outline = std::vector<F_POINT> {};
-  outline.resize(FormControlPoints->size());
+  outline.resize(FormControlPoints.size());
   thred::unsel();
   outline[PTL].x = outline[PBL].x = outline[PLM].x = outline[PTLE].x = StitchRangeRect.left;
   outline[PTL].y = outline[PTM].y = outline[PTR].y = outline[PTLE].y = StitchRangeRect.top;
@@ -5264,7 +5263,7 @@ void nuselrct() {
   outline[PRM].y = outline[PLM].y = wrap::midl(StitchRangeRect.top, StitchRangeRect.bottom);
 
   auto iPoint = outline.begin();
-  for (auto& controlPoint : *FormControlPoints) {
+  for (auto& controlPoint : FormControlPoints) {
 	controlPoint = form::sfCor2px(*iPoint);
 	++iPoint;
   }
@@ -8930,7 +8929,7 @@ void thred::rSelbox() {
       wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                           ((stitchPoint.y - ZoomRect.bottom - wrap::toFloat(SelectBoxOffset.y)) * ratio) -
                           wrap::toFloat(adjustedSelectSize.cy))};
-  auto& frmCtrls  = *FormControlPoints;
+  auto& frmCtrls  = FormControlPoints;
   frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = stitchCoordsInPixels.x;
   frmCtrls[PTL].y = frmCtrls[PTM].y = frmCtrls[PTR].y = frmCtrls[PTLE].y = stitchCoordsInPixels.y;
   frmCtrls[PBR].y = frmCtrls[PBM].y = frmCtrls[PBL].y = stitchCoordsInPixels.y + adjustedSelectSize.cy;
@@ -9977,7 +9976,7 @@ auto thred::iselpnt() noexcept -> bool {
   auto closestControlPoint = 0U;
   auto minimumLength       = BIGDBL;
   auto iControlPoint       = 0U;
-  for (auto const& controlPoint : *FormControlPoints) {
+  for (auto const& controlPoint : FormControlPoints) {
 	auto const deltaX = pointToTest.x - controlPoint.x;
 	auto const deltaY = pointToTest.y - controlPoint.y;
 	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length < minimumLength) {
@@ -12227,7 +12226,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 
 	DefaultColorWin.resize(COLORCNT);
-	  FormControlPoints     = &Instance->FormControlPoints;     // thred only
+	  FormControlPoints.resize(OUTPNTS);
 	  HomeDirectory         = &Instance->HomeDirectory;         // thred only
 	  IniFileName           = &Instance->IniFileName;           // thred only
 	  Knots                 = &Instance->Knots;                 // thred only
@@ -12418,7 +12417,7 @@ auto thred::getColorChangeIndex(uint32_t const iColor) noexcept -> uint16_t {
   return ColorChangeTable.operator[](iColor).stitchIndex;
 }
 
-auto thred::getFormControlPoints() noexcept -> std::vector<POINT>* {
+auto thred::getFormControlPoints() noexcept -> std::vector<POINT>& {
   return FormControlPoints;
 }
 
@@ -12680,7 +12679,7 @@ void thred::redrawCapturedStitch(uint32_t const closestPointIndexClone) {
 void thred::setFormControls() noexcept(!std::is_same_v<size_t, uint32_t>) {
   auto formsRect = F_RECTANGLE {};
   selRct(formsRect);
-  auto& frmCtrls = *FormControlPoints;
+  auto& frmCtrls = FormControlPoints;
   frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = std::lround(formsRect.left);
   frmCtrls[PTL].y = frmCtrls[PTR].y = frmCtrls[PTM].y = frmCtrls[PTLE].y = std::lround(formsRect.top);
   frmCtrls[PTR].x = frmCtrls[PRM].x = frmCtrls[PBR].x = std::lround(formsRect.right);

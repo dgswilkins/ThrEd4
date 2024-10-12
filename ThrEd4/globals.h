@@ -80,7 +80,6 @@ class MY_SINGLE
 	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
-	FormControlPoints.resize(OUTPNTS);
 	LabelWindow.resize(LASTLIN);
 	MsgBuffer.reserve(MSGSIZ);
 	NearestPixel.resize(NERCNT);

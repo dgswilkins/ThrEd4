@@ -6575,7 +6575,7 @@ void form::filangl() {
   }
 }
 
-auto form::chkfrm(gsl::not_null<std::vector<POINT>*> const formControlPoints,
+auto form::chkfrm(std::vector<POINT>& formControlPoints,
                   std::vector<POINT>&                      stretchBoxLine,
                   float&                                   xyRatio) -> bool {
   auto const point = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
@@ -6583,7 +6583,7 @@ auto form::chkfrm(gsl::not_null<std::vector<POINT>*> const formControlPoints,
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   thred::duzrat();
   auto const rectangle    = sRct2px(currentForm.rectangle);
-  auto&      formControls = *formControlPoints;
+  auto&      formControls = formControlPoints;
   rct2sel(rectangle, formControls);
 
   auto minimumLength      = BIGLONG;
