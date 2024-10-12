@@ -71,7 +71,7 @@ void redbak();
 
 // Functions
 void redbak() {
-  auto bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
+  auto bufferElement = Instance->UndoBuffer.at(UndoBufferWriteIndex);
   if (bufferElement.empty()) {
 	return;
   }
@@ -126,7 +126,7 @@ void redbak() {
 
 #pragma warning(push)
 void backup::dudat() {
-  auto& bufferElement = UndoBuffer->at(UndoBufferWriteIndex);
+  auto& bufferElement = Instance->UndoBuffer.at(UndoBufferWriteIndex);
   bufferElement.clear();
   auto const& formList  = Instance->FormList;
   auto const  formCount = wrap::toUnsigned(formList.size());
@@ -191,7 +191,7 @@ void backup::dudat() {
 #pragma warning(pop)
 
 void backup::deldu() {
-  for (auto& bufferElement : *UndoBuffer) {
+  for (auto& bufferElement : Instance->UndoBuffer) {
 	bufferElement.clear();
   }
   UndoBufferWriteIndex = 0;

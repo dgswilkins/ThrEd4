@@ -136,8 +136,6 @@ HWND                           ThrEdWindow               = nullptr; // main wind
 POINT                          ThredWindowOrigin         = {};      // offset origin of the main window
 uint32_t*                      TraceBitmapData           = nullptr; // trace bitmap data
 
-std::array<std::vector<uint32_t>, UNDOLEN>* UndoBuffer   = nullptr; // backup data
-
 SIZE                           UnzoomedRect              = {};      // size of the unzoomed stitch window
 std::array<COLORREF, COLORCNT> UserColor                 = {};      // user colors
 ENUM_MAP<UserFlag>*            UserFlagMap               = nullptr; // for storage of persistent binary variables set by the user

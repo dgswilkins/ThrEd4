@@ -353,8 +353,6 @@ extern uint32_t*      TraceBitmapData;
 
 extern SIZE UnzoomedRect;
 
-extern std::array<std::vector<uint32_t>, UNDOLEN>* UndoBuffer;
-
 extern std::array<COLORREF, COLORCNT> UserColor;
 
 extern ENUM_MAP<UserFlag>* UserFlagMap;

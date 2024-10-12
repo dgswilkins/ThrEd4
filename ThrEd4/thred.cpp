@@ -12248,7 +12248,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
 	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only
 	  Thumbnails            = &Instance->Thumbnails;            // thred only
-	  UndoBuffer            = &Instance->UndoBuffer;
 	  UserColorWin          = &Instance->UserColorWin; // thred only
 	  UserFlagMap           = &Instance->UserFlagMap;
 	  UserPen               = &Instance->UserPen;      // thred only
