@@ -114,7 +114,6 @@ class MY_SINGLE
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> StitchBuffer;
   std::vector<F_POINT>      tempPolygon;
-  std::vector<TX_PNT>       TempTexturePoints;
   std::vector<TX_HIST>      TextureHistory;
   std::vector<TX_PNT>       TexturePointsBuffer;
   fs::path                  thrName;
