@@ -227,10 +227,10 @@ void nxtlinprf() noexcept {
 void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   static constexpr auto EDGE_ARRAY = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
-  auto const strOn          = displayText::loadStr(IDS_ON);
-  auto const strOff         = displayText::loadStr(IDS_OFF);
-  auto&      labelWindow    = thred::getLabelWindow();
-  auto&      valueWindow    = Instance->ValueWindow;
+  auto const strOn       = displayText::loadStr(IDS_ON);
+  auto const strOff      = displayText::loadStr(IDS_OFF);
+  auto&      labelWindow = thred::getLabelWindow();
+  auto&      valueWindow = Instance->ValueWindow;
   // set the window coordinates
   ValueWindowCoords.top    = TXTMARG;
   LabelWindowCoords.top    = ValueWindowCoords.top;
@@ -1041,7 +1041,7 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.eggRatio), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.fillAngle * RADDEGF), *row++);
   auto choice = Instance->UserFlagMap.test(UserFlag::SQRFIL) ? displayText::loadStr(IDS_SQR)
-                                                    : displayText::loadStr(IDS_PNTD);
+                                                             : displayText::loadStr(IDS_PNTD);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(ShowStitchThreshold)), *row++);
@@ -1055,9 +1055,10 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.cursorNudgeStep), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), PicotSpacing * IPFGRAN), *row++);
   choice = Instance->UserFlagMap.test(UserFlag::BLUNT) ? displayText::loadStr(IDS_BLUNT)
-                                              : displayText::loadStr(IDS_TAPR);
+                                                       : displayText::loadStr(IDS_TAPR);
   prflin(choice, *row++);
-  choice = Instance->UserFlagMap.test(UserFlag::DUND) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
+  choice = Instance->UserFlagMap.test(UserFlag::DUND) ? displayText::loadStr(IDS_ON)
+                                                      : displayText::loadStr(IDS_OFF);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SmallStitchLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);

@@ -567,7 +567,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCD;
 		}
 		else {
-		  pixelIndex += bitmap::getBitmapWidth();            // look at the pixel below
+		  pixelIndex += bitmap::getBitmapWidth();                     // look at the pixel below
 		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.x;
 		  }
@@ -591,7 +591,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCL;
 		}
 		else {
-		  ++pixelIndex;                                      // look at the pixel to the right
+		  ++pixelIndex; // look at the pixel to the right
 		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.y;
 		  }
@@ -615,7 +615,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCU;
 		}
 		else {
-		  pixelIndex -= bitmap::getBitmapWidth();            // look at the pixel above
+		  pixelIndex -= bitmap::getBitmapWidth();                     // look at the pixel above
 		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.x;
 		  }
@@ -639,7 +639,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCR;
 		}
 		else {
-		  --pixelIndex;                                      // look at the pixel to the left
+		  --pixelIndex; // look at the pixel to the left
 		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.y;
 		  }

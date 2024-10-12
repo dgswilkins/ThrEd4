@@ -129,11 +129,11 @@ class MY_SINGLE
 
   std::array<std::vector<uint32_t>, UNDOLEN> UndoBuffer;
 
-  fs::path              UserBMPFileName;
-  ENUM_MAP<UserFlag>    UserFlagMap = ENUM_MAP<UserFlag> {0};
-  std::vector<HWND>     ValueWindow;
-  fs::path              WorkingFileName;
-  std::wstring          textureInputBuffer;
+  fs::path           UserBMPFileName;
+  ENUM_MAP<UserFlag> UserFlagMap = ENUM_MAP<UserFlag> {0};
+  std::vector<HWND>  ValueWindow;
+  fs::path           WorkingFileName;
+  std::wstring       textureInputBuffer;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   MY_SINGLE(const MY_SINGLE&)                    = delete;
@@ -144,7 +144,6 @@ class MY_SINGLE
   private:
   MY_SINGLE()  = default;
   ~MY_SINGLE() = default;
-
 };
 
 extern MY_SINGLE* Instance;
@@ -165,10 +164,10 @@ extern uint32_t Clip;
 
 extern HGLOBAL ClipMemory;
 
-extern F_LSIZ       ClipRectSize;
-extern uint32_t     ClosestFormToCursor;
-extern uint32_t     ClosestPointIndex;
-extern uint32_t     ClosestVertexToCursor;
+extern F_LSIZ   ClipRectSize;
+extern uint32_t ClosestFormToCursor;
+extern uint32_t ClosestPointIndex;
+extern uint32_t ClosestVertexToCursor;
 
 extern HWND DeleteStitchesDialog;
 

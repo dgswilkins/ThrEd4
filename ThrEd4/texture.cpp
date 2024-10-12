@@ -591,7 +591,7 @@ void txhor(FRM_HEAD& form) {
 
 auto txnam(std::wstring& name) -> bool {
   auto const& texturePath = thred::getHomeDir();
-  auto const textureFile = texturePath / L"thred.txr";
+  auto const  textureFile = texturePath / L"thred.txr";
   name.assign(textureFile.generic_wstring());
   return true;
 }
@@ -1558,8 +1558,8 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	}
 	if (flag) {
 	  auto character = wchar_t {};
-	  if (constexpr auto BUFFLEN = 8U;
-	      Instance->textureInputBuffer.size() < BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
+	  if (constexpr auto BUFFLEN = 8U; Instance->textureInputBuffer.size() <
+	                                   BUFFLEN) { // i.e. floating point 7 digits of precision + '.'
 		if (txdig(keyCode, character)) {
 		  Instance->textureInputBuffer.push_back(character);
 		}
@@ -1688,8 +1688,8 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 	return;
   }
   for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	if (auto const& currentPoint =
-	        Instance->TexturePointsBuffer.operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
+	if (auto const& currentPoint = Instance->TexturePointsBuffer.operator[](
+	        wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
 	    currentPoint.line != 0U) {
 	  auto const iSegment            = currentPoint.line - 1U;
 	  textureSegments[iSegment].line = iTexturePoint;
@@ -1705,7 +1705,8 @@ void texture::rtrtx(FRM_HEAD const& form) {
 	return;
   }
   auto currentCount = form.texture.count;
-  if (wrap::toUnsigned(Instance->TexturePointsBuffer.size()) < gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
+  if (wrap::toUnsigned(Instance->TexturePointsBuffer.size()) <
+      gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
 	currentCount = gsl::narrow<uint16_t>(Instance->TexturePointsBuffer.size()) - currentIndex;
   }
   TempTexturePoints->resize(currentCount);

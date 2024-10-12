@@ -386,8 +386,8 @@ void reptx() {
 	if (wrap::toUnsigned(Instance->TexturePointsBuffer.size()) >
 	    wrap::toUnsigned(iForm.texture.index) + iForm.texture.count) {
 	  auto const startTexture = wrap::next(Instance->TexturePointsBuffer.cbegin(), iForm.texture.index);
-	  auto const endTexture   = wrap::next(startTexture, iForm.texture.count);
-	  auto const destination  = wrap::next(Instance->TexturePointsBuffer.begin(), textureCount);
+	  auto const endTexture  = wrap::next(startTexture, iForm.texture.count);
+	  auto const destination = wrap::next(Instance->TexturePointsBuffer.begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(iForm.texture.index, textureCount);
 	  textureCount += iForm.texture.count;
@@ -397,8 +397,8 @@ void reptx() {
 	if (Instance->TexturePointsBuffer.size() > iForm.texture.index) {
 	  wrap::narrow(iForm.texture.count, Instance->TexturePointsBuffer.size() - iForm.texture.index);
 	  auto const startTexture = wrap::next(Instance->TexturePointsBuffer.cbegin(), iForm.texture.index);
-	  auto const endTexture   = wrap::next(startTexture, iForm.texture.count);
-	  auto const destination  = wrap::next(Instance->TexturePointsBuffer.begin(), textureCount);
+	  auto const endTexture  = wrap::next(startTexture, iForm.texture.count);
+	  auto const destination = wrap::next(Instance->TexturePointsBuffer.begin(), textureCount);
 	  std::copy(startTexture, endTexture, destination);
 	  wrap::narrow(iForm.texture.index, textureCount);
 	  bcup(iForm, badData);

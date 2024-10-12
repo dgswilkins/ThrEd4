@@ -513,7 +513,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return thred::updatePreferences();
   }
   if (!Instance->StateMap.test(StateFlag::ROTAT) && Instance->StateMap.test(StateFlag::GRPSEL)) { // if we have a group of stitches selected
-	auto const& controlPoint      = thred::getFormControlPoints();
+	auto const& controlPoint = thred::getFormControlPoints();
 	if (thred::iselpnt()) {
 	  for (auto iSide = 0U; iSide < wrap::toUnsigned(stretchBoxLine.size()); ++iSide) {
 		stretchBoxLine[iSide] = controlPoint[wrap::toSize(iSide) * 2U];

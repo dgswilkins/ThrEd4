@@ -174,7 +174,7 @@ void clipSelectedForm() {
   auto* textures = convertFromPtr<TX_PNT*>(wrap::next(ptrPoints, iClip));
   if (form.isTexture()) {
 	auto const startTexture = wrap::next(Instance->TexturePointsBuffer.cbegin(), form.texture.index);
-	auto const endTexture   = wrap::next(startTexture, form.texture.count);
+	auto const endTexture = wrap::next(startTexture, form.texture.count);
 
 	auto const spDest = gsl::span {textures, form.texture.count};
 	std::copy(startTexture, endTexture, spDest.begin());
@@ -836,11 +836,13 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		     auto& form : spForms) {
 		  if (form.isTexture()) {
 			textureCount += form.texture.count;
-			form.texture.index += gsl::narrow<decltype(form.texture.index)>(Instance->TexturePointsBuffer.size());
+			form.texture.index +=
+			    gsl::narrow<decltype(form.texture.index)>(Instance->TexturePointsBuffer.size());
 		  }
 		}
 		auto const textureSource = gsl::span {ptrTextureSource, textureCount};
-		Instance->TexturePointsBuffer.insert(Instance->TexturePointsBuffer.end(), textureSource.begin(), textureSource.end());
+		Instance->TexturePointsBuffer.insert(
+		    Instance->TexturePointsBuffer.end(), textureSource.begin(), textureSource.end());
 		GlobalUnlock(ClipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
 		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;

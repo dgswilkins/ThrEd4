@@ -6575,9 +6575,8 @@ void form::filangl() {
   }
 }
 
-auto form::chkfrm(std::vector<POINT>& formControlPoints,
-                  std::vector<POINT>&                      stretchBoxLine,
-                  float&                                   xyRatio) -> bool {
+auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
+    -> bool {
   auto const point = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = Instance->FormList.operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
@@ -7040,7 +7039,8 @@ void form::apliq() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
-	if (auto& currentForm = formList.operator[](ClosestFormToCursor); Instance->UserFlagMap.test(UserFlag::BLUNT)) {
+	if (auto& currentForm = formList.operator[](ClosestFormToCursor);
+	    Instance->UserFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	}
 	else {

@@ -1941,8 +1941,8 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 
   auto const appliqueColor = gsl::narrow_cast<uint32_t>(form.borderColor >> FRMSHFT);
   for (auto iSourceStitch = 0U; iSourceStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iSourceStitch) {
-	if (!Instance->UserFlagMap.test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX) &&
-	    iSourceStitch == ClosestPointIndex) {
+	if (!Instance->UserFlagMap.test(UserFlag::FIL2OF) &&
+	    Instance->StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 	  ClosestPointIndex = iDestinationStitch;
 	}
 	if (auto const attribute = Instance->StitchBuffer.operator[](iSourceStitch).attribute;

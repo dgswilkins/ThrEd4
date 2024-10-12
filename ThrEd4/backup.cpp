@@ -131,10 +131,11 @@ void backup::dudat() {
   auto const& formList  = Instance->FormList;
   auto const  formCount = wrap::toUnsigned(formList.size());
 
-  auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
-                    wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
-                    wrap::sizeofVector(Instance->SatinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
-                    wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
+  auto const size =
+      wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
+      wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->ClipPoints) +
+      wrap::sizeofVector(Instance->SatinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
+      wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
   auto* backupData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
   if (size != bufferElement.size()) {
