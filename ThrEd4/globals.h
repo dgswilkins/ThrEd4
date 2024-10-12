@@ -351,7 +351,6 @@ extern HWND           ThrEdWindow;
 extern POINT          ThredWindowOrigin;
 extern uint32_t*      TraceBitmapData;
 
-extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;
 
 extern SIZE UnzoomedRect;

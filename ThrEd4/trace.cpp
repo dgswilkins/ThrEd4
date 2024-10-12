@@ -327,11 +327,11 @@ void dutrac() {
   CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   auto       traceDirection = 0U;
-  if (!TracedEdges->test(wrap::toSize(savedPoint))) {
+  if (!Instance->TracedEdges.test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
 	auto limit = (CurrentTracePoint.y + 1L) * bitmap::getBitmapWidth();
 	// find the right edge
-	while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
+	while (point < limit && !Instance->TracedEdges.test(wrap::toSize(point))) {
 	  ++point;
 	}
 	auto const right = point < limit ? point - (CurrentTracePoint.y * bitmap::getBitmapWidth())
@@ -339,13 +339,13 @@ void dutrac() {
 	point            = savedPoint;
 	limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	// find the left edge
-	while (point > limit && !TracedEdges->test(wrap::toSize(point))) {
+	while (point > limit && !Instance->TracedEdges.test(wrap::toSize(point))) {
 	  --point;
 	}
 	auto const left = point == limit ? 0 : point - limit;
 	point           = savedPoint;
 	// find the bottom edge
-	while (point > 0 && !TracedEdges->test(wrap::toSize(point))) {
+	while (point > 0 && !Instance->TracedEdges.test(wrap::toSize(point))) {
 	  if (point > bitmap::getBitmapWidth()) {
 		point -= bitmap::getBitmapWidth();
 	  }
@@ -357,7 +357,7 @@ void dutrac() {
 	point             = savedPoint;
 	limit             = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
 	// find the top edge
-	while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
+	while (point < limit && !Instance->TracedEdges.test(wrap::toSize(point))) {
 	  point += bitmap::getBitmapWidth();
 	}
 	auto const top  = point < limit ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
@@ -561,14 +561,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCU;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
 		  traceDirection = TRCD;
 		}
 		else {
 		  pixelIndex += bitmap::getBitmapWidth();            // look at the pixel below
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.x;
 		  }
 		  else { // start tracing up
@@ -585,14 +585,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCR;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
 		  traceDirection = TRCL;
 		}
 		else {
 		  ++pixelIndex;                                      // look at the pixel to the right
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.y;
 		  }
 		  else { // start tracing right
@@ -609,14 +609,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCD;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
 		  traceDirection = TRCU;
 		}
 		else {
 		  pixelIndex -= bitmap::getBitmapWidth();            // look at the pixel above
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.x;
 		  }
 		  else { // start tracing down
@@ -633,14 +633,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCL;
 	  }
 	  else {
-		if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
 		  traceDirection = TRCR;
 		}
 		else {
 		  --pixelIndex;                                      // look at the pixel to the left
-		  if (TracedEdges->test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.y;
 		  }
 		  else {
@@ -830,8 +830,8 @@ void trace::untrace() {
 	return;
   }
   bitmap::resetDC();
-  if (!TracedEdges->empty()) {
-	TracedEdges->resize(0); // allocated in tracedg
+  if (!Instance->TracedEdges.empty()) {
+	Instance->TracedEdges.resize(0); // allocated in tracedg
   }
   if (!TracedMap->empty()) {
 	TracedMap->resize(0); // allocated in trace
@@ -999,28 +999,28 @@ void trace::tracedg() {
   if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
 	trace();
   }
-  TracedEdges->resize(TraceDataSize, false);
-  TracedEdges->reset();
+  Instance->TracedEdges.resize(TraceDataSize, false);
+  Instance->TracedEdges.reset();
   auto pixelIndex = 0L;
   for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	auto flag = false;
 	for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
 	  if (TracedMap->test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
-		  TracedEdges->set(wrap::toSize(pixelIndex));
+		  Instance->TracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
 		}
 	  }
 	  else {
 		if (flag) {
-		  TracedEdges->set(wrap::toSize(pixelIndex) - 1U);
+		  Instance->TracedEdges.set(wrap::toSize(pixelIndex) - 1U);
 		  flag = false;
 		}
 	  }
 	  ++pixelIndex;
 	}
 	if (flag) {
-	  TracedEdges->set(wrap::toSize(pixelIndex) - 1U);
+	  Instance->TracedEdges.set(wrap::toSize(pixelIndex) - 1U);
 	}
   }
   for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
@@ -1029,27 +1029,27 @@ void trace::tracedg() {
 	for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	  if (TracedMap->test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
-		  TracedEdges->set(wrap::toSize(pixelIndex));
+		  Instance->TracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
 		}
 	  }
 	  else {
 		if (flag) {
-		  TracedEdges->set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
+		  Instance->TracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 		  flag = false;
 		}
 	  }
 	  pixelIndex += bitmap::getBitmapWidth();
 	}
 	if (flag) {
-	  TracedEdges->set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
+	  Instance->TracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 	}
   }
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto const spTBD      = gsl::span(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
   for (auto& iPixel : spTBD) {
-	if (TracedEdges->test(pos)) {
+	if (Instance->TracedEdges.test(pos)) {
 	  iPixel = PENWHITE;
 	}
 	else {
