@@ -85,7 +85,7 @@ constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
 
 auto BalaradOffset = F_POINT {};                           // balarad offset
 auto BalaradName0  = fs::path {};                          // balarad semaphore file
-auto BalaradName1  = gsl::narrow_cast<fs::path*>(nullptr); // balarad data file
+auto BalaradName1  = fs::path {};                          // balarad data file
 auto BalaradName2  = gsl::narrow_cast<fs::path*>(nullptr);
 
 // Functions
@@ -102,16 +102,12 @@ auto bal::getBN0() noexcept -> fs::path& {
   return BalaradName0;
 }
 
-auto bal::getBN1() noexcept -> fs::path* {
+auto bal::getBN1() noexcept -> fs::path& {
   return BalaradName1;
 }
 
 auto bal::getBN2() noexcept -> fs::path* {
   return BalaradName2;
-}
-
-void bal::setBN1(fs::path* name) noexcept {
-  BalaradName1 = name;
 }
 
 void bal::setBN2(fs::path* name) noexcept {
@@ -194,7 +190,7 @@ void bal::redbal() {
 
 void bal::ritbal() {
   auto balaradHeader = BAL_HEAD {};
-  if (!BalaradName0.empty() && !BalaradName1->empty() && !Instance->StitchBuffer.empty()) {
+  if (!BalaradName0.empty() && !BalaradName1.empty() && !Instance->StitchBuffer.empty()) {
 	auto outputName = thred::setFileName();
 	outputName.replace_extension(L".thv");
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -240,16 +236,16 @@ void bal::ritbal() {
 	WriteFile(balaradFile, balaradStitch.data(), wrap::sizeofVector(balaradStitch), &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
 	balaradFile =
-	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	    CreateFile(BalaradName1.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	auto const outString = utf::utf16ToUtf8(outputName.wstring());
 	wrap::writeFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
   }
   else {
-	if (!BalaradName1->empty()) {
+	if (!BalaradName1.empty()) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto const balaradFile =
-	      CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	      CreateFile(BalaradName1.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	  CloseHandle(balaradFile);
 	}
   }

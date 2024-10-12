@@ -2593,9 +2593,9 @@ void ducmd() {
   }
   auto readBuffer = std::vector<char> {};
   readBuffer.resize(MAX_PATH + 1);
-  gsl::not_null const balaradName1 = bal::getBN1();
+  auto& balaradName1 = bal::getBN1();
 
-  *balaradName1  = balaradFileName;
+  balaradName1  = balaradFileName;
   auto bytesRead = DWORD {};
   if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
 	return;
@@ -2607,7 +2607,7 @@ void ducmd() {
 	bal::redbal();
   }
   CloseHandle(balaradFile);
-  fs::remove(*balaradName1);
+  fs::remove(balaradName1);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -12278,7 +12278,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		VersionNames.emplace_back(L"");
 	  }
 
-	  bal::setBN1(&Instance->BalaradName1);
 	  bal::setBN2(&Instance->BalaradName2);
 	  bitmap::setBBCV(&Instance->bitmapBackgroundColor);
 	  bitmap::setUBfilename(&Instance->userBMPFileName);
