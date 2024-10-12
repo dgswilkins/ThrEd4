@@ -224,7 +224,7 @@ auto ThredDC             = gsl::narrow_cast<HDC>(nullptr); // main device contex
 auto ScreenSizePixels    = SIZE {};                        // screen size in pixels
 auto StitchWindowAbsRect = RECT {};                        // stitch window size,absolute
 auto NearestPixel        = std::vector<POINT> {};          // selected points
-auto NearestPoint = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of the closest points
+auto NearestPoint            = std::vector<uint32_t> {};       // indices of the closest points
 auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
 auto PrevGroupEndStitch      = uint32_t {}; // higher end of previous selection
 auto StitchWindowAspectRatio = float {};    // aspect ratio of the stitch window
@@ -2337,7 +2337,7 @@ void duClos(uint32_t const      startStitch,
 	auto sum       = (deltaX * deltaX) + (deltaY * deltaY);
 	auto tempPoint = iStitch;
 	auto gap       = gapToNearest.begin();
-	for (auto& point : *NearestPoint) {
+	for (auto& point : NearestPoint) {
 	  if (sum < *gap) {
 		std::swap(*gap, sum);
 		std::swap(point, tempPoint);
@@ -8351,8 +8351,8 @@ void thred::closPnt() {
   unbox();
   unboxs();
   auto gapToNearest = std::vector<float> {};           // distances of the closest points
-  gapToNearest.resize(NearestPoint->size(), BIGFLOAT); // to a mouse click
-  NearestPoint->assign(NearestPoint->size(), BIGUINT);
+  gapToNearest.resize(NearestPoint.size(), BIGFLOAT); // to a mouse click
+  NearestPoint.assign(NearestPoint.size(), BIGUINT);
   auto const stitchPoint = pxCor2stch(WinMsg.pt);
   for (auto iColor = size_t {}; iColor < maxColor(); ++iColor) {
 	auto const iStitch0 = ColorChangeTable.operator[](iColor).stitchIndex;
@@ -8370,9 +8370,9 @@ void thred::closPnt() {
   }
   GetClientRect(MainStitchWin, &StitchWindowClientRect);
   auto stitchCoordsInPixels = POINT {};
-  for (auto const& iNear : *NearestPoint) {
+  for (auto const& iNear : NearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
-	  NearestPoint->operator[](NearestCount)   = iNear;
+	  NearestPoint.operator[](NearestCount)   = iNear;
 	  NearestPixel.operator[](NearestCount++) = stitchCoordsInPixels;
 	}
   }
@@ -8393,7 +8393,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   if (NearestCount != 0) {
 	auto itBoxOffset = BoxOffset.begin();
 	auto npi         = NearestPixel.begin();
-	auto npo         = NearestPoint->begin();
+	auto npo         = NearestPoint.begin();
 	for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
 	  auto const offset = *itBoxOffset++;
 	  if (auto const& pixel = *(npi++);
@@ -12257,7 +12257,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	LabelWindow.resize(LASTLIN);
 	  MsgBuffer.reserve(MSGSIZ);
 	  NearestPixel.resize(NERCNT);
-	  NearestPoint          = &Instance->NearestPoint;          // thred only
+	  NearestPoint.resize(NERCNT);
 	  PreviousNames         = &Instance->PreviousNames;         // thred only
 	  ScrollSize            = &Instance->ScrollSize;            // thred only
 	  SideWindow            = &Instance->SideWindow;            // thred only
