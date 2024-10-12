@@ -12278,7 +12278,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		VersionNames.emplace_back(L"");
 	  }
 
-	  texture::initTextures(&Instance->SelectedTexturePointsList, &Instance->TextureHistory);
+	  texture::initTextures(&Instance->TextureHistory);
 	  tfc::setFVAS(&Instance->FormVerticesAsLine);
 	  redini();
 

@@ -110,7 +110,6 @@ class MY_SINGLE
   std::vector<uint32_t>     selectedFormList;
   std::vector<POINT>        selectedFormsLine;
   std::vector<POINT>        selectedPointsLine;
-  std::vector<uint32_t>     SelectedTexturePointsList;
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> StitchBuffer;
   std::vector<F_POINT>      tempPolygon;
