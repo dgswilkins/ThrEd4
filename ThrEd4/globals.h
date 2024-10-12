@@ -121,7 +121,6 @@ class MY_SINGLE
   std::vector<F_POINT_ATTR> ClipBuffer;
   std::vector<F_POINT>      ClipPoints;
   fs::path                  ColorFileName;
-  std::vector<COL_CHANGE>   ColorChangeTable;
   std::vector<HWND>         DefaultColorWin;
   fs::path                  DefaultDirectory;
   std::wstring              DesignerName;
