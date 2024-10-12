@@ -189,7 +189,7 @@ auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr);       // command line
 auto ThredWindowRect = RECT {};                                  // main window size
 auto ColorBarSize    = COLSIZ;                               // Color bar width scaled for DPI
 auto ColorBarRect    = RECT {};                                  // color bar rectangle
-auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which ThrEd was executed
+auto HomeDirectory       = fs::path {}; // directory from which ThrEd was executed
 auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
 auto LargestStitchIndex  = uint32_t {}; // pointer to the largest stitch in the selected range
 auto CurrentStitchIndex  = uint32_t {}; // pointer to the current selection for length search
@@ -2535,7 +2535,7 @@ void ducmd() {
 	nuFil(FileIndices::THR);
 	return;
   }
-  auto balaradFileName = *HomeDirectory / arg1.substr(4);
+  auto balaradFileName = HomeDirectory / arg1.substr(4);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto balaradFile =
       CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -2553,7 +2553,7 @@ void ducmd() {
   if (!arg2.starts_with(L"/F2:")) {
 	return;
   }
-  balaradFileName = *HomeDirectory / arg2.substr(4);
+  balaradFileName = HomeDirectory / arg2.substr(4);
   balaradFile =
       CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (balaradFile == INVALID_HANDLE_VALUE) {
@@ -2623,7 +2623,7 @@ void dugrid() {
 
 void duhom() {
   auto const arg0 = fs::path {*ArgList};
-  *HomeDirectory  = arg0.parent_path();
+  HomeDirectory  = arg0.parent_path();
 }
 
 void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1) {
@@ -5648,7 +5648,7 @@ void redfnam(std::wstring& designerName) {
 
 void redini() {
   duhom();
-  *IniFileName = *HomeDirectory;
+  *IniFileName = HomeDirectory;
   *IniFileName /= L"thred.ini";
   // NOLINTNEXTLINE(readability-qualified-auto)
   if (auto const iniFileHandle =
@@ -6207,7 +6207,7 @@ void ritloc() {
   if (auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
       lockFile != INVALID_HANDLE_VALUE) {
 	auto       bytesWritten = DWORD {};
-	auto const value        = utf::utf16ToUtf8(*HomeDirectory);
+	auto const value        = utf::utf16ToUtf8(HomeDirectory);
 	wrap::writeFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(lockFile);
   }
@@ -12148,7 +12148,7 @@ auto thred::txtWid(wchar_t const* string) noexcept(std::is_same_v<size_t, uint32
   return textSize;
 }
 
-auto thred::getHomeDir() noexcept -> fs::path* {
+auto thred::getHomeDir() noexcept -> fs::path& {
   return HomeDirectory;
 }
 
@@ -12227,7 +12227,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
 	DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
-	  HomeDirectory         = &Instance->HomeDirectory;         // thred only
 	  IniFileName           = &Instance->IniFileName;           // thred only
 	  Knots                 = &Instance->Knots;                 // thred only
 	  LabelWindow           = &Instance->LabelWindow;           // thred only

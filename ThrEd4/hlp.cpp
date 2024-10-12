@@ -10,11 +10,10 @@
 #include <HtmlHelp.h>
 
 void hlp::help() {
-  if (auto const* homeDir = thred::getHomeDir(); nullptr != homeDir) {
-	auto const helpfile = *homeDir / displayText::loadStr(IDS_HELPFN);
+  auto const& homeDir = thred::getHomeDir(); 
+	auto const helpfile = homeDir / displayText::loadStr(IDS_HELPFN);
 #pragma warning(suppress : 26462) // con.4 NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const helpWindow = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0); nullptr == helpWindow) {
 	  displayText::tabmsg(IDS_NOHLP, false);
 	}
-  }
 }

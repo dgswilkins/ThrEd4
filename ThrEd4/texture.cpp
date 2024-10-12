@@ -590,11 +590,8 @@ void txhor(FRM_HEAD& form) {
 }
 
 auto txnam(std::wstring& name) -> bool {
-  auto const* texturePath = thred::getHomeDir();
-  if (nullptr == texturePath) {
-	return false;
-  }
-  auto const textureFile = *texturePath / L"thred.txr";
+  auto const& texturePath = thred::getHomeDir();
+  auto const textureFile = texturePath / L"thred.txr";
   name.assign(textureFile.generic_wstring());
   return true;
 }
