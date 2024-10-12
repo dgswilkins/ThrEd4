@@ -171,12 +171,12 @@ auto coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
 
 auto colfil() -> bool {
   auto const& workingFileName = Instance->WorkingFileName;
-
-  *ColorFileName = workingFileName;
-  *RGBFileName   = workingFileName;
   if (!workingFileName.has_extension()) {
 	return false;
   }
+
+  *ColorFileName = workingFileName;
+  *RGBFileName   = workingFileName;
   ColorFileName->replace_extension(L"thw");
   RGBFileName->replace_extension(L"rgb");
   return true;
