@@ -184,7 +184,7 @@ constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 auto FormControlPoints =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
 auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr);  // ThrEd file header extension
-auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
+auto DesignerName    = std::wstring {};                          // designer name in clear
 auto ArgCount        = int32_t {};                               // command line argument count
 auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr);       // command line argument array
 auto ThredWindowRect = RECT {};                                  // main window size
@@ -1735,7 +1735,7 @@ auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> 
 	case WM_INITDIALOG: {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto const hwnd = GetDlgItem(hwndlg, IDC_DESED);
-	  SetWindowText(hwnd, DesignerName->c_str());
+	  SetWindowText(hwnd, DesignerName.c_str());
 	  SetFocus(hwnd);
 	  SendMessage(hwnd, EM_SETSEL, 0, -1);
 	  break;
@@ -1751,9 +1751,9 @@ auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> 
 		  auto const hwnd           = GetDlgItem(hwndlg, IDC_DESED);
 		  auto       designerBuffer = std::array<wchar_t, NameOrder.size()> {};
 		  GetWindowText(hwnd, designerBuffer.data(), gsl::narrow<int>(designerBuffer.size()));
-		  DesignerName->assign(designerBuffer.data());
+		  DesignerName.assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
-		  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
+		  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
 		  SetWindowText(ThrEdWindow, fmtStr.c_str());
 		  EndDialog(hwndlg, TRUE);
 		  break;
@@ -2387,7 +2387,7 @@ void dubuf(std::vector<char>& buffer) {
       wrap::sizeofVector(Instance->StitchBuffer) + sizeof(stitchHeader) + bitmap::getBmpNameLength();
   wrap::narrow(stitchHeader.stitchCount, Instance->StitchBuffer.size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
-  auto       designer       = utf::utf16ToUtf8(*DesignerName);
+  auto       designer       = utf::utf16ToUtf8(DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
@@ -4390,8 +4390,8 @@ void init() {
   wrap::getTextExtentPoint32(ThredDC, pikol.c_str(), wrap::toUnsigned(pikol.size()), &PickColorMsgSize);
   menu::auxmen();
   fnamtabs();
-  ritfnam(*DesignerName);
-  auto       designer       = utf::utf16ToUtf8(*DesignerName);
+  ritfnam(DesignerName);
+  auto       designer       = utf::utf16ToUtf8(DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
@@ -4411,7 +4411,7 @@ void init() {
   menu::chkmen();
   // check command line-should be last item in init
   ducmd();
-  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
@@ -4688,8 +4688,8 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	    filscor > homscor) {
 	  auto const spEHCN = gsl::span {ExtendedHeader->creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
-	  redfnam(*DesignerName);
-	  auto fmtStr = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), *DesignerName);
+	  redfnam(DesignerName);
+	  auto fmtStr = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), DesignerName);
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
   }
@@ -5145,7 +5145,7 @@ void nuFil(FileIndices const fileIndex) {
   }
   menu::auxmen();
   thred::lenCalc();
-  auto const fmtStr = displayText::format2(IDS_THRDBY, newFileName.wstring(), *DesignerName);
+  auto const fmtStr = displayText::format2(IDS_THRDBY, newFileName.wstring(), DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   Instance->StateMap.set(StateFlag::INIT);
   Instance->StateMap.reset(StateFlag::TRSET);
@@ -5370,7 +5370,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
   auto const spIDN   = gsl::span {IniFile.designerName};
-  DesignerName->assign(utf::utf8ToUtf16(std::string(spIDN.data())));
+  DesignerName.assign(utf::utf8ToUtf16(std::string(spIDN.data())));
   switch (version) { // handle the different versions of the file format
 	case 0: {
 	  if (thredHeader.hoopType == SMALHUP) {
@@ -5383,7 +5383,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		IniFile.hoopSizeY = LHUPY;
 		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 	  }
-	  ritfnam(*DesignerName);
+	  ritfnam(DesignerName);
 	  auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
 	  std::copy(spIDN.begin(), wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U), spModifierName.begin());
 	  break;
@@ -5401,7 +5401,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
 
 	  UnzoomedRect = {.cx = std::lround(ExtendedHeader->hoopSizeX), .cy = std::lround(ExtendedHeader->hoopSizeY)};
-	  redfnam(*DesignerName);
+	  redfnam(DesignerName);
 	  break;
 	}
 	default: {
@@ -5684,7 +5684,7 @@ void redini() {
 		  ++previousName;
 		}
 	  }
-	  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
+	  DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
 	  loadColors();
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
@@ -6109,7 +6109,7 @@ void ritini() {
 	}
 	++previousName;
   }
-  auto const designer = utf::utf16ToUtf8(*DesignerName);
+  auto const designer = utf::utf16ToUtf8(DesignerName);
   std::ranges::fill(IniFile.designerName, FILLCHAR);
   auto const spIDN = gsl::span {IniFile.designerName};
   std::ranges::copy(designer, spIDN.begin());
@@ -6493,8 +6493,8 @@ void setknt() {
 void setPrefs() {
   thred::defpref();
   getDocsFolder(DefaultDirectory);
-  if (DesignerName->empty()) {
-	DesignerName->assign(displayText::loadStr(IDS_UNAM));
+  if (DesignerName.empty()) {
+	DesignerName.assign(displayText::loadStr(IDS_UNAM));
 	thred::getdes();
   }
 }
@@ -8779,12 +8779,12 @@ void thred::newFil() {
   Instance->StateMap.reset(StateFlag::CMPDO);
   bitmap::resetBmpFile(true);
   backup::deldu();
-  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
-  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
+  DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
+  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   Instance->ThrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
-  ritfnam(*DesignerName);
-  auto const designer       = utf::utf16ToUtf8(*DesignerName);
+  ritfnam(DesignerName);
+  auto const designer       = utf::utf16ToUtf8(DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
@@ -9262,7 +9262,7 @@ void thred::hidbit() {
 }
 
 void thred::deltot() {
-  DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
+  DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   Instance->TexturePointsBuffer.clear();
   Instance->FormList.clear();
   Instance->StitchBuffer.clear();
@@ -9272,7 +9272,7 @@ void thred::deltot() {
   rstAll();
   coltab();
   zumhom();
-  auto const wTxt = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), *DesignerName);
+  auto const wTxt = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
@@ -10825,7 +10825,7 @@ void thred::closfn() {
   bitmap::delmap();
   backup::deldu();
   displayText::clrhbut(3);
-  auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
@@ -12158,8 +12158,8 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 }
 
 void thred::tst() {
-  DesignerName->assign(L"Coder");
-  Instance->ThrName.assign(*DesignerName);
+  DesignerName.assign(L"Coder");
+  Instance->ThrName.assign(DesignerName);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
@@ -12227,7 +12227,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 
 	DefaultColorWin.resize(COLORCNT);
-	  DesignerName          = &Instance->DesignerName;          // thred only
 	  ExtendedHeader        = &Instance->ExtendedHeader;        // thred only
 	  FormControlPoints     = &Instance->FormControlPoints;     // thred only
 	  HomeDirectory         = &Instance->HomeDirectory;         // thred only
@@ -12320,8 +12319,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  else {
 		ShowWindow(ThrEdWindow, SW_SHOW);
 	  }
-	  if (DesignerName->empty()) {
-		DesignerName->assign(displayText::loadStr(IDS_UNAM));
+	  if (DesignerName.empty()) {
+		DesignerName.assign(displayText::loadStr(IDS_UNAM));
 		thred::getdes();
 	  }
 	  auto xyRatio        = 1.0F; // expand form aspect ratio
@@ -12409,7 +12408,7 @@ auto thred::setFileName() -> fs::path {
 
 auto thred::getDesigner() -> std::wstring {
   auto const modifier = utf::utf8ToUtf16(std::string(ExtendedHeader->modifierName.data()));
-  return displayText::format2(IDS_CREATBY, *DesignerName, modifier);
+  return displayText::format2(IDS_CREATBY, DesignerName, modifier);
 }
 
 auto thred::getVerticalIndex() noexcept -> uint8_t {
