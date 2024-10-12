@@ -81,7 +81,6 @@ class MY_SINGLE
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
 	FormControlPoints.resize(OUTPNTS);
-	DefaultColorWin.resize(COLORCNT);
 	LabelWindow.resize(LASTLIN);
 	MsgBuffer.reserve(MSGSIZ);
 	NearestPixel.resize(NERCNT);
@@ -121,7 +120,6 @@ class MY_SINGLE
   std::vector<F_POINT_ATTR> ClipBuffer;
   std::vector<F_POINT>      ClipPoints;
   fs::path                  ColorFileName;
-  std::vector<HWND>         DefaultColorWin;
   fs::path                  DefaultDirectory;
   std::wstring              DesignerName;
   int32_t                   DPI = 0;

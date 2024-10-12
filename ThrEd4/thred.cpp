@@ -258,7 +258,7 @@ constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread s
 auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
-auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
+auto DefaultColorWin = std::vector<HWND> {};                          // default color windows
 auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
 auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
 auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
@@ -3873,7 +3873,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
   auto dcb = DefaultColorBrush.begin();
   auto ucb = UserColorBrush.begin();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
+	if (DrawItem->hwndItem == DefaultColorWin.operator[](iColor)) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
 	  if (DisplayedColorBitmap.test(iColor)) {
 		SetBkColor(DrawItem->hDC, DEFAULT_COLORS.at(iColor));
@@ -4824,7 +4824,7 @@ void makCol() noexcept {
   buffer[1]   = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont        = displayText::getThrEdFont(FONTSIZE);
-  auto       dcw          = DefaultColorWin->begin();
+  auto       dcw          = DefaultColorWin.begin();
   auto       ucw          = UserColorWin->begin();
   auto       itThreadSize = ThreadSize.begin();
   auto       yOffset      = int32_t {};
@@ -5291,7 +5291,7 @@ void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t const iSource, char cons
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
 auto oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (DefaultColorWin->operator[](iColor) == window ||
+	if (DefaultColorWin.operator[](iColor) == window ||
 	    UserColorWin->operator[](iColor) == window || ThreadSizeWin->operator[](iColor) == window) {
 	  return false;
 	}
@@ -7169,7 +7169,7 @@ void handle_program_memory_depletion() {
 } // namespace
 
 void thred::hideColorWin() noexcept {
-  auto iDefaultColorWin = DefaultColorWin->begin();
+  auto iDefaultColorWin = DefaultColorWin.begin();
   auto iUserColorWin    = UserColorWin->begin();
   for (auto const& iThreadSizeWin : *ThreadSizeWin) {
 	hidwnd(*iDefaultColorWin++);
@@ -7179,7 +7179,7 @@ void thred::hideColorWin() noexcept {
 }
 
 void thred::showColorWin() noexcept {
-  auto iDefaultColorWin = DefaultColorWin->begin();
+  auto iDefaultColorWin = DefaultColorWin.begin();
   auto iUserColorWin    = UserColorWin->begin();
   for (auto const& iThreadSizeWin : *ThreadSizeWin) {
 	shownd(*iDefaultColorWin++);
@@ -7368,7 +7368,7 @@ void thred::redraw(HWND window) noexcept {
   if (window != MainStitchWin) {
 	return;
   }
-  for (auto const& iWindow : *DefaultColorWin) {
+  for (auto const& iWindow : DefaultColorWin) {
 	if (iWindow != nullptr) {
 	  RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
 	}
@@ -8061,7 +8061,7 @@ void thred::dun() {
 }
 
 auto thred::inDefaultColorWindows() -> bool {
-  return chkMsgs(WinMsg.pt, DefaultColorWin->front(), DefaultColorWin->back());
+  return chkMsgs(WinMsg.pt, DefaultColorWin.front(), DefaultColorWin.back());
 }
 
 auto thred::inChangeThreadWindows() -> bool {
@@ -8821,7 +8821,7 @@ void thred::newFil() {
   Knots->clear();
   Instance->WorkingFileName.clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	redraw(DefaultColorWin->operator[](iColor));
+	redraw(DefaultColorWin.operator[](iColor));
 	redraw(UserColorWin->operator[](iColor));
 	redraw(ThreadSizeWin->operator[](iColor));
   }
@@ -12226,7 +12226,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
-	  DefaultColorWin       = &Instance->DefaultColorWin;       // thred only
+	DefaultColorWin.resize(COLORCNT);
 	  DefaultDirectory      = &Instance->DefaultDirectory;      // thred only
 	  DesignerName          = &Instance->DesignerName;          // thred only
 	  ExtendedHeader        = &Instance->ExtendedHeader;        // thred only
@@ -12426,13 +12426,13 @@ auto thred::getFormControlPoints() noexcept -> std::vector<POINT>* {
 }
 
 void thred::chkInsCol() {
-  if (chkMsgs(WinMsg.pt, DefaultColorWin->front(), UserColorWin->back())) { // check if point is in any of the color windows
+  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin->back())) { // check if point is in any of the color windows
 	inscol();
   }
 }
 
 void thred::chkDelCol() {
-  if (chkMsgs(WinMsg.pt, DefaultColorWin->front(), UserColorWin->back())) {
+  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin->back())) {
 	delcol();
   }
   else {
