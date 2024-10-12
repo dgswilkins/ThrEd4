@@ -121,7 +121,6 @@ class MY_SINGLE
   std::vector<F_POINT>      ClipPoints;
   fs::path                  ColorFileName;
   int32_t                   DPI = 0;
-  THR_HEAD_EX               ExtendedHeader;
   std::vector<float>        FormAngles;
   std::vector<POINT>        FormControlPoints;
   std::vector<POINT>        FormLines;

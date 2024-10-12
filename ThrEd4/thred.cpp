@@ -183,7 +183,7 @@ constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
 auto FormControlPoints =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
-auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr);  // ThrEd file header extension
+auto ExtendedHeader  = THR_HEAD_EX {};              // ThrEd file header extension
 auto DesignerName    = std::wstring {};                          // designer name in clear
 auto ArgCount        = int32_t {};                               // command line argument count
 auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr);       // command line argument array
@@ -2388,7 +2388,7 @@ void dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.stitchCount, Instance->StitchBuffer.size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer       = utf::utf16ToUtf8(DesignerName);
-  auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
+  auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   auto& formList                    = Instance->FormList;
@@ -2432,12 +2432,12 @@ void dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(Instance->ClipPoints) * clipDataCount);
   // write the header to the buffer
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
-  ExtendedHeader->auxFormat         = IniFile.auxFileType;
-  ExtendedHeader->hoopSizeX         = IniFile.hoopSizeX;
-  ExtendedHeader->hoopSizeY         = IniFile.hoopSizeY;
-  ExtendedHeader->texturePointCount = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
+  ExtendedHeader.auxFormat         = IniFile.auxFileType;
+  ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
+  ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
+  ExtendedHeader.texturePointCount = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
   // write the rest of the data to the buffer
-  durit(buffer, ExtendedHeader, sizeof(*ExtendedHeader));
+  durit(buffer, &ExtendedHeader, sizeof(ExtendedHeader));
   durit(buffer, Instance->StitchBuffer.data(), wrap::sizeofVector(Instance->StitchBuffer));
   durit(buffer, bitmap::getBmpNameData(), bitmap::getBmpNameLength());
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
@@ -4392,7 +4392,7 @@ void init() {
   fnamtabs();
   ritfnam(DesignerName);
   auto       designer       = utf::utf16ToUtf8(DesignerName);
-  auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
+  auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   thred::chkhup();
@@ -4686,7 +4686,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	                         (gethand(fileStitchBuffer, fileHeader.stitchCount) * HANDW) +
 	                         (fileHeader.vertexLen * FRMPW) + (fileHeader.stitchCount * STCHW);
 	    filscor > homscor) {
-	  auto const spEHCN = gsl::span {ExtendedHeader->creatorName};
+	  auto const spEHCN = gsl::span {ExtendedHeader.creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
 	  redfnam(DesignerName);
 	  auto fmtStr = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), DesignerName);
@@ -5384,23 +5384,23 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 	  }
 	  ritfnam(DesignerName);
-	  auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
+	  auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
 	  std::copy(spIDN.begin(), wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U), spModifierName.begin());
 	  break;
 	}
 	case 1:
 	case 2: {
-	  if (!wrap::readFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &bytesRead, L"ReadFile for ExtendedHeader in readTHRFile")) {
+	  if (!wrap::readFile(fileHandle, &ExtendedHeader, sizeof(ExtendedHeader), &bytesRead, L"ReadFile for ExtendedHeader in readTHRFile")) {
 		return false;
 	  }
-	  if (bytesRead != sizeof(*ExtendedHeader)) { // is there enough data in the file to read the extended header
+	  if (bytesRead != sizeof(ExtendedHeader)) { // is there enough data in the file to read the extended header
 		prtred(fileHandle, IDS_SHRTF);
 		return false;
 	  }
-	  IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
-	  IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
+	  IniFile.hoopSizeX = ExtendedHeader.hoopSizeX;
+	  IniFile.hoopSizeY = ExtendedHeader.hoopSizeY;
 
-	  UnzoomedRect = {.cx = std::lround(ExtendedHeader->hoopSizeX), .cy = std::lround(ExtendedHeader->hoopSizeY)};
+	  UnzoomedRect = {.cx = std::lround(ExtendedHeader.hoopSizeX), .cy = std::lround(ExtendedHeader.hoopSizeY)};
 	  redfnam(DesignerName);
 	  break;
 	}
@@ -5554,9 +5554,9 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	}
   }
   Instance->ClipPoints.shrink_to_fit();
-  if (ExtendedHeader->texturePointCount != 0U) { // read the texture points
-	Instance->TexturePointsBuffer.resize(ExtendedHeader->texturePointCount);
-	bytesToRead = ExtendedHeader->texturePointCount * wrap::sizeofType(Instance->TexturePointsBuffer);
+  if (ExtendedHeader.texturePointCount != 0U) { // read the texture points
+	Instance->TexturePointsBuffer.resize(ExtendedHeader.texturePointCount);
+	bytesToRead = ExtendedHeader.texturePointCount * wrap::sizeofType(Instance->TexturePointsBuffer);
 	if (!wrap::readFile(fileHandle, Instance->TexturePointsBuffer.data(), bytesToRead, &bytesRead, L"ReadFile for TexturePointsBuffer in readTHRFile")) {
 	  return false;
 	}
@@ -5624,7 +5624,7 @@ void redfnam(std::wstring& designerName) {
   auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
   auto           designer      = std::string {};
   auto           iNameOrder    = NameOrder.begin();
-  auto const     spCreatorName = gsl::span {ExtendedHeader->creatorName};
+  auto const     spCreatorName = gsl::span {ExtendedHeader.creatorName};
   for (auto& iTmpName : tmpName) {
 	if (auto const& index = *iNameOrder; index < spCreatorName.size()) {
 	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[index]);
@@ -6085,7 +6085,7 @@ void ritfnam(std::wstring const& designerName) {
   }
   auto iTmpName = tmpName.begin();
   // write the encoded name
-  auto const spCreatorName = gsl::span {ExtendedHeader->creatorName};
+  auto const spCreatorName = gsl::span {ExtendedHeader.creatorName};
   for (auto const& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*iTmpName++);
@@ -8785,7 +8785,7 @@ void thred::newFil() {
   Instance->ThrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
   ritfnam(DesignerName);
   auto const designer       = utf::utf16ToUtf8(DesignerName);
-  auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
+  auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   rstdu();
@@ -12227,7 +12227,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 
 	DefaultColorWin.resize(COLORCNT);
-	  ExtendedHeader        = &Instance->ExtendedHeader;        // thred only
 	  FormControlPoints     = &Instance->FormControlPoints;     // thred only
 	  HomeDirectory         = &Instance->HomeDirectory;         // thred only
 	  IniFileName           = &Instance->IniFileName;           // thred only
@@ -12407,7 +12406,7 @@ auto thred::setFileName() -> fs::path {
 }
 
 auto thred::getDesigner() -> std::wstring {
-  auto const modifier = utf::utf8ToUtf16(std::string(ExtendedHeader->modifierName.data()));
+  auto const modifier = utf::utf8ToUtf16(std::string(ExtendedHeader.modifierName.data()));
   return displayText::format2(IDS_CREATBY, DesignerName, modifier);
 }
 
