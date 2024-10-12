@@ -270,7 +270,7 @@ auto PickColorMsgSize = SIZE {};         // size of the pick color message
 auto InsertSize       = SIZE {};         // size of file insert window
 auto InsertCenter     = F_POINT {};      // center point in inserted file
 auto NumericCode      = wchar_t {};      // keyboard numerical input
-auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
+auto Knots            = std::vector<uint32_t> {}; // indices of knot stitches
 
 auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
@@ -2176,7 +2176,7 @@ void drwStch() {
 }
 
 void drwknot() {
-  if (Instance->UserFlagMap.test(UserFlag::KNOTOF) || Knots->empty() || Instance->StitchBuffer.empty()) {
+  if (Instance->UserFlagMap.test(UserFlag::KNOTOF) || Knots.empty() || Instance->StitchBuffer.empty()) {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
@@ -2186,7 +2186,7 @@ void drwknot() {
   auto           point    = POINT {};
   auto           kOutline = std::array<POINT, SQPNTS> {};
   auto           tLine    = std::array<POINT, LNPNTS> {};
-  for (auto const knot : *Knots) {
+  for (auto const knot : Knots) {
 	stCor2px(Instance->StitchBuffer.operator[](knot), point);
 	SelectObject(StitchWindowMemDC, KnotPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -2913,16 +2913,16 @@ void fnamtabs() {
 void fndknt() {
   auto endStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (endStitch <= 4U) {
-	Knots->clear();
+	Knots.clear();
 	return;
   }
   endStitch -= 4U;
-  Knots->clear();
+  Knots.clear();
   auto const spStitch = std::ranges::subrange(Instance->StitchBuffer.begin(),
                                               wrap::next(Instance->StitchBuffer.begin(), endStitch));
   for (auto iStitch = 0; const auto& stitch : spStitch) {
 	if ((stitch.attribute & KNOTMSK) != 0U) {
-	  Knots->emplace_back(iStitch);
+	  Knots.emplace_back(iStitch);
 	}
 	iStitch++;
   }
@@ -6769,8 +6769,8 @@ void srchk() {
 }
 
 auto srchknot(uint32_t const source) -> uint32_t {
-  auto upper = std::ranges::find(*Knots, source);
-  if (upper == Knots->end()) {
+  auto upper = std::ranges::find(Knots, source);
+  if (upper == Knots.end()) {
 	return 3;
   }
   --upper;
@@ -8817,7 +8817,7 @@ void thred::newFil() {
   formList.clear();
   formList.shrink_to_fit();
   resetColorChanges();
-  Knots->clear();
+  Knots.clear();
   Instance->WorkingFileName.clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	redraw(DefaultColorWin.operator[](iColor));
@@ -10819,7 +10819,7 @@ void thred::delstch() {
 
 void thred::closfn() {
   deltot();
-  Knots->clear();
+  Knots.clear();
   Instance->WorkingFileName.clear();
   bitmap::delmap();
   backup::deldu();
@@ -12227,7 +12227,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
 	DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
-	  Knots                 = &Instance->Knots;                 // thred only
 	  LabelWindow           = &Instance->LabelWindow;           // thred only
 	  LRUPtr                = &Instance->LRUMenuId;             // thred only
 	  MsgBuffer             = &Instance->MsgBuffer;             // thred only

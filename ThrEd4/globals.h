@@ -130,7 +130,6 @@ class MY_SINGLE
   std::vector<F_POINT>      InsidePointList;
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      InterleaveSequenceIndices;
-  std::vector<uint32_t>     Knots;
   std::vector<HWND>         LabelWindow;
 
   std::array<uint32_t, OLDNUM> LRUMenuId = {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
