@@ -34,5 +34,4 @@ namespace DST { // NOLINT(readability-identifier-naming)
 auto colmatch(COLORREF color) -> uint32_t;
 auto readDSTFile(fs::path const& newFileName) -> bool;
 auto saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
-void setRGBFilename(fs::path* directory) noexcept;
 } // namespace DST

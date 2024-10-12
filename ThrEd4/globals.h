@@ -105,7 +105,6 @@ class MY_SINGLE
   MENUITEMINFO              menuInfo = MENUITEMINFO {};
   std::vector<F_POINT>      OSequence;
   std::vector<F_POINT>      outsidePointList;
-  fs::path                  RGBFileName;
   std::vector<POINT>        rubberBandLine;
   std::vector<SAT_CON>      satinGuides;
   std::vector<POINT>        searchLine;

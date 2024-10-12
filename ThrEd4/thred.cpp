@@ -12280,7 +12280,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 
 	  bitmap::setBBCV(&Instance->bitmapBackgroundColor);
 	  bitmap::setUBfilename(&Instance->userBMPFileName);
-	  DST::setRGBFilename(&Instance->RGBFileName);
 	  texture::initTextures(
 	      &Instance->TempTexturePoints, &Instance->SelectedTexturePointsList, &Instance->TextureHistory);
 	  tfc::setFVAS(&Instance->FormVerticesAsLine);

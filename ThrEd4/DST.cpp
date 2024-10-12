@@ -134,7 +134,7 @@ class DSTDAT
 // DST internal namespace
 namespace {
 auto ColorFileName = fs::path {};                     //.thw file name
-auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
+auto RGBFileName   = fs::path {}; //.rgb file name
 
 constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
 constexpr auto DSTMAX    = 121L;                 // maximum stitch/jump length of 121 in DST format
@@ -176,9 +176,9 @@ auto colfil() -> bool {
   }
 
   ColorFileName = workingFileName;
-  *RGBFileName   = workingFileName;
+  RGBFileName   = workingFileName;
   ColorFileName.replace_extension(L"thw");
-  RGBFileName->replace_extension(L"rgb");
+  RGBFileName.replace_extension(L"rgb");
   return true;
 }
 
@@ -901,7 +901,7 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
 	                nullptr);
   }
   CloseHandle(colorFile);
-  colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  colorFile = CreateFile(RGBFileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                &colorData[2],
@@ -980,10 +980,6 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
 }
 // ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
-
-void DST::setRGBFilename(fs::path* directory) noexcept {
-  RGBFileName = directory;
-}
 
 auto DST::colmatch(COLORREF const color) -> uint32_t {
   if (auto const colorChanges = thred::maxColor() + 1U; colorChanges < UserColor.size()) {
