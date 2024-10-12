@@ -73,13 +73,11 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
 	RubberBandLine.resize(3U);
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
-	SideWindowEntryBuffer.resize(SWBLEN);
 	TextureHistory.resize(ITXBUFSZ);
 	ThreadSizeWin.resize(COLORCNT);
 	ThumbnailSearchString.reserve(TSSSIZ);
@@ -128,7 +126,6 @@ class MY_SINGLE
   std::vector<POINT>        SelectedFormsLine;
   std::vector<POINT>        SelectedPointsLine;
   std::vector<uint32_t>     SelectedTexturePointsList;
-  std::vector<wchar_t>      SideWindowEntryBuffer;
   std::vector<SEARCH_REC>   SortBuffer;
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> StitchBuffer;

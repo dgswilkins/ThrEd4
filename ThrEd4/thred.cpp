@@ -201,6 +201,7 @@ constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
 constexpr auto SCROLSIZ = int32_t {12};           // logical pixel width of a scroll bar
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
+constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 constexpr auto SWCOUNT  = 16U;                   // number of side windows to create/track
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
@@ -302,8 +303,7 @@ auto InsertCenter     = F_POINT {};      // center point in inserted file
 auto NumericCode      = wchar_t {};      // keyboard numerical input
 auto Knots            = std::vector<uint32_t> {}; // indices of knot stitches
 
-auto SideWindowEntryBuffer =
-    gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
+auto SideWindowEntryBuffer = std::vector<wchar_t> {}; // buffer for entering form data sheet numbers
 auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
 auto MsgBuffer     = std::vector<wchar_t> {}; // for user messages
 
@@ -832,7 +832,7 @@ void chknum() {
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
 
-	  auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data()) * PFGRAN;
+	  auto const value = wrap::wcsToFloat(SideWindowEntryBuffer.data()) * PFGRAN;
 	  switch (FormMenuChoice) {
 		case LTXOF: { // update texture fill spacing
 		  thred::savdo();
@@ -883,7 +883,7 @@ void chknum() {
 		case LFTHCOL: { // update feather color
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol((wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			form::nufthcol((wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -895,7 +895,7 @@ void chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			form::nufilcol(colVal);
 			auto const fmtStr = format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(valueWindow.operator[](LFRMCOL), fmtStr.c_str());
@@ -909,7 +909,7 @@ void chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			form.underlayColor = colVal;
 			auto const fmtStr  = format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(valueWindow.operator[](LUNDCOL), fmtStr.c_str());
@@ -924,7 +924,7 @@ void chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			form::nubrdcol(colVal);
 			auto const fmtStr = format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(valueWindow.operator[](LBRDCOL), fmtStr.c_str());
@@ -1106,7 +1106,7 @@ void chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) { // the preference menu is open
-		auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data());
+		auto const value = wrap::wcsToFloat(SideWindowEntryBuffer.data());
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto hWnd   = HWND {nullptr};
 		auto fmtStr = std::wstring {};
@@ -3723,10 +3723,10 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
   }
   if (FormMenuChoice != 0U || PreferenceIndex != 0U) {
 	if (chkminus(code)) {
-	  if (SideWindowEntryBuffer->front() != '-') {
+	  if (SideWindowEntryBuffer.front() != '-') {
 		thred::resetSideBuffer();
-		SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '-';
-		SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+		SideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '-';
+		SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
 	  }
 	  return true;
 	}
@@ -3746,10 +3746,10 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 		thred::unsid();
 	  }
 	  else {
-		if (SideWinMsgIdx < SideWindowEntryBuffer->size() - 1U) {
-		  SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = NumericCode;
-		  SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
-		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+		if (SideWinMsgIdx < SideWindowEntryBuffer.size() - 1U) {
+		  SideWindowEntryBuffer.operator[](SideWinMsgIdx++) = NumericCode;
+		  SideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
+		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
 		}
 	  }
 	  return true;
@@ -6487,7 +6487,7 @@ void setScrollVisibility() {
 }
 
 void setSideWinVal(int const index) {
-  SetWindowText(Instance->ValueWindow.operator[](wrap::toSize(index)), SideWindowEntryBuffer->data());
+  SetWindowText(Instance->ValueWindow.operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
 }
 
 void setbak(int32_t const penWidth) noexcept {
@@ -7224,7 +7224,7 @@ auto thred::getUserPen(uint32_t const iPen) noexcept -> HPEN {
 void thred::resetSideBuffer() {
   SideWinMsgIdx           = 0;
   constexpr auto FILLCHAR = gsl::narrow_cast<wchar_t>(0U);
-  std::ranges::fill(*SideWindowEntryBuffer, FILLCHAR);
+  std::ranges::fill(SideWindowEntryBuffer, FILLCHAR);
 }
 
 void thred::resetMsgBuffer() {
@@ -12151,17 +12151,17 @@ void thred::thumbEnd() {
 
 void thred::otherPeriod() noexcept {
   // ToDo - only allow entry if there is not already a period in the buffer
-  if (SideWinMsgIdx < SideWindowEntryBuffer->size() - 1U) {
-	SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '.';
-	SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
-	SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+  if (SideWinMsgIdx < SideWindowEntryBuffer.size() - 1U) {
+	SideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '.';
+	SideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
+	SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
   }
 }
 
 void thred::otherBack() noexcept {
   if (SideWinMsgIdx != 0U) {
-	SideWindowEntryBuffer->operator[](--SideWinMsgIdx) = 0;
-	SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+	SideWindowEntryBuffer.operator[](--SideWinMsgIdx) = 0;
+	SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
   }
 }
 
@@ -12266,7 +12266,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		PreviousNames.emplace_back(L"");
 	  }
 	  SideWindow.resize(SWCOUNT);
-	  SideWindowEntryBuffer = &Instance->SideWindowEntryBuffer; // thred only
+	  SideWindowEntryBuffer.resize(SWBLEN);
 	  SortBuffer            = &Instance->SortBuffer;            // thred only
 	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
 	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only
