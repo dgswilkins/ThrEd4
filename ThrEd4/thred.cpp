@@ -264,7 +264,7 @@ auto BackgroundPen      = gsl::narrow_cast<HPEN>(nullptr); // background color p
 auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
 auto KnotPen            = gsl::narrow_cast<HPEN>(nullptr); // knot pen
 auto BackgroundPenWidth = int32_t {};                      // width of the background pen
-auto UserPen            = gsl::narrow_cast<std::vector<HPEN>*>(nullptr); // user color pens
+auto UserPen            = std::vector<HPEN> {};            // user color pens
 
 // brushes
 auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
@@ -1882,7 +1882,7 @@ void doInitUnzoomed() {
 	  drwLin(linePoints,
 	         ColorChangeTable.operator[](iColor).stitchIndex,
 	         stitchCount,
-	         UserPen->operator[](ColorChangeTable.operator[](iColor).colorIndex));
+	         UserPen.operator[](ColorChangeTable.operator[](iColor).colorIndex));
 	}
   }
 }
@@ -1916,7 +1916,7 @@ void doInitZoomed() {
 	  continue;
 	}
 	auto wascol = 0U;
-	SelectObject(StitchWindowMemDC, UserPen->operator[](ColorChangeTable.operator[](iColor).colorIndex));
+	SelectObject(StitchWindowMemDC, UserPen.operator[](ColorChangeTable.operator[](iColor).colorIndex));
 	stitchCount = ColorChangeTable.operator[](iColor + 1U).stitchIndex -
 	              ColorChangeTable.operator[](iColor).stitchIndex;
 	auto const stIndex = ColorChangeTable.operator[](iColor).stitchIndex;
@@ -2284,7 +2284,7 @@ void drwlstch(uint32_t const finish) {
 		++RunPoint;
 	  }
 	}
-	SelectObject(StitchWindowDC, UserPen->operator[](color));
+	SelectObject(StitchWindowDC, UserPen.operator[](color));
 	wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
 	if (!flag) {
 	  --RunPoint;
@@ -2293,7 +2293,7 @@ void drwlstch(uint32_t const finish) {
   else {
 	auto iMovieFrame = 0U;
 
-	SelectObject(StitchWindowDC, UserPen->operator[](color));
+	SelectObject(StitchWindowDC, UserPen.operator[](color));
 	while (iMovieFrame < StitchesPerFrame && RunPoint + 1 < finish - 1 &&
 	       (Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK) == color) {
 	  movieLine.push_back(thred::stch2px1(RunPoint++));
@@ -4403,7 +4403,7 @@ void init() {
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
   auto tsi           = ThreadSizeIndex.begin();
-  auto itUserPen     = UserPen->begin();
+  auto itUserPen     = UserPen.begin();
   for (auto const& color : UserColor) {
 	*tsp++       = 1;
 	*tsi++       = 1;
@@ -5142,7 +5142,7 @@ void nuFil(FileIndices const fileIndex) {
   Instance->StateMap.reset(StateFlag::ZUMED);
   auto buffer       = std::array<wchar_t, 3> {};
   buffer[1]         = L'0';
-  auto itUserPen    = UserPen->begin();
+  auto itUserPen    = UserPen.begin();
   auto ucb          = UserColorBrush.begin();
   auto itThreadSize = ThreadSize.begin();
   auto tsw          = ThreadSizeWin.begin();
@@ -5225,7 +5225,7 @@ void nuRct() noexcept {
 
 void nuStchSiz(uint32_t const iColor, int32_t const width) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   if (auto const tsp = wrap::next(ThreadSizePixels.begin(), iColor); width != *tsp) {
-	thred::nuPen(UserPen->operator[](iColor), width, UserColor.at(iColor));
+	thred::nuPen(UserPen.operator[](iColor), width, UserColor.at(iColor));
 	*tsp = width;
   }
 }
@@ -7219,7 +7219,7 @@ void thred::showColorWin() noexcept {
 }
 
 auto thred::getUserPen(uint32_t const iPen) noexcept -> HPEN {
-  return UserPen->operator[](iPen);
+  return UserPen.operator[](iPen);
 }
 
 void thred::resetSideBuffer() {
@@ -10972,7 +10972,7 @@ void thred::bakmrk() {
 
 void thred::nuscol(size_t const iColor) {
   auto const itUserColor = wrap::next(UserColor.begin(), iColor);
-  auto const itUserPen   = wrap::next(UserPen->begin(), iColor);
+  auto const itUserPen   = wrap::next(UserPen.begin(), iColor);
   nuPen(*itUserPen, 1, *itUserColor);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *itUserColor);
@@ -12271,7 +12271,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ThreadSizeWin.resize(COLORCNT);
 	  ThumbnailSearchString.reserve(TSSSIZ);
 	  UserColorWin.resize(COLORCNT);
-	  UserPen               = &Instance->UserPen;      // thred only
+	  UserPen.resize(COLORCNT);
 	  VersionNames          = &Instance->VersionNames; // thred only
 
 	  bal::setBN0(&Instance->BalaradName0);
@@ -12395,7 +12395,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 }
 
 void thred::refreshColors() noexcept {
-  auto itUserPen = UserPen->begin();
+  auto itUserPen = UserPen.begin();
   auto ucb       = UserColorBrush.begin();
   for (auto const& color : UserColor) {
 	nuPen(*itUserPen, 1, color);
@@ -12409,7 +12409,7 @@ void thred::refreshColors() noexcept {
 }
 
 void thred::initPenBrush() noexcept {
-  auto itUserPen = UserPen->begin();
+  auto itUserPen = UserPen.begin();
   auto ucb       = UserColorBrush.begin();
   for (auto const& ucolor : UserColor) {
 	*itUserPen++ = wrap::createPen(PS_SOLID, PENNWID, ucolor);
@@ -12478,7 +12478,7 @@ auto thred::getZoomMin() noexcept -> float {
 void thred::resetColors() {
   auto ucb         = UserColorBrush.begin();
   auto itUserColor = UserColor.begin();
-  auto itUserPen   = UserPen->begin();
+  auto itUserPen   = UserPen.begin();
   auto ucw         = UserColorWin.begin();
   for (auto const& color : DEFAULT_COLORS) {
 	*itUserColor = color;
@@ -12617,7 +12617,7 @@ void thred::updateUserColor() {
 	savdo();
 	auto const itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
 	*itUserColor           = ColorStruct.rgbResult;
-	auto const itUserPen   = wrap::next(UserPen->begin(), VerticalIndex);
+	auto const itUserPen   = wrap::next(UserPen.begin(), VerticalIndex);
 	nuPen(*itUserPen, 1, *itUserColor);
 	auto const ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
 	nuBrush(*ucb, *itUserColor);

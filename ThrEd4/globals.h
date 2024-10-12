@@ -78,7 +78,6 @@ class MY_SINGLE
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
 	TextureHistory.resize(ITXBUFSZ);
-	UserPen.resize(COLORCNT);
 	ValueWindow.resize(LASTLIN);
 	VersionNames.reserve(OLDVER);
 	for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
@@ -136,7 +135,6 @@ class MY_SINGLE
 
   fs::path              UserBMPFileName;
   ENUM_MAP<UserFlag>    UserFlagMap = ENUM_MAP<UserFlag> {0};
-  std::vector<HPEN>     UserPen;
   std::vector<HWND>     ValueWindow;
   std::vector<fs::path> VersionNames;
   fs::path              WorkingFileName;
