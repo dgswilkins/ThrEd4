@@ -73,13 +73,11 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto SCROLSIZ = int32_t {12};     // logical pixel width of a scroll bar
 	constexpr auto SWCOUNT  = 16U;              // number of side windows to create/track
 	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
 	RubberBandLine.resize(3U);
-	ScrollSize = SCROLSIZ;
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
 	SideWindow.resize(SWCOUNT);
@@ -127,7 +125,6 @@ class MY_SINGLE
   fs::path                  RGBFileName;
   std::vector<POINT>        RubberBandLine;
   std::vector<SAT_CON>      SatinGuides;
-  int32_t                   ScrollSize = 0;
   std::vector<POINT>        SearchLine;
   std::vector<uint32_t>     SelectedFormList;
   std::vector<POINT>        SelectedFormsLine;
@@ -253,7 +250,6 @@ extern uint32_t       PseudoRandomValue;
 extern F_RECTANGLE    RotationRect;
 
 extern int32_t* ScreenDPI;
-extern int32_t* ScrollSize;
 
 extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;

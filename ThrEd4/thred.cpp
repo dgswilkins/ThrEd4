@@ -199,6 +199,7 @@ constexpr auto MSGSIZ   = uint32_t {8192U};       // size of the message buffer
 constexpr auto NERCNT   = 4U;                     // number of entries in the nearestxxx arrays;
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
+constexpr auto SCROLSIZ = int32_t {12};           // logical pixel width of a scroll bar
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
@@ -227,6 +228,7 @@ auto NearestPixel        = std::vector<POINT> {};          // selected points
 auto NearestPoint            = std::vector<uint32_t> {};       // indices of the closest points
 auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
 auto PrevGroupEndStitch      = uint32_t {}; // higher end of previous selection
+auto ScrollSize              = SCROLSIZ;    // Scroll bar width scaled for DPI
 auto StitchWindowAspectRatio = float {};    // aspect ratio of the stitch window
 auto SelectBoxSize           = SIZE {};     // size of the select box
 auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
@@ -6835,14 +6837,14 @@ void stchPars() {
   auto const aspectRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(UnzoomedRect.cy);
   StitchWindowSize.cx =
       Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)
-          ? std::lround(wrap::toFloat(ThredWindowRect.bottom - (*ScrollSize * 2)) * aspectRatio)
-          : std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
+          ? std::lround(wrap::toFloat(ThredWindowRect.bottom - (ScrollSize * 2)) * aspectRatio)
+          : std::lround(wrap::toFloat(ThredWindowRect.bottom - ScrollSize) * aspectRatio);
 
-  if (StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + ColorBarSize < ThredWindowRect.right) {
+  if (StitchWindowSize.cx + ButtonWidthX3 + ScrollSize + ColorBarSize < ThredWindowRect.right) {
 	StitchWindowSize.cy =
 	    Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)
-	        ? ThredWindowRect.bottom - (*ScrollSize * 2)
-	        : ThredWindowRect.bottom - *ScrollSize;
+	        ? ThredWindowRect.bottom - (ScrollSize * 2)
+	        : ThredWindowRect.bottom - ScrollSize;
   }
   else {
 	StitchWindowSize = {.cx = ThredWindowRect.right - ButtonWidthX3 - ColorBarSize,
@@ -6884,7 +6886,7 @@ void stchWnd() {
                                    SBS_VERT | WS_CHILD | WS_VISIBLE,
                                    StitchWindowSize.cx + ButtonWidthX3,
                                    0,
-                                   *ScrollSize,
+                                   ScrollSize,
                                    StitchWindowSize.cy,
                                    ThrEdWindow,
                                    nullptr,
@@ -6896,7 +6898,7 @@ void stchWnd() {
                                      ButtonWidthX3,
                                      StitchWindowSize.cy,
                                      StitchWindowSize.cx,
-                                     *ScrollSize,
+                                     ScrollSize,
                                      ThrEdWindow,
                                      nullptr,
                                      ThrEdInstance,
@@ -7404,35 +7406,35 @@ void thred::redraw(HWND window) noexcept {
 // ReSharper restore CppParameterMayBeConst
 
 void thred::movStch() {
-  auto clientSize = SIZE {(ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + ColorBarSize)),
+  auto clientSize = SIZE {(ThredWindowRect.right - ButtonWidthX3 - (ScrollSize + ColorBarSize)),
                           ThredWindowRect.bottom};
   auto verticalOffset = 0;
   unboxs();
   if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
-	verticalOffset = *ScrollSize;
-	clientSize.cy -= *ScrollSize;
+	verticalOffset = ScrollSize;
+	clientSize.cy -= ScrollSize;
   }
   if (Instance->StateMap.test(StateFlag::ZUMED)) {
-	clientSize.cy -= *ScrollSize;
+	clientSize.cy -= ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, clientSize.cx, clientSize.cy, FALSE);
-	MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.cx, 0, *ScrollSize, clientSize.cy, TRUE);
-	MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.cy + verticalOffset, clientSize.cx, *ScrollSize, TRUE);
+	MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.cx, 0, ScrollSize, clientSize.cy, TRUE);
+	MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.cy + verticalOffset, clientSize.cx, ScrollSize, TRUE);
 	StitchWindowAspectRatio = wrap::toFloat(clientSize.cx) / wrap::toFloat(clientSize.cy);
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
-	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.cx, *ScrollSize, TRUE);
+	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.cx, ScrollSize, TRUE);
 	}
 	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
 	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
   }
   else {
 	stchPars();
-	auto const actualWindowHeight = StitchWindowSize.cy + *ScrollSize;
+	auto const actualWindowHeight = StitchWindowSize.cy + ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.cx, actualWindowHeight, TRUE);
 	ShowWindow(VerticalScrollBar, SW_HIDE);
 	ShowWindow(HorizontalScrollBar, SW_HIDE);
 	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.cx) / wrap::toFloat(actualWindowHeight);
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
-	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, *ScrollSize, TRUE);
+	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, ScrollSize, TRUE);
 	}
   }
   MoveWindow(ColorBar, ThredWindowRect.right - ColorBarSize, 0, ColorBarSize, ThredWindowRect.bottom, TRUE);
@@ -9523,7 +9525,7 @@ void thred::movi() {
 	                              ButtonWidthX3,
 	                              0,
 	                              StitchWindowSize.cx,
-	                              *ScrollSize,
+	                              ScrollSize,
 	                              ThrEdWindow,
 	                              nullptr,
 	                              ThrEdInstance,
@@ -12262,7 +12264,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
 		PreviousNames.emplace_back(L"");
 	  }
-	  ScrollSize            = &Instance->ScrollSize;            // thred only
 	  SideWindow            = &Instance->SideWindow;            // thred only
 	  SideWindowEntryBuffer = &Instance->SideWindowEntryBuffer; // thred only
 	  SortBuffer            = &Instance->SortBuffer;            // thred only
@@ -12334,7 +12335,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
 	  ScreenDPI     = &Instance->DPI;
 	  *ScreenDPI    = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
-	  *ScrollSize   = MulDiv(*ScrollSize, *ScreenDPI, STDDPI);
+	  ScrollSize   = MulDiv(ScrollSize, *ScreenDPI, STDDPI);
 	  ColorBarSize = MulDiv(ColorBarSize, *ScreenDPI, STDDPI);
 	  init();
 	  if (Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
