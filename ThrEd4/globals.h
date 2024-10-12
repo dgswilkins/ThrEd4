@@ -120,7 +120,6 @@ class MY_SINGLE
   std::vector<F_POINT_ATTR> ClipBuffer;
   std::vector<F_POINT>      ClipPoints;
   fs::path                  ColorFileName;
-  fs::path                  DefaultDirectory;
   std::wstring              DesignerName;
   int32_t                   DPI = 0;
   THR_HEAD_EX               ExtendedHeader;

@@ -300,7 +300,7 @@ constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
 auto BoxOffset = std::array<int32_t, 4> {};
 
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
-auto DefaultDirectory = gsl::narrow_cast<fs::path*>(nullptr);
+auto DefaultDirectory = fs::path {};
 auto IniFileName      = gsl::narrow_cast<fs::path*>(nullptr); //.ini file name
 auto PreviousNames    = gsl::narrow_cast<std::vector<fs::path>*>(nullptr);
 auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); // vector of thumbnail names
@@ -1540,10 +1540,10 @@ void cros(uint32_t const iStitch) {
 
 void defNam(fs::path const& fileName) {
   if (fileName.empty()) {
-	getDocsFolder(*DefaultDirectory);
+	getDocsFolder(DefaultDirectory);
 	return;
   }
-  *DefaultDirectory = fileName.parent_path();
+  DefaultDirectory = fileName.parent_path();
 }
 
 auto defTxt(uint32_t const iColor) -> COLORREF {
@@ -3065,7 +3065,7 @@ void getbak() {
   unthum();
   Instance->StateMap.set(StateFlag::FRMOF);
   auto& workingFileName = Instance->WorkingFileName;
-  workingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
+  workingFileName = DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(workingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
@@ -3171,7 +3171,7 @@ auto getNewFileName(fs::path& newFileName, FileStyles const fileTypes, FileIndic
 #if USE_DEFAULTDIR
   // If we want to, we can set the default directory rather than using the OS mechanism for last used
   auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-  hResult += SHCreateItemFromParsingName(DefaultDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+  hResult += SHCreateItemFromParsingName(DefaultDirectory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
   hResult += pFileOpen->SetFolder(psiFrom);
   if (nullptr != psiFrom) {
 	psiFrom->Release();
@@ -3441,7 +3441,7 @@ auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool {
 		auto fileError = 0U;
 		for (auto& iFile : spFileInfo) {
 		  auto& cFileName = iFile.cFileName;
-		  if (auto fileName = *DefaultDirectory / std::begin(cFileName);
+		  if (auto fileName = DefaultDirectory / std::begin(cFileName);
 		      !SetFileAttributes(fileName.wstring().c_str(), iFile.dwFileAttributes)) {
 			++fileError;
 		  }
@@ -3470,12 +3470,12 @@ auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) ->
 	// ToDo - investigate C++17 option shown here: https://web.archive.org/web/20220812120940/https://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	auto*      fileInfo   = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(lparam);
-	auto const searchName = *DefaultDirectory / L"*.thr";
+	auto const searchName = DefaultDirectory / L"*.thr";
 	auto       result     = WIN32_FIND_DATA {};
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &result);
 	if (searchResult == INVALID_HANDLE_VALUE) {
-	  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
+	  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory.wstring());
 	  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
 	  return true;
 	}
@@ -5102,7 +5102,7 @@ void nuFil(FileIndices const fileIndex) {
 	}
   }
   if (bitmap::ismap()) {
-	bitmap::assignUBFilename(*DefaultDirectory);
+	bitmap::assignUBFilename(DefaultDirectory);
   }
   thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
   ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
@@ -5671,7 +5671,7 @@ void redini() {
 	}
 	else {
 	  auto const directory = utf::utf8ToUtf16(std::string(IniFile.defaultDirectory.data()));
-	  DefaultDirectory->assign(directory);
+	  DefaultDirectory.assign(directory);
 	  {
 		auto previousName = PreviousNames->begin();
 		for (auto const& prevName : IniFile.prevNames) {
@@ -6094,7 +6094,7 @@ void ritfnam(std::wstring const& designerName) {
 }
 
 void ritini() {
-  auto const     directory = utf::utf16ToUtf8(DefaultDirectory->wstring());
+  auto const     directory = utf::utf16ToUtf8(DefaultDirectory.wstring());
   constexpr char FILLCHAR  = '\0';
   std::ranges::fill(IniFile.defaultDirectory, FILLCHAR);
   auto const spIDD = gsl::span {IniFile.defaultDirectory};
@@ -6492,7 +6492,7 @@ void setknt() {
 
 void setPrefs() {
   thred::defpref();
-  getDocsFolder(*DefaultDirectory);
+  getDocsFolder(DefaultDirectory);
   if (DesignerName->empty()) {
 	DesignerName->assign(displayText::loadStr(IDS_UNAM));
 	thred::getdes();
@@ -6967,9 +6967,9 @@ void thrsav() {
 		version.clear();
 	  }
 	  auto& fileName = fileData.cFileName;
-	  duver(*DefaultDirectory / std::begin(fileName));
+	  duver(DefaultDirectory / std::begin(fileName));
 	  while (FindNextFile(file, &fileData)) {
-		duver(*DefaultDirectory / std::begin(fileName));
+		duver(DefaultDirectory / std::begin(fileName));
 	  }
 	  FindClose(file);
 	  fs::remove(VersionNames->back());
@@ -7981,7 +7981,7 @@ void thred::savAs() {
   if (!getSaveName(workingFileName, index)) {
 	return;
   }
-  *DefaultDirectory = workingFileName.parent_path();
+  DefaultDirectory = workingFileName.parent_path();
   switch (index) {
 	case FileIndices::THR: {
 	  workingFileName.replace_extension(L".thr");
@@ -8782,7 +8782,7 @@ void thred::newFil() {
   DesignerName->assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   auto const fmtStr = displayText::format(IDS_THRED, *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
-  Instance->ThrName = *DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
+  Instance->ThrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
   ritfnam(*DesignerName);
   auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
@@ -9680,7 +9680,7 @@ void thred::purg() {
 
 void thred::purgdir() {
   Instance->StateMap.set(StateFlag::PRGMSG);
-  displayText::showMessage(IDS_DELBAK, DefaultDirectory->wstring());
+  displayText::showMessage(IDS_DELBAK, DefaultDirectory.wstring());
   displayText::okcan();
 }
 
@@ -9688,7 +9688,7 @@ void thred::deldir() {
   unmsg();
   displayText::tabmsg(IDS_BAKDEL, false);
   auto backSpec = std::wstring {L".th0"};
-  for (auto const& filePath : fs::directory_iterator(*DefaultDirectory)) {
+  for (auto const& filePath : fs::directory_iterator(DefaultDirectory)) {
 	if (!is_directory(filePath)) {
 	  auto fileExt    = filePath.path().extension().wstring();
 	  backSpec.back() = 's';
@@ -10185,8 +10185,8 @@ void thred::thumnail() {
   unbsho();
   undat();
   trace::untrace();
-  current_path(*DefaultDirectory);
-  auto const searchName = *DefaultDirectory / L"*.thr";
+  current_path(DefaultDirectory);
+  auto const searchName = DefaultDirectory / L"*.thr";
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const file = FindFirstFile(searchName.wstring().c_str(), &fileData);
   if (file == INVALID_HANDLE_VALUE) {
@@ -12227,7 +12227,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 
 	DefaultColorWin.resize(COLORCNT);
-	  DefaultDirectory      = &Instance->DefaultDirectory;      // thred only
 	  DesignerName          = &Instance->DesignerName;          // thred only
 	  ExtendedHeader        = &Instance->ExtendedHeader;        // thred only
 	  FormControlPoints     = &Instance->FormControlPoints;     // thred only
@@ -12405,7 +12404,7 @@ void thred::initBackPenBrush() noexcept {
 auto thred::setFileName() -> fs::path {
   auto const& workingFileName = Instance->WorkingFileName;
 
-  return workingFileName.empty() ? *DefaultDirectory / L"balfil.thr" : workingFileName;
+  return workingFileName.empty() ? DefaultDirectory / L"balfil.thr" : workingFileName;
 }
 
 auto thred::getDesigner() -> std::wstring {
@@ -12538,7 +12537,7 @@ void thred::openNewFile() {
 }
 
 void thred::openBitMapFile() {
-  bitmap::lodbmp(*DefaultDirectory);
+  bitmap::lodbmp(DefaultDirectory);
 }
 
 void thred::destroyChangeThreadSizeWindows() noexcept {
