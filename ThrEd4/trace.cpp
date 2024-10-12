@@ -833,8 +833,8 @@ void trace::untrace() {
   if (!Instance->TracedEdges.empty()) {
 	Instance->TracedEdges.resize(0); // allocated in tracedg
   }
-  if (!TracedMap->empty()) {
-	TracedMap->resize(0); // allocated in trace
+  if (!Instance->TracedMap.empty()) {
+	Instance->TracedMap.resize(0); // allocated in trace
   }
   Instance->StateMap.reset(StateFlag::WASEDG);
   hideTraceWin();
@@ -949,15 +949,15 @@ void trace::trace() {
 #if TRCMTH == 0
   auto const upBrightness   = icolsum(UpPixelColor);
   auto const downBrightness = icolsum(DownPixelColor);
-  if (TracedMap->empty()) {
-	TracedMap->resize(TraceDataSize, false);
+  if (Instance->TracedMap.empty()) {
+	Instance->TracedMap.resize(TraceDataSize, false);
   }
   auto const lastIndex = wrap::toUnsigned(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto       itTBD     = spTBD.begin();
   for (auto index = 0U; index < lastIndex; ++index) {
 	auto const pointBrightness = colsum(*itTBD);
 	if (upBrightness > pointBrightness && downBrightness < pointBrightness) {
-	  TracedMap->set(index);
+	  Instance->TracedMap.set(index);
 	}
 	else {
 	  *itTBD = 0;
@@ -977,13 +977,13 @@ void trace::trace() {
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	LowColors.at(iRGB) = colors.at(iRGB);
   }
-  if (TracedMap->empty()) {
-	TracedMap->resize(TraceDataSize, false);
+  if (Instance->TracedMap.empty()) {
+	Instance->TracedMap.resize(TraceDataSize, false);
   }
   auto pos = size_t {0U};
   for (auto& iPixel : spTBD) {
 	if (trcin(iPixel)) {
-	  TracedMap->set(pos);
+	  Instance->TracedMap.set(pos);
 	}
 	else {
 	  iPixel = 0;
@@ -1005,7 +1005,7 @@ void trace::tracedg() {
   for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	auto flag = false;
 	for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
-	  if (TracedMap->test(wrap::toSize(pixelIndex))) {
+	  if (Instance->TracedMap.test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
 		  Instance->TracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
@@ -1027,7 +1027,7 @@ void trace::tracedg() {
 	pixelIndex = iWidth;
 	auto flag  = false;
 	for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
-	  if (TracedMap->test(wrap::toSize(pixelIndex))) {
+	  if (Instance->TracedMap.test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
 		  Instance->TracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;

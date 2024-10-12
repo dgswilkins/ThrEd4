@@ -135,7 +135,6 @@ HINSTANCE                      ThrEdInstance             = {};      // main inst
 HWND                           ThrEdWindow               = nullptr; // main window handle
 POINT                          ThredWindowOrigin         = {};      // offset origin of the main window
 uint32_t*                      TraceBitmapData           = nullptr; // trace bitmap data
-boost::dynamic_bitset<>*       TracedMap                 = nullptr; // in/out state of trace areas
 
 std::array<std::vector<uint32_t>, UNDOLEN>* UndoBuffer   = nullptr; // backup data
 
