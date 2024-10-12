@@ -73,14 +73,12 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto SWCOUNT  = 16U;              // number of side windows to create/track
 	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
 	RubberBandLine.resize(3U);
 	SelectedFormsLine.resize(OUTPNTS);
 	SelectedPointsLine.resize(OUTPNTS);
-	SideWindow.resize(SWCOUNT);
 	SideWindowEntryBuffer.resize(SWBLEN);
 	TextureHistory.resize(ITXBUFSZ);
 	ThreadSizeWin.resize(COLORCNT);
@@ -130,7 +128,6 @@ class MY_SINGLE
   std::vector<POINT>        SelectedFormsLine;
   std::vector<POINT>        SelectedPointsLine;
   std::vector<uint32_t>     SelectedTexturePointsList;
-  std::vector<HWND>         SideWindow;
   std::vector<wchar_t>      SideWindowEntryBuffer;
   std::vector<SEARCH_REC>   SortBuffer;
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};

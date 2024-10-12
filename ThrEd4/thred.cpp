@@ -201,6 +201,7 @@ constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
 constexpr auto SCROLSIZ = int32_t {12};           // logical pixel width of a scroll bar
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
+constexpr auto SWCOUNT  = 16U;                   // number of side windows to create/track
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
@@ -288,7 +289,7 @@ auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for m
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 auto DefaultColorWin = std::vector<HWND> {};                          // default color windows
 auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
-auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
+auto SideWindow      = std::vector<HWND> {};                          // side message windows
 auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
@@ -2801,7 +2802,7 @@ void duselrng(RANGE& selectedRange) {
 }
 
 void dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& windowSize) {
-  SideWindow->operator[](entry.value) = CreateWindow(L"STATIC",
+  SideWindow.operator[](entry.value) = CreateWindow(L"STATIC",
                                                      displayText::loadStr(entry.stringID).c_str(),
                                                      SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                                      3,
@@ -6613,7 +6614,7 @@ void sidhup() {
   constexpr auto SW_FLAGS  = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
-	SideWindow->operator[](iHoop) =
+	SideWindow.operator[](iHoop) =
 	    CreateWindow(L"STATIC",
 	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
 	                 SW_FLAGS,
@@ -11327,11 +11328,11 @@ void thred::handleFormSelected() {
 }
 
 void thred::updateHoopSize() {
-  auto const itHwnd = std::ranges::find(*SideWindow, WinMsg.hwnd);
-  if (itHwnd == SideWindow->end()) {
+  auto const itHwnd = std::ranges::find(SideWindow, WinMsg.hwnd);
+  if (itHwnd == SideWindow.end()) {
 	return;
   }
-  switch (auto const option = std::distance(SideWindow->begin(), itHwnd) + 1; option) {
+  switch (auto const option = std::distance(SideWindow.begin(), itHwnd) + 1; option) {
 	case SETCUST: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
 	  IniFile.customHoopY = IniFile.hoopSizeY;
@@ -11468,7 +11469,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (auto const iFeather = std::ranges::find_if(FTHRLIST,
 	                                               [](LIST_TYPE const& feather) noexcept -> bool {
 	                                                 return WinMsg.hwnd ==
-	                                                        SideWindow->operator[](feather.value);
+	                                                        SideWindow.operator[](feather.value);
 	                                               });
 	    iFeather != FTHRLIST.end()) {
 	  form.feather.fillType = iFeather->value;
@@ -11482,7 +11483,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (auto const iLayer = std::ranges::find_if(LAYRLIST,
 	                                             [](LIST_TYPE const& layer) noexcept -> bool {
 	                                               return WinMsg.hwnd ==
-	                                                      SideWindow->operator[](layer.value);
+	                                                      SideWindow.operator[](layer.value);
 	                                             });
 	    iLayer != LAYRLIST.end()) {
 	  form::movlayr(iLayer->value);
@@ -11497,7 +11498,7 @@ auto thred::handleSideWindowActive() -> bool {
   form.borderColor &= COLMSK;
   if (Instance->StateMap.testAndReset(StateFlag::BRDACT)) {
 	while (true) {
-	  if (WinMsg.hwnd == SideWindow->operator[](0)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](0)) {
 		if (form.isEdgeClip()) {
 		  clip::deleclp(ClosestFormToCursor);
 		}
@@ -11506,58 +11507,58 @@ auto thred::handleSideWindowActive() -> bool {
 		Instance->StateMap.set(StateFlag::RESTCH);
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGELINE)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGELINE)) {
 		form::bord();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEBEAN)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEBEAN)) {
 		form::dubold();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGECLIP)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGECLIP)) {
 		form::fclp();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEANGSAT)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEANGSAT)) {
 		satin::satbrd();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEAPPL)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEAPPL)) {
 		if (form.fillType != 0U) {
 		  form::delmfil(ClosestFormToCursor);
 		}
 		form::apliq();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEPROPSAT)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEPROPSAT)) {
 		form::prpbrd(LineSpacing);
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEBHOL)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEBHOL)) {
 		form::bhol();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEPICOT)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEPICOT)) {
 		form::picot();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEDOUBLE)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEDOUBLE)) {
 		form::dubsfil(form);
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGELCHAIN)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGELCHAIN)) {
 		Instance->StateMap.set(StateFlag::LINCHN);
 		form::chain();
 		coltab();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGEOCHAIN)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGEOCHAIN)) {
 		Instance->StateMap.reset(StateFlag::LINCHN);
 		form::chain();
 		coltab();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow->operator[](EDGECLIPX)) {
+	  if (WinMsg.hwnd == SideWindow.operator[](EDGECLIPX)) {
 		form::filclpx();
 	  }
 	  break;
@@ -11581,7 +11582,7 @@ auto thred::handleSideWindowActive() -> bool {
   }
   auto textureFlag = false;
   while (true) {
-	if (WinMsg.hwnd == SideWindow->operator[](0)) { // none
+	if (WinMsg.hwnd == SideWindow.operator[](0)) { // none
 	  form.type = FRMFPOLY;
 	  form::delmfil(ClosestFormToCursor);
 	  form.fillType = 0;
@@ -11589,7 +11590,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](VRTF)) { // vertical fill
+	if (WinMsg.hwnd == SideWindow.operator[](VRTF)) { // vertical fill
 	  savdo();
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
@@ -11602,7 +11603,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filvrt();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](HORF)) { // horizontal fill
+	if (WinMsg.hwnd == SideWindow.operator[](HORF)) { // horizontal fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		respac(form);
@@ -11613,7 +11614,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filhor();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](ANGF)) { // angle fill
+	if (WinMsg.hwnd == SideWindow.operator[](ANGF)) { // angle fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		if (form.satinGuideCount != 0U) {
@@ -11629,7 +11630,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filangl();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](SATF)) { // fan fill
+	if (WinMsg.hwnd == SideWindow.operator[](SATF)) { // fan fill
 	  form.type = SAT;
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
@@ -11644,7 +11645,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filsat();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](CLPF)) { // fan clip
+	if (WinMsg.hwnd == SideWindow.operator[](CLPF)) { // fan clip
 	  form.type = SAT;
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
@@ -11652,7 +11653,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::clpfil();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](CONTF)) { // contour fill
+	if (WinMsg.hwnd == SideWindow.operator[](CONTF)) { // contour fill
 	  if (form.vertexCount > 4) {
 		if (form.fillType != 0U) {
 		  if (form.fillType == CLPF) {
@@ -11669,7 +11670,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](VCLPF)) { // vertical clip
+	if (WinMsg.hwnd == SideWindow.operator[](VCLPF)) { // vertical clip
 	  if (sidclp()) {
 		form::vrtsclp(ClosestFormToCursor);
 	  }
@@ -11678,7 +11679,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](HCLPF)) { // horizontal clip
+	if (WinMsg.hwnd == SideWindow.operator[](HCLPF)) { // horizontal clip
 	  if (sidclp()) {
 		form::horsclp();
 	  }
@@ -11687,7 +11688,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](ANGCLPF)) { // angle clip
+	if (WinMsg.hwnd == SideWindow.operator[](ANGCLPF)) { // angle clip
 	  if (sidclp()) {
 		if (form.satinGuideCount != 0U) {
 		  satin::delsac(ClosestFormToCursor);
@@ -11699,7 +11700,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](FTHF)) { // feather fill
+	if (WinMsg.hwnd == SideWindow.operator[](FTHF)) { // feather fill
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
 	  }
@@ -11709,7 +11710,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](TXVRTF)) // vertical texture
+	if (WinMsg.hwnd == SideWindow.operator[](TXVRTF)) // vertical texture
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXVRTF;
@@ -11720,7 +11721,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](TXHORF)) // horizontal texture
+	if (WinMsg.hwnd == SideWindow.operator[](TXHORF)) // horizontal texture
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXHORF;
@@ -11731,7 +11732,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow->operator[](TXANGF)) // angle texture
+	if (WinMsg.hwnd == SideWindow.operator[](TXANGF)) // angle texture
 	{
 	  if (form.isTexture()) {
 		form.fillType  = TXANGF;
@@ -12264,7 +12265,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
 		PreviousNames.emplace_back(L"");
 	  }
-	  SideWindow            = &Instance->SideWindow;            // thred only
+	  SideWindow.resize(SWCOUNT);
 	  SideWindowEntryBuffer = &Instance->SideWindowEntryBuffer; // thred only
 	  SortBuffer            = &Instance->SortBuffer;            // thred only
 	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
