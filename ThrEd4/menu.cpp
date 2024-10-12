@@ -399,16 +399,16 @@ void menu::auxmen() {
   Instance->StateMap.set(StateFlag::DUMEN);
 }
 
-void menu::redfils(gsl::not_null<std::array<uint32_t, OLDNUM>*> const lruMenuId,
+void menu::redfils(std::array<uint32_t, OLDNUM>& lruMenuId,
                    gsl::not_null<std::vector<fs::path>*> const        previousNames) {
   auto findData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-  for (auto const& iLRU : *lruMenuId) {
+  for (auto const& iLRU : lruMenuId) {
 	if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != gsl::narrow_cast<UINT>(-1)) {
 	  DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
 	}
   }
   auto previousName = previousNames->begin();
-  for (auto const& iLRU : *lruMenuId) {
+  for (auto const& iLRU : lruMenuId) {
 	if (!previousName->empty()) {
 	  if (Instance->StateMap.test(StateFlag::SAVAS)) {
 		AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, iLRU, previousName->wstring().c_str());

@@ -130,8 +130,6 @@ class MY_SINGLE
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      InterleaveSequenceIndices;
 
-  std::array<uint32_t, OLDNUM> LRUMenuId = {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-
   MENUITEMINFO              MenuInfo = MENUITEMINFO {};
   std::vector<wchar_t>      MsgBuffer;
   std::vector<POINT>        NearestPixel;
@@ -185,28 +183,6 @@ class MY_SINGLE
   MY_SINGLE()  = default;
   ~MY_SINGLE() = default;
 
-  // file menu items
-  enum FileMenuItems : uint8_t {
-	FM_NEW,
-	FM_OPEN,
-	FM_CLOS,
-	FM_THUMB,
-	FM_OPNPCS,
-	FM_INSRT,
-	FM_OVRLAY,
-	FM_SAV,
-	FM_SAVAS,
-	FM_LODBIT,
-	FM_SAVBIT,
-	FM_HIDBIT,
-	FM_RMVBIT,
-	FM_PURG,
-	FM_LOCK,
-	FM_ONAM0,
-	FM_ONAM1,
-	FM_ONAM2,
-	FM_ONAM3
-  };
 };
 
 extern MY_SINGLE* Instance;
@@ -262,8 +238,6 @@ extern std::vector<F_POINT>* InsidePoints;
 extern F_POINT LastPoint;
 extern float   LineSpacing;
 extern F_POINT LowerLeftStitch;
-
-extern std::array<uint32_t, OLDNUM>* LRUPtr;
 
 extern HMENU MainMenu;
 extern HWND  MainStitchWin;

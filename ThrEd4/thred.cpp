@@ -131,6 +131,29 @@ enum class FileIndices : uint8_t {
   DST  // Tajima
 };
 
+  // file menu items
+enum FileMenuItems : uint8_t {
+  FM_NEW,
+  FM_OPEN,
+  FM_CLOS,
+  FM_THUMB,
+  FM_OPNPCS,
+  FM_INSRT,
+  FM_OVRLAY,
+  FM_SAV,
+  FM_SAVAS,
+  FM_LODBIT,
+  FM_SAVBIT,
+  FM_HIDBIT,
+  FM_RMVBIT,
+  FM_PURG,
+  FM_LOCK,
+  FM_ONAM0,
+  FM_ONAM1,
+  FM_ONAM2,
+  FM_ONAM3
+};
+
 #pragma pack(push, 1)
 class THR_HEAD // ThrEd file header
 {
@@ -181,6 +204,7 @@ constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeter
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
+auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
 auto LabelWindow         = std::vector<HWND> {};  // text handles for the form data sheet
 auto FormControlPoints   = std::vector<POINT> {}; // form control rectangle in pixel coordinates
 auto ExtendedHeader  = THR_HEAD_EX {};              // ThrEd file header extension
@@ -3212,7 +3236,7 @@ void gselrng() noexcept {
 void handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
   {
 	auto previousName = PreviousNames->begin();
-	for (auto const& iLRU : *LRUPtr) {
+	for (auto const& iLRU : LRUMenuId) {
 	  if (WinMsg.wParam == iLRU) {
 		Instance->WorkingFileName = *previousName;
 		Instance->StateMap.set(StateFlag::REDOLD);
@@ -4215,7 +4239,7 @@ void init() {
   menu::init();
   menu::qchk();
   mouse::crtcurs();
-  menu::redfils(LRUPtr, PreviousNames);
+  menu::redfils(LRUMenuId, PreviousNames);
   Instance->StateMap.reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
@@ -5234,7 +5258,7 @@ void nunams() {
 	break;
   }
   if (!flag) {
-	menu::redfils(LRUPtr, PreviousNames);
+	menu::redfils(LRUMenuId, PreviousNames);
 	return;
   }
   for (auto& previousName : *PreviousNames) {
@@ -5249,7 +5273,7 @@ void nunams() {
 	PreviousNames->insert(PreviousNames->begin(), Instance->ThrName);
 	PreviousNames->pop_back();
   }
-  menu::redfils(LRUPtr, PreviousNames);
+  menu::redfils(LRUMenuId, PreviousNames);
 }
 
 void nuselrct() {
@@ -12229,7 +12253,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
 	LabelWindow.resize(LASTLIN);
-	LRUPtr                = &Instance->LRUMenuId;             // thred only
 	  MsgBuffer             = &Instance->MsgBuffer;             // thred only
 	  NearestPixel          = &Instance->NearestPixel;          // thred only
 	  NearestPoint          = &Instance->NearestPoint;          // thred only
