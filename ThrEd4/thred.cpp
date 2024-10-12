@@ -234,6 +234,7 @@ auto ScrollSize              = SCROLSIZ;    // Scroll bar width scaled for DPI
 auto StitchWindowAspectRatio = float {};    // aspect ratio of the stitch window
 auto SelectBoxSize           = SIZE {};     // size of the select box
 auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
+auto SortBuffer          = std::vector<SEARCH_REC> {}; // sort buffer for stitch search
 auto RotationHandleAngle = float {};    // angle of the rotation handle
 auto ThreadSize30        = TSIZ30;      // #30 thread size
 auto ThreadSize40        = TSIZ40;      // #40 thread size
@@ -2885,8 +2886,8 @@ void f1del(uint32_t const formIndex) {
 }
 
 void fillSortBuffer() {
-  SortBuffer->clear();
-  SortBuffer->reserve(Instance->StitchBuffer.size());
+  SortBuffer.clear();
+  SortBuffer.reserve(Instance->StitchBuffer.size());
   auto stitch     = wrap::next(Instance->StitchBuffer.begin(), SelectedRange.start);
   auto nextStitch = wrap::next(stitch, 1);
   auto index      = SelectedRange.start;
@@ -2896,12 +2897,12 @@ void fillSortBuffer() {
 	auto const deltaX = nextStitch->x - stitch->x;
 	auto const deltaY = nextStitch->y - stitch->y;
 	auto const length = (deltaX * deltaX) + (deltaY * deltaY);
-	SortBuffer->push_back(SEARCH_REC {.index = index, .length = length});
+	SortBuffer.push_back(SEARCH_REC {.index = index, .length = length});
 	++index;
 	++stitch;
 	++nextStitch;
   }
-  std::ranges::stable_sort(*SortBuffer, {}, &SEARCH_REC::length);
+  std::ranges::stable_sort(SortBuffer, {}, &SEARCH_REC::length);
 }
 
 auto find1st() -> uint32_t {
@@ -6552,7 +6553,7 @@ void setsped() {
 void setsrch(bool const end) {
   if (end) {
 	CurrentStitchIndex = LargestStitchIndex;
-	SortIndex          = wrap::toUnsigned(SortBuffer->size() - 1U);
+	SortIndex          = wrap::toUnsigned(SortBuffer.size() - 1U);
   }
   else {
 	CurrentStitchIndex = SmallestStitchIndex;
@@ -10191,7 +10192,7 @@ void thred::nextSortedStitch(bool const direction) {
 	}
 	--SortIndex;
   }
-  auto const nextStitch = wrap::next(SortBuffer->begin(), SortIndex);
+  auto const nextStitch = wrap::next(SortBuffer.begin(), SortIndex);
   outDebugString(L"SortIndex [{}]\n", SortIndex);
   CurrentStitchIndex   = nextStitch->index;
   auto const minLength = std::sqrt(nextStitch->length) * IPFGRAN;
@@ -12267,7 +12268,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 	  SideWindow.resize(SWCOUNT);
 	  SideWindowEntryBuffer.resize(SWBLEN);
-	  SortBuffer            = &Instance->SortBuffer;            // thred only
 	  ThreadSizeWin         = &Instance->ThreadSizeWin;         // thred only
 	  ThumbnailSearchString = &Instance->ThumbnailSearchString; // thred only
 	  Thumbnails            = &Instance->Thumbnails;            // thred only
@@ -12791,7 +12791,7 @@ void thred::setSmallestStitchVal() {
 void thred::setLargestStitchVal() {
   srchk();
   fillSortBuffer();
-  SortIndex = wrap::toUnsigned(SortBuffer->size() - 1U);
+  SortIndex = wrap::toUnsigned(SortBuffer.size() - 1U);
   setSrchLargest();
   lensadj();
 }

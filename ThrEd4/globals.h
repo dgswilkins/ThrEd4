@@ -126,7 +126,6 @@ class MY_SINGLE
   std::vector<POINT>        SelectedFormsLine;
   std::vector<POINT>        SelectedPointsLine;
   std::vector<uint32_t>     SelectedTexturePointsList;
-  std::vector<SEARCH_REC>   SortBuffer;
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> StitchBuffer;
   std::vector<F_POINT>      TempPolygon;
@@ -260,8 +259,6 @@ extern float ShowStitchThreshold;
 extern HWND  SideMessageWindow;
 extern float SmallStitchLength;
 extern float SnapLength;
-
-extern std::vector<SEARCH_REC>* SortBuffer;
 
 extern uint32_t SortIndex;
 extern float    SpiralWrap;
