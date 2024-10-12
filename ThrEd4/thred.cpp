@@ -195,6 +195,7 @@ constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
 constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
 constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
 constexpr auto MINZUMF  = float {MINZUM};         // minimum zoom in stitch points
+constexpr auto MSGSIZ   = uint32_t {8192U};       // size of the message buffer
 constexpr auto NUGINI   = 2.0F;                   // default nudge step
 constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
@@ -300,7 +301,7 @@ auto Knots            = std::vector<uint32_t> {}; // indices of knot stitches
 auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
 auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
-auto MsgBuffer     = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // for user messages
+auto MsgBuffer     = std::vector<wchar_t> {}; // for user messages
 
 // graphics variables
 
@@ -1285,8 +1286,8 @@ void chknum() {
 	  }
 	}
   }
-  if (MsgBuffer->size() > 1) {
-	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+  if (MsgBuffer.size() > 1) {
+	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
 	auto const value = thred::getMsgBufferValue();
 	if (Instance->StateMap.testAndReset(StateFlag::NUROT)) { // rotate
 	  if (value != 0.0F) {
@@ -3517,11 +3518,11 @@ auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) ->
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   retflag = true;
   if (Instance->StateMap.test(StateFlag::SCLPSPAC) && (code == VK_OEM_MINUS || code == VK_SUBTRACT)) {
-	if (MsgBuffer->front() != '-') {
+	if (MsgBuffer.front() != '-') {
 	  thred::resetMsgBuffer();
-	  MsgBuffer->back() = '-';
-	  MsgBuffer->push_back(0);
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+	  MsgBuffer.back() = '-';
+	  MsgBuffer.push_back(0);
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	}
 	return true;
   }
@@ -3530,9 +3531,9 @@ auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 	  trace::traceNumberInput(NumericCode);
 	}
 	else {
-	  MsgBuffer->back() = NumericCode;
-	  MsgBuffer->push_back(0);
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+	  MsgBuffer.back() = NumericCode;
+	  MsgBuffer.push_back(0);
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	}
 	return true;
   }
@@ -3540,19 +3541,19 @@ auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 	case VK_DECIMAL:      // numpad period
 	case VK_OEM_PERIOD: { // period
 	  // ToDo - only allow entry if there is not already a period in the buffer
-	  MsgBuffer->back() = '.';
-	  MsgBuffer->push_back(0);
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+	  MsgBuffer.back() = '.';
+	  MsgBuffer.push_back(0);
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	  return true;
 	}
 	case VK_BACK: { // backspace
 	  if (Instance->StateMap.test(StateFlag::TRNIN0)) {
 		trace::traceNumberReset();
 	  }
-	  if (MsgBuffer->size() > 1) {
-		MsgBuffer->pop_back();
-		MsgBuffer->back() = 0;
-		SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+	  if (MsgBuffer.size() > 1) {
+		MsgBuffer.pop_back();
+		MsgBuffer.back() = 0;
+		SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	  }
 	  return true;
 	}
@@ -3707,11 +3708,11 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
   if (Instance->StateMap.test(StateFlag::FSETFSPAC) || Instance->StateMap.test(StateFlag::GTWLKIND)) {
 	// Check for keycode 'dash' and numpad 'subtract'
 	if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
-	  if (MsgBuffer->front() != '-') {
+	  if (MsgBuffer.front() != '-') {
 		thred::resetMsgBuffer();
-		MsgBuffer->back() = '-';
-		MsgBuffer->push_back(0);
-		SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+		MsgBuffer.back() = '-';
+		MsgBuffer.push_back(0);
+		SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	  }
 	  return true;
 	}
@@ -3772,8 +3773,8 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	}
   }
   if (Instance->StateMap.testAndReset(StateFlag::ENTRDUP)) {
-	if (MsgBuffer->size() > 1) {
-	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+	if (MsgBuffer.size() > 1) {
+	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
 	  if (auto const value = thred::getMsgBufferValue(); value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
 	  }
@@ -3783,8 +3784,8 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	}
   }
   if (Instance->StateMap.testAndReset(StateFlag::ENTROT)) {
-	if (MsgBuffer->size() > 1) {
-	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+	if (MsgBuffer.size() > 1) {
+	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
 	  if (auto const value = thred::getMsgBufferValue(); value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
 	  }
@@ -7223,12 +7224,12 @@ void thred::resetSideBuffer() {
 }
 
 void thred::resetMsgBuffer() {
-  MsgBuffer->clear();
-  MsgBuffer->push_back(0);
+  MsgBuffer.clear();
+  MsgBuffer.push_back(0);
 }
 
 auto thred::getMsgBufferValue() -> float {
-  return wrap::wcsToFloat(MsgBuffer->data());
+  return wrap::wcsToFloat(MsgBuffer.data());
 }
 
 void thred::getdes() noexcept {
@@ -12253,7 +12254,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
 	LabelWindow.resize(LASTLIN);
-	  MsgBuffer             = &Instance->MsgBuffer;             // thred only
+	  MsgBuffer.reserve(MSGSIZ);
 	  NearestPixel          = &Instance->NearestPixel;          // thred only
 	  NearestPoint          = &Instance->NearestPoint;          // thred only
 	  PreviousNames         = &Instance->PreviousNames;         // thred only

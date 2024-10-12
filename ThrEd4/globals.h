@@ -73,14 +73,12 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto MSGSIZ   = uint32_t {8192U}; // size of the message buffer
 	constexpr auto NERCNT   = 4U;               // number of entries in the near array;
 	constexpr auto SCROLSIZ = int32_t {12};     // logical pixel width of a scroll bar
 	constexpr auto SWCOUNT  = 16U;              // number of side windows to create/track
 	constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	constexpr auto TSSSIZ   = size_t {32U};   // size of the message buffer
-	MsgBuffer.reserve(MSGSIZ);
 	NearestPixel.resize(NERCNT);
 	NearestPoint.resize(NERCNT);
 	RubberBandLine.resize(3U);
@@ -131,7 +129,6 @@ class MY_SINGLE
   std::vector<INS_REC>      InterleaveSequenceIndices;
 
   MENUITEMINFO              MenuInfo = MENUITEMINFO {};
-  std::vector<wchar_t>      MsgBuffer;
   std::vector<POINT>        NearestPixel;
   std::vector<uint32_t>     NearestPoint;
   std::vector<F_POINT>      OSequence;
