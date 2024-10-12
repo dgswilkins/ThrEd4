@@ -213,7 +213,7 @@ auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitch
 	CloseHandle(fileHandle);
 	return false;
   }
-  if (Instance->UserFlagMap.test(UserFlag::BSAVOF)) {
+  if (Instance->userFlagMap.test(UserFlag::BSAVOF)) {
 	constexpr auto BLANK = std::array<char, PCSBMPNSZ> {};
 	if (FALSE == WriteFile(fileHandle, BLANK.data(), wrap::toUnsigned(BLANK.size()), &bytesWritten, nullptr)) {
 	  displayText::riter();

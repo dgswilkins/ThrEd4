@@ -520,7 +520,7 @@ void pecdat(std::vector<uint8_t>& buffer) {
 void pecnam(gsl::span<char> const& label) {
   strncpy(label.data(), "LA:", 3);
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
-  auto       fileStem = utf::utf16ToUtf8(Instance->AuxName.stem());
+  auto       fileStem = utf::utf16ToUtf8(Instance->auxName.stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }

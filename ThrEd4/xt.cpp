@@ -305,7 +305,7 @@ void ulenfn(uint32_t const formIndex, float const length) {
 }
 
 void undclp(float& underlayStitchLen) {
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto& clipBuffer = Instance->clipBuffer;
 
   clipBuffer.clear();
   clipBuffer.reserve(2);
@@ -329,7 +329,7 @@ void xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, f
 void addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
   auto        code                      = 0U;
   auto&       interleaveSequence        = Instance->InterleaveSequence;
-  auto const& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto const& interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(interleaveSequenceIndices.size() - 1U); ++iSequence) {
 	code = ilData.layerIndex | interleaveSequenceIndices.operator[](iSequence).code |
@@ -525,7 +525,7 @@ void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t cod
 	ilData.start += count;
 	ilData.output += count;
   }
-  auto const& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto const& interleaveSequenceIndices = Instance->interleaveSequenceIndices;
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	if (!Instance->StateMap.testAndSet(StateFlag::DIDSTRT)) {
 	  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillStart);
@@ -586,7 +586,7 @@ constexpr auto durat(float const start, float const finish, float const featherR
 }
 
 void durats(uint32_t const iSequence, std::vector<F_POINT>& sequence, FEATHER& feather) {
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
 
   auto const& bCurrent = bSequence.operator[](iSequence);
   auto const& bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
@@ -628,7 +628,7 @@ auto dutyp(uint32_t const attribute) noexcept -> uint32_t {
 }
 
 void duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, float const featherRatioLocal) noexcept {
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
 
   point = F_POINT {durat(bSequence.operator[](finish).x, bSequence.operator[](start).x, featherRatioLocal),
                    durat(bSequence.operator[](finish).y, bSequence.operator[](start).y, featherRatioLocal)};
@@ -736,7 +736,7 @@ void fncwlk(FRM_HEAD& form) {
 	                                   wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide =
-	    wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
+	    wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
@@ -821,7 +821,7 @@ void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) 
 	return;
   }
   auto const& interleaveSequence        = Instance->InterleaveSequence;
-  auto&       interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto&       interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   interleaveSequenceIndices.emplace_back(INS_REC {
       .code = TYPFRM, .color = form.fillColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
@@ -855,7 +855,7 @@ void fspacfn(uint32_t const formIndex, float const spacing) {
 }
 
 void fthdfn(uint32_t const iSequence, FEATHER& feather) {
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
 
   auto const& bCurrent = bSequence.operator[](iSequence);
   auto const& bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
@@ -892,7 +892,7 @@ void fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT>& f
   auto currentPoint = F_POINT {};
   auto nextPoint    = F_POINT {};
 
-  auto& bSequence = Instance->BSequence;
+  auto& bSequence = Instance->bSequence;
 
   auto const& bCurrent = bSequence.operator[](iSequence);
   auto&       bNext    = bSequence.operator[](wrap::toSize(iSequence) + 1U);
@@ -1057,10 +1057,10 @@ auto handleSetsWMCOMMAND(WPARAM const& wparam, HWND hwndlg) -> bool {
 	case IDOK: {
 	  DesignSize = F_POINT {getstxt(IDC_DESWID, hwndlg), getstxt(IDC_DESHI, hwndlg)};
 	  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
-		Instance->UserFlagMap.set(UserFlag::CHREF);
+		Instance->userFlagMap.set(UserFlag::CHREF);
 	  }
 	  else {
-		Instance->UserFlagMap.reset(UserFlag::CHREF);
+		Instance->userFlagMap.reset(UserFlag::CHREF);
 	  }
 	  EndDialog(hwndlg, TRUE);
 	  break;
@@ -1103,7 +1103,7 @@ void handleSetsWMINITDIALOG(HWND hwndlg) {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
   setstxt(IDC_DESWID, DesignSize.x, hwndlg);
   setstxt(IDC_DESHI, DesignSize.y, hwndlg);
-  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(Instance->UserFlagMap.test(UserFlag::CHREF)));
+  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(Instance->userFlagMap.test(UserFlag::CHREF)));
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -1121,7 +1121,7 @@ auto isfil(FRM_HEAD const& form) noexcept -> bool {
 }
 
 auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
-  auto const& interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto const& interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   auto const color = interleaveSequenceIndices.operator[](index).color;
   while (index != 0U) {
@@ -1155,7 +1155,7 @@ void notundfn(uint32_t code) {
 	}
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
@@ -1323,7 +1323,7 @@ auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> c
 }
 
 void ratpnt(uint32_t const iPoint, uint32_t const iNextPoint, F_POINT& point, float const featherRatio) noexcept {
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
 
   auto const& bPoint = bSequence.operator[](iPoint);
 
@@ -1385,7 +1385,7 @@ void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
   if (!Instance->OSequence.empty()) {
-	Instance->InterleaveSequenceIndices.emplace_back(INS_REC {
+	Instance->interleaveSequenceIndices.emplace_back(INS_REC {
 	    .code = walkMask, .color = form.underlayColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
 #if BUGBAK
 	for (auto val : Instance->OSequence) {
@@ -1488,7 +1488,7 @@ void setundfn(uint32_t const code) {
 	}
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (form.type == FRMLINE) {
 		continue;
@@ -1670,7 +1670,7 @@ void xt::fthrfn(FRM_HEAD& form) {
   fthvars(form, feather);
   LineSpacing = form.fillSpacing;
   satin::satfil(form);
-  auto& bSequence = Instance->BSequence;
+  auto& bSequence = Instance->bSequence;
 
   bSequence.front().attribute       = 0;
   bSequence.operator[](1).attribute = 1;
@@ -1768,7 +1768,7 @@ void xt::fethr() {
 	fethrf(ClosestFormToCursor);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  if (Instance->FormList.operator[](selectedForm).vertexCount > 2U) {
 		fethrf(selectedForm);
 	  }
@@ -1906,9 +1906,9 @@ void xt::chkund(uint32_t const                formIndex,
 void xt::selalfrm() {
   auto const& formList = Instance->FormList;
 
-  Instance->SelectedFormList.reserve(formList.size());
+  Instance->selectedFormList.reserve(formList.size());
   for (auto formIndex = 0U; formIndex < wrap::toUnsigned(formList.size()); ++formIndex) {
-	Instance->SelectedFormList.push_back(formIndex);
+	Instance->selectedFormList.push_back(formIndex);
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -1941,7 +1941,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 
   auto const appliqueColor = gsl::narrow_cast<uint32_t>(form.borderColor >> FRMSHFT);
   for (auto iSourceStitch = 0U; iSourceStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iSourceStitch) {
-	if (!Instance->UserFlagMap.test(UserFlag::FIL2OF) &&
+	if (!Instance->userFlagMap.test(UserFlag::FIL2OF) &&
 	    Instance->StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 	  ClosestPointIndex = iDestinationStitch;
 	}
@@ -2073,7 +2073,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	  --iDestinationStitch;
 	}
   }
-  if (!Instance->UserFlagMap.test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX)) {
+  if (!Instance->userFlagMap.test(UserFlag::FIL2OF) && Instance->StateMap.test(StateFlag::SELBOX)) {
 	std::ranges::fill(fillStartsData, ClosestPointIndex);
   }
 }
@@ -2082,7 +2082,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   auto ilData = INT_INFO {};
   Instance->StateMap.reset(StateFlag::ISEND);
   auto const& form                      = Instance->FormList.operator[](formIndex);
-  auto&       interleaveSequenceIndices = Instance->InterleaveSequenceIndices;
+  auto&       interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   interleaveSequenceIndices.emplace_back(INS_REC {
       .code = 0, .color = 0, .index = wrap::toUnsigned(Instance->InterleaveSequence.size()), .seq = 0});
@@ -2197,7 +2197,7 @@ void xt::dusulen(float const length) {
 	ulenfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ulenfn(selectedForm, length);
 	}
   }
@@ -2218,7 +2218,7 @@ void xt::duspac(float const spacing) {
 	uspacfn(ClosestFormToCursor, spacing);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  uspacfn(selectedForm, spacing);
 	}
   }
@@ -2233,7 +2233,7 @@ void xt::dufang(float angle) {
 	uangfn(ClosestFormToCursor, angle);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  uangfn(selectedForm, angle);
 	}
   }
@@ -2247,7 +2247,7 @@ void xt::duflen(float const length) {
 	flenfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  flenfn(selectedForm, length);
 	}
   }
@@ -2261,7 +2261,7 @@ void xt::dufspac(float const spacing) {
 	fspacfn(ClosestFormToCursor, spacing);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fspacfn(selectedForm, spacing);
 	}
   }
@@ -2276,7 +2276,7 @@ void xt::dufind(float indent) {
 	findfn(ClosestFormToCursor, indent);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  findfn(selectedForm, indent);
 	}
   }
@@ -2291,7 +2291,7 @@ void xt::dufxang(float angle) {
 	fangfn(ClosestFormToCursor, angle);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fangfn(selectedForm, angle);
 	}
   }
@@ -2309,7 +2309,7 @@ void xt::dundcol(uint8_t color) {
 	ucolfn(ClosestFormToCursor, color);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ucolfn(selectedForm, color);
 	}
   }
@@ -2327,7 +2327,7 @@ void xt::dufcol(uint8_t color) {
 	fcolfn(ClosestFormToCursor, color);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fcolfn(selectedForm, color);
 	}
   }
@@ -2345,7 +2345,7 @@ void xt::dubcol(uint8_t color) {
 	bcolfn(ClosestFormToCursor, color);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  bcolfn(selectedForm, color);
 	}
   }
@@ -2359,7 +2359,7 @@ void xt::dublen(float const length) {
 	blenfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  blenfn(selectedForm, length);
 	}
   }
@@ -2373,7 +2373,7 @@ void xt::dubspac(float const length) {
 	bspacfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  bspacfn(selectedForm, length);
 	}
   }
@@ -2387,7 +2387,7 @@ void xt::dubmin(float const length) {
 	bminfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  bminfn(selectedForm, length);
 	}
   }
@@ -2401,7 +2401,7 @@ void xt::dubmax(float const length) {
 	bmaxfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  bmaxfn(selectedForm, length);
 	}
   }
@@ -2415,7 +2415,7 @@ void xt::dufmin(float const length) {
 	fminfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fminfn(selectedForm, length);
 	}
   }
@@ -2429,7 +2429,7 @@ void xt::dufmax(float const length) {
 	fmaxfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fmaxfn(selectedForm, length);
 	}
   }
@@ -2443,7 +2443,7 @@ void xt::dufwid(float const length) {
 	fwidfn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fwidfn(selectedForm, length);
 	}
   }
@@ -2457,7 +2457,7 @@ void xt::dufhi(float const length) {
 	fhifn(ClosestFormToCursor, length);
   }
   else {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fhifn(selectedForm, length);
 	}
   }
@@ -2549,7 +2549,7 @@ void xt::nudsiz() {
 	flag              = 1;
   }
   nudfn(designSizeRect);
-  if (Instance->UserFlagMap.test(UserFlag::CHREF)) {
+  if (Instance->userFlagMap.test(UserFlag::CHREF)) {
 	form::refilal();
   }
   if (flag != 0) {
@@ -2604,7 +2604,7 @@ void xt::clrstch() noexcept {
 }
 
 void xt::chgwrn() {
-  Instance->UserFlagMap.flip(UserFlag::WRNOF);
+  Instance->userFlagMap.flip(UserFlag::WRNOF);
   menu::wrnmen();
 }
 

@@ -74,64 +74,64 @@ class MY_SINGLE
 
   void initialize() {
 	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
-	RubberBandLine.resize(3U);
-	SelectedFormsLine.resize(OUTPNTS);
-	SelectedPointsLine.resize(OUTPNTS);
+	rubberBandLine.resize(3U);
+	selectedFormsLine.resize(OUTPNTS);
+	selectedPointsLine.resize(OUTPNTS);
 	TextureHistory.resize(ITXBUFSZ);
-	ValueWindow.resize(LASTLIN);
+	valueWindow.resize(LASTLIN);
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  F_RECTANGLE               AllItemsRect;
-  std::vector<F_POINT>      AngledFormVertices;
-  fs::path                  AuxName;
-  std::vector<COLORREF>     BitmapBackgroundColor;
-  std::vector<B_SEQ_PNT>    BSequence;
+  F_RECTANGLE               allItemsRect;
+  std::vector<F_POINT>      angledFormVertices;
+  fs::path                  auxName;
+  std::vector<COLORREF>     bitmapBackgroundColor;
+  std::vector<B_SEQ_PNT>    bSequence;
   fs::path                  BalaradName0;
   fs::path                  BalaradName1;
   fs::path                  BalaradName2;
-  std::vector<HWND>         ButtonWin;
-  std::vector<F_POINT_ATTR> ClipBuffer;
+  std::vector<HWND>         buttonWin;
+  std::vector<F_POINT_ATTR> clipBuffer;
   std::vector<F_POINT>      ClipPoints;
   fs::path                  ColorFileName;
   int32_t                   DPI = 0;
-  std::vector<float>        FormAngles;
+  std::vector<float>        formAngles;
   std::vector<POINT>        FormControlPoints;
-  std::vector<POINT>        FormLines;
+  std::vector<POINT>        formLines;
   std::vector<FRM_HEAD>     FormList;
-  std::wstring              FormOnOff;
+  std::wstring              formOnOff;
   std::vector<F_POINT>      FormVertices;
   std::vector<POINT>        FormVerticesAsLine;
-  std::vector<F_POINT>      InsidePointList;
+  std::vector<F_POINT>      insidePointList;
   std::vector<F_POINT>      InterleaveSequence;
-  std::vector<INS_REC>      InterleaveSequenceIndices;
+  std::vector<INS_REC>      interleaveSequenceIndices;
 
-  MENUITEMINFO              MenuInfo = MENUITEMINFO {};
+  MENUITEMINFO              menuInfo = MENUITEMINFO {};
   std::vector<F_POINT>      OSequence;
-  std::vector<F_POINT>      OutsidePointList;
+  std::vector<F_POINT>      outsidePointList;
   fs::path                  RGBFileName;
-  std::vector<POINT>        RubberBandLine;
-  std::vector<SAT_CON>      SatinGuides;
-  std::vector<POINT>        SearchLine;
-  std::vector<uint32_t>     SelectedFormList;
-  std::vector<POINT>        SelectedFormsLine;
-  std::vector<POINT>        SelectedPointsLine;
+  std::vector<POINT>        rubberBandLine;
+  std::vector<SAT_CON>      satinGuides;
+  std::vector<POINT>        searchLine;
+  std::vector<uint32_t>     selectedFormList;
+  std::vector<POINT>        selectedFormsLine;
+  std::vector<POINT>        selectedPointsLine;
   std::vector<uint32_t>     SelectedTexturePointsList;
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> StitchBuffer;
-  std::vector<F_POINT>      TempPolygon;
+  std::vector<F_POINT>      tempPolygon;
   std::vector<TX_PNT>       TempTexturePoints;
   std::vector<TX_HIST>      TextureHistory;
   std::vector<TX_PNT>       TexturePointsBuffer;
-  fs::path                  ThrName;
-  boost::dynamic_bitset<>   TracedEdges;
+  fs::path                  thrName;
+  boost::dynamic_bitset<>   tracedEdges;
   boost::dynamic_bitset<>   TracedMap;
 
   std::array<std::vector<uint32_t>, UNDOLEN> UndoBuffer;
 
-  fs::path           UserBMPFileName;
-  ENUM_MAP<UserFlag> UserFlagMap = ENUM_MAP<UserFlag> {0};
-  std::vector<HWND>  ValueWindow;
+  fs::path           userBMPFileName;
+  ENUM_MAP<UserFlag> userFlagMap = ENUM_MAP<UserFlag> {0};
+  std::vector<HWND>  valueWindow;
   fs::path           WorkingFileName;
   std::wstring       textureInputBuffer;
   // NOLINTEND(misc-non-private-member-variables-in-classes)

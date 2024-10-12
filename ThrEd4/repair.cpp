@@ -266,7 +266,7 @@ auto frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 	if (badData.clip != Instance->ClipPoints.size()) {
 	  badData.attribute |= BADCLP;
 	}
-	if (badData.guideCount != Instance->SatinGuides.size()) {
+	if (badData.guideCount != Instance->satinGuides.size()) {
 	  badData.attribute |= BADSAT;
 	}
 	if (badData.tx != Instance->TexturePointsBuffer.size()) {
@@ -334,7 +334,7 @@ void repflt(std::wstring& repairMessage) {
 	}
 	formList.resize(iForm);
 	Instance->ClipPoints.resize(badData.clip);
-	Instance->SatinGuides.resize(badData.guideCount);
+	Instance->satinGuides.resize(badData.guideCount);
 	Instance->TexturePointsBuffer.resize(badData.tx);
 	chkfstch();
 	adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(formList.size()));
@@ -352,20 +352,20 @@ void repsat() {
 	}
 	auto const guideDifference = form.satinGuideIndex;
 	if (Instance->FormVertices.size() > wrap::toSize(guideDifference) + form.vertexCount) {
-	  auto const startGuide  = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+	  auto const startGuide  = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
-	  auto const destination = wrap::next(Instance->SatinGuides.begin(), guideCount);
+	  auto const destination = wrap::next(Instance->satinGuides.begin(), guideCount);
 	  std::copy(startGuide, endGuide, destination);
 	  form.satinGuideIndex = guideCount;
 	  guideCount += form.satinGuideCount;
 	  bcup(form, badData);
 	  continue;
 	}
-	if (guideDifference < Instance->SatinGuides.size()) {
-	  wrap::narrow(form.satinGuideCount, Instance->SatinGuides.size() - guideDifference);
-	  auto const startGuide  = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+	if (guideDifference < Instance->satinGuides.size()) {
+	  wrap::narrow(form.satinGuideCount, Instance->satinGuides.size() - guideDifference);
+	  auto const startGuide  = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
-	  auto const destination = wrap::next(Instance->SatinGuides.begin(), guideCount);
+	  auto const destination = wrap::next(Instance->satinGuides.begin(), guideCount);
 	  std::copy(startGuide, endGuide, destination);
 	  bcup(form, badData);
 	  continue;
@@ -373,7 +373,7 @@ void repsat() {
 	guideCount           = badData.guideCount;
 	form.satinGuideCount = 0;
   }
-  Instance->SatinGuides.resize(guideCount);
+  Instance->satinGuides.resize(guideCount);
 }
 
 void reptx() {

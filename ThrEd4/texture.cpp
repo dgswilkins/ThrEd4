@@ -217,7 +217,7 @@ void dutxrct(TXTR_RECT& textureRect) noexcept {
 
 void dutxtlin() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::polyline(StitchWindowDC, Instance->FormLines.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, Instance->formLines.data(), LNPNTS);
 }
 
 void dutxtx(uint32_t const index, uint16_t const offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
@@ -367,9 +367,9 @@ void ritxfrm(FRM_HEAD const& textureForm) {
   auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                              (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
-  auto const& angledFormVertices = Instance->AngledFormVertices;
+  auto const& angledFormVertices = Instance->angledFormVertices;
   for (auto formLine = formLines.begin(); auto const& vertex : angledFormVertices) {
 	ed2px(vertex, *formLine);
 	formLine->x += offset.x;
@@ -426,7 +426,7 @@ void setxclp(FRM_HEAD const& form) {
 	editorOffset.x -= TextureScreen.formCenter.x;
   }
   editorOffset.y -= TextureScreen.formCenter.y;
-  auto& angledFormVertices = Instance->AngledFormVertices;
+  auto& angledFormVertices = Instance->angledFormVertices;
   std::ranges::transform(angledFormVertices, angledFormVertices.begin(), [editorOffset](auto& vertex) {
 	return vertex + editorOffset;
   });
@@ -454,7 +454,7 @@ void stxlin() {
   Instance->StateMap.reset(StateFlag::TXTMOV);
   deorg(offset);
   px2ed(offset, point1);
-  px2ed(Instance->FormLines.front(), point0);
+  px2ed(Instance->formLines.front(), point0);
   dutxlin(point0, point1);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -556,7 +556,7 @@ void txfn(uint32_t const textureType, uint32_t const formIndex) {
   }
   texture::savtxt();
   nutx(formIndex);
-  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
   switch (textureType) {
 	case VRTYP: {
 	  txvrt(form);
@@ -675,7 +675,7 @@ void txshrnk(FRM_HEAD const& textureForm) {
 
 void txsiz(float const ratio, FRM_HEAD const& textureForm) {
   ritxfrm(textureForm);
-  for (auto& vertex : Instance->AngledFormVertices) {
+  for (auto& vertex : Instance->angledFormVertices) {
 	vertex *= ratio;
   }
   auto angleRect = F_RECTANGLE {};
@@ -742,7 +742,7 @@ void txtdel() {
 }
 
 void txtlin() {
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines.clear();
   formLines.resize(2);
   deorg(formLines[0]);
@@ -788,7 +788,7 @@ void angrct(F_RECTANGLE& rectangle) noexcept {
   auto minY = BIGFLOAT;
   auto maxX = LOWFLOAT;
   auto maxY = LOWFLOAT;
-  for (auto const& vertex : Instance->AngledFormVertices) {
+  for (auto const& vertex : Instance->angledFormVertices) {
 	minX = std::min(minX, vertex.x);
 	minY = std::min(minY, vertex.y);
 	maxX = std::max(maxX, vertex.x);
@@ -801,7 +801,7 @@ void butsid(uint32_t const windowId) {
   auto buttonRect = RECT {};
   chktxnum();
   TextureWindowId = windowId;
-  GetWindowRect(Instance->ButtonWin.operator[](windowId), &buttonRect);
+  GetWindowRect(Instance->buttonWin.operator[](windowId), &buttonRect);
   SideWindowButton = CreateWindow(L"STATIC",
                                   nullptr,
                                   SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -817,35 +817,35 @@ void butsid(uint32_t const windowId) {
 }
 
 auto chkbut() -> bool {
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXCLR)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXCLR)) {
 	txdelal();
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXHI)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXHI)) {
 	butsid(HTXHI);
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXWID)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXWID)) {
 	butsid(HTXWID);
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXSPAC)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXSPAC)) {
 	butsid(HTXSPAC);
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXVRT)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXVRT)) {
 	dutxfn(VRTYP);
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXHOR)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXHOR)) {
 	dutxfn(HORTYP);
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXANG)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXANG)) {
 	dutxfn(ANGTYP);
 	return true;
   }
-  if (WinMsg.hwnd == Instance->ButtonWin.operator[](HTXMIR)) {
+  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXMIR)) {
 	dutxmir();
 	return true;
   }
@@ -937,7 +937,7 @@ void dutxfn(uint32_t const textureType) {
 	txfn(textureType, ClosestFormToCursor);
   }
   else {
-	for (auto const& selectedForm : Instance->SelectedFormList) {
+	for (auto const& selectedForm : Instance->selectedFormList) {
 	  txfn(textureType, selectedForm);
 	}
   }
@@ -1362,7 +1362,7 @@ void texture::txtrup() {
 void texture::setxfrm() noexcept {
   auto angleRect = F_RECTANGLE {};
   angrct(angleRect);
-  auto& angledFormVertices = Instance->AngledFormVertices;
+  auto& angledFormVertices = Instance->angledFormVertices;
   for (auto& vertex : angledFormVertices) {
 	vertex.x -= angleRect.left;
 	vertex.y -= angleRect.bottom;
@@ -1382,7 +1382,7 @@ void texture::setxfrm() noexcept {
 void texture::txtrmov(FRM_HEAD const& textureForm) {
   if (Instance->StateMap.test(StateFlag::TXTLIN)) {
 	dutxtlin();
-	deorg(Instance->FormLines.operator[](1));
+	deorg(Instance->formLines.operator[](1));
 	dutxtlin();
 	return;
   }
@@ -1452,14 +1452,14 @@ void texture::deltx(uint32_t const formIndex) {
 
 void texture::txof() {
   displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
-  thred::redraw(Instance->ButtonWin.operator[](HHID));
+  thred::redraw(Instance->buttonWin.operator[](HHID));
   if (Instance->StateMap.test(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
   else {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
   }
-  SetWindowText(Instance->ButtonWin.operator[](HTXSPAC), L"");
+  SetWindowText(Instance->buttonWin.operator[](HTXSPAC), L"");
   savtxt();
   thred::zumhom();
   SelectedTexturePointsList->clear();

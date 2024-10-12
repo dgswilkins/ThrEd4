@@ -58,7 +58,7 @@ void sdmsg();
 
 // Functions
 void bxtxt(uint32_t const iButton, uint32_t const iMessage) {
-  SetWindowText(Instance->ButtonWin.operator[](iButton), displayText::loadStr(iMessage).c_str());
+  SetWindowText(Instance->buttonWin.operator[](iButton), displayText::loadStr(iMessage).c_str());
 }
 
 auto clpmsgs(uint32_t const code) -> bool {
@@ -79,11 +79,11 @@ auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 
 void hlpflt(uint32_t const iButton, uint32_t const iMessage, float const data) {
   auto const fmtStr = displayText::format(iMessage, data);
-  SetWindowText(Instance->ButtonWin.operator[](iButton), fmtStr.c_str());
+  SetWindowText(Instance->buttonWin.operator[](iButton), fmtStr.c_str());
 }
 
 void sdmsg() {
-  displayText::showMessage(IDS_SAVDISC, Instance->ThrName.wstring());
+  displayText::showMessage(IDS_SAVDISC, Instance->thrName.wstring());
 }
 } // namespace
 
@@ -214,26 +214,26 @@ void displayText::crmsg(fs::path const& fileName) {
 
 void displayText::butxt(uint32_t const iButton, std::wstring const& buttonText) {
   if (!Instance->StateMap.test(StateFlag::WASTRAC) || iButton <= HNUM) {
-	SetWindowText(Instance->ButtonWin.operator[](iButton), buttonText.c_str());
+	SetWindowText(Instance->buttonWin.operator[](iButton), buttonText.c_str());
 	return;
   }
   if (iButton != HMINLEN) {
 	auto const bText = loadStr(iButton - 4U + IDS_TRC0);
-	SetWindowText(Instance->ButtonWin.operator[](iButton), bText.c_str());
+	SetWindowText(Instance->buttonWin.operator[](iButton), bText.c_str());
 	return;
   }
   if (!Instance->StateMap.test(StateFlag::HIDMAP)) {
 	auto const bText = loadStr(IDS_TRC1S);
-	SetWindowText(Instance->ButtonWin.operator[](iButton), bText.c_str());
+	SetWindowText(Instance->buttonWin.operator[](iButton), bText.c_str());
 	return;
   }
   auto const bText = loadStr(IDS_TRC1H);
-  SetWindowText(Instance->ButtonWin.operator[](iButton), bText.c_str());
+  SetWindowText(Instance->buttonWin.operator[](iButton), bText.c_str());
 }
 
 void displayText::clrhbut(uint32_t const startButton) {
-  for (auto const spButtons = std::ranges::subrange(wrap::next(Instance->ButtonWin.begin(), startButton),
-                                                    Instance->ButtonWin.end());
+  for (auto const spButtons = std::ranges::subrange(wrap::next(Instance->buttonWin.begin(), startButton),
+                                                    Instance->buttonWin.end());
        auto const iButton : spButtons) { // NOLINT(readability-qualified-auto)
 	SetWindowText(iButton, L"");
   }
@@ -266,7 +266,7 @@ void displayText::frm1pnt() {
 }
 
 auto displayText::filmsgs(uint32_t const code) -> bool {
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	return clpmsgs(code);
   }
 
@@ -410,14 +410,14 @@ void displayText::tomsg() {
 void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
   bxtxt(HTXCLR, IDS_CLEAR);
   hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight * IPFGRAN);
-  thred::redraw(Instance->ButtonWin.operator[](HTXWID));
+  thred::redraw(Instance->buttonWin.operator[](HTXWID));
   hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing * IPFGRAN);
   bxtxt(HTXVRT, IDS_TXVRT);
   bxtxt(HTXHOR, IDS_TXHOR);
   bxtxt(HTXANG, IDS_TXANG);
   bxtxt(HTXMIR, IDS_TXMIR);
   auto constexpr INDEX = HTXMIR + 1U;
-  SetWindowText(Instance->ButtonWin.operator[](INDEX), L"");
+  SetWindowText(Instance->buttonWin.operator[](INDEX), L"");
 }
 
 auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {

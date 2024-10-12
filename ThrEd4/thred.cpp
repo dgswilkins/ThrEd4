@@ -646,7 +646,7 @@ auto chk2of() -> bool {
   if (!Instance->StateMap.test(StateFlag::SELBOX)) {
 	return false;
   }
-  if (Instance->UserFlagMap.test(UserFlag::FIL2OF)) {
+  if (Instance->userFlagMap.test(UserFlag::FIL2OF)) {
 	return false;
   }
   return true;
@@ -829,7 +829,7 @@ void chknum() {
   auto& formList = Instance->FormList;
 
   if (SideWinMsgIdx != 0U) {
-	auto& valueWindow = Instance->ValueWindow;
+	auto& valueWindow = Instance->valueWindow;
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
 
@@ -1853,7 +1853,7 @@ void doDrwInit() {
 	  cros(ClosestPointIndex);
 	}
 	else {
-	  Instance->SearchLine.clear();
+	  Instance->searchLine.clear();
 	  ducros(StitchWindowMemDC);
 	}
 	thred::selRct(StitchRangeRect);
@@ -2207,7 +2207,7 @@ void drwStch() {
 }
 
 void drwknot() {
-  if (Instance->UserFlagMap.test(UserFlag::KNOTOF) || Knots.empty() || Instance->StitchBuffer.empty()) {
+  if (Instance->userFlagMap.test(UserFlag::KNOTOF) || Knots.empty() || Instance->StitchBuffer.empty()) {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
@@ -2450,7 +2450,7 @@ void dubuf(std::vector<char>& buffer) {
   // calculate the design data size
   auto const thredDataSize = wrap::sizeofVector(formList) +
                              (vertexCount * wrap::sizeofType(Instance->FormVertices)) +
-                             (guideCount * wrap::sizeofType(Instance->SatinGuides)) +
+                             (guideCount * wrap::sizeofType(Instance->satinGuides)) +
                              (clipDataCount * wrap::sizeofType(Instance->ClipPoints)) +
                              wrap::sizeofVector(Instance->TexturePointsBuffer);
   buffer.reserve(vtxLen + thredDataSize);
@@ -2507,7 +2507,7 @@ void dubuf(std::vector<char>& buffer) {
 	if (srcForm.type == SAT) { // write the satin guide data to the guide buffer
 	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
 	  if (srcForm.satinGuideCount != 0U) {
-		auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), srcForm.satinGuideIndex);
+		auto itGuide = wrap::next(Instance->satinGuides.cbegin(), srcForm.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
 		  guides.emplace_back(*itGuide);
 		  ++itGuide;
@@ -3053,7 +3053,7 @@ void frmsnap(uint32_t const start, uint32_t const count) noexcept(!std::is_same_
 
 auto frmstch() -> bool {
   auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	formMap.set(selectedForm);
   }
   return std::ranges::any_of(Instance->StitchBuffer, [&formMap](F_POINT_ATTR const& stitch) -> bool {
@@ -3232,7 +3232,7 @@ auto getNewFileName(fs::path& newFileName, FileStyles const fileTypes, FileIndic
 }
 
 void gselrng() noexcept {
-  auto const& selectedFormList = Instance->SelectedFormList;
+  auto const& selectedFormList = Instance->selectedFormList;
   SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
   for (auto const selectedForm : selectedFormList) {
 	SelectedFormsRange.start  = std::min(selectedForm, SelectedFormsRange.start);
@@ -3311,7 +3311,7 @@ void handleDeleteSatinForm(FRM_HEAD& form, bool& satinFlag) {
 	}
   }
   if (form.satinGuideCount != 0U) {
-	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+	auto itGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 		satin::delcon(form, iGuide);
@@ -3585,7 +3585,7 @@ auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 
 // ReSharper disable CppParameterMayBeConst
 void handleSizeRestored(HWND p_hWnd) {
-  Instance->UserFlagMap.reset(UserFlag::SAVMAX);
+  Instance->userFlagMap.reset(UserFlag::SAVMAX);
   chkirct();
   if (Instance->StateMap.testAndSet(StateFlag::SIZED)) {
 	auto       screenCenterOffset = LONG {};
@@ -3650,8 +3650,8 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
   if (Instance->StateMap.testAndReset(StateFlag::MOVMSG)) {
 	if (code == VK_RETURN || code == VK_OEM_3) {
 	  thred::savdo();
-	  if (!Instance->SelectedFormList.empty()) {
-		for (auto const selectedForm : Instance->SelectedFormList) {
+	  if (!Instance->selectedFormList.empty()) {
+		for (auto const selectedForm : Instance->selectedFormList) {
 		  form::refilfn(selectedForm);
 		}
 	  }
@@ -3736,7 +3736,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	  if (PreferenceIndex == PRFGRDCUT + 1 || PreferenceIndex == PRFSBXCUT + 1U) {
 		auto buffer             = std::array<wchar_t, 2> {};
 		buffer[0]               = NumericCode;
-		auto const& valueWindow = Instance->ValueWindow;
+		auto const& valueWindow = Instance->valueWindow;
 		if (PreferenceIndex == PRFGRDCUT + 1U) {
 		  ShowStitchThreshold = unthrsh(NumericCode - L'0');
 		  SetWindowText(valueWindow.operator[](PRFGRDCUT), buffer.data());
@@ -3814,7 +3814,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	if (!Instance->StateMap.test(StateFlag::RUNPAT)) {
 	  if (!Instance->StateMap.test(StateFlag::HIDSTCH) &&
-	      (!Instance->ThrName.empty() || Instance->StateMap.test(StateFlag::INIT) ||
+	      (!Instance->thrName.empty() || Instance->StateMap.test(StateFlag::INIT) ||
 	       !Instance->FormList.empty() || Instance->StateMap.test(StateFlag::SATPNT)) &&
 	      !Instance->StateMap.test(StateFlag::BAKSHO)) {
 		drwStch();
@@ -3876,7 +3876,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	return true;
   }
-  if (!Instance->ButtonWin.empty() && DrawItem->hwndItem == Instance->ButtonWin.operator[](HHID) &&
+  if (!Instance->buttonWin.empty() && DrawItem->hwndItem == Instance->buttonWin.operator[](HHID) &&
       DrawItem->itemAction == ODA_DRAWENTIRE) {
 	auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 	if (Instance->StateMap.test(StateFlag::HID)) {
@@ -3955,7 +3955,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
 		if (DrawItem->hwndItem == *itHWndBV) {
-		  auto fileName = Instance->ThrName; // intentional copy
+		  auto fileName = Instance->thrName; // intentional copy
 		  auto ext      = fileName.extension().wstring();
 		  ext.back()    = iVersion + 's';
 		  fileName.replace_extension(ext);
@@ -4105,11 +4105,11 @@ void handleWndProcWMSIZE(HWND p_hWnd, WPARAM const wParam) {
   GetClientRect(p_hWnd, &ThredWindowRect);
   switch (wParam) {
 	case SIZE_MAXIMIZED: {
-	  Instance->UserFlagMap.set(UserFlag::SAVMAX);
+	  Instance->userFlagMap.set(UserFlag::SAVMAX);
 	  break;
 	}
 	case SIZE_MINIMIZED: {
-	  Instance->UserFlagMap.reset(UserFlag::SAVMAX);
+	  Instance->userFlagMap.reset(UserFlag::SAVMAX);
 	  break;
 	}
 	case SIZE_RESTORED: {
@@ -4254,7 +4254,7 @@ void init() {
   StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
   StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
   chkirct();
-  if (!Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
+  if (!Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 	MoveWindow(ThrEdWindow,
 	           IniFile.initialWindowCoords.left,
 	           IniFile.initialWindowCoords.top,
@@ -4328,7 +4328,7 @@ void init() {
   }
   thred::setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
-  Instance->ButtonWin.resize(BTNCOUNT);
+  Instance->buttonWin.resize(BTNCOUNT);
   auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
 	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
@@ -4353,7 +4353,7 @@ void init() {
 		buttonTxt.assign(blank);
 	  }
 	}
-	Instance->ButtonWin.operator[](iButton) =
+	Instance->buttonWin.operator[](iButton) =
 	    CreateWindow(L"STATIC",
 	                 buttonTxt.c_str(),
 	                 windowFlags,
@@ -4549,7 +4549,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
   InsertedFormIndex   = wrap::toUnsigned(formList.size());
   if (fileHeader.formCount != 0U) {
 	auto const newFormVertexIndex = wrap::toUnsigned(Instance->FormVertices.size());
-	auto       newSatinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
+	auto       newSatinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
 	auto       clipOffset         = wrap::toUnsigned(Instance->ClipPoints.size());
 	auto       textureOffset      = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
 	if (version < 2) {
@@ -4599,7 +4599,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	else {
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
-	auto guideOffset = wrap::toUnsigned(Instance->SatinGuides.size());
+	auto guideOffset = wrap::toUnsigned(Instance->satinGuides.size());
 	if (fileHeader.dlineCount != 0U) {
 	  auto inGuideList = std::vector<SAT_CON_OUT> {};
 	  inGuideList.resize(fileHeader.dlineCount);
@@ -4611,8 +4611,8 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 		inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
 		Instance->StateMap.set(StateFlag::BADFIL);
 	  }
-	  Instance->SatinGuides.reserve(Instance->SatinGuides.size() + inGuideList.size());
-	  Instance->SatinGuides.insert(Instance->SatinGuides.end(), inGuideList.begin(), inGuideList.end());
+	  Instance->satinGuides.reserve(Instance->satinGuides.size() + inGuideList.size());
+	  Instance->satinGuides.insert(Instance->satinGuides.end(), inGuideList.begin(), inGuideList.end());
 	  newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
 	}
 	if (fileHeader.clipDataCount != 0U) {
@@ -4669,7 +4669,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	if (newFormVertexIndex != Instance->FormVertices.size()) {
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
-	if (newSatinGuideIndex != Instance->SatinGuides.size()) {
+	if (newSatinGuideIndex != Instance->satinGuides.size()) {
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
 	if (clipOffset != Instance->ClipPoints.size()) {
@@ -4721,7 +4721,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	  auto const spEHCN = gsl::span {ExtendedHeader.creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
 	  redfnam(DesignerName);
-	  auto fmtStr = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), DesignerName);
+	  auto fmtStr = displayText::format2(IDS_THRDBY, Instance->thrName.wstring(), DesignerName);
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
   }
@@ -5248,17 +5248,17 @@ auto nuang(float const originalAngle, float const xDelta, float const yDelta) no
 
 void nunams() {
   auto const& workingFileName = Instance->WorkingFileName;
-  Instance->AuxName           = workingFileName;
-  xt::duauxnam(Instance->AuxName);
-  Instance->ThrName = workingFileName;
-  Instance->ThrName.replace_extension(L".thr");
-  if (PreviousNames.front() == Instance->ThrName) {
+  Instance->auxName           = workingFileName;
+  xt::duauxnam(Instance->auxName);
+  Instance->thrName = workingFileName;
+  Instance->thrName.replace_extension(L".thr");
+  if (PreviousNames.front() == Instance->thrName) {
 	return;
   }
   auto flag = true;
   for (auto  spNames = std::ranges::subrange(std::next(PreviousNames.begin()), PreviousNames.end());
        auto& previousName : spNames) {
-	if (previousName != Instance->ThrName) {
+	if (previousName != Instance->thrName) {
 	  continue;
 	}
 	std::swap(PreviousNames.front(), previousName);
@@ -5273,12 +5273,12 @@ void nunams() {
 	if (!previousName.empty()) {
 	  continue;
 	}
-	previousName.assign(Instance->ThrName);
+	previousName.assign(Instance->thrName);
 	flag = false;
 	break;
   }
   if (flag) {
-	PreviousNames.insert(PreviousNames.begin(), Instance->ThrName);
+	PreviousNames.insert(PreviousNames.begin(), Instance->thrName);
 	PreviousNames.pop_back();
   }
   menu::redfils(LRUMenuId, PreviousNames);
@@ -5329,7 +5329,7 @@ auto oldwnd(HWND window) noexcept -> bool {
 	}
   }
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
-	if (Instance->ButtonWin.operator[](iButton) == window) {
+	if (Instance->buttonWin.operator[](iButton) == window) {
 	  return false;
 	}
   }
@@ -5570,10 +5570,10 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
 	  Instance->StateMap.set(StateFlag::BADFIL);
 	}
-	Instance->SatinGuides.reserve(inGuideList.size());
-	Instance->SatinGuides.insert(Instance->SatinGuides.end(), inGuideList.begin(), inGuideList.end());
+	Instance->satinGuides.reserve(inGuideList.size());
+	Instance->satinGuides.insert(Instance->satinGuides.end(), inGuideList.begin(), inGuideList.end());
   }
-  Instance->SatinGuides.shrink_to_fit();
+  Instance->satinGuides.shrink_to_fit();
   if (thredHeader.clipDataCount != 0U) { // read the clip points
 	Instance->ClipPoints.resize(thredHeader.clipDataCount);
 	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->ClipPoints);
@@ -5633,19 +5633,19 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 
 void rebak() {
   destroyBV();
-  auto newFileName    = Instance->ThrName; // intentional copy
+  auto newFileName    = Instance->thrName; // intentional copy
   auto safetyFileName = newFileName;       // initialise from local variable
   auto ext            = newFileName.extension().wstring();
   ext.back()          = FileVersionIndex + L's';
   newFileName.replace_extension(ext);
   ext.back() = 'x';
   safetyFileName.replace_extension(ext);
-  fs::rename(Instance->ThrName, safetyFileName);
+  fs::rename(Instance->thrName, safetyFileName);
   if (exists(newFileName)) {
-	fs::rename(newFileName, Instance->ThrName);
+	fs::rename(newFileName, Instance->thrName);
   }
   fs::rename(safetyFileName, newFileName);
-  Instance->WorkingFileName = Instance->ThrName;
+  Instance->WorkingFileName = Instance->thrName;
   Instance->StateMap.set(StateFlag::REDOLD);
   nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
@@ -5751,7 +5751,7 @@ void redini() {
 	  }
 	  {
 		auto const tmp        = ENUM_MAP<UserFlag>(IniFile.userFlagMap);
-		Instance->UserFlagMap = tmp;
+		Instance->userFlagMap = tmp;
 	  }
 	  if (IniFile.borderWidth != 0.0F) {
 		BorderWidth = IniFile.borderWidth;
@@ -5854,15 +5854,15 @@ void resetState() {
   menu::disableRedo();
   thred::unbsho();
   form::frmon();
-  Instance->SelectedFormList.clear();
-  Instance->SelectedFormList.shrink_to_fit();
+  Instance->selectedFormList.clear();
+  Instance->selectedFormList.shrink_to_fit();
   if (Instance->StateMap.test(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
 	PreferenceIndex = 0;
   }
   bitmap::resetBmpFile(true);
-  Instance->SearchLine.clear();
-  Instance->SearchLine.shrink_to_fit();
+  Instance->searchLine.clear();
+  Instance->searchLine.shrink_to_fit();
   rstdu();
   thred::unmsg();
   ZoomFactor   = 1;
@@ -6170,7 +6170,7 @@ void ritini() {
   IniFile.smallStitchLength      = SmallStitchLength;
   IniFile.stitchBoxesThreshold   = StitchBoxesThreshold;
   IniFile.stitchSpace            = LineSpacing;
-  IniFile.userFlagMap            = Instance->UserFlagMap.to_ulong();
+  IniFile.userFlagMap            = Instance->userFlagMap.to_ulong();
   IniFile.borderWidth            = BorderWidth;
   IniFile.appliqueColor          = AppliqueColor;
   IniFile.snapLength             = SnapLength;
@@ -6178,7 +6178,7 @@ void ritini() {
   IniFile.spiralWrap             = SpiralWrap;
   IniFile.buttonholeCornerLength = ButtonholeCornerLength;
   IniFile.picotSpace             = PicotSpacing;
-  if (!Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
+  if (!Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 	auto windowRect = RECT {};
 	GetWindowRect(ThrEdWindow, &windowRect);
 	IniFile.initialWindowCoords.left   = windowRect.left;
@@ -6323,19 +6323,19 @@ void rstdu() {
 void rthumnam(uint32_t const iThumbnail) {
   switch (iThumbnail) {
 	case 0: {
-	  barnam(Instance->ButtonWin.operator[](HNUM), iThumbnail);
+	  barnam(Instance->buttonWin.operator[](HNUM), iThumbnail);
 	  break;
 	}
 	case 1: {
-	  barnam(Instance->ButtonWin.operator[](HTOT), iThumbnail);
+	  barnam(Instance->buttonWin.operator[](HTOT), iThumbnail);
 	  break;
 	}
 	case 2: {
-	  barnam(Instance->ButtonWin.operator[](HMINLEN), iThumbnail);
+	  barnam(Instance->buttonWin.operator[](HMINLEN), iThumbnail);
 	  break;
 	}
 	case 3: {
-	  barnam(Instance->ButtonWin.operator[](HMAXLEN), iThumbnail);
+	  barnam(Instance->buttonWin.operator[](HMAXLEN), iThumbnail);
 	  break;
 	}
 	default: {
@@ -6348,7 +6348,7 @@ void rthumnam(uint32_t const iThumbnail) {
 void sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(Instance->FormList.size()); ++iForm) {
 	if (auto const& form = Instance->FormList.operator[](iForm); form.type == SAT && form.satinGuideCount != 0U) {
-	  auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+	  auto itGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
 		  satin::delsac(iForm);
@@ -6360,7 +6360,7 @@ void sachk() {
 }
 
 void sav() {
-  auto& auxName = Instance->AuxName;
+  auto& auxName = Instance->auxName;
   auxName       = Instance->WorkingFileName;
   xt::duauxnam(auxName);
   if (chkattr(auxName)) {
@@ -6373,7 +6373,7 @@ void sav() {
   thred::coltab();
   auto saveStitches = std::vector<F_POINT_ATTR> {};
   saveStitches.resize(Instance->StitchBuffer.size());
-  if (Instance->UserFlagMap.test(UserFlag::ROTAUX)) {
+  if (Instance->userFlagMap.test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
 	for (auto const& stitch : Instance->StitchBuffer) {
 	  *iDest++ = F_POINT_ATTR {stitch.y, stitch.x, stitch.attribute};
@@ -6401,7 +6401,7 @@ void sav() {
   }
   if (flag) {
 	defNam(Instance->WorkingFileName);
-	if (Instance->UserFlagMap.test(UserFlag::ROTAUX)) {
+	if (Instance->userFlagMap.test(UserFlag::ROTAUX)) {
 	  displayText::filnopn(IDS_FILROT, auxName);
 	}
   }
@@ -6434,23 +6434,23 @@ void segentr(float rotationAngle) {
 void selin(uint32_t start, uint32_t end, HDC hDC) {
   SelectObject(hDC, GroupSelectPen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  if (!Instance->SearchLine.empty()) {
-	wrap::polyline(hDC, Instance->SearchLine.data(), wrap::toUnsigned(Instance->SearchLine.size()));
+  if (!Instance->searchLine.empty()) {
+	wrap::polyline(hDC, Instance->searchLine.data(), wrap::toUnsigned(Instance->searchLine.size()));
   }
   if (start > end) {
 	std::swap(start, end);
   }
-  Instance->SearchLine.clear();
+  Instance->searchLine.clear();
   if (!Instance->StitchBuffer.empty()) {
 	auto stitch = wrap::next(Instance->StitchBuffer.begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
-	  Instance->SearchLine.push_back(
+	  Instance->searchLine.push_back(
 	      POINT {wrap::ceil<int32_t>((stitch->x - ZoomRect.left) * ZoomRatio.x),
 	             wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                 ((stitch->y - ZoomRect.bottom) * ZoomRatio.y))});
 	  ++stitch;
 	}
-	wrap::polyline(hDC, Instance->SearchLine.data(), wrap::toUnsigned(Instance->SearchLine.size()));
+	wrap::polyline(hDC, Instance->searchLine.data(), wrap::toUnsigned(Instance->searchLine.size()));
   }
   SetROP2(hDC, R2_COPYPEN);
 }
@@ -6490,7 +6490,7 @@ void setScrollVisibility() {
 }
 
 void setSideWinVal(int const index) {
-  SetWindowText(Instance->ValueWindow.operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
+  SetWindowText(Instance->valueWindow.operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
 }
 
 void setbak(int32_t const penWidth) noexcept {
@@ -6600,7 +6600,7 @@ void sidhup() {
   auto hoopRectangle        = RECT {};
   auto preferencesRectangle = RECT {};
   Instance->StateMap.set(StateFlag::HUPMSG);
-  GetWindowRect(Instance->ValueWindow.operator[](PRFHUPTYP), &hoopRectangle);
+  GetWindowRect(Instance->valueWindow.operator[](PRFHUPTYP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
   constexpr auto SMW_FLAGS = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
   SideMessageWindow        = CreateWindow(L"STATIC",
@@ -6636,7 +6636,7 @@ void sidhup() {
 void sidmsg(FRM_HEAD const& form, HWND window) {
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
-  std::ranges::fill(Instance->ValueWindow, nullptr);
+  std::ranges::fill(Instance->valueWindow, nullptr);
   auto sideWindowSize     = SIZE {};
   auto sideWindowLocation = int32_t {};
   GetWindowRect(window, &childListRect);
@@ -6777,7 +6777,7 @@ void sidmsg(FRM_HEAD const& form, HWND window) {
 
 void srchk() {
   Instance->StateMap.reset(StateFlag::FORMSEL);
-  Instance->SelectedFormList.clear();
+  Instance->selectedFormList.clear();
   if (Instance->StateMap.testAndSet(StateFlag::LENSRCH)) {
 	if (Instance->StateMap.test(StateFlag::WASGRP)) {
 	  ClosestPointIndex = GroupStartStitch = PrevGroupStartStitch;
@@ -7026,9 +7026,9 @@ void thrsav() {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
-      CreateFile(Instance->ThrName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      CreateFile(Instance->thrName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(Instance->ThrName);
+	displayText::crmsg(Instance->thrName);
 	return;
   }
   auto output = std::vector<char> {};
@@ -7036,7 +7036,7 @@ void thrsav() {
   auto bytesWritten = DWORD {};
   WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
   if (bytesWritten != output.size()) {
-	displayText::showMessage(IDS_FWERR, Instance->ThrName.wstring());
+	displayText::showMessage(IDS_FWERR, Instance->thrName.wstring());
   }
   CloseHandle(fileHandle);
 }
@@ -7086,7 +7086,7 @@ void unthum() {
   }
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
-  thred::redraw(Instance->ButtonWin.operator[](HHID));
+  thred::redraw(Instance->buttonWin.operator[](HHID));
   displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
 }
 
@@ -7717,12 +7717,12 @@ void thred::rstAll() {
   }
   Instance->StateMap.reset(StateFlag::FORMSEL);
   Instance->StateMap.reset(StateFlag::FRMPSEL);
-  if (!Instance->SelectedFormList.empty()) {
-	Instance->SelectedFormList.clear();
+  if (!Instance->selectedFormList.empty()) {
+	Instance->selectedFormList.clear();
   }
   unmsg();
-  Instance->SearchLine.clear();
-  Instance->SearchLine.shrink_to_fit();
+  Instance->searchLine.clear();
+  Instance->searchLine.shrink_to_fit();
   FirstWin = nullptr;
   while (EnumChildWindows(MainStitchWin, enumChildProc, 0) != 0) { }
 }
@@ -7770,9 +7770,9 @@ void thred::duzero() {
 	return;
   }
   auto const minStitch = SmallStitchLength * SmallStitchLength;
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  formMap.set(selectedForm);
 	}
 	Instance->StateMap.reset(StateFlag::CONTIG);
@@ -8048,7 +8048,7 @@ void thred::savAs() {
   Instance->StateMap.reset(StateFlag::CMPDO);
   thrsav();
   sav();
-  SetWindowText(ThrEdWindow, Instance->ThrName.wstring().c_str());
+  SetWindowText(ThrEdWindow, Instance->thrName.wstring().c_str());
 }
 
 void thred::save() {
@@ -8085,7 +8085,7 @@ void thred::dun() {
 	Instance->StateMap.set(StateFlag::SAVEX);
 	return;
   }
-  auto const fmtStr = displayText::format(IDS_SAVFIL, Instance->ThrName.wstring());
+  auto const fmtStr = displayText::format(IDS_SAVFIL, Instance->thrName.wstring());
   if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
 	save();
   }
@@ -8217,15 +8217,15 @@ void thred::zumin() {
 		}
 		break;
 	  }
-	  if (!Instance->SelectedFormList.empty()) { // zoom to the selected forms
-		auto const  firstForm = Instance->SelectedFormList.front();
+	  if (!Instance->selectedFormList.empty()) { // zoom to the selected forms
+		auto const  firstForm = Instance->selectedFormList.front();
 		auto const& firstRect = formList.operator[](firstForm).rectangle;
 
 		SelectedFormsRect = {.left   = std::lround(firstRect.left),
 		                     .top    = std::lround(firstRect.top),
 		                     .right  = std::lround(firstRect.right),
 		                     .bottom = std::lround(firstRect.bottom)};
-		for (auto const selectedForm : Instance->SelectedFormList) {
+		for (auto const selectedForm : Instance->selectedFormList) {
 		  auto const& rect = formList.operator[](selectedForm).rectangle;
 		  if (rect.bottom < wrap::toFloat(SelectedFormsRect.bottom)) {
 			SelectedFormsRect.bottom = std::lround(rect.bottom);
@@ -8546,7 +8546,7 @@ void thred::toglHid() {
 	Instance->StateMap.set(StateFlag::FRMOF);
   }
   unthum();
-  redraw(Instance->ButtonWin.operator[](HHID));
+  redraw(Instance->buttonWin.operator[](HHID));
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
@@ -8814,7 +8814,7 @@ void thred::newFil() {
   DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
-  Instance->ThrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
+  Instance->thrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
   ritfnam(DesignerName);
   auto const designer       = utf::utf16ToUtf8(DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
@@ -8843,8 +8843,8 @@ void thred::newFil() {
   Instance->TexturePointsBuffer.shrink_to_fit();
   Instance->ClipPoints.clear();
   Instance->ClipPoints.shrink_to_fit();
-  Instance->SatinGuides.clear();
-  Instance->SatinGuides.shrink_to_fit();
+  Instance->satinGuides.clear();
+  Instance->satinGuides.shrink_to_fit();
   auto& formList = Instance->FormList;
 
   formList.clear();
@@ -8889,8 +8889,8 @@ void thred::rebox() {
   if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
 	Instance->StateMap.reset(StateFlag::SCROS);
 	Instance->StateMap.reset(StateFlag::ECROS);
-	Instance->SearchLine.clear();
-	Instance->SearchLine.shrink_to_fit();
+	Instance->searchLine.clear();
+	Instance->searchLine.shrink_to_fit();
 	Instance->StateMap.set(StateFlag::RESTCH);
 	for (auto const& window : UserColorWin) {
 	  redraw(window);
@@ -9088,7 +9088,7 @@ void thred::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
 }
 
 void thred::rot(F_POINT& rotationCenter) {
-  if (!Instance->StateMap.test(StateFlag::FORMSEL) && Instance->SelectedFormList.empty() &&
+  if (!Instance->StateMap.test(StateFlag::FORMSEL) && Instance->selectedFormList.empty() &&
       !Instance->StateMap.test(StateFlag::BIGBOX) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
       !Instance->StateMap.test(StateFlag::FPSEL)) {
 	// no rotatable selections found
@@ -9150,7 +9150,7 @@ void thred::delsfrms() {
   auto formIndices = std::vector<uint32_t> {};
   formIndices.resize(formList.size());
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	formMap.set(selectedForm);
 	f1del(selectedForm);
   }
@@ -9192,7 +9192,7 @@ void thred::delsfrms() {
 	  }
 	}
   }
-  Instance->SelectedFormList.clear();
+  Instance->selectedFormList.clear();
   Instance->StateMap.reset(StateFlag::FORMSEL);
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
@@ -9201,7 +9201,7 @@ void thred::delsfrms() {
 void thred::cut() {
   savdo();
   tfc::duclip();
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	Instance->StateMap.set(StateFlag::DELTO);
 	delsfrms();
   }
@@ -9222,8 +9222,8 @@ void thred::cut() {
 }
 
 void thred::stretch() {
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  formStretch(selectedForm);
 	}
 	return;
@@ -9299,12 +9299,12 @@ void thred::deltot() {
   Instance->FormList.clear();
   Instance->StitchBuffer.clear();
   Instance->FormVertices.clear();
-  Instance->SatinGuides.clear();
+  Instance->satinGuides.clear();
   Instance->StateMap.reset(StateFlag::GMRK);
   rstAll();
   coltab();
   zumhom();
-  auto const wTxt = displayText::format2(IDS_THRDBY, Instance->ThrName.wstring(), DesignerName);
+  auto const wTxt = displayText::format2(IDS_THRDBY, Instance->thrName.wstring(), DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
@@ -9356,7 +9356,7 @@ void thred::delet() {
 
 	  if (form.satinGuideCount == 0U) {
 		// ToDo - Is there a better way to do this than iterating through?
-		auto itGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
+		auto itGuide = wrap::next(Instance->satinGuides.begin(), form.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		  auto newGuideVal = 0U;
 		  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -9395,7 +9395,7 @@ void thred::delet() {
   }
   savdo();
   auto satinFlag = false;
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	if (frmstch()) {
 	  Instance->StateMap.set(StateFlag::DELSFRMS);
 	  displayText::tabmsg(IDS_DELFRM, false);
@@ -9565,7 +9565,7 @@ void thred::redclp() {
   auto const        clipSize         = clipStitchPtr->led;
   auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
 
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto& clipBuffer = Instance->clipBuffer;
 
   clipBuffer.clear();
   clipBuffer.reserve(clipSize);
@@ -9644,7 +9644,7 @@ void thred::vubak() {
 
 void thred::insflin(POINT const insertPoint) {
   auto const offset    = POINT {InsertSize.cx / 2, InsertSize.cy / 2};
-  auto&      formLines = Instance->FormLines;
+  auto&      formLines = Instance->formLines;
   formLines.resize(SQPNTS);
   formLines[0].x = formLines[3].x = formLines[4].x = insertPoint.x - offset.x;
   formLines[1].x = formLines[2].x = insertPoint.x + offset.x;
@@ -9698,11 +9698,11 @@ void thred::thumbak() {
 }
 
 void thred::purg() {
-  if (Instance->ThrName.empty()) {
+  if (Instance->thrName.empty()) {
 	return;
   }
-  auto fileName = Instance->ThrName; // intentional copy
-  auto ext      = Instance->ThrName.extension().wstring();
+  auto fileName = Instance->thrName; // intentional copy
+  auto ext      = Instance->thrName.extension().wstring();
   for (auto iLast = wchar_t {}; iLast < OLDVER; ++iLast) {
 	ext.back() = iLast + 's';
 	fileName.replace_extension(ext);
@@ -9879,19 +9879,19 @@ void thred::ritmov(uint32_t const formIndex) noexcept {
   SelectObject(StitchWindowDC, FormPen);
   if (ClosestVertexToCursor != 0U) {
 	if (ClosestVertexToCursor == form.vertexCount - 1U && form.type == FRMLINE) {
-	  Polyline(StitchWindowDC, Instance->RubberBandLine.data(), 2);
+	  Polyline(StitchWindowDC, Instance->rubberBandLine.data(), 2);
 	}
 	else {
-	  Polyline(StitchWindowDC, Instance->RubberBandLine.data(), 3);
+	  Polyline(StitchWindowDC, Instance->rubberBandLine.data(), 3);
 	}
   }
   else {
-	Instance->RubberBandLine.operator[](2) = Instance->FormLines.operator[](1);
+	Instance->rubberBandLine.operator[](2) = Instance->formLines.operator[](1);
 	if (form.type == FRMLINE) {
-	  Polyline(StitchWindowDC, std::addressof(Instance->RubberBandLine.operator[](1)), 2);
+	  Polyline(StitchWindowDC, std::addressof(Instance->rubberBandLine.operator[](1)), 2);
 	}
 	else {
-	  Polyline(StitchWindowDC, Instance->RubberBandLine.data(), 3);
+	  Polyline(StitchWindowDC, Instance->rubberBandLine.data(), 3);
 	}
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -9902,7 +9902,7 @@ void thred::setpsel() {
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
   duprct(form);
   SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
-  form::rct2sel(SelectedPixelsRect, Instance->SelectedPointsLine);
+  form::rct2sel(SelectedPixelsRect, Instance->selectedPointsLine);
   auto const itVertex =
       wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + SelectedFormVertices.finish);
   EndPointCross = form::sfCor2px(*itVertex);
@@ -9946,7 +9946,7 @@ void thred::rotfn(float const rotationAngle, F_POINT const& rotationCenter) {
 	return;
   }
   if (Instance->StateMap.testAndReset(StateFlag::FRMSROT)) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  // clang-format off
 	  auto& form     = formList.operator[](selectedForm);
 	  auto  itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
@@ -9999,7 +9999,7 @@ void thred::showOnlyLayer(uint8_t const play) {
       ActiveLayer != ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U) {
 	Instance->StateMap.reset(StateFlag::SELBOX);
   }
-  Instance->SelectedFormList.clear();
+  Instance->selectedFormList.clear();
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
@@ -10047,9 +10047,9 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto       minLength = BIGDBL;
   auto const pointToTest =
       POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
-  auto controlPoint = Instance->SelectedFormsLine.begin();
+  auto controlPoint = Instance->selectedFormsLine.begin();
 
-  auto const endPoint = Instance->SelectedFormsLine.size();
+  auto const endPoint = Instance->selectedFormsLine.size();
   for (auto iControlPoint = 0U; iControlPoint < endPoint; ++iControlPoint) {
 	auto const deltaX = pointToTest.x - controlPoint->x;
 	auto const deltaY = pointToTest.y - controlPoint->y;
@@ -10061,15 +10061,15 @@ auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   }
   auto const minimumLength = std::sqrt(minLength);
 
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines.resize(SQPNTS);
   for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
-	formLines[iCorner] = Instance->SelectedFormsLine.operator[](wrap::toSize(iCorner) * 2U);
+	formLines[iCorner] = Instance->selectedFormsLine.operator[](wrap::toSize(iCorner) * 2U);
   }
   formLines[4] = formLines[0];
   if (minimumLength < CLOSENUF && !isLine(formLines)) {
 	for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
-	  stretchBoxLine[iCorner] = Instance->SelectedFormsLine.operator[](wrap::toSize(iCorner) * 2U);
+	  stretchBoxLine[iCorner] = Instance->selectedFormsLine.operator[](wrap::toSize(iCorner) * 2U);
 	}
 	stretchBoxLine[4] = stretchBoxLine[0];
 	strtchbox(stretchBoxLine);
@@ -10145,9 +10145,9 @@ void thred::rembig() {
   }
   savdo();
   while (true) {
-	if (!Instance->SelectedFormList.empty()) {
+	if (!Instance->selectedFormList.empty()) {
 	  auto range = RANGE {};
-	  for (auto const selectedForm : Instance->SelectedFormList) {
+	  for (auto const selectedForm : Instance->selectedFormList) {
 		if (form::frmrng(selectedForm, range)) {
 		  makbig(range.start, range.finish);
 		}
@@ -10249,7 +10249,7 @@ void thred::thumnail() {
   Instance->StateMap.set(StateFlag::THUMSHO);
   ThumbnailSearchString.clear();
   ThumbnailSearchString.push_back(0);
-  SetWindowText(Instance->ButtonWin.operator[](HBOXSEL), L"");
+  SetWindowText(Instance->buttonWin.operator[](HBOXSEL), L"");
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
   vubak();
@@ -10387,7 +10387,7 @@ void thred::nucols() {
   auto& formList = Instance->FormList;
 
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	formMap.set(selectedForm);
 	auto& form = formList.operator[](selectedForm);
 	if (form.fillType != 0U) {
@@ -10515,7 +10515,7 @@ void thred::defpref() {
   constexpr auto DEFBPIX = uint16_t {4U}; // default form box pixels
   constexpr auto DEFANG  = 0.7853981F;    // default fill angle, 45 degrees
 
-  Instance->UserFlagMap.reset();
+  Instance->userFlagMap.reset();
   // NOLINTBEGIN(readability-magic-numbers)
   UserColor = {0x00000000,
                0x002dffff,
@@ -10571,8 +10571,8 @@ void thred::defpref() {
 
   bitmap::setBmpBackColor();
   IniFile.dazdef();
-  Instance->UserFlagMap.set(UserFlag::DAZHOL);
-  Instance->UserFlagMap.set(UserFlag::DAZD);
+  Instance->userFlagMap.set(UserFlag::DAZHOL);
+  Instance->userFlagMap.set(UserFlag::DAZD);
   AppliqueColor          = COLORCNT - 1U;
   IniFile.AppStitchLen   = APSPAC;
   BorderWidth            = BRDWID;
@@ -10580,7 +10580,7 @@ void thred::defpref() {
   IniFile.chainSpace     = CHSDEF;
   IniFile.chainRatio     = CHRDEF;
   IniFile.fillAngle      = DEFANG;
-  Instance->UserFlagMap.reset(UserFlag::SQRFIL);
+  Instance->userFlagMap.reset(UserFlag::SQRFIL);
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
   IniFile.gridSize        = 2.0F * PFGRAN; // 2mm default spacing NOLINT(readability-magic-numbers)
@@ -10589,7 +10589,7 @@ void thred::defpref() {
   IniFile.hoopSizeY       = LHUPY;
   IniFile.cursorNudgeStep = NUGINI;
   IniFile.nudgePixels     = DEFPIX;
-  Instance->UserFlagMap.set(UserFlag::BLUNT);
+  Instance->userFlagMap.set(UserFlag::BLUNT);
   SmallStitchLength       = SMALSIZ * PFGRAN;
   SnapLength              = SNPLEN * PFGRAN;
   SpiralWrap              = SPIRWRAP;
@@ -10608,7 +10608,7 @@ void thred::defpref() {
 	IniFile.customHoopY = LHUPY;
   }
   PicotSpacing = IPICSPAC;
-  Instance->UserFlagMap.set(UserFlag::FIL2OF);
+  Instance->userFlagMap.set(UserFlag::FIL2OF);
   menu::fil2men();
   BackgroundColor = 0xa8c4b1; // lighter Dark Sea green NOLINT(readability-magic-numbers)
   UnzoomedRect.cx = std::lround(IniFile.hoopSizeX);
@@ -10707,7 +10707,7 @@ void thred::pntmrk() {
 }
 
 void thred::filfrms() {
-  if (Instance->SelectedFormList.empty()) {
+  if (Instance->selectedFormList.empty()) {
 	if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
 	  return;
 	}
@@ -10717,7 +10717,7 @@ void thred::filfrms() {
 	return;
   }
   savdo();
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	form::refilfn(selectedForm);
   }
   Instance->StateMap.set(StateFlag::RESTCH);
@@ -10728,18 +10728,18 @@ void thred::nuslst(uint32_t const find) {
   // ToDo - Check this code. Does it do what is intended?
   if (find < SelectedFormsRange.start) {
 	for (auto form = find; form < SelectedFormsRange.finish; ++form) {
-	  Instance->SelectedFormList.push_back(form);
+	  Instance->selectedFormList.push_back(form);
 	}
 	return;
   }
   if (find > SelectedFormsRange.finish) {
 	for (auto form = SelectedFormsRange.start; form <= find; ++form) {
-	  Instance->SelectedFormList.push_back(form);
+	  Instance->selectedFormList.push_back(form);
 	}
 	return;
   }
   for (auto form = SelectedFormsRange.start; form <= find; ++form) {
-	Instance->SelectedFormList.push_back(form);
+	Instance->selectedFormList.push_back(form);
   }
 }
 
@@ -10794,7 +10794,7 @@ void thred::gsnap() {
   }
   auto& formList = Instance->FormList;
 
-  if (Instance->SelectedFormList.empty()) {
+  if (Instance->selectedFormList.empty()) {
 	if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
 	  if (!Instance->StateMap.test(StateFlag::GRPSEL)) {
 		displayText::shoseln(IDS_FGRPF, IDS_SNAP2GRD);
@@ -10815,7 +10815,7 @@ void thred::gsnap() {
 	return;
   }
   savdo();
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	ClosestFormToCursor = selectedForm;
 	auto& formIter      = formList.operator[](ClosestFormToCursor);
 	frmsnap(formIter.vertexIndex, formIter.vertexCount);
@@ -10871,7 +10871,7 @@ void thred::filclos() {
 }
 
 void thred::nudgfn(float const deltaX, float const deltaY) {
-  if (Instance->StateMap.test(StateFlag::BIGBOX) || !Instance->SelectedFormList.empty() ||
+  if (Instance->StateMap.test(StateFlag::BIGBOX) || !Instance->selectedFormList.empty() ||
       Instance->StateMap.test(StateFlag::FORMSEL) || Instance->StateMap.test(StateFlag::GRPSEL) ||
       Instance->StateMap.test(StateFlag::SELBOX)) {
 	savdo();
@@ -10885,7 +10885,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	for (auto& stitch : Instance->StitchBuffer) {
 	  stitch += F_POINT {deltaX, deltaY};
 	}
-	auto& allItemsRect = Instance->AllItemsRect;
+	auto& allItemsRect = Instance->allItemsRect;
 	allItemsRect.left += deltaX;
 	allItemsRect.top += deltaY;
 	allItemsRect.right += deltaX;
@@ -10894,9 +10894,9 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  formMap.set(selectedForm);
 	}
 	for (auto& stitch : Instance->StitchBuffer) {
@@ -10904,7 +10904,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 		stitch += F_POINT {deltaX, deltaY};
 	  }
 	}
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  frmpos(form, deltaX, deltaY);
 	}
@@ -11174,8 +11174,8 @@ auto thred::unselectAll() -> bool {
 	unbsho();
 	return true;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	Instance->SelectedFormList.clear();
+  if (!Instance->selectedFormList.empty()) {
+	Instance->selectedFormList.clear();
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
   return false;
@@ -11189,7 +11189,7 @@ void thred::esccode() {
   Instance->StateMap.reset(StateFlag::HID);
   Instance->StateMap.reset(StateFlag::FRMOF);
   Instance->StateMap.reset(StateFlag::THRDS);
-  redraw(Instance->ButtonWin.operator[](HHID));
+  redraw(Instance->buttonWin.operator[](HHID));
   menu::resetThreadView();
   Instance->StateMap.reset(StateFlag::RUNPAT);
   Instance->StateMap.reset(StateFlag::WASPAT);
@@ -11201,7 +11201,7 @@ void thred::esccode() {
   DestroyWindow(SpeedScrollBar);
   Instance->StateMap.reset(StateFlag::GMRK);
   Instance->StateMap.reset(StateFlag::FORMSEL);
-  Instance->SelectedFormList.clear();
+  Instance->selectedFormList.clear();
 }
 
 void thred::qcode() {
@@ -11222,9 +11222,9 @@ void thred::qcode() {
 	  Instance->FormVertices.erase(first, last);
 	}
 	if (formList.back().satinGuideCount != 0U) {
-	  auto const first = wrap::next(Instance->SatinGuides.begin(), formList.back().satinGuideIndex);
+	  auto const first = wrap::next(Instance->satinGuides.begin(), formList.back().satinGuideIndex);
 	  auto const last  = wrap::next(first, formList.back().satinGuideCount);
-	  Instance->SatinGuides.erase(first, last);
+	  Instance->satinGuides.erase(first, last);
 	}
 	formList.pop_back();
 	if (!formList.empty()) {
@@ -11237,10 +11237,10 @@ void thred::qcode() {
   }
   if (Instance->StateMap.testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 	backup::bak();
-	Instance->SelectedFormList.clear();
+	Instance->selectedFormList.clear();
 	ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   }
-  if (!Instance->UserFlagMap.test(UserFlag::MARQ)) {
+  if (!Instance->userFlagMap.test(UserFlag::MARQ)) {
 	Instance->StateMap.reset(StateFlag::GMRK);
   }
   if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
@@ -11411,7 +11411,7 @@ auto thred::updateFillColor() -> bool {
   }
   auto buffer = std::array<wchar_t, 2> {};
   wrap::narrow(buffer[0], VerticalIndex + '0');
-  SetWindowText(Instance->ValueWindow.operator[](LBRDCOL), buffer.data());
+  SetWindowText(Instance->valueWindow.operator[](LBRDCOL), buffer.data());
   unsid();
   coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
@@ -11422,9 +11422,9 @@ auto thred::updateFillColor() -> bool {
 
 auto thred::updatePreferences() -> bool {
   chknum();
-  auto const& valueWindow = Instance->ValueWindow;
+  auto const& valueWindow = Instance->valueWindow;
   if (WinMsg.hwnd == valueWindow.operator[](PRFFILEND)) {
-	if (Instance->UserFlagMap.testAndFlip(UserFlag::SQRFIL)) {
+	if (Instance->userFlagMap.testAndFlip(UserFlag::SQRFIL)) {
 	  SetWindowText(valueWindow.operator[](PRFFILEND), displayText::loadStr(IDS_PNTD).c_str());
 	}
 	else {
@@ -11433,7 +11433,7 @@ auto thred::updatePreferences() -> bool {
 	return true;
   }
   if (WinMsg.hwnd == valueWindow.operator[](PRFSATEND)) {
-	if (Instance->UserFlagMap.testAndFlip(UserFlag::BLUNT)) {
+	if (Instance->userFlagMap.testAndFlip(UserFlag::BLUNT)) {
 	  SetWindowText(valueWindow.operator[](PRFSATEND), displayText::loadStr(IDS_TAPR).c_str());
 	}
 	else {
@@ -11442,7 +11442,7 @@ auto thred::updatePreferences() -> bool {
 	return true;
   }
   if (WinMsg.hwnd == valueWindow.operator[](PRFSATUND)) {
-	if (Instance->UserFlagMap.testAndFlip(UserFlag::DUND)) {
+	if (Instance->userFlagMap.testAndFlip(UserFlag::DUND)) {
 	  SetWindowText(valueWindow.operator[](PRFSATUND), displayText::loadStr(IDS_OFF).c_str());
 	}
 	else {
@@ -11491,7 +11491,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::movlayr(iLayer->value);
 	  Instance->StateMap.set(StateFlag::FORMSEL);
 	  auto const layerStr = displayText::loadStr(iLayer->stringID);
-	  SetWindowText(Instance->ValueWindow.operator[](LLAYR), layerStr.c_str());
+	  SetWindowText(Instance->valueWindow.operator[](LLAYR), layerStr.c_str());
 	}
 	unsid();
 	formForms::refrm();
@@ -11578,7 +11578,7 @@ auto thred::handleSideWindowActive() -> bool {
   }
   if ((form.edgeType & NEGUND) == EDGEAPPL) {
 	form.edgeType = EDGEANGSAT;
-	if (Instance->UserFlagMap.test(UserFlag::DUND)) {
+	if (Instance->userFlagMap.test(UserFlag::DUND)) {
 	  form.edgeType |= EGUND;
 	}
   }
@@ -11767,7 +11767,7 @@ auto thred::handleFormDataSheet() -> bool {
   chknum();
   unsid();
   auto&       form        = Instance->FormList.operator[](ClosestFormToCursor);
-  auto const& valueWindow = Instance->ValueWindow;
+  auto const& valueWindow = Instance->valueWindow;
   while (true) {
 	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == LabelWindow.operator[](LTXOF)) {
 	  // draw the texture fill spacing window
@@ -12190,7 +12190,7 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 
 void thred::tst() {
   DesignerName.assign(L"Coder");
-  Instance->ThrName.assign(DesignerName);
+  Instance->thrName.assign(DesignerName);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
@@ -12281,8 +12281,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  bal::setBN0(&Instance->BalaradName0);
 	  bal::setBN1(&Instance->BalaradName1);
 	  bal::setBN2(&Instance->BalaradName2);
-	  bitmap::setBBCV(&Instance->BitmapBackgroundColor);
-	  bitmap::setUBfilename(&Instance->UserBMPFileName);
+	  bitmap::setBBCV(&Instance->bitmapBackgroundColor);
+	  bitmap::setUBfilename(&Instance->userBMPFileName);
 	  DST::setColFilename(&Instance->ColorFileName);
 	  DST::setRGBFilename(&Instance->RGBFileName);
 	  texture::initTextures(
@@ -12290,7 +12290,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  tfc::setFVAS(&Instance->FormVerticesAsLine);
 	  redini();
 
-	  Instance->MenuInfo = MENUITEMINFO {
+	  Instance->menuInfo = MENUITEMINFO {
 	      sizeof(MENUITEMINFO),       // Size
 	      MIIM_TYPE,                  // Mask
 	      MFT_STRING,                 // Type
@@ -12300,7 +12300,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	      nullptr,                    // bmpChecked
 	      nullptr,                    // bmpUnchecked
 	      0,                          // ItemData
-	      Instance->FormOnOff.data(), // TypeData
+	      Instance->formOnOff.data(), // TypeData
 	      1,                          // cch (dummy value since we use SetMenuItemInfo)
 	      nullptr                     // bmpItem (available only on Windows 2000 and higher)
 	  };
@@ -12342,7 +12342,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ScrollSize   = MulDiv(ScrollSize, *ScreenDPI, STDDPI);
 	  ColorBarSize = MulDiv(ColorBarSize, *ScreenDPI, STDDPI);
 	  init();
-	  if (Instance->UserFlagMap.test(UserFlag::SAVMAX)) {
+	  if (Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
 	  }
 	  else {

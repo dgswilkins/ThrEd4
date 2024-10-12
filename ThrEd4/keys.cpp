@@ -93,10 +93,10 @@ constexpr auto byteSwap(uint32_t const data) noexcept -> uint32_t {
 void dufsel() {
   auto start = LastFormSelected > ClosestFormToCursor ? ClosestFormToCursor : LastFormSelected;
   auto const finish = LastFormSelected > ClosestFormToCursor ? LastFormSelected : ClosestFormToCursor;
-  Instance->SelectedFormList.clear();
-  Instance->SelectedFormList.reserve(wrap::toSize(finish) - start + 1U);
+  Instance->selectedFormList.clear();
+  Instance->selectedFormList.reserve(wrap::toSize(finish) - start + 1U);
   while (start <= finish) {
-	Instance->SelectedFormList.push_back(start);
+	Instance->selectedFormList.push_back(start);
 	++start;
   }
 }
@@ -594,16 +594,16 @@ void seldwn() {
 	Instance->StateMap.reset(StateFlag::SELBOX);
 	if (Instance->StateMap.testAndReset(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor != 0U) {
-		Instance->SelectedFormList.push_back(ClosestFormToCursor);
+		Instance->selectedFormList.push_back(ClosestFormToCursor);
 		LastFormSelected = ClosestFormToCursor - 1U;
-		Instance->SelectedFormList.push_back(LastFormSelected);
+		Instance->selectedFormList.push_back(LastFormSelected);
 	  }
 	  else {
 		return;
 	  }
 	}
 	else {
-	  if (!Instance->SelectedFormList.empty()) {
+	  if (!Instance->selectedFormList.empty()) {
 		if (LastFormSelected != 0U) {
 		  --LastFormSelected;
 		  dufsel();
@@ -667,16 +667,16 @@ void selup() {
 	Instance->StateMap.reset(StateFlag::SELBOX);
 	if (Instance->StateMap.testAndReset(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor < formList.size() - 1U) {
-		Instance->SelectedFormList.push_back(ClosestFormToCursor);
+		Instance->selectedFormList.push_back(ClosestFormToCursor);
 		LastFormSelected = ClosestFormToCursor + 1U;
-		Instance->SelectedFormList.push_back(LastFormSelected);
+		Instance->selectedFormList.push_back(LastFormSelected);
 	  }
 	  else {
 		return;
 	  }
 	}
 	else {
-	  if (!Instance->SelectedFormList.empty()) {
+	  if (!Instance->selectedFormList.empty()) {
 		if (LastFormSelected < formList.size() - 1U) {
 		  ++LastFormSelected;
 		  dufsel();
@@ -1167,7 +1167,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 	  break;
 	}
 	case L'F': {
-	  if (!Instance->SelectedFormList.empty()) {
+	  if (!Instance->selectedFormList.empty()) {
 		PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 		keybd_event('F', 0, 0, 0);
 		break;

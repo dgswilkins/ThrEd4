@@ -145,7 +145,7 @@ void clpcrnr(FRM_HEAD const&       form,
   auto const referencePoint = F_POINT_ATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
   ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
   auto iClip    = clipFillData.begin();
-  for (auto& clip : Instance->ClipBuffer) {
+  for (auto& clip : Instance->clipBuffer) {
 	*iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	++iClip;
   }
@@ -223,7 +223,7 @@ void clpsub(uint32_t const formIndex, uint32_t const cnt) {
 
 void clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   dulast(chainEndPoints);
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto& clipBuffer = Instance->clipBuffer;
 
   if (auto const& form = Instance->FormList.operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
@@ -312,7 +312,7 @@ void dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
   listSINEs.reserve(wrap::toSize(form.vertexCount) + 1U);
   auto listCOSINEs = std::vector<float> {};
   listCOSINEs.reserve(form.vertexCount);
-  auto const& formAngles = Instance->FormAngles;
+  auto const& formAngles = Instance->formAngles;
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	listSINEs.push_back(sin(formAngles.operator[](iVertex)));
 	listCOSINEs.push_back(cos(formAngles.operator[](iVertex)));
@@ -356,7 +356,7 @@ void dulast(std::vector<F_POINT>& chainEndPoints) {
 }
 
 void durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept {
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto& clipBuffer = Instance->clipBuffer;
 
   if (clipBuffer.empty()) {
 	return;
@@ -675,7 +675,7 @@ void picfn(FRM_HEAD const&       form,
 	step           = val;
   }
   auto iClip = clipFillData.begin();
-  for (auto& clip : Instance->ClipBuffer) {
+  for (auto& clip : Instance->clipBuffer) {
 	*iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	++iClip;
   }
@@ -817,7 +817,7 @@ auto clip::nueclp(uint32_t const currentForm, uint32_t const count) -> uint32_t 
 }
 
 auto clip::numclp(uint32_t const formIndex) -> uint32_t {
-  auto const clipSize    = wrap::toUnsigned(Instance->ClipBuffer.size());
+  auto const clipSize    = wrap::toUnsigned(Instance->clipBuffer.size());
   auto const find        = findclp(formIndex);
   auto const itClipPoint = wrap::next(Instance->ClipPoints.cbegin(), find);
   auto constexpr VAL     = F_POINT {};
@@ -845,7 +845,7 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const 
   if (Instance->StateMap.test(StateFlag::NOCLP)) {
 	return;
   }
-  auto& clipBuffer = Instance->ClipBuffer;
+  auto& clipBuffer = Instance->clipBuffer;
 
   clipBuffer.clear();
   if (clipEntries != 0U) {
@@ -882,7 +882,7 @@ void clip::clpout(float const width) {
 	return;
   }
   satin::satout(form, ClipRectSize.cy);
-  auto& insidePointList = Instance->InsidePointList;
+  auto& insidePointList = Instance->insidePointList;
   insidePointList.clear();
   auto const itStartVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
   auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
@@ -893,7 +893,7 @@ void clip::clpout(float const width) {
 void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t const startVertex) {
   Instance->OSequence.clear();
   Instance->StateMap.reset(StateFlag::CLPBAK);
-  auto const clipStitchCount = Instance->ClipBuffer.size();
+  auto const clipStitchCount = Instance->clipBuffer.size();
   auto       clipFillData    = std::vector<F_POINT> {};
   clipFillData.resize(clipStitchCount);
   auto clipReversedData = std::vector<F_POINT> {};
@@ -942,7 +942,7 @@ void clip::duxclp(FRM_HEAD const& form) {
   chainEndPoints.reserve(CLRES);
   dufxlen(form, chainEndPoints);
   auto tempClipPoints = std::vector<F_POINT> {};
-  tempClipPoints.reserve(Instance->ClipBuffer.size());
+  tempClipPoints.reserve(Instance->clipBuffer.size());
   clpxadj(tempClipPoints, chainEndPoints);
   Instance->OSequence.clear();
   auto constexpr ROTATION_CENTER = F_POINT {};
@@ -956,7 +956,7 @@ void clip::duxclp(FRM_HEAD const& form) {
 
 void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   auto clipFillData = std::vector<F_POINT> {};
-  clipFillData.resize(Instance->ClipBuffer.size());
+  clipFillData.resize(Instance->clipBuffer.size());
   auto const rotationCenter =
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   Instance->OSequence.clear();

@@ -527,11 +527,11 @@ void adfrm(uint32_t const iForm) {
       Instance->FormVertices.end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
   if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
 	auto const originalGuide    = currentForm.satinGuideIndex;
-	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
+	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
 
-	auto const itGuides = wrap::next(Instance->SatinGuides.cbegin(), originalGuide);
-	Instance->SatinGuides.insert(
-	    Instance->SatinGuides.end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
+	auto const itGuides = wrap::next(Instance->satinGuides.cbegin(), originalGuide);
+	Instance->satinGuides.insert(
+	    Instance->satinGuides.end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
   }
   if (currentForm.isEdgeClipX()) {
 	auto const originalBCData  = currentForm.borderClipData;
@@ -588,7 +588,7 @@ void frmToLine(FRM_HEAD const& form) {
   if (form.vertexCount == 0U) {
 	return;
   }
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines.clear();
   formLines.reserve(form.vertexCount);
   auto const itFirstVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
@@ -684,7 +684,7 @@ void drawStartGuide(FRM_HEAD const& form,
                     uint8_t const   layer,
                     unsigned int&   lastPoint) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   SelectObject(StitchWindowMemDC, FormPen);
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   frmpoly(gsl::span(std::addressof(formLines.operator[](1)), form.wordParam - 1));
   SelectObject(StitchWindowMemDC, FormPen3px);
   wrap::polyline(StitchWindowMemDC, std::addressof(formLines.operator[](form.wordParam)), LNPNTS);
@@ -695,7 +695,7 @@ void drawStartGuide(FRM_HEAD const& form,
 void drawGuides(FRM_HEAD const& form) {
   auto       line          = std::array<POINT, 2> {};
   auto const itFirstVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
-  auto       itGuide       = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+  auto       itGuide       = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
   auto const maxGuide      = form.satinGuideCount;
   for (auto iGuide = 0U; iGuide < maxGuide; ++iGuide) {
 	auto const itStartVertex  = wrap::next(itFirstVertex, itGuide->start);
@@ -709,7 +709,7 @@ void drawGuides(FRM_HEAD const& form) {
 }
 
 void drawFormBox(FRM_HEAD const& form) {
-  auto const& formLines = Instance->FormLines;
+  auto const& formLines = Instance->formLines;
   for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 	if (iVertex == ClosestVertexToCursor) {
 	  frmx(formLines.operator[](iVertex), StitchWindowMemDC);
@@ -731,7 +731,7 @@ void drawFormsBox() {
   SelectObject(StitchWindowMemDC, MultiFormPen);
   form::ratsr();
   SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	form::fselrct(selectedForm);
   }
   wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
@@ -876,7 +876,7 @@ void ritbrd(FRM_HEAD const& form) {
   if (Instance->OSequence.empty()) {
 	return;
   }
-  Instance->InterleaveSequenceIndices.emplace_back(
+  Instance->interleaveSequenceIndices.emplace_back(
       INS_REC {.code  = TYPBRD,
                .color = gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
                .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
@@ -889,7 +889,7 @@ void ritapbrd() {
 	return;
   }
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
-  Instance->InterleaveSequenceIndices.emplace_back(
+  Instance->interleaveSequenceIndices.emplace_back(
       INS_REC {.code  = TYPMSK,
                .color = gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
                .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
@@ -901,7 +901,7 @@ void ritfil(FRM_HEAD& form) {
   if (Instance->OSequence.empty()) {
 	return;
   }
-  Instance->InterleaveSequenceIndices.emplace_back(
+  Instance->interleaveSequenceIndices.emplace_back(
       INS_REC {.code  = TYPFRM,
                .color = gsl::narrow_cast<uint32_t>(form.fillColor),
                .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
@@ -915,11 +915,11 @@ void bdrlin(uint32_t const vertexIndex, uint32_t const start, uint32_t const fin
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
   auto const length      = std::hypot(delta.x, delta.y);
-  auto       stitchCount = Instance->UserFlagMap.test(UserFlag::LINSPAC)
+  auto       stitchCount = Instance->userFlagMap.test(UserFlag::LINSPAC)
                                ? wrap::ceil<uint32_t>(length / stitchSize)
                                : wrap::round<uint32_t>(((length - stitchSize * HALF) / stitchSize) + 1.0F);
   auto       step        = F_POINT {};
-  if (Instance->UserFlagMap.test(UserFlag::LINSPAC)) {
+  if (Instance->userFlagMap.test(UserFlag::LINSPAC)) {
 	if (stitchCount != 0U) {
 	  step = delta / wrap::toFloat(stitchCount);
 	}
@@ -1620,10 +1620,10 @@ void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& ang
   OutsidePoints->push_back(OutsidePoints->front());
   auto const& outsidePoints = *OutsidePoints;
   for (auto iVertex = 0U; iVertex < angledForm.vertexCount - 1U; ++iVertex) {
-	sprct(Instance->AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U, outsidePoints);
+	sprct(Instance->angledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U, outsidePoints);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
   }
-  sprct(Instance->AngledFormVertices, 0U, fillVerticalRect, angledForm.vertexCount - 1U, 0U, outsidePoints);
+  sprct(Instance->angledFormVertices, 0U, fillVerticalRect, angledForm.vertexCount - 1U, 0U, outsidePoints);
   spurct(underlayVerticalRect, fillVerticalRect, angledForm.vertexCount - 1U);
   auto const itVertex = wrap::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
   if ((angledForm.attribute & SBLNT) == 0U) {
@@ -2398,7 +2398,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
   if (auto iclpxSize = wrap::toUnsigned(iclpx.size()); iclpxSize != 0U) {
 	--iclpxSize;
 	bool  breakFlag  = false;
-	auto& clipBuffer = Instance->ClipBuffer;
+	auto& clipBuffer = Instance->clipBuffer;
 
 	for (auto iRegion = 0U; iRegion < iclpxSize; ++iRegion) {
 	  auto regionCrossingStart = iclpx[iRegion];
@@ -2991,7 +2991,7 @@ void brkdun(std::vector<SMAL_PNT_L> const& lineEndpoints,
             uint32_t const                 start,
             uint32_t const                 finish,
             std::vector<F_POINT>&          workingFormVertices) {
-  auto& bSequence = Instance->BSequence;
+  auto& bSequence = Instance->bSequence;
   bSequence.emplace_back(
       lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y, 0);
   bSequence.emplace_back(
@@ -3009,7 +3009,7 @@ void duseq1(std::vector<SMAL_PNT_L> const& lineEndpoints,
   auto        index     = sortedLineIndices[sequenceIndex];
   auto const& sequence0 = lineEndpoints[index];
   auto const& sequence1 = lineEndpoints[++index];
-  Instance->BSequence.emplace_back(
+  Instance->bSequence.emplace_back(
       wrap::midl(sequence1.x, sequence0.x), wrap::midl(sequence1.y, sequence0.y), 0);
 }
 
@@ -3017,7 +3017,7 @@ void movseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
             std::vector<uint32_t> const&   sortedLineIndices,
             uint32_t const                 ind) {
   auto  lineEndPoint = wrap::next(lineEndpoints.begin(), sortedLineIndices[ind]);
-  auto& bSequence    = Instance->BSequence;
+  auto& bSequence    = Instance->bSequence;
 
   bSequence.emplace_back(lineEndPoint->x, lineEndPoint->y, SEQBOT);
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
@@ -3045,7 +3045,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	  auto const iLineDec = iLine - 1U;
 	  --savedGroup;
 	  if (lineEndpoints[sortedLineIndices[iLineDec]].group != savedGroup) {
-		auto& bSequence = Instance->BSequence;
+		auto& bSequence = Instance->bSequence;
 		bSequence.emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
 		                       lineEndpoints[sortedLineIndices[sequenceIndex]].y,
 		                       0);
@@ -3074,7 +3074,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	for (auto iLine = start; iLine <= finish; ++iLine) {
 	  ++savedGroup;
 	  if (lineEndpoints[sortedLineIndices[iLine]].group != savedGroup) {
-		auto& bSequence = Instance->BSequence;
+		auto& bSequence = Instance->bSequence;
 		bSequence.emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
 		                       lineEndpoints[sortedLineIndices[sequenceIndex]].y,
 		                       0);
@@ -3121,7 +3121,7 @@ void dunseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
   else {
 	minimumY *= HALF;
   }
-  auto& bSequence = Instance->BSequence;
+  auto& bSequence = Instance->bSequence;
   bSequence.emplace_back(
       lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y + minimumY, 0);
   bSequence.emplace_back(lineEndpoints[sortedLineIndices[finish]].x,
@@ -3237,7 +3237,7 @@ void durgn(FRM_HEAD const&                form,
   auto const& currentRegion = regionsList[iRegion];
   auto const  sequenceStart = currentRegion.start;
   auto const  sequenceEnd   = currentRegion.end;
-  auto&       bSequence     = Instance->BSequence;
+  auto&       bSequence     = Instance->bSequence;
 
   if (sequencePath[pthi].skp || Instance->StateMap.testAndReset(StateFlag::BRKFIX)) {
 	if (auto iter = std::prev(bSequence.end()); iter->attribute != SEQBOT) {
@@ -3518,7 +3518,7 @@ void lcon(FRM_HEAD const&              form,
 	bugColor &= 0xf;
   }
 #else
-  Instance->BSequence.clear();
+  Instance->bSequence.clear();
   auto mapIndexSequence = std::vector<uint32_t> {};
   mapIndexSequence.reserve(wrap::toSize(regionCount) + 1U);
   auto pathMap      = std::vector<R_CON> {};
@@ -3651,7 +3651,7 @@ void handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
       17,
   };
 
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
 
   auto const& bNext     = bSequence.operator[](iSequence + 1U);
   auto const& bPrevious = bSequence.operator[](iSequence - 1U);
@@ -3724,7 +3724,7 @@ void handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
       17,
   };
 
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
 
   auto const& bNext = bSequence.operator[](iSequence + 1U);
   auto        delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
@@ -3760,7 +3760,7 @@ void handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
 }
 
 auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
-  auto const& bNext = Instance->BSequence.operator[](iSequence + 1U);
+  auto const& bNext = Instance->bSequence.operator[](iSequence + 1U);
   auto const  delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 
   Instance->StateMap.reset(StateFlag::FILDIR);
@@ -3791,7 +3791,7 @@ auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
 }
 
 void bakseq() {
-  auto& bSequence = Instance->BSequence;
+  auto& bSequence = Instance->bSequence;
 
 #if BUGSEQ
 #else
@@ -4036,7 +4036,7 @@ void trfrm(F_POINT const& bottomLeftPoint,
            F_POINT const& topRightPoint) {
   auto const topDelta    = topRightPoint - topLeftPoint;
   auto const bottomDelta = bottomRightPoint - bottomLeftPoint;
-  for (auto const& clip : Instance->ClipBuffer) {
+  for (auto const& clip : Instance->clipBuffer) {
 	auto const clipRatio   = F_POINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
 	auto const topMidpoint = F_POINT {(clipRatio.x * topDelta.x) + topLeftPoint.x,
 	                                  (clipRatio.x * topDelta.y) + topLeftPoint.y};
@@ -4051,7 +4051,7 @@ void trfrm(F_POINT const& bottomLeftPoint,
 }
 
 void clpfm() {
-  auto const& bSequence = Instance->BSequence;
+  auto const& bSequence = Instance->bSequence;
   auto const  endIt     = wrap::toUnsigned(bSequence.size()) - 2U;
 
   for (auto iSequence = 0U; iSequence < endIt; iSequence += 2) {
@@ -4125,7 +4125,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	case EDGEPROPSAT: {
 	  if (form.vertexCount > 2) {
 		Instance->StateMap.reset(StateFlag::SAT1);
-		plbrd(form, angledForm, Instance->AngledFormVertices);
+		plbrd(form, angledForm, Instance->angledFormVertices);
 		ritbrd(form);
 	  }
 	  break;
@@ -4208,20 +4208,20 @@ void swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_COUNT>
 	}
 	case HORF: { // horizontal fill
 	  rotationAngle = PI_FHALF;
-	  fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, Instance->AngledFormVertices);
+	  fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, Instance->angledFormVertices);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(angledForm.vertexCount);
-	  auto const itStartVertex = wrap::next(Instance->AngledFormVertices.cbegin(), angledForm.vertexIndex);
+	  auto const itStartVertex = wrap::next(Instance->angledFormVertices.cbegin(), angledForm.vertexIndex);
 	  auto const itEndVertex = wrap::next(itStartVertex, angledForm.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
 	}
 	case ANGF: { // angled fill
 	  rotationAngle = PI_FHALF - form.fillAngle;
-	  fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, Instance->AngledFormVertices);
+	  fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, Instance->angledFormVertices);
 	  workingFormVertices.clear();
 	  workingFormVertices.reserve(angledForm.vertexCount);
-	  auto const itStartVertex = wrap::next(Instance->AngledFormVertices.cbegin(), angledForm.vertexIndex);
+	  auto const itStartVertex = wrap::next(Instance->angledFormVertices.cbegin(), angledForm.vertexIndex);
 	  auto const itEndVertex = wrap::next(itStartVertex, angledForm.vertexCount);
 	  workingFormVertices.insert(workingFormVertices.end(), itStartVertex, itEndVertex);
 	  break;
@@ -4241,7 +4241,7 @@ void swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_COUNT>
 	case HCLPF: { // horizontal clip fill
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
-	  horclpfn(textureSegments, angledForm, Instance->AngledFormVertices);
+	  horclpfn(textureSegments, angledForm, Instance->angledFormVertices);
 	  doFill = false;
 	  break;
 	}
@@ -4249,7 +4249,7 @@ void swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_COUNT>
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
 	  Instance->StateMap.reset(StateFlag::ISUND);
-	  form::angclpfn(form, textureSegments, Instance->AngledFormVertices);
+	  form::angclpfn(form, textureSegments, Instance->angledFormVertices);
 	  doFill = false;
 	  break;
 	}
@@ -4266,14 +4266,14 @@ void swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_COUNT>
 	}
 	case TXHORF: { // horizontal fill with texture
 	  texture::setxt(form, textureSegments);
-	  horclpfn(textureSegments, angledForm, Instance->AngledFormVertices);
+	  horclpfn(textureSegments, angledForm, Instance->angledFormVertices);
 	  doFill = false;
 	  break;
 	}
 	case TXANGF: { // angled fill with texture
 	  texture::setxt(form, textureSegments);
 	  Instance->StateMap.reset(StateFlag::ISUND);
-	  form::angclpfn(form, textureSegments, Instance->AngledFormVertices);
+	  form::angclpfn(form, textureSegments, Instance->angledFormVertices);
 	  doFill = false;
 	  break;
 	}
@@ -4341,7 +4341,7 @@ void fsvrt() {
   form.fillType    = VRTF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
   form::refilfn(ClosestFormToCursor);
 }
 
@@ -4355,7 +4355,7 @@ void fshor(FRM_HEAD& form) {
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
   form.fillAngle = PI_FHALF;
-  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
   form::refil(ClosestFormToCursor);
 }
 
@@ -4369,14 +4369,14 @@ void fsangl(FRM_HEAD& form) {
   form.fillAngle   = IniFile.fillAngle;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
+  form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
   form::refil(ClosestFormToCursor);
 }
 
 void ducon() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, Instance->FormLines.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, Instance->formLines.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -4455,7 +4455,7 @@ void nufpnt(uint32_t const vertex, FRM_HEAD& formForInsert, F_POINT const stitch
   auto const itVertex = wrap::next(Instance->FormVertices.begin(), formForInsert.vertexIndex + vertex + 1U);
   *itVertex = stitchPoint;
   if (formForInsert.satinGuideCount != 0U) {
-	auto itGuide = wrap::next(Instance->SatinGuides.begin(), formForInsert.satinGuideIndex);
+	auto itGuide = wrap::next(Instance->satinGuides.begin(), formForInsert.satinGuideIndex);
 	for (auto ind = 0U; ind < formForInsert.satinGuideCount; ++ind) {
 	  if (itGuide->start > vertex) {
 		++itGuide->start;
@@ -4492,7 +4492,7 @@ void sbord(uint32_t const formIndex) {
 void fsclp(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGECLIP;
@@ -4515,7 +4515,7 @@ void sapliq(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
   form.edgeType = EDGEAPPL;
-  if (Instance->UserFlagMap.test(UserFlag::DUND)) {
+  if (Instance->userFlagMap.test(UserFlag::DUND)) {
 	form.edgeType |= EGUND;
   }
   form.edgeSpacing = LineSpacing * HALF;
@@ -4600,7 +4600,7 @@ void resizeBigBox(F_POINT const& stitchReference, F_POINT const& ratio) {
 }
 
 void resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& ratio) {
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	auto& form = Instance->FormList.operator[](selectedForm);
 
 	auto const& formVertexCount = form.vertexCount;
@@ -4660,7 +4660,7 @@ void prpsbrd(uint32_t const formIndex) {
   }
   clip::deleclp(formIndex);
   form.edgeType = EDGEPROPSAT;
-  if (Instance->UserFlagMap.test(UserFlag::DUND)) {
+  if (Instance->userFlagMap.test(UserFlag::DUND)) {
 	form.edgeType |= EGUND;
   }
   form::bsizpar(form);
@@ -4689,7 +4689,7 @@ void filsclp() {
   currentForm.type       = SAT;
   currentForm.fillType   = CLPF;
   currentForm.clipIndex  = clip::numclp(ClosestFormToCursor);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   currentForm.clipCount = wrap::toUnsigned(clipBuffer.size());
   auto itClipPoints     = wrap::next(Instance->ClipPoints.begin(), currentForm.clipIndex);
@@ -4738,7 +4738,7 @@ void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std:
   auto const timeDC       = GetDC(timeWindow);
   auto const timeStep     = wrap::toFloat(StitchWindowSize.cx) / rangeX;
   auto       timePosition = 0.0F;
-  auto&      formLines    = Instance->FormLines;
+  auto&      formLines    = Instance->formLines;
   formLines.clear();
   formLines.push_back(POINT {});
   formLines.push_back(POINT {0, ButtonHeight});
@@ -4810,8 +4810,8 @@ void snp(uint32_t const start, uint32_t const finish) {
 void dufcntr(F_POINT& center) noexcept {
   auto const& formList = Instance->FormList;
 
-  auto bigRect = formList.operator[](Instance->SelectedFormList.front()).rectangle;
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  auto bigRect = formList.operator[](Instance->selectedFormList.front()).rectangle;
+  for (auto const selectedForm : Instance->selectedFormList) {
 	auto const formRect = formList.operator[](selectedForm).rectangle;
 	bigRect.left        = std::min(formRect.left, bigRect.left);
 	bigRect.top         = std::max(formRect.top, bigRect.top);
@@ -4829,7 +4829,7 @@ void rotentr(float const rotationAngle) {
 
 void fnagain(float const rotationAngle) {
   if (!Instance->StateMap.test(StateFlag::FORMSEL) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
-      Instance->SelectedFormList.empty() && !Instance->StateMap.test(StateFlag::BIGBOX) &&
+      Instance->selectedFormList.empty() && !Instance->StateMap.test(StateFlag::BIGBOX) &&
       !Instance->StateMap.test(StateFlag::FPSEL)) {
 	displayText::alrotmsg();
 	return;
@@ -4850,7 +4850,7 @@ void duprot(float const rotationAngle) {
 
 void duprotfs(float const rotationAngle) {
   auto const rotationCenter = form::rotpar();
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	adfrm(selectedForm);
 	form::refil(wrap::toUnsigned(Instance->FormList.size() - 1U));
   }
@@ -4889,12 +4889,12 @@ void cplayfn(uint32_t const iForm, uint32_t const layer) {
             wrap::next(Instance->FormVertices.begin(), currentForm.vertexIndex));
   if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
 	auto const originalGuide    = currentForm.satinGuideIndex;
-	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
+	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
 
-	auto const itStartGuide = wrap::next(Instance->SatinGuides.cbegin(), originalGuide);
+	auto const itStartGuide = wrap::next(Instance->satinGuides.cbegin(), originalGuide);
 	auto const itEndGuide   = wrap::next(itStartGuide, currentForm.satinGuideCount);
-	auto const destination  = Instance->SatinGuides.end();
-	Instance->SatinGuides.insert(destination, itStartGuide, itEndGuide);
+	auto const destination  = Instance->satinGuides.end();
+	Instance->satinGuides.insert(destination, itStartGuide, itEndGuide);
   }
   currentForm.clipEntries   = 0;
   currentForm.fillType      = 0;
@@ -4904,7 +4904,7 @@ void cplayfn(uint32_t const iForm, uint32_t const layer) {
   currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
-  currentForm.squareEnd(Instance->UserFlagMap.test(UserFlag::SQRFIL));
+  currentForm.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
   formList.push_back(currentForm);
 }
 
@@ -4953,7 +4953,7 @@ void bholbrd(uint32_t const formIndex) {
 void fspic(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGEPICOT;
@@ -5037,7 +5037,7 @@ void dufdat(std::vector<F_POINT>&  tempClipPoints,
   dest.vertexIndex = formSourceIndex;
   formSourceIndex += dest.vertexCount;
   if (dest.satinGuideCount != 0U) {
-	auto const itStartGuide = wrap::next(Instance->SatinGuides.cbegin(), dest.satinGuideIndex);
+	auto const itStartGuide = wrap::next(Instance->satinGuides.cbegin(), dest.satinGuideIndex);
 	auto const itEndGuide   = wrap::next(itStartGuide, dest.satinGuideCount);
 	tempGuides.insert(tempGuides.end(), itStartGuide, itEndGuide);
 	dest.satinGuideIndex = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
@@ -5222,7 +5222,7 @@ void chan(uint32_t const formIndex) {
 void fsclpx(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::deleclp(formIndex);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.edgeType       = EDGECLIPX;
@@ -5353,7 +5353,7 @@ void form::chkcont() {
 	if (form.satinGuideCount != 0U) {
 	  auto shortestGuideIndex = 0U;
 	  auto minimumLength      = MAXDWORD;
-	  auto itGuide            = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+	  auto itGuide            = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (auto const length = itGuide->finish - itGuide->start; length < minimumLength) {
 		  minimumLength      = length;
@@ -5362,7 +5362,7 @@ void form::chkcont() {
 		++itGuide;
 	  }
 	  auto const shortestGuide =
-	      wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex + shortestGuideIndex);
+	      wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex + shortestGuideIndex);
 
 	  form.fillGuide = *shortestGuide;
 	  satin::delsac(ClosestFormToCursor);
@@ -5400,7 +5400,7 @@ void form::frmlin(std::vector<F_POINT> const& vertices) {
   if (vertexMax == 0U) {
 	return;
   }
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines.clear();
   formLines.reserve(vertexMax);
   for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
@@ -5416,7 +5416,7 @@ void form::frmlin(std::vector<F_POINT> const& vertices) {
 void form::dufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, Instance->FormLines.data(), NewFormVertexCount);
+  wrap::polyline(StitchWindowDC, Instance->formLines.data(), NewFormVertexCount);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5429,7 +5429,7 @@ void form::unfrm() {
 void form::mdufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  auto const& formLines = Instance->FormLines;
+  auto const& formLines = Instance->formLines;
   if (Instance->FormList.operator[](ClosestFormToCursor).type == FRMLINE) {
 	wrap::polyline(StitchWindowDC, formLines.data(), NewFormVertexCount - 1);
   }
@@ -5453,7 +5453,7 @@ void form::setfrm() {
   }
   rats();
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
-  auto const point    = px2stchf(Instance->FormLines.front());
+  auto const point    = px2stchf(Instance->formLines.front());
   auto const newCount = NewFormVertexCount - 1U; // -1 to account for the last point being the same as the first
   auto const spVertices = gsl::span(Instance->FormVertices).subspan(formList.back().vertexIndex, newCount);
   auto const delta = F_POINT {point.x - spVertices.front().x, point.y - spVertices.front().y};
@@ -5537,8 +5537,8 @@ void form::ritfrct(uint32_t const iForm, HDC hDC) {
   SetROP2(StitchWindowDC, R2_COPYPEN);
   if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
 	Instance->StateMap.reset(StateFlag::SELSHO);
-	Instance->SearchLine.clear();
-	Instance->SearchLine.shrink_to_fit();
+	Instance->searchLine.clear();
+	Instance->searchLine.shrink_to_fit();
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
 }
@@ -5549,7 +5549,7 @@ void form::delfrms() {
   Instance->FormVertices.clear();
   Instance->ClipPoints.clear();
   Instance->FormList.clear();
-  Instance->SatinGuides.clear();
+  Instance->satinGuides.clear();
   for (auto& stitch : Instance->StitchBuffer) {
 	stitch.attribute &= NFRM_NTYP;
 	stitch.attribute |= NOTFRM;
@@ -5599,13 +5599,13 @@ void form::rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept {
 }
 
 void form::dubig() {
-  rct2sel(SelectedFormsRect, Instance->SelectedFormsLine);
+  rct2sel(SelectedFormsRect, Instance->selectedFormsLine);
   SelectObject(StitchWindowMemDC, SelectAllPen);
   wrap::polyline(StitchWindowMemDC,
-                 Instance->SelectedFormsLine.data(),
-                 wrap::toUnsigned(Instance->SelectedFormsLine.size()));
-  for (auto iPoint = 0U; iPoint < Instance->SelectedFormsLine.size() - 1U; ++iPoint) {
-	selsqr(Instance->SelectedFormsLine.operator[](iPoint), StitchWindowMemDC);
+                 Instance->selectedFormsLine.data(),
+                 wrap::toUnsigned(Instance->selectedFormsLine.size()));
+  for (auto iPoint = 0U; iPoint < Instance->selectedFormsLine.size() - 1U; ++iPoint) {
+	selsqr(Instance->selectedFormsLine.operator[](iPoint), StitchWindowMemDC);
   }
 }
 
@@ -5614,9 +5614,9 @@ void form::dupsel(HDC hDC) {
   SelectObject(hDC, FormPen);
   SetROP2(hDC, R2_XORPEN);
   wrap::polyline(
-      hDC, Instance->SelectedPointsLine.data(), wrap::toUnsigned(Instance->SelectedPointsLine.size()));
-  for (auto iPoint = 0U; iPoint < Instance->SelectedPointsLine.size() - 1U; ++iPoint) {
-	selsqr(Instance->SelectedPointsLine.operator[](iPoint), hDC);
+      hDC, Instance->selectedPointsLine.data(), wrap::toUnsigned(Instance->selectedPointsLine.size()));
+  for (auto iPoint = 0U; iPoint < Instance->selectedPointsLine.size() - 1U; ++iPoint) {
+	selsqr(Instance->selectedPointsLine.operator[](iPoint), hDC);
   }
   frmx(EndPointCross, hDC);
 }
@@ -5645,7 +5645,7 @@ void form::drwfrm() {
   thred::duzrat();
   auto const maxForm = Instance->FormList.size();
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
-	auto&       formLines = Instance->FormLines;
+	auto&       formLines = Instance->formLines;
 	auto const& form      = Instance->FormList.operator[](iForm);
 	frmToLine(form);
 	if (formLines.empty()) {
@@ -5705,12 +5705,12 @@ void form::drwfrm() {
 	    ClosestFormToCursor == iForm) { // if form points are selected, draw the selection box
 	  dupsel(StitchWindowMemDC);
 	  SelectedPixelsRect = sRct2px(SelectedVerticesRect);
-	  rct2sel(SelectedPixelsRect, Instance->SelectedPointsLine);
+	  rct2sel(SelectedPixelsRect, Instance->selectedPointsLine);
 	  Instance->StateMap.set(StateFlag::SHOPSEL);
 	  dupsel(StitchWindowMemDC);
 	}
   }
-  if (!Instance->SelectedFormList.empty()) { // if there are selected forms, draw the selection box
+  if (!Instance->selectedFormList.empty()) { // if there are selected forms, draw the selection box
 	drawFormsBox();
   }
   else { // if there are no selected forms, erase the selection box
@@ -5719,7 +5719,7 @@ void form::drwfrm() {
 	}
 	if (Instance->StateMap.test(StateFlag::FRMPMOV)) { // if the user is moving a form point
 	  thred::ritmov(ClosestFormToCursor);
-	  Instance->RubberBandLine.operator[](1) =
+	  Instance->rubberBandLine.operator[](1) =
 	      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->StateMap.set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
@@ -5736,7 +5736,7 @@ void form::setmfrm(uint32_t const formIndex) {
   auto const offset =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
              WinMsg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
 	point            = sfCor2px(*itVertex);
@@ -5834,7 +5834,7 @@ void form::flipv() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::BIGBOX)) {
-	auto const offset = Instance->AllItemsRect.top + Instance->AllItemsRect.bottom;
+	auto const offset = Instance->allItemsRect.top + Instance->allItemsRect.bottom;
 	for (auto& formVertice : Instance->FormVertices) {
 	  formVertice.y = offset - formVertice.y;
 	}
@@ -5848,12 +5848,12 @@ void form::flipv() {
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	auto formMap = boost::dynamic_bitset {formList.size()}; // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	auto rectangle = F_RECTANGLE {};
 	pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.top + rectangle.bottom;
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& iForm = formList.operator[](selectedForm);
 	  formMap.set(selectedForm);
 	  auto itVertex = wrap::next(Instance->FormVertices.begin(), iForm.vertexIndex);
@@ -6024,9 +6024,9 @@ void form::frmovlin() {
   }
   frmToLine(form);
   auto        previousPoint = prv(form, ClosestVertexToCursor);
-  auto const& formLines     = Instance->FormLines;
+  auto const& formLines     = Instance->formLines;
   for (auto iPoint = 0U; iPoint < 3U; ++iPoint) {
-	Instance->RubberBandLine.operator[](iPoint) = formLines[previousPoint];
+	Instance->rubberBandLine.operator[](iPoint) = formLines[previousPoint];
 
 	previousPoint = nxt(form, previousPoint);
   }
@@ -6206,11 +6206,11 @@ void form::savplen(float length) {
 }
 
 void form::duangs(FRM_HEAD const& form) {
-  auto& formAngles = Instance->FormAngles;
+  auto& formAngles = Instance->formAngles;
   formAngles.clear();
   auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
   if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
-	itVertex = wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex);
+	itVertex = wrap::next(Instance->angledFormVertices.cbegin(), form.vertexIndex);
   }
   auto const vMax = gsl::narrow<ptrdiff_t>(form.vertexCount - 1U);
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
@@ -6233,7 +6233,7 @@ auto form::cisin(FRM_HEAD const& form,
   auto intersection = F_POINT {};
   auto itVertex     = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
   if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
-	itVertex = wrap::next(Instance->AngledFormVertices.cbegin(), form.vertexIndex);
+	itVertex = wrap::next(Instance->angledFormVertices.cbegin(), form.vertexIndex);
   }
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const itThisVertex = wrap::next(itVertex, iVertex);
@@ -6403,7 +6403,7 @@ void form::refilfn(uint32_t const formIndex) {
 	form.type = FRMFPOLY;
   }
   Instance->InterleaveSequence.clear();
-  Instance->InterleaveSequenceIndices.clear();
+  Instance->interleaveSequenceIndices.clear();
   Instance->StateMap.reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};
   textureSegments.resize(wrap::toSize(form.texture.lines));
@@ -6419,7 +6419,7 @@ void form::refilfn(uint32_t const formIndex) {
 	case FRMFPOLY: {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
-	  xt::chkund(formIndex, textureSegments, Instance->AngledFormVertices);
+	  xt::chkund(formIndex, textureSegments, Instance->angledFormVertices);
 	  Instance->StateMap.reset(StateFlag::ISUND);
 	  if (form.fillType == 0U) {
 		chkbrd(form);
@@ -6436,7 +6436,7 @@ void form::refilfn(uint32_t const formIndex) {
 	case SAT: {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
-	  xt::chkund(formIndex, textureSegments, Instance->AngledFormVertices);
+	  xt::chkund(formIndex, textureSegments, Instance->angledFormVertices);
 	  Instance->StateMap.reset(StateFlag::ISUND);
 	  swSatFillType(form);
 	  chkbrd(form);
@@ -6454,7 +6454,7 @@ void form::refilfn(uint32_t const formIndex) {
 }
 
 void form::refil(uint32_t const formIndex) {
-  if (Instance->UserFlagMap.test(UserFlag::WRNOF)) {
+  if (Instance->userFlagMap.test(UserFlag::WRNOF)) {
 	refilfn(formIndex);
 	return;
   }
@@ -6499,9 +6499,9 @@ void form::filvrt() {
   if (!displayText::filmsgs(FMM_VRT)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (auto const& currentForm = Instance->FormList.operator[](ClosestFormToCursor);
 	      currentForm.type != FRMLINE) {
@@ -6526,8 +6526,8 @@ void form::filhor() {
   if (!displayText::filmsgs(FMM_HOR)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (auto& form = Instance->FormList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
 		fshor(form);
@@ -6552,9 +6552,9 @@ void form::filangl() {
   if (!displayText::filmsgs(FMM_ANG)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (auto& form = formList.operator[](selectedForm); form.type != FRMLINE) {
 		fsangl(form);
@@ -6669,7 +6669,7 @@ void form::clrfills() noexcept {
 
 void form::drwcon() {
   uncon();
-  auto& formLines = Instance->FormLines;
+  auto& formLines = Instance->formLines;
   formLines[1]    = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   Instance->StateMap.set(StateFlag::SHOCON);
   ducon();
@@ -6705,7 +6705,7 @@ void form::rotfrm(FRM_HEAD& form, uint32_t const newStartVertex) {
 		form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
 	  }
 	  if (form.satinGuideCount != 0U) {
-		auto const itStartGuide = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
+		auto const itStartGuide = wrap::next(Instance->satinGuides.begin(), form.satinGuideIndex);
 		auto       rotatedIt    = itStartGuide; // intended copy
 		auto       itGuide      = itStartGuide; // intended copy
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
@@ -6741,9 +6741,9 @@ void form::filsat() {
   if (!displayText::filmsgs(FMM_FAN)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  if (auto const& currentForm = Instance->FormList.operator[](selectedForm); currentForm.type != FRMLINE) {
 		filsfn(selectedForm);
 	  }
@@ -6810,9 +6810,9 @@ void form::unfil() {
   }
   auto& formList = Instance->FormList;
 
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  if (auto& form = formList.operator[](selectedForm); form.fillType != 0U || form.edgeType != 0U) {
 		clip::delclps(selectedForm);
 		texture::deltx(selectedForm);
@@ -6834,7 +6834,7 @@ void form::unfil() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
-	if (!Instance->StateMap.testAndReset(StateFlag::IGNOR) && !Instance->UserFlagMap.test(UserFlag::WRNOF)) {
+	if (!Instance->StateMap.testAndReset(StateFlag::IGNOR) && !Instance->userFlagMap.test(UserFlag::WRNOF)) {
 	  if (auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
 	      std::ranges::any_of(Instance->StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
 		    return (stitch.attribute & NOTFRM) == 0U && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
@@ -6887,7 +6887,7 @@ void form::rinfrm() {
   frmToLine(*FormForInsert);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  auto const& formLines = Instance->FormLines;
+  auto const& formLines = Instance->formLines;
   if (FormVertexNext != 0U || FormForInsert->type != FRMLINE) {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
@@ -6940,7 +6940,7 @@ void form::setins() {
 	FormVertexNext = nxt(*FormForInsert, FormVertexPrev);
   }
   frmToLine(*FormForInsert);
-  InsertLine[0] = Instance->FormLines.operator[](FormVertexPrev);
+  InsertLine[0] = Instance->formLines.operator[](FormVertexPrev);
   InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   Instance->StateMap.set(StateFlag::INSFRM);
   duinsf();
@@ -6959,8 +6959,8 @@ void form::bord() {
   }
   auto& formList = Instance->FormList;
 
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form       = formList.operator[](selectedForm);
 	  form.borderColor = ActiveColor;
 	  sbord(selectedForm);
@@ -7000,8 +7000,8 @@ void form::fclp() {
 	displayText::tabmsg(IDS_CLP, false);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fsclp(selectedForm);
 	}
 	Instance->StateMap.set(StateFlag::INIT);
@@ -7023,9 +7023,9 @@ void form::apliq() {
   }
   auto& formList = Instance->FormList;
 
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
-	  if (auto& currentForm = formList.operator[](selectedForm); Instance->UserFlagMap.test(UserFlag::BLUNT)) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
+	  if (auto& currentForm = formList.operator[](selectedForm); Instance->userFlagMap.test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -7040,7 +7040,7 @@ void form::apliq() {
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	if (auto& currentForm = formList.operator[](ClosestFormToCursor);
-	    Instance->UserFlagMap.test(UserFlag::BLUNT)) {
+	    Instance->userFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	}
 	else {
@@ -7072,10 +7072,10 @@ void form::stchrct2px(F_RECTANGLE const& stitchRect, RECT& screenRect) {
 
 void form::selal() {
   Instance->StateMap.reset(StateFlag::FORMSEL);
-  Instance->SelectedFormList.clear();
+  Instance->selectedFormList.clear();
   Instance->StateMap.reset(StateFlag::SELBOX);
   Instance->StateMap.reset(StateFlag::GRPSEL);
-  Instance->AllItemsRect = getbig(Instance->FormList, Instance->StitchBuffer);
+  Instance->allItemsRect = getbig(Instance->FormList, Instance->StitchBuffer);
   ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   Instance->StateMap.reset(StateFlag::ZUMED);
@@ -7083,7 +7083,7 @@ void form::selal() {
   NearestCount = 0;
   Instance->StateMap.reset(StateFlag::RUNPAT);
   thred::duzrat();
-  stchrct2px(Instance->AllItemsRect, SelectedFormsRect);
+  stchrct2px(Instance->allItemsRect, SelectedFormsRect);
   Instance->StateMap.set(StateFlag::BIGBOX);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -7099,7 +7099,7 @@ void form::setstrtch() {
 	stitchRect = SelectedVerticesRect;
   }
   else {
-	if (!Instance->SelectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX)) {
+	if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX)) {
 	  pxrct2stch(SelectedFormsRect, stitchRect);
 	  stitchPoint = F_POINT {stitchRect.right, stitchRect.bottom};
 	}
@@ -7109,7 +7109,7 @@ void form::setstrtch() {
   }
   switch (SelectedFormControlVertex) {
 	case 0: { // top control
-	  if (!Instance->SelectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
+	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
 	      Instance->StateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.bottom;
 
@@ -7130,7 +7130,7 @@ void form::setstrtch() {
 	  break;
 	}
 	case 1: { // right control
-	  if (!Instance->SelectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
+	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
 	      Instance->StateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.left;
 
@@ -7152,7 +7152,7 @@ void form::setstrtch() {
 	  break;
 	}
 	case 2: { // bottom control
-	  if (!Instance->SelectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
+	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
 	      Instance->StateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.top;
 
@@ -7173,7 +7173,7 @@ void form::setstrtch() {
 	  break;
 	}
 	case 3: { // left control
-	  if (!Instance->SelectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
+	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
 	      Instance->StateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.right;
 
@@ -7230,8 +7230,8 @@ void form::setstrtch() {
 	  selal();
 	  return;
 	}
-	if (!Instance->SelectedFormList.empty()) {
-	  for (auto selectedForm : Instance->SelectedFormList) {
+	if (!Instance->selectedFormList.empty()) {
+	  for (auto selectedForm : Instance->selectedFormList) {
 		auto& formIter = formList.operator[](selectedForm);
 		auto  itVertex = wrap::next(Instance->FormVertices.begin(), formIter.vertexIndex);
 		for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
@@ -7239,7 +7239,7 @@ void form::setstrtch() {
 		  ++itVertex;
 		}
 	  }
-	  for (auto selectedForm : Instance->SelectedFormList) {
+	  for (auto selectedForm : Instance->selectedFormList) {
 		formList.operator[](selectedForm).outline();
 		ClosestFormToCursor = selectedForm;
 		refil(ClosestFormToCursor);
@@ -7297,8 +7297,8 @@ void form::setstrtch() {
 	  selal();
 	  return;
 	}
-	if (!Instance->SelectedFormList.empty()) {
-	  for (auto selectedForm : Instance->SelectedFormList) {
+	if (!Instance->selectedFormList.empty()) {
+	  for (auto selectedForm : Instance->selectedFormList) {
 		auto& formIter = formList.operator[](selectedForm);
 		auto  itVertex = wrap::next(Instance->FormVertices.begin(), formIter.vertexIndex);
 		for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
@@ -7306,7 +7306,7 @@ void form::setstrtch() {
 		  ++itVertex;
 		}
 	  }
-	  for (auto selectedForm : Instance->SelectedFormList) {
+	  for (auto selectedForm : Instance->selectedFormList) {
 		formList.operator[](selectedForm).outline();
 		ClosestFormToCursor = selectedForm;
 		refil(selectedForm);
@@ -7342,7 +7342,7 @@ void form::setexpand(float const xyRatio) {
   auto stitchPoint = F_POINT {};
 
   auto& formList = Instance->FormList;
-  if (!Instance->SelectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
+  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
       Instance->StateMap.test(StateFlag::FPSEL)) {
 	// if we have multiple forms selected, or we are in big box mode, or we are in form point select
 	// mode we need to use the selected forms rectangle
@@ -7375,7 +7375,7 @@ void form::setexpand(float const xyRatio) {
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
-	  if (Instance->SelectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.left  = rectangle.right - size1.x;
 		formRect.top   = rectangle.bottom + size1.y;
@@ -7387,7 +7387,7 @@ void form::setexpand(float const xyRatio) {
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
-	  if (Instance->SelectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.right = rectangle.left + size1.x;
 		formRect.top   = rectangle.bottom + size1.y;
@@ -7399,7 +7399,7 @@ void form::setexpand(float const xyRatio) {
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
-	  if (Instance->SelectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect  = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.right  = rectangle.left + size1.x;
 		formRect.bottom = rectangle.top - size1.y;
@@ -7412,7 +7412,7 @@ void form::setexpand(float const xyRatio) {
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
 	  // if we are in form select mode, we need to update the form rectangle
-	  if (Instance->SelectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect  = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.left   = rectangle.right - size1.x;
 		formRect.bottom = rectangle.top - size1.y;
@@ -7433,7 +7433,7 @@ void form::setexpand(float const xyRatio) {
 	resizeBigBox(stitchReference, ratio);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	resizeSelectedForms(stitchReference, ratio);
 	return;
   }
@@ -7508,8 +7508,8 @@ void form::dubold() {
   if (!displayText::filmsgs(FML_BLD)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  sbold(selectedForm);
 	}
 	Instance->StateMap.set(StateFlag::INIT);
@@ -7844,7 +7844,7 @@ void form::fliph() {
 
   if (Instance->StateMap.test(StateFlag::BIGBOX)) {
 	thred::savdo();
-	auto const offset = Instance->AllItemsRect.right + Instance->AllItemsRect.left;
+	auto const offset = Instance->allItemsRect.right + Instance->allItemsRect.left;
 	for (auto& formVertice : Instance->FormVertices) {
 	  formVertice.x = offset - formVertice.x;
 	}
@@ -7859,13 +7859,13 @@ void form::fliph() {
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
 	auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
 	auto rectangle = F_RECTANGLE {};
 	pxrct2stch(SelectedFormsRect, rectangle);
 	auto const offset = rectangle.right + rectangle.left;
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  formMap.set(selectedForm);
 	  // clang-format off
 	  auto& formIter = formList.operator[](selectedForm);
@@ -7924,11 +7924,11 @@ void form::prpbrd(float const borderStitchSpacing) {
   }
   auto const savedSpacing = LineSpacing;
   LineSpacing             = borderStitchSpacing;
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& currentForm      = Instance->FormList.operator[](selectedForm);
 	  currentForm.borderSize = LineSpacing;
-	  if (Instance->UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (Instance->userFlagMap.test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -7944,7 +7944,7 @@ void form::prpbrd(float const borderStitchSpacing) {
   }
   if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	if (auto& currentForm = Instance->FormList.operator[](ClosestFormToCursor);
-	    Instance->UserFlagMap.test(UserFlag::BLUNT)) {
+	    Instance->userFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	}
 	else {
@@ -7993,9 +7993,9 @@ void form::flpord() {
 	refil(ClosestFormToCursor);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  fnord();
 	}
@@ -8040,8 +8040,8 @@ void form::clpfil() {
 	displayText::tabmsg(IDS_CLP, false);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (Instance->FormList.operator[](ClosestFormToCursor).type != FRMLINE) {
 		filsclp();
@@ -8080,13 +8080,13 @@ auto form::rotpar() -> F_POINT {
 	  Instance->StateMap.set(StateFlag::FRMROT);
 	  break;
 	}
-	if (!Instance->SelectedFormList.empty()) {
+	if (!Instance->selectedFormList.empty()) {
 	  pxrct2stch(SelectedFormsRect, RotationRect);
 	  Instance->StateMap.set(StateFlag::FRMSROT);
 	  break;
 	}
 	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
-	  RotationRect = Instance->AllItemsRect;
+	  RotationRect = Instance->allItemsRect;
 	  break;
 	}
 	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
@@ -8114,7 +8114,7 @@ void form::setrang() {
 
 void form::rotcmd() {
   if (!Instance->StateMap.test(StateFlag::FORMSEL) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
-      Instance->SelectedFormList.empty() && !Instance->StateMap.test(StateFlag::BIGBOX) &&
+      Instance->selectedFormList.empty() && !Instance->StateMap.test(StateFlag::BIGBOX) &&
       !Instance->StateMap.test(StateFlag::FPSEL)) {
 	displayText::shoseln(IDS_ALLX, IDS_ROTCMD);
 	return;
@@ -8133,7 +8133,7 @@ void form::bakagain() {
 
 void form::rotdup() {
   if (!Instance->StateMap.test(StateFlag::FORMSEL) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
-      Instance->SelectedFormList.empty()) {
+      Instance->selectedFormList.empty()) {
 	displayText::shord();
 	return;
   }
@@ -8142,9 +8142,9 @@ void form::rotdup() {
 }
 
 void form::cpylayr(uint32_t const layer) {
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  cplayfn(selectedForm, layer);
 	}
 	return;
@@ -8178,10 +8178,10 @@ void form::movlayr(uint32_t layer) {
   auto const codedStitchLayer = layer << LAYSHFT;
 
   auto& formList = Instance->FormList;
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
 	auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& formAttr = formList.operator[](selectedForm).attribute;
 	  formAttr = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formAttr & NFRMLMSK) | layer << FLAYSHFT);
 	  formMap.set(selectedForm);
@@ -8193,7 +8193,7 @@ void form::movlayr(uint32_t layer) {
 		}
 	  }
 	}
-	Instance->SelectedFormList.clear();
+	Instance->selectedFormList.clear();
 	Instance->StateMap.reset(StateFlag::FORMSEL);
 	Instance->StateMap.set(StateFlag::RESTCH);
 	return;
@@ -8290,11 +8290,11 @@ void form::nufsel() {
   }
   Instance->StateMap.reset(StateFlag::FORMSEL);
   if (Instance->StateMap.testAndReset(StateFlag::WASEL)) {
-	Instance->SelectedFormList.push_back(PreviousFormIndex);
+	Instance->selectedFormList.push_back(PreviousFormIndex);
   }
-  if (std::ranges::none_of(Instance->SelectedFormList,
+  if (std::ranges::none_of(Instance->selectedFormList,
                            [](uint32_t const intX) { return intX == ClosestFormToCursor; })) {
-	Instance->SelectedFormList.push_back(ClosestFormToCursor);
+	Instance->selectedFormList.push_back(ClosestFormToCursor);
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -8312,7 +8312,7 @@ void form::frmadj(uint32_t const formIndex) noexcept(!std::is_same_v<ptrdiff_t, 
 
 void form::frmsadj() {
   auto formMap = boost::dynamic_bitset(Instance->FormList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	formMap.set(selectedForm);
   }
   for (auto& stitch : Instance->StitchBuffer) {
@@ -8393,8 +8393,8 @@ void form::bhol() {
   if (!displayText::filmsgs(FML_BHOL)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  bholbrd(selectedForm);
 	}
 	Instance->StateMap.set(StateFlag::INIT);
@@ -8414,19 +8414,19 @@ void form::bhol() {
 }
 
 void form::fcntr() {
-  if (Instance->SelectedFormList.empty()) {
+  if (Instance->selectedFormList.empty()) {
 	displayText::tabmsg(IDS_SELC, false);
 	return;
   }
   thred::savdo();
-  auto const firstForm = Instance->SelectedFormList.front();
+  auto const firstForm = Instance->selectedFormList.front();
   auto&      formList  = Instance->FormList;
 
   auto const& firstRect = formList.operator[](firstForm).rectangle;
 
   auto const initialCenter =
       F_POINT {wrap::midl(firstRect.right, firstRect.left), wrap::midl(firstRect.top, firstRect.bottom)};
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	auto& currentForm = formList.operator[](selectedForm);
 
 	auto const& formRect = currentForm.rectangle;
@@ -8480,8 +8480,8 @@ void form::picot() {
 	displayText::tabmsg(IDS_CLP, false);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  fspic(selectedForm);
 	}
 	Instance->StateMap.set(StateFlag::INIT);
@@ -8501,9 +8501,9 @@ void form::contfil() {
   if (!displayText::filmsgs(FML_CONT)) {
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  contsf(selectedForm);
 	}
 	Instance->StateMap.set(StateFlag::INIT);
@@ -8541,7 +8541,7 @@ void form::dupfn(float const rotationAngle) {
 	duprots(usedAngle, rotationCenter);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	duprotfs(usedAngle);
 	return;
   }
@@ -8574,7 +8574,7 @@ void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
   auto tempFormVertices = std::vector<F_POINT> {};
   tempFormVertices.resize(Instance->FormVertices.size());
   auto tempGuides = std::vector<SAT_CON> {};
-  tempGuides.reserve(Instance->SatinGuides.size());
+  tempGuides.reserve(Instance->satinGuides.size());
   auto tempClipPoints = std::vector<F_POINT> {};
   tempClipPoints.reserve(Instance->ClipPoints.size());
   auto formSourceIndex = 0U;
@@ -8590,7 +8590,7 @@ void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
   }
   std::ranges::copy(tempFormList, formList.begin());
   std::ranges::copy(tempFormVertices, Instance->FormVertices.begin());
-  std::ranges::copy(tempGuides, Instance->SatinGuides.begin());
+  std::ranges::copy(tempGuides, Instance->satinGuides.begin());
   std::ranges::copy(tempClipPoints, Instance->ClipPoints.begin());
   for (auto& stitch : Instance->StitchBuffer) {
 	if ((stitch.attribute & SRTYPMSK) == 0U) {
@@ -8659,7 +8659,7 @@ void form::cntrx() {
       Instance->StateMap.test(StateFlag::GMRK)
           ? ZoomMarkPoint
           : F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
 	auto selectedCenter = F_POINT {};
 	dufcntr(selectedCenter);
@@ -8670,7 +8670,7 @@ void form::cntrx() {
 	if (Instance->StateMap.test(StateFlag::CNTRH)) {
 	  FormMoveDelta.x = 0.0F;
 	}
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  frmadj(selectedForm);
 	}
 	frmsadj();
@@ -8733,7 +8733,7 @@ void form::cntrx() {
 void form::centir() {
   Instance->StateMap.reset(StateFlag::BIGBOX);
   auto& formList        = Instance->FormList;
-  auto& allItemsRect    = Instance->AllItemsRect;
+  auto& allItemsRect    = Instance->allItemsRect;
   allItemsRect          = getbig(formList, Instance->StitchBuffer);
   auto const itemCenter = F_POINT {wrap::midl(allItemsRect.right, allItemsRect.left),
                                    wrap::midl(allItemsRect.top, allItemsRect.bottom)};
@@ -8838,7 +8838,7 @@ void form::spltfrm() {
 	if (currentForm.satinGuideCount == 0U) {
 	  return;
 	}
-	auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), currentForm.satinGuideIndex);
+	auto itGuide = wrap::next(Instance->satinGuides.cbegin(), currentForm.satinGuideIndex);
 	for (auto guideIndex = 0U; guideIndex < currentForm.satinGuideCount; ++guideIndex) {
 	  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 		satin::spltsat(guideIndex);
@@ -8893,7 +8893,7 @@ void form::vrtsclp(uint32_t const formIndex) {
   auto& form = Instance->FormList.operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   form.clipCount = wrap::toUnsigned(clipBuffer.size());
   form.clipIndex = clip::numclp(formIndex);
@@ -8930,9 +8930,9 @@ void form::vrtclp() {
 	displayText::tabmsg(IDS_CLP, false);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	Instance->StateMap.set(StateFlag::NOCLP);
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  if (Instance->FormList.operator[](selectedForm).type != FRMLINE) {
 		vrtsclp(selectedForm);
 	  }
@@ -8955,7 +8955,7 @@ void form::horsclp() {
   auto& form = Instance->FormList.operator[](ClosestFormToCursor);
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   auto const clipSize = wrap::toUnsigned(clipBuffer.size());
   form.clipCount      = clipSize;
@@ -8995,9 +8995,9 @@ void form::horclp() {
 	displayText::tabmsg(IDS_CLP, false);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	Instance->StateMap.set(StateFlag::NOCLP);
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (Instance->FormList.operator[](ClosestFormToCursor).type != FRMLINE) {
 		horsclp();
@@ -9022,7 +9022,7 @@ void form::angsclp(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.clipIndex         = clip::numclp(ClosestFormToCursor);
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   form.clipCount = wrap::toUnsigned(clipBuffer.size());
   form.wordParam = IniFile.fillPhase;
@@ -9061,9 +9061,9 @@ void form::angclp() {
   }
   auto& formList = Instance->FormList;
 
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	Instance->StateMap.set(StateFlag::NOCLP);
-	for (auto const selectedForm : Instance->SelectedFormList) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (auto& form = formList.operator[](selectedForm); form.type != FRMLINE) {
 		angsclp(form);
@@ -9099,8 +9099,8 @@ void form::dubfil() {
   }
   auto& formList = Instance->FormList;
 
-  if (!Instance->SelectedFormList.empty()) {
-	for (auto const selectedForm : Instance->SelectedFormList) {
+  if (!Instance->selectedFormList.empty()) {
+	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  dubsfil(form);
 	}
@@ -9238,7 +9238,7 @@ void form::chain() {
 	return;
   }
   thred::savdo();
-  if (Instance->SelectedFormList.empty()) {
+  if (Instance->selectedFormList.empty()) {
 	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	  chan(ClosestFormToCursor);
 	  Instance->StateMap.set(StateFlag::INIT);
@@ -9248,7 +9248,7 @@ void form::chain() {
 	}
 	return;
   }
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	chan(selectedForm);
   }
   Instance->StateMap.set(StateFlag::INIT);
@@ -9299,7 +9299,7 @@ void form::filclpx() {
 	displayText::tabmsg(IDS_CLP, false);
 	return;
   }
-  if (Instance->SelectedFormList.empty()) {
+  if (Instance->selectedFormList.empty()) {
 	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	  fsclpx(ClosestFormToCursor);
 	  Instance->StateMap.set(StateFlag::INIT);
@@ -9308,7 +9308,7 @@ void form::filclpx() {
 	}
 	return;
   }
-  for (auto const selectedForm : Instance->SelectedFormList) {
+  for (auto const selectedForm : Instance->selectedFormList) {
 	fsclpx(selectedForm);
   }
   Instance->StateMap.set(StateFlag::INIT);

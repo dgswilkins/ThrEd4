@@ -145,7 +145,7 @@ void clipSelectedForm() {
   auto  iGuide    = 0U;
   if (form.type == SAT && form.satinGuideCount != 0U) {
 	iGuide                = form.satinGuideCount;
-	auto const startGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+	auto const startGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	auto const endGuide   = wrap::next(startGuide, iGuide);
 
 	auto const guides = gsl::span {ptrGuides, iGuide};
@@ -218,7 +218,7 @@ void clipSelectedForms() {
   auto  length   = 0U;
   auto& formList = Instance->FormList;
 
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	auto& currentForm = formList.operator[](selectedForm);
 	length += sizfclp(currentForm);
   }
@@ -234,24 +234,24 @@ void clipSelectedForms() {
   auto const thrEdClip       = RegisterClipboardFormat(ThrEdClipFormat);
   auto*      clipFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
   clipFormsHeader->clipType  = CLP_FRMS;
-  wrap::narrow(clipFormsHeader->formCount, Instance->SelectedFormList.size());
+  wrap::narrow(clipFormsHeader->formCount, Instance->selectedFormList.size());
   // Skip past the header
   auto*      ptrForms = convertFromPtr<FRM_HEAD*>(std::next(clipFormsHeader));
-  auto const forms    = gsl::span {ptrForms, Instance->SelectedFormList.size()};
+  auto const forms    = gsl::span {ptrForms, Instance->selectedFormList.size()};
   auto       iForm    = 0U;
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	auto& currentForm = formList.operator[](selectedForm);
 	forms[iForm++]    = currentForm;
   }
   // skip past the forms
   auto* ptrFormVertices = convertFromPtr<F_POINT*>(wrap::next(ptrForms, iForm));
   auto  verticesSize    = 0U;
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	verticesSize += formList.operator[](selectedForm).vertexCount;
   }
   auto const formVertices = gsl::span {ptrFormVertices, verticesSize};
   auto       iVertex      = 0U;
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 
 	auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
@@ -263,7 +263,7 @@ void clipSelectedForms() {
   // skip past the vertex list
   auto* ptrGuides  = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, iVertex));
   auto  guidesSize = 0U;
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	if (auto& form = formList.operator[](selectedForm); form.type == SAT && form.satinGuideCount != 0U) {
 	  guidesSize += form.satinGuideCount;
 	}
@@ -271,9 +271,9 @@ void clipSelectedForms() {
   auto guideCount = 0U;
   if (guidesSize != 0U) {
 	auto const guides = gsl::span {ptrGuides, guidesSize};
-	for (auto& selectedForm : Instance->SelectedFormList) {
+	for (auto& selectedForm : Instance->selectedFormList) {
 	  if (auto& form = formList.operator[](selectedForm); form.type == SAT && form.satinGuideCount != 0U) {
-		auto itGuide = wrap::next(Instance->SatinGuides.cbegin(), form.satinGuideIndex);
+		auto itGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		  guides[guideCount++] = *itGuide;
 		  ++itGuide;
@@ -284,7 +284,7 @@ void clipSelectedForms() {
   // skip past the guides
   auto* ptrPoints  = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, guideCount));
   auto  pointsSize = 0U;
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 	if (form.isClipX()) {
 	  pointsSize += form.clipCount;
@@ -296,7 +296,7 @@ void clipSelectedForms() {
   auto pointCount = uint32_t {0U};
   if (pointsSize != 0U) {
 	auto const points = gsl::span {ptrPoints, pointsSize};
-	for (auto& selectedForm : Instance->SelectedFormList) {
+	for (auto& selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
 	  if (form.isClipX()) {
 		auto offsetStart = wrap::next(Instance->ClipPoints.cbegin(), form.clipIndex);
@@ -319,7 +319,7 @@ void clipSelectedForms() {
   auto* textures     = convertFromPtr<TX_PNT*>(std::next(ptrPoints, wrap::toPtrdiff(pointCount)));
   auto  textureCount = uint16_t {};
   iForm              = 0;
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 	if (!form.isTexture()) {
 	  continue;
@@ -335,7 +335,7 @@ void clipSelectedForms() {
   SetClipboardData(thrEdClip, clipHandle);
 
   auto formMap = boost::dynamic_bitset(formList.size()); // NOLINT(clang-diagnostic-ctad-maybe-unsupported)
-  for (auto& selectedForm : Instance->SelectedFormList) {
+  for (auto& selectedForm : Instance->selectedFormList) {
 	formMap.set(selectedForm);
   }
   auto astch = std::vector<F_POINT_ATTR> {};
@@ -539,7 +539,7 @@ void rtrclpfn(FRM_HEAD const& form) {
 	return;
   }
   auto const  spClipData = gsl::span {clipStitchData, count};
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   savclp(spClipData[0], clipBuffer.operator[](0), count);
   for (auto iStitch = 1U; iStitch < count; ++iStitch) {
@@ -589,7 +589,7 @@ void sizclp(FRM_HEAD const& form,
   fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->FormVertices);
   length = fileSize;
   if (form.type == SAT && form.satinGuideCount != 0U) {
-	fileSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
+	fileSize += form.satinGuideCount * wrap::sizeofType(Instance->satinGuides);
   }
   if (form.fillType != 0U || form.edgeType != 0U) {
 	formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
@@ -611,7 +611,7 @@ auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) ->
   auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) +
                   (form.vertexCount * wrap::sizeofType(Instance->FormVertices));
   if (form.type == SAT && form.satinGuideCount != 0U) {
-	clipSize += form.satinGuideCount * wrap::sizeofType(Instance->SatinGuides);
+	clipSize += form.satinGuideCount * wrap::sizeofType(Instance->satinGuides);
   }
   if (form.isEdgeClip()) {
 	clipSize += form.clipEntries * wrap::sizeofType(Instance->ClipPoints);
@@ -654,7 +654,7 @@ void tfc::duclip() {
 	displayText::tabmsg(IDS_INSF, false);
 	return;
   }
-  if (!Instance->SelectedFormList.empty()) {
+  if (!Instance->selectedFormList.empty()) {
 	clipSelectedForms();
 	return;
   }
@@ -784,7 +784,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto const offset = formOffset + iForm;
 		  if (auto& form = formList.operator[](offset); form.type == SAT && form.satinGuideCount != 0U) {
 			form.satinGuideIndex = satin::adsatk(form.satinGuideCount);
-			auto itGuide         = wrap::next(Instance->SatinGuides.begin(), form.satinGuideIndex);
+			auto itGuide         = wrap::next(Instance->satinGuides.begin(), form.satinGuideIndex);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 			  *itGuide = guides[currentGuide++];
 			  ++itGuide;
@@ -847,16 +847,16 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
 		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;
 		form::ratsr();
-		Instance->SelectedFormList.clear();
-		Instance->SelectedFormList.reserve(ClipFormsCount);
+		Instance->selectedFormList.clear();
+		Instance->selectedFormList.reserve(ClipFormsCount);
 		for (auto index = 0U; index < ClipFormsCount; ++index) {
 		  form::fselrct(formOffset + index);
-		  Instance->SelectedFormList.push_back(formOffset + index);
+		  Instance->selectedFormList.push_back(formOffset + index);
 		}
 		wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
 		wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);
 		Instance->StateMap.set(StateFlag::INIT);
-		auto& formLines = Instance->FormLines;
+		auto& formLines = Instance->formLines;
 		formLines.resize(SQPNTS);
 		formLines[0].x = formLines[3].x = formLines[4].x = SelectedFormsRect.left;
 		formLines[1].x = formLines[2].x = SelectedFormsRect.right;
@@ -884,8 +884,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrVertices, formIter.vertexCount));
 		  if (formIter.type == SAT && formIter.satinGuideCount != 0U) {
 			auto const guides        = gsl::span {ptrGuides, formIter.satinGuideCount};
-			formIter.satinGuideIndex = wrap::toUnsigned(Instance->SatinGuides.size());
-			Instance->SatinGuides.insert(Instance->SatinGuides.end(), guides.begin(), guides.end());
+			formIter.satinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
+			Instance->satinGuides.insert(Instance->satinGuides.end(), guides.begin(), guides.end());
 		  }
 		  auto* ptrClipData = convertFromPtr<F_POINT*>(wrap::next(ptrGuides, formIter.satinGuideCount));
 		  auto clipCount = 0U;
@@ -962,9 +962,9 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   textureForm           = *clipForm;
   auto*      vertices   = convertFromPtr<F_POINT*>(std::next(clipForm));
   auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
-  Instance->AngledFormVertices.clear();
-  Instance->AngledFormVertices.insert(
-      Instance->AngledFormVertices.end(), spVertices.begin(), spVertices.end());
+  Instance->angledFormVertices.clear();
+  Instance->angledFormVertices.insert(
+      Instance->angledFormVertices.end(), spVertices.begin(), spVertices.end());
   textureForm.vertexIndex = 0;
   Instance->StateMap.reset(StateFlag::TXTLIN);
   Instance->StateMap.set(StateFlag::TXTCLP);
@@ -984,7 +984,7 @@ void tfc::fpUnClip() {
 }
 
 void tfc::lodclp(uint32_t iStitch) {
-  auto const& clipBuffer = Instance->ClipBuffer;
+  auto const& clipBuffer = Instance->clipBuffer;
 
   Instance->StitchBuffer.insert(
       wrap::next(Instance->StitchBuffer.begin(), iStitch), clipBuffer.size(), F_POINT_ATTR {});

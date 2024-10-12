@@ -327,11 +327,11 @@ void dutrac() {
   CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   auto       traceDirection = 0U;
-  if (!Instance->TracedEdges.test(wrap::toSize(savedPoint))) {
+  if (!Instance->tracedEdges.test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
 	auto limit = (CurrentTracePoint.y + 1L) * bitmap::getBitmapWidth();
 	// find the right edge
-	while (point < limit && !Instance->TracedEdges.test(wrap::toSize(point))) {
+	while (point < limit && !Instance->tracedEdges.test(wrap::toSize(point))) {
 	  ++point;
 	}
 	auto const right = point < limit ? point - (CurrentTracePoint.y * bitmap::getBitmapWidth())
@@ -339,13 +339,13 @@ void dutrac() {
 	point            = savedPoint;
 	limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	// find the left edge
-	while (point > limit && !Instance->TracedEdges.test(wrap::toSize(point))) {
+	while (point > limit && !Instance->tracedEdges.test(wrap::toSize(point))) {
 	  --point;
 	}
 	auto const left = point == limit ? 0 : point - limit;
 	point           = savedPoint;
 	// find the bottom edge
-	while (point > 0 && !Instance->TracedEdges.test(wrap::toSize(point))) {
+	while (point > 0 && !Instance->tracedEdges.test(wrap::toSize(point))) {
 	  if (point > bitmap::getBitmapWidth()) {
 		point -= bitmap::getBitmapWidth();
 	  }
@@ -357,7 +357,7 @@ void dutrac() {
 	point             = savedPoint;
 	limit             = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
 	// find the top edge
-	while (point < limit && !Instance->TracedEdges.test(wrap::toSize(point))) {
+	while (point < limit && !Instance->tracedEdges.test(wrap::toSize(point))) {
 	  point += bitmap::getBitmapWidth();
 	}
 	auto const top  = point < limit ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
@@ -540,8 +540,8 @@ void showTraceWin() noexcept {
 
 void tracwnd() {
   thred::hideColorWin();
-  hidwnd(Instance->ButtonWin.operator[](HBOXSEL));
-  hidwnd(Instance->ButtonWin.operator[](HUPTO));
+  hidwnd(Instance->buttonWin.operator[](HBOXSEL));
+  hidwnd(Instance->buttonWin.operator[](HUPTO));
   shownd(TraceStepWin);
   trcstpnum();
   trcratnum();
@@ -561,14 +561,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCU;
 	  }
 	  else {
-		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
 		  traceDirection = TRCD;
 		}
 		else {
 		  pixelIndex += bitmap::getBitmapWidth();                     // look at the pixel below
-		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.x;
 		  }
 		  else { // start tracing up
@@ -585,14 +585,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCR;
 	  }
 	  else {
-		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
 		  traceDirection = TRCL;
 		}
 		else {
 		  ++pixelIndex; // look at the pixel to the right
-		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.y;
 		  }
 		  else { // start tracing right
@@ -609,14 +609,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCD;
 	  }
 	  else {
-		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
 		  traceDirection = TRCU;
 		}
 		else {
 		  pixelIndex -= bitmap::getBitmapWidth();                     // look at the pixel above
-		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.x;
 		  }
 		  else { // start tracing down
@@ -633,14 +633,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCL;
 	  }
 	  else {
-		if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
 		  traceDirection = TRCR;
 		}
 		else {
 		  --pixelIndex; // look at the pixel to the left
-		  if (Instance->TracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.y;
 		  }
 		  else {
@@ -830,8 +830,8 @@ void trace::untrace() {
 	return;
   }
   bitmap::resetDC();
-  if (!Instance->TracedEdges.empty()) {
-	Instance->TracedEdges.resize(0); // allocated in tracedg
+  if (!Instance->tracedEdges.empty()) {
+	Instance->tracedEdges.resize(0); // allocated in tracedg
   }
   if (!Instance->TracedMap.empty()) {
 	Instance->TracedMap.resize(0); // allocated in trace
@@ -840,7 +840,7 @@ void trace::untrace() {
   hideTraceWin();
   hidwnd(TraceStepWin);
   thred::showColorWin();
-  for (auto const& iButton : Instance->ButtonWin) {
+  for (auto const& iButton : Instance->buttonWin) {
 	shownd(iButton);
   }
 }
@@ -999,28 +999,28 @@ void trace::tracedg() {
   if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
 	trace();
   }
-  Instance->TracedEdges.resize(TraceDataSize, false);
-  Instance->TracedEdges.reset();
+  Instance->tracedEdges.resize(TraceDataSize, false);
+  Instance->tracedEdges.reset();
   auto pixelIndex = 0L;
   for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	auto flag = false;
 	for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
 	  if (Instance->TracedMap.test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
-		  Instance->TracedEdges.set(wrap::toSize(pixelIndex));
+		  Instance->tracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
 		}
 	  }
 	  else {
 		if (flag) {
-		  Instance->TracedEdges.set(wrap::toSize(pixelIndex) - 1U);
+		  Instance->tracedEdges.set(wrap::toSize(pixelIndex) - 1U);
 		  flag = false;
 		}
 	  }
 	  ++pixelIndex;
 	}
 	if (flag) {
-	  Instance->TracedEdges.set(wrap::toSize(pixelIndex) - 1U);
+	  Instance->tracedEdges.set(wrap::toSize(pixelIndex) - 1U);
 	}
   }
   for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
@@ -1029,27 +1029,27 @@ void trace::tracedg() {
 	for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	  if (Instance->TracedMap.test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
-		  Instance->TracedEdges.set(wrap::toSize(pixelIndex));
+		  Instance->tracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
 		}
 	  }
 	  else {
 		if (flag) {
-		  Instance->TracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
+		  Instance->tracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 		  flag = false;
 		}
 	  }
 	  pixelIndex += bitmap::getBitmapWidth();
 	}
 	if (flag) {
-	  Instance->TracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
+	  Instance->tracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 	}
   }
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto const spTBD      = gsl::span(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
   for (auto& iPixel : spTBD) {
-	if (Instance->TracedEdges.test(pos)) {
+	if (Instance->tracedEdges.test(pos)) {
 	  iPixel = PENWHITE;
 	}
 	else {
