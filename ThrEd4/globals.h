@@ -73,11 +73,9 @@ class MY_SINGLE
   }
 
   void initialize() {
-	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 	rubberBandLine.resize(3U);
 	selectedFormsLine.resize(OUTPNTS);
 	selectedPointsLine.resize(OUTPNTS);
-	TextureHistory.resize(ITXBUFSZ);
 	valueWindow.resize(LASTLIN);
   }
 

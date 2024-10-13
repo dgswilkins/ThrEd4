@@ -97,14 +97,15 @@ constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should b
 
 // texture internal namespace
 namespace {
-auto TextureWindowId           = uint32_t {};  // id of the window being updated
+constexpr auto ITXBUFSZ                  = uint32_t {16U}; // texture buffer depth
+auto           TextureWindowId           = uint32_t {};    // id of the window being updated
 auto SideWindowButton          = HWND {};      // button side window
 auto TexturePixelRect          = RECT {};      // screen selected texture points rectangle
 auto TextureRect               = TXTR_RECT {}; // selected texture points rectangle
 auto SelectTexturePointsOrigin = POINT {};     // original location of selected texture points
 auto TextureCursorLocation     = POINT {};     // texture editor move cursor location
 auto TextureCrossPen           = HPEN {};      // texture editor cross pen
-auto TextureHistory = gsl::narrow_cast<std::vector<TX_HIST>*>(nullptr); // texture editor history headers
+auto TextureHistory = std::vector<TX_HIST> {}; // texture editor history headers
 auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
 auto TempTexturePoints   = std::vector<TX_PNT> {}; // temporary storage for textured fill data
 auto SelectedTexturePointsList = std::vector<uint32_t> {}; // list of selected points
@@ -309,10 +310,10 @@ void nxbak() {
 	return;
   }
   auto       flag = false;
-  auto const end  = wrap::toUnsigned(TextureHistory->size());
+  auto const end  = wrap::toUnsigned(TextureHistory.size());
   for (auto iHistory = uint32_t {0U}; iHistory < end; ++iHistory) {
 	txrfor();
-	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
+	if (TextureHistory.operator[](TextureHistoryIndex).width != 0.0F) {
 	  flag = true;
 	  break;
 	}
@@ -349,7 +350,7 @@ auto px2txt(POINT const& offset) -> bool {
 
 void redtbak() {
   outDebugString(L"retrieving texture history {}\n", TextureHistoryIndex);
-  auto const& textureHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
+  auto const& textureHistoryItem = TextureHistory.operator[](TextureHistoryIndex);
   TextureScreen.areaHeight       = textureHistoryItem.height;
   TextureScreen.width            = textureHistoryItem.width;
   TextureScreen.spacing          = textureHistoryItem.spacing;
@@ -404,8 +405,8 @@ void ritxrct() noexcept(std::is_same_v<size_t, uint32_t>) {
 }
 
 void rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
-  auto dist           = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
-  TextureHistoryIndex = dist == 0 ? wrap::toUnsigned(TextureHistory->size() - 1U) : --dist;
+  auto dist           = wrap::toUnsigned(std::distance(TextureHistory.begin(), texture));
+  TextureHistoryIndex = dist == 0 ? wrap::toUnsigned(TextureHistory.size() - 1U) : --dist;
   texture->height     = 0;
   texture->width      = 0;
   texture->spacing    = 0;
@@ -474,9 +475,9 @@ void txbak() {
   }
   SelectedTexturePointsList.clear();
   auto       flag = false;
-  auto const end  = wrap::toUnsigned(TextureHistory->size());
+  auto const end  = wrap::toUnsigned(TextureHistory.size());
   for (auto iHistory = 0U; iHistory < end; ++iHistory) {
-	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
+	if (TextureHistory.operator[](TextureHistoryIndex).width != 0.0F) {
 	  flag = true;
 	  break;
 	}
@@ -642,7 +643,7 @@ void txpar(FRM_HEAD& form) {
 
 void txrbak() noexcept(std::is_same_v<size_t, uint32_t>) {
   if (TextureHistoryIndex == 0) {
-	TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
+	TextureHistoryIndex = wrap::toUnsigned(TextureHistory.size() - 1U);
 	return;
   }
   --TextureHistoryIndex;
@@ -662,7 +663,7 @@ void txrct2rct(TXTR_RECT const& textureRect, RECT& rectangle) noexcept {
 }
 
 void txrfor() noexcept {
-  if (TextureHistoryIndex == TextureHistory->size() - 1U) {
+  if (TextureHistoryIndex == TextureHistory.size() - 1U) {
 	TextureHistoryIndex = 0;
 	return;
   }
@@ -705,7 +706,7 @@ auto txtclos(uint32_t& closestTexturePoint) noexcept(std::is_same_v<size_t, uint
   auto point         = POINT {};
   deorg(reference);
   closestTexturePoint = 0;
-  auto const end      = wrap::toUnsigned(TextureHistory->size());
+  auto const end      = wrap::toUnsigned(TextureHistory.size());
   for (auto iPoint = uint32_t {0U}; iPoint < end; ++iPoint) {
 	txt2pix(TempTexturePoints.operator[](iPoint), point);
 	auto const deltaX = point.x - reference.x;
@@ -995,15 +996,15 @@ void texture::setTxtCurLoc(POINT const location) noexcept {
   TextureCursorLocation = location;
 }
 
-void texture::initTextures(std::vector<TX_HIST>*  ptrTextureHistory) noexcept {
-  TextureHistory            = ptrTextureHistory;
+void texture::initTextureHistory() noexcept {
+  TextureHistory.resize(ITXBUFSZ);
 }
 
 void texture::txdun() {
   constexpr auto SIGNATURE            = std::array<char, 4> {"txh"};
   auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
-  textureHistoryBuffer.resize(TextureHistory->size());
-  if (TextureHistory->operator[](0).texturePoints.empty()) {
+  textureHistoryBuffer.resize(TextureHistory.size());
+  if (TextureHistory.operator[](0).texturePoints.empty()) {
 	return;
   }
   auto name = std::wstring {};
@@ -1019,7 +1020,7 @@ void texture::txdun() {
   }
   WriteFile(handle, SIGNATURE.data(), wrap::toUnsigned(SIGNATURE.size()), &bytesWritten, nullptr);
   WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
-  for (auto bufferIter = textureHistoryBuffer.begin(); auto const& historyEntry : *TextureHistory) {
+  for (auto bufferIter = textureHistoryBuffer.begin(); auto const& historyEntry : TextureHistory) {
 	bufferIter->count   = wrap::toUnsigned(historyEntry.texturePoints.size());
 	bufferIter->height  = historyEntry.height;
 	bufferIter->width   = historyEntry.width;
@@ -1031,7 +1032,7 @@ void texture::txdun() {
                   wrap::toUnsigned(textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer)),
                   &bytesWritten,
                   nullptr);
-  for (auto const& item : *TextureHistory) {
+  for (auto const& item : TextureHistory) {
 	if (item.texturePoints.empty()) {
 	  continue;
 	}
@@ -1043,8 +1044,8 @@ void texture::txdun() {
 void texture::redtx() {
   auto name                 = std::wstring {};
   auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
-  textureHistoryBuffer.resize(TextureHistory->size());
-  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
+  textureHistoryBuffer.resize(TextureHistory.size());
+  TextureHistoryIndex = wrap::toUnsigned(TextureHistory.size() - 1U);
   while (true) {
 	if (!txnam(name)) {
 	  break;
@@ -1064,16 +1065,16 @@ void texture::redtx() {
 	  break;
 	}
 	if (!wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
-	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
+	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory.size() - 1U);
 	  break;
 	}
 	auto const bytesToRead = textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer);
 	auto       historyBytesRead = DWORD {};
 	if (!wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
-	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory->size() - 1U);
+	  TextureHistoryIndex = wrap::toUnsigned(TextureHistory.size() - 1U);
 	  break;
 	}
-	for (auto texture = TextureHistory->begin(); auto const& entry : textureHistoryBuffer) {
+	for (auto texture = TextureHistory.begin(); auto const& entry : textureHistoryBuffer) {
 	  texture->height  = entry.height;
 	  texture->width   = entry.width;
 	  texture->spacing = entry.spacing;
@@ -1082,7 +1083,7 @@ void texture::redtx() {
 		continue;
 	  }
 	  texture->texturePoints.resize(entry.count);
-	  if (auto const bytesToReadTx = wrap::sizeofType(TextureHistory->front().texturePoints) * entry.count;
+	  if (auto const bytesToReadTx = wrap::sizeofType(TextureHistory.front().texturePoints) * entry.count;
 	      !wrap::readFile(handle, texture->texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
 		rollbackTexture(texture);
 		break;
@@ -1100,7 +1101,7 @@ void texture::savtxt() {
   if (TempTexturePoints.empty()) {
 	return;
   }
-  if (auto const& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
+  if (auto const& currentHistoryItem = TextureHistory.operator[](TextureHistoryIndex);
       !chktxh(currentHistoryItem)) {
 	return;
   }
@@ -1108,7 +1109,7 @@ void texture::savtxt() {
   Instance->StateMap.reset(StateFlag::TXBDIR);
   Instance->StateMap.reset(StateFlag::LASTXBAK);
   txrfor();
-  auto& currentItem   = TextureHistory->operator[](TextureHistoryIndex);
+  auto& currentItem   = TextureHistory.operator[](TextureHistoryIndex);
   currentItem.height  = TextureScreen.areaHeight;
   currentItem.width   = TextureScreen.width;
   currentItem.spacing = TextureScreen.spacing;

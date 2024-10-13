@@ -11,7 +11,7 @@ namespace texture {
 void deltx(uint32_t formIndex);
 void drwtxtr();
 auto dutxtfil() -> bool;
-void initTextures(std::vector<TX_HIST>*  ptrTextureHistory) noexcept;
+void initTextureHistory() noexcept;
 void redtx();
 void rstxt();
 void rtrtx(FRM_HEAD const& form);
