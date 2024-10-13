@@ -94,7 +94,6 @@ class MY_SINGLE
   std::vector<FRM_HEAD>     FormList;
   std::wstring              formOnOff;
   std::vector<F_POINT>      FormVertices;
-  std::vector<POINT>        FormVerticesAsLine;
   std::vector<F_POINT>      insidePointList;
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      interleaveSequenceIndices;

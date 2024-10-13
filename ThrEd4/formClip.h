@@ -17,6 +17,5 @@ auto getClipFormCount() noexcept -> uint32_t;
 void lodclp(uint32_t iStitch);
 void rtrclp();
 void setClipOrigin(POINT source) noexcept;
-void setFVAS(std::vector<POINT>* source) noexcept;
 void txtclp(FRM_HEAD& textureForm);
 } // namespace tfc

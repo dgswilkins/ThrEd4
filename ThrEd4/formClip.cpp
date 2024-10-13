@@ -91,8 +91,7 @@ class FORM_VERTEX_CLIP // form points clipboard header
 namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
-auto FormVerticesAsLine =
-    gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
+auto FormVerticesAsLine = std::vector<POINT> {}; // form vertex clipboard paste into form line
 
 // Definitions
 void clipSelectedForm();
@@ -461,7 +460,7 @@ void clipSelectedStitches() {
 void dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
+  wrap::polyline(StitchWindowDC, FormVerticesAsLine.data(), wrap::toUnsigned(FormVerticesAsLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -564,21 +563,21 @@ void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const
 void setpclp() {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
-  FormVerticesAsLine->clear();
+  FormVerticesAsLine.clear();
   auto itIntlvSeq = interleaveSequence.begin();
   auto point      = form::sfCor2px(*itIntlvSeq);
   ++itIntlvSeq;
-  FormVerticesAsLine->push_back(point);
+  FormVerticesAsLine.push_back(point);
   point             = form::sfCor2px(*itIntlvSeq);
   auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
                              WinMsg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;
-	FormVerticesAsLine->push_back(POINT {point.x + offset.x, point.y + offset.y});
+	FormVerticesAsLine.push_back(POINT {point.x + offset.x, point.y + offset.y});
   }
   point = form::sfCor2px(interleaveSequence.back());
-  FormVerticesAsLine->push_back(point);
+  FormVerticesAsLine.push_back(point);
 }
 
 void sizclp(FRM_HEAD const& form,
@@ -635,10 +634,6 @@ void unpclp() {
 
 auto tfc::getClipFormCount() noexcept -> uint32_t {
   return ClipFormsCount;
-}
-
-void tfc::setFVAS(std::vector<POINT>* source) noexcept {
-  FormVerticesAsLine = source;
 }
 
 void tfc::setClipOrigin(POINT const source) noexcept {

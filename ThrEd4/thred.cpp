@@ -12279,7 +12279,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 
 	  texture::initTextureHistory();
-	  tfc::setFVAS(&Instance->FormVerticesAsLine);
 	  redini();
 
 	  Instance->menuInfo = MENUITEMINFO {
