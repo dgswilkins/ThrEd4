@@ -10885,7 +10885,7 @@ void thred::nudgfn(float const deltaX, float const deltaY) {
 	for (auto& stitch : Instance->StitchBuffer) {
 	  stitch += F_POINT {deltaX, deltaY};
 	}
-	auto& allItemsRect = Instance->allItemsRect;
+	auto& allItemsRect = form::getAllItemsRect();
 	allItemsRect.left += deltaX;
 	allItemsRect.top += deltaY;
 	allItemsRect.right += deltaX;

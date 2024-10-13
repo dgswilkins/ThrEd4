@@ -80,7 +80,6 @@ class MY_SINGLE
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  F_RECTANGLE               allItemsRect;
   std::vector<F_POINT>      angledFormVertices;
   fs::path                  auxName;
   std::vector<B_SEQ_PNT>    bSequence;

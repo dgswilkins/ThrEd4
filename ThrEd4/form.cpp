@@ -186,6 +186,7 @@ auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in 
 auto FormVertexNext = uint32_t {};                     // form vertex storage for form vertex insert
 auto FormVertexPrev = uint32_t {};                     // form vertex storage for form vertex insert
 auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
+auto AllItemsRect   = F_RECTANGLE {};                  // bounding rectangle for all items
 
 // Definitions
 void adfrm(uint32_t iForm);
@@ -5834,7 +5835,7 @@ void form::flipv() {
 	return;
   }
   if (Instance->StateMap.test(StateFlag::BIGBOX)) {
-	auto const offset = Instance->allItemsRect.top + Instance->allItemsRect.bottom;
+	auto const offset = AllItemsRect.top + AllItemsRect.bottom;
 	for (auto& formVertice : Instance->FormVertices) {
 	  formVertice.y = offset - formVertice.y;
 	}
@@ -6169,6 +6170,10 @@ void form::filinsb(F_POINT const& point, F_POINT& stitchPoint) {
   }
   Instance->OSequence.push_back(point);
   stitchPoint = point;
+}
+
+auto form::getAllItemsRect() noexcept -> F_RECTANGLE& {
+  return AllItemsRect;
 }
 
 auto form::getblen() noexcept -> float {
@@ -7075,7 +7080,7 @@ void form::selal() {
   Instance->selectedFormList.clear();
   Instance->StateMap.reset(StateFlag::SELBOX);
   Instance->StateMap.reset(StateFlag::GRPSEL);
-  Instance->allItemsRect = getbig(Instance->FormList, Instance->StitchBuffer);
+  AllItemsRect = getbig(Instance->FormList, Instance->StitchBuffer);
   ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   Instance->StateMap.reset(StateFlag::ZUMED);
@@ -7083,7 +7088,7 @@ void form::selal() {
   NearestCount = 0;
   Instance->StateMap.reset(StateFlag::RUNPAT);
   thred::duzrat();
-  stchrct2px(Instance->allItemsRect, SelectedFormsRect);
+  stchrct2px(AllItemsRect, SelectedFormsRect);
   Instance->StateMap.set(StateFlag::BIGBOX);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -7844,7 +7849,7 @@ void form::fliph() {
 
   if (Instance->StateMap.test(StateFlag::BIGBOX)) {
 	thred::savdo();
-	auto const offset = Instance->allItemsRect.right + Instance->allItemsRect.left;
+	auto const offset = AllItemsRect.right + AllItemsRect.left;
 	for (auto& formVertice : Instance->FormVertices) {
 	  formVertice.x = offset - formVertice.x;
 	}
@@ -8086,7 +8091,7 @@ auto form::rotpar() -> F_POINT {
 	  break;
 	}
 	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
-	  RotationRect = Instance->allItemsRect;
+	  RotationRect = AllItemsRect;
 	  break;
 	}
 	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
@@ -8733,10 +8738,9 @@ void form::cntrx() {
 void form::centir() {
   Instance->StateMap.reset(StateFlag::BIGBOX);
   auto& formList        = Instance->FormList;
-  auto& allItemsRect    = Instance->allItemsRect;
-  allItemsRect          = getbig(formList, Instance->StitchBuffer);
-  auto const itemCenter = F_POINT {wrap::midl(allItemsRect.right, allItemsRect.left),
-                                   wrap::midl(allItemsRect.top, allItemsRect.bottom)};
+  AllItemsRect           = getbig(formList, Instance->StitchBuffer);
+  auto const itemCenter = F_POINT {wrap::midl(AllItemsRect.right, AllItemsRect.left),
+                                   wrap::midl(AllItemsRect.top, AllItemsRect.bottom)};
   auto const hoopCenter =
       F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   auto const delta = F_POINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};
