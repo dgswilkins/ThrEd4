@@ -6907,7 +6907,7 @@ void form::infrm() { // insert multiple points into a form
   if (!closat(inOutFlag)) {
 	return;
   }
-  FormForInsert = &Instance->FormList.operator[](ClosestFormToCursor);
+  FormForInsert = std::addressof(Instance->FormList.operator[](ClosestFormToCursor));
   switch (inOutFlag) {
 	case IntersectionStyles::POINT_BEFORE_LINE: {
 	  FormVertexPrev = 0;

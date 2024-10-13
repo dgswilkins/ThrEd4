@@ -1501,7 +1501,7 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
   Instance->StateMap.reset(StateFlag::INDIR);
   if (count < form.vertexCount / 2U) {
 	Instance->StateMap.set(StateFlag::INDIR);
-	OutsidePoints = &Instance->insidePointList;
+	OutsidePoints = std::addressof(Instance->insidePointList);
 	InsidePoints  = std::addressof(Instance->outsidePointList);
   }
 }
