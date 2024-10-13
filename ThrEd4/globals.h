@@ -96,7 +96,6 @@ class MY_SINGLE
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      interleaveSequenceIndices;
 
-  MENUITEMINFO              menuInfo = MENUITEMINFO {};
   std::vector<F_POINT>      OSequence;
   std::vector<F_POINT>      outsidePointList;
   std::vector<POINT>        rubberBandLine;

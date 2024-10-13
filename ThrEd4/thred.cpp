@@ -12281,21 +12281,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  texture::initTextureHistory();
 	  redini();
 
-	  Instance->menuInfo = MENUITEMINFO {
-	      sizeof(MENUITEMINFO),       // Size
-	      MIIM_TYPE,                  // Mask
-	      MFT_STRING,                 // Type
-	      0,                          // State
-	      0,                          // ID
-	      nullptr,                    // SubMenu
-	      nullptr,                    // bmpChecked
-	      nullptr,                    // bmpUnchecked
-	      0,                          // ItemData
-	      Instance->formOnOff.data(), // TypeData
-	      1,                          // cch (dummy value since we use SetMenuItemInfo)
-	      nullptr                     // bmpItem (available only on Windows 2000 and higher)
-	  };
-
 	  createParams createParams {};
 	  createParams.bEnableNonClientDpiScaling = TRUE;
 

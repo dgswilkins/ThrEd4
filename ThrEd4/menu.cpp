@@ -68,6 +68,7 @@ auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
 auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
 auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
+auto MenuInfo       = MENUITEMINFO {};
 
 constexpr auto GRDHI  = uint32_t {0xffffffU}; // grid high color
 constexpr auto GRDMED = uint32_t {0x404040U}; // grid medium color
@@ -268,13 +269,13 @@ void menu::flipFormOnOff() {
 	Instance->StateMap.reset(StateFlag::FRMPSEL);
 	Instance->StateMap.reset(StateFlag::INSFRM);
   }
-  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(Instance->menuInfo));
+  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(MenuInfo));
   Instance->StateMap.set(StateFlag::DUMEN);
 }
 
 void menu::resetFormOnOff() {
   Instance->formOnOff.assign(displayText::loadStr(IDS_FRMPLUS));
-  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(Instance->menuInfo));
+  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, std::addressof(MenuInfo));
   Instance->StateMap.set(StateFlag::DUMEN);
 }
 
@@ -436,6 +437,20 @@ void menu::init() noexcept {
   BorderFillMenu = GetSubMenu(FillMenu, MFIL_BORD);
   ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
   ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
+  MenuInfo       = MENUITEMINFO {
+      sizeof(MENUITEMINFO),       // Size
+      MIIM_TYPE,                  // Mask
+      MFT_STRING,                 // Type
+      0,                          // State
+      0,                          // ID
+      nullptr,                    // SubMenu
+      nullptr,                    // bmpChecked
+      nullptr,                    // bmpUnchecked
+      0,                          // ItemData
+      Instance->formOnOff.data(), // TypeData
+      1,                          // cch (dummy value since we use SetMenuItemInfo)
+      nullptr                     // bmpItem (available only on Windows 2000 and higher)
+  };
 }
 
 void menu::resetThreadView() {
