@@ -88,7 +88,6 @@ class MY_SINGLE
   std::vector<F_POINT>      clipPoints;
   int32_t                   DPI = 0;
   std::vector<float>        formAngles;
-  std::vector<POINT>        FormControlPoints;
   std::vector<POINT>        formLines;
   std::vector<FRM_HEAD>     FormList;
   std::wstring              formOnOff;
