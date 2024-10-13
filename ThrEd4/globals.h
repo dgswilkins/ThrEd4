@@ -213,8 +213,6 @@ extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
 extern F_RECTANGLE    RotationRect;
 
-extern int32_t* ScreenDPI;
-
 extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 

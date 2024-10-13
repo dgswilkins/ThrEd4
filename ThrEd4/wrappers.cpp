@@ -89,7 +89,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
 // ReSharper restore CppParameterMayBeConst
 
 auto wrap::createPen(int32_t const iStyle, int32_t const width, COLORREF const color) noexcept -> HPEN {
-  auto const scaledWidth = MulDiv(width, *ScreenDPI, STDDPI);
+  auto const scaledWidth = MulDiv(width, Instance->DPI, STDDPI);
   return CreatePen(iStyle, scaledWidth, color);
 }
 
