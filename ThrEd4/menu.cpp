@@ -399,7 +399,7 @@ void menu::auxmen() {
   Instance->StateMap.set(StateFlag::DUMEN);
 }
 
-void menu::redfils(std::array<uint32_t, OLDNUM>& lruMenuId, std::vector<fs::path>& previousNames) {
+void menu::redfils(std::array<uint32_t, OLDNUM> const& lruMenuId, std::vector<fs::path>& previousNames) {
   auto findData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
   for (auto const& iLRU : lruMenuId) {
 	if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != gsl::narrow_cast<UINT>(-1)) {

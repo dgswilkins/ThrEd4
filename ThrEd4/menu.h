@@ -32,7 +32,7 @@ void ladj();
 void linbmen();
 void nedmen();
 void qchk();
-void redfils(std::array<uint32_t, OLDNUM>& lruMenuId, std::vector<fs::path>& previousNames);
+void redfils(std::array<uint32_t, OLDNUM> const& lruMenuId, std::vector<fs::path>& previousNames);
 void resetFormOnOff();
 void resetThreadView();
 void rotauxmen();
