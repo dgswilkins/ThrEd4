@@ -31,7 +31,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "gsl/pointers"
 #include "gsl/util"
 #pragma warning(pop)
 

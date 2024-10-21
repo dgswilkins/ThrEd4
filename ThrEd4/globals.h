@@ -4,7 +4,6 @@
 #pragma warning(disable : 26446) // bounds.4     Prefer to use gsl::at() instead of unchecked subscript operator
 
 // Local Headers
-#include "clipStitch.h"
 #include "EnumMap.h"
 #include "formHeader.h"
 #include "fRectangle.h"

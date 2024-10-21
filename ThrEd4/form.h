@@ -3,12 +3,6 @@
 // Local Headers
 #include "formHeader.h"
 
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "gsl/gsl"
-#pragma warning(pop)
-
 constexpr auto SQRCORNS = 4U; // number of corners in a square
 
 // is intersection of line and cursor in, before or after the line

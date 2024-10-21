@@ -17,7 +17,6 @@
 // Standard Libraries
 #include <cstdint>
 #include <filesystem>
-#include <vector>
 
 namespace fs = std::filesystem;
 

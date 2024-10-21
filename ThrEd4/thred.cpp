@@ -46,7 +46,6 @@
 #include "boost/range/algorithm_ext/iota.hpp"
 #include "fmt/compile.h"
 #include "gsl/narrow"
-#include "gsl/pointers"
 #include "gsl/span"
 #include "gsl/util"
 #pragma warning(pop)
