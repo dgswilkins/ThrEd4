@@ -194,6 +194,7 @@ void backup::dudat() {
 void backup::deldu() {
   for (auto& bufferElement : Instance->UndoBuffer) {
 	bufferElement.clear();
+	bufferElement.shrink_to_fit();
   }
   UndoBufferWriteIndex = 0;
   Instance->StateMap.reset(StateFlag::BAKWRAP);
