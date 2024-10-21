@@ -1552,7 +1552,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		Instance->StateMap.set(StateFlag::RESTCH);
 	  }
 	}
-	if (Instance->StateMap.test(StateFlag::INIT) || !Instance->thrName.empty()) { // If we are inserting a stitch
+	if (Instance->StateMap.test(StateFlag::INIT) || !Instance->StitchBuffer.empty()) { // If we are inserting a stitch
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		if (Instance->StateMap.test(StateFlag::SELBOX)) { // if we are holding shift and selecting a box
 		  // extend the thread selection
