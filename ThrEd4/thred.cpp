@@ -10230,9 +10230,9 @@ void thred::thumnail() {
   }
   Thumbnails.clear();
   auto& fileName = fileData.cFileName;
-  Thumbnails.push_back(std::wstring(std::begin(fileName)));
+  Thumbnails.emplace_back(std::begin(fileName));
   while (FindNextFile(file, &fileData)) {
-	Thumbnails.push_back(std::wstring(std::begin(fileName)));
+	Thumbnails.emplace_back(std::begin(fileName));
   }
   FindClose(file);
   std::ranges::sort(Thumbnails);
