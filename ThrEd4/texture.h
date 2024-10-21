@@ -10,7 +10,7 @@ namespace texture {
 void deltx(uint32_t formIndex);
 void drwtxtr();
 auto dutxtfil() -> bool;
-void initTextureHistory() noexcept;
+void initTextureHistory();
 void redtx();
 void rstxt();
 void rtrtx(FRM_HEAD const& form);

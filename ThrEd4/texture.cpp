@@ -996,7 +996,7 @@ void texture::setTxtCurLoc(POINT const location) noexcept {
   TextureCursorLocation = location;
 }
 
-void texture::initTextureHistory() noexcept {
+void texture::initTextureHistory() {
   TextureHistory.resize(ITXBUFSZ);
 }
 
