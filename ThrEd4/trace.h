@@ -6,6 +6,7 @@ void dutrnum1();
 void dutrnum2();
 void initColorRef() noexcept;
 void initTraceWindows();
+void setTracedMapSize(uint32_t bitmapSize);
 void trace();
 void tracedg();
 void traceNumberInput(wchar_t NumericCode);

@@ -1419,3 +1419,8 @@ void trace::traceNumberReset() noexcept(!std::is_same_v<ptrdiff_t, int>) {
   *itTraceInputBuffer           = 0;
   thred::redraw(TraceNumberInput);
 }
+
+void trace::setTracedMapSize(uint32_t bitmapSize) {
+  Instance->TracedMap.resize(bitmapSize);
+  Instance->TracedMap.reset();
+}

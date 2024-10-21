@@ -715,8 +715,7 @@ auto bitmap::getrmap() -> uint32_t {
 	BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 	Instance->StateMap.set(StateFlag::WASTRAC);
 	bitmapSize = (wrap::toUnsigned(BitmapWidth) + 1U) * (wrap::toUnsigned(BitmapHeight) + 1U);
-	Instance->TracedMap.resize(bitmapSize);
-	Instance->TracedMap.reset();
+	trace::setTracedMapSize(bitmapSize);
 	StretchBlt(StitchWindowMemDC,
 	           BitmapDstRect.left,
 	           BitmapDstRect.top,
