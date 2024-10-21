@@ -107,7 +107,6 @@ class MY_SINGLE
   ENUM_MAP<StateFlag>       StateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> StitchBuffer;
   std::vector<TX_PNT>       TexturePointsBuffer;
-  fs::path                  thrName;
   boost::dynamic_bitset<>   tracedEdges;
   boost::dynamic_bitset<>   TracedMap;
 

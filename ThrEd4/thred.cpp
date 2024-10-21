@@ -254,6 +254,7 @@ auto NameDecoder         = std::array<uint8_t, DNDLEN> {}; // designer name deco
 auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
 auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
+auto ThrName            = fs::path {};           // ThrEd file path
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -3814,7 +3815,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	if (!Instance->StateMap.test(StateFlag::RUNPAT)) {
 	  if (!Instance->StateMap.test(StateFlag::HIDSTCH) &&
-	      (!Instance->thrName.empty() || Instance->StateMap.test(StateFlag::INIT) ||
+	      (!ThrName.empty() || Instance->StateMap.test(StateFlag::INIT) ||
 	       !Instance->FormList.empty() || Instance->StateMap.test(StateFlag::SATPNT)) &&
 	      !Instance->StateMap.test(StateFlag::BAKSHO)) {
 		drwStch();
@@ -3955,7 +3956,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
 		if (DrawItem->hwndItem == *itHWndBV) {
-		  auto fileName = Instance->thrName; // intentional copy
+		  auto fileName = ThrName; // intentional copy
 		  auto ext      = fileName.extension().wstring();
 		  ext.back()    = iVersion + 's';
 		  fileName.replace_extension(ext);
@@ -4721,7 +4722,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	  auto const spEHCN = gsl::span {ExtendedHeader.creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
 	  redfnam(DesignerName);
-	  auto fmtStr = displayText::format2(IDS_THRDBY, Instance->thrName.wstring(), DesignerName);
+	  auto fmtStr = displayText::format2(IDS_THRDBY, ThrName.wstring(), DesignerName);
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
   }
@@ -5250,15 +5251,15 @@ void nunams() {
   auto const& workingFileName = Instance->WorkingFileName;
   Instance->auxName           = workingFileName;
   xt::duauxnam(Instance->auxName);
-  Instance->thrName = workingFileName;
-  Instance->thrName.replace_extension(L".thr");
-  if (PreviousNames.front() == Instance->thrName) {
+  ThrName = workingFileName;
+  ThrName.replace_extension(L".thr");
+  if (PreviousNames.front() == ThrName) {
 	return;
   }
   auto flag = true;
   for (auto  spNames = std::ranges::subrange(std::next(PreviousNames.begin()), PreviousNames.end());
        auto& previousName : spNames) {
-	if (previousName != Instance->thrName) {
+	if (previousName != ThrName) {
 	  continue;
 	}
 	std::swap(PreviousNames.front(), previousName);
@@ -5273,12 +5274,12 @@ void nunams() {
 	if (!previousName.empty()) {
 	  continue;
 	}
-	previousName.assign(Instance->thrName);
+	previousName.assign(ThrName);
 	flag = false;
 	break;
   }
   if (flag) {
-	PreviousNames.insert(PreviousNames.begin(), Instance->thrName);
+	PreviousNames.insert(PreviousNames.begin(), ThrName);
 	PreviousNames.pop_back();
   }
   menu::redfils(LRUMenuId, PreviousNames);
@@ -5633,19 +5634,19 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 
 void rebak() {
   destroyBV();
-  auto newFileName    = Instance->thrName; // intentional copy
+  auto newFileName    = ThrName; // intentional copy
   auto safetyFileName = newFileName;       // initialise from local variable
   auto ext            = newFileName.extension().wstring();
   ext.back()          = FileVersionIndex + L's';
   newFileName.replace_extension(ext);
   ext.back() = 'x';
   safetyFileName.replace_extension(ext);
-  fs::rename(Instance->thrName, safetyFileName);
+  fs::rename(ThrName, safetyFileName);
   if (exists(newFileName)) {
-	fs::rename(newFileName, Instance->thrName);
+	fs::rename(newFileName, ThrName);
   }
   fs::rename(safetyFileName, newFileName);
-  Instance->WorkingFileName = Instance->thrName;
+  Instance->WorkingFileName = ThrName;
   Instance->StateMap.set(StateFlag::REDOLD);
   nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
@@ -7026,9 +7027,9 @@ void thrsav() {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
-      CreateFile(Instance->thrName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      CreateFile(ThrName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(Instance->thrName);
+	displayText::crmsg(ThrName);
 	return;
   }
   auto output = std::vector<char> {};
@@ -7036,7 +7037,7 @@ void thrsav() {
   auto bytesWritten = DWORD {};
   WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
   if (bytesWritten != output.size()) {
-	displayText::showMessage(IDS_FWERR, Instance->thrName.wstring());
+	displayText::showMessage(IDS_FWERR, ThrName.wstring());
   }
   CloseHandle(fileHandle);
 }
@@ -8048,7 +8049,7 @@ void thred::savAs() {
   Instance->StateMap.reset(StateFlag::CMPDO);
   thrsav();
   sav();
-  SetWindowText(ThrEdWindow, Instance->thrName.wstring().c_str());
+  SetWindowText(ThrEdWindow, ThrName.wstring().c_str());
 }
 
 void thred::save() {
@@ -8085,7 +8086,7 @@ void thred::dun() {
 	Instance->StateMap.set(StateFlag::SAVEX);
 	return;
   }
-  auto const fmtStr = displayText::format(IDS_SAVFIL, Instance->thrName.wstring());
+  auto const fmtStr = displayText::format(IDS_SAVFIL, ThrName.wstring());
   if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
 	save();
   }
@@ -8814,7 +8815,7 @@ void thred::newFil() {
   DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
-  Instance->thrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
+  ThrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
   ritfnam(DesignerName);
   auto const designer       = utf::utf16ToUtf8(DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
@@ -9304,7 +9305,7 @@ void thred::deltot() {
   rstAll();
   coltab();
   zumhom();
-  auto const wTxt = displayText::format2(IDS_THRDBY, Instance->thrName.wstring(), DesignerName);
+  auto const wTxt = displayText::format2(IDS_THRDBY, ThrName.wstring(), DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
@@ -9698,11 +9699,11 @@ void thred::thumbak() {
 }
 
 void thred::purg() {
-  if (Instance->thrName.empty()) {
+  if (ThrName.empty()) {
 	return;
   }
-  auto fileName = Instance->thrName; // intentional copy
-  auto ext      = Instance->thrName.extension().wstring();
+  auto fileName = ThrName; // intentional copy
+  auto ext      = ThrName.extension().wstring();
   for (auto iLast = wchar_t {}; iLast < OLDVER; ++iLast) {
 	ext.back() = iLast + 's';
 	fileName.replace_extension(ext);
@@ -12190,7 +12191,7 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 
 void thred::tst() {
   DesignerName.assign(L"Coder");
-  Instance->thrName.assign(DesignerName);
+  ThrName.assign(DesignerName);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
@@ -12776,4 +12777,8 @@ void thred::setLargestStitchVal() {
 
 auto thred::getLabelWindow() noexcept -> std::vector<HWND>& {
   return LabelWindow;
+}
+
+auto thred::getThrEdName() noexcept -> fs::path const& {
+  return ThrName;
 }

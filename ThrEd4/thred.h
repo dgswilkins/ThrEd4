@@ -82,6 +82,7 @@ auto getHomeDir() noexcept -> fs::path&;
 auto getLabelWindow() noexcept -> std::vector<HWND>&;
 auto getMsgBufferValue() -> float;
 auto getRotationHandleAngle() noexcept -> float;
+auto getThrEdName() noexcept -> fs::path const&;
 auto getUserPen(uint32_t iPen) noexcept -> HPEN;
 auto getVerticalIndex() noexcept -> uint8_t;
 auto getZoomMin() noexcept -> float;
