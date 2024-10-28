@@ -12257,6 +12257,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
+	  trace::traceInit();
+
 	  DefaultColorWin.resize(COLORCNT);
 	  FormControlPoints.resize(OUTPNTS);
 	  LabelWindow.resize(LASTLIN);

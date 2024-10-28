@@ -98,6 +98,30 @@ class TRACE_PNT
   int16_t y {};
 };
 
+class TRACE_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> TRACE_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static TRACE_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  boost::dynamic_bitset<>        TracedEdges;
+  boost::dynamic_bitset<>        TracedMap;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  TRACE_SINGLE(const TRACE_SINGLE&)                    = delete;
+  auto operator=(const TRACE_SINGLE&) -> TRACE_SINGLE& = delete;
+  TRACE_SINGLE(TRACE_SINGLE&&)                         = delete;
+  auto operator=(TRACE_SINGLE&&) -> TRACE_SINGLE&      = delete;
+
+  private:
+  TRACE_SINGLE() noexcept = default;
+  ~TRACE_SINGLE()         = default;
+};
+
 // trace internal namespace
 namespace {
 auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
@@ -125,6 +149,8 @@ auto TraceShift       = std::array {0U, BYTSHFT, WRDSHFT}; // trace shift values
 auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {};   // red,green,and blue brushes
 auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr);   // trace number input window
 auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr);   // black pen
+
+TRACE_SINGLE* TraceInstance;
 
 // Definitions
 void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst);
@@ -327,11 +353,12 @@ void dutrac() {
   CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   auto       traceDirection = 0U;
-  if (!Instance->tracedEdges.test(wrap::toSize(savedPoint))) {
+  auto const&      tracedEdges    = TraceInstance->TracedEdges;
+  if (!tracedEdges.test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
 	auto limit = (CurrentTracePoint.y + 1L) * bitmap::getBitmapWidth();
 	// find the right edge
-	while (point < limit && !Instance->tracedEdges.test(wrap::toSize(point))) {
+	while (point < limit && !tracedEdges.test(wrap::toSize(point))) {
 	  ++point;
 	}
 	auto const right = point < limit ? point - (CurrentTracePoint.y * bitmap::getBitmapWidth())
@@ -339,13 +366,13 @@ void dutrac() {
 	point            = savedPoint;
 	limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	// find the left edge
-	while (point > limit && !Instance->tracedEdges.test(wrap::toSize(point))) {
+	while (point > limit && !tracedEdges.test(wrap::toSize(point))) {
 	  --point;
 	}
 	auto const left = point == limit ? 0 : point - limit;
 	point           = savedPoint;
 	// find the bottom edge
-	while (point > 0 && !Instance->tracedEdges.test(wrap::toSize(point))) {
+	while (point > 0 && !tracedEdges.test(wrap::toSize(point))) {
 	  if (point > bitmap::getBitmapWidth()) {
 		point -= bitmap::getBitmapWidth();
 	  }
@@ -357,7 +384,7 @@ void dutrac() {
 	point             = savedPoint;
 	limit             = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
 	// find the top edge
-	while (point < limit && !Instance->tracedEdges.test(wrap::toSize(point))) {
+	while (point < limit && !tracedEdges.test(wrap::toSize(point))) {
 	  point += bitmap::getBitmapWidth();
 	}
 	auto const top  = point < limit ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
@@ -551,6 +578,7 @@ void tracwnd() {
 
 auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
     -> bool {
+  auto const& tracedEdges = TraceInstance->TracedEdges;
   auto pixelIndex = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
   switch (traceDirection) {
@@ -561,14 +589,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCU;
 	  }
 	  else {
-		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
 		  traceDirection = TRCD;
 		}
 		else {
 		  pixelIndex += bitmap::getBitmapWidth();                     // look at the pixel below
-		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.x;
 		  }
 		  else { // start tracing up
@@ -585,14 +613,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCR;
 	  }
 	  else {
-		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
 		  traceDirection = TRCL;
 		}
 		else {
 		  ++pixelIndex; // look at the pixel to the right
-		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.y;
 		  }
 		  else { // start tracing right
@@ -609,14 +637,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCD;
 	  }
 	  else {
-		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
 		  traceDirection = TRCU;
 		}
 		else {
 		  pixelIndex -= bitmap::getBitmapWidth();                     // look at the pixel above
-		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.x;
 		  }
 		  else { // start tracing down
@@ -633,14 +661,14 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		traceDirection = TRCL;
 	  }
 	  else {
-		if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
 		  traceDirection = TRCR;
 		}
 		else {
 		  --pixelIndex; // look at the pixel to the left
-		  if (Instance->tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
+		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.y;
 		  }
 		  else {
@@ -830,11 +858,11 @@ void trace::untrace() {
 	return;
   }
   bitmap::resetDC();
-  if (!Instance->tracedEdges.empty()) {
-	Instance->tracedEdges.resize(0); // allocated in tracedg
+  if (!TraceInstance->TracedEdges.empty()) {
+	TraceInstance->TracedEdges.resize(0); // allocated in tracedg
   }
-  if (!Instance->TracedMap.empty()) {
-	Instance->TracedMap.resize(0); // allocated in trace
+  if (!TraceInstance->TracedMap.empty()) {
+	TraceInstance->TracedMap.resize(0); // allocated in trace
   }
   Instance->StateMap.reset(StateFlag::WASEDG);
   hideTraceWin();
@@ -977,13 +1005,13 @@ void trace::trace() {
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	LowColors.at(iRGB) = colors.at(iRGB);
   }
-  if (Instance->TracedMap.empty()) {
-	Instance->TracedMap.resize(TraceDataSize, false);
+  if (TraceInstance->TracedMap.empty()) {
+	TraceInstance->TracedMap.resize(TraceDataSize, false);
   }
   auto pos = size_t {0U};
   for (auto& iPixel : spTBD) {
 	if (trcin(iPixel)) {
-	  Instance->TracedMap.set(pos);
+	  TraceInstance->TracedMap.set(pos);
 	}
 	else {
 	  iPixel = 0;
@@ -999,57 +1027,58 @@ void trace::tracedg() {
   if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
 	trace();
   }
-  Instance->tracedEdges.resize(TraceDataSize, false);
-  Instance->tracedEdges.reset();
+  auto& tracedEdges = TraceInstance->TracedEdges;
+  tracedEdges.resize(TraceDataSize, false);
+  tracedEdges.reset();
   auto pixelIndex = 0L;
   for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	auto flag = false;
 	for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
-	  if (Instance->TracedMap.test(wrap::toSize(pixelIndex))) {
+	  if (TraceInstance->TracedMap.test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
-		  Instance->tracedEdges.set(wrap::toSize(pixelIndex));
+		  tracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
 		}
 	  }
 	  else {
 		if (flag) {
-		  Instance->tracedEdges.set(wrap::toSize(pixelIndex) - 1U);
+		  tracedEdges.set(wrap::toSize(pixelIndex) - 1U);
 		  flag = false;
 		}
 	  }
 	  ++pixelIndex;
 	}
 	if (flag) {
-	  Instance->tracedEdges.set(wrap::toSize(pixelIndex) - 1U);
+	  tracedEdges.set(wrap::toSize(pixelIndex) - 1U);
 	}
   }
   for (auto iWidth = 0; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
 	pixelIndex = iWidth;
 	auto flag  = false;
 	for (auto iHeight = 0; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
-	  if (Instance->TracedMap.test(wrap::toSize(pixelIndex))) {
+	  if (TraceInstance->TracedMap.test(wrap::toSize(pixelIndex))) {
 		if (!flag) {
-		  Instance->tracedEdges.set(wrap::toSize(pixelIndex));
+		  tracedEdges.set(wrap::toSize(pixelIndex));
 		  flag = true;
 		}
 	  }
 	  else {
 		if (flag) {
-		  Instance->tracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
+		  tracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 		  flag = false;
 		}
 	  }
 	  pixelIndex += bitmap::getBitmapWidth();
 	}
 	if (flag) {
-	  Instance->tracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
+	  tracedEdges.set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 	}
   }
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto const spTBD      = gsl::span(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
   for (auto& iPixel : spTBD) {
-	if (Instance->tracedEdges.test(pos)) {
+	if (tracedEdges.test(pos)) {
 	  iPixel = PENWHITE;
 	}
 	else {
@@ -1421,6 +1450,10 @@ void trace::traceNumberReset() noexcept(!std::is_same_v<ptrdiff_t, int>) {
 }
 
 void trace::setTracedMapSize(uint32_t bitmapSize) {
-  Instance->TracedMap.resize(bitmapSize);
-  Instance->TracedMap.reset();
+  TraceInstance->TracedMap.resize(bitmapSize);
+  TraceInstance->TracedMap.reset();
+}
+
+void trace::traceInit() noexcept {
+  TraceInstance = TRACE_SINGLE::getInstance();
 }

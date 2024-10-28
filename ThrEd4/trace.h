@@ -9,6 +9,7 @@ void initTraceWindows();
 void setTracedMapSize(uint32_t bitmapSize);
 void trace();
 void tracedg();
+void traceInit() noexcept;
 void traceNumberInput(wchar_t NumericCode);
 void traceNumberReset() noexcept(!std::is_same_v<ptrdiff_t, int>);
 void tracpar();
