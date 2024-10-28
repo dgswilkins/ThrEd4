@@ -88,10 +88,34 @@ class FORM_VERTEX_CLIP // form points clipboard header
 };
 #pragma pack(pop)
 
+class FCLIP_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> FCLIP_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static FCLIP_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  std::vector<POINT> FormVerticesAsLine; // form vertex clipboard paste into form line
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  FCLIP_SINGLE(const FCLIP_SINGLE&)                    = delete;
+  auto operator=(const FCLIP_SINGLE&) -> FCLIP_SINGLE& = delete;
+  FCLIP_SINGLE(FCLIP_SINGLE&&)                         = delete;
+  auto operator=(FCLIP_SINGLE&&) -> FCLIP_SINGLE&      = delete;
+
+  private:
+  FCLIP_SINGLE() noexcept = default;
+  ~FCLIP_SINGLE()         = default;
+};
+
 namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
-auto FormVerticesAsLine = std::vector<POINT> {}; // form vertex clipboard paste into form line
+
+FCLIP_SINGLE* fClipInstance;
 
 // Definitions
 void clipSelectedForm();
@@ -460,7 +484,9 @@ void clipSelectedStitches() {
 void dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::polyline(StitchWindowDC, FormVerticesAsLine.data(), wrap::toUnsigned(FormVerticesAsLine.size()));
+  wrap::polyline(StitchWindowDC,
+                 fClipInstance->FormVerticesAsLine.data(),
+                 wrap::toUnsigned(fClipInstance->FormVerticesAsLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -563,21 +589,21 @@ void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const
 void setpclp() {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
-  FormVerticesAsLine.clear();
+  fClipInstance->FormVerticesAsLine.clear();
   auto itIntlvSeq = interleaveSequence.begin();
   auto point      = form::sfCor2px(*itIntlvSeq);
   ++itIntlvSeq;
-  FormVerticesAsLine.push_back(point);
+  fClipInstance->FormVerticesAsLine.push_back(point);
   point             = form::sfCor2px(*itIntlvSeq);
   auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
                              WinMsg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;
-	FormVerticesAsLine.push_back(POINT {point.x + offset.x, point.y + offset.y});
+	fClipInstance->FormVerticesAsLine.push_back(POINT {point.x + offset.x, point.y + offset.y});
   }
   point = form::sfCor2px(interleaveSequence.back());
-  FormVerticesAsLine.push_back(point);
+  fClipInstance->FormVerticesAsLine.push_back(point);
 }
 
 void sizclp(FRM_HEAD const& form,
@@ -997,4 +1023,8 @@ void tfc::lodclp(uint32_t iStitch) {
   if (!Instance->StitchBuffer.empty()) {
 	Instance->StateMap.set(StateFlag::INIT);
   }
+}
+
+void tfc::fClipInit() noexcept {
+  fClipInstance = FCLIP_SINGLE::getInstance();
 }

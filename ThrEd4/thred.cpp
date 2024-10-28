@@ -12260,6 +12260,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  DST::dstInit();
 	  bal::balInit();
 	  bitmap::bmpInit();
+	  tfc::fClipInit();
 	  trace::traceInit();
 
 	  DefaultColorWin.resize(COLORCNT);
