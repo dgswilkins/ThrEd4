@@ -131,10 +131,32 @@ class DSTDAT
   char val {};
 };
 
+class DST_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> DST_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static DST_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  fs::path ColorFileName; //.thw file name
+  fs::path RGBFileName;   //.rgb file name
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  DST_SINGLE(const DST_SINGLE&)                    = delete;
+  auto operator=(const DST_SINGLE&) -> DST_SINGLE& = delete;
+  DST_SINGLE(DST_SINGLE&&)                         = delete;
+  auto operator=(DST_SINGLE&&) -> DST_SINGLE&      = delete;
+
+  private:
+  DST_SINGLE() noexcept = default;
+  ~DST_SINGLE()         = default;
+};
+
 // DST internal namespace
 namespace {
-auto ColorFileName = fs::path {};                     //.thw file name
-auto RGBFileName   = fs::path {}; //.rgb file name
 
 constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
 constexpr auto DSTMAX    = 121L;                 // maximum stitch/jump length of 121 in DST format
@@ -143,6 +165,8 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling f
 // constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
 constexpr auto TYPJMP = 0x830000U; // dst jump stitch mask
 constexpr auto TYPREG = 0x030000U; // dst regular stitch mask
+
+DST_SINGLE* DSTInstance;
 
 // Definitions
 auto coldis(COLORREF colorA, COLORREF colorB) -> DWORD;
@@ -175,10 +199,10 @@ auto colfil() -> bool {
 	return false;
   }
 
-  ColorFileName = workingFileName;
-  RGBFileName   = workingFileName;
-  ColorFileName.replace_extension(L"thw");
-  RGBFileName.replace_extension(L"rgb");
+  DSTInstance->ColorFileName = workingFileName;
+  DSTInstance->RGBFileName   = workingFileName;
+  DSTInstance->ColorFileName.replace_extension(L"thw");
+  DSTInstance->RGBFileName.replace_extension(L"rgb");
   return true;
 }
 
@@ -217,8 +241,8 @@ void dstran(std::vector<DSTREC>& DSTData) {
   auto colors    = std::vector<uint32_t> {};
   if (colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	if (auto const colorFile =
-	        CreateFile(ColorFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	if (auto const colorFile = CreateFile(
+	        DSTInstance->ColorFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	    colorFile != INVALID_HANDLE_VALUE) {
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
@@ -891,8 +915,8 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
   }
   auto bytesWritten = DWORD {};
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto colorFile =
-      CreateFile(ColorFileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  auto colorFile = CreateFile(
+      DSTInstance->ColorFileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                colorData.data(),
@@ -901,7 +925,8 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
 	                nullptr);
   }
   CloseHandle(colorFile);
-  colorFile = CreateFile(RGBFileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  colorFile = CreateFile(
+      DSTInstance->RGBFileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (colorFile != INVALID_HANDLE_VALUE) {
 	wrap::writeFile(colorFile,
 	                &colorData[2],
@@ -1078,4 +1103,8 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   }
   CloseHandle(fileHandle);
   return true;
+}
+
+void DST::dstInit() noexcept {
+  DSTInstance = DST_SINGLE::getInstance();
 }
