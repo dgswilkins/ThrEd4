@@ -700,27 +700,21 @@ auto trcin(COLORREF const color) -> bool {
 	return false;
   }
   auto const colors = trcols(color);
+  auto       colIndex = 3U;
   if (Instance->StateMap.test(StateFlag::TRCRED)) {
-	if (colors[0] > HighColors[0]) {
-	  return false;
-	}
-	if (colors[0] < LowColors[0]) {
-	  return false;
-	}
+	colIndex = 0U;
   }
   if (Instance->StateMap.test(StateFlag::TRCGRN)) {
-	if (colors[1] > HighColors[1]) {
-	  return false;
-	}
-	if (colors[1] < LowColors[1]) {
-	  return false;
-	}
+	colIndex = 1U;
   }
   if (Instance->StateMap.test(StateFlag::TRCBLU)) {
-	if (colors[2] > HighColors[2]) {
+	colIndex = 2U;
+  }
+  if (colIndex != 3U) {
+	if (colors.at(colIndex) > HighColors.at(colIndex)) {
 	  return false;
 	}
-	if (colors[2] < LowColors[2]) {
+	if (colors.at(colIndex) < LowColors.at(colIndex)) {
 	  return false;
 	}
   }
