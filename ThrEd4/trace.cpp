@@ -124,6 +124,11 @@ class TRACE_SINGLE
 
 // trace internal namespace
 namespace {
+constexpr auto TRACE_RGB_FLAG = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
+constexpr auto TRACE_RGB_MASK = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
+constexpr auto TRACE_RGB     = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
+constexpr auto TRACE_SHIFT   = std::array {0U, BYTSHFT, WRDSHFT};   // trace shift values
+
 auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
 auto TraceDownWindow    = std::array<HWND, CHANLCNT> {}; // trace down number windows
 auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select windows
@@ -131,9 +136,6 @@ auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number wind
 auto CurrentTracePoint  = POINT {};                      // current point being traced
 auto TraceDataSize      = uint32_t {};                   // size of the trace bitmap in double words
 auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
-auto TraceRGBFlag = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
-auto TraceRGBMask = std::array {REDMSK, GRNMSK, BLUMSK};      // trace masks
-auto TraceRGB     = std::array {BLUCOL, GRNCOL, REDCOL};      // trace colors
 auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
 auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
 auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
@@ -145,7 +147,6 @@ auto TraceMsgPoint    = POINT {};    // message point for trace parsing
 auto HighColors       = std::array<uint32_t, CHANLCNT> {}; // separated upper reference colors
 auto LowColors        = std::array<uint32_t, CHANLCNT> {}; // separated lower reference colors
 auto ColumnColor      = uint32_t {};                       // trace color column
-auto TraceShift       = std::array {0U, BYTSHFT, WRDSHFT}; // trace shift values
 auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {};   // red,green,and blue brushes
 auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr);   // trace number input window
 auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr);   // black pen
@@ -494,32 +495,32 @@ void dutrnum0(uint32_t const colNum) {
 void getColors() {
   auto const invColumn = 2U - ColumnColor;
   if (wrap::pressed(VK_SHIFT)) {
-	UpPixelColor &= TraceRGBMask.at(ColumnColor);
-	DownPixelColor |= TraceRGB.at(invColumn);
+	UpPixelColor &= TRACE_RGB_MASK.at(ColumnColor);
+	DownPixelColor |= TRACE_RGB.at(invColumn);
 	return;
   }
   auto const ratio         = TraceMsgPoint.y / (ButtonHeight * 15.0);
   auto const position      = wrap::floor<uint32_t>(ratio * 255.0);
-  auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB.at(invColumn));
-  auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift.at(ColumnColor));
+  auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TRACE_RGB.at(invColumn));
+  auto const tracePosition = gsl::narrow_cast<COLORREF>(position << TRACE_SHIFT.at(ColumnColor));
   if (tracePosition < traceColor) {
-	UpPixelColor &= TraceRGBMask.at(ColumnColor);
+	UpPixelColor &= TRACE_RGB_MASK.at(ColumnColor);
 	UpPixelColor |= tracePosition;
 	return;
   }
-  traceColor = DownPixelColor & TraceRGB.at(invColumn);
+  traceColor = DownPixelColor & TRACE_RGB.at(invColumn);
   if (tracePosition > traceColor) {
-	DownPixelColor &= TraceRGBMask.at(ColumnColor);
+	DownPixelColor &= TRACE_RGB_MASK.at(ColumnColor);
 	DownPixelColor |= tracePosition;
 	return;
   }
   if (WinMsg.message == WM_LBUTTONDOWN) {
-	UpPixelColor &= TraceRGBMask.at(ColumnColor);
-	UpPixelColor |= position << TraceShift.at(ColumnColor);
+	UpPixelColor &= TRACE_RGB_MASK.at(ColumnColor);
+	UpPixelColor |= position << TRACE_SHIFT.at(ColumnColor);
   }
   else {
-	DownPixelColor &= TraceRGBMask.at(ColumnColor);
-	DownPixelColor |= position << TraceShift.at(ColumnColor);
+	DownPixelColor &= TRACE_RGB_MASK.at(ColumnColor);
+	DownPixelColor |= position << TRACE_SHIFT.at(ColumnColor);
   }
 }
 
@@ -542,9 +543,9 @@ void hideTraceWin() noexcept {
 }
 
 void ritrcol(COLORREF& colRef, uint32_t colNum) noexcept {
-  colRef &= TraceRGBMask.at(ColumnColor);
+  colRef &= TRACE_RGB_MASK.at(ColumnColor);
   colNum &= BYTMASK;
-  colRef |= colNum << TraceShift.at(ColumnColor);
+  colRef |= colNum << TRACE_SHIFT.at(ColumnColor);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -793,7 +794,7 @@ auto colsum(COLORREF col) -> uint32_t {
   auto colors   = trcols(col);
   auto itColor  = colors.begin();
   auto colorSum = 0U;
-  for (auto iRGB : TraceRGBFlag) {
+  for (auto iRGB : TRACE_RGB_FLAG) {
 	if (Instance->StateMap.test(iRGB)) {
 	  colorSum += *itColor;
 	}
@@ -808,7 +809,7 @@ auto icolsum(COLORREF col) -> uint32_t {
   auto colorSum = 0U;
 
   constexpr auto RGBMAX = 255U;
-  for (auto iRGB : TraceRGBFlag) {
+  for (auto iRGB : TRACE_RGB_FLAG) {
 	if (Instance->StateMap.test(iRGB)) {
 	  colorSum += RGBMAX - *itColor;
 	}
@@ -836,7 +837,7 @@ void trace::initTraceWindows() {
   auto iTraceSelectWindow  = TraceSelectWindow.begin();
   auto iTraceUpWindow      = TraceUpWindow.begin();
   auto iTraceBrush         = TraceBrush.begin();
-  auto iTraceRGB           = TraceRGB.begin();
+  auto iTraceRGB           = TRACE_RGB.begin();
   for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
 	auto const channel     = gsl::narrow_cast<int32_t>(iRGB);
 	*iTraceControlWindow++ = trcsub(ButtonWidth * channel, 0, ButtonHeight * TRWINROW01);
@@ -898,7 +899,7 @@ void trace::trdif() {
 	  auto iPoint = iHeight * bitmap::getBitmapWidth();
 	  ++iPoint;
 	  for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
-		difbits(TraceShift.at(iRGB), std::next(spTBD.begin(), iPoint));
+		difbits(TRACE_SHIFT.at(iRGB), std::next(spTBD.begin(), iPoint));
 		differenceBitmap[wrap::toSize(iPoint)] = trsum();
 
 		auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
@@ -910,11 +911,11 @@ void trace::trdif() {
 	auto const ratio = 255.0F / wrap::toFloat(colorSumMaximum - colorSumMinimum);
 	auto       pos   = size_t {0U};
 	for (auto& iPixel : spTBD) {
-	  iPixel &= TraceRGBMask.at(iRGB);
+	  iPixel &= TRACE_RGB_MASK.at(iRGB);
 	  if (differenceBitmap[pos] != 0U) {
 		auto const adjustedColorSum =
 		    wrap::round<uint32_t>(wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
-		iPixel |= adjustedColorSum << TraceShift.at(iRGB);
+		iPixel |= adjustedColorSum << TRACE_SHIFT.at(iRGB);
 	  }
 	  ++pos;
 	}
@@ -1162,7 +1163,7 @@ void trace::trinit() {
 	if (componentPeak.at(iRGB) != 0U) {
 	  --componentPeak.at(iRGB);
 	}
-	InvertDownColor |= componentPeak.at(iRGB) << TraceShift.at(iRGB);
+	InvertDownColor |= componentPeak.at(iRGB) << TRACE_SHIFT.at(iRGB);
   }
   DownPixelColor = InvertDownColor ^ COLMASK;
   InvertUpColor  = PENWHITE;
@@ -1197,7 +1198,7 @@ void trace::trcsel() {
 	if (colors[2] > maximumColorComponent) {
 	  iRGB = 0;
 	}
-	iPixel &= TraceRGB.at(iRGB);
+	iPixel &= TRACE_RGB.at(iRGB);
   }
   bitmap::bitbltBitmap();
   Instance->StateMap.set(StateFlag::WASDSEL);
@@ -1272,7 +1273,7 @@ void trace::tracpar() {
 	}
 	else {
 	  if (auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight); position < TRWINROW02) {
-		Instance->StateMap.flip(TraceRGBFlag.at(ColumnColor));
+		Instance->StateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
 		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
 		thred::redraw(*itTraceSelectWindow);
 		trace();
@@ -1350,9 +1351,9 @@ void trace::wasTrace() {
   auto       iTraceDownWindow    = TraceDownWindow.begin();
   auto       iTraceControlWindow = TraceControlWindow.begin();
   auto       iTraceSelectWindow  = TraceSelectWindow.begin();
-  auto       iTraceShift         = TraceShift.begin();
-  auto       iTraceRGB           = TraceRGB.begin();
-  auto       iTraceRGBFlag       = TraceRGBFlag.begin();
+  auto       iTraceShift         = TRACE_SHIFT.begin();
+  auto       iTraceRGB           = TRACE_RGB.begin();
+  auto       iTraceRGBFlag       = TRACE_RGB_FLAG.begin();
   for (auto const& brush : TraceBrush) {
 	if (DrawItem->hwndItem == *iTraceUpWindow++) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
@@ -1387,7 +1388,7 @@ void trace::wasTrace() {
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {
 	  auto const itColTraceBrush = wrap::next(TraceBrush.begin(), ColumnColor);
-	  auto const itColTraceRGB   = wrap::next(TraceRGB.begin(), ColumnColor);
+	  auto const itColTraceRGB   = wrap::next(TRACE_RGB.begin(), ColumnColor);
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *itColTraceBrush);
 	  SetBkColor(DrawItem->hDC, *itColTraceRGB);
 	  wrap::textOut(DrawItem->hDC,
