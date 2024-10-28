@@ -6,6 +6,7 @@
 namespace fs = std::filesystem;
 
 namespace bal {
+void balInit() noexcept;
 void redbal();
 void ritbal();
 auto getBN0() noexcept -> fs::path&;

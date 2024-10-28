@@ -12257,6 +12257,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		return EXIT_FAILURE;
 	  }
 
+	  bal::balInit();
 	  trace::traceInit();
 
 	  DefaultColorWin.resize(COLORCNT);

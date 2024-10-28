@@ -76,6 +76,31 @@ class BAL_HEAD // balarad file header
 };
 #pragma pack(pop)
 
+class BAL_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> BAL_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static BAL_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  fs::path BalaradName0;          // balarad semaphore file
+  fs::path BalaradName1; // balarad data file
+  fs::path BalaradName2;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  BAL_SINGLE(const BAL_SINGLE&)                    = delete;
+  auto operator=(const BAL_SINGLE&) -> BAL_SINGLE& = delete;
+  BAL_SINGLE(BAL_SINGLE&&)                         = delete;
+  auto operator=(BAL_SINGLE&&) -> BAL_SINGLE&      = delete;
+
+  private:
+  BAL_SINGLE() noexcept = default;
+  ~BAL_SINGLE()         = default;
+};
+
 // balarad namespace
 namespace {
 constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
@@ -84,9 +109,8 @@ constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
 constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
 
 auto BalaradOffset = F_POINT {};                           // balarad offset
-auto BalaradName0  = fs::path {};                          // balarad semaphore file
-auto BalaradName1  = fs::path {};                          // balarad data file
-auto BalaradName2  = fs::path {};
+
+BAL_SINGLE* BalInstance;
 
 // Functions
 void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint8_t const code, uint8_t const flag) {
@@ -99,28 +123,28 @@ void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t const source, uint
 } // namespace
 
 auto bal::getBN0() noexcept -> fs::path& {
-  return BalaradName0;
+  return BalInstance->BalaradName0;
 }
 
 auto bal::getBN1() noexcept -> fs::path& {
-  return BalaradName1;
+  return BalInstance->BalaradName1;
 }
 
 auto bal::getBN2() noexcept -> fs::path& {
-  return BalaradName2;
+  return BalInstance->BalaradName2;
 }
 
 void bal::redbal() {
   auto fileSize = uintmax_t {};
-  if (!thred::getFileSize(BalaradName2, fileSize)) {
+  if (!thred::getFileSize(BalInstance->BalaradName2, fileSize)) {
 	return;
   }
   auto balaradHeader = BAL_HEAD {};
   Instance->StitchBuffer.clear();
   Instance->FormList.clear();
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const balaradFile =
-      CreateFile(BalaradName2.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  auto const balaradFile = CreateFile(
+      BalInstance->BalaradName2.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (balaradFile == INVALID_HANDLE_VALUE) {
 	return;
   }
@@ -186,7 +210,8 @@ void bal::redbal() {
 
 void bal::ritbal() {
   auto balaradHeader = BAL_HEAD {};
-  if (!BalaradName0.empty() && !BalaradName1.empty() && !Instance->StitchBuffer.empty()) {
+  if (!BalInstance->BalaradName0.empty() && !BalInstance->BalaradName1.empty() &&
+      !Instance->StitchBuffer.empty()) {
 	auto outputName = thred::setFileName();
 	outputName.replace_extension(L".thv");
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -231,21 +256,25 @@ void bal::ritbal() {
 	}
 	WriteFile(balaradFile, balaradStitch.data(), wrap::sizeofVector(balaradStitch), &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
-	balaradFile =
-	    CreateFile(BalaradName1.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	balaradFile = CreateFile(
+	    BalInstance->BalaradName1.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	auto const outString = utf::utf16ToUtf8(outputName.wstring());
 	wrap::writeFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
   }
   else {
-	if (!BalaradName1.empty()) {
+	if (!BalInstance->BalaradName1.empty()) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const balaradFile =
-	      CreateFile(BalaradName1.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	  auto const balaradFile = CreateFile(
+	      BalInstance->BalaradName1.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	  CloseHandle(balaradFile);
 	}
   }
-  if (!BalaradName0.empty()) {
-	fs::remove(BalaradName0);
+  if (!BalInstance->BalaradName0.empty()) {
+	fs::remove(BalInstance->BalaradName0);
   }
+}
+
+void bal::balInit() noexcept {
+  BalInstance = BAL_SINGLE::getInstance();
 }
