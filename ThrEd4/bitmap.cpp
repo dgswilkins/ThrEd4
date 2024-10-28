@@ -67,6 +67,30 @@
 // ReSharper restore CppUnusedIncludeDirective
 #include <vector>
 
+class BMP_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> BMP_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static BMP_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  std::vector<COLORREF> BitmapBackgroundColors; // for the bitmap color dialog box
+  fs::path              UTF16BMPname;           // bitmap file name from user load
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  BMP_SINGLE(const BMP_SINGLE&)                    = delete;
+  auto operator=(const BMP_SINGLE&) -> BMP_SINGLE& = delete;
+  BMP_SINGLE(BMP_SINGLE&&)                         = delete;
+  auto operator=(BMP_SINGLE&&) -> BMP_SINGLE&      = delete;
+
+  private:
+  BMP_SINGLE() noexcept = default;
+  ~BMP_SINGLE()         = default;
+};
+
 constexpr auto BITCOL  = uint32_t {0xffff00U}; // default bitmap color
 constexpr auto SZBMPNM = 17U; // THR spec for BMP filename length (+ 1 for zero terminator)
 constexpr auto FLTBMP  = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"}; // filter specifications
@@ -77,7 +101,6 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 
 // bitmap internal namespace
 namespace {
-auto BitmapBackgroundColors = std::vector<COLORREF> {}; // for the bitmap color dialog box
 auto BitmapColor          = BITCOL;                                              // bitmap color
 auto BitMapColorStruct    = CHOOSECOLOR {};
 auto BitmapDC             = HDC {};    // bitmap device context
@@ -95,8 +118,9 @@ auto BitmapWidth          = LONG {};             // bitmap width
 auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
 auto TraceBitmap          = HBITMAP {};          // trace bitmap
 auto TraceDC              = HDC {};              // trace device context
-auto UTF16BMPname           = fs::path {};         // bitmap file name from user load
 auto UTF8BMPname          = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
+
+BMP_SINGLE* BMPInstance;
 
 // Definitions
 auto binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool;
@@ -304,7 +328,7 @@ auto nuBit() noexcept -> BOOL {
   BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
   BitMapColorStruct.lCustData      = 0;
-  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors.data();
+  BitMapColorStruct.lpCustColors   = BMPInstance->BitmapBackgroundColors.data();
   BitMapColorStruct.lpfnHook       = nullptr;
   BitMapColorStruct.lpTemplateName = nullptr;
   BitMapColorStruct.rgbResult      = BitmapColor;
@@ -336,7 +360,7 @@ auto saveName(fs::path& fileName) {
   hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
   hResult += pFileSave->SetFileTypeIndex(0);
   hResult += pFileSave->SetTitle(L"Save Bitmap");
-  auto const bmpName = UTF16BMPname.filename().wstring();
+  auto const bmpName = BMPInstance->UTF16BMPname.filename().wstring();
   hResult += pFileSave->SetFileName(bmpName.c_str());
   hResult += pFileSave->SetDefaultExtension(L"bmp");
   if (FAILED(hResult)) {
@@ -374,10 +398,10 @@ auto stch2bit(F_POINT& point) -> POINT {
 void bitmap::bfil(COLORREF const& backgroundColor) {
   auto const inverseBackgroundColor = fswap(backgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto hBitmapFile =
-      CreateFile(UTF16BMPname.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  auto hBitmapFile = CreateFile(
+      BMPInstance->UTF16BMPname.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
-	displayText::showMessage(IDS_UNOPEN, UTF16BMPname.wstring());
+	displayText::showMessage(IDS_UNOPEN, BMPInstance->UTF16BMPname.wstring());
 	CloseHandle(hBitmapFile);
 	resetBmpFile(true);
 	return;
@@ -474,7 +498,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	CloseHandle(hBitmapFile);
 	Instance->StateMap.reset(StateFlag::MONOMAP);
 	hBitmapFile = LoadImage(
-	    ThrEdInstance, UTF16BMPname.wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
+	    ThrEdInstance, BMPInstance->UTF16BMPname.wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 	SelectObject(BitmapDC, hBitmapFile);
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
@@ -515,7 +539,7 @@ void bitmap::savmap() {
   auto const hBitmap =
       CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (hBitmap == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(UTF16BMPname);
+	displayText::crmsg(BMPInstance->UTF16BMPname);
 	return;
   }
   auto bytesWritten = DWORD {};
@@ -530,16 +554,16 @@ void bitmap::savmap() {
 }
 
 void bitmap::lodbmp(fs::path const& directory) {
-  if (!loadName(directory, UTF16BMPname)) {
+  if (!loadName(directory, BMPInstance->UTF16BMPname)) {
 	return;
   }
   resetBmpFile(false);
   trace::untrace();
 #if USE_SHORT_NAME
-  auto const pleng = GetShortPathName(UTF16BMPname.wstring().c_str(), nullptr, 0);
+  auto const pleng = GetShortPathName(BMPInstance->UTF16BMPname.wstring().c_str(), nullptr, 0);
   auto       dest  = std::vector<wchar_t> {};
   dest.resize(pleng);
-  GetShortPathName(UTF16BMPname.wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
+  GetShortPathName(BMPInstance->UTF16BMPname.wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
   auto const filePart = fs::path {dest.data()};
   auto       saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
 #else
@@ -573,7 +597,7 @@ void bitmap::assignUBFilename(fs::path const& directory) {
   current_path(directory);
   auto const bmpFileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
   auto const fullPath    = directory / bmpFileName;
-  UTF16BMPname.assign(fullPath);
+  BMPInstance->UTF16BMPname.assign(fullPath);
   bfil(BackgroundColor);
 }
 
@@ -582,7 +606,7 @@ auto bitmap::getBitmapSizeinStitches() noexcept -> F_POINT {
 }
 
 auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
-  return BitmapBackgroundColors.operator[](index);
+  return BMPInstance->BitmapBackgroundColors.operator[](index);
 }
 
 void bitmap::setBmpBackColor() {
@@ -602,9 +626,9 @@ void bitmap::setBmpBackColor() {
                                                                   0x0043377b,
                                                                   0x00b799ae,
                                                                   0x0054667a};
-  BitmapBackgroundColors.clear();
-  BitmapBackgroundColors.resize(DEFAULT_COLORS.size());
-  std::ranges::copy(DEFAULT_COLORS, BitmapBackgroundColors.begin());
+  BMPInstance->BitmapBackgroundColors.clear();
+  BMPInstance->BitmapBackgroundColors.resize(DEFAULT_COLORS.size());
+  std::ranges::copy(DEFAULT_COLORS, BMPInstance->BitmapBackgroundColors.begin());
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {
@@ -745,4 +769,8 @@ void bitmap::bfrm(FRM_HEAD const& form) {
   if (form.type != FRMLINE) {
 	pxlin(form, form.vertexCount - 1U, 0);
   }
+}
+
+void bitmap::bmpInit() noexcept {
+  BMPInstance = BMP_SINGLE::getInstance();
 }

@@ -25,6 +25,7 @@ void assignUBFilename(fs::path const& directory);
 void bfil(COLORREF const& backgroundColor);
 void bfrm(FRM_HEAD const& form);
 void bitbltBitmap() noexcept;
+void bmpInit() noexcept;
 void chkbit();
 void delmap();
 void drawBmpBackground();
