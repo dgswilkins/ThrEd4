@@ -2,8 +2,6 @@
 Checks:            "*,\
 -altera-*,\
 -bugprone-easily-swappable-parameters,\
--clang-diagnostic-exit-time-destructors,\
--clang-diagnostic-global-constructors,\
 -clang-diagnostic-nonportable-system-include-path,\
 -clang-diagnostic-pre-c++20-compat-pedantic,\
 -cppcoreguidelines-avoid-c-arrays,\
