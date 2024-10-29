@@ -15,6 +15,7 @@ void satadj(FRM_HEAD& form);
 void satbrd();
 void satfil(FRM_HEAD& form);
 void satfix();
+void satinInit() noexcept;
 void satknkt();
 void satout(FRM_HEAD const& form, float satinWidth);
 void satpnt0();

@@ -54,10 +54,34 @@
 #include <type_traits>
 #include <vector>
 
+class SATIN_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> SATIN_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static SATIN_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  std::vector<F_POINT> TempPolygon;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  SATIN_SINGLE(const SATIN_SINGLE&)                    = delete;
+  auto operator=(const SATIN_SINGLE&) -> SATIN_SINGLE& = delete;
+  SATIN_SINGLE(SATIN_SINGLE&&)                         = delete;
+  auto operator=(SATIN_SINGLE&&) -> SATIN_SINGLE&      = delete;
+
+  private:
+  SATIN_SINGLE() noexcept = default;
+  ~SATIN_SINGLE()         = default;
+};
+
 // satin internal namespace
 namespace {
 auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-line
-auto TempPolygon = std::vector<F_POINT> {};
+
+SATIN_SINGLE* SatinInstance;
 
 // Definitions
 auto chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool;
@@ -1396,25 +1420,26 @@ void satin::satfil(FRM_HEAD& form) {
 }
 
 void satin::satfix() {
-  auto const vertexCount = wrap::toUnsigned(TempPolygon.size());
+  auto&      tempPolygon = SatinInstance->TempPolygon;
+  auto const vertexCount = wrap::toUnsigned(tempPolygon.size());
   auto       minSize     = 1U;
   auto&      formList    = Instance->FormList;
   auto&      form        = formList.back();
   if (form.type == FRMFPOLY) {
 	minSize = 2U;
   }
-  if (TempPolygon.size() > minSize) {
+  if (tempPolygon.size() > minSize) {
 	form.vertexIndex    = thred::adflt(vertexCount);
 	auto const itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
-	std::ranges::copy(TempPolygon, itVertex);
-	TempPolygon.clear();
+	std::ranges::copy(tempPolygon, itVertex);
+	tempPolygon.clear();
 	form.vertexCount = vertexCount;
 	form.outline();
 	form.satinGuideCount = 0;
 	Instance->StateMap.set(StateFlag::INIT);
   }
   else {
-	TempPolygon.clear();
+	tempPolygon.clear();
 	formList.pop_back();
   }
   Instance->StateMap.reset(StateFlag::SHOSAT);
@@ -1422,7 +1447,7 @@ void satin::satfix() {
 }
 
 void satin::dusat() noexcept {
-  auto const  vertexCount = TempPolygon.size();
+  auto const  vertexCount = SatinInstance->TempPolygon.size();
   auto const& formLines   = Instance->formLines;
   auto const* line        = &formLines[vertexCount - 1U];
   SetROP2(StitchWindowDC, R2_XORPEN);
@@ -1433,7 +1458,7 @@ void satin::dusat() noexcept {
 
 void satin::drwsat() {
   unsat();
-  auto const vertexCount = TempPolygon.size();
+  auto const vertexCount = SatinInstance->TempPolygon.size();
   auto&      formLines   = Instance->formLines;
   formLines.resize(vertexCount + 1U);
   formLines[vertexCount] =
@@ -1446,26 +1471,26 @@ void satin::satpnt0() {
   auto& formLines = Instance->formLines;
   formLines.clear();
   formLines.push_back(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
-  TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
+  SatinInstance->TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
   Instance->StateMap.set(StateFlag::SATPNT);
 }
 
 void satin::satpnt1() {
   unsat();
-  auto const vertexCount = TempPolygon.size();
+  auto const vertexCount = SatinInstance->TempPolygon.size();
   auto&      formLines   = Instance->formLines;
   formLines[vertexCount] =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   dusat();
-  TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
+  SatinInstance->TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void satin::satzum() {
   Instance->StateMap.reset(StateFlag::SHOSAT);
   thred::duzrat();
-  auto const vertexCount = wrap::toUnsigned(TempPolygon.size());
-  form::frmlin(TempPolygon);
+  auto const vertexCount = wrap::toUnsigned(SatinInstance->TempPolygon.size());
+  form::frmlin(SatinInstance->TempPolygon);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, FormPen);
   wrap::polyline(StitchWindowMemDC, Instance->formLines.data(), vertexCount);
@@ -1534,4 +1559,8 @@ auto satin::adsatk(uint32_t const count) -> uint32_t {
   auto constexpr VAL = SAT_CON {};
   Instance->satinGuides.insert(dest, count, VAL);
   return oldSize;
+}
+
+void satin::satinInit() noexcept {
+  SatinInstance = SATIN_SINGLE::getInstance();
 }

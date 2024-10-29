@@ -12260,6 +12260,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  DST::dstInit();
 	  bal::balInit();
 	  bitmap::bmpInit();
+	  satin::satinInit();
 	  tfc::fClipInit();
 	  trace::traceInit();
 
