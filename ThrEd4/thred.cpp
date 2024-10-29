@@ -171,6 +171,56 @@ class THR_HEAD // ThrEd file header
 };
 #pragma pack(pop)
 
+class THR_SINGLE
+{
+  public:
+  static auto getInstance() noexcept -> THR_SINGLE* {
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	static THR_SINGLE instance;
+	return &instance;
+  }
+
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  std::vector<HWND>       LabelWindow;       // text handles for the form data sheet
+  std::vector<POINT>      FormControlPoints; // form control rectangle in pixel coordinates
+  std::wstring            DesignerName;      // designer name in clear
+  fs::path                HomeDirectory;     // directory from which ThrEd was executed
+  std::vector<POINT>      NearestPixel;      // selected points
+  std::vector<uint32_t>   NearestPoint;      // indices of the closest points
+  std::vector<SEARCH_REC> SortBuffer;        // sort buffer for stitch search
+  std::vector<fs::path>   VersionNames;      // temporary storage for old file version names
+  fs::path                ThrName;           // ThrEd file path
+
+  // Pens
+  std::vector<HPEN> UserPen; // user color pens
+
+  // Windows
+  std::vector<HWND>     DefaultColorWin;       // default color windows
+  std::vector<HWND>     UserColorWin;          // user color windows
+  std::vector<HWND>     SideWindow;            // side message windows
+  std::vector<HWND>     ThreadSizeWin;         // thread size windows
+  std::vector<uint32_t> Knots;                 // indices of knot stitches
+  std::vector<wchar_t>  SideWindowEntryBuffer; // buffer for entering form data sheet numbers
+  std::vector<wchar_t>  MsgBuffer;             // for user messages
+
+  fs::path                  DefaultDirectory;
+  fs::path                  IniFileName; //.ini file name
+  std::vector<fs::path>     PreviousNames;
+  std::vector<std::wstring> Thumbnails;            // vector of thumbnail names
+  std::vector<wchar_t>      ThumbnailSearchString; // storage for the thumbnail search string
+  std::vector<COL_CHANGE>   ColorChangeTable;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  THR_SINGLE(const THR_SINGLE&)                    = delete;
+  auto operator=(const THR_SINGLE&) -> THR_SINGLE& = delete;
+  THR_SINGLE(THR_SINGLE&&)                         = delete;
+  auto operator=(THR_SINGLE&&) -> THR_SINGLE&      = delete;
+
+  private:
+  THR_SINGLE() noexcept = default;
+  ~THR_SINGLE()         = default;
+};
+
 // thred internal namespace
 namespace {
 constexpr auto ARROWPNT = 3U;            // points required to draw arrow
@@ -210,31 +260,24 @@ constexpr auto TSSSIZ   = size_t {32U};         // size of the thumbnail search 
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
 auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-auto LabelWindow             = std::vector<HWND> {};  // text handles for the form data sheet
-auto FormControlPoints       = std::vector<POINT> {}; // form control rectangle in pixel coordinates
 auto ExtendedHeader          = THR_HEAD_EX {};        // ThrEd file header extension
-auto DesignerName            = std::wstring {};       // designer name in clear
 auto ArgCount                = int32_t {};            // command line argument count
 auto ArgList                 = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
 auto ThredWindowRect         = RECT {};                            // main window size
 auto ColorBarSize            = COLSIZ;                             // Color bar width scaled for DPI
 auto ColorBarRect            = RECT {};                            // color bar rectangle
-auto HomeDirectory           = fs::path {}; // directory from which ThrEd was executed
 auto SmallestStitchIndex     = uint32_t {}; // pointer to the smallest stitch in the selected range
 auto LargestStitchIndex      = uint32_t {}; // pointer to the largest stitch in the selected range
 auto CurrentStitchIndex      = uint32_t {}; // pointer to the current selection for length search
 auto ThredDC                 = gsl::narrow_cast<HDC>(nullptr); // main device context handle
 auto ScreenSizePixels        = SIZE {};                        // screen size in pixels
 auto StitchWindowAbsRect     = RECT {};                        // stitch window size,absolute
-auto NearestPixel            = std::vector<POINT> {};          // selected points
-auto NearestPoint            = std::vector<uint32_t> {};       // indices of the closest points
 auto PrevGroupStartStitch    = uint32_t {};                    // lower end of previous selection
 auto PrevGroupEndStitch      = uint32_t {};                    // higher end of previous selection
 auto ScrollSize              = SCROLSIZ;                       // Scroll bar width scaled for DPI
 auto StitchWindowAspectRatio = float {};                       // aspect ratio of the stitch window
 auto SelectBoxSize           = SIZE {};                        // size of the select box
 auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
-auto SortBuffer          = std::vector<SEARCH_REC> {}; // sort buffer for stitch search
 auto RotationHandleAngle = float {};                   // angle of the rotation handle
 auto ThreadSize30        = TSIZ30;                     // #30 thread size
 auto ThreadSize40        = TSIZ40;                     // #40 thread size
@@ -243,7 +286,6 @@ auto RunPoint            = uint32_t {};                // point for animating st
 auto StitchesPerFrame    = uint32_t {};                // number of stitches to draw in each frame
 auto MovieTimeStep       = int32_t {};                 // time delay for stitchout
 auto LastKeyCode         = std::numeric_limits<wchar_t>::max(); // last key code
-auto VersionNames        = std::vector<fs::path> {}; // temporary storage for old file version names
 auto FileVersionIndex    = uint8_t {};               // points to old version to be read
 auto StitchArrow         = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
 auto SelectedRange       = RANGE {}; // first and last stitch for min/max stitch select
@@ -253,7 +295,6 @@ auto NameDecoder         = std::array<uint8_t, DNDLEN> {}; // designer name deco
 auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
 auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
-auto ThrName            = fs::path {};           // ThrEd file path
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -264,7 +305,6 @@ auto BackgroundPen      = gsl::narrow_cast<HPEN>(nullptr); // background color p
 auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
 auto KnotPen            = gsl::narrow_cast<HPEN>(nullptr); // knot pen
 auto BackgroundPenWidth = int32_t {};                      // width of the background pen
-auto UserPen            = std::vector<HPEN> {};            // user color pens
 
 // brushes
 auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
@@ -290,10 +330,6 @@ constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread s
 auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
-auto DefaultColorWin = std::vector<HWND> {}; // default color windows
-auto UserColorWin    = std::vector<HWND> {}; // user color windows
-auto SideWindow      = std::vector<HWND> {}; // side message windows
-auto ThreadSizeWin   = std::vector<HWND> {}; // thread size windows
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 auto DisplayedColorBitmap =
@@ -303,11 +339,8 @@ auto PickColorMsgSize = SIZE {};         // size of the pick color message
 auto InsertSize       = SIZE {};         // size of file insert window
 auto InsertCenter     = F_POINT {};      // center point in inserted file
 auto NumericCode      = wchar_t {};      // keyboard numerical input
-auto Knots            = std::vector<uint32_t> {}; // indices of knot stitches
 
-auto SideWindowEntryBuffer = std::vector<wchar_t> {}; // buffer for entering form data sheet numbers
 auto SideWinMsgIdx         = uint32_t {}; // track current position in SideWindowEntryBuffer
-auto MsgBuffer             = std::vector<wchar_t> {}; // for user messages
 
 // graphics variables
 
@@ -331,17 +364,11 @@ constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
 auto BoxOffset = std::array<int32_t, 4> {};
 
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
-auto DefaultDirectory = fs::path {};
-auto IniFileName      = fs::path {}; //.ini file name
-auto PreviousNames    = std::vector<fs::path> {};
-auto Thumbnails       = std::vector<std::wstring> {}; // vector of thumbnail names
 
 auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
 
 auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
 auto ThumbnailIndex        = uint32_t {}; // index into the thumbnail filname table
-
-auto ThumbnailSearchString = std::vector<wchar_t> {}; // storage for the thumbnail search string
 
 auto InsertedVertexIndex = uint32_t {};                  // saved vertex pointer for inserting files
 auto InsertedFormIndex   = uint32_t {};                  // saved form pointer for inserting files
@@ -353,7 +380,8 @@ auto RotateBoxOutline  = std::array<POINT, SQPNTS> {}; // for drawing the rotate
 auto RotateBoxCrossVertLine = std::array<POINT, LNPNTS> {}; // vertical part of the rotate cross
 auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part of the rotate cross
 auto RotateBoxToCursorLine = std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
-auto ColorChangeTable = std::vector<COL_CHANGE> {};
+
+THR_SINGLE* ThrSingle;
 
 // Definitions
 void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
@@ -551,6 +579,7 @@ void stchout();
 void stchsnap(uint32_t start, uint32_t finish) noexcept(!std::is_same_v<ptrdiff_t, int>);
 auto stlen(uint32_t iStitch) -> float;
 void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
+void thrInit() noexcept;
 void thrsav();
 void unboxs();
 void uncros();
@@ -581,7 +610,7 @@ void barnam(HWND window, uint32_t const iThumbnail) {
 	SetWindowText(window, L"");
 	return;
   }
-  auto const thumbPath = fs::path(Thumbnails.operator[](ThumbnailsSelected.at(iThumbnail)).data());
+  auto const thumbPath = fs::path(ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(iThumbnail)).data());
   constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
   auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
@@ -593,7 +622,7 @@ void barnam(HWND window, uint32_t const iThumbnail) {
 void box(uint32_t const iNearest, HDC hDC) {
   auto const itBoxWidth     = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth       = *itBoxWidth;
-  auto const itNearestPixel = wrap::next(NearestPixel.begin(), iNearest);
+  auto const itNearestPixel = wrap::next(ThrSingle->NearestPixel.begin(), iNearest);
   auto const npx            = itNearestPixel->x;
   auto const npy            = itNearestPixel->y;
   auto       line           = std::array<POINT, SQPNTS> {};
@@ -627,7 +656,7 @@ void chk1col() {
   thred::coltab();
   Instance->StateMap.set(StateFlag::RESTCH);
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
-	auto const ccTableIt = wrap::next(ColorChangeTable.begin(), iColorChange);
+	auto const ccTableIt = wrap::next(ThrSingle->ColorChangeTable.begin(), iColorChange);
 	if (auto const ccTableNextIt = std::next(ccTableIt);
 	    ccTableNextIt->stitchIndex - ccTableIt->stitchIndex != 1) {
 	  continue;
@@ -757,7 +786,7 @@ auto chkattr(fs::path const& filename) -> bool {
 
 auto chkhid(size_t const colorToCheck) -> bool {
   if (Instance->StateMap.test(StateFlag::HID)) {
-	return ColorChangeTable.operator[](colorToCheck).colorIndex == ActiveColor;
+	return ThrSingle->ColorChangeTable.operator[](colorToCheck).colorIndex == ActiveColor;
   }
 
   return true;
@@ -830,10 +859,11 @@ void chknum() {
 
   if (SideWinMsgIdx != 0U) {
 	auto& valueWindow = Instance->valueWindow;
+	auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
 
-	  auto const value = wrap::wcsToFloat(SideWindowEntryBuffer.data()) * PFGRAN;
+	  auto const value = wrap::wcsToFloat(sideWindowEntryBuffer.data()) * PFGRAN;
 	  switch (FormMenuChoice) {
 		case LTXOF: { // update texture fill spacing
 		  thred::savdo();
@@ -884,7 +914,7 @@ void chknum() {
 		case LFTHCOL: { // update feather color
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol((wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
+			form::nufthcol((wrap::wcsToLong<uint32_t>(sideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -896,7 +926,7 @@ void chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(sideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			form::nufilcol(colVal);
 			auto const fmtStr = format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(valueWindow.operator[](LFRMCOL), fmtStr.c_str());
@@ -910,7 +940,7 @@ void chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(sideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			form.underlayColor = colVal;
 			auto const fmtStr  = format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(valueWindow.operator[](LUNDCOL), fmtStr.c_str());
@@ -925,7 +955,7 @@ void chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(sideWindowEntryBuffer.data()) - 1U) & COLMSK);
 			form::nubrdcol(colVal);
 			auto const fmtStr = format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(valueWindow.operator[](LBRDCOL), fmtStr.c_str());
@@ -1107,7 +1137,7 @@ void chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) { // the preference menu is open
-		auto const value = wrap::wcsToFloat(SideWindowEntryBuffer.data());
+		auto const value = wrap::wcsToFloat(sideWindowEntryBuffer.data());
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto hWnd   = HWND {nullptr};
 		auto fmtStr = std::wstring {};
@@ -1291,8 +1321,8 @@ void chknum() {
 	  }
 	}
   }
-  if (MsgBuffer.size() > 1) {
-	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
+  if (ThrSingle->MsgBuffer.size() > 1) {
+	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(ThrSingle->MsgBuffer.data()), ThrSingle->MsgBuffer.size());
 	auto const value = thred::getMsgBufferValue();
 	if (Instance->StateMap.testAndReset(StateFlag::NUROT)) { // rotate
 	  if (value != 0.0F) {
@@ -1511,11 +1541,12 @@ auto chkup(uint32_t const count, size_t const iStitch) -> uint32_t {
   if (!Instance->StateMap.test(StateFlag::UPTO) || ClosestPointIndex == 0U) {
 	return count;
   }
-  if (ColorChangeTable.operator[](iStitch).stitchIndex >= ClosestPointIndex) {
+  auto& colorChangeTable = ThrSingle->ColorChangeTable;
+  if (colorChangeTable.operator[](iStitch).stitchIndex >= ClosestPointIndex) {
 	return 0U;
   }
-  if (ColorChangeTable.operator[](iStitch + 1U).stitchIndex >= ClosestPointIndex) {
-	return ClosestPointIndex - ColorChangeTable.operator[](iStitch).stitchIndex + 1U;
+  if (colorChangeTable.operator[](iStitch + 1U).stitchIndex >= ClosestPointIndex) {
+	return ClosestPointIndex - colorChangeTable.operator[](iStitch).stitchIndex + 1U;
   }
   return count;
 }
@@ -1570,10 +1601,10 @@ void cros(uint32_t const iStitch) {
 
 void defNam(fs::path const& fileName) {
   if (fileName.empty()) {
-	getDocsFolder(DefaultDirectory);
+	getDocsFolder(ThrSingle->DefaultDirectory);
 	return;
   }
-  DefaultDirectory = fileName.parent_path();
+  ThrSingle->DefaultDirectory = fileName.parent_path();
 }
 
 auto defTxt(uint32_t const iColor) -> COLORREF {
@@ -1761,11 +1792,12 @@ void destroyBV() noexcept {
 // ReSharper disable CppParameterMayBeConst
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   UNREFERENCED_PARAMETER(lparam);
+  auto& designerName = ThrSingle->DesignerName;
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto const hwnd = GetDlgItem(hwndlg, IDC_DESED);
-	  SetWindowText(hwnd, DesignerName.c_str());
+	  SetWindowText(hwnd, designerName.c_str());
 	  SetFocus(hwnd);
 	  SendMessage(hwnd, EM_SETSEL, 0, -1);
 	  break;
@@ -1781,9 +1813,9 @@ auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> 
 		  auto const hwnd           = GetDlgItem(hwndlg, IDC_DESED);
 		  auto       designerBuffer = std::array<wchar_t, NameOrder.size()> {};
 		  GetWindowText(hwnd, designerBuffer.data(), gsl::narrow<int>(designerBuffer.size()));
-		  DesignerName.assign(designerBuffer.data());
+		  designerName.assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
-		  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
+		  auto const fmtStr = displayText::format(IDS_THRED, designerName);
 		  SetWindowText(ThrEdWindow, fmtStr.c_str());
 		  EndDialog(hwndlg, TRUE);
 		  break;
@@ -1873,16 +1905,17 @@ void doInitUnzoomed() {
   auto linePoints = std::vector<POINT> {};
   linePoints.reserve(wrap::toSize(getMaxCount()) + 2U);
   auto const pwid = Instance->StateMap.test(StateFlag::HID);
+  auto&      colorChangeTable = ThrSingle->ColorChangeTable;
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	DisplayedColorBitmap.set(ColorChangeTable.operator[](iColor).colorIndex);
-	auto stitchCount = wrap::toUnsigned(ColorChangeTable.operator[](iColor + 1U).stitchIndex) -
-	                   ColorChangeTable.operator[](iColor).stitchIndex;
+	DisplayedColorBitmap.set(colorChangeTable.operator[](iColor).colorIndex);
+	auto stitchCount = wrap::toUnsigned(colorChangeTable.operator[](iColor + 1U).stitchIndex) -
+	                   colorChangeTable.operator[](iColor).stitchIndex;
 	stitchCount = chkup(stitchCount, iColor);
-	if (!pwid || ColorChangeTable.operator[](iColor).colorIndex == ActiveColor) {
+	if (!pwid || colorChangeTable.operator[](iColor).colorIndex == ActiveColor) {
 	  drwLin(linePoints,
-	         ColorChangeTable.operator[](iColor).stitchIndex,
+	         colorChangeTable.operator[](iColor).stitchIndex,
 	         stitchCount,
-	         UserPen.operator[](ColorChangeTable.operator[](iColor).colorIndex));
+	         ThrSingle->UserPen.operator[](colorChangeTable.operator[](iColor).colorIndex));
 	}
   }
 }
@@ -1899,27 +1932,28 @@ void doInitZoomed() {
   // intentional copy of first stitch to initialize previous stitch
   auto prevStitch = Instance->StitchBuffer.front();
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) { // iterate through all colors
-	if (Instance->StateMap.test(StateFlag::HID) && ColorChangeTable.operator[](iColor).colorIndex != ActiveColor) {
-	  stitchCount = ColorChangeTable.operator[](iColor + 1U).stitchIndex -
-	                ColorChangeTable.operator[](iColor).stitchIndex;
+	auto& colorChangeTable = ThrSingle->ColorChangeTable;
+	if (Instance->StateMap.test(StateFlag::HID) && colorChangeTable.operator[](iColor).colorIndex != ActiveColor) {
+	  stitchCount = colorChangeTable.operator[](iColor + 1U).stitchIndex -
+	                colorChangeTable.operator[](iColor).stitchIndex;
 	  auto const sStart =
-	      wrap::next(Instance->StitchBuffer.begin(), ColorChangeTable.operator[](iColor).stitchIndex);
+	      wrap::next(Instance->StitchBuffer.begin(), colorChangeTable.operator[](iColor).stitchIndex);
 	  auto const sEnd = wrap::next(sStart, stitchCount);
 	  // and check if the color is to be displayed in the zoomed view
 	  for (auto sRange = std::ranges::subrange(sStart, sEnd); auto const& iStitch : sRange) {
 		if (iStitch.x >= ZoomRect.left && iStitch.x <= ZoomRect.right &&
 		    iStitch.y >= ZoomRect.bottom && iStitch.y <= ZoomRect.top) {
-		  DisplayedColorBitmap.set(ColorChangeTable.operator[](iColor).colorIndex);
+		  DisplayedColorBitmap.set(colorChangeTable.operator[](iColor).colorIndex);
 		  break;
 		}
 	  }
 	  continue;
 	}
 	auto wascol = 0U;
-	SelectObject(StitchWindowMemDC, UserPen.operator[](ColorChangeTable.operator[](iColor).colorIndex));
-	stitchCount = ColorChangeTable.operator[](iColor + 1U).stitchIndex -
-	              ColorChangeTable.operator[](iColor).stitchIndex;
-	auto const stIndex = ColorChangeTable.operator[](iColor).stitchIndex;
+	SelectObject(StitchWindowMemDC, ThrSingle->UserPen.operator[](colorChangeTable.operator[](iColor).colorIndex));
+	stitchCount = colorChangeTable.operator[](iColor + 1U).stitchIndex -
+	              colorChangeTable.operator[](iColor).stitchIndex;
+	auto const stIndex = colorChangeTable.operator[](iColor).stitchIndex;
 
 	auto const stStart   = wrap::next(Instance->StitchBuffer.begin(), stIndex);
 	stitchCount          = chkup(stitchCount, iColor);
@@ -1998,7 +2032,7 @@ void doInitZoomed() {
 	  linePoints.push_back(lastPoint);
 	}
 	if (wascol != 0U) {
-	  DisplayedColorBitmap.set(ColorChangeTable.operator[](iColor).colorIndex);
+	  DisplayedColorBitmap.set(colorChangeTable.operator[](iColor).colorIndex);
 	}
   }
 }
@@ -2093,11 +2127,12 @@ void drawStitchBoxes() {
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
   if (Instance->StateMap.test(StateFlag::HID)) {
 	for (auto iColor = 0U; iColor < thred::maxColor(); ++iColor) {
-	  if (ColorChangeTable.operator[](iColor).colorIndex != ActiveColor) {
+	  auto& colorChangeTable = ThrSingle->ColorChangeTable;
+	  if (colorChangeTable.operator[](iColor).colorIndex != ActiveColor) {
 		continue;
 	  }
-	  for (auto iStitch = ColorChangeTable.operator[](iColor).stitchIndex;
-	       iStitch < ColorChangeTable.operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
+	  for (auto iStitch = colorChangeTable.operator[](iColor).stitchIndex;
+	       iStitch < colorChangeTable.operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
 	       ++iStitch) {
 		if (auto const& stitch = Instance->StitchBuffer.operator[](iStitch);
 		    stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
@@ -2207,7 +2242,7 @@ void drwStch() {
 }
 
 void drwknot() {
-  if (Instance->userFlagMap.test(UserFlag::KNOTOF) || Knots.empty() || Instance->StitchBuffer.empty()) {
+  if (Instance->userFlagMap.test(UserFlag::KNOTOF) || ThrSingle->Knots.empty() || Instance->StitchBuffer.empty()) {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
@@ -2217,7 +2252,7 @@ void drwknot() {
   auto           point    = POINT {};
   auto           kOutline = std::array<POINT, SQPNTS> {};
   auto           tLine    = std::array<POINT, LNPNTS> {};
-  for (auto const knot : Knots) {
+  for (auto const knot : ThrSingle->Knots) {
 	stCor2px(Instance->StitchBuffer.operator[](knot), point);
 	SelectObject(StitchWindowMemDC, KnotPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -2284,7 +2319,7 @@ void drwlstch(uint32_t const finish) {
 		++RunPoint;
 	  }
 	}
-	SelectObject(StitchWindowDC, UserPen.operator[](color));
+	SelectObject(StitchWindowDC, ThrSingle->UserPen.operator[](color));
 	wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
 	if (!flag) {
 	  --RunPoint;
@@ -2293,7 +2328,7 @@ void drwlstch(uint32_t const finish) {
   else {
 	auto iMovieFrame = 0U;
 
-	SelectObject(StitchWindowDC, UserPen.operator[](color));
+	SelectObject(StitchWindowDC, ThrSingle->UserPen.operator[](color));
 	while (iMovieFrame < StitchesPerFrame && RunPoint + 1 < finish - 1 &&
 	       (Instance->StitchBuffer.operator[](RunPoint).attribute & COLMSK) == color) {
 	  movieLine.push_back(thred::stch2px1(RunPoint++));
@@ -2341,7 +2376,7 @@ void duClos(uint32_t const      startStitch,
 	auto sum       = (deltaX * deltaX) + (deltaY * deltaY);
 	auto tempPoint = iStitch;
 	auto gap       = gapToNearest.begin();
-	for (auto& point : NearestPoint) {
+	for (auto& point : ThrSingle->NearestPoint) {
 	  if (sum < *gap) {
 		std::swap(*gap, sum);
 		std::swap(point, tempPoint);
@@ -2374,10 +2409,11 @@ void dubar() {
   auto       indicatorLine = std::array<POINT, 2> {};
   auto const buffSize      = wrap::toFloat(Instance->StitchBuffer.size());
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
+	auto&      colorChangeTable = ThrSingle->ColorChangeTable;
 	auto const barSectionHeight =
-	    wrap::toFloat(ColorChangeTable.operator[](iColorChange + 1U).stitchIndex) / buffSize;
+	    wrap::toFloat(colorChangeTable.operator[](iColorChange + 1U).stitchIndex) / buffSize;
 	colorBarRect.bottom = std::lround(barSectionHeight * wrap::toFloat(DrawItem->rcItem.bottom));
-	auto ucb = wrap::next(UserColorBrush.begin(), ColorChangeTable.operator[](iColorChange).colorIndex);
+	auto ucb = wrap::next(UserColorBrush.begin(), colorChangeTable.operator[](iColorChange).colorIndex);
 	FillRect(DrawItem->hDC, &colorBarRect, *ucb);
 	colorBarRect.top = colorBarRect.bottom;
   }
@@ -2417,7 +2453,7 @@ void dubuf(std::vector<char>& buffer) {
       wrap::sizeofVector(Instance->StitchBuffer) + sizeof(stitchHeader) + bitmap::getBmpNameLength();
   wrap::narrow(stitchHeader.stitchCount, Instance->StitchBuffer.size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
-  auto       designer       = utf::utf16ToUtf8(DesignerName);
+  auto       designer       = utf::utf16ToUtf8(ThrSingle->DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
@@ -2567,7 +2603,7 @@ void ducmd() {
 	nuFil(FileIndices::THR);
 	return;
   }
-  auto balaradFileName = HomeDirectory / arg1.substr(4);
+  auto balaradFileName = ThrSingle->HomeDirectory / arg1.substr(4);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto balaradFile =
       CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -2585,7 +2621,7 @@ void ducmd() {
   if (!arg2.starts_with(L"/F2:")) {
 	return;
   }
-  balaradFileName = HomeDirectory / arg2.substr(4);
+  balaradFileName = ThrSingle->HomeDirectory / arg2.substr(4);
   balaradFile =
       CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (balaradFile == INVALID_HANDLE_VALUE) {
@@ -2655,7 +2691,7 @@ void dugrid() {
 
 void duhom() {
   auto const arg0 = fs::path {*ArgList};
-  HomeDirectory   = arg0.parent_path();
+  ThrSingle->HomeDirectory   = arg0.parent_path();
 }
 
 void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1) {
@@ -2784,9 +2820,10 @@ void durot() noexcept(std::is_same_v<size_t, uint32_t>) {
 void dusel(HDC hDC) {
   SetROP2(hDC, R2_NOTXORPEN);
   SelectObject(hDC, LinePen);
-  wrap::polyline(hDC, FormControlPoints.data(), wrap::toUnsigned(FormControlPoints.size() - 1U));
-  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(FormControlPoints.size() - 1U); ++iPoint) {
-	form::selsqr(FormControlPoints.operator[](iPoint), hDC);
+  auto& formControlPoints = ThrSingle->FormControlPoints;
+  wrap::polyline(hDC, formControlPoints.data(), wrap::toUnsigned(formControlPoints.size() - 1U));
+  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(formControlPoints.size() - 1U); ++iPoint) {
+	form::selsqr(formControlPoints.operator[](iPoint), hDC);
   }
   SetROP2(hDC, R2_COPYPEN);
 }
@@ -2804,7 +2841,7 @@ void duselrng(RANGE& selectedRange) {
 }
 
 void dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& windowSize) {
-  SideWindow.operator[](entry.value) = CreateWindow(L"STATIC",
+  ThrSingle->SideWindow.operator[](entry.value) = CreateWindow(L"STATIC",
                                                     displayText::loadStr(entry.stringID).c_str(),
                                                     SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                                     3,
@@ -2820,8 +2857,8 @@ void dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& windowSiz
 
 void duver(fs::path const& name) {
   if (auto const version = wrap::toSize(tolower(name.extension().wstring().back()) - 'r');
-      version < VersionNames.size()) {
-	VersionNames.operator[](version) = name;
+      version < ThrSingle->VersionNames.size()) {
+	ThrSingle->VersionNames.operator[](version) = name;
   }
 }
 
@@ -2887,8 +2924,9 @@ void f1del(uint32_t const formIndex) {
 }
 
 void fillSortBuffer() {
-  SortBuffer.clear();
-  SortBuffer.reserve(Instance->StitchBuffer.size());
+  auto& sortBuffer = ThrSingle->SortBuffer;
+  sortBuffer.clear();
+  sortBuffer.reserve(Instance->StitchBuffer.size());
   auto stitch     = wrap::next(Instance->StitchBuffer.begin(), SelectedRange.start);
   auto nextStitch = wrap::next(stitch, 1);
   auto index      = SelectedRange.start;
@@ -2898,12 +2936,12 @@ void fillSortBuffer() {
 	auto const deltaX = nextStitch->x - stitch->x;
 	auto const deltaY = nextStitch->y - stitch->y;
 	auto const length = (deltaX * deltaX) + (deltaY * deltaY);
-	SortBuffer.push_back(SEARCH_REC {.index = index, .length = length});
+	sortBuffer.push_back(SEARCH_REC {.index = index, .length = length});
 	++index;
 	++stitch;
 	++nextStitch;
   }
-  std::ranges::stable_sort(SortBuffer, {}, &SEARCH_REC::length);
+  std::ranges::stable_sort(sortBuffer, {}, &SEARCH_REC::length);
 }
 
 auto find1st() -> uint32_t {
@@ -2943,18 +2981,19 @@ void fnamtabs() {
 }
 
 void fndknt() {
+  auto& knots     = ThrSingle->Knots;
   auto endStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (endStitch <= 4U) {
-	Knots.clear();
+	knots.clear();
 	return;
   }
   endStitch -= 4U;
-  Knots.clear();
+  knots.clear();
   auto const spStitch = std::ranges::subrange(Instance->StitchBuffer.begin(),
                                               wrap::next(Instance->StitchBuffer.begin(), endStitch));
   for (auto iStitch = 0; const auto& stitch : spStitch) {
 	if ((stitch.attribute & KNOTMSK) != 0U) {
-	  Knots.emplace_back(iStitch);
+	  knots.emplace_back(iStitch);
 	}
 	iStitch++;
   }
@@ -3096,7 +3135,7 @@ void getbak() {
   unthum();
   Instance->StateMap.set(StateFlag::FRMOF);
   auto& workingFileName = Instance->WorkingFileName;
-  workingFileName = DefaultDirectory / Thumbnails.operator[](ThumbnailsSelected.at(FileVersionIndex));
+  workingFileName = ThrSingle->DefaultDirectory / ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(workingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
@@ -3130,8 +3169,8 @@ auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t const stitchCount
 auto getMaxCount() -> uint32_t {
   auto maxCount = uint32_t {0U};
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable.operator[](iColor + 1U).stitchIndex -
-	                                              ColorChangeTable.operator[](iColor).stitchIndex);
+	auto const deltaCount = gsl::narrow<uint32_t>(ThrSingle->ColorChangeTable.operator[](iColor + 1U).stitchIndex -
+	                                              ThrSingle->ColorChangeTable.operator[](iColor).stitchIndex);
 	maxCount = std::max(deltaCount, maxCount);
   }
   return maxCount;
@@ -3202,7 +3241,7 @@ auto getNewFileName(fs::path& newFileName, FileStyles const fileTypes, FileIndic
 #if USE_DEFAULTDIR
   // If we want to, we can set the default directory rather than using the OS mechanism for last used
   auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-  hResult += SHCreateItemFromParsingName(DefaultDirectory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+  hResult += SHCreateItemFromParsingName(ThrSingle->DefaultDirectory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
   hResult += pFileOpen->SetFolder(psiFrom);
   if (nullptr != psiFrom) {
 	psiFrom->Release();
@@ -3242,7 +3281,7 @@ void gselrng() noexcept {
 
 void handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
   {
-	auto previousName = PreviousNames.begin();
+	auto previousName = ThrSingle->PreviousNames.begin();
 	for (auto const& iLRU : LRUMenuId) {
 	  if (WinMsg.wParam == iLRU) {
 		Instance->WorkingFileName = *previousName;
@@ -3472,7 +3511,7 @@ auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool {
 		auto fileError = 0U;
 		for (auto& iFile : spFileInfo) {
 		  auto& cFileName = iFile.cFileName;
-		  if (auto fileName = DefaultDirectory / std::begin(cFileName);
+		  if (auto fileName = ThrSingle->DefaultDirectory / std::begin(cFileName);
 		      !SetFileAttributes(fileName.wstring().c_str(), iFile.dwFileAttributes)) {
 			++fileError;
 		  }
@@ -3501,12 +3540,12 @@ auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) ->
 	// ToDo - investigate C++17 option shown here: https://web.archive.org/web/20220812120940/https://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	auto*      fileInfo   = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(lparam);
-	auto const searchName = DefaultDirectory / L"*.thr";
+	auto const searchName = ThrSingle->DefaultDirectory / L"*.thr";
 	auto       result     = WIN32_FIND_DATA {};
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &result);
 	if (searchResult == INVALID_HANDLE_VALUE) {
-	  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory.wstring());
+	  displayText::showMessage(IDS_NOTHRFIL, ThrSingle->DefaultDirectory.wstring());
 	  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
 	  return true;
 	}
@@ -3523,12 +3562,13 @@ auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) ->
 
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   retflag = true;
+  auto& msgBuffer = ThrSingle->MsgBuffer;
   if (Instance->StateMap.test(StateFlag::SCLPSPAC) && (code == VK_OEM_MINUS || code == VK_SUBTRACT)) {
-	if (MsgBuffer.front() != '-') {
+	if (msgBuffer.front() != '-') {
 	  thred::resetMsgBuffer();
-	  MsgBuffer.back() = '-';
-	  MsgBuffer.push_back(0);
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	  msgBuffer.back() = '-';
+	  msgBuffer.push_back(0);
+	  SetWindowText(GeneralNumberInputBox, msgBuffer.data());
 	}
 	return true;
   }
@@ -3537,9 +3577,9 @@ auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 	  trace::traceNumberInput(NumericCode);
 	}
 	else {
-	  MsgBuffer.back() = NumericCode;
-	  MsgBuffer.push_back(0);
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	  msgBuffer.back() = NumericCode;
+	  msgBuffer.push_back(0);
+	  SetWindowText(GeneralNumberInputBox, msgBuffer.data());
 	}
 	return true;
   }
@@ -3547,19 +3587,19 @@ auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
 	case VK_DECIMAL:      // numpad period
 	case VK_OEM_PERIOD: { // period
 	  // ToDo - only allow entry if there is not already a period in the buffer
-	  MsgBuffer.back() = '.';
-	  MsgBuffer.push_back(0);
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	  msgBuffer.back() = '.';
+	  msgBuffer.push_back(0);
+	  SetWindowText(GeneralNumberInputBox, msgBuffer.data());
 	  return true;
 	}
 	case VK_BACK: { // backspace
 	  if (Instance->StateMap.test(StateFlag::TRNIN0)) {
 		trace::traceNumberReset();
 	  }
-	  if (MsgBuffer.size() > 1) {
-		MsgBuffer.pop_back();
-		MsgBuffer.back() = 0;
-		SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	  if (msgBuffer.size() > 1) {
+		msgBuffer.pop_back();
+		msgBuffer.back() = 0;
+		SetWindowText(GeneralNumberInputBox, msgBuffer.data());
 	  }
 	  return true;
 	}
@@ -3711,24 +3751,26 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	keys::navigateThumbnails(code);
 	return true;
   }
+  auto& msgBuffer = ThrSingle->MsgBuffer;
+  auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
   if (Instance->StateMap.test(StateFlag::FSETFSPAC) || Instance->StateMap.test(StateFlag::GTWLKIND)) {
 	// Check for keycode 'dash' and numpad 'subtract'
 	if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
-	  if (MsgBuffer.front() != '-') {
+	  if (msgBuffer.front() != '-') {
 		thred::resetMsgBuffer();
-		MsgBuffer.back() = '-';
-		MsgBuffer.push_back(0);
-		SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+		msgBuffer.back() = '-';
+		msgBuffer.push_back(0);
+		SetWindowText(GeneralNumberInputBox, msgBuffer.data());
 	  }
 	  return true;
 	}
   }
   if (FormMenuChoice != 0U || PreferenceIndex != 0U) {
 	if (chkminus(code)) {
-	  if (SideWindowEntryBuffer.front() != '-') {
+	  if (sideWindowEntryBuffer.front() != '-') {
 		thred::resetSideBuffer();
-		SideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '-';
-		SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+		sideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '-';
+		SetWindowText(SideMessageWindow, sideWindowEntryBuffer.data());
 	  }
 	  return true;
 	}
@@ -3748,10 +3790,10 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 		thred::unsid();
 	  }
 	  else {
-		if (SideWinMsgIdx < SideWindowEntryBuffer.size() - 1U) {
-		  SideWindowEntryBuffer.operator[](SideWinMsgIdx++) = NumericCode;
-		  SideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
-		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+		if (SideWinMsgIdx < sideWindowEntryBuffer.size() - 1U) {
+		  sideWindowEntryBuffer.operator[](SideWinMsgIdx++) = NumericCode;
+		  sideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
+		  SetWindowText(SideMessageWindow, sideWindowEntryBuffer.data());
 		}
 	  }
 	  return true;
@@ -3779,8 +3821,8 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	}
   }
   if (Instance->StateMap.testAndReset(StateFlag::ENTRDUP)) {
-	if (MsgBuffer.size() > 1) {
-	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
+	if (msgBuffer.size() > 1) {
+	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(msgBuffer.data()), msgBuffer.size());
 	  if (auto const value = thred::getMsgBufferValue(); value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
 	  }
@@ -3790,8 +3832,8 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	}
   }
   if (Instance->StateMap.testAndReset(StateFlag::ENTROT)) {
-	if (MsgBuffer.size() > 1) {
-	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
+	if (msgBuffer.size() > 1) {
+	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(msgBuffer.data()), msgBuffer.size());
 	  if (auto const value = thred::getMsgBufferValue(); value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
 	  }
@@ -3814,7 +3856,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	if (!Instance->StateMap.test(StateFlag::RUNPAT)) {
 	  if (!Instance->StateMap.test(StateFlag::HIDSTCH) &&
-	      (!ThrName.empty() || Instance->StateMap.test(StateFlag::INIT) ||
+	      (!ThrSingle->ThrName.empty() || Instance->StateMap.test(StateFlag::INIT) ||
 	       !Instance->FormList.empty() || Instance->StateMap.test(StateFlag::SATPNT)) &&
 	      !Instance->StateMap.test(StateFlag::BAKSHO)) {
 		drwStch();
@@ -3904,7 +3946,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
   auto dcb = DefaultColorBrush.begin();
   auto ucb = UserColorBrush.begin();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (DrawItem->hwndItem == DefaultColorWin.operator[](iColor)) {
+	if (DrawItem->hwndItem == ThrSingle->DefaultColorWin.operator[](iColor)) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
 	  if (DisplayedColorBitmap.test(iColor)) {
 		SetBkColor(DrawItem->hDC, DEFAULT_COLORS.at(iColor));
@@ -3920,7 +3962,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  }
 	  return true;
 	}
-	if (DrawItem->hwndItem == UserColorWin.operator[](iColor)) {
+	if (DrawItem->hwndItem == ThrSingle->UserColorWin.operator[](iColor)) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 	  if (iColor == ActiveColor) {
 		SelectObject(DrawItem->hDC, CrossPen);
@@ -3944,7 +3986,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
 		if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
-		  ritbak(Thumbnails.operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
+		  ritbak(ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
 		  rthumnam(iThumb);
 		  return true;
 		}
@@ -3955,7 +3997,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
 		if (DrawItem->hwndItem == *itHWndBV) {
-		  auto fileName = ThrName; // intentional copy
+		  auto fileName = ThrSingle->ThrName; // intentional copy
 		  auto ext      = fileName.extension().wstring();
 		  ext.back()    = iVersion + 's';
 		  fileName.replace_extension(ext);
@@ -4246,7 +4288,7 @@ void init() {
   menu::init();
   menu::qchk();
   mouse::crtcurs();
-  menu::redfils(LRUMenuId, PreviousNames);
+  menu::redfils(LRUMenuId, ThrSingle->PreviousNames);
   Instance->StateMap.reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
@@ -4404,7 +4446,7 @@ void init() {
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
   auto tsi           = ThreadSizeIndex.begin();
-  auto itUserPen     = UserPen.begin();
+  auto itUserPen     = ThrSingle->UserPen.begin();
   for (auto const& color : UserColor) {
 	*tsp++       = 1;
 	*tsi++       = 1;
@@ -4421,8 +4463,8 @@ void init() {
   wrap::getTextExtentPoint32(ThredDC, pikol.c_str(), wrap::toUnsigned(pikol.size()), &PickColorMsgSize);
   menu::auxmen();
   fnamtabs();
-  ritfnam(DesignerName);
-  auto       designer       = utf::utf16ToUtf8(DesignerName);
+  ritfnam(ThrSingle->DesignerName);
+  auto       designer       = utf::utf16ToUtf8(ThrSingle->DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
@@ -4442,7 +4484,7 @@ void init() {
   menu::chkmen();
   // check command line-should be last item in init
   ducmd();
-  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, ThrSingle->DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
@@ -4720,8 +4762,8 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	    filscor > homscor) {
 	  auto const spEHCN = gsl::span {ExtendedHeader.creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
-	  redfnam(DesignerName);
-	  auto fmtStr = displayText::format2(IDS_THRDBY, ThrName.wstring(), DesignerName);
+	  redfnam(ThrSingle->DesignerName);
+	  auto fmtStr = displayText::format2(IDS_THRDBY, ThrSingle->ThrName.wstring(), ThrSingle->DesignerName);
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
   }
@@ -4856,12 +4898,12 @@ void makCol() noexcept {
   buffer[1]   = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont        = displayText::getThrEdFont(FONTSIZE);
-  auto       dcw          = DefaultColorWin.begin();
-  auto       ucw          = UserColorWin.begin();
+  auto       dcw          = ThrSingle->DefaultColorWin.begin();
+  auto       ucw          = ThrSingle->UserColorWin.begin();
   auto       itThreadSize = ThreadSize.begin();
   auto       yOffset      = int32_t {};
 
-  for (auto& tsw : ThreadSizeWin) {
+  for (auto& tsw : ThrSingle->ThreadSizeWin) {
 	*dcw = CreateWindow(L"STATIC",
 	                    nullptr,
 	                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -5134,7 +5176,7 @@ void nuFil(FileIndices const fileIndex) {
 	}
   }
   if (bitmap::ismap()) {
-	bitmap::assignUBFilename(DefaultDirectory);
+	bitmap::assignUBFilename(ThrSingle->DefaultDirectory);
   }
   thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
   ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
@@ -5144,10 +5186,10 @@ void nuFil(FileIndices const fileIndex) {
   Instance->StateMap.reset(StateFlag::ZUMED);
   auto buffer       = std::array<wchar_t, 3> {};
   buffer[1]         = L'0';
-  auto itUserPen    = UserPen.begin();
+  auto itUserPen    = ThrSingle->UserPen.begin();
   auto ucb          = UserColorBrush.begin();
   auto itThreadSize = ThreadSize.begin();
-  auto tsw          = ThreadSizeWin.begin();
+  auto tsw          = ThrSingle->ThreadSizeWin.begin();
   for (auto const& color : UserColor) {
 	thred::nuPen(*itUserPen, 1, color);
 	++itUserPen;
@@ -5156,7 +5198,7 @@ void nuFil(FileIndices const fileIndex) {
 	buffer[0] = *itThreadSize++;
 	SetWindowText(*tsw++, buffer.data());
   }
-  for (auto const& iColor : UserColorWin) {
+  for (auto const& iColor : ThrSingle->UserColorWin) {
 	thred::redraw(iColor);
   }
   thred::redrawColorBar();
@@ -5177,7 +5219,7 @@ void nuFil(FileIndices const fileIndex) {
   }
   menu::auxmen();
   thred::lenCalc();
-  auto const fmtStr = displayText::format2(IDS_THRDBY, newFileName.wstring(), DesignerName);
+  auto const fmtStr = displayText::format2(IDS_THRDBY, newFileName.wstring(), ThrSingle->DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   Instance->StateMap.set(StateFlag::INIT);
   Instance->StateMap.reset(StateFlag::TRSET);
@@ -5227,7 +5269,7 @@ void nuRct() noexcept {
 
 void nuStchSiz(uint32_t const iColor, int32_t const width) noexcept(!std::is_same_v<ptrdiff_t, int>) {
   if (auto const tsp = wrap::next(ThreadSizePixels.begin(), iColor); width != *tsp) {
-	thred::nuPen(UserPen.operator[](iColor), width, UserColor.at(iColor));
+	thred::nuPen(ThrSingle->UserPen.operator[](iColor), width, UserColor.at(iColor));
 	*tsp = width;
   }
 }
@@ -5250,43 +5292,45 @@ void nunams() {
   auto const& workingFileName = Instance->WorkingFileName;
   Instance->auxName           = workingFileName;
   xt::duauxnam(Instance->auxName);
-  ThrName = workingFileName;
-  ThrName.replace_extension(L".thr");
-  if (PreviousNames.front() == ThrName) {
+  auto& thrName      = ThrSingle->ThrName;
+  thrName = workingFileName;
+  thrName.replace_extension(L".thr");
+  auto& previousNames = ThrSingle->PreviousNames;
+  if (previousNames.front() == thrName) {
 	return;
   }
   auto flag = true;
-  for (auto  spNames = std::ranges::subrange(std::next(PreviousNames.begin()), PreviousNames.end());
+  for (auto  spNames = std::ranges::subrange(std::next(previousNames.begin()), ThrSingle->PreviousNames.end());
        auto& previousName : spNames) {
-	if (previousName != ThrName) {
+	if (previousName != thrName) {
 	  continue;
 	}
-	std::swap(PreviousNames.front(), previousName);
+	std::swap(ThrSingle->PreviousNames.front(), previousName);
 	flag = false;
 	break;
   }
   if (!flag) {
-	menu::redfils(LRUMenuId, PreviousNames);
+	menu::redfils(LRUMenuId, ThrSingle->PreviousNames);
 	return;
   }
-  for (auto& previousName : PreviousNames) {
+  for (auto& previousName : ThrSingle->PreviousNames) {
 	if (!previousName.empty()) {
 	  continue;
 	}
-	previousName.assign(ThrName);
+	previousName.assign(thrName);
 	flag = false;
 	break;
   }
   if (flag) {
-	PreviousNames.insert(PreviousNames.begin(), ThrName);
-	PreviousNames.pop_back();
+	previousNames.insert(previousNames.begin(), thrName);
+	previousNames.pop_back();
   }
-  menu::redfils(LRUMenuId, PreviousNames);
+  menu::redfils(LRUMenuId, previousNames);
 }
 
 void nuselrct() {
   auto outline = std::vector<F_POINT> {};
-  outline.resize(FormControlPoints.size());
+  outline.resize(ThrSingle->FormControlPoints.size());
   thred::unsel();
   outline[PTL].x = outline[PBL].x = outline[PLM].x = outline[PTLE].x = StitchRangeRect.left;
   outline[PTL].y = outline[PTM].y = outline[PTR].y = outline[PTLE].y = StitchRangeRect.top;
@@ -5296,7 +5340,7 @@ void nuselrct() {
   outline[PRM].y = outline[PLM].y = wrap::midl(StitchRangeRect.top, StitchRangeRect.bottom);
 
   auto iPoint = outline.begin();
-  for (auto& controlPoint : FormControlPoints) {
+  for (auto& controlPoint : ThrSingle->FormControlPoints) {
 	controlPoint = form::sfCor2px(*iPoint);
 	++iPoint;
   }
@@ -5304,10 +5348,11 @@ void nuselrct() {
 
 void nuthum(wchar_t const character) {
   Instance->StateMap.set(StateFlag::RESTCH);
-  ThumbnailSearchString.back() = character;
-  ThumbnailSearchString.push_back(0);
+  auto& thumbnailSearchString             = ThrSingle->ThumbnailSearchString;
+  thumbnailSearchString.back() = character;
+  thumbnailSearchString.push_back(0);
 
-  auto const txt = std::wstring(ThumbnailSearchString.data());
+  auto const txt = std::wstring(thumbnailSearchString.data());
   displayText::butxt(HBOXSEL, txt);
   ThumbnailIndex = 0;
   thred::nuthsel();
@@ -5323,8 +5368,8 @@ void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t const iSource, char cons
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
 auto oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (DefaultColorWin.operator[](iColor) == window || UserColorWin.operator[](iColor) == window ||
-	    ThreadSizeWin.operator[](iColor) == window) {
+	if (ThrSingle->DefaultColorWin.operator[](iColor) == window || ThrSingle->UserColorWin.operator[](iColor) == window ||
+	    ThrSingle->ThreadSizeWin.operator[](iColor) == window) {
 	  return false;
 	}
   }
@@ -5402,7 +5447,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
   auto const spIDN   = gsl::span {IniFile.designerName};
-  DesignerName.assign(utf::utf8ToUtf16(std::string(spIDN.data())));
+  ThrSingle->DesignerName.assign(utf::utf8ToUtf16(std::string(spIDN.data())));
   switch (version) { // handle the different versions of the file format
 	case 0: {
 	  if (thredHeader.hoopType == SMALHUP) {
@@ -5415,7 +5460,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		IniFile.hoopSizeY = LHUPY;
 		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 	  }
-	  ritfnam(DesignerName);
+	  ritfnam(ThrSingle->DesignerName);
 	  auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
 	  std::copy(spIDN.begin(), wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U), spModifierName.begin());
 	  break;
@@ -5433,7 +5478,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  IniFile.hoopSizeY = ExtendedHeader.hoopSizeY;
 
 	  UnzoomedRect = {.cx = std::lround(ExtendedHeader.hoopSizeX), .cy = std::lround(ExtendedHeader.hoopSizeY)};
-	  redfnam(DesignerName);
+	  redfnam(ThrSingle->DesignerName);
 	  break;
 	}
 	default: {
@@ -5633,19 +5678,20 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 
 void rebak() {
   destroyBV();
-  auto newFileName    = ThrName; // intentional copy
+  auto& thrName        = ThrSingle->ThrName;
+  auto newFileName    = thrName; // intentional copy
   auto safetyFileName = newFileName;       // initialise from local variable
   auto ext            = newFileName.extension().wstring();
   ext.back()          = FileVersionIndex + L's';
   newFileName.replace_extension(ext);
   ext.back() = 'x';
   safetyFileName.replace_extension(ext);
-  fs::rename(ThrName, safetyFileName);
+  fs::rename(thrName, safetyFileName);
   if (exists(newFileName)) {
-	fs::rename(newFileName, ThrName);
+	fs::rename(newFileName, thrName);
   }
   fs::rename(safetyFileName, newFileName);
-  Instance->WorkingFileName = ThrName;
+  Instance->WorkingFileName = thrName;
   Instance->StateMap.set(StateFlag::REDOLD);
   nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
@@ -5681,11 +5727,12 @@ void redfnam(std::wstring& designerName) {
 
 void redini() {
   duhom();
-  IniFileName = HomeDirectory;
-  IniFileName /= L"thred.ini";
+  auto& iniFileName      = ThrSingle->IniFileName;
+  iniFileName = ThrSingle->HomeDirectory;
+  iniFileName /= L"thred.ini";
   // NOLINTNEXTLINE(readability-qualified-auto)
   if (auto const iniFileHandle =
-          CreateFile(IniFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+          CreateFile(iniFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
       iniFileHandle == INVALID_HANDLE_VALUE) {
 	setPrefs();
   }
@@ -5696,16 +5743,16 @@ void redini() {
 	}
 	CloseHandle(iniFileHandle);
 	if (bytesRead < sizeof(IniFile)) {
-	  auto newFileName = IniFileName; // intentional copy
+	  auto newFileName = iniFileName; // intentional copy
 	  newFileName.replace_filename("thred-ini.bak");
-	  fs::rename(IniFileName, newFileName);
+	  fs::rename(iniFileName, newFileName);
 	  setPrefs();
 	}
 	else {
 	  auto const directory = utf::utf8ToUtf16(std::string(IniFile.defaultDirectory.data()));
-	  DefaultDirectory.assign(directory);
+	  ThrSingle->DefaultDirectory.assign(directory);
 	  {
-		auto previousName = PreviousNames.begin();
+		auto previousName = ThrSingle->PreviousNames.begin();
 		for (auto const& prevName : IniFile.prevNames) {
 		  if (strlen(prevName.data()) != 0U) {
 			previousName->assign(utf::utf8ToUtf16(std::string(prevName.data())));
@@ -5716,7 +5763,7 @@ void redini() {
 		  ++previousName;
 		}
 	  }
-	  DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
+	  ThrSingle->DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
 	  loadColors();
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
@@ -6126,12 +6173,12 @@ void ritfnam(std::wstring const& designerName) {
 }
 
 void ritini() {
-  auto const     directory = utf::utf16ToUtf8(DefaultDirectory.wstring());
+  auto const     directory = utf::utf16ToUtf8(ThrSingle->DefaultDirectory.wstring());
   constexpr char FILLCHAR  = '\0';
   std::ranges::fill(IniFile.defaultDirectory, FILLCHAR);
   auto const spIDD = gsl::span {IniFile.defaultDirectory};
   std::ranges::copy(directory, spIDD.begin());
-  auto previousName = PreviousNames.begin();
+  auto previousName = ThrSingle->PreviousNames.begin();
   for (auto& prevName : IniFile.prevNames) {
 	std::ranges::fill(prevName, FILLCHAR);
 	if (!previousName->empty()) {
@@ -6141,7 +6188,7 @@ void ritini() {
 	}
 	++previousName;
   }
-  auto const designer = utf::utf16ToUtf8(DesignerName);
+  auto const designer = utf::utf16ToUtf8(ThrSingle->DesignerName);
   std::ranges::fill(IniFile.designerName, FILLCHAR);
   auto const spIDN = gsl::span {IniFile.designerName};
   std::ranges::copy(designer, spIDN.begin());
@@ -6188,7 +6235,7 @@ void ritini() {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const iniFileHandle = CreateFile(
-      IniFileName.wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      ThrSingle->IniFileName.wstring().c_str(), GENERIC_WRITE | GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (iniFileHandle != INVALID_HANDLE_VALUE) {
 	auto bytesRead = DWORD {};
 	WriteFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
@@ -6240,7 +6287,7 @@ void ritloc() {
   if (auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
       lockFile != INVALID_HANDLE_VALUE) {
 	auto       bytesWritten = DWORD {};
-	auto const value        = utf::utf16ToUtf8(HomeDirectory);
+	auto const value        = utf::utf16ToUtf8(ThrSingle->HomeDirectory);
 	wrap::writeFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(lockFile);
   }
@@ -6490,7 +6537,7 @@ void setScrollVisibility() {
 }
 
 void setSideWinVal(int const index) {
-  SetWindowText(Instance->valueWindow.operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
+  SetWindowText(Instance->valueWindow.operator[](wrap::toSize(index)), ThrSingle->SideWindowEntryBuffer.data());
 }
 
 void setbak(int32_t const penWidth) noexcept {
@@ -6524,9 +6571,9 @@ void setknt() {
 
 void setPrefs() {
   thred::defpref();
-  getDocsFolder(DefaultDirectory);
-  if (DesignerName.empty()) {
-	DesignerName.assign(displayText::loadStr(IDS_UNAM));
+  getDocsFolder(ThrSingle->DefaultDirectory);
+  if (ThrSingle->DesignerName.empty()) {
+	ThrSingle->DesignerName.assign(displayText::loadStr(IDS_UNAM));
 	thred::getdes();
   }
 }
@@ -6555,7 +6602,7 @@ void setsped() {
 void setsrch(bool const end) {
   if (end) {
 	CurrentStitchIndex = LargestStitchIndex;
-	SortIndex          = wrap::toUnsigned(SortBuffer.size() - 1U);
+	SortIndex          = wrap::toUnsigned(ThrSingle->SortBuffer.size() - 1U);
   }
   else {
 	CurrentStitchIndex = SmallestStitchIndex;
@@ -6617,7 +6664,7 @@ void sidhup() {
   constexpr auto SW_FLAGS  = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
-	SideWindow.operator[](iHoop) =
+	ThrSingle->SideWindow.operator[](iHoop) =
 	    CreateWindow(L"STATIC",
 	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
 	                 SW_FLAGS,
@@ -6802,8 +6849,8 @@ void srchk() {
 }
 
 auto srchknot(uint32_t const source) -> uint32_t {
-  auto upper = std::ranges::find(Knots, source);
-  if (upper == Knots.end()) {
+  auto upper = std::ranges::find(ThrSingle->Knots, source);
+  if (upper == ThrSingle->Knots.end()) {
 	return 3;
   }
   --upper;
@@ -6982,6 +7029,10 @@ void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const start) {
   }
 }
 
+void thrInit() noexcept {
+  ThrSingle = THR_SINGLE::getInstance();
+}
+
 void thrsav() {
   auto const& workingFileName = Instance->WorkingFileName;
 
@@ -6994,26 +7045,27 @@ void thrsav() {
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const file = FindFirstFile(geName.wstring().c_str(), &fileData); file != INVALID_HANDLE_VALUE) {
+	  auto& versionNames = ThrSingle->VersionNames;
 	  Instance->StateMap.reset(StateFlag::CMPDO);
-	  for (auto& version : VersionNames) {
+	  for (auto& version : versionNames) {
 		version.clear();
 	  }
 	  auto& fileName = fileData.cFileName;
-	  duver(DefaultDirectory / std::begin(fileName));
+	  duver(ThrSingle->DefaultDirectory / std::begin(fileName));
 	  while (FindNextFile(file, &fileData)) {
-		duver(DefaultDirectory / std::begin(fileName));
+		duver(ThrSingle->DefaultDirectory / std::begin(fileName));
 	  }
 	  FindClose(file);
-	  fs::remove(VersionNames.back());
-	  for (auto iBackup = VersionNames.size() - 1U; iBackup > 0; --iBackup) {
-		if (!VersionNames.operator[](iBackup - 1U).empty()) {
-		  auto newFileName = VersionNames.operator[](iBackup - 1U); // copy intended
+	  fs::remove(versionNames.back());
+	  for (auto iBackup = versionNames.size() - 1U; iBackup > 0; --iBackup) {
+		if (!versionNames.operator[](iBackup - 1U).empty()) {
+		  auto newFileName = versionNames.operator[](iBackup - 1U); // copy intended
 
 		  auto ext   = newFileName.extension().wstring();
 		  ext.back() = gsl::narrow<wchar_t>(iBackup - 1) + 's';
 		  newFileName.replace_extension(ext);
 		  auto eCode = std::error_code {};
-		  fs::rename(VersionNames.operator[](iBackup - 1U), newFileName, eCode);
+		  fs::rename(versionNames.operator[](iBackup - 1U), newFileName, eCode);
 		  auto const msg = eCode.message();
 		  if (eCode != std::error_code {}) {
 			// ToDo - find better error message
@@ -7026,9 +7078,9 @@ void thrsav() {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
-      CreateFile(ThrName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+      CreateFile(ThrSingle->ThrName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   if (fileHandle == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(ThrName);
+	displayText::crmsg(ThrSingle->ThrName);
 	return;
   }
   auto output = std::vector<char> {};
@@ -7036,7 +7088,7 @@ void thrsav() {
   auto bytesWritten = DWORD {};
   WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
   if (bytesWritten != output.size()) {
-	displayText::showMessage(IDS_FWERR, ThrName.wstring());
+	displayText::showMessage(IDS_FWERR, ThrSingle->ThrName.wstring());
   }
   CloseHandle(fileHandle);
 }
@@ -7201,9 +7253,9 @@ void handle_program_memory_depletion() {
 } // namespace
 
 void thred::hideColorWin() noexcept {
-  auto iDefaultColorWin = DefaultColorWin.begin();
-  auto iUserColorWin    = UserColorWin.begin();
-  for (auto const& iThreadSizeWin : ThreadSizeWin) {
+  auto iDefaultColorWin = ThrSingle->DefaultColorWin.begin();
+  auto iUserColorWin    = ThrSingle->UserColorWin.begin();
+  for (auto const& iThreadSizeWin : ThrSingle->ThreadSizeWin) {
 	hidwnd(*iDefaultColorWin++);
 	hidwnd(*iUserColorWin++);
 	hidwnd(iThreadSizeWin);
@@ -7211,9 +7263,9 @@ void thred::hideColorWin() noexcept {
 }
 
 void thred::showColorWin() noexcept {
-  auto iDefaultColorWin = DefaultColorWin.begin();
-  auto iUserColorWin    = UserColorWin.begin();
-  for (auto const& iThreadSizeWin : ThreadSizeWin) {
+  auto iDefaultColorWin = ThrSingle->DefaultColorWin.begin();
+  auto iUserColorWin    = ThrSingle->UserColorWin.begin();
+  for (auto const& iThreadSizeWin : ThrSingle->ThreadSizeWin) {
 	shownd(*iDefaultColorWin++);
 	shownd(*iUserColorWin++);
 	shownd(iThreadSizeWin);
@@ -7221,22 +7273,22 @@ void thred::showColorWin() noexcept {
 }
 
 auto thred::getUserPen(uint32_t const iPen) noexcept -> HPEN {
-  return UserPen.operator[](iPen);
+  return ThrSingle->UserPen.operator[](iPen);
 }
 
 void thred::resetSideBuffer() {
   SideWinMsgIdx           = 0;
   constexpr auto FILLCHAR = gsl::narrow_cast<wchar_t>(0U);
-  std::ranges::fill(SideWindowEntryBuffer, FILLCHAR);
+  std::ranges::fill(ThrSingle->SideWindowEntryBuffer, FILLCHAR);
 }
 
 void thred::resetMsgBuffer() {
-  MsgBuffer.clear();
-  MsgBuffer.push_back(0);
+  ThrSingle->MsgBuffer.clear();
+  ThrSingle->MsgBuffer.push_back(0);
 }
 
 auto thred::getMsgBufferValue() -> float {
-  return wrap::wcsToFloat(MsgBuffer.data());
+  return wrap::wcsToFloat(ThrSingle->MsgBuffer.data());
 }
 
 void thred::getdes() noexcept {
@@ -7296,20 +7348,20 @@ void thred::ritfcor(F_POINT const& point) {
 }
 
 auto thred::maxColor() noexcept -> size_t {
-  if (ColorChangeTable.empty()) {
+  if (ThrSingle->ColorChangeTable.empty()) {
 	return 0U;
   }
-  return ColorChangeTable.size() - 1U;
+  return ThrSingle->ColorChangeTable.size() - 1U;
 }
 
 void thred::resetColorChanges() noexcept {
-  ColorChangeTable.clear();
+  ThrSingle->ColorChangeTable.clear();
 }
 
 void thred::addColor(uint32_t const stitch, uint32_t const color) {
-  ColorChangeTable.emplace_back(
-      COL_CHANGE {.stitchIndex = gsl::narrow<decltype(ColorChangeTable.back().stitchIndex)>(stitch),
-                  .colorIndex  = gsl::narrow<decltype(ColorChangeTable.back().colorIndex)>(color)});
+  ThrSingle->ColorChangeTable.emplace_back(
+      COL_CHANGE {.stitchIndex = gsl::narrow<decltype(ThrSingle->ColorChangeTable.back().stitchIndex)>(stitch),
+                  .colorIndex  = gsl::narrow<decltype(ThrSingle->ColorChangeTable.back().colorIndex)>(color)});
 }
 
 void thred::coltab() {
@@ -7400,7 +7452,7 @@ void thred::redraw(HWND window) noexcept {
   if (window != MainStitchWin) {
 	return;
   }
-  for (auto const& iWindow : DefaultColorWin) {
+  for (auto const& iWindow : ThrSingle->DefaultColorWin) {
 	if (iWindow != nullptr) {
 	  RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
 	}
@@ -7945,8 +7997,8 @@ void thred::nuAct(uint32_t const iStitch) noexcept {
   else {
 	ActiveColor = 0;
   }
-  redraw(UserColorWin.operator[](color));
-  redraw(UserColorWin.operator[](ActiveColor));
+  redraw(ThrSingle->UserColorWin.operator[](color));
+  redraw(ThrSingle->UserColorWin.operator[](ActiveColor));
 }
 
 void thred::nuPen(HPEN& pen, int32_t const width, COLORREF const color) noexcept {
@@ -8013,7 +8065,7 @@ void thred::savAs() {
   if (!getSaveName(workingFileName, index)) {
 	return;
   }
-  DefaultDirectory = workingFileName.parent_path();
+  ThrSingle->DefaultDirectory = workingFileName.parent_path();
   switch (index) {
 	case FileIndices::THR: {
 	  workingFileName.replace_extension(L".thr");
@@ -8048,7 +8100,7 @@ void thred::savAs() {
   Instance->StateMap.reset(StateFlag::CMPDO);
   thrsav();
   sav();
-  SetWindowText(ThrEdWindow, ThrName.wstring().c_str());
+  SetWindowText(ThrEdWindow, ThrSingle->ThrName.wstring().c_str());
 }
 
 void thred::save() {
@@ -8085,7 +8137,7 @@ void thred::dun() {
 	Instance->StateMap.set(StateFlag::SAVEX);
 	return;
   }
-  auto const fmtStr = displayText::format(IDS_SAVFIL, ThrName.wstring());
+  auto const fmtStr = displayText::format(IDS_SAVFIL, ThrSingle->ThrName.wstring());
   if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
 	save();
   }
@@ -8093,7 +8145,7 @@ void thred::dun() {
 }
 
 auto thred::inDefaultColorWindows() -> bool {
-  return chkMsgs(WinMsg.pt, DefaultColorWin.front(), DefaultColorWin.back());
+  return chkMsgs(WinMsg.pt, ThrSingle->DefaultColorWin.front(), ThrSingle->DefaultColorWin.back());
 }
 
 auto thred::inChangeThreadWindows() -> bool {
@@ -8101,15 +8153,15 @@ auto thred::inChangeThreadWindows() -> bool {
 }
 
 auto thred::inThreadWindows() -> bool {
-  return chkMsgs(WinMsg.pt, ThreadSizeWin.front(), ThreadSizeWin.back());
+  return chkMsgs(WinMsg.pt, ThrSingle->ThreadSizeWin.front(), ThrSingle->ThreadSizeWin.back());
 }
 
 auto thred::inUserColorWindows() -> bool {
-  return chkMsgs(WinMsg.pt, UserColorWin.front(), UserColorWin.back());
+  return chkMsgs(WinMsg.pt, ThrSingle->UserColorWin.front(), ThrSingle->UserColorWin.back());
 }
 
 auto thred::inThreadSizeWindows() -> bool {
-  return chkMsgs(WinMsg.pt, ThreadSizeWin.front(), ThreadSizeWin.back());
+  return chkMsgs(WinMsg.pt, ThrSingle->ThreadSizeWin.front(), ThrSingle->ThreadSizeWin.back());
 }
 
 auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
@@ -8356,17 +8408,19 @@ void thred::zumout() {
 void thred::closPnt() {
   unbox();
   unboxs();
+  auto& nearestPoint = ThrSingle->NearestPoint;
+  auto& colorChangeTable = ThrSingle->ColorChangeTable;
   auto gapToNearest = std::vector<float> {};          // distances of the closest points
-  gapToNearest.resize(NearestPoint.size(), BIGFLOAT); // to a mouse click
-  NearestPoint.assign(NearestPoint.size(), BIGUINT);
+  gapToNearest.resize(nearestPoint.size(), BIGFLOAT); // to a mouse click
+  nearestPoint.assign(nearestPoint.size(), BIGUINT);
   auto const stitchPoint = pxCor2stch(WinMsg.pt);
   for (auto iColor = size_t {}; iColor < maxColor(); ++iColor) {
-	auto const iStitch0 = ColorChangeTable.operator[](iColor).stitchIndex;
+	auto const iStitch0 = colorChangeTable.operator[](iColor).stitchIndex;
 
 	auto const iStitch1 =
-	    gsl::narrow_cast<decltype(iStitch0)>(ColorChangeTable.operator[](iColor + 1U).stitchIndex - iStitch0);
+	    gsl::narrow_cast<decltype(iStitch0)>(colorChangeTable.operator[](iColor + 1U).stitchIndex - iStitch0);
 	if (Instance->StateMap.test(StateFlag::HID)) {
-	  if (ColorChangeTable.operator[](iColor).colorIndex == ActiveColor) {
+	  if (colorChangeTable.operator[](iColor).colorIndex == ActiveColor) {
 		duClos(iStitch0, iStitch1, stitchPoint, gapToNearest);
 	  }
 	}
@@ -8376,10 +8430,10 @@ void thred::closPnt() {
   }
   GetClientRect(MainStitchWin, &StitchWindowClientRect);
   auto stitchCoordsInPixels = POINT {};
-  for (auto const& iNear : NearestPoint) {
+  for (auto const& iNear : nearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
-	  NearestPixel.operator[](NearestCount++) = stitchCoordsInPixels;
-	  NearestPoint.operator[](NearestCount)   = iNear;
+	  ThrSingle->NearestPixel.operator[](NearestCount++) = stitchCoordsInPixels;
+	  nearestPoint.operator[](NearestCount)   = iNear;
 	}
   }
   boxs();
@@ -8398,8 +8452,8 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   }
   if (NearestCount != 0) {
 	auto itBoxOffset = BoxOffset.begin();
-	auto npi         = NearestPixel.begin();
-	auto npo         = NearestPoint.begin();
+	auto npi         = ThrSingle->NearestPixel.begin();
+	auto npo         = ThrSingle->NearestPoint.begin();
 	for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
 	  auto const offset = *itBoxOffset++;
 	  if (auto const& pixel = *(npi++);
@@ -8414,8 +8468,8 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   auto const stitchPoint     = pxCor2stch(WinMsg.pt);
   auto       distanceToClick = BIGFLOAT;
   if (Instance->StateMap.test(StateFlag::HID)) {
-	auto const maxIt = wrap::next(ColorChangeTable.end(), -1);
-	for (auto colorIt = ColorChangeTable.begin(); colorIt != maxIt; ++colorIt) {
+	auto const maxIt = wrap::next(ThrSingle->ColorChangeTable.end(), -1);
+	for (auto colorIt = ThrSingle->ColorChangeTable.begin(); colorIt != maxIt; ++colorIt) {
 	  if (colorIt->colorIndex != ActiveColor) {
 		continue;
 	  }
@@ -8477,7 +8531,7 @@ auto thred::closPnt1(uint32_t& closestStitch) -> bool {
 auto thred::pt2colInd(uint32_t const iStitch) noexcept -> uint32_t {
   auto iColor = 0U;
   for (; iColor < maxColor(); ++iColor) {
-	if (ColorChangeTable.operator[](iColor).stitchIndex > iStitch) {
+	if (ThrSingle->ColorChangeTable.operator[](iColor).stitchIndex > iStitch) {
 	  break;
 	}
   }
@@ -8666,14 +8720,15 @@ auto thred::closlin() -> uint32_t {
   auto       sum = BIGFLOAT;
   auto const tolerance = offset * TLFACTOR;
   for (auto iChange = size_t {}; iChange < maxColor(); ++iChange) {
+	auto& colorChangeTable = ThrSingle->ColorChangeTable;
 	auto stitchCount =
-	    gsl::narrow_cast<ptrdiff_t>(std::abs(ColorChangeTable.operator[](iChange + 1U).stitchIndex -
-	                                         ColorChangeTable.operator[](iChange).stitchIndex));
-	if (ColorChangeTable.operator[](iChange + 1U).stitchIndex == Instance->StitchBuffer.size()) {
+	    gsl::narrow_cast<ptrdiff_t>(std::abs(colorChangeTable.operator[](iChange + 1U).stitchIndex -
+	                                         colorChangeTable.operator[](iChange).stitchIndex));
+	if (colorChangeTable.operator[](iChange + 1U).stitchIndex == Instance->StitchBuffer.size()) {
 	  --stitchCount;
 	}
 	auto const stitches =
-	    wrap::next(Instance->StitchBuffer.begin(), ColorChangeTable.operator[](iChange).stitchIndex);
+	    wrap::next(Instance->StitchBuffer.begin(), colorChangeTable.operator[](iChange).stitchIndex);
 	if (!chkhid(iChange)) {
 	  continue;
 	}
@@ -8761,7 +8816,7 @@ auto thred::closlin() -> uint32_t {
 	  }
 	  if (tsum < sum) {
 		sum          = tsum;
-		closestPoint = wrap::toUnsigned(iStitch) + ColorChangeTable.operator[](iChange).stitchIndex;
+		closestPoint = wrap::toUnsigned(iStitch) + colorChangeTable.operator[](iChange).stitchIndex;
 	  }
 	}
   }
@@ -8811,12 +8866,13 @@ void thred::newFil() {
   Instance->StateMap.reset(StateFlag::CMPDO);
   bitmap::resetBmpFile(true);
   backup::deldu();
-  DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
-  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
+  auto& designerName = ThrSingle->DesignerName;
+  designerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
+  auto const fmtStr = displayText::format(IDS_THRED, designerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
-  ThrName = DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
-  ritfnam(DesignerName);
-  auto const designer       = utf::utf16ToUtf8(DesignerName);
+  ThrSingle->ThrName = ThrSingle->DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
+  ritfnam(designerName);
+  auto const designer       = utf::utf16ToUtf8(designerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
@@ -8850,12 +8906,12 @@ void thred::newFil() {
   formList.clear();
   formList.shrink_to_fit();
   resetColorChanges();
-  Knots.clear();
+  ThrSingle->Knots.clear();
   Instance->WorkingFileName.clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	redraw(DefaultColorWin.operator[](iColor));
-	redraw(UserColorWin.operator[](iColor));
-	redraw(ThreadSizeWin.operator[](iColor));
+	redraw(ThrSingle->DefaultColorWin.operator[](iColor));
+	redraw(ThrSingle->UserColorWin.operator[](iColor));
+	redraw(ThrSingle->ThreadSizeWin.operator[](iColor));
   }
   zumhom();
 }
@@ -8892,7 +8948,7 @@ void thred::rebox() {
 	Instance->searchLine.clear();
 	Instance->searchLine.shrink_to_fit();
 	Instance->StateMap.set(StateFlag::RESTCH);
-	for (auto const& window : UserColorWin) {
+	for (auto const& window : ThrSingle->UserColorWin) {
 	  redraw(window);
 	}
   }
@@ -8962,7 +9018,7 @@ void thred::rSelbox() {
       wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                           ((stitchPoint.y - ZoomRect.bottom - wrap::toFloat(SelectBoxOffset.y)) * ratio) -
                           wrap::toFloat(adjustedSelectSize.cy))};
-  auto& frmCtrls  = FormControlPoints;
+  auto& frmCtrls  = ThrSingle->FormControlPoints;
   frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = stitchCoordsInPixels.x;
   frmCtrls[PTL].y = frmCtrls[PTM].y = frmCtrls[PTR].y = frmCtrls[PTLE].y = stitchCoordsInPixels.y;
   frmCtrls[PBR].y = frmCtrls[PBM].y = frmCtrls[PBL].y = stitchCoordsInPixels.y + adjustedSelectSize.cy;
@@ -9294,7 +9350,7 @@ void thred::hidbit() {
 }
 
 void thred::deltot() {
-  DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
+  ThrSingle->DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
   Instance->TexturePointsBuffer.clear();
   Instance->FormList.clear();
   Instance->StitchBuffer.clear();
@@ -9304,7 +9360,7 @@ void thred::deltot() {
   rstAll();
   coltab();
   zumhom();
-  auto const wTxt = displayText::format2(IDS_THRDBY, ThrName.wstring(), DesignerName);
+  auto const wTxt = displayText::format2(IDS_THRDBY, ThrSingle->ThrName.wstring(), ThrSingle->DesignerName);
   SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
@@ -9698,11 +9754,11 @@ void thred::thumbak() {
 }
 
 void thred::purg() {
-  if (ThrName.empty()) {
+  if (ThrSingle->ThrName.empty()) {
 	return;
   }
-  auto fileName = ThrName; // intentional copy
-  auto ext      = ThrName.extension().wstring();
+  auto fileName = ThrSingle->ThrName; // intentional copy
+  auto ext      = ThrSingle->ThrName.extension().wstring();
   for (auto iLast = wchar_t {}; iLast < OLDVER; ++iLast) {
 	ext.back() = iLast + 's';
 	fileName.replace_extension(ext);
@@ -9712,7 +9768,7 @@ void thred::purg() {
 
 void thred::purgdir() {
   Instance->StateMap.set(StateFlag::PRGMSG);
-  displayText::showMessage(IDS_DELBAK, DefaultDirectory.wstring());
+  displayText::showMessage(IDS_DELBAK, ThrSingle->DefaultDirectory.wstring());
   displayText::okcan();
 }
 
@@ -9720,7 +9776,7 @@ void thred::deldir() {
   unmsg();
   displayText::tabmsg(IDS_BAKDEL, false);
   auto backSpec = std::wstring {L".th0"};
-  for (auto const& filePath : fs::directory_iterator(DefaultDirectory)) {
+  for (auto const& filePath : fs::directory_iterator(ThrSingle->DefaultDirectory)) {
 	if (!is_directory(filePath)) {
 	  auto fileExt    = filePath.path().extension().wstring();
 	  backSpec.back() = 's';
@@ -10009,7 +10065,7 @@ auto thred::iselpnt() noexcept -> bool {
   auto closestControlPoint = 0U;
   auto minimumLength       = BIGDBL;
   auto iControlPoint       = 0U;
-  for (auto const& controlPoint : FormControlPoints) {
+  for (auto const& controlPoint : ThrSingle->FormControlPoints) {
 	auto const deltaX = pointToTest.x - controlPoint.x;
 	auto const deltaY = pointToTest.y - controlPoint.y;
 	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length < minimumLength) {
@@ -10194,7 +10250,7 @@ void thred::nextSortedStitch(bool const direction) {
 	}
 	--SortIndex;
   }
-  auto const nextStitch = wrap::next(SortBuffer.begin(), SortIndex);
+  auto const nextStitch = wrap::next(ThrSingle->SortBuffer.begin(), SortIndex);
   outDebugString(L"SortIndex [{}]\n", SortIndex);
   CurrentStitchIndex   = nextStitch->index;
   auto const minLength = std::sqrt(nextStitch->length) * IPFGRAN;
@@ -10217,8 +10273,8 @@ void thred::thumnail() {
   unbsho();
   undat();
   trace::untrace();
-  current_path(DefaultDirectory);
-  auto const searchName = DefaultDirectory / L"*.thr";
+  current_path(ThrSingle->DefaultDirectory);
+  auto const searchName = ThrSingle->DefaultDirectory / L"*.thr";
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const file = FindFirstFile(searchName.wstring().c_str(), &fileData);
   if (file == INVALID_HANDLE_VALUE) {
@@ -10228,16 +10284,17 @@ void thred::thumnail() {
 	unthum();
 	return;
   }
-  Thumbnails.clear();
+  auto& thumbnails = ThrSingle->Thumbnails;
+  thumbnails.clear();
   auto& fileName = fileData.cFileName;
-  Thumbnails.emplace_back(std::begin(fileName));
+  thumbnails.emplace_back(std::begin(fileName));
   while (FindNextFile(file, &fileData)) {
-	Thumbnails.emplace_back(std::begin(fileName));
+	thumbnails.emplace_back(std::begin(fileName));
   }
   FindClose(file);
-  std::ranges::sort(Thumbnails);
+  std::ranges::sort(thumbnails);
   auto       iThumbnail = 0U;
-  auto const thumbSize  = Thumbnails.size();
+  auto const thumbSize  = thumbnails.size();
   while (iThumbnail < 4 && iThumbnail < thumbSize) {
 	ThumbnailsSelected.at(iThumbnail) = iThumbnail;
 	++iThumbnail;
@@ -10247,8 +10304,8 @@ void thred::thumnail() {
 	rthumnam(iThumbnail++);
   }
   Instance->StateMap.set(StateFlag::THUMSHO);
-  ThumbnailSearchString.clear();
-  ThumbnailSearchString.push_back(0);
+  ThrSingle->ThumbnailSearchString.clear();
+  ThrSingle->ThumbnailSearchString.push_back(0);
   SetWindowText(Instance->buttonWin.operator[](HBOXSEL), L"");
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
@@ -10257,17 +10314,18 @@ void thred::thumnail() {
 }
 
 void thred::nuthsel() {
-  if (ThumbnailIndex >= Thumbnails.size()) {
+  auto& thumbnails = ThrSingle->Thumbnails;
+  if (ThumbnailIndex >= thumbnails.size()) {
 	return;
   }
   auto const savedIndex = ThumbnailIndex;
   auto       iThumbnail = uint32_t {};
-  auto const length     = wcslen(ThumbnailSearchString.data());
+  auto const length     = wcslen(ThrSingle->ThumbnailSearchString.data());
   Instance->StateMap.set(StateFlag::RESTCH);
   if (length != 0U) {
 	auto itHWndBV = BackupViewer.begin();
-	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails.size()) { // there are 4 quadrants
-	  if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
+	while (iThumbnail < QUADRT && ThumbnailIndex < thumbnails.size()) { // there are 4 quadrants
+	  if (_wcsnicmp(ThrSingle->ThumbnailSearchString.data(), thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
 		ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 		redraw(*itHWndBV);
 		++itHWndBV;
@@ -10278,7 +10336,7 @@ void thred::nuthsel() {
   }
   else {
 	auto itHWndBV = BackupViewer.begin();
-	while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails.size()) { // there are 4 quadrants
+	while (iThumbnail < QUADRT && ThumbnailIndex < thumbnails.size()) { // there are 4 quadrants
 	  ThumbnailsSelected.at(iThumbnail) = ThumbnailIndex;
 	  redraw(*itHWndBV);
 	  ++itHWndBV;
@@ -10302,11 +10360,11 @@ void thred::nuthbak(uint32_t count) {
 	return;
   }
   constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
-  if (auto const length = wcslen(ThumbnailSearchString.data()); length != 0U) {
+  if (auto const length = wcslen(ThrSingle->ThumbnailSearchString.data()); length != 0U) {
 	while (count != 0U && ThumbnailIndex < MAXFORMS) {
 	  if (ThumbnailIndex != 0U) {
 		--ThumbnailIndex;
-		if (_wcsnicmp(ThumbnailSearchString.data(), Thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
+		if (_wcsnicmp(ThrSingle->ThumbnailSearchString.data(), ThrSingle->Thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
 		  --count;
 		}
 	  }
@@ -10325,14 +10383,15 @@ void thred::nuthbak(uint32_t count) {
 }
 
 void thred::thumbBack() {
-  if (ThumbnailSearchString.size() <= 1) {
+  auto& thumbnailSearchString = ThrSingle->ThumbnailSearchString;
+  if (thumbnailSearchString.size() <= 1) {
 	return;
   }
   Instance->StateMap.set(StateFlag::RESTCH);
-  ThumbnailSearchString.pop_back();
-  ThumbnailSearchString.back() = 0;
+  thumbnailSearchString.pop_back();
+  thumbnailSearchString.back() = 0;
   ThumbnailIndex               = 0;
-  auto const txt               = std::wstring(ThumbnailSearchString.data());
+  auto const txt               = std::wstring(thumbnailSearchString.data());
   displayText::butxt(HBOXSEL, txt);
   nuthsel();
 }
@@ -10852,12 +10911,12 @@ void thred::delstch() {
 
 void thred::closfn() {
   deltot();
-  Knots.clear();
+  ThrSingle->Knots.clear();
   Instance->WorkingFileName.clear();
   bitmap::delmap();
   backup::deldu();
   displayText::clrhbut(3);
-  auto const fmtStr = displayText::format(IDS_THRED, DesignerName);
+  auto const fmtStr = displayText::format(IDS_THRED, ThrSingle->DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
 }
 
@@ -10974,11 +11033,11 @@ void thred::bakmrk() {
 
 void thred::nuscol(size_t const iColor) {
   auto const itUserColor = wrap::next(UserColor.begin(), iColor);
-  auto const itUserPen   = wrap::next(UserPen.begin(), iColor);
+  auto const itUserPen   = wrap::next(ThrSingle->UserPen.begin(), iColor);
   nuPen(*itUserPen, 1, *itUserColor);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *itUserColor);
-  redraw(UserColorWin.operator[](iColor));
+  redraw(ThrSingle->UserColorWin.operator[](iColor));
 }
 
 void thred::movchk() {
@@ -11331,11 +11390,12 @@ void thred::handleFormSelected() {
 }
 
 void thred::updateHoopSize() {
-  auto const itHwnd = std::ranges::find(SideWindow, WinMsg.hwnd);
-  if (itHwnd == SideWindow.end()) {
+  auto&      sideWindow = ThrSingle->SideWindow;
+  auto const itHwnd = std::ranges::find(sideWindow, WinMsg.hwnd);
+  if (itHwnd == sideWindow.end()) {
 	return;
   }
-  switch (auto const option = std::distance(SideWindow.begin(), itHwnd) + 1; option) {
+  switch (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1; option) {
 	case SETCUST: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
 	  IniFile.customHoopY = IniFile.hoopSizeY;
@@ -11472,7 +11532,7 @@ auto thred::handleSideWindowActive() -> bool {
 	if (auto const iFeather = std::ranges::find_if(FTHRLIST,
 	                                               [](LIST_TYPE const& feather) noexcept -> bool {
 	                                                 return WinMsg.hwnd ==
-	                                                        SideWindow.operator[](feather.value);
+	                                                        ThrSingle->SideWindow.operator[](feather.value);
 	                                               });
 	    iFeather != FTHRLIST.end()) {
 	  form.feather.fillType = iFeather->value;
@@ -11485,7 +11545,7 @@ auto thred::handleSideWindowActive() -> bool {
   if (FormMenuChoice == LLAYR) {
 	if (auto const iLayer = std::ranges::find_if(LAYRLIST,
 	                                             [](LIST_TYPE const& layer) noexcept -> bool {
-	                                               return WinMsg.hwnd == SideWindow.operator[](layer.value);
+	                                               return WinMsg.hwnd == ThrSingle->SideWindow.operator[](layer.value);
 	                                             });
 	    iLayer != LAYRLIST.end()) {
 	  form::movlayr(iLayer->value);
@@ -11498,9 +11558,10 @@ auto thred::handleSideWindowActive() -> bool {
 	return true;
   }
   form.borderColor &= COLMSK;
+  auto& sideWindow = ThrSingle->SideWindow;
   if (Instance->StateMap.testAndReset(StateFlag::BRDACT)) {
 	while (true) {
-	  if (WinMsg.hwnd == SideWindow.operator[](0)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](0)) {
 		if (form.isEdgeClip()) {
 		  clip::deleclp(ClosestFormToCursor);
 		}
@@ -11509,58 +11570,58 @@ auto thred::handleSideWindowActive() -> bool {
 		Instance->StateMap.set(StateFlag::RESTCH);
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGELINE)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGELINE)) {
 		form::bord();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEBEAN)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEBEAN)) {
 		form::dubold();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGECLIP)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGECLIP)) {
 		form::fclp();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEANGSAT)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEANGSAT)) {
 		satin::satbrd();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEAPPL)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEAPPL)) {
 		if (form.fillType != 0U) {
 		  form::delmfil(ClosestFormToCursor);
 		}
 		form::apliq();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEPROPSAT)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEPROPSAT)) {
 		form::prpbrd(LineSpacing);
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEBHOL)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEBHOL)) {
 		form::bhol();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEPICOT)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEPICOT)) {
 		form::picot();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEDOUBLE)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEDOUBLE)) {
 		form::dubsfil(form);
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGELCHAIN)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGELCHAIN)) {
 		Instance->StateMap.set(StateFlag::LINCHN);
 		form::chain();
 		coltab();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGEOCHAIN)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGEOCHAIN)) {
 		Instance->StateMap.reset(StateFlag::LINCHN);
 		form::chain();
 		coltab();
 		break;
 	  }
-	  if (WinMsg.hwnd == SideWindow.operator[](EDGECLIPX)) {
+	  if (WinMsg.hwnd == sideWindow.operator[](EDGECLIPX)) {
 		form::filclpx();
 	  }
 	  break;
@@ -11584,7 +11645,7 @@ auto thred::handleSideWindowActive() -> bool {
   }
   auto textureFlag = false;
   while (true) {
-	if (WinMsg.hwnd == SideWindow.operator[](0)) { // none
+	if (WinMsg.hwnd == sideWindow.operator[](0)) { // none
 	  form.type = FRMFPOLY;
 	  form::delmfil(ClosestFormToCursor);
 	  form.fillType = 0;
@@ -11592,7 +11653,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](VRTF)) { // vertical fill
+	if (WinMsg.hwnd == sideWindow.operator[](VRTF)) { // vertical fill
 	  savdo();
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
@@ -11605,7 +11666,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filvrt();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](HORF)) { // horizontal fill
+	if (WinMsg.hwnd == sideWindow.operator[](HORF)) { // horizontal fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		respac(form);
@@ -11616,7 +11677,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filhor();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](ANGF)) { // angle fill
+	if (WinMsg.hwnd == sideWindow.operator[](ANGF)) { // angle fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		if (form.satinGuideCount != 0U) {
@@ -11632,7 +11693,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filangl();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](SATF)) { // fan fill
+	if (WinMsg.hwnd == sideWindow.operator[](SATF)) { // fan fill
 	  form.type = SAT;
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
@@ -11647,7 +11708,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::filsat();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](CLPF)) { // fan clip
+	if (WinMsg.hwnd == sideWindow.operator[](CLPF)) { // fan clip
 	  form.type = SAT;
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
@@ -11655,7 +11716,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  form::clpfil();
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](CONTF)) { // contour fill
+	if (WinMsg.hwnd == sideWindow.operator[](CONTF)) { // contour fill
 	  if (form.vertexCount > 4) {
 		if (form.fillType != 0U) {
 		  if (form.fillType == CLPF) {
@@ -11672,7 +11733,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](VCLPF)) { // vertical clip
+	if (WinMsg.hwnd == sideWindow.operator[](VCLPF)) { // vertical clip
 	  if (sidclp()) {
 		form::vrtsclp(ClosestFormToCursor);
 	  }
@@ -11681,7 +11742,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](HCLPF)) { // horizontal clip
+	if (WinMsg.hwnd == sideWindow.operator[](HCLPF)) { // horizontal clip
 	  if (sidclp()) {
 		form::horsclp();
 	  }
@@ -11690,7 +11751,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](ANGCLPF)) { // angle clip
+	if (WinMsg.hwnd == sideWindow.operator[](ANGCLPF)) { // angle clip
 	  if (sidclp()) {
 		if (form.satinGuideCount != 0U) {
 		  satin::delsac(ClosestFormToCursor);
@@ -11702,7 +11763,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](FTHF)) { // feather fill
+	if (WinMsg.hwnd == sideWindow.operator[](FTHF)) { // feather fill
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
 	  }
@@ -11712,7 +11773,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](TXVRTF)) // vertical texture
+	if (WinMsg.hwnd == sideWindow.operator[](TXVRTF)) // vertical texture
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXVRTF;
@@ -11723,7 +11784,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](TXHORF)) // horizontal texture
+	if (WinMsg.hwnd == sideWindow.operator[](TXHORF)) // horizontal texture
 	{
 	  if (form.isTexture()) {
 		form.fillType = TXHORF;
@@ -11734,7 +11795,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  }
 	  break;
 	}
-	if (WinMsg.hwnd == SideWindow.operator[](TXANGF)) // angle texture
+	if (WinMsg.hwnd == sideWindow.operator[](TXANGF)) // angle texture
 	{
 	  if (form.isTexture()) {
 		form.fillType  = TXANGF;
@@ -11768,67 +11829,68 @@ auto thred::handleFormDataSheet() -> bool {
   unsid();
   auto&       form        = Instance->FormList.operator[](ClosestFormToCursor);
   auto const& valueWindow = Instance->valueWindow;
+  auto&       labelWindow = ThrSingle->LabelWindow;
   while (true) {
-	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == LabelWindow.operator[](LTXOF)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == labelWindow.operator[](LTXOF)) {
 	  // draw the texture fill spacing window
 	  FormMenuChoice = LTXOF;
 	  formForms::sidwnd(valueWindow.operator[](LTXOF));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUSPAC) || WinMsg.hwnd == LabelWindow.operator[](LUSPAC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUSPAC) || WinMsg.hwnd == labelWindow.operator[](LUSPAC)) {
 	  // draw the underlay spacing window
 	  FormMenuChoice = LUSPAC;
 	  formForms::sidwnd(valueWindow.operator[](LUSPAC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUANG) || WinMsg.hwnd == LabelWindow.operator[](LUANG)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUANG) || WinMsg.hwnd == labelWindow.operator[](LUANG)) {
 	  // draw the underlay angle window
 	  FormMenuChoice = LUANG;
 	  formForms::sidwnd(valueWindow.operator[](LUANG));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LULEN) || WinMsg.hwnd == LabelWindow.operator[](LULEN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LULEN) || WinMsg.hwnd == labelWindow.operator[](LULEN)) {
 	  // draw the underlay length window
 	  FormMenuChoice = LULEN;
 	  formForms::sidwnd(valueWindow.operator[](LULEN));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LWLKIND) || WinMsg.hwnd == LabelWindow.operator[](LWLKIND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LWLKIND) || WinMsg.hwnd == labelWindow.operator[](LWLKIND)) {
 	  // draw the edge walk/underlay indent window
 	  FormMenuChoice = LWLKIND;
 	  formForms::sidwnd(valueWindow.operator[](LWLKIND));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHSIZ) || WinMsg.hwnd == LabelWindow.operator[](LFTHSIZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHSIZ) || WinMsg.hwnd == labelWindow.operator[](LFTHSIZ)) {
 	  FormMenuChoice = LFTHSIZ;
 	  formForms::sidwnd(valueWindow.operator[](LFTHSIZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHNUM) || WinMsg.hwnd == LabelWindow.operator[](LFTHNUM)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHNUM) || WinMsg.hwnd == labelWindow.operator[](LFTHNUM)) {
 	  // draw the feather number window
 	  FormMenuChoice = LFTHNUM;
 	  formForms::sidwnd(valueWindow.operator[](LFTHNUM));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHFLR) || WinMsg.hwnd == LabelWindow.operator[](LFTHFLR)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHFLR) || WinMsg.hwnd == labelWindow.operator[](LFTHFLR)) {
 	  // draw the feather floor window
 	  FormMenuChoice = LFTHFLR;
 	  formForms::sidwnd(valueWindow.operator[](LFTHFLR));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHUPCNT) || WinMsg.hwnd == LabelWindow.operator[](LFTHUPCNT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHUPCNT) || WinMsg.hwnd == labelWindow.operator[](LFTHUPCNT)) {
 	  // draw the feather up count window
 	  FormMenuChoice = LFTHUPCNT;
 	  formForms::sidwnd(valueWindow.operator[](LFTHUPCNT));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHDWNCNT) || WinMsg.hwnd == LabelWindow.operator[](LFTHDWNCNT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHDWNCNT) || WinMsg.hwnd == labelWindow.operator[](LFTHDWNCNT)) {
 	  // draw the feather down count window
 	  FormMenuChoice = LFTHDWNCNT;
 	  formForms::sidwnd(valueWindow.operator[](LFTHDWNCNT));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHBLND) || WinMsg.hwnd == LabelWindow.operator[](LFTHBLND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHBLND) || WinMsg.hwnd == labelWindow.operator[](LFTHBLND)) {
 	  // draw the feather blend window
 	  form.extendedAttribute ^= AT_FTHBLND;
 	  formForms::refrm();
@@ -11837,7 +11899,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHUP) || WinMsg.hwnd == LabelWindow.operator[](LFTHUP)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHUP) || WinMsg.hwnd == labelWindow.operator[](LFTHUP)) {
 	  // draw the feather up or down window
 	  form.extendedAttribute ^= AT_FTHUP;
 	  form::refil(ClosestFormToCursor);
@@ -11846,7 +11908,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHBTH) || WinMsg.hwnd == LabelWindow.operator[](LFTHBTH)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHBTH) || WinMsg.hwnd == labelWindow.operator[](LFTHBTH)) {
 	  // draw the feather both window
 	  form.extendedAttribute ^= AT_FTHBTH;
 	  formForms::refrm();
@@ -11855,13 +11917,13 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHTYP) || WinMsg.hwnd == LabelWindow.operator[](LFTHTYP)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHTYP) || WinMsg.hwnd == labelWindow.operator[](LFTHTYP)) {
 	  // draw the feather fill type window
 	  FormMenuChoice = LFTHTYP;
 	  sidmsg(form, valueWindow.operator[](LFTHTYP));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRM) || WinMsg.hwnd == LabelWindow.operator[](LFRM)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRM) || WinMsg.hwnd == labelWindow.operator[](LFRM)) {
 	  // draw the form type window
 	  savdo();
 	  form::unfil();
@@ -11876,28 +11938,28 @@ auto thred::handleFormDataSheet() -> bool {
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LLAYR) || WinMsg.hwnd == LabelWindow.operator[](LLAYR)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LLAYR) || WinMsg.hwnd == labelWindow.operator[](LLAYR)) {
 	  // draw the layer window
 	  FormMenuChoice = LLAYR;
 	  Instance->StateMap.reset(StateFlag::FILTYP);
 	  sidmsg(form, valueWindow.operator[](LLAYR));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMFIL) || WinMsg.hwnd == LabelWindow.operator[](LFRMFIL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMFIL) || WinMsg.hwnd == labelWindow.operator[](LFRMFIL)) {
 	  // draw the fill type window
 	  Instance->StateMap.reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
 	  sidmsg(form, valueWindow.operator[](LFRMFIL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMCOL) || WinMsg.hwnd == LabelWindow.operator[](LFRMCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMCOL) || WinMsg.hwnd == labelWindow.operator[](LFRMCOL)) {
 	  // draw the fill color window
 	  FormMenuChoice = LFRMCOL;
 	  formForms::sidwnd(valueWindow.operator[](LFRMCOL));
 	  Instance->StateMap.set(StateFlag::SIDCOL);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUNDCOL) || WinMsg.hwnd == LabelWindow.operator[](LUNDCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUNDCOL) || WinMsg.hwnd == labelWindow.operator[](LUNDCOL)) {
 	  // draw the underlay color window
 	  FormMenuChoice = LUNDCOL;
 	  formForms::sidwnd(valueWindow.operator[](LUNDCOL));
@@ -11905,7 +11967,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::UNDCOL);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFTHCOL) || WinMsg.hwnd == LabelWindow.operator[](LFTHCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFTHCOL) || WinMsg.hwnd == labelWindow.operator[](LFTHCOL)) {
 	  // draw the feather color window
 	  FormMenuChoice = LFTHCOL;
 	  formForms::sidwnd(valueWindow.operator[](LFTHCOL));
@@ -11913,26 +11975,26 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::FTHSID);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMSPAC) || WinMsg.hwnd == LabelWindow.operator[](LFRMSPAC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMSPAC) || WinMsg.hwnd == labelWindow.operator[](LFRMSPAC)) {
 	  // draw the form spacing window
 	  FormMenuChoice = LFRMSPAC;
 	  formForms::sidwnd(valueWindow.operator[](LFRMSPAC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMLEN) || WinMsg.hwnd == LabelWindow.operator[](LFRMLEN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMLEN) || WinMsg.hwnd == labelWindow.operator[](LFRMLEN)) {
 	  // draw the form stitch length window
 	  FormMenuChoice = LFRMLEN;
 	  formForms::sidwnd(valueWindow.operator[](LFRMLEN));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRD) || WinMsg.hwnd == LabelWindow.operator[](LBRD)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRD) || WinMsg.hwnd == labelWindow.operator[](LBRD)) {
 	  // draw the border window
 	  Instance->StateMap.set(StateFlag::FILTYP);
 	  sidmsg(form, valueWindow.operator[](LBRD));
 	  Instance->StateMap.set(StateFlag::BRDACT);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDCOL) || WinMsg.hwnd == LabelWindow.operator[](LBRDCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDCOL) || WinMsg.hwnd == labelWindow.operator[](LBRDCOL)) {
 	  // draw the border color window
 	  FormMenuChoice = LBRDCOL;
 	  formForms::sidwnd(valueWindow.operator[](LBRDCOL));
@@ -11940,25 +12002,25 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::BRDSID);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDSPAC) || WinMsg.hwnd == LabelWindow.operator[](LBRDSPAC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDSPAC) || WinMsg.hwnd == labelWindow.operator[](LBRDSPAC)) {
 	  // draw the border stitch spacing window
 	  FormMenuChoice = LBRDSPAC;
 	  formForms::sidwnd(valueWindow.operator[](LBRDSPAC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDLEN) || WinMsg.hwnd == LabelWindow.operator[](LBRDLEN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDLEN) || WinMsg.hwnd == labelWindow.operator[](LBRDLEN)) {
 	  // draw the border stitch length window
 	  FormMenuChoice = LBRDLEN;
 	  formForms::sidwnd(valueWindow.operator[](LBRDLEN));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDSIZ) || WinMsg.hwnd == LabelWindow.operator[](LBRDSIZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDSIZ) || WinMsg.hwnd == labelWindow.operator[](LBRDSIZ)) {
 	  // draw the border stitch size window
 	  FormMenuChoice = LBRDSIZ;
 	  formForms::sidwnd(valueWindow.operator[](LBRDSIZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LAPCOL) || WinMsg.hwnd == LabelWindow.operator[](LAPCOL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LAPCOL) || WinMsg.hwnd == labelWindow.operator[](LAPCOL)) {
 	  // draw the applique color window
 	  FormMenuChoice = LAPCOL;
 	  Instance->StateMap.set(StateFlag::SIDCOL);
@@ -11966,13 +12028,13 @@ auto thred::handleFormDataSheet() -> bool {
 	  formForms::sidwnd(valueWindow.operator[](LAPCOL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBCSIZ) || WinMsg.hwnd == LabelWindow.operator[](LBCSIZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBCSIZ) || WinMsg.hwnd == labelWindow.operator[](LBCSIZ)) {
 	  // draw the buttonhole corner size window
 	  FormMenuChoice = LBCSIZ;
 	  formForms::sidwnd(valueWindow.operator[](LBCSIZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBSTRT) || WinMsg.hwnd == LabelWindow.operator[](LBSTRT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBSTRT) || WinMsg.hwnd == labelWindow.operator[](LBSTRT)) {
 	  // draw the satin start style window
 	  auto const code     = form.attribute & SBLNT;
 	  auto const bluntStr = displayText::loadStr(code != 0U ? IDS_TAPR : IDS_BLUNT);
@@ -11988,7 +12050,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBFIN) || WinMsg.hwnd == LabelWindow.operator[](LBFIN)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBFIN) || WinMsg.hwnd == labelWindow.operator[](LBFIN)) {
 	  // draw the satin finish style window
 	  auto const code     = form.attribute & FBLNT;
 	  auto const bluntStr = displayText::loadStr(code != 0U ? IDS_TAPR : IDS_BLUNT);
@@ -12004,19 +12066,19 @@ auto thred::handleFormDataSheet() -> bool {
 	  Instance->StateMap.set(StateFlag::RESTCH);
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMANG) || WinMsg.hwnd == LabelWindow.operator[](LFRMANG)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMANG) || WinMsg.hwnd == labelWindow.operator[](LFRMANG)) {
 	  // draw the form fill angle window
 	  FormMenuChoice = LFRMANG;
 	  formForms::sidwnd(valueWindow.operator[](LFRMANG));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDPIC) || WinMsg.hwnd == LabelWindow.operator[](LBRDPIC)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDPIC) || WinMsg.hwnd == labelWindow.operator[](LBRDPIC)) {
 	  // draw the picot spacing window
 	  FormMenuChoice = LBRDPIC;
 	  formForms::sidwnd(valueWindow.operator[](LBRDPIC));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDUND) || WinMsg.hwnd == LabelWindow.operator[](LBRDUND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDUND) || WinMsg.hwnd == labelWindow.operator[](LBRDUND)) {
 	  // draw the border underlay window
 	  form.edgeType ^= EGUND;
 	  form::refil(ClosestFormToCursor);
@@ -12025,92 +12087,92 @@ auto thred::handleFormDataSheet() -> bool {
 	  SetWindowText(valueWindow.operator[](LBRDUND), bUndStr.c_str());
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LSACANG) || WinMsg.hwnd == LabelWindow.operator[](LSACANG)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LSACANG) || WinMsg.hwnd == labelWindow.operator[](LSACANG)) {
 	  // draw the clipboard fill angle window
 	  FormMenuChoice = LSACANG;
 	  formForms::sidwnd(valueWindow.operator[](LSACANG));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFRMFAZ) || WinMsg.hwnd == LabelWindow.operator[](LFRMFAZ)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFRMFAZ) || WinMsg.hwnd == labelWindow.operator[](LFRMFAZ)) {
 	  // draw the form fill phase window
 	  FormMenuChoice = LFRMFAZ;
 	  formForms::sidwnd(valueWindow.operator[](LFRMFAZ));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBRDPOS) || WinMsg.hwnd == LabelWindow.operator[](LBRDPOS)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBRDPOS) || WinMsg.hwnd == labelWindow.operator[](LBRDPOS)) {
 	  // draw the chain position window
 	  FormMenuChoice = LBRDPOS;
 	  formForms::sidwnd(valueWindow.operator[](LBRDPOS));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LBFILSQR) || WinMsg.hwnd == LabelWindow.operator[](LBFILSQR)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LBFILSQR) || WinMsg.hwnd == labelWindow.operator[](LBFILSQR)) {
 	  // draw the form fill ends square window
 	  xt::dubit(form, AT_SQR);
 	  auto const choice = displayText::loadStr((form.extendedAttribute & AT_SQR) == 0U ? IDS_PNTD : IDS_SQR);
 	  SetWindowText(valueWindow.operator[](LBFILSQR), choice.c_str());
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFSTRT) || WinMsg.hwnd == LabelWindow.operator[](LFSTRT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFSTRT) || WinMsg.hwnd == labelWindow.operator[](LFSTRT)) {
 	  // draw the form fill start on/off window
 	  xt::dubit(form, AT_STRT);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LDSTRT) || WinMsg.hwnd == LabelWindow.operator[](LDSTRT)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LDSTRT) || WinMsg.hwnd == labelWindow.operator[](LDSTRT)) {
 	  // draw the form fill start window
 	  FormMenuChoice = LDSTRT;
 	  formForms::sidwnd(valueWindow.operator[](LDSTRT));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LFEND) || WinMsg.hwnd == LabelWindow.operator[](LFEND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LFEND) || WinMsg.hwnd == labelWindow.operator[](LFEND)) {
 	  // draw the form fill end on/off window
 	  xt::dubit(form, AT_END);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LDEND) || WinMsg.hwnd == LabelWindow.operator[](LDEND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LDEND) || WinMsg.hwnd == labelWindow.operator[](LDEND)) {
 	  // draw the form fill end window
 	  FormMenuChoice = LDEND;
 	  formForms::sidwnd(valueWindow.operator[](LDEND));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LWALK) || WinMsg.hwnd == LabelWindow.operator[](LWALK)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LWALK) || WinMsg.hwnd == labelWindow.operator[](LWALK)) {
 	  // draw the edge walk window
 	  xt::dubit(form, AT_WALK);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LCWLK) || WinMsg.hwnd == LabelWindow.operator[](LCWLK)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LCWLK) || WinMsg.hwnd == labelWindow.operator[](LCWLK)) {
 	  // draw the center walk window
 	  xt::dubit(form, AT_CWLK);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LUND) || WinMsg.hwnd == LabelWindow.operator[](LUND)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LUND) || WinMsg.hwnd == labelWindow.operator[](LUND)) {
 	  // draw the underlay window
 	  xt::dubit(form, AT_UND);
 	  formForms::refrm();
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMAXFIL) || WinMsg.hwnd == LabelWindow.operator[](LMAXFIL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMAXFIL) || WinMsg.hwnd == labelWindow.operator[](LMAXFIL)) {
 	  // draw the maximum fill stitch length window
 	  FormMenuChoice = LMAXFIL;
 	  formForms::sidwnd(valueWindow.operator[](LMAXFIL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMINFIL) || WinMsg.hwnd == LabelWindow.operator[](LMINFIL)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMINFIL) || WinMsg.hwnd == labelWindow.operator[](LMINFIL)) {
 	  // draw the minimum fill stitch length window
 	  FormMenuChoice = LMINFIL;
 	  formForms::sidwnd(valueWindow.operator[](LMINFIL));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMAXBRD) || WinMsg.hwnd == LabelWindow.operator[](LMAXBRD)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMAXBRD) || WinMsg.hwnd == labelWindow.operator[](LMAXBRD)) {
 	  // draw the maximum border stitch length window
 	  FormMenuChoice = LMAXBRD;
 	  formForms::sidwnd(valueWindow.operator[](LMAXBRD));
 	  break;
 	}
-	if (WinMsg.hwnd == valueWindow.operator[](LMINBRD) || WinMsg.hwnd == LabelWindow.operator[](LMINBRD)) {
+	if (WinMsg.hwnd == valueWindow.operator[](LMINBRD) || WinMsg.hwnd == labelWindow.operator[](LMINBRD)) {
 	  // draw the minimum border stitch length window
 	  FormMenuChoice = LMINBRD;
 	  formForms::sidwnd(valueWindow.operator[](LMINBRD));
@@ -12147,23 +12209,24 @@ void thred::thumbHome() {
 }
 
 void thred::thumbEnd() {
-  ThumbnailIndex = wrap::toUnsigned(Thumbnails.size());
+  ThumbnailIndex = wrap::toUnsigned(ThrSingle->Thumbnails.size());
   nuthbak(QUADRT);
 }
 
 void thred::otherPeriod() noexcept {
+  auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
   // ToDo - only allow entry if there is not already a period in the buffer
-  if (SideWinMsgIdx < SideWindowEntryBuffer.size() - 1U) {
-	SideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '.';
-	SideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
-	SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+  if (SideWinMsgIdx < sideWindowEntryBuffer.size() - 1U) {
+	sideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '.';
+	sideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
+	SetWindowText(SideMessageWindow, ThrSingle->SideWindowEntryBuffer.data());
   }
 }
 
 void thred::otherBack() noexcept {
   if (SideWinMsgIdx != 0U) {
-	SideWindowEntryBuffer.operator[](--SideWinMsgIdx) = 0;
-	SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+	ThrSingle->SideWindowEntryBuffer.operator[](--SideWinMsgIdx) = 0;
+	SetWindowText(SideMessageWindow, ThrSingle->SideWindowEntryBuffer.data());
   }
 }
 
@@ -12181,7 +12244,7 @@ auto thred::txtWid(wchar_t const* string) noexcept(std::is_same_v<size_t, uint32
 }
 
 auto thred::getHomeDir() noexcept -> fs::path& {
-  return HomeDirectory;
+  return ThrSingle->HomeDirectory;
 }
 
 auto thred::getBackGroundBrush() noexcept -> HBRUSH {
@@ -12189,8 +12252,8 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 }
 
 void thred::tst() {
-  DesignerName.assign(L"Coder");
-  ThrName.assign(DesignerName);
+  ThrSingle->DesignerName.assign(L"Coder");
+  ThrSingle->ThrName.assign(ThrSingle->DesignerName);
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
@@ -12264,26 +12327,27 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  texture::textureInit();
 	  tfc::fClipInit();
 	  trace::traceInit();
+	  thrInit();
 
-	  DefaultColorWin.resize(COLORCNT);
-	  FormControlPoints.resize(OUTPNTS);
-	  LabelWindow.resize(LASTLIN);
-	  MsgBuffer.reserve(MSGSIZ);
-	  NearestPixel.resize(NERCNT);
-	  NearestPoint.resize(NERCNT);
-	  PreviousNames.reserve(OLDNUM);
+	  ThrSingle->DefaultColorWin.resize(COLORCNT);
+	  ThrSingle->FormControlPoints.resize(OUTPNTS);
+	  ThrSingle->LabelWindow.resize(LASTLIN);
+	  ThrSingle->MsgBuffer.reserve(MSGSIZ);
+	  ThrSingle->NearestPixel.resize(NERCNT);
+	  ThrSingle->NearestPoint.resize(NERCNT);
+	  ThrSingle->PreviousNames.reserve(OLDNUM);
 	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
-		PreviousNames.emplace_back(L"");
+		ThrSingle->PreviousNames.emplace_back(L"");
 	  }
-	  SideWindow.resize(SWCOUNT);
-	  SideWindowEntryBuffer.resize(SWBLEN);
-	  ThreadSizeWin.resize(COLORCNT);
-	  ThumbnailSearchString.reserve(TSSSIZ);
-	  UserColorWin.resize(COLORCNT);
-	  UserPen.resize(COLORCNT);
-	  VersionNames.reserve(OLDVER);
+	  ThrSingle->SideWindow.resize(SWCOUNT);
+	  ThrSingle->SideWindowEntryBuffer.resize(SWBLEN);
+	  ThrSingle->ThreadSizeWin.resize(COLORCNT);
+	  ThrSingle->ThumbnailSearchString.reserve(TSSSIZ);
+	  ThrSingle->UserColorWin.resize(COLORCNT);
+	  ThrSingle->UserPen.resize(COLORCNT);
+	  ThrSingle->VersionNames.reserve(OLDVER);
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-		VersionNames.emplace_back(L"");
+		ThrSingle->VersionNames.emplace_back(L"");
 	  }
 
 	  texture::initTextureHistory();
@@ -12331,8 +12395,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  else {
 		ShowWindow(ThrEdWindow, SW_SHOW);
 	  }
-	  if (DesignerName.empty()) {
-		DesignerName.assign(displayText::loadStr(IDS_UNAM));
+	  if (ThrSingle->DesignerName.empty()) {
+		ThrSingle->DesignerName.assign(displayText::loadStr(IDS_UNAM));
 		thred::getdes();
 	  }
 	  auto xyRatio        = 1.0F; // expand form aspect ratio
@@ -12382,7 +12446,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 }
 
 void thred::refreshColors() noexcept {
-  auto itUserPen = UserPen.begin();
+  auto itUserPen = ThrSingle->UserPen.begin();
   auto ucb       = UserColorBrush.begin();
   for (auto const& color : UserColor) {
 	nuPen(*itUserPen, 1, color);
@@ -12390,13 +12454,13 @@ void thred::refreshColors() noexcept {
 	++itUserPen;
 	++ucb;
   }
-  for (auto const& iColor : UserColorWin) {
+  for (auto const& iColor : ThrSingle->UserColorWin) {
 	redraw(iColor);
   }
 }
 
 void thred::initPenBrush() noexcept {
-  auto itUserPen = UserPen.begin();
+  auto itUserPen = ThrSingle->UserPen.begin();
   auto ucb       = UserColorBrush.begin();
   for (auto const& ucolor : UserColor) {
 	*itUserPen++ = wrap::createPen(PS_SOLID, PENNWID, ucolor);
@@ -12415,12 +12479,12 @@ void thred::initBackPenBrush() noexcept {
 auto thred::setFileName() -> fs::path {
   auto const& workingFileName = Instance->WorkingFileName;
 
-  return workingFileName.empty() ? DefaultDirectory / L"balfil.thr" : workingFileName;
+  return workingFileName.empty() ? ThrSingle->DefaultDirectory / L"balfil.thr" : workingFileName;
 }
 
 auto thred::getDesigner() -> std::wstring {
   auto const modifier = utf::utf8ToUtf16(std::string(ExtendedHeader.modifierName.data()));
-  return displayText::format2(IDS_CREATBY, DesignerName, modifier);
+  return displayText::format2(IDS_CREATBY, ThrSingle->DesignerName, modifier);
 }
 
 auto thred::getVerticalIndex() noexcept -> uint8_t {
@@ -12428,21 +12492,21 @@ auto thred::getVerticalIndex() noexcept -> uint8_t {
 }
 
 auto thred::getColorChangeIndex(uint32_t const iColor) noexcept -> uint16_t {
-  return ColorChangeTable.operator[](iColor).stitchIndex;
+  return ThrSingle->ColorChangeTable.operator[](iColor).stitchIndex;
 }
 
 auto thred::getFormControlPoints() noexcept -> std::vector<POINT>& {
-  return FormControlPoints;
+  return ThrSingle->FormControlPoints;
 }
 
 void thred::chkInsCol() {
-  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin.back())) { // check if point is in any of the color windows
+  if (chkMsgs(WinMsg.pt, ThrSingle->DefaultColorWin.front(), ThrSingle->UserColorWin.back())) { // check if point is in any of the color windows
 	inscol();
   }
 }
 
 void thred::chkDelCol() {
-  if (chkMsgs(WinMsg.pt, DefaultColorWin.front(), UserColorWin.back())) {
+  if (chkMsgs(WinMsg.pt, ThrSingle->DefaultColorWin.front(), ThrSingle->UserColorWin.back())) {
 	delcol();
   }
   else {
@@ -12465,8 +12529,8 @@ auto thred::getZoomMin() noexcept -> float {
 void thred::resetColors() {
   auto ucb         = UserColorBrush.begin();
   auto itUserColor = UserColor.begin();
-  auto itUserPen   = UserPen.begin();
-  auto ucw         = UserColorWin.begin();
+  auto itUserPen   = ThrSingle->UserPen.begin();
+  auto ucw         = ThrSingle->UserColorWin.begin();
   for (auto const& color : DEFAULT_COLORS) {
 	*itUserColor = color;
 	nuBrush(*ucb, *itUserColor);
@@ -12548,7 +12612,7 @@ void thred::openNewFile() {
 }
 
 void thred::openBitMapFile() {
-  bitmap::lodbmp(DefaultDirectory);
+  bitmap::lodbmp(ThrSingle->DefaultDirectory);
 }
 
 void thred::destroyChangeThreadSizeWindows() noexcept {
@@ -12570,7 +12634,7 @@ void thred::updateThreadSize(uint32_t const threadSizeSelected) {
   auto buffer             = std::array<wchar_t, 3> {};
   buffer[0]               = *itThreadSize;
   buffer[1]               = L'0';
-  auto const tsw          = wrap::next(ThreadSizeWin.begin(), threadSizeSelected);
+  auto const tsw          = wrap::next(ThrSingle->ThreadSizeWin.begin(), threadSizeSelected);
   SetWindowText(*tsw, buffer.data());
   Instance->StateMap.set(StateFlag::RESTCH);
   destroyChangeThreadSizeWindows();
@@ -12604,11 +12668,11 @@ void thred::updateUserColor() {
 	savdo();
 	auto const itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
 	*itUserColor           = ColorStruct.rgbResult;
-	auto const itUserPen   = wrap::next(UserPen.begin(), VerticalIndex);
+	auto const itUserPen   = wrap::next(ThrSingle->UserPen.begin(), VerticalIndex);
 	nuPen(*itUserPen, 1, *itUserColor);
 	auto const ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
 	nuBrush(*ucb, *itUserColor);
-	redraw(UserColorWin.operator[](VerticalIndex));
+	redraw(ThrSingle->UserColorWin.operator[](VerticalIndex));
 	Instance->StateMap.set(StateFlag::RESTCH);
   }
 }
@@ -12616,8 +12680,8 @@ void thred::updateUserColor() {
 void thred::switchUserColors() noexcept {
   auto const code = ActiveColor;
   ActiveColor     = VerticalIndex & COLMSK;
-  redraw(UserColorWin.operator[](code));
-  redraw(UserColorWin.operator[](ActiveColor));
+  redraw(ThrSingle->UserColorWin.operator[](code));
+  redraw(ThrSingle->UserColorWin.operator[](ActiveColor));
 }
 
 // ToDo - rename this to something more appropriate
@@ -12693,7 +12757,7 @@ void thred::redrawCapturedStitch(uint32_t const closestPointIndexClone) {
 void thred::setFormControls() noexcept(!std::is_same_v<size_t, uint32_t>) {
   auto formsRect = F_RECTANGLE {};
   selRct(formsRect);
-  auto& frmCtrls = FormControlPoints;
+  auto& frmCtrls = ThrSingle->FormControlPoints;
   frmCtrls[PTL].x = frmCtrls[PBL].x = frmCtrls[PLM].x = frmCtrls[PTLE].x = std::lround(formsRect.left);
   frmCtrls[PTL].y = frmCtrls[PTR].y = frmCtrls[PTM].y = frmCtrls[PTLE].y = std::lround(formsRect.top);
   frmCtrls[PTR].x = frmCtrls[PRM].x = frmCtrls[PBR].x = std::lround(formsRect.right);
@@ -12732,7 +12796,7 @@ void thred::setRotateCapture() {
 }
 
 auto thred::chkForm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
-  return form::chkfrm(FormControlPoints, stretchBoxLine, xyRatio);
+  return form::chkfrm(ThrSingle->FormControlPoints, stretchBoxLine, xyRatio);
 }
 
 auto thred::getAdjustedPoint(F_POINT const stitchPoint) noexcept -> F_POINT {
@@ -12777,15 +12841,15 @@ void thred::setSmallestStitchVal() {
 void thred::setLargestStitchVal() {
   srchk();
   fillSortBuffer();
-  SortIndex = wrap::toUnsigned(SortBuffer.size() - 1U);
+  SortIndex = wrap::toUnsigned(ThrSingle->SortBuffer.size() - 1U);
   setSrchLargest();
   lensadj();
 }
 
 auto thred::getLabelWindow() noexcept -> std::vector<HWND>& {
-  return LabelWindow;
+  return ThrSingle->LabelWindow;
 }
 
 auto thred::getThrEdName() noexcept -> fs::path const& {
-  return ThrName;
+  return ThrSingle->ThrName;
 }
