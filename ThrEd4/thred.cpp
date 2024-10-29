@@ -12261,6 +12261,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  bal::balInit();
 	  bitmap::bmpInit();
 	  satin::satinInit();
+	  texture::textureInit();
 	  tfc::fClipInit();
 	  trace::traceInit();
 
