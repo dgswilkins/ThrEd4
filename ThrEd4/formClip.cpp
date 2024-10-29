@@ -115,7 +115,7 @@ namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
 
-FCLIP_SINGLE* fClipInstance;
+FCLIP_SINGLE* FormClipInstance;
 
 // Definitions
 void clipSelectedForm();
@@ -485,8 +485,8 @@ void dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::polyline(StitchWindowDC,
-                 fClipInstance->FormVerticesAsLine.data(),
-                 wrap::toUnsigned(fClipInstance->FormVerticesAsLine.size()));
+                 FormClipInstance->FormVerticesAsLine.data(),
+                 wrap::toUnsigned(FormClipInstance->FormVerticesAsLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -589,21 +589,21 @@ void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const
 void setpclp() {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
-  fClipInstance->FormVerticesAsLine.clear();
+  FormClipInstance->FormVerticesAsLine.clear();
   auto itIntlvSeq = interleaveSequence.begin();
   auto point      = form::sfCor2px(*itIntlvSeq);
   ++itIntlvSeq;
-  fClipInstance->FormVerticesAsLine.push_back(point);
+  FormClipInstance->FormVerticesAsLine.push_back(point);
   point             = form::sfCor2px(*itIntlvSeq);
   auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
                              WinMsg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;
-	fClipInstance->FormVerticesAsLine.push_back(POINT {point.x + offset.x, point.y + offset.y});
+	FormClipInstance->FormVerticesAsLine.push_back(POINT {point.x + offset.x, point.y + offset.y});
   }
   point = form::sfCor2px(interleaveSequence.back());
-  fClipInstance->FormVerticesAsLine.push_back(point);
+  FormClipInstance->FormVerticesAsLine.push_back(point);
 }
 
 void sizclp(FRM_HEAD const& form,
@@ -1026,5 +1026,5 @@ void tfc::lodclp(uint32_t iStitch) {
 }
 
 void tfc::fClipInit() noexcept {
-  fClipInstance = FCLIP_SINGLE::getInstance();
+  FormClipInstance = FCLIP_SINGLE::getInstance();
 }
