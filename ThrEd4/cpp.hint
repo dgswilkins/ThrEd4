@@ -20,17 +20,23 @@
 #define IDC_REFILF
 #define IDOK
 #define IDS_EGG
+#define IDS_FRMN1
 #define IDS_HEART
 #define IDS_LENS
 #define IDS_NUMPNT
+#define IDS_OVRIT
+#define IDS_OVRLOK
 #define IDS_REGP
 #define IDS_ROTA
 #define IDS_SPIR
 #define IDS_STAR
 #define IDS_ZIG
+#define IDYES
 #define LOWORD(l) ((WORD)(((DWORD_PTR)(l)) & 0xffff))
 #define MAXDWORD
+#define MB_YESNO
 #define R2_COPYPEN
+#define R2_NOTXORPEN
 #define R2_XORPEN
 #define SendMessage
 #define SetWindowText
@@ -38,9 +44,18 @@
 #define UNREFERENCED_PARAMETER(P) (P)
 #define UNREFERENCED_PARAMETER(P) _Prefast_unreferenced_parameter_impl_("PREfast", ((void) (P), 0))
 #define UNREFERENCED_PARAMETER(P) { (P) = (P); }
+#define VK_OEM_MINUS
+#define VK_SUBTRACT
+#define WM_CHAR
 #define WM_COMMAND
 #define WM_INITDIALOG
+#define WM_KEYDOWN
+#define WM_LBUTTONDOWN
+#define WM_LBUTTONUP
+#define WM_MOUSEMOVE
+#define WM_RBUTTONDOWN
 #define WM_SETFOCUS
+#define WM_TIMER
 #define WS_BORDER
 #define WS_CHILD
 #define WS_VISIBLE
