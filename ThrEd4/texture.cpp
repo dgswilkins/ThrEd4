@@ -220,7 +220,7 @@ void dutxmir() {
 }
 
 void dutxrct(TXTR_RECT& textureRect) noexcept {
-  auto& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
+  auto const& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
   if (selectedTexturePointsList.empty()) {
 	textureRect.left = textureRect.right = 0U;
 	textureRect.top = textureRect.bottom = 0.0F;
@@ -626,7 +626,7 @@ auto txnam(std::wstring& name) -> bool {
 }
 
 void txnudg(int32_t const deltaX, float const deltaY) {
-  auto& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
+  auto const& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
   auto& tempTexturePoints = TextureInstance->TempTexturePoints;
   if (selectedTexturePointsList.empty()) {
 	return;
@@ -1543,7 +1543,7 @@ void texture::txtlbut(FRM_HEAD const& textureForm) {
 
 void texture::txsnap() {
   auto& tempTexturePoints = TextureInstance->TempTexturePoints;
-  auto& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
+  auto const& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
   if (tempTexturePoints.empty()) {
 	return;
   }

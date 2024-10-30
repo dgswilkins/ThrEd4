@@ -1541,7 +1541,7 @@ auto chkup(uint32_t const count, size_t const iStitch) -> uint32_t {
   if (!Instance->StateMap.test(StateFlag::UPTO) || ClosestPointIndex == 0U) {
 	return count;
   }
-  auto& colorChangeTable = ThrSingle->ColorChangeTable;
+  auto const& colorChangeTable = ThrSingle->ColorChangeTable;
   if (colorChangeTable.operator[](iStitch).stitchIndex >= ClosestPointIndex) {
 	return 0U;
   }
@@ -1905,7 +1905,7 @@ void doInitUnzoomed() {
   auto linePoints = std::vector<POINT> {};
   linePoints.reserve(wrap::toSize(getMaxCount()) + 2U);
   auto const pwid = Instance->StateMap.test(StateFlag::HID);
-  auto&      colorChangeTable = ThrSingle->ColorChangeTable;
+  auto const&      colorChangeTable = ThrSingle->ColorChangeTable;
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	DisplayedColorBitmap.set(colorChangeTable.operator[](iColor).colorIndex);
 	auto stitchCount = wrap::toUnsigned(colorChangeTable.operator[](iColor + 1U).stitchIndex) -
@@ -2820,7 +2820,7 @@ void durot() noexcept(std::is_same_v<size_t, uint32_t>) {
 void dusel(HDC hDC) {
   SetROP2(hDC, R2_NOTXORPEN);
   SelectObject(hDC, LinePen);
-  auto& formControlPoints = ThrSingle->FormControlPoints;
+  auto const& formControlPoints = ThrSingle->FormControlPoints;
   wrap::polyline(hDC, formControlPoints.data(), wrap::toUnsigned(formControlPoints.size() - 1U));
   for (auto iPoint = 0U; iPoint < wrap::toUnsigned(formControlPoints.size() - 1U); ++iPoint) {
 	form::selsqr(formControlPoints.operator[](iPoint), hDC);
@@ -5678,7 +5678,7 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 
 void rebak() {
   destroyBV();
-  auto& thrName        = ThrSingle->ThrName;
+  auto const& thrName        = ThrSingle->ThrName;
   auto newFileName    = thrName; // intentional copy
   auto safetyFileName = newFileName;       // initialise from local variable
   auto ext            = newFileName.extension().wstring();
@@ -8409,7 +8409,7 @@ void thred::closPnt() {
   unbox();
   unboxs();
   auto& nearestPoint = ThrSingle->NearestPoint;
-  auto& colorChangeTable = ThrSingle->ColorChangeTable;
+  auto const& colorChangeTable = ThrSingle->ColorChangeTable;
   auto gapToNearest = std::vector<float> {};          // distances of the closest points
   gapToNearest.resize(nearestPoint.size(), BIGFLOAT); // to a mouse click
   nearestPoint.assign(nearestPoint.size(), BIGUINT);
@@ -10314,7 +10314,7 @@ void thred::thumnail() {
 }
 
 void thred::nuthsel() {
-  auto& thumbnails = ThrSingle->Thumbnails;
+  auto const& thumbnails = ThrSingle->Thumbnails;
   if (ThumbnailIndex >= thumbnails.size()) {
 	return;
   }
@@ -11558,7 +11558,7 @@ auto thred::handleSideWindowActive() -> bool {
 	return true;
   }
   form.borderColor &= COLMSK;
-  auto& sideWindow = ThrSingle->SideWindow;
+  auto const& sideWindow = ThrSingle->SideWindow;
   if (Instance->StateMap.testAndReset(StateFlag::BRDACT)) {
 	while (true) {
 	  if (WinMsg.hwnd == sideWindow.operator[](0)) {
@@ -11829,7 +11829,7 @@ auto thred::handleFormDataSheet() -> bool {
   unsid();
   auto&       form        = Instance->FormList.operator[](ClosestFormToCursor);
   auto const& valueWindow = Instance->valueWindow;
-  auto&       labelWindow = ThrSingle->LabelWindow;
+  auto const&       labelWindow = ThrSingle->LabelWindow;
   while (true) {
 	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == labelWindow.operator[](LTXOF)) {
 	  // draw the texture fill spacing window
