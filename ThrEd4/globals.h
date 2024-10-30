@@ -10,9 +10,6 @@
 #include "iniFile.h"
 #include "textureHeader.h"
 
-// Open Source headers
-#include "boost/dynamic_bitset.hpp"
-
 // Standard Libraries
 #include <filesystem>
 
