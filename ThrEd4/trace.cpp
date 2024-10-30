@@ -354,8 +354,7 @@ void dutrac() {
   CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   auto       traceDirection = 0U;
-  auto const&      tracedEdges    = TraceInstance->TracedEdges;
-  if (!tracedEdges.test(wrap::toSize(savedPoint))) {
+  if (auto const& tracedEdges = TraceInstance->TracedEdges; !tracedEdges.test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
 	auto limit = (CurrentTracePoint.y + 1L) * bitmap::getBitmapWidth();
 	// find the right edge

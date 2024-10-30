@@ -12214,9 +12214,9 @@ void thred::thumbEnd() {
 }
 
 void thred::otherPeriod() noexcept {
-  auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
   // ToDo - only allow entry if there is not already a period in the buffer
-  if (SideWinMsgIdx < sideWindowEntryBuffer.size() - 1U) {
+  if (auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
+      SideWinMsgIdx < sideWindowEntryBuffer.size() - 1U) {
 	sideWindowEntryBuffer.operator[](SideWinMsgIdx++) = '.';
 	sideWindowEntryBuffer.operator[](SideWinMsgIdx)   = 0;
 	SetWindowText(SideMessageWindow, ThrSingle->SideWindowEntryBuffer.data());
