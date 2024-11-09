@@ -1060,7 +1060,7 @@ void formForms::prfmsg() {
   choice = Instance->userFlagMap.test(UserFlag::DUND) ? displayText::loadStr(IDS_ON)
                                                       : displayText::loadStr(IDS_OFF);
   prflin(choice, *row++);
-  prflin(format(FMT_COMPILE(L"{:.2f}"), SmallStitchLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getSmallStitchLength() * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SpiralWrap), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), StarRatio), *row++);

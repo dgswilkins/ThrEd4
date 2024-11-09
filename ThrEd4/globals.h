@@ -213,7 +213,6 @@ extern F_RECTANGLE SelectedVerticesRect;
 
 extern float ShowStitchThreshold;
 extern HWND  SideMessageWindow;
-extern float SmallStitchLength;
 extern float SnapLength;
 
 extern float    SpiralWrap;
