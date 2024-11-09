@@ -211,7 +211,6 @@ extern RECT    SelectedPixelsRect;
 
 extern F_RECTANGLE SelectedVerticesRect;
 
-extern float ShowStitchThreshold;
 extern HWND  SideMessageWindow;
 extern float SnapLength;
 

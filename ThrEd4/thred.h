@@ -83,6 +83,7 @@ auto getLabelWindow() noexcept -> std::vector<HWND>&;
 auto getMoveDelta(const POINT& point) noexcept -> F_POINT;
 auto getMsgBufferValue() -> float;
 auto getRotationHandleAngle() noexcept -> float;
+auto getShowStitchThreshold() noexcept -> float;
 auto getSmallStitchLength() noexcept -> float;
 auto getStitchWindowX() noexcept -> LONG;
 auto getStitchBoxesThreshold() noexcept -> float;

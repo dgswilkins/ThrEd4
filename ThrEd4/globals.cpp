@@ -91,7 +91,6 @@ RECT                           SelectedFormsRect         = {};      // for multi
 F_POINT                        SelectedFormsSize         = F_POINT {}; // size of multiple select rectangle
 RECT                           SelectedPixelsRect        = {};      // display form vertex select rectangle
 F_RECTANGLE                    SelectedVerticesRect      = F_RECTANGLE {}; // rectangle enclosing selected form verticess
-float                          ShowStitchThreshold       = SHOPNTS; // show stitch grid below this zoom level
 HWND                           SideMessageWindow         = nullptr; // main side message window
 float                          SnapLength                = SNPLEN * PFGRAN;  // snap together length
 float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral

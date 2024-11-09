@@ -301,6 +301,7 @@ auto StitchWindowSize   = SIZE {};                    // size of the stitch wind
 auto StitchBoxesThreshold = STCHBOX;               // threshold for drawing stitch boxes
 auto SortIndex            = uint32_t {};                // index for stitch search
 auto SmallStitchLength    = SMALSIZ * PFGRAN;      // user can remove stitches smaller than this
+auto ShowStitchThreshold  = SHOPNTS;          // show stitch grid below this zoom level
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -12912,4 +12913,8 @@ auto thred::getStitchBoxesThreshold() noexcept -> float {
 
 auto thred::getSmallStitchLength() noexcept -> float {
   return SmallStitchLength;
+}
+
+auto thred::getShowStitchThreshold() noexcept -> float {
+  return ShowStitchThreshold;
 }

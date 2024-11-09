@@ -1044,7 +1044,7 @@ void formForms::prfmsg() {
                                                              : displayText::loadStr(IDS_PNTD);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
-  prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(ShowStitchThreshold)), *row++);
+  prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getShowStitchThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
   prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
