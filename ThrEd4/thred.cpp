@@ -12900,10 +12900,10 @@ auto thred::scaleVertical(float const& value) noexcept -> long {
   return std::lround(value * VerticalRatio);
 }
 
-auto thred::getStitchWindowX() -> LONG{
+auto thred::getStitchWindowX() noexcept -> LONG{
   return StitchWindowSize.cx;
 }
 
-auto thred::getStitchBoxesThreshold() -> float {
+auto thred::getStitchBoxesThreshold() noexcept -> float {
   return StitchBoxesThreshold;
 }
