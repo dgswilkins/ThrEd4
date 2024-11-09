@@ -6533,10 +6533,10 @@ void setScrollVisibility() {
 	scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(ZoomRect.left);
 	SetScrollInfo(HorizontalScrollBar, SB_CTL, &scrollInfo, TRUE);
 	// and show the scroll bars
-	thred::ShowScrollBars(true);
+	thred::showScrollBars(true);
   }
   else {
-	thred::ShowScrollBars(false);
+	thred::showScrollBars(false);
   }
 }
 
@@ -6958,7 +6958,7 @@ void stchWnd() {
                                      nullptr,
                                      ThrEdInstance,
                                      nullptr);
-  thred::ShowScrollBars(false);
+  thred::showScrollBars(false);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -7275,7 +7275,7 @@ void thred::showColorWin() noexcept {
   }
 }
 
-void thred::ShowScrollBars(bool const Show) noexcept {
+void thred::showScrollBars(bool const Show) noexcept {
   if (Show) {
 	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
 	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
@@ -7493,13 +7493,13 @@ void thred::movStch() {
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.cx, ScrollSize, TRUE);
 	}
-	ShowScrollBars(true);
+	showScrollBars(true);
   }
   else {
 	stchPars();
 	auto const actualWindowHeight = StitchWindowSize.cy + ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.cx, actualWindowHeight, TRUE);
-	ShowScrollBars(false);
+	showScrollBars(false);
 	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.cx) / wrap::toFloat(actualWindowHeight);
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, ScrollSize, TRUE);
