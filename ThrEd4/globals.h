@@ -200,7 +200,6 @@ extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
 extern F_RECTANGLE    RotationRect;
 
-extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 
 extern FORM_VERTICES SelectedFormVertices;

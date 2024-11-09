@@ -312,6 +312,7 @@ auto BackgroundPen      = gsl::narrow_cast<HPEN>(nullptr); // background color p
 auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
 auto KnotPen            = gsl::narrow_cast<HPEN>(nullptr); // knot pen
 auto BackgroundPenWidth = int32_t {};                      // width of the background pen
+auto SelectAllPen       = gsl::narrow_cast<HPEN>(nullptr); // pen for drawing large boxes
 
 // brushes
 auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
@@ -12917,4 +12918,8 @@ auto thred::getSmallStitchLength() noexcept -> float {
 
 auto thred::getShowStitchThreshold() noexcept -> float {
   return ShowStitchThreshold;
+}
+
+void thred::selectAllPen() {
+  SelectObject(StitchWindowMemDC, SelectAllPen);
 }

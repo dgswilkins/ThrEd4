@@ -84,7 +84,6 @@ HWND                           PreferencesWindow         = nullptr; // preferenc
 uint32_t                       PreviousFormIndex         = 0U;      // previously selected form
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle
-HPEN                           SelectAllPen              = nullptr; // pen for drawing large boxes
 uint32_t                       SelectedFormControlVertex = 0U;      // user selected form control formOrigin
 FORM_VERTICES                  SelectedFormVertices      = {};      // selected form vertices
 RECT                           SelectedFormsRect         = {};      // for multiple selections;

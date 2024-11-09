@@ -5579,7 +5579,7 @@ void form::rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept {
 
 void form::dubig() {
   rct2sel(SelectedFormsRect, Instance->selectedFormsLine);
-  SelectObject(StitchWindowMemDC, SelectAllPen);
+  thred::selectAllPen();
   wrap::polyline(StitchWindowMemDC,
                  Instance->selectedFormsLine.data(),
                  wrap::toUnsigned(Instance->selectedFormsLine.size()));

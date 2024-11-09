@@ -192,6 +192,7 @@ auto scaleVertical(float const& value) noexcept -> int32_t;
 void selCol();
 void selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uint32_t>);
 void selalstch();
+void selectAllPen();
 void selfpnt();
 void set1knot();
 void setBackGroundColor();
