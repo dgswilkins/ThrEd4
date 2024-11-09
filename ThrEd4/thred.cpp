@@ -12892,11 +12892,11 @@ auto thred::getMoveDelta(const POINT& point) noexcept -> F_POINT {
   return F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
 }
 
-auto thred::scaleHorizontal(float const& value) noexcept -> long {
+auto thred::scaleHorizontal(float const& value) noexcept -> int32_t {
   return std::lround(value * HorizontalRatio);
 }
 
-auto thred::scaleVertical(float const& value) noexcept -> long {
+auto thred::scaleVertical(float const& value) noexcept -> int32_t {
   return std::lround(value * VerticalRatio);
 }
 
