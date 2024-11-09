@@ -221,7 +221,6 @@ extern float    SpiralWrap;
 extern float    StarRatio;
 
 extern F_POINT StitchBmpRatio;
-extern float   StitchBoxesThreshold;
 
 extern F_RECTANGLE StitchRangeRect;
 extern RECT        StitchWindowClientRect;

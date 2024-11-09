@@ -99,7 +99,6 @@ uint32_t                       SortIndex                 = 0U;      // index for
 float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral
 float                          StarRatio                 = STARAT;  // star formOrigin to body ratio
 F_POINT                        StitchBmpRatio            = F_POINT {}; // stitch hoop to bitmap ratios
-float                          StitchBoxesThreshold      = STCHBOX; // threshold for drawing stitch boxes
 F_RECTANGLE                    StitchRangeRect           = F_RECTANGLE {}; // stitch range rectangle
 RECT                           StitchWindowClientRect    = {};      // stitch window size,client
 HDC                            StitchWindowDC            = nullptr; // stitch window device context
