@@ -206,7 +206,7 @@ void shft(F_POINT const& delta) noexcept;
 void shftflt(F_POINT const& point) noexcept;
 void showColorWin() noexcept;
 void showOnlyLayer(uint8_t play);
-void ShowScrollBars(bool const Show) noexcept;
+void ShowScrollBars(bool Show) noexcept;
 auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
 auto stch2px1(uint32_t iStitch) -> POINT;
 auto stch2pxr(F_POINT const& stitchCoordinate) -> POINT;
