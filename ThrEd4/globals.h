@@ -216,7 +216,6 @@ extern HWND  SideMessageWindow;
 extern float SmallStitchLength;
 extern float SnapLength;
 
-extern uint32_t SortIndex;
 extern float    SpiralWrap;
 extern float    StarRatio;
 

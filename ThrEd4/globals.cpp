@@ -95,7 +95,6 @@ float                          ShowStitchThreshold       = SHOPNTS; // show stit
 HWND                           SideMessageWindow         = nullptr; // main side message window
 float                          SmallStitchLength         = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 float                          SnapLength                = SNPLEN * PFGRAN;  // snap together length
-uint32_t                       SortIndex                 = 0U;      // index for stitch search
 float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral
 float                          StarRatio                 = STARAT;  // star formOrigin to body ratio
 F_POINT                        StitchBmpRatio            = F_POINT {}; // stitch hoop to bitmap ratios

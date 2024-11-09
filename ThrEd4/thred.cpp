@@ -299,6 +299,7 @@ auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
 auto StitchWindowSize   = SIZE {};                    // size of the stitch window in pixels
 auto StitchBoxesThreshold = STCHBOX;               // threshold for drawing stitch boxes
+auto SortIndex            = uint32_t {};                // index for stitch search
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
