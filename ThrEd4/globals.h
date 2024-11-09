@@ -194,7 +194,6 @@ extern std::vector<F_POINT>* OutsidePoints;
 
 extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;
-extern uint32_t       PreferenceIndex;
 extern HWND           PreferencesWindow;
 extern uint32_t       PseudoRandomValue;
 extern F_RECTANGLE    RotationRect;

@@ -303,6 +303,7 @@ auto SortIndex            = uint32_t {};                // index for stitch sear
 auto SmallStitchLength    = SMALSIZ * PFGRAN;      // user can remove stitches smaller than this
 auto ShowStitchThreshold  = SHOPNTS;          // show stitch grid below this zoom level
 auto PreviousFormIndex    = uint32_t {};           // previously selected form
+auto PreferenceIndex      = uint32_t {};      // index to the active preference window
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -12931,4 +12932,12 @@ void thred::pushPreviousForm() noexcept {
 
 void thred::setPreviousForm(uint32_t const value) noexcept {
   PreviousFormIndex = value;
+}
+
+void thred::resetPrefIndex() noexcept {
+  PreferenceIndex = 0;
+}
+
+auto thred::checkPreferenceIndex(uint32_t const value) noexcept -> bool {
+  return PreferenceIndex == value;
 }

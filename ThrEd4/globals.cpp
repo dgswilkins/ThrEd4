@@ -79,7 +79,6 @@ bool                           OutLineEverySelectedForm  = false;   // When sele
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
 wchar_t const*                 PcdClipFormat             = L"PMust_Format";   //
 float                          PicotSpacing              = IPICSPAC;// space between border picots
-uint32_t                       PreferenceIndex           = 0U;      // index to the active preference window
 HWND                           PreferencesWindow         = nullptr; // preferences window
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle

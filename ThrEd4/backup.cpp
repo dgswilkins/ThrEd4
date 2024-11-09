@@ -225,7 +225,7 @@ void backup::bak() {
   if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
 	Instance->StateMap.reset(StateFlag::WASRT);
 	DestroyWindow(PreferencesWindow);
-	PreferenceIndex = 0;
+	thred::resetPrefIndex();
 	thred::unsid();
   }
   if (!Instance->StateMap.testAndSet(StateFlag::BAKING)) {
