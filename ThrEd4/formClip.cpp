@@ -114,6 +114,7 @@ class FCLIP_SINGLE
 namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
+constexpr auto ThrEdClipFormat = L"threditor"; //
 
 FCLIP_SINGLE* FormClipInstance;
 

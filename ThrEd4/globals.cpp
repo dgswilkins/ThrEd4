@@ -106,7 +106,6 @@ HDC                            StitchWindowDC            = nullptr; // stitch wi
 HDC                            StitchWindowMemDC         = nullptr; // stitch window memory device context
 POINT                          StitchWindowOrigin        = {};      // offset origin of the stitch window
 SIZE                           StitchWindowSize          = {};      // size of the stitch window in pixels
-wchar_t const*                 ThrEdClipFormat           = L"threditor"; //
 HINSTANCE                      ThrEdInstance             = {};      // main instance handle
 HWND                           ThrEdWindow               = nullptr; // main window handle
 POINT                          ThredWindowOrigin         = {};      // offset origin of the main window
