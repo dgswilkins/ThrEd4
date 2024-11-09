@@ -83,6 +83,7 @@ auto getLabelWindow() noexcept -> std::vector<HWND>&;
 auto getMoveDelta(const POINT& point) noexcept -> F_POINT;
 auto getMsgBufferValue() -> float;
 auto getRotationHandleAngle() noexcept -> float;
+auto getStitchWindowX() -> LONG;
 auto getThrEdName() noexcept -> fs::path const&;
 auto getUserPen(uint32_t iPen) noexcept -> HPEN;
 auto getVerticalIndex() noexcept -> uint8_t;

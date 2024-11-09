@@ -297,6 +297,7 @@ auto NameDecoder         = std::array<uint8_t, DNDLEN> {}; // designer name deco
 auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
 auto SelectedFormsRange = RANGE {};              // range of selected forms
 auto ZoomMin            = float {};              // minimum allowed zoom value
+auto StitchWindowSize   = SIZE {};                    // size of the stitch window in pixels
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -12896,4 +12897,8 @@ auto thred::scaleHorizontal(float const& value) noexcept -> long {
 
 auto thred::scaleVertical(float const& value) noexcept -> long {
   return std::lround(value * VerticalRatio);
+}
+
+auto thred::getStitchWindowX() -> LONG{
+  return StitchWindowSize.cx;
 }

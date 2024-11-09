@@ -105,7 +105,6 @@ RECT                           StitchWindowClientRect    = {};      // stitch wi
 HDC                            StitchWindowDC            = nullptr; // stitch window device context
 HDC                            StitchWindowMemDC         = nullptr; // stitch window memory device context
 POINT                          StitchWindowOrigin        = {};      // offset origin of the stitch window
-SIZE                           StitchWindowSize          = {};      // size of the stitch window in pixels
 HINSTANCE                      ThrEdInstance             = {};      // main instance handle
 HWND                           ThrEdWindow               = nullptr; // main window handle
 POINT                          ThredWindowOrigin         = {};      // offset origin of the main window

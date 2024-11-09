@@ -228,7 +228,6 @@ extern RECT        StitchWindowClientRect;
 extern HDC         StitchWindowDC;
 extern HDC         StitchWindowMemDC;
 extern POINT       StitchWindowOrigin;
-extern SIZE        StitchWindowSize;
 
 extern HINSTANCE      ThrEdInstance;
 extern HWND           ThrEdWindow;
