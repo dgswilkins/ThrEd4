@@ -7489,13 +7489,13 @@ void thred::movStch() {
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.cx, ScrollSize, TRUE);
 	}
-	thred::ShowScrollBars(true);
+	ShowScrollBars(true);
   }
   else {
 	stchPars();
 	auto const actualWindowHeight = StitchWindowSize.cy + ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.cx, actualWindowHeight, TRUE);
-	thred::ShowScrollBars(false);
+	ShowScrollBars(false);
 	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.cx) / wrap::toFloat(actualWindowHeight);
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, ScrollSize, TRUE);
