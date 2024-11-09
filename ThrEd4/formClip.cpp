@@ -867,7 +867,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		GlobalUnlock(ClipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
 		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;
-		form::ratsr();
+		thred::ratsr();
 		Instance->selectedFormList.clear();
 		Instance->selectedFormList.reserve(ClipFormsCount);
 		for (auto index = 0U; index < ClipFormsCount; ++index) {

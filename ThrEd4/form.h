@@ -119,7 +119,6 @@ void prpbrd(float borderStitchSpacing);
 auto prv(FRM_HEAD const& form, uint32_t iVertex) noexcept -> uint32_t;
 auto psg() noexcept -> uint32_t;
 void pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept;
-void ratsr();
 void rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept;
 void refil(uint32_t formIndex);
 void refilal();

@@ -104,8 +104,8 @@ void moveForms() {
   auto const point =
       POINT {WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x - SelectedFormsRect.left,
              WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
-  form::ratsr();
-  FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
+  thred::ratsr();
+  FormMoveDelta = thred::getMoveDelta(point);
 
   auto& formList = Instance->FormList;
   if (Instance->StateMap.test(StateFlag::FPSEL)) { // moving a group of form points

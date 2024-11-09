@@ -437,7 +437,6 @@ auto projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoi
 void prpsbrd(uint32_t formIndex);
 void prsmal(float width);
 auto px2stchf(POINT const& screen) noexcept -> F_POINT;
-void rats();
 auto regclos(std::vector<uint32_t> const&   groupIndexSequence,
              std::vector<SMAL_PNT_L> const& lineEndpoints,
              std::vector<uint32_t> const&   sortedLineIndices,
@@ -606,17 +605,6 @@ void frmToLine(FRM_HEAD const& form) {
                                          ((itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y))});
 }
 
-void rats() {
-  if (Instance->StateMap.test(StateFlag::ZUMED)) {
-	HorizontalRatio = (ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right);
-	VerticalRatio = (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom);
-  }
-  else {
-	HorizontalRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(StitchWindowClientRect.right);
-	VerticalRatio   = wrap::toFloat(UnzoomedRect.cy) / wrap::toFloat(StitchWindowClientRect.bottom);
-  }
-}
-
 void frmsqr(uint32_t const vertexIndex, uint32_t const iVertex) {
   auto       line             = std::array<POINT, TRIPNTS> {};
   auto const itCurrentVertex  = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + iVertex);
@@ -730,7 +718,7 @@ void drawFormBox(FRM_HEAD const& form) {
 
 void drawFormsBox() {
   SelectObject(StitchWindowMemDC, MultiFormPen);
-  form::ratsr();
+  thred::ratsr();
   SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
   for (auto const selectedForm : Instance->selectedFormList) {
 	form::fselrct(selectedForm);
@@ -5452,7 +5440,7 @@ void form::setfrm() {
   if (formList.empty()) {
 	return;
   }
-  rats();
+  thred::rats();
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   auto const point    = px2stchf(Instance->formLines.front());
   auto const newCount = NewFormVertexCount - 1U; // -1 to account for the last point being the same as the first
@@ -5496,23 +5484,12 @@ void form::selsqr(POINT const& controlPoint, HDC hDC) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-void form::ratsr() {
-  if (Instance->StateMap.test(StateFlag::ZUMED)) {
-	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-	VerticalRatio = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
-  }
-  else {
-	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / wrap::toFloat(UnzoomedRect.cx);
-	VerticalRatio   = wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(UnzoomedRect.cy);
-  }
-}
-
 // ReSharper disable CppParameterMayBeConst
 void form::ritfrct(uint32_t const iForm, HDC hDC) {
   auto pixelOutline = std::array<POINT, OUTPNTS> {};
 
   std::array<F_POINT, OUTPNTS> formOutline;
-  ratsr();
+  thred::ratsr();
   SelectObject(StitchWindowDC, FormPen);
   SetROP2(StitchWindowDC, R2_XORPEN);
   auto const& rectangle = Instance->FormList.operator[](iForm).rectangle;
@@ -5575,8 +5552,8 @@ void form::fselrct(uint32_t const iForm) noexcept(std::is_same_v<size_t, uint32_
   auto maxX = SelectedFormsRect.right;
   auto minY = SelectedFormsRect.bottom;
   for (auto& point : line) {
-	point.x = std::lround((iFormOutline->x - ZoomRect.left) * HorizontalRatio);
-	point.y = std::lround((ZoomRect.top - iFormOutline->y) * VerticalRatio);
+	point.x = thred::scaleHorizontal(iFormOutline->x - ZoomRect.left);
+	point.y = thred::scaleVertical(ZoomRect.top - iFormOutline->y);
 	minX    = std::min(minX, point.x);
 	minY    = std::min(minY, point.y);
 	maxX    = std::max(maxX, point.x);
@@ -5642,7 +5619,7 @@ void form::drwfrm() {
   Instance->StateMap.reset(StateFlag::SHOMOV);
   Instance->StateMap.reset(StateFlag::SHOPSEL);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  ratsr();
+  thred::ratsr();
   thred::duzrat();
   auto const maxForm = Instance->FormList.size();
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
@@ -5959,7 +5936,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
   }
   auto const screenCoordinate =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  rats();
+  thred::rats();
   auto       closestForm   = 0U;
   auto       closestVertex = 0U;
   auto       minimumLength = BIGFLOAT;
@@ -6016,7 +5993,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 
 void form::frmovlin() {
   auto const& form = Instance->FormList.operator[](ClosestFormToCursor);
-  ratsr();
+  thred::ratsr();
   if (form.type == FRMLINE) {
 	NewFormVertexCount = form.vertexCount;
   }
@@ -6489,7 +6466,7 @@ void form::setfpnt() {
   auto const itVertex         = wrap::next(Instance->FormVertices.begin(), form.vertexIndex + ClosestVertexToCursor);
   // clang-format on
   unfrm();
-  rats();
+  thred::rats();
   *itVertex = px2stchf(screenCoordinate);
   form.outline();
   refil(ClosestFormToCursor);

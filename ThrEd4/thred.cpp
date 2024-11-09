@@ -276,6 +276,8 @@ auto PrevGroupStartStitch    = uint32_t {};                    // lower end of p
 auto PrevGroupEndStitch      = uint32_t {};                    // higher end of previous selection
 auto ScrollSize              = SCROLSIZ;                       // Scroll bar width scaled for DPI
 auto StitchWindowAspectRatio = float {};                       // aspect ratio of the stitch window
+auto HorizontalRatio = float {}; // horizontal ratio between the zoom window and the entire stitch space
+auto VerticalRatio = float {}; // vertical ratio between the zoom window and the entire stitch space
 auto SelectBoxSize           = SIZE {};                        // size of the select box
 auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
 auto RotationHandleAngle = float {};                   // angle of the rotation handle
@@ -9744,7 +9746,7 @@ void thred::insfil(fs::path& insertedFile) {
 
   auto const insertedSize = F_POINT {insertedRectangle.right - insertedRectangle.left,
                                      insertedRectangle.top - insertedRectangle.bottom};
-  form::ratsr();
+  ratsr();
   InsertSize.cx = std::lround(insertedSize.x * HorizontalRatio);
   // ToDo - Should this be vertical ratio?
   InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
@@ -12860,4 +12862,38 @@ auto thred::getLabelWindow() noexcept -> std::vector<HWND>& {
 
 auto thred::getThrEdName() noexcept -> fs::path const& {
   return ThrSingle->ThrName;
+}
+
+void thred::rats() {
+  if (Instance->StateMap.test(StateFlag::ZUMED)) {
+	HorizontalRatio = (ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right);
+	VerticalRatio = (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom);
+  }
+  else {
+	HorizontalRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(StitchWindowClientRect.right);
+	VerticalRatio   = wrap::toFloat(UnzoomedRect.cy) / wrap::toFloat(StitchWindowClientRect.bottom);
+  }
+}
+
+void thred::ratsr() {
+  if (Instance->StateMap.test(StateFlag::ZUMED)) {
+	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+	VerticalRatio = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+  }
+  else {
+	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / wrap::toFloat(UnzoomedRect.cx);
+	VerticalRatio   = wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(UnzoomedRect.cy);
+  }
+}
+
+auto thred::getMoveDelta(const POINT& point) noexcept -> F_POINT {
+  return F_POINT {wrap::toFloat(point.x) / HorizontalRatio, -wrap::toFloat(point.y) / VerticalRatio};
+}
+
+auto thred::scaleHorizontal(float const& value) noexcept -> long {
+  return std::lround(value * HorizontalRatio);
+}
+
+auto thred::scaleVertical(float const& value) noexcept -> long {
+  return std::lround(value * VerticalRatio);
 }
