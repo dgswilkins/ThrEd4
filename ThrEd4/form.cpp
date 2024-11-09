@@ -8273,7 +8273,7 @@ void form::nufsel() {
   }
   Instance->StateMap.reset(StateFlag::FORMSEL);
   if (Instance->StateMap.testAndReset(StateFlag::WASEL)) {
-	Instance->selectedFormList.push_back(PreviousFormIndex);
+	thred::pushPreviousForm();
   }
   if (std::ranges::none_of(Instance->selectedFormList,
                            [](uint32_t const intX) { return intX == ClosestFormToCursor; })) {

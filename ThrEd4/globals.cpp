@@ -81,7 +81,6 @@ wchar_t const*                 PcdClipFormat             = L"PMust_Format";   //
 float                          PicotSpacing              = IPICSPAC;// space between border picots
 uint32_t                       PreferenceIndex           = 0U;      // index to the active preference window
 HWND                           PreferencesWindow         = nullptr; // preferences window
-uint32_t                       PreviousFormIndex         = 0U;      // previously selected form
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle
 uint32_t                       SelectedFormControlVertex = 0U;      // user selected form control formOrigin

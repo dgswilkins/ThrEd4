@@ -1512,7 +1512,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	  if ((WinMsg.wParam & MK_CONTROL) != 0U) { // If control is pressed
 		if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
 		  Instance->StateMap.set(StateFlag::WASEL);
-		  PreviousFormIndex = ClosestFormToCursor;
+		  thred::setPreviousForm(ClosestFormToCursor);
 		}
 		if (form::closfrm(ClosestFormToCursor)) {
 		  form::nufsel();

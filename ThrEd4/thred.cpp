@@ -302,6 +302,7 @@ auto StitchBoxesThreshold = STCHBOX;               // threshold for drawing stit
 auto SortIndex            = uint32_t {};                // index for stitch search
 auto SmallStitchLength    = SMALSIZ * PFGRAN;      // user can remove stitches smaller than this
 auto ShowStitchThreshold  = SHOPNTS;          // show stitch grid below this zoom level
+auto PreviousFormIndex    = uint32_t {};           // previously selected form
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -12920,6 +12921,14 @@ auto thred::getShowStitchThreshold() noexcept -> float {
   return ShowStitchThreshold;
 }
 
-void thred::selectAllPen() {
+void thred::selectAllPen() noexcept {
   SelectObject(StitchWindowMemDC, SelectAllPen);
+}
+
+void thred::pushPreviousForm() noexcept {
+  Instance->selectedFormList.push_back(PreviousFormIndex);
+}
+
+void thred::setPreviousForm(uint32_t const value) noexcept {
+  PreviousFormIndex = value;
 }

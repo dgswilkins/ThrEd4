@@ -196,7 +196,6 @@ extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;
 extern uint32_t       PreferenceIndex;
 extern HWND           PreferencesWindow;
-extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
 extern F_RECTANGLE    RotationRect;
 
