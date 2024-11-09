@@ -166,7 +166,6 @@ extern uint32_t GroupEndStitch;
 extern uint32_t GroupStartStitch;
 extern uint32_t GroupStitchIndex;
 extern float    HorizontalRatio;
-extern HWND     HorizontalScrollBar;
 extern INI_FILE IniFile;
 
 extern std::array<POINT, 3>  InsertLine;
@@ -245,7 +244,6 @@ extern std::array<COLORREF, COLORCNT> UserColor;
 extern float UserStitchLength;
 
 extern float VerticalRatio;
-extern HWND  VerticalScrollBar;
 
 extern std::array<POINT, SQPNTS> ZoomBoxLine;
 

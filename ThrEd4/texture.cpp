@@ -1174,8 +1174,7 @@ auto texture::dutxtfil() -> bool {
   Instance->StateMap.reset(StateFlag::WASPAT);
   Instance->StateMap.reset(StateFlag::RUNPAT);
   thred::movStch();
-  ShowWindow(VerticalScrollBar, SW_HIDE);
-  ShowWindow(HorizontalScrollBar, SW_HIDE);
+  thred::ShowScrollBars(false);
   TextureInstance->SelectedTexturePointsList.clear();
   Instance->StateMap.set(StateFlag::INIT);
   SideWindowButton = nullptr;

@@ -328,7 +328,9 @@ constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread s
 
 // windows
 auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
+auto HorizontalScrollBar = gsl::narrow_cast<HWND>(nullptr); // horizontal scroll bar
 auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
+auto VerticalScrollBar = gsl::narrow_cast<HWND>(nullptr); // vertical scroll bar
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
@@ -6527,12 +6529,10 @@ void setScrollVisibility() {
 	scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(ZoomRect.left);
 	SetScrollInfo(HorizontalScrollBar, SB_CTL, &scrollInfo, TRUE);
 	// and show the scroll bars
-	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
-	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
+	thred::ShowScrollBars(true);
   }
   else {
-	ShowWindow(VerticalScrollBar, SW_HIDE);
-	ShowWindow(HorizontalScrollBar, SW_HIDE);
+	thred::ShowScrollBars(false);
   }
 }
 
@@ -6954,8 +6954,7 @@ void stchWnd() {
                                      nullptr,
                                      ThrEdInstance,
                                      nullptr);
-  ShowWindow(VerticalScrollBar, SW_HIDE);
-  ShowWindow(HorizontalScrollBar, SW_HIDE);
+  thred::ShowScrollBars(false);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -7272,6 +7271,17 @@ void thred::showColorWin() noexcept {
   }
 }
 
+void thred::ShowScrollBars(bool const Show) noexcept {
+  if (Show) {
+	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
+	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
+  }
+  else {
+	ShowWindow(VerticalScrollBar, SW_HIDE);
+	ShowWindow(HorizontalScrollBar, SW_HIDE);
+  }
+}
+
 auto thred::getUserPen(uint32_t const iPen) noexcept -> HPEN {
   return ThrSingle->UserPen.operator[](iPen);
 }
@@ -7479,15 +7489,13 @@ void thred::movStch() {
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.cx, ScrollSize, TRUE);
 	}
-	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
-	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
+	thred::ShowScrollBars(true);
   }
   else {
 	stchPars();
 	auto const actualWindowHeight = StitchWindowSize.cy + ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.cx, actualWindowHeight, TRUE);
-	ShowWindow(VerticalScrollBar, SW_HIDE);
-	ShowWindow(HorizontalScrollBar, SW_HIDE);
+	thred::ShowScrollBars(false);
 	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.cx) / wrap::toFloat(actualWindowHeight);
 	if (Instance->StateMap.test(StateFlag::RUNPAT) || Instance->StateMap.test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, ScrollSize, TRUE);
