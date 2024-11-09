@@ -114,7 +114,7 @@ class FCLIP_SINGLE
 namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
-constexpr auto ThrEdClipFormat = L"threditor"; //
+constexpr auto THRED_CLIP_FORMAT = L"threditor"; //
 
 FCLIP_SINGLE* FormClipInstance;
 
@@ -155,7 +155,7 @@ void clipSelectedForm() {
 	return;
   }
   EmptyClipboard();
-  auto const thrEdClip       = RegisterClipboardFormat(ThrEdClipFormat);
+  auto const thrEdClip       = RegisterClipboardFormat(THRED_CLIP_FORMAT);
   auto*      clipFormHeader  = gsl::narrow_cast<FORM_CLIP*>(GlobalLock(clipHandle));
   clipFormHeader->clipType   = CLP_FRM;
   clipFormHeader->form       = form;
@@ -255,7 +255,7 @@ void clipSelectedForms() {
 	return;
   }
   EmptyClipboard();
-  auto const thrEdClip       = RegisterClipboardFormat(ThrEdClipFormat);
+  auto const thrEdClip       = RegisterClipboardFormat(THRED_CLIP_FORMAT);
   auto*      clipFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
   clipFormsHeader->clipType  = CLP_FRMS;
   wrap::narrow(clipFormsHeader->formCount, Instance->selectedFormList.size());
@@ -414,7 +414,7 @@ void clipSelectedPoints() {
 	return;
   }
   EmptyClipboard();
-  auto const thrEdClip    = RegisterClipboardFormat(ThrEdClipFormat);
+  auto const thrEdClip    = RegisterClipboardFormat(THRED_CLIP_FORMAT);
   auto*      clipHeader   = gsl::narrow_cast<FORM_VERTEX_CLIP*>(GlobalLock(clipHandle));
   clipHeader->clipType    = CLP_FRMPS;
   clipHeader->vertexCount = SelectedFormVertices.vertexCount;
@@ -705,7 +705,7 @@ void tfc::rtrclp() {
 auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+  auto const thrEdClip = RegisterClipboardFormat(THRED_CLIP_FORMAT);
   ClipMemory           = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
 	if (auto* clipPointer = GlobalLock(ClipMemory); clipPointer != nullptr) {
@@ -964,7 +964,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 }
 
 void tfc::txtclp(FRM_HEAD& textureForm) {
-  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+  auto const thrEdClip = RegisterClipboardFormat(THRED_CLIP_FORMAT);
   if (0U == thrEdClip) {
 	return;
   }
