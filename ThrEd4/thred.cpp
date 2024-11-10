@@ -4279,26 +4279,10 @@ void infadj(float& xCoordinate, float& yCoordinate) noexcept {
 void init() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const deviceContext   = GetDC(nullptr);
-  auto const screenHalfWidth = GetDeviceCaps(deviceContext, HORZRES) / 2;
   ReleaseDC(nullptr, deviceContext);
   Instance->TexturePointsBuffer.clear();
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
   MainMenu   = GetMenu(ThrEdWindow);
-  auto wRect = RECT {};
-  GetWindowRect(ThrEdWindow, &wRect);
-  auto mRect = RECT {};
-  GetMenuItemRect(ThrEdWindow, MainMenu, 0, &mRect);
-  wRect.left  = mRect.left;
-  wRect.right = mRect.right;
-  for (auto iMenu = 0U; iMenu <= M_HELP; ++iMenu) {
-	GetMenuItemRect(ThrEdWindow, MainMenu, iMenu, &mRect);
-	wRect.right += mRect.right - mRect.left;
-  }
-  constexpr auto MENUWS = LONG {20}; // menu righthand whitespace
-  wRect.right += MENUWS;
-  if (auto const sWidth = wRect.right - wRect.left; sWidth < screenHalfWidth) {
-	wRect.right = wRect.left += screenHalfWidth;
-  }
   menu::init();
   menu::qchk();
   mouse::crtcurs();
