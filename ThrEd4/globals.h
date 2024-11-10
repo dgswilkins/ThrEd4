@@ -172,7 +172,6 @@ extern std::vector<F_POINT>* InsidePoints;
 
 extern F_POINT LastPoint;
 extern float   LineSpacing;
-extern F_POINT LowerLeftStitch;
 
 extern HWND  MainStitchWin;
 

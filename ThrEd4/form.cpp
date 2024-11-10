@@ -5570,7 +5570,8 @@ void form::fselrct(uint32_t const iForm) noexcept(std::is_same_v<size_t, uint32_
   }
 
   SelectedFormsRect = RECT {minX, maxY, maxX, minY};
-  if (OUTL_ALL) {
+  // ReSharper disable once CppUnreachableCode
+  if (OUTL_ALL) { 
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }

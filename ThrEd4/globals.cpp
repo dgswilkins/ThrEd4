@@ -63,7 +63,6 @@ std::array<POINT, 3>           InsertLine                = {};      // the inser
 std::vector<F_POINT>*          InsidePoints              = nullptr; // pointer to the list of inside outline points
 F_POINT                        LastPoint                 = F_POINT {}; // last formOrigin written by line connect routine
 float                          LineSpacing               = DEFSPACE * PFGRAN; // stitch spacing in stitch units
-F_POINT                        LowerLeftStitch           = F_POINT {}; // lower left formOrigin in a form
 HWND                           MainStitchWin             = nullptr; // stitch window
 float                          MinStitchLength           = MINSIZ * PFGRAN; // minimum stitch size
 MSG                            WinMsg                    = {};      // main message loop message
