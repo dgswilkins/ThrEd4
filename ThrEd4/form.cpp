@@ -5368,8 +5368,8 @@ void form::chkcont() {
 }
 
 auto form::registerPCDFormat() noexcept -> uint32_t {
-  constexpr auto PcdClipFormat = L"PMust_Format";
-  return RegisterClipboardFormat(PcdClipFormat);
+  constexpr auto PCD_CLIP_FORMAT = L"PMust_Format";
+  return RegisterClipboardFormat(PCD_CLIP_FORMAT);
 }
 
 void form::ispcdclp() {
