@@ -7608,7 +7608,7 @@ void thred::zumhom() {
   ZoomFactor = 1;
   Instance->StateMap.reset(StateFlag::ZUMED);
   movStch();
-  thred::resetNearest();
+  resetNearest();
   if (Instance->StateMap.test(StateFlag::RUNPAT)) {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	RunPoint = 0;
@@ -8308,7 +8308,7 @@ void thred::zumin() {
   auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
   ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
   shft(stitchPoint);
-  thred::resetNearest();
+  resetNearest();
   if (!Instance->StateMap.test(StateFlag::GMRK) && Instance->StateMap.test(StateFlag::SELBOX)) {
 	shft2box();
   }
@@ -8326,7 +8326,7 @@ void thred::zumshft() {
   if (Instance->StateMap.test(StateFlag::ZUMED)) {
 	unboxs();
 	if (inStitchWin()) {
-	  thred::resetNearest();
+	  resetNearest();
 	  shft(pxCor2stch(WinMsg.pt));
 	  if (Instance->StateMap.test(StateFlag::RUNPAT)) {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
@@ -8392,7 +8392,7 @@ void thred::zumout() {
 	Instance->StateMap.reset(StateFlag::ZUMED);
 	ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
 	movStch();
-	thred::resetNearest();
+	resetNearest();
   }
   else {
 	auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
