@@ -152,7 +152,7 @@ void pntmrk();
 auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;
 void purg();
 void purgdir();
-void pushPreviousForm() noexcept;
+void pushPreviousForm();
 auto pxCor2stch(POINT const& point) noexcept -> F_POINT;
 void qcode();
 void rSelbox();

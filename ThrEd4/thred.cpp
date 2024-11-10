@@ -12926,7 +12926,7 @@ void thred::selectAllPen() noexcept {
   SelectObject(StitchWindowMemDC, SelectAllPen);
 }
 
-void thred::pushPreviousForm() noexcept {
+void thred::pushPreviousForm() {
   Instance->selectedFormList.push_back(PreviousFormIndex);
 }
 
