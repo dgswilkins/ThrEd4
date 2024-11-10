@@ -169,6 +169,7 @@ void rembig();
 void resetColorChanges() noexcept;
 void resetColors();
 void resetMsgBuffer();
+void resetNearest();
 void resetPrefIndex() noexcept;
 void resetSideBuffer();
 void retrac();

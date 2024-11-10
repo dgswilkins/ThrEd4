@@ -7069,7 +7069,7 @@ void form::selal() {
   ZoomFactor = 1;
   Instance->StateMap.reset(StateFlag::ZUMED);
   thred::movStch();
-  NearestCount = 0;
+  thred::resetNearest();
   Instance->StateMap.reset(StateFlag::RUNPAT);
   thred::duzrat();
   stchrct2px(AllItemsRect, SelectedFormsRect);

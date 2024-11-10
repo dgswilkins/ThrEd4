@@ -304,6 +304,7 @@ auto SmallStitchLength    = SMALSIZ * PFGRAN;      // user can remove stitches s
 auto ShowStitchThreshold  = SHOPNTS;          // show stitch grid below this zoom level
 auto PreviousFormIndex    = uint32_t {};           // previously selected form
 auto PreferenceIndex      = uint32_t {};      // index to the active preference window
+auto NearestCount         = uint32_t {};           // number of boxes selected
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -4192,7 +4193,7 @@ void handleWndProcWMSIZE(HWND p_hWnd, WPARAM const wParam) {
 	ZoomRect =
 	    F_RECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.cy), gsl::narrow<float>(UnzoomedRect.cx), 0.0F};
   }
-  NearestCount = 0;
+  thred::resetNearest();
   Instance->StateMap.set(StateFlag::RESTCH);
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
 	shft2box();
@@ -5925,7 +5926,7 @@ void resetState() {
   rstdu();
   thred::unmsg();
   ZoomFactor   = 1;
-  NearestCount = 0;
+  thred::resetNearest();
   if (Instance->StateMap.testAndReset(StateFlag::WASPAT)) {
 	DestroyWindow(SpeedScrollBar);
   }
@@ -7105,7 +7106,7 @@ void thrsav() {
 void unboxs() {
   if (NearestCount != 0U) {
 	boxs();
-	NearestCount = 0;
+	thred::resetNearest();
   }
 }
 
@@ -7623,7 +7624,7 @@ void thred::zumhom() {
   ZoomFactor = 1;
   Instance->StateMap.reset(StateFlag::ZUMED);
   movStch();
-  NearestCount = 0;
+  thred::resetNearest();
   if (Instance->StateMap.test(StateFlag::RUNPAT)) {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	RunPoint = 0;
@@ -8323,7 +8324,7 @@ void thred::zumin() {
   auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
   ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
   shft(stitchPoint);
-  NearestCount = 0;
+  thred::resetNearest();
   if (!Instance->StateMap.test(StateFlag::GMRK) && Instance->StateMap.test(StateFlag::SELBOX)) {
 	shft2box();
   }
@@ -8341,7 +8342,7 @@ void thred::zumshft() {
   if (Instance->StateMap.test(StateFlag::ZUMED)) {
 	unboxs();
 	if (inStitchWin()) {
-	  NearestCount = 0;
+	  thred::resetNearest();
 	  shft(pxCor2stch(WinMsg.pt));
 	  if (Instance->StateMap.test(StateFlag::RUNPAT)) {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
@@ -8407,7 +8408,7 @@ void thred::zumout() {
 	Instance->StateMap.reset(StateFlag::ZUMED);
 	ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
 	movStch();
-	NearestCount = 0;
+	thred::resetNearest();
   }
   else {
 	auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
@@ -12940,4 +12941,8 @@ void thred::resetPrefIndex() noexcept {
 
 auto thred::checkPreferenceIndex(uint32_t const value) noexcept -> bool {
   return PreferenceIndex == value;
+}
+
+void thred::resetNearest() {
+  NearestCount = 0;
 }
