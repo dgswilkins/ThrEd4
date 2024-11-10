@@ -180,6 +180,7 @@ constexpr auto FRECONT  = 0x80U; // 1000 0000 contour refil
 constexpr auto NFRECONT = 0x7fU; // 0111 1111 contour refil
 constexpr auto SEQTOP   = int32_t {2};
 constexpr auto SEQBOT   = int32_t {3};
+constexpr auto OUTL_ALL = false; // When selecting multiple forms, should we outline every form?
 
 namespace {
 auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
@@ -5568,7 +5569,7 @@ void form::fselrct(uint32_t const iForm) noexcept(std::is_same_v<size_t, uint32_
   }
 
   SelectedFormsRect = RECT {minX, maxY, maxX, minY};
-  if (OutLineEverySelectedForm) {
+  if (OUTL_ALL) {
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }

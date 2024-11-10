@@ -75,7 +75,6 @@ HPEN                           MultiFormPen              = nullptr; // multiple 
 uint32_t                       NearestCount              = 0U;      // number of boxes selected
 uint32_t                       NewFormVertexCount        = 0U;      // points in the new form
 HWND                           OKButton                  = nullptr; // ok button
-bool                           OutLineEverySelectedForm  = false;   // When selecting multiple forms, should we outline every form?
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
 float                          PicotSpacing              = IPICSPAC;// space between border picots
 HWND                           PreferencesWindow         = nullptr; // preferences window

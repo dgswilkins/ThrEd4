@@ -188,8 +188,6 @@ extern uint32_t NearestCount;
 extern uint32_t NewFormVertexCount;
 extern HWND     OKButton;
 
-extern bool OutLineEverySelectedForm;
-
 extern std::vector<F_POINT>* OutsidePoints;
 
 extern float          PicotSpacing;
