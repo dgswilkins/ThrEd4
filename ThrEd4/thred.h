@@ -197,6 +197,7 @@ void selCol();
 void selRct(F_RECTANGLE& sourceRect) noexcept(!std::is_same_v<size_t, uint32_t>);
 void selalstch();
 void selectAllPen() noexcept;
+void selectGridPen() noexcept;
 void selectMultiFormPen() noexcept;
 void selfpnt();
 void set1knot();

@@ -310,6 +310,7 @@ auto NearestCount         = uint32_t {};           // number of boxes selected
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
 auto BoxPen             = std::array<HPEN, 4> {};          // box pens
 auto CrossPen           = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
+auto GridPen            = gsl::narrow_cast<HPEN>(nullptr); // pen for stitch grid
 auto GroupSelectPen     = gsl::narrow_cast<HPEN>(nullptr); // pen for group select
 auto BackgroundPen      = gsl::narrow_cast<HPEN>(nullptr); // background color pen
 auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
@@ -2678,7 +2679,7 @@ void dugrid() {
 	return;
   }
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  SelectObject(StitchWindowMemDC, GridPen);
+  thred::selectGridPen();
   auto const gridRect = RECT {wrap::ceil<int32_t>(ZoomRect.left / IniFile.gridSize),
                               wrap::floor<int32_t>(ZoomRect.top / IniFile.gridSize),
                               wrap::floor<int32_t>(ZoomRect.right / IniFile.gridSize),
@@ -12935,3 +12936,6 @@ void thred::selectMultiFormPen() noexcept {
   SelectObject(StitchWindowMemDC, MultiFormPen);
 }
 
+void thred::selectGridPen() noexcept {
+  SelectObject(StitchWindowMemDC, GridPen);
+}

@@ -1244,7 +1244,7 @@ void texture::drwtxtr() {
   TextureScreen.screenHeight = wrap::toFloat(StitchWindowClientRect.bottom) * TextureScreen.editToPixelRatio;
   TextureScreen.yOffset = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  SelectObject(StitchWindowMemDC, GridPen);
+  thred::selectGridPen();
   auto const gridLineCount = wrap::floor<uint32_t>((TextureScreen.areaHeight / IniFile.gridSize) + 1.0F);
   auto textureRecord = TX_PNT {};
   line[0].x          = 0;
