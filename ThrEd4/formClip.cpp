@@ -210,7 +210,7 @@ void clipSelectedForm() {
 	CloseClipboard();
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = form::registerPCDFormat();
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -380,7 +380,7 @@ void clipSelectedForms() {
 	CloseClipboard();
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = form::registerPCDFormat();
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -458,7 +458,7 @@ void clipSelectedStitches() {
 	  return;
 	}
 	EmptyClipboard();
-	Clip                      = RegisterClipboardFormat(PcdClipFormat);
+	Clip                      = form::registerPCDFormat();
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span {clipStitchData, length};
 	savclp(spData[0], Instance->StitchBuffer.operator[](iSource), length);
@@ -552,7 +552,7 @@ void rtrclpfn(FRM_HEAD const& form) {
   }
   LowerLeftStitch = F_POINT {0.0F, 0.0F};
   EmptyClipboard();
-  Clip = RegisterClipboardFormat(PcdClipFormat);
+  Clip = form::registerPCDFormat();
 
   auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
   if (nullptr == clipHandle) {
@@ -950,7 +950,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 	CloseClipboard();
   }
   else {
-	Clip       = RegisterClipboardFormat(PcdClipFormat);
+	Clip       = form::registerPCDFormat();
 	ClipMemory = GetClipboardData(Clip);
 	if (ClipMemory != nullptr) {
 	  thred::redclp();

@@ -5366,12 +5366,17 @@ void form::chkcont() {
   form.fillType = CONTF;
 }
 
+auto form::registerPCDFormat() noexcept -> uint32_t {
+  constexpr auto PcdClipFormat = L"PMust_Format";
+  return RegisterClipboardFormat(PcdClipFormat);
+}
+
 void form::ispcdclp() {
   Instance->StateMap.reset(StateFlag::WASPCDCLP);
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory != nullptr) {
 	Instance->StateMap.set(StateFlag::WASPCDCLP);
@@ -6970,7 +6975,7 @@ void form::fclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();
@@ -8011,7 +8016,7 @@ void form::clpfil() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();
@@ -8451,7 +8456,7 @@ void form::picot() {
 	return;
   }
   thred::savdo();
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();
@@ -8900,7 +8905,7 @@ void form::vrtclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();
@@ -8965,7 +8970,7 @@ void form::horclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();
@@ -9029,7 +9034,7 @@ void form::angclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();
@@ -9266,7 +9271,7 @@ void form::filclpx() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	auto const str = std::wstring(L"no clipboard data");

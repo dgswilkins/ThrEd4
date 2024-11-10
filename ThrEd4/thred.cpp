@@ -6642,7 +6642,7 @@ auto sidclp() -> bool {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return false;
   }
-  Clip       = RegisterClipboardFormat(PcdClipFormat);
+  Clip       = form::registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory == nullptr) {
 	CloseClipboard();

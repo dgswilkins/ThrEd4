@@ -192,7 +192,6 @@ extern bool OutLineEverySelectedForm;
 
 extern std::vector<F_POINT>* OutsidePoints;
 
-extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;
 extern HWND           PreferencesWindow;
 extern uint32_t       PseudoRandomValue;
