@@ -183,7 +183,6 @@ extern MSG   WinMsg;
 
 extern RECT     MsgRect;
 extern HWND     MsgWindow;
-extern HPEN     MultiFormPen;
 extern uint32_t NewFormVertexCount;
 extern HWND     OKButton;
 

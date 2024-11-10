@@ -316,6 +316,7 @@ auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
 auto KnotPen            = gsl::narrow_cast<HPEN>(nullptr); // knot pen
 auto BackgroundPenWidth = int32_t {};                      // width of the background pen
 auto SelectAllPen       = gsl::narrow_cast<HPEN>(nullptr); // pen for drawing large boxes
+auto MultiFormPen       = gsl::narrow_cast<HPEN>(nullptr); // multiple selected forms pen
 
 // brushes
 auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
@@ -12943,6 +12944,11 @@ auto thred::checkPreferenceIndex(uint32_t const value) noexcept -> bool {
   return PreferenceIndex == value;
 }
 
-void thred::resetNearest() {
+void thred::resetNearest() noexcept {
   NearestCount = 0;
 }
+
+void thred::selectMultiFormPen() noexcept {
+  SelectObject(StitchWindowMemDC, MultiFormPen);
+}
+

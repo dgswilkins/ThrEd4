@@ -71,7 +71,6 @@ float                          MinStitchLength           = MINSIZ * PFGRAN; // m
 MSG                            WinMsg                    = {};      // main message loop message
 RECT                           MsgRect                   = {};      // rectangle containing the text message
 HWND                           MsgWindow                 = nullptr; // message window
-HPEN                           MultiFormPen              = nullptr; // multiple selected forms pen
 uint32_t                       NewFormVertexCount        = 0U;      // points in the new form
 HWND                           OKButton                  = nullptr; // ok button
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points

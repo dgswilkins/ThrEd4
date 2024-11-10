@@ -718,7 +718,7 @@ void drawFormBox(FRM_HEAD const& form) {
 }
 
 void drawFormsBox() {
-  SelectObject(StitchWindowMemDC, MultiFormPen);
+  thred::selectMultiFormPen();
   thred::ratsr();
   SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
   for (auto const selectedForm : Instance->selectedFormList) {
