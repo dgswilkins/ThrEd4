@@ -16,7 +16,7 @@ void addColor(uint32_t stitch, uint32_t color);
 auto adflt(uint32_t count) -> uint32_t;
 void bBox() noexcept(std::is_same_v<size_t, uint32_t>);
 void bakmrk();
-auto checkPreferenceIndex(uint32_t const value) noexcept -> bool;
+auto checkPreferenceIndex(uint32_t value) noexcept -> bool;
 auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
 void chkDelCol();
 void chkInsCol();
