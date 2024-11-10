@@ -1236,7 +1236,6 @@ void satin::ribon() {
   auto const currentVertexCount = formList.operator[](ClosestFormToCursor).vertexCount;
   newForm.maxFillStitchLen      = MAXSIZ * PFGRAN;
   newForm.minFillStitchLen      = MinStitchLength;
-  MaxStitchLen                  = MAXSIZ * PFGRAN;
   if (currentType == FRMLINE) {
 	// Set blunt flags
 	auto isBlunt = 0U;

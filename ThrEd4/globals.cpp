@@ -66,7 +66,6 @@ float                          LineSpacing               = DEFSPACE * PFGRAN; //
 F_POINT                        LowerLeftStitch           = F_POINT {}; // lower left formOrigin in a form
 HMENU                          MainMenu                  = nullptr; // main menu
 HWND                           MainStitchWin             = nullptr; // stitch window
-float                          MaxStitchLen              = 0.0F;    // maximum stitch length
 float                          MinStitchLength           = MINSIZ * PFGRAN; // minimum stitch size
 MSG                            WinMsg                    = {};      // main message loop message
 RECT                           MsgRect                   = {};      // rectangle containing the text message

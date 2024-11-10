@@ -188,6 +188,7 @@ auto FormVertexNext = uint32_t {};                     // form vertex storage fo
 auto FormVertexPrev = uint32_t {};                     // form vertex storage for form vertex insert
 auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
 auto AllItemsRect   = F_RECTANGLE {};                  // bounding rectangle for all items
+auto MaxStitchLen   = float {};                        // maximum stitch length
 
 // Definitions
 void adfrm(uint32_t iForm);
@@ -6056,7 +6057,7 @@ void form::chkseq(bool border) {
 	                                                                           : form.edgeStitchLen;
   }
   else {
-	userStitchLen = form.isClip() ? MaxStitchLen : form.stitchLength;
+	userStitchLen = form.isClip() ? form.maxFillStitchLen : form.stitchLength;
   }
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {

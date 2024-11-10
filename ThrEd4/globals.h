@@ -176,7 +176,6 @@ extern F_POINT LowerLeftStitch;
 
 extern HMENU MainMenu;
 extern HWND  MainStitchWin;
-extern float MaxStitchLen;
 
 extern float MinStitchLength;
 extern MSG   WinMsg;
