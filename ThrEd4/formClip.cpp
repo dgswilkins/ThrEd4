@@ -114,7 +114,6 @@ class FCLIP_SINGLE
 namespace {
 auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
-constexpr auto THRED_CLIP_FORMAT = L"threditor"; //
 
 FCLIP_SINGLE* FormClipInstance;
 
@@ -126,6 +125,7 @@ void clipSelectedStitches();
 void dupclp() noexcept(std::is_same_v<size_t, uint32_t>);
 auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
 auto getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD*;
+auto registerThredClipFormat() noexcept -> uint32_t;
 void rtrclpfn(FRM_HEAD const& form);
 void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t led);
 void setpclp();
@@ -138,6 +138,11 @@ auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) ->
 void unpclp();
 
 // Functions
+auto registerThredClipFormat() noexcept -> uint32_t {
+  constexpr auto THRED_CLIP_FORMAT = L"threditor"; //
+  return RegisterClipboardFormat(THRED_CLIP_FORMAT);
+}
+
 void clipSelectedForm() {
   auto        firstStitch = 0U; // points to the first stitch in a form
   auto        stitchCount = 0U;
@@ -155,7 +160,7 @@ void clipSelectedForm() {
 	return;
   }
   EmptyClipboard();
-  auto const thrEdClip       = RegisterClipboardFormat(THRED_CLIP_FORMAT);
+  auto const thrEdClip       = registerThredClipFormat();
   auto*      clipFormHeader  = gsl::narrow_cast<FORM_CLIP*>(GlobalLock(clipHandle));
   clipFormHeader->clipType   = CLP_FRM;
   clipFormHeader->form       = form;
@@ -255,7 +260,7 @@ void clipSelectedForms() {
 	return;
   }
   EmptyClipboard();
-  auto const thrEdClip       = RegisterClipboardFormat(THRED_CLIP_FORMAT);
+  auto const thrEdClip       = registerThredClipFormat();
   auto*      clipFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
   clipFormsHeader->clipType  = CLP_FRMS;
   wrap::narrow(clipFormsHeader->formCount, Instance->selectedFormList.size());
@@ -414,7 +419,7 @@ void clipSelectedPoints() {
 	return;
   }
   EmptyClipboard();
-  auto const thrEdClip    = RegisterClipboardFormat(THRED_CLIP_FORMAT);
+  auto const thrEdClip    = registerThredClipFormat();
   auto*      clipHeader   = gsl::narrow_cast<FORM_VERTEX_CLIP*>(GlobalLock(clipHandle));
   clipHeader->clipType    = CLP_FRMPS;
   clipHeader->vertexCount = SelectedFormVertices.vertexCount;
@@ -705,7 +710,7 @@ void tfc::rtrclp() {
 auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  auto const thrEdClip = RegisterClipboardFormat(THRED_CLIP_FORMAT);
+  auto const thrEdClip = registerThredClipFormat();
   ClipMemory           = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
 	if (auto* clipPointer = GlobalLock(ClipMemory); clipPointer != nullptr) {
@@ -964,7 +969,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 }
 
 void tfc::txtclp(FRM_HEAD& textureForm) {
-  auto const thrEdClip = RegisterClipboardFormat(THRED_CLIP_FORMAT);
+  auto const thrEdClip = registerThredClipFormat();
   if (0U == thrEdClip) {
 	return;
   }
