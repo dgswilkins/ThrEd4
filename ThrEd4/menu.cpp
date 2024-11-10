@@ -65,6 +65,7 @@ auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
 auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
 auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
 auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
+auto MainMenu       = gsl::narrow_cast<HMENU>(nullptr); // main menu
 auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
 auto MenuInfo       = MENUITEMINFO {};
@@ -430,6 +431,7 @@ void menu::redfils(std::array<uint32_t, OLDNUM> const& lruMenuId, std::vector<fs
 }
 
 void menu::init() noexcept {
+  MainMenu       = GetMenu(ThrEdWindow);
   FillMenu       = GetSubMenu(MainMenu, M_FILL);
   FileMenu       = GetSubMenu(MainMenu, M_FILE);
   EditMenu       = GetSubMenu(MainMenu, M_EDIT);

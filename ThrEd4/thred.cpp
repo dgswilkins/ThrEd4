@@ -4282,7 +4282,6 @@ void init() {
   ReleaseDC(nullptr, deviceContext);
   Instance->TexturePointsBuffer.clear();
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
-  MainMenu   = GetMenu(ThrEdWindow);
   menu::init();
   menu::qchk();
   mouse::crtcurs();

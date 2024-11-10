@@ -174,7 +174,6 @@ extern F_POINT LastPoint;
 extern float   LineSpacing;
 extern F_POINT LowerLeftStitch;
 
-extern HMENU MainMenu;
 extern HWND  MainStitchWin;
 
 extern float MinStitchLength;
