@@ -166,7 +166,7 @@ void clipSelectedForm() {
   clipFormHeader->clipType   = CLP_FRM;
   clipFormHeader->form       = form;
   auto*      ptrFormVertices = convertFromPtr<F_POINT*>(std::next(clipFormHeader));
-  auto const startVertex     = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+  auto const startVertex     = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
   auto const endVertex       = wrap::next(startVertex, form.vertexCount);
 
   auto const vertices = gsl::span {ptrFormVertices, form.vertexCount};
@@ -284,7 +284,7 @@ void clipSelectedForms() {
   for (auto& selectedForm : Instance->selectedFormList) {
 	auto& form = formList.operator[](selectedForm);
 
-	auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+	auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	for (auto iSide = 0U; iSide < form.vertexCount; ++iSide) {
 	  formVertices[iVertex++] = *itVertex;
 	  ++itVertex;
@@ -430,7 +430,7 @@ void clipSelectedPoints() {
   auto const vertices = gsl::span {ptrVertices, wrap::toSize(SelectedFormVertices.vertexCount) + 1U};
   auto const& form = Instance->formList.operator[](ClosestFormToCursor);
 
-  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
   auto       iSource  = SelectedFormVertices.start;
   for (auto& vertex : vertices) {
 	auto sourceIt = wrap::next(itVertex, iSource);
@@ -618,7 +618,7 @@ void sizclp(FRM_HEAD const& form,
             uint32_t&       formStitchCount,
             uint32_t&       length,
             uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>) {
-  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->FormVertices);
+  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->formVertices);
   length = fileSize;
   if (form.type == SAT && form.satinGuideCount != 0U) {
 	fileSize += form.satinGuideCount * wrap::sizeofType(Instance->satinGuides);
@@ -641,7 +641,7 @@ void sizclp(FRM_HEAD const& form,
 
 auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) +
-                  (form.vertexCount * wrap::sizeofType(Instance->FormVertices));
+                  (form.vertexCount * wrap::sizeofType(Instance->formVertices));
   if (form.type == SAT && form.satinGuideCount != 0U) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(Instance->satinGuides);
   }
@@ -720,7 +720,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		thred::duzrat();
 		auto const byteCount =
 		    sizeof(*ptrFormVertexData) + ((wrap::toSize(ptrFormVertexData->vertexCount) + 1U) *
-		                                  wrap::sizeofType(Instance->FormVertices));
+		                                  wrap::sizeofType(Instance->formVertices));
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const ptrClip        = convertFromPtr<uint8_t*>(clipPointer);
 		auto const  clips          = gsl::span {ptrClip, byteCount};
@@ -731,7 +731,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		if (Instance->StateMap.test(StateFlag::FRMPSEL)) {
 		  // clang-format off
 		  auto& form     = Instance->formList.operator[](ClosestFormToCursor);
-		  auto  itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+		  auto  itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 		  // clang-format on
 		  auto& interleaveSequence = Instance->InterleaveSequence;
 
@@ -756,10 +756,10 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto formIter          = FRM_HEAD {};
 		  formIter.type          = FRMLINE;
 		  formIter.vertexCount   = ptrFormVertexData->vertexCount + 1U;
-		  formIter.vertexIndex   = wrap::toUnsigned(Instance->FormVertices.size());
+		  formIter.vertexIndex   = wrap::toUnsigned(Instance->formVertices.size());
 		  auto*      ptrVertices = convertFromPtr<F_POINT*>(std::next(ptrFormVertexData));
 		  auto const vertices    = gsl::span {ptrVertices, formIter.vertexCount};
-		  Instance->FormVertices.insert(Instance->FormVertices.end(), vertices.begin(), vertices.end());
+		  Instance->formVertices.insert(Instance->formVertices.end(), vertices.begin(), vertices.end());
 		  Instance->formList.push_back(formIter);
 		  ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
 		  Instance->StateMap.set(StateFlag::INIT);
@@ -790,10 +790,10 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
 		  auto&      form   = formList.operator[](offset);
-		  form.vertexIndex  = wrap::toUnsigned(Instance->FormVertices.size());
+		  form.vertexIndex  = wrap::toUnsigned(Instance->formVertices.size());
 		  auto const formVertices =
 		      gsl::span {ptrFormVertices, wrap::toSize(currentVertex + form.vertexCount)};
-		  Instance->FormVertices.insert(Instance->FormVertices.end(),
+		  Instance->formVertices.insert(Instance->formVertices.end(),
 		                                wrap::next(formVertices.begin(), currentVertex),
 		                                formVertices.end());
 		  currentVertex += form.vertexCount;
@@ -905,10 +905,10 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto formIter = ptrClipFormHeader->form;
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
-		  formIter.vertexIndex   = wrap::toUnsigned(Instance->FormVertices.size());
+		  formIter.vertexIndex   = wrap::toUnsigned(Instance->formVertices.size());
 		  auto*      ptrVertices = convertFromPtr<F_POINT*>(std::next(ptrClipFormHeader));
 		  auto const vertices    = gsl::span {ptrVertices, formIter.vertexCount};
-		  Instance->FormVertices.insert(Instance->FormVertices.end(), vertices.begin(), vertices.end());
+		  Instance->formVertices.insert(Instance->formVertices.end(), vertices.begin(), vertices.end());
 		  auto* ptrGuides = convertFromPtr<SAT_CON*>(wrap::next(ptrVertices, formIter.vertexCount));
 		  if (formIter.type == SAT && formIter.satinGuideCount != 0U) {
 			auto const guides        = gsl::span {ptrGuides, formIter.satinGuideCount};

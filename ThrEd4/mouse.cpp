@@ -112,7 +112,7 @@ void moveForms() {
 	// clang-format off
 	  auto&      form            = formList.operator[](ClosestFormToCursor);
 	  auto       iSelectedVertex = SelectedFormVertices.start;
-	  auto const itVertex        = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+	  auto const itVertex        = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	// clang-format on
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 	  auto const thisIt = wrap::next(itVertex, iSelectedVertex);
@@ -450,7 +450,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ClosestFormToCursor = wrap::toUnsigned(formList.size() - iForm - 1U);
 	  // clang-format off
 	  auto& form     = formList.operator[](ClosestFormToCursor);
-	  auto  itVertex = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+	  auto  itVertex = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		*itVertex += FormMoveDelta;

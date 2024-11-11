@@ -456,9 +456,9 @@ void dutrac() {
   decLen(decimatedLine, tracedPoints);
 #endif
   auto form        = FRM_HEAD {};
-  form.vertexIndex = wrap::toUnsigned(Instance->FormVertices.size());
-  decForm(tracedPoints, Instance->FormVertices);
-  form.vertexCount     = wrap::toUnsigned(Instance->FormVertices.size() - form.vertexIndex);
+  form.vertexIndex = wrap::toUnsigned(Instance->formVertices.size());
+  decForm(tracedPoints, Instance->formVertices);
+  form.vertexCount     = wrap::toUnsigned(Instance->formVertices.size() - form.vertexIndex);
   form.type            = FRMFPOLY;
   form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   form.satinGuideCount = 0;

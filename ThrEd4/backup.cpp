@@ -93,10 +93,10 @@ void redbak() {
 	auto const span = gsl::span {undoData->forms, undoData->formCount};
 	formList.insert(formList.end(), span.begin(), span.end());
   }
-  Instance->FormVertices.clear();
+  Instance->formVertices.clear();
   if (undoData->vertexCount != 0U) {
 	auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
-	Instance->FormVertices.insert(Instance->FormVertices.end(), span.begin(), span.end());
+	Instance->formVertices.insert(Instance->formVertices.end(), span.begin(), span.end());
   }
   Instance->satinGuides.clear();
   if (undoData->guideCount != 0U) {
@@ -133,7 +133,7 @@ void backup::dudat() {
 
   auto const size =
       wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
-      wrap::sizeofVector(Instance->FormVertices) + wrap::sizeofVector(Instance->clipPoints) +
+      wrap::sizeofVector(Instance->formVertices) + wrap::sizeofVector(Instance->clipPoints) +
       wrap::sizeofVector(Instance->satinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
       wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
@@ -155,16 +155,16 @@ void backup::dudat() {
 	auto const spStitches = gsl::span {backupData->stitches, Instance->StitchBuffer.size()};
 	std::ranges::copy(Instance->StitchBuffer, spStitches.begin());
   }
-  backupData->vertexCount = wrap::toUnsigned(Instance->FormVertices.size());
+  backupData->vertexCount = wrap::toUnsigned(Instance->formVertices.size());
   backupData->vertices    = convertFromPtr<F_POINT*>(
       std::next(backupData->stitches, wrap::toPtrdiff(Instance->StitchBuffer.size())));
-  if (!Instance->FormVertices.empty()) {
-	auto const spVertices = gsl::span {backupData->vertices, Instance->FormVertices.size()};
-	std::ranges::copy(Instance->FormVertices, spVertices.begin());
+  if (!Instance->formVertices.empty()) {
+	auto const spVertices = gsl::span {backupData->vertices, Instance->formVertices.size()};
+	std::ranges::copy(Instance->formVertices, spVertices.begin());
   }
   backupData->guideCount = wrap::toUnsigned(Instance->satinGuides.size());
   backupData->guide      = convertFromPtr<SAT_CON*>(
-      std::next(backupData->vertices, wrap::toPtrdiff(Instance->FormVertices.size())));
+      std::next(backupData->vertices, wrap::toPtrdiff(Instance->formVertices.size())));
   if (!Instance->satinGuides.empty()) {
 	auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
 	std::ranges::copy(Instance->satinGuides, spGuides.begin());

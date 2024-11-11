@@ -337,7 +337,7 @@ void addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
 	       interleaveSequenceIndices.operator[](iSequence).color;
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  if (!Instance->StateMap.testAndSet(StateFlag::DIDSTRT)) {
-		auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillStart);
+		auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + form.fillStart);
 		ilData.output +=
 		    gucon(form,
 		          Instance->StitchBuffer,
@@ -441,7 +441,7 @@ void chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t co
   if (isfil(form)) {
 	Instance->StateMap.set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
-	  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillEnd);
+	  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + form.fillEnd);
 	  ilData.output +=
 	      gucon(form, buffer, Instance->InterleaveSequence.back(), *itVertex, ilData.output, code);
 	}
@@ -529,7 +529,7 @@ void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t cod
   auto const& interleaveSequenceIndices = Instance->interleaveSequenceIndices;
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	if (!Instance->StateMap.testAndSet(StateFlag::DIDSTRT)) {
-	  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.fillStart);
+	  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + form.fillStart);
 	  ilData.output +=
 	      gucon(form,
 	            buffer,
@@ -688,7 +688,7 @@ void fhifn(uint32_t const formIndex, float const length) {
 
   auto const reference = form.rectangle.bottom;
   auto const ratio     = length / (form.rectangle.top - reference);
-  auto       itVertex  = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+  auto       itVertex  = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->y = (itVertex->y - reference) * ratio + reference;
 	++itVertex;
@@ -731,14 +731,14 @@ void fncwlk(FRM_HEAD& form) {
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
 	if (form.wordParam != 0U) {
-	  auto const thisVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + form.wordParam);
+	  auto const thisVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
 	  Instance->OSequence.emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
 	                                   wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide =
 	    wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex + form.satinGuideCount - 1U);
-	auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+	auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
@@ -756,13 +756,13 @@ void fncwlk(FRM_HEAD& form) {
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  start = form.fillStart;
 	}
-	auto endVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
+	auto endVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + start);
 	Instance->OSequence.push_back(*endVertex);
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < form.vertexCount / 2U; ++iGuide) {
-	  auto const startVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
-	  auto const finishVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + finish);
+	  auto const startVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + start);
+	  auto const finishVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + finish);
 	  if (auto const pnt = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
 	                                wrap::midl(finishVertex->y, startVertex->y)};
 	      form::cisin(form, pnt.x, pnt.y)) {
@@ -771,7 +771,7 @@ void fncwlk(FRM_HEAD& form) {
 	  start  = form::nxt(form, start);
 	  finish = form::prv(form, finish);
 	}
-	endVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
+	endVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + start);
 	Instance->OSequence.push_back(*endVertex);
   }
   ritwlk(form, CWLKMSK);
@@ -953,7 +953,7 @@ void fwidfn(uint32_t const formIndex, float const length) {
 
   auto const reference = form.rectangle.left;
   auto const ratio     = length / (form.rectangle.right - reference);
-  auto       itVertex  = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+  auto       itVertex  = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x = (itVertex->x - reference) * ratio + reference;
 	++itVertex;
@@ -1179,7 +1179,7 @@ void nudfn(F_RECTANGLE const& designSizeRect) noexcept {
   for (auto& stitch : Instance->StitchBuffer) {
 	sadj(stitch, designSizeRatio, designSizeRect);
   }
-  for (auto& formVertice : Instance->FormVertices) {
+  for (auto& formVertice : Instance->formVertices) {
 	sadj(formVertice, designSizeRatio, designSizeRect);
   }
 }
@@ -1783,7 +1783,7 @@ void xt::fethr() {
 auto xt::insid(FRM_HEAD const& form) -> std::vector<F_POINT>& {
   satin::satout(form, fabs(form.underlayIndent));
   if (form.underlayIndent > 0) {
-	auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+	auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  if (!form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
 		InsidePoints->operator[](iVertex) = *itVertex;

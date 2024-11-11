@@ -109,7 +109,7 @@ void checkClip(const uint32_t&       clipDifference,
 	return;
   }
   if (clipDifference < Instance->clipPoints.size()) {
-	form.clipCount = wrap::toUnsigned(Instance->FormVertices.size() - clipDifference);
+	form.clipCount = wrap::toUnsigned(Instance->formVertices.size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipCount);
 	auto const startClip   = wrap::next(Instance->clipPoints.cbegin(), form.clipIndex);
 	auto const endClip     = wrap::next(startClip, form.clipCount);
@@ -139,7 +139,7 @@ void checkEdgeClip(const uint32_t&       clipDifference,
 	return;
   }
   if (clipDifference < Instance->clipPoints.size()) {
-	wrap::narrow(form.clipEntries, Instance->FormVertices.size() - clipDifference);
+	wrap::narrow(form.clipEntries, Instance->formVertices.size() - clipDifference);
 	clipPoint.resize(clipPoint.size() + form.clipEntries);
 	auto const startClip   = wrap::next(Instance->clipPoints.cbegin(), form.borderClipData);
 	auto const endClip     = wrap::next(startClip, form.clipEntries);
@@ -260,7 +260,7 @@ auto frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 		break;
 	  }
 	}
-	if (badData.flt != Instance->FormVertices.size()) {
+	if (badData.flt != Instance->formVertices.size()) {
 	  badData.attribute |= BADFLT;
 	}
 	if (badData.clip != Instance->clipPoints.size()) {
@@ -312,8 +312,8 @@ void repflt(std::wstring& repairMessage) {
   auto vertexPoint = std::vector<F_POINT> {};
   auto iVertex     = 0U;
   for (auto iForm = 0U; auto& form : formList) {
-	if (Instance->FormVertices.size() >= wrap::toSize(form.vertexIndex) + form.vertexCount) {
-	  auto const startVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+	if (Instance->formVertices.size() >= wrap::toSize(form.vertexIndex) + form.vertexCount) {
+	  auto const startVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	  auto const endVertex   = wrap::next(startVertex, form.vertexCount);
 	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
 	  form.vertexIndex = iVertex;
@@ -322,10 +322,10 @@ void repflt(std::wstring& repairMessage) {
 	  ++iForm;
 	  continue;
 	}
-	if (form.vertexIndex < Instance->FormVertices.size()) {
-	  wrap::narrow(form.vertexCount, Instance->FormVertices.size() - form.vertexIndex);
+	if (form.vertexIndex < Instance->formVertices.size()) {
+	  wrap::narrow(form.vertexCount, Instance->formVertices.size() - form.vertexIndex);
 	  satin::delsac(iForm);
-	  auto const startVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+	  auto const startVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	  auto const endVertex   = wrap::next(startVertex, form.vertexCount);
 	  vertexPoint.insert(vertexPoint.end(), startVertex, endVertex);
 	  bcup(form, badData);
@@ -340,7 +340,7 @@ void repflt(std::wstring& repairMessage) {
 	adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(formList.size()));
 	break;
   }
-  Instance->FormVertices = std::move(vertexPoint);
+  Instance->formVertices = std::move(vertexPoint);
 }
 
 void repsat() {
@@ -351,7 +351,7 @@ void repsat() {
 	  continue;
 	}
 	auto const guideDifference = form.satinGuideIndex;
-	if (Instance->FormVertices.size() > wrap::toSize(guideDifference) + form.vertexCount) {
+	if (Instance->formVertices.size() > wrap::toSize(guideDifference) + form.vertexCount) {
 	  auto const startGuide  = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
 	  auto const destination = wrap::next(Instance->satinGuides.begin(), guideCount);

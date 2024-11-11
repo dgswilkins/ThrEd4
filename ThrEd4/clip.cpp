@@ -133,7 +133,7 @@ void clpcrnr(FRM_HEAD const&       form,
              uint32_t const        vertex,
              F_POINT const&        rotationCenter) {
   auto const  nextVertex = form::nxt(form, vertex);
-  auto const  itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + nextVertex);
+  auto const  itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + nextVertex);
   auto const* points   = Instance->StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (nullptr == points) {
 	return;
@@ -170,7 +170,7 @@ auto clpsid(uint32_t const              vertexIndex,
             uint32_t const              start,
             uint32_t const              finish,
             F_POINT const&              rotationCenter) -> bool {
-  auto const itVertex       = wrap::next(Instance->FormVertices.cbegin(), vertexIndex);
+  auto const itVertex       = wrap::next(Instance->formVertices.cbegin(), vertexIndex);
   auto const itFinishVertex = wrap::next(itVertex, finish);
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const delta =
@@ -397,7 +397,7 @@ void fxlen(FRM_HEAD const&           form,
            std::vector<float> const& listCOSINEs) {
   auto       moveToCoords  = F_POINT {}; // moving formOrigin for clipboard fill
   auto       flag          = true;
-  auto const itFirstVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+  auto const itFirstVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
   auto const vNext         = std::next(itFirstVertex);
   auto const minimumLength = form.edgeSpacing * form.edgeSpacing;
   for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(itFirstVertex, form.vertexCount));
@@ -512,7 +512,7 @@ void fxlin(uint32_t const            vertexIndex,
   }
   stitchPoint = moveToCoords;
   chainEndPoints.push_back(stitchPoint);
-  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + nextStart);
+  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), vertexIndex + nextStart);
   auto const length   = std::hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
   auto const count    = wrap::floor<uint32_t>(length / adjustedSpace);
   auto const delta =
@@ -537,7 +537,7 @@ void fxlit(uint32_t const            vertexIndex,
   }
   stitchPoint = moveToCoords;
   ++adjCount;
-  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + nextStart);
+  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), vertexIndex + nextStart);
   auto const length   = std::hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
   auto const count    = std::floor(length / adjustedSpace);
   auto const delta =
@@ -554,7 +554,7 @@ auto fxpnt(uint32_t const            vertexIndex,
            F_POINT const&            stitchPoint,
            float const               adjustedSpace,
            uint32_t const            nextStart) noexcept(!std::is_same_v<ptrdiff_t, int>) -> bool {
-  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + nextStart);
+  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), vertexIndex + nextStart);
   moveToCoords        = *itVertex;
   auto length         = std::hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
   if (length <= adjustedSpace) {
@@ -580,7 +580,7 @@ void lincrnr(uint32_t const              vertexIndex,
              uint32_t const              currentSide,
              F_POINT&                    stitchPoint,
              F_POINT const&              borderClipReference) {
-  auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + currentSide + 2);
+  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), vertexIndex + currentSide + 2);
   auto       moveToCoords = *itVertex; // intended copy
   if (!nupnt(clipAngle, moveToCoords, stitchPoint)) {
 	return;
@@ -606,7 +606,7 @@ void linsid(uint32_t const              vertexIndex,
             uint32_t const              currentSide,
             F_POINT&                    stitchPoint,
             F_POINT const&              borderClipReference) {
-  auto const itVertex  = wrap::next(Instance->FormVertices.cbegin(), vertexIndex + currentSide + 1);
+  auto const itVertex  = wrap::next(Instance->formVertices.cbegin(), vertexIndex + currentSide + 1);
   auto const length    = std::hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
   auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
   if (clipCount == 0U) {
@@ -652,8 +652,8 @@ void picfn(FRM_HEAD const&       form,
            uint32_t const        finish,
            float                 spacing,
            F_POINT const&        rotationCenter) {
-  auto const itStartVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + start);
-  auto const itFinishVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + finish);
+  auto const itStartVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + start);
+  auto const itFinishVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + finish);
   auto const delta =
       F_POINT {(itFinishVertex->x - itStartVertex->x), (itFinishVertex->y - itStartVertex->y)};
   auto       rotationAngle = std::atan2(-delta.x, delta.y);
@@ -721,7 +721,7 @@ void setvct(uint32_t const vertexIndex,
             uint32_t const finish,
             float&         clipAngle,
             F_POINT&       vector0) noexcept(!std::is_same_v<ptrdiff_t, int>) {
-  auto const itVertex       = wrap::next(Instance->FormVertices.cbegin(), vertexIndex);
+  auto const itVertex       = wrap::next(Instance->formVertices.cbegin(), vertexIndex);
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);
   clipAngle = std::atan2(itFinishVertex->y - itStartVertex->y, itFinishVertex->x - itStartVertex->x);
@@ -884,7 +884,7 @@ void clip::clpout(float const width) {
   satin::satout(form, ClipRectSize.cy);
   auto& insidePointList = Instance->insidePointList;
   insidePointList.clear();
-  auto const itStartVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+  auto const itStartVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
   auto const itEndVertex   = wrap::next(itStartVertex, form.vertexCount);
   insidePointList.insert(insidePointList.end(), itStartVertex, itEndVertex);
   InsidePoints = &insidePointList;
@@ -903,7 +903,7 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t co
   ClipReference = F_POINT {clipRect.left, rotationCenter.y};
   durev(clipRect, clipReversedData);
   if (form.type == FRMLINE) {
-	auto const itVertex    = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+	auto const itVertex    = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	auto       stitchPoint = *itVertex;
 	auto       clipAngle   = 0.0F;       // for clipboard border fill
 	auto       vector0     = F_POINT {}; // x size of the clipboard fill at the fill angle
@@ -973,7 +973,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
 	picfn(form, clipRect, clipFillData, form.vertexCount - 2, form.vertexCount - 1, form.edgeSpacing, rotationCenter);
 	return;
   }
-  auto itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex);
+  auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
   if (form.fillType == 0U) {
 	Instance->OSequence.push_back(*itVertex);
   }

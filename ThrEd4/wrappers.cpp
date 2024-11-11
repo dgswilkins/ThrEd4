@@ -94,5 +94,5 @@ auto wrap::createPen(int32_t const iStyle, int32_t const width, COLORREF const c
 }
 
 auto wrap::getFormVertices() noexcept -> std::vector<F_POINT>& {
-  return Instance->FormVertices;
+  return Instance->formVertices;
 }

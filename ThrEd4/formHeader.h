@@ -232,7 +232,7 @@ class FRM_HEAD
   uint8_t     fillColor {};           // fill color
   uint8_t     borderColor {};         // border color
   uint32_t    clipEntries {};         // number of border clipboard entries
-  uint32_t    vertexIndex {};         // index into FormVertices
+  uint32_t    vertexIndex {};         // index into formVertices
   uint32_t    satinGuideIndex {};     // satin guidelines
   float       clipFillAngle {};       // clipboard fill angle
   uint32_t    borderClipData {};      // pointer to start of border clipboard data

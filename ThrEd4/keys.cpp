@@ -260,7 +260,7 @@ auto handleLeftKey(bool& retflag) -> bool {
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		  auto const itVertex =
-		      wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
+		      wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*itVertex);
 		  thred::shftflt(*itVertex);
 		  Instance->StateMap.set(StateFlag::RESTCH);
@@ -309,7 +309,7 @@ auto handleRightKey(bool& retflag) -> bool {
 		  ClosestVertexToCursor = form::nxt(formList.operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		  auto const itVertex =
-		      wrap::next(Instance->FormVertices.cbegin(),
+		      wrap::next(Instance->formVertices.cbegin(),
 		                 formList.operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*itVertex);
 		  thred::shftflt(*itVertex);

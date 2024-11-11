@@ -338,7 +338,7 @@ auto nuBit() noexcept -> BOOL {
 
 void pxlin(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {
   auto       line     = std::array<POINT, 2> {};
-  auto const vertexIt = wrap::next(Instance->FormVertices.begin(), form.vertexIndex);
+  auto const vertexIt = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
   auto const vStart   = wrap::next(vertexIt, start);
   auto const vFinish  = wrap::next(vertexIt, finish);
 
