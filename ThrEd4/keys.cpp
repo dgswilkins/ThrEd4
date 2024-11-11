@@ -256,7 +256,7 @@ auto handleLeftKey(bool& retflag) -> bool {
 	  }
 	  else {
 		if (Instance->StateMap.test(StateFlag::FRMPSEL)) {
-		  auto const& form      = Instance->FormList.operator[](ClosestFormToCursor);
+		  auto const& form      = Instance->formList.operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		  auto const itVertex =
@@ -304,7 +304,7 @@ auto handleRightKey(bool& retflag) -> bool {
 	  }
 	  else {
 		if (Instance->StateMap.test(StateFlag::FRMPSEL)) {
-		  auto const& formList = Instance->FormList;
+		  auto const& formList = Instance->formList;
 
 		  ClosestVertexToCursor = form::nxt(formList.operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
@@ -340,7 +340,7 @@ auto handleRightKey(bool& retflag) -> bool {
 
 void handleShiftedLeftKey() {
   if (Instance->StateMap.test(StateFlag::FPSEL)) {
-	auto const& vertexCount = Instance->FormList.operator[](ClosestFormToCursor).vertexCount;
+	auto const& vertexCount = Instance->formList.operator[](ClosestFormToCursor).vertexCount;
 	if (!Instance->StateMap.test(StateFlag::PSELDIR)) {
 	  ++SelectedFormVertices.vertexCount %= vertexCount;
 	  SelectedFormVertices.finish =
@@ -386,7 +386,7 @@ void handleShiftedLeftKey() {
 }
 
 void handleShiftedRightKey() {
-  auto const& formList = Instance->FormList;
+  auto const& formList = Instance->formList;
 
   if (Instance->StateMap.test(StateFlag::FPSEL)) {
 	auto const& vertexCount = formList.operator[](ClosestFormToCursor).vertexCount;
@@ -629,7 +629,7 @@ void seldwn() {
 	return;
   }
 
-  if (auto const& formList = Instance->FormList; !formList.empty()) {
+  if (auto const& formList = Instance->formList; !formList.empty()) {
 	if (Instance->StateMap.testAndSet(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor != 0U) {
 		--ClosestFormToCursor;
@@ -656,13 +656,13 @@ void selfrmx() {
   Instance->StateMap.reset(StateFlag::GRPSEL);
   if (Instance->StateMap.testAndReset(StateFlag::FORMSEL)) {
 	Instance->StateMap.set(StateFlag::FRMPSEL);
-	ClosestVertexToCursor = Instance->FormList.operator[](ClosestFormToCursor).vertexCount - 1U;
+	ClosestVertexToCursor = Instance->formList.operator[](ClosestFormToCursor).vertexCount - 1U;
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
 
 void selup() {
-  auto const& formList = Instance->FormList;
+  auto const& formList = Instance->formList;
   if (wrap::pressed(VK_SHIFT)) {
 	Instance->StateMap.reset(StateFlag::SELBOX);
 	if (Instance->StateMap.testAndReset(StateFlag::FORMSEL)) {
@@ -827,7 +827,7 @@ void keys::desiz() {
 	    IDS_STCHS, wrap::toUnsigned(Instance->StitchBuffer.size()), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
 
-  if (auto const& formList = Instance->FormList; !formList.empty()) {
+  if (auto const& formList = Instance->formList; !formList.empty()) {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;

@@ -231,7 +231,7 @@ void displayText::shoseln(uint32_t const code0, uint32_t const code1) {
 }
 
 void displayText::frm1pnt() {
-  if (Instance->FormList.size() == 1) {
+  if (Instance->formList.size() == 1) {
 	Instance->StateMap.set(StateFlag::FORMSEL);
 	ClosestFormToCursor = 0;
   }
@@ -242,7 +242,7 @@ auto displayText::filmsgs(uint32_t const code) -> bool {
 	return clpmsgs(code);
   }
 
-  if (auto const& formList = Instance->FormList; !formList.empty()) {
+  if (auto const& formList = Instance->formList; !formList.empty()) {
 	frm1pnt();
 	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
 	  if (auto const& form = formList.operator[](ClosestFormToCursor); form.vertexCount == 2) {

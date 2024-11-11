@@ -917,7 +917,7 @@ void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std:
 }
 
 void formForms::refrm() {
-  auto& form = Instance->FormList.operator[](ClosestFormToCursor);
+  auto& form = Instance->formList.operator[](ClosestFormToCursor);
   if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
 	Instance->StateMap.reset(StateFlag::WASRT);
@@ -1074,7 +1074,7 @@ void formForms::prfmsg() {
 }
 
 void formForms::frmnum() {
-  auto const& formList = Instance->FormList;
+  auto const& formList = Instance->formList;
 
   if (formList.empty() || !Instance->StateMap.test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);
@@ -1224,7 +1224,7 @@ void formForms::dasyfrm() {
   }
   Instance->StateMap.set(StateFlag::INIT);
   form.outline();
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   formList.push_back(form);
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
@@ -1251,7 +1251,7 @@ void formForms::setear() {
 
   auto twistStep = IniFile.tearTwistStep;
   form::durpoli(IniFile.formSides);
-  auto&      form             = Instance->FormList.back();
+  auto&      form             = Instance->formList.back();
   auto const formVertexIndex  = form.vertexIndex;
   auto const formVertexCount  = form.vertexCount;
   auto       firstVertex      = wrap::next(Instance->FormVertices.begin(), formVertexIndex);
@@ -1332,7 +1332,7 @@ void formForms::wavfrm() {
   points.reserve(IniFile.wavePoints);
   // reuse regular polygon code to build the template for points
   form::durpoli(IniFile.wavePoints);
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   auto&      form            = formList.back();
   auto const formVertexIndex = form.vertexIndex;

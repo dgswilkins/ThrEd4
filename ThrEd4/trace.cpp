@@ -463,7 +463,7 @@ void dutrac() {
   form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   form.satinGuideCount = 0;
   form.outline();
-  Instance->FormList.push_back(form);
+  Instance->formList.push_back(form);
   Instance->StateMap.set(StateFlag::RESTCH);
   Instance->StateMap.set(StateFlag::FRMOF);
   form::tglfrm();
@@ -1218,7 +1218,7 @@ void trace::blak() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  auto const& formList = Instance->FormList;
+  auto const& formList = Instance->formList;
 
   if (formList.empty()) {
 	displayText::tabmsg(IDS_FRMNO, false);

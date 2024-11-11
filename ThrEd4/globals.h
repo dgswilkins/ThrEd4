@@ -85,7 +85,7 @@ class MY_SINGLE
   int32_t                   DPI = 0;
   std::vector<float>        formAngles;
   std::vector<POINT>        formLines;
-  std::vector<FRM_HEAD>     FormList;
+  std::vector<FRM_HEAD>     formList;
   std::wstring              formOnOff;
   std::vector<F_POINT>      FormVertices;
   std::vector<F_POINT>      insidePointList;

@@ -87,7 +87,7 @@ void redbak() {
   }
   UnzoomedRect = undoData->zoomRect;
 
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
   formList.clear();
   if (undoData->formCount != 0U) {
 	auto const span = gsl::span {undoData->forms, undoData->formCount};
@@ -128,7 +128,7 @@ void redbak() {
 void backup::dudat() {
   auto& bufferElement = Instance->UndoBuffer.at(UndoBufferWriteIndex);
   bufferElement.clear();
-  auto const& formList  = Instance->FormList;
+  auto const& formList  = Instance->formList;
   auto const  formCount = wrap::toUnsigned(formList.size());
 
   auto const size =

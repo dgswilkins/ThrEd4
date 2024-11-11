@@ -290,7 +290,7 @@ auto inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept ->
 
 void nutx(uint32_t const formIndex) {
   auto& tempTexturePoints = TextureInstance->TempTexturePoints;
-  auto& formList          = Instance->FormList;
+  auto& formList          = Instance->formList;
 
   if (formList.empty()) {
 	return;
@@ -320,7 +320,7 @@ void nutx(uint32_t const formIndex) {
   auto const itPoint = wrap::next(Instance->TexturePointsBuffer.begin(), index);
   Instance->TexturePointsBuffer.insert(itPoint, tempTexturePoints.cbegin(), tempTexturePoints.cend());
   for (auto spForms =
-           std::ranges::subrange(wrap::next(formList.begin(), formIndex + 1U), Instance->FormList.end());
+           std::ranges::subrange(wrap::next(formList.begin(), formIndex + 1U), Instance->formList.end());
        auto& current : spForms) {
 	if (current.isTexture()) {
 	  current.texture.index += tempPointCount;
@@ -576,7 +576,7 @@ auto txdig(wchar_t const keyCode, wchar_t& character) noexcept -> bool {
 }
 
 void txfn(uint32_t const textureType, uint32_t const formIndex) {
-  auto& form = Instance->FormList.operator[](formIndex);
+  auto& form = Instance->formList.operator[](formIndex);
   clip::delmclp(formIndex);
   if (form.satinGuideCount != 0U) {
 	satin::delsac(formIndex);
@@ -1437,7 +1437,7 @@ void texture::txtrmov(FRM_HEAD const& textureForm) {
 }
 
 void texture::deltx(uint32_t const formIndex) {
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   auto const itForm = wrap::next(formList.begin(), formIndex);
   auto const itNext = std::next(itForm);

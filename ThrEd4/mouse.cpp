@@ -85,7 +85,7 @@ auto chkok() noexcept -> bool {
 }
 
 auto finrng(uint32_t const find) noexcept -> bool {
-  auto const& formList = Instance->FormList;
+  auto const& formList = Instance->formList;
 
   if (auto const& rectFind = formList.operator[](find).rectangle;
       rectFind.left < StitchRangeRect.left || rectFind.right > StitchRangeRect.right ||
@@ -107,7 +107,7 @@ void moveForms() {
   thred::ratsr();
   FormMoveDelta = thred::getMoveDelta(point);
 
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
   if (Instance->StateMap.test(StateFlag::FPSEL)) { // moving a group of form points
 	// clang-format off
 	  auto&      form            = formList.operator[](ClosestFormToCursor);
@@ -369,7 +369,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (Instance->StateMap.testAndReset(StateFlag::FPUNCLP)) { // pasting points into a form
 	thred::savdo();
 	thred::fixpclp(ClosestFormToCursor);
-	Instance->FormList.operator[](ClosestFormToCursor).outline();
+	Instance->formList.operator[](ClosestFormToCursor).outline();
 	return true;
   }
   if (Instance->StateMap.test(StateFlag::FPSEL) && !Instance->StateMap.test(StateFlag::FUNCLP) &&
@@ -445,7 +445,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	                         stitchPoint.y - wrap::midl(formsRect.top, formsRect.bottom)};
 	auto const clipFormsCount = tfc::getClipFormCount();
 	for (auto iForm = 0U; iForm < clipFormsCount; ++iForm) {
-	  auto& formList = Instance->FormList;
+	  auto& formList = Instance->formList;
 
 	  ClosestFormToCursor = wrap::toUnsigned(formList.size() - iForm - 1U);
 	  // clang-format off
@@ -661,7 +661,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	form::setins();
 	return true;
   }
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   if (Instance->StateMap.test(StateFlag::FUNCLP)) { // pasting a form
 	Instance->StateMap.set(StateFlag::INIT);
@@ -1050,7 +1050,7 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	  }
 	  if (Instance->StateMap.testAndReset(StateFlag::NOSEL)) {
 		Instance->selectedFormList.clear();
-		auto const& formList = Instance->FormList;
+		auto const& formList = Instance->formList;
 		// We potentially reserve too much memory, but the cost of reallocation is higher than the
 		// small amount overallocated
 		Instance->selectedFormList.reserve(formList.size());
@@ -1446,7 +1446,7 @@ auto mouse::handleRightButtonDown() -> bool {
 	texture::txtrbut();
 	return true;
   }
-  auto const& formList = Instance->FormList;
+  auto const& formList = Instance->formList;
 
   if (wrap::pressed(VK_SHIFT)) { // If shift is pressed as well
 	if (form::closfrm(ClosestFormToCursor)) {

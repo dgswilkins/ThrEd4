@@ -128,7 +128,7 @@ void filinsbw(std::vector<F_POINT>& satinBackup, F_POINT const& point, uint32_t&
 
 auto nusac(uint32_t const formIndex, uint32_t const guideCount) -> uint32_t {
   auto        guideIndex = 0U;
-  auto const& formList   = Instance->FormList;
+  auto const& formList   = Instance->formList;
   for (auto const formRange = std::ranges::subrange(formList.begin(), wrap::next(formList.begin(), formIndex));
        auto const& form : formRange) {
 	if (form.type == SAT && form.satinGuideCount != 0U) {
@@ -159,7 +159,7 @@ void sacspac(uint32_t const startGuide, uint32_t const guideCount) {
   auto constexpr VAL = SAT_CON {};
   auto const itGuide = wrap::next(Instance->satinGuides.cbegin(), startGuide);
   Instance->satinGuides.insert(itGuide, VAL);
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
   for (auto formRange =
            std::ranges::subrange(wrap::next(formList.begin(), ClosestFormToCursor + 1U), formList.end());
        auto& form : formRange) {
@@ -171,7 +171,7 @@ void sacspac(uint32_t const startGuide, uint32_t const guideCount) {
 
 void satclos() {
   // clang-format off
-  auto&      form              = Instance->FormList.operator[](ClosestFormToCursor);
+  auto&      form              = Instance->formList.operator[](ClosestFormToCursor);
   auto const initialGuideCount = form.satinGuideCount;
   // clang-format on
   form::uninsf();
@@ -560,7 +560,7 @@ auto satOffset(const uint32_t& finish, const uint32_t& start, float const satinW
 }
 
 void satsbrd(uint32_t const formIndex) {
-  auto& currentForm = Instance->FormList.operator[](formIndex);
+  auto& currentForm = Instance->formList.operator[](formIndex);
   clip::deleclp(ClosestFormToCursor);
   currentForm.edgeType = EDGEANGSAT;
   if (Instance->userFlagMap.test(UserFlag::DUND)) {
@@ -576,7 +576,7 @@ void satsbrd(uint32_t const formIndex) {
 auto satselfn() -> bool {
   auto        minimumLength = BIGFLOAT;
   auto const  stitchPoint   = thred::pxCor2stch(WinMsg.pt);
-  auto const& formList      = Instance->FormList;
+  auto const& formList      = Instance->formList;
 
   for (auto const& form : formList) {
 	if (auto const layerCode =
@@ -703,7 +703,7 @@ void unsat() {
 } // namespace
 
 void satin::delsac(uint32_t const formIndex) {
-  auto& formList    = Instance->FormList;
+  auto& formList    = Instance->formList;
   auto& currentForm = formList[formIndex];
   if (Instance->satinGuides.empty() || currentForm.type != SAT || currentForm.satinGuideCount == 0U) {
 	formList[formIndex].satinGuideCount = 0;
@@ -724,7 +724,7 @@ void satin::delsac(uint32_t const formIndex) {
 }
 
 void satin::spltsat(uint32_t const guideIndex) {
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
   {
 	auto const& currentForm = formList.operator[](ClosestFormToCursor);
 	formList.insert(wrap::next(formList.cbegin(), ClosestFormToCursor), currentForm);
@@ -832,7 +832,7 @@ void satin::satsel() {
   if (!satselfn()) {
 	return;
   }
-  auto& form = Instance->FormList.operator[](ClosestFormToCursor);
+  auto& form = Instance->formList.operator[](ClosestFormToCursor);
   thred::duzrat();
   StartPoint = ClosestVertexToCursor;
   auto const itVertex = wrap::next(Instance->FormVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
@@ -1066,8 +1066,8 @@ void satin::satadj(FRM_HEAD& form) {
   if (form.satinGuideCount < savedGuideCount) {
 	auto const iGuide = savedGuideCount - currentGuidesCount;
 	outDebugString(L"Guides adjusted by {}, so updating forms\n", iGuide);
-	std::for_each(wrap::next(Instance->FormList.begin(), ClosestFormToCursor + 1U),
-	              Instance->FormList.end(),
+	std::for_each(wrap::next(Instance->formList.begin(), ClosestFormToCursor + 1U),
+	              Instance->formList.end(),
 	              [iGuide](auto& iForm) {
 	                if (iForm.type == SAT && iForm.satinGuideIndex >= iGuide) {
 		              iForm.satinGuideIndex -= iGuide;
@@ -1080,8 +1080,8 @@ void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
   auto const offset  = form.satinGuideIndex + GuideIndex;
   auto const itGuide = wrap::next(Instance->satinGuides.cbegin(), offset);
   Instance->satinGuides.erase(itGuide);
-  std::for_each(wrap::next(Instance->FormList.begin(), ClosestFormToCursor + 1U),
-                Instance->FormList.end(),
+  std::for_each(wrap::next(Instance->formList.begin(), ClosestFormToCursor + 1U),
+                Instance->formList.end(),
                 [](auto& iForm) {
 	              if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex != 0U) {
 	                --iForm.satinGuideIndex;
@@ -1096,7 +1096,7 @@ void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
 }
 
 void satin::delspnt() {
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   auto& currentForm = formList.operator[](ClosestFormToCursor);
   if (form::chkdel(currentForm)) {
@@ -1178,7 +1178,7 @@ void satin::satbrd() {
   if (!displayText::filmsgs(FML_ANGS)) {
 	return;
   }
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   if (!Instance->selectedFormList.empty()) {
 	for (auto const selectedForm : Instance->selectedFormList) {
@@ -1219,7 +1219,7 @@ void satin::ribon() {
 	displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
 	return;
   }
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
 
   if (formList.operator[](ClosestFormToCursor).vertexCount < 2) {
 	displayText::tabmsg(IDS_FRM2, false);
@@ -1229,7 +1229,7 @@ void satin::ribon() {
   auto const savedFormIndex = ClosestFormToCursor;
   satout(formList.operator[](ClosestFormToCursor), BorderWidth);
   if (formList.empty()) {
-	throw std::runtime_error("FormList is empty");
+	throw std::runtime_error("formList is empty");
   }
   auto       newForm            = FRM_HEAD {};
   auto const currentType        = formList.operator[](ClosestFormToCursor).type;
@@ -1422,7 +1422,7 @@ void satin::satfix() {
   auto&      tempPolygon = SatinInstance->TempPolygon;
   auto const vertexCount = wrap::toUnsigned(tempPolygon.size());
   auto       minSize     = 1U;
-  auto&      formList    = Instance->FormList;
+  auto&      formList    = Instance->formList;
   auto&      form        = formList.back();
   if (form.type == FRMFPOLY) {
 	minSize = 2U;

@@ -172,7 +172,7 @@ void chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
 }
 
 void chkfstch() noexcept {
-  auto const codedFormIndex = Instance->FormList.size() << FRMSHFT;
+  auto const codedFormIndex = Instance->formList.size() << FRMSHFT;
   for (auto& stitch : Instance->StitchBuffer) {
 	if ((stitch.attribute & FRMSK) >= codedFormIndex) {
 	  stitch.attribute = NOTFRM;
@@ -230,7 +230,7 @@ void datmsg(uint32_t const code) {
 
 auto frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
   auto badData = BAD_COUNTS {};
-  if (auto const& formList = Instance->FormList; !formList.empty()) {
+  if (auto const& formList = Instance->formList; !formList.empty()) {
 	for (auto const& form : formList) {
 	  if ((badData.attribute & BADFLT) == 0U) {
 		if (form.vertexCount == 0U) {
@@ -280,7 +280,7 @@ void repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
   auto clipPoint    = std::vector<F_POINT> {};
-  for (auto& form : Instance->FormList) {
+  for (auto& form : Instance->formList) {
 	// NOLINTBEGIN(readability-avoid-nested-conditional-operator)
 	auto const clipDifference = form.isClip()       ? form.clipIndex
 	                            : form.isEdgeClip() ? form.borderClipData
@@ -302,7 +302,7 @@ void repclp(std::wstring& repairMessage) {
 void repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BAD_COUNTS {};
-  auto& formList     = Instance->FormList;
+  auto& formList     = Instance->formList;
   for (auto const& iForm : formList) {
 	if (iForm.vertexCount != 0U) {
 	  formList[iDestination++] = iForm;
@@ -346,7 +346,7 @@ void repflt(std::wstring& repairMessage) {
 void repsat() {
   auto guideCount = 0U;
   auto badData    = BAD_COUNTS {};
-  for (auto& form : Instance->FormList) {
+  for (auto& form : Instance->formList) {
 	if (form.type != SAT || form.satinGuideCount == 0U) {
 	  continue;
 	}
@@ -379,7 +379,7 @@ void repsat() {
 void reptx() {
   auto textureCount = 0U;
   auto badData      = BAD_COUNTS {};
-  for (auto& iForm : Instance->FormList) {
+  for (auto& iForm : Instance->formList) {
 	if (!iForm.isTexture()) {
 	  continue;
 	}
@@ -414,7 +414,7 @@ void reptx() {
 
 void repair::lodchk() {
   thred::delinf();
-  auto& formList = Instance->FormList;
+  auto& formList = Instance->formList;
   if (formList.empty()) {
 	return;
   }
