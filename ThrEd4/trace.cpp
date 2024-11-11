@@ -55,21 +55,6 @@
 #include <type_traits>
 #include <vector>
 
-constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are 9 pixels immediately adjacent
-constexpr auto BLUCOL   = uint32_t {0xff0000U}; // code for the color blue
-constexpr auto BLUMSK   = uint32_t {0x00ffffU}; // mask for the color blue
-constexpr auto BYTEMAXV = uint8_t {255U};       // max color value in a byte wide counter
-constexpr auto CCRATIO  = 1.0F / 255.0F;        // This is used to convert 0-255 to 0-1
-constexpr auto CHANLCNT = uint32_t {3U};        // number of color channels i.e. RGB
-constexpr auto GRNCOL   = uint32_t {0x00ff00U}; // code for the color green
-constexpr auto GRNMSK   = uint32_t {0xff00ffU}; // mask for the color green
-constexpr auto LEVELCNT = uint32_t {256U};      // number of color levels in a byte wide counter
-constexpr auto POINTMAX = size_t {500000U};     // maximum number of trace points to consider
-constexpr auto REDCOL   = uint32_t {0x0000ffU}; // code for the color red
-constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
-constexpr auto TRBASE   = 0.1F;                 // Trace ratio base
-constexpr auto TROFF    = 1.0F;                 // Trace ratio offset
-
 enum TraceWin : int8_t {
   TRWINROW01 = 15,
   TRWINROW02,
@@ -124,43 +109,59 @@ class TRACE_SINGLE
 
 // trace internal namespace
 namespace {
+constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are 9 pixels immediately adjacent
+constexpr auto BYTEMAXV = uint8_t {255U};   // max color value in a byte wide counter
+constexpr auto CCRATIO  = 1.0F / 255.0F;    // This is used to convert 0-255 to 0-1
+constexpr auto CHANLCNT = uint32_t {3U};    // number of color channels i.e. RGB
+constexpr auto LEVELCNT = uint32_t {256U};  // number of color levels in a byte wide counter
+constexpr auto POINTMAX = size_t {500000U}; // maximum number of trace points to consider
+constexpr auto TRBASE   = 0.1F;             // Trace ratio base
+constexpr auto TROFF    = 1.0F;             // Trace ratio offset
+
+// trace colors
+constexpr auto BLUCOL = uint32_t {0xff0000U}; // code for the color blue
+constexpr auto BLUMSK = uint32_t {0x00ffffU}; // mask for the color blue
+constexpr auto GRNCOL = uint32_t {0x00ff00U}; // code for the color green
+constexpr auto GRNMSK = uint32_t {0xff00ffU}; // mask for the color green
+constexpr auto REDCOL = uint32_t {0x0000ffU}; // code for the color red
+constexpr auto REDMSK = uint32_t {0xffff00U}; // mask for the color red
+constexpr auto TRACE_RGB = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
 constexpr auto TRACE_RGB_FLAG = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
 constexpr auto TRACE_RGB_MASK = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
-constexpr auto TRACE_RGB      = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
 constexpr auto TRACE_SHIFT    = std::array {0U, BYTSHFT, WRDSHFT};   // trace shift values
 
-auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
-auto TraceDownWindow    = std::array<HWND, CHANLCNT> {}; // trace down number windows
-auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select windows
-auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number windows
-auto CurrentTracePoint  = POINT {};                      // current point being traced
-auto TraceDataSize      = uint32_t {};                   // size of the trace bitmap in double words
-auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr);    // trace stepSize window
+auto BlackPen          = gsl::narrow_cast<HPEN>(nullptr);   // black pen
+auto ColumnColor       = uint32_t {};                       // trace color column
+auto CurrentTracePoint = POINT {};                          // current point being traced
+auto DownPixelColor    = COLORREF {};                       // color of the down reference pixel
+auto HighColors        = std::array<uint32_t, CHANLCNT> {}; // separated upper reference colors
+auto InvertDownColor   = COLORREF {}; // complement color of the down reference pixel
+auto InvertUpColor     = COLORREF {}; // complement color of the up reference pixel
+auto LowColors         = std::array<uint32_t, CHANLCNT> {};   // separated lower reference colors
 auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
-auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
-auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
-auto UpPixelColor     = COLORREF {};                          // color of the up reference pixel
-auto DownPixelColor   = COLORREF {};                          // color of the down reference pixel
-auto InvertUpColor    = COLORREF {}; // complement color of the up reference pixel
-auto InvertDownColor  = COLORREF {}; // complement color of the down reference pixel
-auto TraceMsgPoint    = POINT {};    // message point for trace parsing
-auto HighColors       = std::array<uint32_t, CHANLCNT> {}; // separated upper reference colors
-auto LowColors        = std::array<uint32_t, CHANLCNT> {}; // separated lower reference colors
-auto ColumnColor      = uint32_t {};                       // trace color column
-auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {};   // red,green,and blue brushes
-auto TraceNumberInput = gsl::narrow_cast<HWND>(nullptr);   // trace number input window
-auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr);   // black pen
+auto TraceBrush       = std::array<HBRUSH, CHANLCNT> {};      // red,green,and blue brushes
+auto TraceDataSize    = uint32_t {};               // size of the trace bitmap in double words
+auto TraceInputBuffer = std::array<wchar_t, 4> {}; // for user input color numbers
+auto TraceMsgIndex    = uint32_t {};               // pointer to the trace buffer
+auto TraceMsgPoint    = POINT {};                  // message point for trace parsing
+auto UpPixelColor     = COLORREF {};               // color of the up reference pixel
 
 TRACE_SINGLE* TraceInstance;
+
+// Trace windows
+auto TraceControlWindow  = std::array<HWND, CHANLCNT> {};     // trace control windows
+auto TraceDownWindow     = std::array<HWND, CHANLCNT> {};     // trace down number windows
+auto TraceSelectWindow   = std::array<HWND, CHANLCNT> {};     // trace select windows
+auto TraceUpWindow       = std::array<HWND, CHANLCNT> {};     // trace up number windows
+auto TraceNumberInput    = gsl::narrow_cast<HWND>(nullptr);   // trace number input window
+auto TraceStepWin        = gsl::narrow_cast<HWND>(nullptr);   // trace stepSize window
 
 // Definitions
 void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst);
 void decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept;
-
 void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
-
 void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
 auto ducolm() -> uint32_t;
 void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
