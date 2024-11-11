@@ -114,28 +114,28 @@ void getfrmbox() {
   displayText::showMessage(IDS_FRMBOX, IniFile.formBoxSizePixels);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::FRMBOXIN);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void getfrmpix() {
   displayText::showMessage(IDS_FRMP, IniFile.formVertexSizePixels);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::FRMPXIN);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void getnpix() {
   displayText::showMessage(IDS_NUDG, IniFile.nudgePixels);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::PIXIN);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void getstpix() {
   displayText::showMessage(IDS_STCHP, IniFile.stitchSizePixels);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::STPXIN);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void hidknot() {

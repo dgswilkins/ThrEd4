@@ -181,7 +181,6 @@ void trcratnum();
 void trcstpnum();
 auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
 void trnumwnd0(int32_t position) noexcept;
-void trnumwnd1(int32_t position) noexcept;
 auto trsum() -> uint32_t;
 
 #if TRCMTH == 0
@@ -766,12 +765,6 @@ void trnumwnd0(int32_t const position) noexcept {
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
-void trnumwnd1(int32_t const position) noexcept {
-  constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
-  GeneralNumberInputBox   = CreateWindowEx(
-      0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
-}
-
 auto trsum() -> uint32_t {
   auto const firstColor = TraceAdjacentColors.front();
   auto const iBegin     = std::next(TraceAdjacentColors.begin());
@@ -1204,7 +1197,7 @@ void trace::dutrnum2() {
 }
 
 void trace::dutrnum1() {
-  DestroyWindow(GeneralNumberInputBox);
+  thred::destroyGeneralNumberInputBox();
   Instance->StateMap.reset(StateFlag::NUMIN);
   Instance->StateMap.reset(StateFlag::TRNIN1);
   auto traceLength = thred::getMsgBufferValue();
@@ -1292,11 +1285,11 @@ void trace::tracpar() {
 			Instance->StateMap.set(StateFlag::TRNIN1);
 			thred::resetMsgBuffer();
 			if (position < TRWINROW05) {
-			  trnumwnd1(ButtonHeight * TRWINROW04);
+			  thred::createTraceNumWin(ButtonHeight * TRWINROW04);
 			  Instance->StateMap.set(StateFlag::TRNUP);
 			}
 			else {
-			  trnumwnd1(ButtonHeight * TRWINROW05);
+			  thred::createTraceNumWin(ButtonHeight * TRWINROW05);
 			  Instance->StateMap.reset(StateFlag::TRNUP);
 			}
 		  }

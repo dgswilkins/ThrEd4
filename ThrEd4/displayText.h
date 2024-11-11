@@ -35,7 +35,6 @@ void grpmsg1();
 void hsizmsg();
 auto loadStr(uint32_t stringID) -> std::wstring;
 void msgflt(uint32_t messageId, float value);
-void numWnd();
 void okcan();
 void pntmsg(uint32_t msgID);
 void riter();

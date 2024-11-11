@@ -754,7 +754,7 @@ void setrpoli() {
   displayText::pntmsg(IDS_REGP);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRPOL);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void setstar() {
@@ -762,7 +762,7 @@ void setstar() {
   displayText::pntmsg(IDS_STAR);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRSTAR);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void setspir() {
@@ -770,7 +770,7 @@ void setspir() {
   displayText::pntmsg(IDS_SPIR);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRSPIR);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void sethart() {
@@ -778,7 +778,7 @@ void sethart() {
   displayText::pntmsg(IDS_HEART);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRHART);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void setlens() {
@@ -786,7 +786,7 @@ void setlens() {
   displayText::pntmsg(IDS_LENS);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRLENS);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void seteg() {
@@ -794,7 +794,7 @@ void seteg() {
   displayText::pntmsg(IDS_EGG);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTREG);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void setzig() {
@@ -802,7 +802,7 @@ void setzig() {
   displayText::pntmsg(IDS_ZIG);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRZIG);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POINT const& point, float& distance) noexcept
@@ -4816,7 +4816,7 @@ void dufcntr(F_POINT& center) noexcept {
 void rotentr(float const rotationAngle) {
   displayText::showMessage(IDS_ROTA, rotationAngle * RADDEGF);
   Instance->StateMap.set(StateFlag::NUMIN);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void fnagain(float const rotationAngle) {

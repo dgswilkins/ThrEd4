@@ -44,7 +44,6 @@
 // ReSharper disable CppUnusedIncludeDirective
 #include <ranges>
 // ReSharper restore CppUnusedIncludeDirective
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -160,44 +159,17 @@ void displayText::hsizmsg() {
   shoMsg(fmtStr, false);
 }
 
-void displayText::numWnd() {
-  auto messageRect = RECT {0L, 0L, 0L, 0L};
-  GetClientRect(MsgWindow, &messageRect);
-  auto wRect = RECT {0L, 0L, 0L, 0L};
-  GetWindowRect(MainStitchWin, &wRect);
-  auto xOffset = wRect.left;
-  GetWindowRect(ThrEdWindow, &wRect);
-  xOffset -= wRect.left;
-  if (nullptr == GeneralNumberInputBox) {
-	GeneralNumberInputBox = CreateWindow(L"STATIC",
-	                                     nullptr,
-	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                     xOffset + 5,
-	                                     messageRect.bottom + 15,
-	                                     ButtonWidthX3,
-	                                     ButtonHeight,
-	                                     ThrEdWindow,
-	                                     nullptr,
-	                                     ThrEdInstance,
-	                                     nullptr);
-  }
-  else {
-	throw std::runtime_error("GeneralNumberInputBox is null"); // we should never reach this
-  }
-  thred::resetMsgBuffer();
-}
-
 void displayText::msgflt(uint32_t const messageId, float const value) {
   showMessage(messageId, value);
   Instance->StateMap.set(StateFlag::NUMIN);
-  numWnd();
+  thred::numWnd();
 }
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float const threadSize) {
   auto const fmtStr = format2(IDS_SIZ, threadSizeText, threadSize);
   shoMsg(fmtStr, true);
   Instance->StateMap.set(StateFlag::NUMIN);
-  numWnd();
+  thred::numWnd();
 }
 
 void displayText::bfilmsg() {

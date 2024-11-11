@@ -2209,7 +2209,7 @@ void xt::setEdit(uint32_t const code, StateFlag const flag) {
   displayText::tabmsg(code, true);
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(flag);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void xt::duspac(float const spacing) {

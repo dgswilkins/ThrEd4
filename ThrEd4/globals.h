@@ -160,7 +160,6 @@ extern HPEN FormPen3px;
 extern HPEN FormPen;
 extern HPEN FormSelectedPen;
 
-extern HWND     GeneralNumberInputBox;
 extern uint32_t GroupEndStitch;
 extern uint32_t GroupStartStitch;
 extern uint32_t GroupStitchIndex;

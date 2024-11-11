@@ -53,7 +53,6 @@ F_POINT                        FormMoveDelta             = F_POINT {}; // offset
 HPEN                           FormPen                   = nullptr; // form pen
 HPEN                           FormPen3px                = nullptr; // three-pixel form pen
 HPEN                           FormSelectedPen           = nullptr; // form select pen
-HWND                           GeneralNumberInputBox     = nullptr; // general number input box
 uint32_t                       GroupEndStitch            = 0U;      // higher end of selected stitches
 uint32_t                       GroupStartStitch          = 0U;      // lower end of selected stitches
 uint32_t                       GroupStitchIndex          = 0U;      // last point selected in group

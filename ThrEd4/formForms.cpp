@@ -1082,7 +1082,7 @@ void formForms::frmnum() {
   displayText::showMessage(IDS_FRML, formList.size());
   Instance->StateMap.set(StateFlag::NUMIN);
   Instance->StateMap.set(StateFlag::ENTRFNUM);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 void formForms::dasyfrm() {

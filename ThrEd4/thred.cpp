@@ -341,7 +341,8 @@ constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread s
 
 // windows
 auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
-auto HorizontalScrollBar = gsl::narrow_cast<HWND>(nullptr); // horizontal scroll bar
+auto GeneralNumberInputBox = gsl::narrow_cast<HWND>(nullptr); // general number input box
+auto HorizontalScrollBar   = gsl::narrow_cast<HWND>(nullptr); // horizontal scroll bar
 auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 auto VerticalScrollBar = gsl::narrow_cast<HWND>(nullptr); // vertical scroll bar
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
@@ -6472,7 +6473,7 @@ void segentr(float rotationAngle) {
   }
   displayText::showMessage(IDS_ENTROT, PI_F2 / rotationAngle);
   Instance->StateMap.set(StateFlag::NUMIN);
-  displayText::numWnd();
+  thred::numWnd();
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -12938,4 +12939,44 @@ void thred::selectMultiFormPen() noexcept {
 
 void thred::selectGridPen() noexcept {
   SelectObject(StitchWindowMemDC, GridPen);
+}
+
+void thred::numWnd() {
+  auto messageRect = RECT {0L, 0L, 0L, 0L};
+  GetClientRect(MsgWindow, &messageRect);
+  auto wRect = RECT {0L, 0L, 0L, 0L};
+  GetWindowRect(MainStitchWin, &wRect);
+  auto xOffset = wRect.left;
+  GetWindowRect(ThrEdWindow, &wRect);
+  xOffset -= wRect.left;
+  if (nullptr == GeneralNumberInputBox) {
+	GeneralNumberInputBox = CreateWindow(L"STATIC",
+	                                     nullptr,
+	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                     xOffset + 5,
+	                                     messageRect.bottom + 15,
+	                                     ButtonWidthX3,
+	                                     ButtonHeight,
+	                                     ThrEdWindow,
+	                                     nullptr,
+	                                     ThrEdInstance,
+	                                     nullptr);
+  }
+  else {
+	throw std::runtime_error("GeneralNumberInputBox is null"); // we should never reach this
+  }
+  resetMsgBuffer();
+}
+
+void thred::destroyGeneralNumberInputBox() noexcept {
+  if (nullptr != GeneralNumberInputBox) {
+	DestroyWindow(GeneralNumberInputBox);
+	GeneralNumberInputBox = nullptr;
+  }
+}
+
+void thred::createTraceNumWin(int32_t const position) noexcept {
+  constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
+  GeneralNumberInputBox   = CreateWindowEx(
+      0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
