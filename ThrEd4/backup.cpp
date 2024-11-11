@@ -76,10 +76,10 @@ void redbak() {
 	return;
   }
   auto const* undoData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
-  Instance->StitchBuffer.clear();
+  Instance->stitchBuffer.clear();
   if (undoData->stitchCount != 0U) {
 	auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
-	Instance->StitchBuffer.insert(Instance->StitchBuffer.end(), span.begin(), span.end());
+	Instance->stitchBuffer.insert(Instance->stitchBuffer.end(), span.begin(), span.end());
 	Instance->StateMap.set(StateFlag::INIT);
   }
   else {
@@ -132,7 +132,7 @@ void backup::dudat() {
   auto const  formCount = wrap::toUnsigned(formList.size());
 
   auto const size =
-      wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->StitchBuffer) +
+      wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->stitchBuffer) +
       wrap::sizeofVector(Instance->formVertices) + wrap::sizeofVector(Instance->clipPoints) +
       wrap::sizeofVector(Instance->satinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
       wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
@@ -148,16 +148,16 @@ void backup::dudat() {
 	auto const spForms = gsl::span {backupData->forms, formList.size()};
 	std::ranges::copy(formList, spForms.begin());
   }
-  backupData->stitchCount = wrap::toUnsigned(Instance->StitchBuffer.size());
+  backupData->stitchCount = wrap::toUnsigned(Instance->stitchBuffer.size());
   backupData->stitches =
       convertFromPtr<F_POINT_ATTR*>(std::next(backupData->forms, wrap::toPtrdiff(formCount)));
-  if (!Instance->StitchBuffer.empty()) {
-	auto const spStitches = gsl::span {backupData->stitches, Instance->StitchBuffer.size()};
-	std::ranges::copy(Instance->StitchBuffer, spStitches.begin());
+  if (!Instance->stitchBuffer.empty()) {
+	auto const spStitches = gsl::span {backupData->stitches, Instance->stitchBuffer.size()};
+	std::ranges::copy(Instance->stitchBuffer, spStitches.begin());
   }
   backupData->vertexCount = wrap::toUnsigned(Instance->formVertices.size());
   backupData->vertices    = convertFromPtr<F_POINT*>(
-      std::next(backupData->stitches, wrap::toPtrdiff(Instance->StitchBuffer.size())));
+      std::next(backupData->stitches, wrap::toPtrdiff(Instance->stitchBuffer.size())));
   if (!Instance->formVertices.empty()) {
 	auto const spVertices = gsl::span {backupData->vertices, Instance->formVertices.size()};
 	std::ranges::copy(Instance->formVertices, spVertices.begin());

@@ -1773,8 +1773,8 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
 	}
 	case ID_ADEND: { // add
 	  auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
-	  if (!Instance->StitchBuffer.empty()) {
-		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(Instance->StitchBuffer.size()) - 1U);
+	  if (!Instance->stitchBuffer.empty()) {
+		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(Instance->stitchBuffer.size()) - 1U);
 	  }
 	  thred::endpnt(stitchCoordsInPixels);
 	  Instance->StateMap.set(StateFlag::BAKEND);

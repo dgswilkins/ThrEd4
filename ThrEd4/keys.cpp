@@ -104,23 +104,23 @@ void dufsel() {
 auto handleEndKey(int32_t& retflag) -> bool {
   retflag = 1;
   if (wrap::pressed(VK_SHIFT) && wrap::pressed(VK_CONTROL)) {
-	if (!Instance->StitchBuffer.empty()) {
+	if (!Instance->stitchBuffer.empty()) {
 	  if (Instance->StateMap.testAndReset(StateFlag::SELBOX)) {
-		GroupStitchIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		GroupStitchIndex = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		Instance->StateMap.set(StateFlag::GRPSEL);
 	  }
 	  else {
 		if (Instance->StateMap.test(StateFlag::GRPSEL)) {
 		  if (GroupStitchIndex > ClosestPointIndex) {
-			GroupStitchIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+			GroupStitchIndex = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		  }
 		  else {
-			ClosestPointIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+			ClosestPointIndex = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		  }
 		}
 		else {
 		  Instance->StateMap.set(StateFlag::SELBOX);
-		  ClosestPointIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		  ClosestPointIndex = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		  Instance->StateMap.set(StateFlag::RESTCH);
 		  return true;
 		}
@@ -146,8 +146,8 @@ auto handleEndKey(int32_t& retflag) -> bool {
   else {
 	if (wrap::pressed(VK_CONTROL)) {
 	  auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
-	  if (!Instance->StitchBuffer.empty()) {
-		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(Instance->StitchBuffer.size() - 1U));
+	  if (!Instance->stitchBuffer.empty()) {
+		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(Instance->stitchBuffer.size() - 1U));
 	  }
 	  thred::endpnt(stitchCoordsInPixels);
 	  Instance->StateMap.set(StateFlag::BAKEND);
@@ -163,7 +163,7 @@ auto handleEndKey(int32_t& retflag) -> bool {
 		  thred::setSrchLargest();
 		  return true;
 		}
-		ClosestPointIndex = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		ClosestPointIndex = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 	  }
 	  thred::movbox();
 	}
@@ -317,14 +317,14 @@ auto handleRightKey(bool& retflag) -> bool {
 		}
 		else {
 		  if (Instance->StateMap.test(StateFlag::SELBOX)) {
-			if (ClosestPointIndex < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+			if (ClosestPointIndex < wrap::toUnsigned(Instance->stitchBuffer.size() - 1U)) {
 			  ++ClosestPointIndex;
 			}
 			thred::movbox();
 			return true;
 		  }
 		  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
-			if (GroupStitchIndex < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+			if (GroupStitchIndex < wrap::toUnsigned(Instance->stitchBuffer.size() - 1U)) {
 			  ++GroupStitchIndex;
 			  thred::grpAdj();
 			  thred::redrawColorBar();
@@ -423,8 +423,8 @@ void handleShiftedRightKey() {
 	  Instance->StateMap.reset(StateFlag::LENSRCH);
 	  Instance->StateMap.reset(StateFlag::FORMSEL);
 	  if (Instance->StateMap.testAndReset(StateFlag::SELBOX)) {
-		if (!Instance->StitchBuffer.empty()) {
-		  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		if (!Instance->stitchBuffer.empty()) {
+		  if (auto const lastStitch = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		      ClosestPointIndex < lastStitch) {
 			Instance->StateMap.set(StateFlag::GRPSEL);
 			GroupStitchIndex = ClosestPointIndex + 1U;
@@ -432,8 +432,8 @@ void handleShiftedRightKey() {
 		}
 	  }
 	  else {
-		if (!Instance->StitchBuffer.empty()) {
-		  if (auto const lastStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		if (!Instance->stitchBuffer.empty()) {
+		  if (auto const lastStitch = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		      GroupStitchIndex < lastStitch) {
 			++GroupStitchIndex;
 			thred::nuAct(GroupStitchIndex);
@@ -450,8 +450,8 @@ void istch() {
   thred::xlin();
   thred::xlin1();
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
-	if (ClosestPointIndex != 0U && ClosestPointIndex != wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
-	  auto const prvStitch   = wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex - 1U);
+	if (ClosestPointIndex != 0U && ClosestPointIndex != wrap::toUnsigned(Instance->stitchBuffer.size() - 1U)) {
+	  auto const prvStitch   = wrap::next(Instance->stitchBuffer.begin(), ClosestPointIndex - 1U);
 	  auto const stitch      = std::next(prvStitch);
 	  auto const angb        = std::atan2(stitch->y - prvStitch->y, stitch->x - prvStitch->x);
 	  auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
@@ -463,7 +463,7 @@ void istch() {
 	  }
 	}
 	else {
-	  if (ClosestPointIndex == wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+	  if (ClosestPointIndex == wrap::toUnsigned(Instance->stitchBuffer.size() - 1U)) {
 		--ClosestPointIndex;
 	  }
 	}
@@ -501,7 +501,7 @@ void mark() {
 
 auto movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool {
   auto tempStitchBuffer = std::vector<F_POINT_ATTR> {};
-  if (destination + 1U < wrap::toUnsigned(Instance->StitchBuffer.size())) {
+  if (destination + 1U < wrap::toUnsigned(Instance->stitchBuffer.size())) {
 	++destination;
   }
   if (start > finish) {
@@ -514,24 +514,24 @@ auto movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool {
   if (destination < start) {
 	auto const bufSize = finish - destination;
 	tempStitchBuffer.resize(bufSize);
-	std::copy(wrap::next(Instance->StitchBuffer.begin(), start),
-	          wrap::next(Instance->StitchBuffer.begin(), finish),
+	std::copy(wrap::next(Instance->stitchBuffer.begin(), start),
+	          wrap::next(Instance->stitchBuffer.begin(), finish),
 	          tempStitchBuffer.begin());
-	std::copy(wrap::next(Instance->StitchBuffer.begin(), destination),
-	          wrap::next(Instance->StitchBuffer.begin(), start),
+	std::copy(wrap::next(Instance->stitchBuffer.begin(), destination),
+	          wrap::next(Instance->stitchBuffer.begin(), start),
 	          wrap::next(tempStitchBuffer.begin(), finish - start));
-	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->StitchBuffer.begin(), destination));
+	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->stitchBuffer.begin(), destination));
   }
   else {
 	auto const bufSize = destination - start;
 	tempStitchBuffer.resize(bufSize);
-	std::copy(wrap::next(Instance->StitchBuffer.begin(), finish),
-	          wrap::next(Instance->StitchBuffer.begin(), destination),
+	std::copy(wrap::next(Instance->stitchBuffer.begin(), finish),
+	          wrap::next(Instance->stitchBuffer.begin(), destination),
 	          tempStitchBuffer.begin());
-	std::copy(wrap::next(Instance->StitchBuffer.begin(), start),
-	          wrap::next(Instance->StitchBuffer.begin(), finish),
+	std::copy(wrap::next(Instance->stitchBuffer.begin(), start),
+	          wrap::next(Instance->stitchBuffer.begin(), finish),
 	          wrap::next(tempStitchBuffer.begin(), destination - finish));
-	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->StitchBuffer.begin(), start));
+	std::ranges::copy(tempStitchBuffer, wrap::next(Instance->stitchBuffer.begin(), start));
   }
   return true;
 }
@@ -618,9 +618,9 @@ void seldwn() {
   }
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
 	thred::unbox();
-	auto const attribute = Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK;
+	auto const attribute = Instance->stitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK;
 	while (ClosestPointIndex != 0U &&
-	       (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
+	       (Instance->stitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 	  --ClosestPointIndex;
 	}
 	auto stitchCoordsInPixels = POINT {};
@@ -691,9 +691,9 @@ void selup() {
   }
   if (Instance->StateMap.test(StateFlag::SELBOX)) {
 	thred::unbox();
-	auto const attribute = Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK;
-	while (ClosestPointIndex < wrap::toUnsigned(Instance->StitchBuffer.size() - 1U) &&
-	       (Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
+	auto const attribute = Instance->stitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK;
+	while (ClosestPointIndex < wrap::toUnsigned(Instance->stitchBuffer.size() - 1U) &&
+	       (Instance->stitchBuffer.operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 	  ++ClosestPointIndex;
 	}
 	auto stitchCoordsInPixels = POINT {};
@@ -766,7 +766,7 @@ void keys::ungrplo() {
   }
   auto flag    = true;
   auto iStitch = 0U;
-  for (auto const& stitch : Instance->StitchBuffer) {
+  for (auto const& stitch : Instance->stitchBuffer) {
 	if ((stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 	  ClosestPointIndex = iStitch;
 	  Instance->StateMap.set(StateFlag::SELBOX);
@@ -794,10 +794,10 @@ void keys::ungrphi() {
 	return;
   }
   auto flag = true;
-  for (auto iStitch = wrap::toUnsigned(Instance->StitchBuffer.size()); iStitch != 0; --iStitch) {
+  for (auto iStitch = wrap::toUnsigned(Instance->stitchBuffer.size()); iStitch != 0; --iStitch) {
 	if (auto const prevStitch = iStitch - 1U;
-	    (Instance->StitchBuffer.operator[](prevStitch).attribute & NOTFRM) == 0U &&
-	    (Instance->StitchBuffer.operator[](prevStitch).attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+	    (Instance->stitchBuffer.operator[](prevStitch).attribute & NOTFRM) == 0U &&
+	    (Instance->stitchBuffer.operator[](prevStitch).attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 	  ClosestPointIndex = iStitch - 1U;
 	  Instance->StateMap.set(StateFlag::SELBOX);
 	  Instance->StateMap.set(StateFlag::RESTCH);
@@ -815,7 +815,7 @@ void keys::desiz() {
 
   auto rectangle = F_RECTANGLE {};
   auto info      = std::wstring {};
-  if (!Instance->StitchBuffer.empty()) {
+  if (!Instance->stitchBuffer.empty()) {
 	thred::stchrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
@@ -824,7 +824,7 @@ void keys::desiz() {
 	  info += displayText::loadStr(IDS_STCHOUT);
 	}
 	info += displayText::format5(
-	    IDS_STCHS, wrap::toUnsigned(Instance->StitchBuffer.size()), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
+	    IDS_STCHS, wrap::toUnsigned(Instance->stitchBuffer.size()), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
 
   if (auto const& formList = Instance->formList; !formList.empty()) {
@@ -834,7 +834,7 @@ void keys::desiz() {
 	info += displayText::format5(IDS_FORMS, formList.size(), xSize, xSize * MMTOINCH, ySize, ySize * MMTOINCH);
   }
   info += displayText::format2(IDS_HUPWID, IniFile.hoopSizeX * IPFGRAN, IniFile.hoopSizeY * IPFGRAN);
-  if (!Instance->StitchBuffer.empty()) {
+  if (!Instance->stitchBuffer.empty()) {
 	info += thred::getDesigner();
   }
   displayText::shoMsg(info, true);

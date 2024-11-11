@@ -271,14 +271,14 @@ void dstran(std::vector<DSTREC>& DSTData) {
   auto localStitch       = F_POINT {};
   auto maximumCoordinate = F_POINT {-BIGFLOAT, -BIGFLOAT};
   auto mimimumCoordinate = F_POINT {BIGFLOAT, BIGFLOAT};
-  Instance->StitchBuffer.clear();
-  Instance->StitchBuffer.reserve(DSTData.size()); // we will be reserving a little more than we need
+  Instance->stitchBuffer.clear();
+  Instance->stitchBuffer.reserve(DSTData.size()); // we will be reserving a little more than we need
   for (auto& record : DSTData) {
 	if (constexpr auto C1MASK = 0x40U;
 	    (record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
 	  if (bytesRead >= (wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors)) {
 		color                    = DST::colmatch(colors[iColor++]);
-		auto const currentStitch = wrap::toUnsigned(Instance->StitchBuffer.size() - 1U);
+		auto const currentStitch = wrap::toUnsigned(Instance->stitchBuffer.size() - 1U);
 		thred::addColor(currentStitch, color);
 		continue;
 	  }
@@ -294,7 +294,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
 	  continue;
 	}
 	auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
-	Instance->StitchBuffer.push_back(stitch);
+	Instance->stitchBuffer.push_back(stitch);
 	maximumCoordinate.x = std::max(maximumCoordinate.x, stitch.x);
 	maximumCoordinate.y = std::max(maximumCoordinate.y, stitch.y);
 	mimimumCoordinate.x = std::min(mimimumCoordinate.x, stitch.x);
@@ -314,7 +314,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
   auto const delta =
       F_POINT {((wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F) - mimimumCoordinate.x,
                ((wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F) - mimimumCoordinate.y};
-  for (auto& iStitch : Instance->StitchBuffer) {
+  for (auto& iStitch : Instance->stitchBuffer) {
 	iStitch += delta;
   }
 }
@@ -823,7 +823,7 @@ auto dudbits(SIZE const& dif) -> uint32_t {
 
 void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
   auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
-  dstStitchBuffer.resize(Instance->StitchBuffer.size());
+  dstStitchBuffer.resize(Instance->stitchBuffer.size());
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number
@@ -1085,7 +1085,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   auto dstRecSize = dstRecords.size();
   // There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
   constexpr auto RECRES = size_t {128U}; // testing shows this to be a good value
-  dstRecords.reserve(Instance->StitchBuffer.size() + RECRES);
+  dstRecords.reserve(Instance->stitchBuffer.size() + RECRES);
   auto dstOffset = DST_OFFSETS {};
   ritdst(dstOffset, dstRecords, saveStitches);
   auto dstHeader = DSTHED {};

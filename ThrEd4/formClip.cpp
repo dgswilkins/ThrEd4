@@ -225,16 +225,16 @@ void clipSelectedForm() {
   auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
   auto const spData         = gsl::span {clipStitchData, stitchCount};
   auto       iTexture       = firstStitch;
-  savclp(spData[0], Instance->StitchBuffer.operator[](iTexture), length);
+  savclp(spData[0], Instance->stitchBuffer.operator[](iTexture), length);
   ++iTexture;
   auto       iDestination   = 1U;
   auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
-  while (iTexture < Instance->StitchBuffer.size()) {
-	if ((Instance->StitchBuffer.operator[](iTexture).attribute & FRMSK) == codedAttribute &&
-	    (Instance->StitchBuffer.operator[](iTexture).attribute & NOTFRM) == 0U) {
+  while (iTexture < Instance->stitchBuffer.size()) {
+	if ((Instance->stitchBuffer.operator[](iTexture).attribute & FRMSK) == codedAttribute &&
+	    (Instance->stitchBuffer.operator[](iTexture).attribute & NOTFRM) == 0U) {
 	  savclp(spData[iDestination++],
-	         Instance->StitchBuffer.operator[](iTexture),
-	         Instance->StitchBuffer.operator[](iTexture).attribute & COLMSK);
+	         Instance->stitchBuffer.operator[](iTexture),
+	         Instance->stitchBuffer.operator[](iTexture).attribute & COLMSK);
 	}
 	++iTexture;
   }
@@ -371,9 +371,9 @@ void clipSelectedForms() {
   auto astch = std::vector<F_POINT_ATTR> {};
   // Reserve a reasonable amount space, probably not enough though
   constexpr auto RESRATIO = 16U; // reserve space factor
-  astch.reserve(Instance->StitchBuffer.size() / RESRATIO);
+  astch.reserve(Instance->stitchBuffer.size() / RESRATIO);
   LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
-  for (auto& stitch : Instance->StitchBuffer) {
+  for (auto& stitch : Instance->stitchBuffer) {
 	if ((stitch.attribute & NOTFRM) != 0U || !formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 	  continue;
 	}
@@ -382,7 +382,7 @@ void clipSelectedForms() {
 	astch.push_back(stitch);
   }
   auto const stitchCount = wrap::toUnsigned(astch.size());
-  if (Instance->StitchBuffer.empty() || stitchCount == 0) {
+  if (Instance->stitchBuffer.empty() || stitchCount == 0) {
 	CloseClipboard();
 	return;
   }
@@ -447,8 +447,8 @@ void clipSelectedStitches() {
   if (GroupStartStitch != GroupEndStitch) {
 	LowerLeftStitch = F_POINT {BIGFLOAT, BIGFLOAT};
 	for (auto const groupStitchRange =
-	         std::ranges::subrange(wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
-	                               wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch));
+	         std::ranges::subrange(wrap::next(Instance->stitchBuffer.begin(), GroupStartStitch),
+	                               wrap::next(Instance->stitchBuffer.begin(), GroupEndStitch));
 	     auto& stitch : groupStitchRange) {
 	  LowerLeftStitch.x = std::min(LowerLeftStitch.x, stitch.x);
 	  LowerLeftStitch.y = std::min(LowerLeftStitch.y, stitch.y);
@@ -467,12 +467,12 @@ void clipSelectedStitches() {
 	Clip                      = form::registerPCDFormat();
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span {clipStitchData, length};
-	savclp(spData[0], Instance->StitchBuffer.operator[](iSource), length);
+	savclp(spData[0], Instance->stitchBuffer.operator[](iSource), length);
 	++iSource;
 	for (auto iStitch = 1U; iStitch < length; ++iStitch) {
 	  savclp(spData[iStitch],
-	         Instance->StitchBuffer.operator[](iSource),
-	         Instance->StitchBuffer.operator[](iSource).attribute & COLMSK);
+	         Instance->stitchBuffer.operator[](iSource),
+	         Instance->stitchBuffer.operator[](iSource).attribute & COLMSK);
 	  ++iSource;
 	}
 	GlobalUnlock(clipHandle);
@@ -499,10 +499,10 @@ void dupclp() noexcept(std::is_same_v<size_t, uint32_t>) {
 
 auto frmcnt(uint32_t const iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t {
   auto const codedAttribute = iForm << FRMSHFT;
-  auto       iStitch        = Instance->StitchBuffer.begin();
+  auto       iStitch        = Instance->stitchBuffer.begin();
   auto       stitchCount    = 0U;
   auto       flag           = true;
-  for (; iStitch != Instance->StitchBuffer.end(); ++iStitch) {
+  for (; iStitch != Instance->stitchBuffer.end(); ++iStitch) {
 	if ((iStitch->attribute & FRMSK) == codedAttribute && (iStitch->attribute & ALTYPMSK) != 0U) {
 	  flag = false;
 	  break;
@@ -515,7 +515,7 @@ auto frmcnt(uint32_t const iForm, uint32_t& formFirstStitchIndex) noexcept -> ui
   formFirstStitchIndex = stitchCount;
   stitchCount          = 0U;
   LowerLeftStitch      = F_POINT {BIGFLOAT, BIGFLOAT};
-  for (; iStitch != Instance->StitchBuffer.end(); ++iStitch) {
+  for (; iStitch != Instance->stitchBuffer.end(); ++iStitch) {
 	if ((iStitch->attribute & FRMSK) == codedAttribute && (iStitch->attribute & ALTYPMSK) != 0U) {
 	  LowerLeftStitch.x = std::min(LowerLeftStitch.x, iStitch->x);
 	  LowerLeftStitch.y = std::min(LowerLeftStitch.y, iStitch->y);
@@ -626,7 +626,7 @@ void sizclp(FRM_HEAD const& form,
   if (form.fillType != 0U || form.edgeType != 0U) {
 	formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
 	length += formStitchCount;
-	fileSize += length * wrap::sizeofType(Instance->StitchBuffer);
+	fileSize += length * wrap::sizeofType(Instance->stitchBuffer);
   }
   if (form.isEdgeClip()) {
 	fileSize += form.clipEntries * wrap::sizeofType(Instance->clipPoints);
@@ -690,7 +690,7 @@ void tfc::duclip() {
 	clipSelectedForm();
 	return;
   }
-  if (Instance->StitchBuffer.empty() || !Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stitchBuffer.empty() || !Instance->StateMap.test(StateFlag::GRPSEL)) {
 	return;
   }
   clipSelectedStitches();
@@ -1014,20 +1014,20 @@ void tfc::fpUnClip() {
 void tfc::lodclp(uint32_t iStitch) {
   auto const& clipBuffer = Instance->clipBuffer;
 
-  Instance->StitchBuffer.insert(
-      wrap::next(Instance->StitchBuffer.begin(), iStitch), clipBuffer.size(), F_POINT_ATTR {});
+  Instance->stitchBuffer.insert(
+      wrap::next(Instance->stitchBuffer.begin(), iStitch), clipBuffer.size(), F_POINT_ATTR {});
   ClosestPointIndex  = iStitch;
   auto const originX = wrap::toFloat(ClipOrigin.x);
   auto const originY = wrap::toFloat(ClipOrigin.y);
   for (auto const& clip : clipBuffer) {
-	Instance->StitchBuffer.operator[](iStitch++) =
+	Instance->stitchBuffer.operator[](iStitch++) =
 	    F_POINT_ATTR {clip.x + originX,
 	                  clip.y + originY,
 	                  (clip.attribute & COLMSK) | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM};
   }
   GroupStitchIndex = iStitch - 1U;
   Instance->StateMap.set(StateFlag::GRPSEL);
-  if (!Instance->StitchBuffer.empty()) {
+  if (!Instance->stitchBuffer.empty()) {
 	Instance->StateMap.set(StateFlag::INIT);
   }
 }

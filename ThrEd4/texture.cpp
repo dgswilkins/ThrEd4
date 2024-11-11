@@ -1773,7 +1773,7 @@ void texture::setshft() {
   tempTexturePoints.clear();
   auto line = 1U;
   auto txIn = false;
-  for (auto const& stitch : Instance->StitchBuffer) {
+  for (auto const& stitch : Instance->stitchBuffer) {
 	if (inrct(selectionRect, stitch)) {
 	  txIn = true;
 	  tempTexturePoints.push_back(

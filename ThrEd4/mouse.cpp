@@ -130,7 +130,7 @@ void moveForms() {
 	  for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 		form::frmadj(iForm);
 	  }
-	  for (auto& stitch : Instance->StitchBuffer) {
+	  for (auto& stitch : Instance->stitchBuffer) {
 		stitch += FormMoveDelta;
 	  }
 	  form::selal();
@@ -159,7 +159,7 @@ void rngal() {
   Instance->StateMap.reset(StateFlag::GRPSEL);
   auto iStitch     = 0U;
   auto flagInRange = false;
-  for (; iStitch < wrap::toUnsigned(Instance->StitchBuffer.size()); ++iStitch) {
+  for (; iStitch < wrap::toUnsigned(Instance->stitchBuffer.size()); ++iStitch) {
 	if (thred::inrng(iStitch)) {
 	  if (!flagInRange) {
 		prng.push_back(RANGE {.start = iStitch, .finish = 0U});
@@ -210,10 +210,10 @@ void updateCursor() {
 	  wrap::setCursor(NeedleUpCursor);
 	}
 	else {
-	  if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).x >
-	      Instance->StitchBuffer.operator[](ClosestPointIndex).x) {
-		if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
-		    Instance->StitchBuffer.operator[](ClosestPointIndex).y) {
+	  if (Instance->stitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).x >
+	      Instance->stitchBuffer.operator[](ClosestPointIndex).x) {
+		if (Instance->stitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
+		    Instance->stitchBuffer.operator[](ClosestPointIndex).y) {
 		  wrap::setCursor(NeedleLeftUpCursor);
 		}
 		else {
@@ -221,8 +221,8 @@ void updateCursor() {
 		}
 	  }
 	  else {
-		if (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
-		    Instance->StitchBuffer.operator[](ClosestPointIndex).y) {
+		if (Instance->stitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).y >
+		    Instance->stitchBuffer.operator[](ClosestPointIndex).y) {
 		  wrap::setCursor(NeedleRightUpCursor);
 		}
 		else {
@@ -303,7 +303,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	      (Instance->StateMap.test(StateFlag::SELBOX) || Instance->StateMap.test(StateFlag::GRPSEL))) {
 		thred::unbox();
 		GroupStitchIndex =
-		    wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
+		    wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->stitchBuffer.size()));
 		Instance->StateMap.set(StateFlag::GRPSEL);
 		thred::grpAdj();
 		thred::nuAct(GroupStitchIndex);
@@ -311,7 +311,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	  }
 	  else {
 		ClosestPointIndex =
-		    wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
+		    wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->stitchBuffer.size()));
 		thred::nuAct(ClosestPointIndex);
 		thred::movbox();
 		if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
@@ -323,7 +323,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	}
 	else {
 	  ClosestPointIndex =
-	      wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->StitchBuffer.size()));
+	      wrap::round<uint32_t>(colorBarPosition * wrap::toFloat(Instance->stitchBuffer.size()));
 	  thred::nuAct(ClosestPointIndex);
 	  thred::rstAll();
 	  Instance->StateMap.set(StateFlag::SELBOX);
@@ -706,13 +706,13 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	if (Instance->StateMap.testAndReset(StateFlag::CLPSHO)) { // pasting
 	  thred::savdo();
-	  if (!Instance->StitchBuffer.empty() &&
+	  if (!Instance->stitchBuffer.empty() &&
 	      (Instance->StateMap.testAndReset(StateFlag::SELBOX) || Instance->StateMap.testAndReset(StateFlag::INSRT)) &&
-	      ClosestPointIndex != wrap::toUnsigned(Instance->StitchBuffer.size() - 1U)) {
+	      ClosestPointIndex != wrap::toUnsigned(Instance->stitchBuffer.size() - 1U)) {
 		tfc::lodclp(ClosestPointIndex);
 	  }
 	  else {
-		tfc::lodclp(wrap::toUnsigned(Instance->StitchBuffer.size()));
+		tfc::lodclp(wrap::toUnsigned(Instance->stitchBuffer.size()));
 	  }
 	  thred::rngadj();
 	  thred::setFormControls();
@@ -750,8 +750,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		if (Instance->StateMap.test(StateFlag::LIN1)) { // inserting a stitch
 		  if (Instance->StateMap.test(StateFlag::BAKEND)) {
 			thred::xlin1();
-			auto const iStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
-			Instance->StitchBuffer.emplace_back(stitchPoint.x, stitchPoint.y, code);
+			auto const iStitch = wrap::toUnsigned(Instance->stitchBuffer.size());
+			Instance->stitchBuffer.emplace_back(stitchPoint.x, stitchPoint.y, code);
 			thred::duzrat();
 			InsertLine[0] = thred::stch2px1(iStitch);
 			InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
@@ -762,9 +762,9 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  }
 
 		  thred::xlin1();
-		  Instance->StitchBuffer.insert(Instance->StitchBuffer.begin(),
+		  Instance->stitchBuffer.insert(Instance->stitchBuffer.begin(),
 		                                F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
-		  Instance->StitchBuffer.front().attribute &= ~KNOTMSK;
+		  Instance->stitchBuffer.front().attribute &= ~KNOTMSK;
 		  InsertLine[0] = thred::stch2px1(0);
 		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
 		                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
@@ -773,16 +773,16 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  return true;
 		}
 		thred::xlin();
-		if ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & ALTYPMSK) != 0U &&
-		    (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & ALTYPMSK) != 0U) {
-		  if ((Instance->StitchBuffer.operator[](ClosestPointIndex).attribute & FRMSK) ==
-		      (Instance->StitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & FRMSK)) {
-			code = Instance->StitchBuffer.operator[](ClosestPointIndex).attribute | USMSK;
+		if ((Instance->stitchBuffer.operator[](ClosestPointIndex).attribute & ALTYPMSK) != 0U &&
+		    (Instance->stitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & ALTYPMSK) != 0U) {
+		  if ((Instance->stitchBuffer.operator[](ClosestPointIndex).attribute & FRMSK) ==
+		      (Instance->stitchBuffer.operator[](wrap::toSize(ClosestPointIndex) + 1U).attribute & FRMSK)) {
+			code = Instance->stitchBuffer.operator[](ClosestPointIndex).attribute | USMSK;
 		  }
 		}
 		++ClosestPointIndex;
 		thred::savdo();
-		Instance->StitchBuffer.insert(wrap::next(Instance->StitchBuffer.begin(), ClosestPointIndex),
+		Instance->stitchBuffer.insert(wrap::next(Instance->stitchBuffer.begin(), ClosestPointIndex),
 		                              F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		thred::xlin();
 		InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
@@ -806,7 +806,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		                          .y = WinMsg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1]          = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
-		Instance->StitchBuffer.emplace_back(
+		Instance->stitchBuffer.emplace_back(
 		    stitchPoint.x,
 		    stitchPoint.y,
 		    USMSK | ActiveColor | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM);
@@ -819,7 +819,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		Instance->StateMap.set(StateFlag::BAKEND);
 	  }
 	}
-	thred::ritot(wrap::toUnsigned(Instance->StitchBuffer.size()));
+	thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
 	Instance->StateMap.set(StateFlag::BOXSLCT);
 	Instance->StateMap.set(StateFlag::BZUMIN);
 	Instance->StateMap.set(StateFlag::NOSEL);
@@ -885,7 +885,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			  form.underlayColor = ActiveColor;
 			}
 			auto const formCode = ClosestFormToCursor << FRMSHFT;
-			for (auto& stitch : Instance->StitchBuffer) {
+			for (auto& stitch : Instance->stitchBuffer) {
 			  if ((stitch.attribute & ALTYPMSK) != 0U && (stitch.attribute & FRMSK) == formCode &&
 			      (stitch.attribute & TYPMSK) != TYPMSK) {
 				stitch.attribute &= NCOLMSK;
@@ -901,8 +901,8 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			thred::savdo();
 			if (GroupStartStitch != GroupEndStitch) {
 			  for (auto const groupStitchRange =
-			           std::ranges::subrange(wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
-			                                 wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch));
+			           std::ranges::subrange(wrap::next(Instance->stitchBuffer.begin(), GroupStartStitch),
+			                                 wrap::next(Instance->stitchBuffer.begin(), GroupEndStitch));
 			       auto& stitch : groupStitchRange) {
 				stitch.attribute &= NCOLMSK;
 				stitch.attribute |= ActiveColor;
@@ -911,7 +911,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			  Instance->StateMap.set(StateFlag::RESTCH);
 			}
 			else {
-			  auto& stitch = Instance->StitchBuffer.operator[](GroupStartStitch);
+			  auto& stitch = Instance->stitchBuffer.operator[](GroupStartStitch);
 			  stitch.attribute &= NCOLMSK;
 			  stitch.attribute |= ActiveColor;
 			}
@@ -994,8 +994,8 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	auto const adjustedPoint = thred::getAdjustedPoint(stitchPoint);
 
 	for (auto const groupStitchRange =
-	         std::ranges::subrange(wrap::next(Instance->StitchBuffer.begin(), GroupStartStitch),
-	                               wrap::next(Instance->StitchBuffer.begin(), GroupEndStitch));
+	         std::ranges::subrange(wrap::next(Instance->stitchBuffer.begin(), GroupStartStitch),
+	                               wrap::next(Instance->stitchBuffer.begin(), GroupEndStitch));
 	     auto& stitch : groupStitchRange) {
 	  stitch -= adjustedPoint;
 	}
@@ -1009,8 +1009,8 @@ auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F
 	thred::savdo();
 	auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
 
-	Instance->StitchBuffer.operator[](ClosestPointIndex) = stitchPoint;
-	Instance->StitchBuffer.operator[](ClosestPointIndex).attribute |= USMSK;
+	Instance->stitchBuffer.operator[](ClosestPointIndex) = stitchPoint;
+	Instance->stitchBuffer.operator[](ClosestPointIndex).attribute |= USMSK;
 	if (ZoomFactor < STCHBOX) {
 	  thred::drawCapturedStitchBox();
 	}
@@ -1400,7 +1400,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		SetCapture(ThrEdWindow);
 	  }
 	  if (Instance->StateMap.test(StateFlag::LIN1)) {
-		if (!Instance->StitchBuffer.empty()) {
+		if (!Instance->stitchBuffer.empty()) {
 		  thred::xlin1();
 		  InsertLine[1] = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
 		                   .y = WinMsg.pt.y - StitchWindowOrigin.y};
@@ -1551,7 +1551,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		Instance->StateMap.set(StateFlag::RESTCH);
 	  }
 	}
-	if (Instance->StateMap.test(StateFlag::INIT) || !Instance->StitchBuffer.empty()) { // If we are inserting a stitch
+	if (Instance->StateMap.test(StateFlag::INIT) || !Instance->stitchBuffer.empty()) { // If we are inserting a stitch
 	  if ((WinMsg.wParam & MK_SHIFT) != 0U) {
 		if (Instance->StateMap.test(StateFlag::SELBOX)) { // if we are holding shift and selecting a box
 		  // extend the thread selection
@@ -1595,7 +1595,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		  if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
 			Instance->StateMap.set(StateFlag::RESTCH);
 		  }
-		  if (!Instance->StitchBuffer.empty()) {
+		  if (!Instance->stitchBuffer.empty()) {
 			thred::rebox();
 		  }
 		}
