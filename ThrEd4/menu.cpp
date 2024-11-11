@@ -61,6 +61,13 @@
 
 // menu internal namespace
 namespace {
+constexpr auto GRDDEF = uint32_t {0x202020U}; // grid default color
+constexpr auto GRDHI  = uint32_t {0xffffffU}; // grid high color
+constexpr auto GRDMED = uint32_t {0x404040U}; // grid medium color
+constexpr auto GRDRED = uint32_t {0xff2020U}; // grid red color
+constexpr auto GRDBLU = uint32_t {0x20ff20U}; // grid green color
+constexpr auto GRDGRN = uint32_t {0x2020ffU}; // grid blue color
+
 auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
 auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
 auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
@@ -68,14 +75,8 @@ auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
 auto MainMenu       = gsl::narrow_cast<HMENU>(nullptr); // main menu
 auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
-auto MenuInfo       = MENUITEMINFO {};
 
-constexpr auto GRDHI  = uint32_t {0xffffffU}; // grid high color
-constexpr auto GRDMED = uint32_t {0x404040U}; // grid medium color
-constexpr auto GRDDEF = uint32_t {0x202020U}; // grid default color
-constexpr auto GRDRED = uint32_t {0xff2020U}; // grid red color
-constexpr auto GRDBLU = uint32_t {0x20ff20U}; // grid green color
-constexpr auto GRDGRN = uint32_t {0x2020ffU}; // grid blue color
+auto MenuInfo       = MENUITEMINFO {};
 
 // Definitions
 void fil2sel(uint32_t stat);
