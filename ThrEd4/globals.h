@@ -76,13 +76,13 @@ class MY_SINGLE
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  int32_t                   DPI = 0;
   std::vector<F_POINT>      angledFormVertices;
   fs::path                  auxName;
   std::vector<B_SEQ_PNT>    bSequence;
   std::vector<HWND>         buttonWin;
   std::vector<F_POINT_ATTR> clipBuffer;
   std::vector<F_POINT>      clipPoints;
-  int32_t                   DPI = 0;
   std::vector<float>        formAngles;
   std::vector<POINT>        formLines;
   std::vector<FRM_HEAD>     formList;
@@ -91,7 +91,6 @@ class MY_SINGLE
   std::vector<F_POINT>      insidePointList;
   std::vector<F_POINT>      interleaveSequence;
   std::vector<INS_REC>      interleaveSequenceIndices;
-
   std::vector<F_POINT>      oSequence;
   std::vector<F_POINT>      outsidePointList;
   std::vector<POINT>        rubberBandLine;
@@ -102,6 +101,7 @@ class MY_SINGLE
   std::vector<POINT>        selectedPointsLine;
   ENUM_MAP<StateFlag>       stateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> stitchBuffer;
+  std::wstring              textureInputBuffer;
   std::vector<TX_PNT>       texturePointsBuffer;
 
   std::array<std::vector<uint32_t>, UNDOLEN> undoBuffer;
@@ -109,7 +109,6 @@ class MY_SINGLE
   ENUM_MAP<UserFlag> userFlagMap = ENUM_MAP<UserFlag> {0};
   std::vector<HWND>  valueWindow;
   fs::path           workingFileName;
-  std::wstring       textureInputBuffer;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   MY_SINGLE(const MY_SINGLE&)                    = delete;
