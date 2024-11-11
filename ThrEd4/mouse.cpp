@@ -58,15 +58,15 @@
 // mouse internal namespace
 namespace {
 // cursors
-auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
-auto DLineCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // dline
-auto NeedleUpCursor        = gsl::narrow_cast<HCURSOR>(nullptr); // upright needle
-auto NeedleLeftUpCursor    = gsl::narrow_cast<HCURSOR>(nullptr); // left up needle
-auto NeedleLeftDownCursor  = gsl::narrow_cast<HCURSOR>(nullptr); // left down needle
-auto NeedleRightUpCursor   = gsl::narrow_cast<HCURSOR>(nullptr); // right up needle
-auto NeedleRightDownCursor = gsl::narrow_cast<HCURSOR>(nullptr); // right down needle
 auto ArrowCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // arrow
 auto CrossCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // cross
+auto DLineCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // dline
+auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
+auto NeedleLeftDownCursor  = gsl::narrow_cast<HCURSOR>(nullptr); // left down needle
+auto NeedleLeftUpCursor    = gsl::narrow_cast<HCURSOR>(nullptr); // left up needle
+auto NeedleRightDownCursor = gsl::narrow_cast<HCURSOR>(nullptr); // right down needle
+auto NeedleRightUpCursor   = gsl::narrow_cast<HCURSOR>(nullptr); // right up needle
+auto NeedleUpCursor        = gsl::narrow_cast<HCURSOR>(nullptr); // upright needle
 
 // Definitions
 auto chkok() noexcept -> bool;
