@@ -227,18 +227,18 @@ class THR_SINGLE
 // thred internal namespace
 namespace {
 constexpr auto ARROWPNT = 3U;            // points required to draw arrow
-constexpr auto CHSDEF   = 24.0F;         // default chain stitch length
 constexpr auto CHRDEF   = 0.25;          // default chain stitch ratio
+constexpr auto CHSDEF   = 24.0F;         // default chain stitch length
 constexpr auto COLSIZ   = int32_t {12};  // logical pixel width of the color bar
 constexpr auto DEFPIX   = uint16_t {2U}; // default nudge pixels
 constexpr auto DEFULEN  = 12.0F;         // default underlay stitch length
 constexpr auto DNDLEN   = 256U;          // designer name decoding table length
 constexpr auto DNELEN   = 128U;          // designer name encoding table length
 constexpr auto DNLEN    = 50U;           // designer name order table length
-constexpr auto FLTTHR   = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Filter specifications
-constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
-constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
-constexpr auto FLTPES   = COMDLG_FILTERSPEC {L"Brother", L"*.pes"};
+constexpr auto FLTDST = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"}; // Display only Tajima format files (.dst)
+constexpr auto FLTPCS = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"}; // Display only Pfaff format files (.pcs)
+constexpr auto FLTPES = COMDLG_FILTERSPEC {L"Brother", L"*.pes"}; // Display only Brother format files (.pes)
+constexpr auto FLTTHR = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Display only ThrEd format files (.thr)
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
 constexpr auto KNOTLEN  = int32_t {54};           // set knots for stitches longer than this
