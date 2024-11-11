@@ -594,7 +594,7 @@ void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t const
 }
 
 void setpclp() {
-  auto& interleaveSequence = Instance->InterleaveSequence;
+  auto& interleaveSequence = Instance->interleaveSequence;
 
   FormClipInstance->FormVerticesAsLine.clear();
   auto itIntlvSeq = interleaveSequence.begin();
@@ -733,7 +733,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto& form     = Instance->formList.operator[](ClosestFormToCursor);
 		  auto  itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 		  // clang-format on
-		  auto& interleaveSequence = Instance->InterleaveSequence;
+		  auto& interleaveSequence = Instance->interleaveSequence;
 
 		  interleaveSequence.clear();
 		  interleaveSequence.reserve(wrap::toSize(ptrFormVertexData->vertexCount) + 3U);

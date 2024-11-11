@@ -329,7 +329,7 @@ void xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, f
 
 void addNewStitches(INT_INFO& ilData, FRM_HEAD const& form) {
   auto        code                      = 0U;
-  auto&       interleaveSequence        = Instance->InterleaveSequence;
+  auto&       interleaveSequence        = Instance->interleaveSequence;
   auto const& interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(interleaveSequenceIndices.size() - 1U); ++iSequence) {
@@ -443,7 +443,7 @@ void chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t co
 	if ((form.extendedAttribute & AT_END) != 0U) {
 	  auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + form.fillEnd);
 	  ilData.output +=
-	      gucon(form, buffer, Instance->InterleaveSequence.back(), *itVertex, ilData.output, code);
+	      gucon(form, buffer, Instance->interleaveSequence.back(), *itVertex, ilData.output, code);
 	}
   }
 }
@@ -514,7 +514,7 @@ void duatf(uint32_t ind) {
 #endif
 
 void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
-  auto const& interleaveSequence = Instance->InterleaveSequence;
+  auto const& interleaveSequence = Instance->interleaveSequence;
   if (ilData.coloc > ilData.start) {
 	auto const count         = ilData.coloc > Instance->StitchBuffer.size()
 	                               ? wrap::toUnsigned(Instance->StitchBuffer.size()) - ilData.start
@@ -821,7 +821,7 @@ void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) 
   if (Instance->oSequence.empty()) {
 	return;
   }
-  auto const& interleaveSequence        = Instance->InterleaveSequence;
+  auto const& interleaveSequence        = Instance->interleaveSequence;
   auto&       interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   interleaveSequenceIndices.emplace_back(INS_REC {
@@ -1129,7 +1129,7 @@ auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
 	--index;
 	if (interleaveSequenceIndices.operator[](index).color == color) {
 	  auto const nextIndex = interleaveSequenceIndices.operator[](wrap::toSize(index) + 1U).index;
-	  point                = Instance->InterleaveSequence.operator[](wrap::toSize(nextIndex) - 1U);
+	  point                = Instance->interleaveSequence.operator[](wrap::toSize(nextIndex) - 1U);
 	  return true;
 	}
   }
@@ -1383,14 +1383,14 @@ auto orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC cons
 }
 
 void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
-  auto& interleaveSequence = Instance->InterleaveSequence;
+  auto& interleaveSequence = Instance->interleaveSequence;
 
   if (!Instance->oSequence.empty()) {
 	Instance->interleaveSequenceIndices.emplace_back(INS_REC {
 	    .code = walkMask, .color = form.underlayColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
 #if BUGBAK
 	for (auto val : Instance->oSequence) {
-	  Instance->InterleaveSequence.push_back(val);
+	  Instance->interleaveSequence.push_back(val);
 	}
 #else
 	constexpr auto MAXWLK  = 54.0F; // max underlay/edge walk stitch length
@@ -2086,7 +2086,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   auto&       interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   interleaveSequenceIndices.emplace_back(INS_REC {
-      .code = 0, .color = 0, .index = wrap::toUnsigned(Instance->InterleaveSequence.size()), .seq = 0});
+      .code = 0, .color = 0, .index = wrap::toUnsigned(Instance->interleaveSequence.size()), .seq = 0});
   ilData.layerIndex =
       gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) | formIndex << FRMSHFT;
   Instance->StateMap.reset(StateFlag::DIDSTRT);

@@ -838,7 +838,7 @@ auto ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen) ->
   // This clamp is temporary to avoid overflow when BH corner value is too large. Find a better fix
   length = std::min(length, CLAMP);
 
-  auto& interleaveSequence = Instance->InterleaveSequence;
+  auto& interleaveSequence = Instance->interleaveSequence;
   interleaveSequence.push_back(start);
   if (length > MaxStitchLen) {
 	constexpr auto MINSTLEN = 1e-1F; // clamp minimum stitch length
@@ -870,7 +870,7 @@ void ritbrd(FRM_HEAD const& form) {
   Instance->interleaveSequenceIndices.emplace_back(
       INS_REC {.code  = TYPBRD,
                .color = gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
-               .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
+               .index = wrap::toUnsigned(Instance->interleaveSequence.size()),
                .seq   = I_BRD});
   form::chkseq(true);
 }
@@ -883,7 +883,7 @@ void ritapbrd() {
   Instance->interleaveSequenceIndices.emplace_back(
       INS_REC {.code  = TYPMSK,
                .color = gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
-               .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
+               .index = wrap::toUnsigned(Instance->interleaveSequence.size()),
                .seq   = I_AP});
   form::chkseq(true);
 }
@@ -895,7 +895,7 @@ void ritfil(FRM_HEAD& form) {
   Instance->interleaveSequenceIndices.emplace_back(
       INS_REC {.code  = TYPFRM,
                .color = gsl::narrow_cast<uint32_t>(form.fillColor),
-               .index = wrap::toUnsigned(Instance->InterleaveSequence.size()),
+               .index = wrap::toUnsigned(Instance->interleaveSequence.size()),
                .seq   = I_FIL});
   form::chkseq(false);
 }
@@ -6043,10 +6043,10 @@ void form::chkseq(bool border) {
   UNREFERENCED_PARAMETER(border);
 
   for (auto val : Instance->oSequence) {
-	Instance->InterleaveSequence.push_back(val);
+	Instance->interleaveSequence.push_back(val);
   }
 #else
-  auto& interleaveSequence = Instance->InterleaveSequence;
+  auto& interleaveSequence = Instance->interleaveSequence;
 
   auto const savedIndex = interleaveSequence.size();
   auto&      form       = Instance->formList.operator[](ClosestFormToCursor);
@@ -6110,10 +6110,10 @@ void form::chkseq(bool border) {
 }
 
 auto form::lastch() noexcept -> bool {
-  if (Instance->InterleaveSequence.empty()) {
+  if (Instance->interleaveSequence.empty()) {
 	return false;
   }
-  LastPoint = Instance->InterleaveSequence.back();
+  LastPoint = Instance->interleaveSequence.back();
   return true;
 }
 
@@ -6393,7 +6393,7 @@ void form::refilfn(uint32_t const formIndex) {
   if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U && form.type == FRMLINE && form.fillType != CONTF) {
 	form.type = FRMFPOLY;
   }
-  Instance->InterleaveSequence.clear();
+  Instance->interleaveSequence.clear();
   Instance->interleaveSequenceIndices.clear();
   Instance->StateMap.reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};

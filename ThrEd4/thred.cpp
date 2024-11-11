@@ -11169,7 +11169,7 @@ void thred::set1knot() {
 }
 
 void thred::fixpclp(uint32_t const closestFormToCursor) {
-  auto& interleaveSequence = Instance->InterleaveSequence;
+  auto& interleaveSequence = Instance->interleaveSequence;
 
   auto const point = POINT {(WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
                             (WinMsg.pt.y + gsl::narrow_cast<decltype(WinMsg.pt.y)>(FormMoveDelta.y))};
