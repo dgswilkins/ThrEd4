@@ -194,7 +194,7 @@ auto coldis(COLORREF const colorA, COLORREF const colorB) -> DWORD {
 }
 
 auto colfil() -> bool {
-  auto const& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->workingFileName;
   if (!workingFileName.has_extension()) {
 	return false;
   }

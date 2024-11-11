@@ -2616,7 +2616,7 @@ void ducmd() {
   auto const spArgList = gsl::span {ArgList, wrap::toSize(ArgCount)};
   auto const arg1      = std::wstring {spArgList[1]};
   if (!arg1.starts_with(L"/F1:")) {
-	Instance->WorkingFileName.assign(arg1);
+	Instance->workingFileName.assign(arg1);
 	Instance->stateMap.set(StateFlag::REDOLD);
 	nuFil(FileIndices::THR);
 	return;
@@ -3153,7 +3153,7 @@ void getbak() {
   }
   unthum();
   Instance->stateMap.set(StateFlag::FRMOF);
-  auto& workingFileName = Instance->WorkingFileName;
+  auto& workingFileName = Instance->workingFileName;
   workingFileName       = ThrSingle->DefaultDirectory /
                     ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(workingFileName);
@@ -3306,7 +3306,7 @@ void handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
 	auto previousName = ThrSingle->PreviousNames.begin();
 	for (auto const& iLRU : LRU_MENU_ID) {
 	  if (WinMsg.wParam == iLRU) {
-		Instance->WorkingFileName = *previousName;
+		Instance->workingFileName = *previousName;
 		Instance->stateMap.set(StateFlag::REDOLD);
 		nuFil(FileIndices::THR);
 	  }
@@ -5138,7 +5138,7 @@ auto nuCol(COLORREF const init) noexcept -> BOOL {
 }
 
 void nuFil(FileIndices const fileIndex) {
-  auto& workingFileName = Instance->WorkingFileName;
+  auto& workingFileName = Instance->workingFileName;
 
   // Todo - check filename for validity before using it
   auto newFileName = workingFileName; // intentional copy
@@ -5294,7 +5294,7 @@ auto nuang(float const originalAngle, float const xDelta, float const yDelta) no
 }
 
 void nunams() {
-  auto const& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->workingFileName;
   Instance->auxName           = workingFileName;
   xt::duauxnam(Instance->auxName);
   auto& thrName = ThrSingle->ThrName;
@@ -5699,7 +5699,7 @@ void rebak() {
 	fs::rename(newFileName, thrName);
   }
   fs::rename(safetyFileName, newFileName);
-  Instance->WorkingFileName = thrName;
+  Instance->workingFileName = thrName;
   Instance->stateMap.set(StateFlag::REDOLD);
   nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
@@ -6416,7 +6416,7 @@ void sachk() {
 
 void sav() {
   auto& auxName = Instance->auxName;
-  auxName       = Instance->WorkingFileName;
+  auxName       = Instance->workingFileName;
   xt::duauxnam(auxName);
   if (chkattr(auxName)) {
 	return;
@@ -6455,7 +6455,7 @@ void sav() {
 	}
   }
   if (flag) {
-	defNam(Instance->WorkingFileName);
+	defNam(Instance->workingFileName);
 	if (Instance->userFlagMap.test(UserFlag::ROTAUX)) {
 	  displayText::filnopn(IDS_FILROT, auxName);
 	}
@@ -7040,7 +7040,7 @@ void thrInit() noexcept {
 }
 
 void thrsav() {
-  auto const& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->workingFileName;
 
   if (chkattr(workingFileName)) {
 	return;
@@ -8076,7 +8076,7 @@ void thred::savAs() {
 	return;
   }
   auto  index           = FileIndices {};
-  auto& workingFileName = Instance->WorkingFileName;
+  auto& workingFileName = Instance->workingFileName;
   if (!getSaveName(workingFileName, index)) {
 	return;
   }
@@ -8119,7 +8119,7 @@ void thred::savAs() {
 }
 
 void thred::save() {
-  auto& workingFileName = Instance->WorkingFileName;
+  auto& workingFileName = Instance->workingFileName;
   if (workingFileName.empty()) {
 	savAs();
 	return;
@@ -8192,7 +8192,7 @@ auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
 
 auto thred::getFileHandle(fs::path const& newFileName, HANDLE& fileHandle) -> bool {
   // ToDo - use ifstream?
-  // ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
+  // ifstream file(workingFileName, ios::in | ios::binary | ios::ate);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const handle =
       CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -8923,7 +8923,7 @@ void thred::newFil() {
   formList.shrink_to_fit();
   resetColorChanges();
   ThrSingle->Knots.clear();
-  Instance->WorkingFileName.clear();
+  Instance->workingFileName.clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	redraw(ThrSingle->DefaultColorWin.operator[](iColor));
 	redraw(ThrSingle->UserColorWin.operator[](iColor));
@@ -9684,7 +9684,7 @@ void thred::redclp() {
 }
 
 void thred::vubak() {
-  if (Instance->WorkingFileName.empty() && !Instance->stateMap.test(StateFlag::THUMSHO)) {
+  if (Instance->workingFileName.empty() && !Instance->stateMap.test(StateFlag::THUMSHO)) {
 	return;
   }
   Instance->stateMap.set(StateFlag::ZUMED);
@@ -10930,7 +10930,7 @@ void thred::delstch() {
 void thred::closfn() {
   deltot();
   ThrSingle->Knots.clear();
-  Instance->WorkingFileName.clear();
+  Instance->workingFileName.clear();
   bitmap::delmap();
   backup::deldu();
   displayText::clrhbut(3);
@@ -12496,7 +12496,7 @@ void thred::initBackPenBrush() noexcept {
 }
 
 auto thred::setFileName() -> fs::path {
-  auto const& workingFileName = Instance->WorkingFileName;
+  auto const& workingFileName = Instance->workingFileName;
 
   return workingFileName.empty() ? ThrSingle->DefaultDirectory / L"balfil.thr" : workingFileName;
 }

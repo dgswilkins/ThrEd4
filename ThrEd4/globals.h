@@ -108,7 +108,7 @@ class MY_SINGLE
 
   ENUM_MAP<UserFlag> userFlagMap = ENUM_MAP<UserFlag> {0};
   std::vector<HWND>  valueWindow;
-  fs::path           WorkingFileName;
+  fs::path           workingFileName;
   std::wstring       textureInputBuffer;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
