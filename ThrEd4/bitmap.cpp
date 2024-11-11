@@ -93,13 +93,13 @@ class BMP_SINGLE
 
 // bitmap internal namespace
 namespace {
-constexpr auto BITCOL  = uint32_t {0xffff00U}; // default bitmap color
-constexpr auto SZBMPNM = 17U; // THR spec for BMP filename length (+ 1 for zero terminator)
-constexpr auto FLTBMP  = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"}; // filter specifications
-constexpr auto FLTALL  = COMDLG_FILTERSPEC {L"All files", L"*.*"};      // filter specifications
+constexpr auto BITCOL  = uint32_t {0xffff00U};                          // default bitmap color
 constexpr auto BPB     = 8U;                                            // bits per byte
 constexpr auto BPP24   = DWORD {24U};                                   // 24 bits per pixel
 constexpr auto BPP32   = DWORD {32U};                                   // 32 bits per pixel
+constexpr auto FLTALL  = COMDLG_FILTERSPEC {L"All files", L"*.*"};      // filter specifications
+constexpr auto FLTBMP  = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"}; // filter specifications
+constexpr auto SZBMPNM = 17U; // ThrEd spec for BMP filename length (16 byte width characters + 1 for zero terminator)
 
 auto BitmapColor          = BITCOL; // bitmap color
 auto BitMapColorStruct    = CHOOSECOLOR {};
