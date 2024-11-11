@@ -160,7 +160,7 @@ auto maxwid() -> SIZE {
 }
 
 auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
-  if (Instance->StateMap.test(StateFlag::REFCNT)) {
+  if (Instance->stateMap.test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
@@ -178,7 +178,7 @@ auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
 }
 
 auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
-  if (Instance->StateMap.test(StateFlag::REFCNT)) {
+  if (Instance->stateMap.test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
@@ -196,7 +196,7 @@ auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
 }
 
 auto numwin(std::wstring const& winName, RECT const& location) -> HWND {
-  if (Instance->StateMap.test(StateFlag::REFCNT)) {
+  if (Instance->stateMap.test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
@@ -918,12 +918,12 @@ void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std:
 
 void formForms::refrm() {
   auto& form = Instance->formList.operator[](ClosestFormToCursor);
-  if (Instance->StateMap.testAndReset(StateFlag::PRFACT)) {
+  if (Instance->stateMap.testAndReset(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
-	Instance->StateMap.reset(StateFlag::WASRT);
+	Instance->stateMap.reset(StateFlag::WASRT);
   }
   LabelWindowSize = ValueWindowSize = {};
-  Instance->StateMap.set(StateFlag::REFCNT); // don't create windows - just size them
+  Instance->stateMap.set(StateFlag::REFCNT); // don't create windows - just size them
   auto formMenuEntryCount = 0U;
   refrmfn(form, formMenuEntryCount);
   if (FormDataSheet != nullptr) {
@@ -940,7 +940,7 @@ void formForms::refrm() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  Instance->StateMap.reset(StateFlag::REFCNT); // this time create the windows
+  Instance->stateMap.reset(StateFlag::REFCNT); // this time create the windows
   refrmfn(form, formMenuEntryCount);
 }
 
@@ -990,10 +990,10 @@ void formForms::prfsid(HWND wnd) {
 
 void formForms::prfmsg() {
   auto preferenceRect = RECT {};
-  if (Instance->StateMap.testAndReset(StateFlag::INSRT)) {
-	Instance->StateMap.set(StateFlag::WASRT);
+  if (Instance->stateMap.testAndReset(StateFlag::INSRT)) {
+	Instance->stateMap.set(StateFlag::WASRT);
   }
-  Instance->StateMap.reset(StateFlag::BIGBOX);
+  Instance->stateMap.reset(StateFlag::BIGBOX);
   Instance->selectedFormList.clear();
   if (FormDataSheet != nullptr) {
 	thred::undat();
@@ -1069,20 +1069,20 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.maxStitchLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), UserStitchLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), MinStitchLength * IPFGRAN), *row);
-  Instance->StateMap.set(StateFlag::PRFACT);
+  Instance->stateMap.set(StateFlag::PRFACT);
   ReleaseDC(ThrEdWindow, preferenceDC);
 }
 
 void formForms::frmnum() {
   auto const& formList = Instance->formList;
 
-  if (formList.empty() || !Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (formList.empty() || !Instance->stateMap.test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_SETFRM);
 	return;
   }
   displayText::showMessage(IDS_FRML, formList.size());
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRFNUM);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRFNUM);
   thred::numWnd();
 }
 
@@ -1092,7 +1092,7 @@ void formForms::dasyfrm() {
   // set the daisy form parameters
   if (auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, &dasyproc);
       nResult < 1) {
-	Instance->StateMap.reset(StateFlag::FORMIN);
+	Instance->stateMap.reset(StateFlag::FORMIN);
 	return;
   }
   auto const referencePoint =
@@ -1222,7 +1222,7 @@ void formForms::dasyfrm() {
 	form.type      = SAT;
 	form.attribute = 1;
   }
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::INIT);
   form.outline();
   auto& formList = Instance->formList;
 
@@ -1235,7 +1235,7 @@ void formForms::dasyfrm() {
   }
   FormMoveDelta      = F_POINT {};
   NewFormVertexCount = iVertex + 1U;
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   form::setmfrm(ClosestFormToCursor);
   form::mdufrm();
 }
@@ -1291,9 +1291,9 @@ void formForms::setear() {
   firstVertex->y = verticalPosition;
   ++form.vertexCount;
   ++NewFormVertexCount;
-  Instance->StateMap.set(StateFlag::FORMSEL);
+  Instance->stateMap.set(StateFlag::FORMSEL);
   form::flipv();
-  Instance->StateMap.reset(StateFlag::FORMSEL);
+  Instance->stateMap.reset(StateFlag::FORMSEL);
   auto const size =
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
   auto horizontalRatio     = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
@@ -1386,7 +1386,7 @@ void formForms::wavfrm() {
   form.type        = FRMLINE;
   form.vertexCount = vertexCount;
   form.outline();
-  Instance->StateMap.reset(StateFlag::FORMSEL);
+  Instance->stateMap.reset(StateFlag::FORMSEL);
   auto const selectedSize =
       F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
   constexpr auto WAVSIZE         = 4.0F; // wave size factor

@@ -211,7 +211,7 @@ void clipSelectedForm() {
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(thrEdClip, clipHandle);
-  Instance->StateMap.reset(StateFlag::WASPCDCLP);
+  Instance->stateMap.reset(StateFlag::WASPCDCLP);
   if (form.fillType == 0U && form.edgeType == 0U) {
 	CloseClipboard();
 	return;
@@ -240,7 +240,7 @@ void clipSelectedForm() {
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(Clip, clipHandle);
-  Instance->StateMap.set(StateFlag::WASPCDCLP);
+  Instance->stateMap.set(StateFlag::WASPCDCLP);
   CloseClipboard();
 }
 
@@ -424,7 +424,7 @@ void clipSelectedPoints() {
   auto*      clipHeader   = gsl::narrow_cast<FORM_VERTEX_CLIP*>(GlobalLock(clipHandle));
   clipHeader->clipType    = CLP_FRMPS;
   clipHeader->vertexCount = SelectedFormVertices.vertexCount;
-  clipHeader->direction   = Instance->StateMap.test(StateFlag::PSELDIR);
+  clipHeader->direction   = Instance->stateMap.test(StateFlag::PSELDIR);
   // skip past the header
   auto* ptrVertices = convertFromPtr<F_POINT*>(std::next(clipHeader));
   auto const vertices = gsl::span {ptrVertices, wrap::toSize(SelectedFormVertices.vertexCount) + 1U};
@@ -658,7 +658,7 @@ auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) ->
 }
 
 void unpclp() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOP)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOP)) {
 	dupclp();
   }
 }
@@ -674,11 +674,11 @@ void tfc::setClipOrigin(POINT const source) noexcept {
 }
 
 void tfc::duclip() {
-  if (Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	clipSelectedPoints();
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+  if (Instance->stateMap.test(StateFlag::BIGBOX)) {
 	displayText::tabmsg(IDS_INSF, false);
 	return;
   }
@@ -686,18 +686,18 @@ void tfc::duclip() {
 	clipSelectedForms();
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	clipSelectedForm();
 	return;
   }
-  if (Instance->stitchBuffer.empty() || !Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stitchBuffer.empty() || !Instance->stateMap.test(StateFlag::GRPSEL)) {
 	return;
   }
   clipSelectedStitches();
 }
 
 void tfc::rtrclp() {
-  if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL)) {
 	return;
   }
   if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.isTexture()) {
@@ -728,7 +728,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
 		ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipCopyBuffer.data());
-		if (Instance->StateMap.test(StateFlag::FRMPSEL)) {
+		if (Instance->stateMap.test(StateFlag::FRMPSEL)) {
 		  // clang-format off
 		  auto& form     = Instance->formList.operator[](ClosestFormToCursor);
 		  auto  itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
@@ -746,13 +746,13 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto const nextIt     = wrap::next(itVertex, nextVertex);
 		  interleaveSequence.push_back(*nextIt);
 		  setpclp();
-		  Instance->StateMap.set(StateFlag::FPUNCLP);
-		  Instance->StateMap.set(StateFlag::SHOP);
+		  Instance->stateMap.set(StateFlag::FPUNCLP);
+		  Instance->stateMap.set(StateFlag::SHOP);
 		  dupclp();
 		}
 		else {
 		  FormMoveDelta = F_POINT {};
-		  Instance->StateMap.set(StateFlag::FUNCLP);
+		  Instance->stateMap.set(StateFlag::FUNCLP);
 		  auto formIter          = FRM_HEAD {};
 		  formIter.type          = FRMLINE;
 		  formIter.vertexCount   = ptrFormVertexData->vertexCount + 1U;
@@ -762,11 +762,11 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  Instance->formVertices.insert(Instance->formVertices.end(), vertices.begin(), vertices.end());
 		  Instance->formList.push_back(formIter);
 		  ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
-		  Instance->StateMap.set(StateFlag::INIT);
+		  Instance->stateMap.set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
 		  form::unfrm();
 		  form::setmfrm(ClosestFormToCursor);
-		  Instance->StateMap.set(StateFlag::SHOFRM);
+		  Instance->stateMap.set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
 		return true;
@@ -883,25 +883,25 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		}
 		wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
 		wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);
-		Instance->StateMap.set(StateFlag::INIT);
+		Instance->stateMap.set(StateFlag::INIT);
 		auto& formLines = Instance->formLines;
 		formLines.resize(SQPNTS);
 		formLines[0].x = formLines[3].x = formLines[4].x = SelectedFormsRect.left;
 		formLines[1].x = formLines[2].x = SelectedFormsRect.right;
 		formLines[0].y = formLines[1].y = formLines[4].y = SelectedFormsRect.top;
 		formLines[2].y = formLines[3].y = SelectedFormsRect.bottom;
-		Instance->StateMap.set(StateFlag::SHOSTRTCH);
+		Instance->stateMap.set(StateFlag::SHOSTRTCH);
 		thred::strtchbox(stretchBoxLine);
 		FormMoveDelta = F_POINT {wrap::toFloat((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
 		                         wrap::toFloat((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2)};
-		Instance->StateMap.set(StateFlag::MOVFRMS);
-		Instance->StateMap.set(StateFlag::FUNSCLP);
+		Instance->stateMap.set(StateFlag::MOVFRMS);
+		Instance->stateMap.set(StateFlag::FUNSCLP);
 	  }
 	  else {
 		if (auto* ptrClipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipPointer);
 		    ptrClipFormHeader->clipType == CLP_FRM) {
 		  FormMoveDelta = F_POINT {};
-		  Instance->StateMap.set(StateFlag::FUNCLP);
+		  Instance->stateMap.set(StateFlag::FUNCLP);
 		  auto formIter = ptrClipFormHeader->form;
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
@@ -943,11 +943,11 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  }
 		  formList.push_back(formIter);
 		  ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
-		  Instance->StateMap.set(StateFlag::INIT);
+		  Instance->stateMap.set(StateFlag::INIT);
 		  form::unfrm();
 		  thred::duzrat();
 		  form::setmfrm(ClosestFormToCursor);
-		  Instance->StateMap.set(StateFlag::SHOFRM);
+		  Instance->stateMap.set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
 		GlobalUnlock(ClipMemory);
@@ -961,7 +961,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 	if (ClipMemory != nullptr) {
 	  thred::redclp();
 	  thred::clpbox();
-	  Instance->StateMap.set(StateFlag::CLPSHO);
+	  Instance->stateMap.set(StateFlag::CLPSHO);
 	}
 	CloseClipboard();
   }
@@ -994,20 +994,20 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   Instance->angledFormVertices.insert(
       Instance->angledFormVertices.end(), spVertices.begin(), spVertices.end());
   textureForm.vertexIndex = 0;
-  Instance->StateMap.reset(StateFlag::TXTLIN);
-  Instance->StateMap.set(StateFlag::TXTCLP);
-  Instance->StateMap.set(StateFlag::TXTMOV);
+  Instance->stateMap.reset(StateFlag::TXTLIN);
+  Instance->stateMap.set(StateFlag::TXTCLP);
+  Instance->stateMap.set(StateFlag::TXTMOV);
   texture::setxfrm();
   texture::setTxtCurLoc(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
   GlobalUnlock(clipMemory);
-  Instance->StateMap.set(StateFlag::RESTCH);
-  Instance->StateMap.reset(StateFlag::WASWROT);
+  Instance->stateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.reset(StateFlag::WASWROT);
 }
 
 void tfc::fpUnClip() {
   unpclp();
   setpclp();
-  Instance->StateMap.set(StateFlag::SHOP);
+  Instance->stateMap.set(StateFlag::SHOP);
   dupclp();
 }
 
@@ -1026,9 +1026,9 @@ void tfc::lodclp(uint32_t iStitch) {
 	                  (clip.attribute & COLMSK) | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM};
   }
   GroupStitchIndex = iStitch - 1U;
-  Instance->StateMap.set(StateFlag::GRPSEL);
+  Instance->stateMap.set(StateFlag::GRPSEL);
   if (!Instance->stitchBuffer.empty()) {
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
   }
 }
 

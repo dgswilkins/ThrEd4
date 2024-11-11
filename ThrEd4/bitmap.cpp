@@ -164,11 +164,11 @@ auto bitar() -> bool {
                    .bottom = wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
   if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
 	BitmapSrcRect.right = BitmapWidth;
-	Instance->StateMap.reset(StateFlag::LANDSCAP);
+	Instance->stateMap.reset(StateFlag::LANDSCAP);
   }
   if (BitmapSrcRect.bottom > BitmapHeight) {
 	BitmapSrcRect.bottom = BitmapHeight;
-	Instance->StateMap.set(StateFlag::LANDSCAP);
+	Instance->stateMap.set(StateFlag::LANDSCAP);
   }
   auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
                                         wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
@@ -387,7 +387,7 @@ auto saveName(fs::path& fileName) {
 }
 
 auto stch2bit(F_POINT& point) -> POINT {
-  if (Instance->StateMap.test(StateFlag::LANDSCAP)) {
+  if (Instance->stateMap.test(StateFlag::LANDSCAP)) {
 	point.y -= wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y;
   }
   return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
@@ -430,19 +430,19 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	displayText::tabmsg(IDS_BMAP, false);
 	return;
   }
-  if (!Instance->StateMap.testAndReset(StateFlag::WASESC)) {
-	Instance->StateMap.reset(StateFlag::TRSET);
+  if (!Instance->stateMap.testAndReset(StateFlag::WASESC)) {
+	Instance->stateMap.reset(StateFlag::TRSET);
   }
   BitmapWidth  = BitmapFileHeaderV4.bV4Width;
   BitmapHeight = BitmapFileHeaderV4.bV4Height;
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::INIT);
   ZoomRect.left   = 0.0F;
   ZoomRect.bottom = 0.0F;
   wrap::narrow_cast(ZoomRect.right, UnzoomedRect.cx);
   wrap::narrow_cast(ZoomRect.top, UnzoomedRect.cy);
   BitmapDC = CreateCompatibleDC(StitchWindowDC);
   if (BitmapFileHeaderV4.bV4BitCount == 1) {
-	Instance->StateMap.set(StateFlag::MONOMAP);
+	Instance->stateMap.set(StateFlag::MONOMAP);
 	constexpr auto SR5 = uint8_t {5}; // Shift Right
 
 	auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> SR5) << 2U;
@@ -496,15 +496,15 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   }
   else {
 	CloseHandle(hBitmapFile);
-	Instance->StateMap.reset(StateFlag::MONOMAP);
+	Instance->stateMap.reset(StateFlag::MONOMAP);
 	hBitmapFile = LoadImage(
 	    ThrEdInstance, BMPInstance->UTF16BMPname.wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 	SelectObject(BitmapDC, hBitmapFile);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
   bitsiz();
   trace::initColorRef();
-  Instance->StateMap.reset(StateFlag::HIDMAP);
+  Instance->stateMap.reset(StateFlag::HIDMAP);
 }
 
 void bitmap::resetBmpFile(bool const reset) {
@@ -523,11 +523,11 @@ void bitmap::savmap() {
 	displayText::tabmsg(IDS_SHOMAP, false);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::MONOMAP)) {
+  if (Instance->stateMap.test(StateFlag::MONOMAP)) {
 	displayText::tabmsg(IDS_SAVMAP, false);
 	return;
   }
-  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
+  if (!Instance->stateMap.test(StateFlag::WASTRAC)) {
 	displayText::tabmsg(IDS_MAPCHG, false);
 	return;
   }
@@ -578,7 +578,7 @@ void bitmap::lodbmp(fs::path const& directory) {
 	// Give the user a little more info why the bitmap has not been loaded
 	displayText::showMessage(IDS_BMPLONG, 0);
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void bitmap::setBmpColor() {
@@ -683,22 +683,22 @@ auto bitmap::ismap() noexcept -> bool {
 }
 
 void bitmap::chkbit() {
-  if (ismap() && (Instance->StateMap.test(StateFlag::WASDIF) || Instance->StateMap.test(StateFlag::WASDSEL) ||
-                  Instance->StateMap.test(StateFlag::WASBLAK))) {
-	Instance->StateMap.set(StateFlag::WASESC);
+  if (ismap() && (Instance->stateMap.test(StateFlag::WASDIF) || Instance->stateMap.test(StateFlag::WASDSEL) ||
+                  Instance->stateMap.test(StateFlag::WASBLAK))) {
+	Instance->stateMap.set(StateFlag::WASESC);
 	bfil(BackgroundColor);
   }
 }
 
 void bitmap::delmap() {
   UTF8BMPname.fill(0);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void bitmap::drawBmpBackground() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto deviceContext = BitmapDC;
-  if (Instance->StateMap.test(StateFlag::WASTRAC)) {
+  if (Instance->stateMap.test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }
   if (!bitar()) {
@@ -737,7 +737,7 @@ auto bitmap::getrmap() -> uint32_t {
   if (TraceDC != nullptr) {
 	SelectObject(TraceDC, TraceBitmap);
 	BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
-	Instance->StateMap.set(StateFlag::WASTRAC);
+	Instance->stateMap.set(StateFlag::WASTRAC);
 	bitmapSize = (wrap::toUnsigned(BitmapWidth) + 1U) * (wrap::toUnsigned(BitmapHeight) + 1U);
 	trace::setTracedMapSize(bitmapSize);
 	StretchBlt(StitchWindowMemDC,

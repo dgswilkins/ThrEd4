@@ -62,7 +62,7 @@ void bxtxt(uint32_t const iButton, uint32_t const iMessage) {
 
 auto clpmsgs(uint32_t const code) -> bool {
   form::ispcdclp();
-  if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !Instance->StateMap.test(StateFlag::WASPCDCLP)) {
+  if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !Instance->stateMap.test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS, false);
 	return false;
   }
@@ -161,14 +161,14 @@ void displayText::hsizmsg() {
 
 void displayText::msgflt(uint32_t const messageId, float const value) {
   showMessage(messageId, value);
-  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::NUMIN);
   thred::numWnd();
 }
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float const threadSize) {
   auto const fmtStr = format2(IDS_SIZ, threadSizeText, threadSize);
   shoMsg(fmtStr, true);
-  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::NUMIN);
   thred::numWnd();
 }
 
@@ -185,7 +185,7 @@ void displayText::crmsg(fs::path const& fileName) {
 }
 
 void displayText::butxt(uint32_t const iButton, std::wstring const& buttonText) {
-  if (!Instance->StateMap.test(StateFlag::WASTRAC) || iButton <= HNUM) {
+  if (!Instance->stateMap.test(StateFlag::WASTRAC) || iButton <= HNUM) {
 	SetWindowText(Instance->buttonWin.operator[](iButton), buttonText.c_str());
 	return;
   }
@@ -194,7 +194,7 @@ void displayText::butxt(uint32_t const iButton, std::wstring const& buttonText) 
 	SetWindowText(Instance->buttonWin.operator[](iButton), bText.c_str());
 	return;
   }
-  if (!Instance->StateMap.test(StateFlag::HIDMAP)) {
+  if (!Instance->stateMap.test(StateFlag::HIDMAP)) {
 	auto const bText = loadStr(IDS_TRC1S);
 	SetWindowText(Instance->buttonWin.operator[](iButton), bText.c_str());
 	return;
@@ -232,7 +232,7 @@ void displayText::shoseln(uint32_t const code0, uint32_t const code1) {
 
 void displayText::frm1pnt() {
   if (Instance->formList.size() == 1) {
-	Instance->StateMap.set(StateFlag::FORMSEL);
+	Instance->stateMap.set(StateFlag::FORMSEL);
 	ClosestFormToCursor = 0;
   }
 }
@@ -244,7 +244,7 @@ auto displayText::filmsgs(uint32_t const code) -> bool {
 
   if (auto const& formList = Instance->formList; !formList.empty()) {
 	frm1pnt();
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  if (auto const& form = formList.operator[](ClosestFormToCursor); form.vertexCount == 2) {
 		if (code < FML_LIN) {
 		  tabmsg(IDS_FRM3X, false);
@@ -314,7 +314,7 @@ void displayText::okcan() {
 
 void displayText::savdisc() {
   sdmsg();
-  Instance->StateMap.reset(StateFlag::BIGBOX);
+  Instance->stateMap.reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
   OKButton      = CreateWindow(L"STATIC",
                           displayText::loadStr(IDS_SAV).c_str(),

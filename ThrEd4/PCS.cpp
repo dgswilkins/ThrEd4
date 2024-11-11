@@ -364,10 +364,10 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	return false;
   }
   if (bytesRead != fileSize) {
-	Instance->StateMap.reset(StateFlag::INIT);
+	Instance->stateMap.reset(StateFlag::INIT);
 	displayText::tabmsg(IDS_SHRTF, false);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	CloseHandle(fileHandle);
 	return false;
   }

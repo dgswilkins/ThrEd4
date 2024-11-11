@@ -197,7 +197,7 @@ void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
   auto itNext           = src.begin();
   auto traceLengthSum1  = 0.0F;
   auto landscapeOffset1 = 0.0F;
-  if (Instance->StateMap.test(StateFlag::LANDSCAP)) {
+  if (Instance->stateMap.test(StateFlag::LANDSCAP)) {
 	auto const bmpSiS = bitmap::getBitmapSizeinStitches();
 	landscapeOffset1  = wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
   }
@@ -288,10 +288,10 @@ void difsub(uint32_t const source, uint32_t const shift, uint32_t& destination) 
 
 // ReSharper disable CppParameterMayBeConst
 void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
-  if (Instance->StateMap.test(StateFlag::DUHI)) {
+  if (Instance->stateMap.test(StateFlag::DUHI)) {
 	FillRect(hDC, &traceHighMask, brush);
   }
-  if (Instance->StateMap.test(StateFlag::DULO)) {
+  if (Instance->stateMap.test(StateFlag::DULO)) {
 	FillRect(hDC, &traceLowMask, brush);
   }
 }
@@ -318,15 +318,15 @@ void durct(uint32_t const shift, RECT const& traceControlRect, RECT& traceHighMa
   traceMiddleMask.top = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
   ratio               = wrap::toFloat(upperColor) * CCRATIO;
   traceMiddleMask.bottom = std::lround((controlHeight * ratio) + wrap::toFloat(traceControlRect.top));
-  Instance->StateMap.reset(StateFlag::DUHI);
-  Instance->StateMap.reset(StateFlag::DULO);
+  Instance->stateMap.reset(StateFlag::DUHI);
+  Instance->stateMap.reset(StateFlag::DULO);
   if (lowerColor != 0U) {
-	Instance->StateMap.set(StateFlag::DULO);
+	Instance->stateMap.set(StateFlag::DULO);
 	traceLowMask.bottom = traceMiddleMask.top;
 	traceLowMask.top    = 0;
   }
   if (upperColor != BYTEMAXV) {
-	Instance->StateMap.set(StateFlag::DUHI);
+	Instance->stateMap.set(StateFlag::DUHI);
 	traceHighMask.top    = traceMiddleMask.bottom;
 	traceHighMask.bottom = traceControlRect.bottom;
   }
@@ -339,12 +339,12 @@ void dutrac() {
 	return;
   }
   auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
-  if (!Instance->StateMap.test(StateFlag::WASEDG)) { // if there is an edge map, trace it
+  if (!Instance->stateMap.test(StateFlag::WASEDG)) { // if there is an edge map, trace it
 	trace::tracedg();
 	return;
   }
   thred::savdo();
-  if (Instance->StateMap.test(StateFlag::LANDSCAP)) { // adjust for landscape mode
+  if (Instance->stateMap.test(StateFlag::LANDSCAP)) { // adjust for landscape mode
 	auto const bmpSiS = bitmap::getBitmapSizeinStitches();
 	stitchPoint.y -= wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
   }
@@ -464,15 +464,15 @@ void dutrac() {
   form.satinGuideCount = 0;
   form.outline();
   Instance->formList.push_back(form);
-  Instance->StateMap.set(StateFlag::RESTCH);
-  Instance->StateMap.set(StateFlag::FRMOF);
+  Instance->stateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::FRMOF);
   form::tglfrm();
 }
 
 void dutrnum0(uint32_t const colNum) {
-  Instance->StateMap.reset(StateFlag::NUMIN);
-  Instance->StateMap.reset(StateFlag::TRNIN0);
-  if (Instance->StateMap.test(StateFlag::TRNUP)) {
+  Instance->stateMap.reset(StateFlag::NUMIN);
+  Instance->stateMap.reset(StateFlag::TRNIN0);
+  if (Instance->stateMap.test(StateFlag::TRNUP)) {
 	auto const itTraceUpWindow = wrap::next(TraceUpWindow.begin(), ColumnColor);
 	ritrcol(InvertUpColor, colNum);
 	UpPixelColor = InvertUpColor ^ COLMASK;
@@ -487,7 +487,7 @@ void dutrnum0(uint32_t const colNum) {
   auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
   thred::redraw(*itTraceControlWindow);
   DestroyWindow(TraceNumberInput);
-  Instance->StateMap.set(StateFlag::WASTRCOL);
+  Instance->stateMap.set(StateFlag::WASTRCOL);
   trace::trace();
 }
 
@@ -700,13 +700,13 @@ auto trcin(COLORREF const color) -> bool {
   }
   auto const colors   = trcols(color);
   auto       colIndex = 3U;
-  if (Instance->StateMap.test(StateFlag::TRCRED)) {
+  if (Instance->stateMap.test(StateFlag::TRCRED)) {
 	colIndex = 0U;
   }
-  if (Instance->StateMap.test(StateFlag::TRCGRN)) {
+  if (Instance->stateMap.test(StateFlag::TRCGRN)) {
 	colIndex = 1U;
   }
-  if (Instance->StateMap.test(StateFlag::TRCBLU)) {
+  if (Instance->stateMap.test(StateFlag::TRCBLU)) {
 	colIndex = 2U;
   }
   if (colIndex != 3U) {
@@ -782,7 +782,7 @@ auto colsum(COLORREF col) -> uint32_t {
   auto itColor  = colors.begin();
   auto colorSum = 0U;
   for (auto iRGB : TRACE_RGB_FLAG) {
-	if (Instance->StateMap.test(iRGB)) {
+	if (Instance->stateMap.test(iRGB)) {
 	  colorSum += *itColor;
 	}
 	++itColor;
@@ -797,7 +797,7 @@ auto icolsum(COLORREF col) -> uint32_t {
 
   constexpr auto RGBMAX = 255U;
   for (auto iRGB : TRACE_RGB_FLAG) {
-	if (Instance->StateMap.test(iRGB)) {
+	if (Instance->stateMap.test(iRGB)) {
 	  colorSum += RGBMAX - *itColor;
 	}
 	++itColor;
@@ -836,8 +836,8 @@ void trace::initTraceWindows() {
 }
 
 void trace::untrace() {
-  if (!Instance->StateMap.testAndReset(StateFlag::WASTRAC)) {
-	if (Instance->StateMap.test(StateFlag::TRCUP)) {
+  if (!Instance->stateMap.testAndReset(StateFlag::WASTRAC)) {
+	if (Instance->stateMap.test(StateFlag::TRCUP)) {
 	  DownPixelColor = PENWHITE;
 	}
 	else {
@@ -852,7 +852,7 @@ void trace::untrace() {
   if (!TraceInstance->TracedMap.empty()) {
 	TraceInstance->TracedMap.resize(0); // allocated in trace
   }
-  Instance->StateMap.reset(StateFlag::WASEDG);
+  Instance->stateMap.reset(StateFlag::WASEDG);
   hideTraceWin();
   hidwnd(TraceStepWin);
   thred::showColorWin();
@@ -866,8 +866,8 @@ void trace::trdif() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  Instance->StateMap.reset(StateFlag::TRSET);
-  Instance->StateMap.reset(StateFlag::HIDMAP);
+  Instance->stateMap.reset(StateFlag::TRSET);
+  Instance->stateMap.reset(StateFlag::HIDMAP);
   untrace();
   auto const bitmapSize = bitmap::getBitmapHeight() * bitmap::getBitmapWidth();
   if (bitmapSize == 0U) {
@@ -877,7 +877,7 @@ void trace::trdif() {
   differenceBitmap.resize(wrap::toSize(bitmapSize));
   auto colorSumMaximum = 0U;
   auto colorSumMinimum = BIGUINT;
-  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
+  if (!Instance->stateMap.test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
   auto const spTBD = gsl::span(TraceBitmapData, wrap::toSize(bitmapSize));
@@ -908,8 +908,8 @@ void trace::trdif() {
 	}
   }
   bitmap::bitbltBitmap();
-  Instance->StateMap.set(StateFlag::WASDIF);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::WASDIF);
+  Instance->stateMap.set(StateFlag::RESTCH);
   tracwnd();
 }
 
@@ -923,9 +923,9 @@ void trace::trace() {
   TraceDataSize = bitmap::getrmap();
   auto const spTBD =
       gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
-  if (thred::inStitchWin() && !Instance->StateMap.testAndReset(StateFlag::WASTRCOL)) {
+  if (thred::inStitchWin() && !Instance->stateMap.testAndReset(StateFlag::WASTRCOL)) {
 	auto stitchPoint = thred::pxCor2stch(WinMsg.pt);
-	if (Instance->StateMap.test(StateFlag::LANDSCAP)) {
+	if (Instance->stateMap.test(StateFlag::LANDSCAP)) {
 	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
 	  stitchPoint.y -= wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
 	}
@@ -934,7 +934,7 @@ void trace::trace() {
 	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround((bmpSR.y * stitchPoint.y) - 1.0F)};
 
 	auto const color = spTBD[wrap::toSize((bitmapPoint.y * bitmap::getBitmapWidth()) + bitmapPoint.x)] ^ 0xffffffU;
-	if (Instance->StateMap.test(StateFlag::TRCUP)) {
+	if (Instance->stateMap.test(StateFlag::TRCUP)) {
 	  UpPixelColor   = color;
 	  DownPixelColor = PENWHITE;
 	}
@@ -942,18 +942,18 @@ void trace::trace() {
 	  DownPixelColor = color;
 	  UpPixelColor   = 0;
 	}
-	Instance->StateMap.set(StateFlag::TRCRED);
-	Instance->StateMap.set(StateFlag::TRCGRN);
-	Instance->StateMap.set(StateFlag::TRCBLU);
+	Instance->stateMap.set(StateFlag::TRCRED);
+	Instance->stateMap.set(StateFlag::TRCGRN);
+	Instance->stateMap.set(StateFlag::TRCBLU);
   }
   auto traceColorMask = COLMASK;
-  if (!Instance->StateMap.test(StateFlag::TRCRED)) {
+  if (!Instance->stateMap.test(StateFlag::TRCRED)) {
 	traceColorMask &= REDMSK;
   }
-  if (!Instance->StateMap.test(StateFlag::TRCGRN)) {
+  if (!Instance->stateMap.test(StateFlag::TRCGRN)) {
 	traceColorMask &= GRNMSK;
   }
-  if (!Instance->StateMap.test(StateFlag::TRCBLU)) {
+  if (!Instance->stateMap.test(StateFlag::TRCBLU)) {
 	traceColorMask &= BLUMSK;
   }
   if (traceColorMask != COLMASK) {
@@ -1007,12 +1007,12 @@ void trace::trace() {
 	++pos;
   }
 #endif
-  Instance->StateMap.set(StateFlag::TRSET);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::TRSET);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void trace::tracedg() {
-  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
+  if (!Instance->stateMap.test(StateFlag::WASTRAC)) {
 	trace();
   }
   auto& tracedEdges = TraceInstance->TracedEdges;
@@ -1074,8 +1074,8 @@ void trace::tracedg() {
 	}
 	++pos;
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
-  Instance->StateMap.set(StateFlag::WASEDG);
+  Instance->stateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::WASEDG);
 }
 
 void trace::trinit() {
@@ -1084,19 +1084,19 @@ void trace::trinit() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::TRSET)) {
-	Instance->StateMap.set(StateFlag::WASTRCOL);
+  if (Instance->stateMap.test(StateFlag::TRSET)) {
+	Instance->stateMap.set(StateFlag::WASTRCOL);
 	trace();
 	return;
   }
-  Instance->StateMap.set(StateFlag::TRCRED);
-  Instance->StateMap.set(StateFlag::TRCGRN);
-  Instance->StateMap.set(StateFlag::TRCBLU);
+  Instance->stateMap.set(StateFlag::TRCRED);
+  Instance->stateMap.set(StateFlag::TRCGRN);
+  Instance->stateMap.set(StateFlag::TRCBLU);
   auto componentPeak = std::array<uint32_t, CHANLCNT> {};
-  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
+  if (!Instance->stateMap.test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
-  if (Instance->StateMap.test(StateFlag::MONOMAP)) {
+  if (Instance->stateMap.test(StateFlag::MONOMAP)) {
 	auto const spTBD =
 	    gsl::span {TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
 	auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
@@ -1155,7 +1155,7 @@ void trace::trinit() {
   DownPixelColor = InvertDownColor ^ COLMASK;
   InvertUpColor  = PENWHITE;
   UpPixelColor   = 0U;
-  Instance->StateMap.set(StateFlag::WASTRCOL);
+  Instance->stateMap.set(StateFlag::WASTRCOL);
   trace();
 }
 
@@ -1164,15 +1164,15 @@ void trace::trcsel() {
 	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
-  Instance->StateMap.set(StateFlag::WASTRCOL);
-  Instance->StateMap.set(StateFlag::TRCRED);
-  Instance->StateMap.set(StateFlag::TRCBLU);
-  Instance->StateMap.set(StateFlag::TRCGRN);
+  Instance->stateMap.set(StateFlag::WASTRCOL);
+  Instance->stateMap.set(StateFlag::TRCRED);
+  Instance->stateMap.set(StateFlag::TRCBLU);
+  Instance->stateMap.set(StateFlag::TRCGRN);
   DownPixelColor = PENWHITE;
   UpPixelColor   = 0;
   trace();
-  Instance->StateMap.reset(StateFlag::HIDMAP);
-  Instance->StateMap.reset(StateFlag::TRSET);
+  Instance->stateMap.reset(StateFlag::HIDMAP);
+  Instance->stateMap.reset(StateFlag::TRSET);
   auto const bitmapSize = wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   for (auto const spTBD = gsl::span(TraceBitmapData, bitmapSize); auto& iPixel : spTBD) {
 	auto colors                = trcols(iPixel);
@@ -1188,8 +1188,8 @@ void trace::trcsel() {
 	iPixel &= TRACE_RGB.at(iRGB);
   }
   bitmap::bitbltBitmap();
-  Instance->StateMap.set(StateFlag::WASDSEL);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::WASDSEL);
+  Instance->stateMap.set(StateFlag::RESTCH);
   tracwnd();
 }
 
@@ -1199,11 +1199,11 @@ void trace::dutrnum2() {
 
 void trace::dutrnum1() {
   thred::destroyGeneralNumberInputBox();
-  Instance->StateMap.reset(StateFlag::NUMIN);
-  Instance->StateMap.reset(StateFlag::TRNIN1);
+  Instance->stateMap.reset(StateFlag::NUMIN);
+  Instance->stateMap.reset(StateFlag::TRNIN1);
   auto traceLength = thred::getMsgBufferValue();
   traceLength      = std::min(traceLength, MAXSIZ);
-  if (Instance->StateMap.test(StateFlag::TRNUP)) {
+  if (Instance->stateMap.test(StateFlag::TRNUP)) {
 	IniFile.traceLength = traceLength * PFGRAN;
 	trcstpnum();
   }
@@ -1228,22 +1228,22 @@ void trace::blak() {
   BlackPen = wrap::createPen(PS_SOLID, PENNWID, PENBLK);
   SelectObject(bitmap::getBitmapDC(), BlackPen);
   SelectObject(bitmap::getTraceDC(), BlackPen);
-  if (!Instance->StateMap.test(StateFlag::WASTRAC)) {
+  if (!Instance->stateMap.test(StateFlag::WASTRAC)) {
 	TraceDataSize = bitmap::getrmap();
   }
   for (auto const& iForm : formList) {
 	bitmap::bfrm(iForm);
   }
   DeleteObject(BlackPen);
-  Instance->StateMap.set(StateFlag::WASBLAK);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::WASBLAK);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void trace::tracpar() {
-  if (Instance->StateMap.test(StateFlag::TRNIN0)) {
+  if (Instance->stateMap.test(StateFlag::TRNIN0)) {
 	dutrnum2();
   }
-  if (Instance->StateMap.test(StateFlag::TRNIN1)) {
+  if (Instance->stateMap.test(StateFlag::TRNIN1)) {
 	dutrnum1();
   }
   TraceMsgPoint = POINT {WinMsg.pt.x - ThredWindowOrigin.x, WinMsg.pt.y - ThredWindowOrigin.y};
@@ -1260,38 +1260,38 @@ void trace::tracpar() {
 	}
 	else {
 	  if (auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight); position < TRWINROW02) {
-		Instance->StateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
+		Instance->stateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
 		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
 		thred::redraw(*itTraceSelectWindow);
 		trace();
 	  }
 	  else {
 		if (position < TRWINROW04) {
-		  Instance->StateMap.set(StateFlag::NUMIN);
-		  Instance->StateMap.set(StateFlag::TRNIN0);
+		  Instance->stateMap.set(StateFlag::NUMIN);
+		  Instance->stateMap.set(StateFlag::TRNIN0);
 		  TraceMsgIndex       = 0;
 		  TraceInputBuffer[0] = 0;
 		  if (position < TRWINROW03) {
 			trnumwnd0(ButtonHeight * TRWINROW02);
-			Instance->StateMap.set(StateFlag::TRNUP);
+			Instance->stateMap.set(StateFlag::TRNUP);
 		  }
 		  else {
 			trnumwnd0(ButtonHeight * TRWINROW03);
-			Instance->StateMap.reset(StateFlag::TRNUP);
+			Instance->stateMap.reset(StateFlag::TRNUP);
 		  }
 		}
 		else {
 		  if (position < TRWINROW06) {
-			Instance->StateMap.set(StateFlag::NUMIN);
-			Instance->StateMap.set(StateFlag::TRNIN1);
+			Instance->stateMap.set(StateFlag::NUMIN);
+			Instance->stateMap.set(StateFlag::TRNIN1);
 			thred::resetMsgBuffer();
 			if (position < TRWINROW05) {
 			  thred::createTraceNumWin(ButtonHeight * TRWINROW04);
-			  Instance->StateMap.set(StateFlag::TRNUP);
+			  Instance->stateMap.set(StateFlag::TRNUP);
 			}
 			else {
 			  thred::createTraceNumWin(ButtonHeight * TRWINROW05);
-			  Instance->StateMap.reset(StateFlag::TRNUP);
+			  Instance->stateMap.reset(StateFlag::TRNUP);
 			}
 		  }
 		  else {
@@ -1362,14 +1362,14 @@ void trace::wasTrace() {
 	  auto tempBrush = blackBrush;
 	  SetBkColor(DrawItem->hDC, 0);
 	  SetTextColor(DrawItem->hDC, *iTraceRGB);
-	  if (Instance->StateMap.test(*iTraceRGBFlag)) {
+	  if (Instance->stateMap.test(*iTraceRGBFlag)) {
 		tempBrush = brush;
 		SetTextColor(DrawItem->hDC, 0);
 		SetBkColor(DrawItem->hDC, *iTraceRGB);
 	  }
 #pragma warning(suppress : 26812) // Enum.3 prefer 'enum class' over 'enum'
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, tempBrush);
-	  auto const strOnOff = displayText::loadStr(Instance->StateMap.test(*iTraceRGBFlag) ? IDS_ON : IDS_OFF);
+	  auto const strOnOff = displayText::loadStr(Instance->stateMap.test(*iTraceRGBFlag) ? IDS_ON : IDS_OFF);
 	  wrap::textOut(DrawItem->hDC, 1, 1, strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
 	  break;
 	}
@@ -1392,13 +1392,13 @@ void trace::wasTrace() {
 }
 
 void trace::wasTrace1() {
-  if (Instance->StateMap.test(StateFlag::TRNIN0)) {
+  if (Instance->stateMap.test(StateFlag::TRNIN0)) {
 	dutrnum2();
   }
-  if (Instance->StateMap.test(StateFlag::TRNIN1)) {
+  if (Instance->stateMap.test(StateFlag::TRNIN1)) {
 	dutrnum1();
   }
-  if (!Instance->StateMap.test(StateFlag::WASEDG)) {
+  if (!Instance->stateMap.test(StateFlag::WASEDG)) {
 	tracpar();
   }
 }

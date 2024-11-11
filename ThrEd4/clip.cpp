@@ -134,7 +134,7 @@ void clpcrnr(FRM_HEAD const&       form,
              F_POINT const&        rotationCenter) {
   auto const  nextVertex = form::nxt(form, vertex);
   auto const  itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + nextVertex);
-  auto const* points   = Instance->StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  auto const* points   = Instance->stateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (nullptr == points) {
 	return;
   }
@@ -257,7 +257,7 @@ void duch(std::vector<F_POINT> const& chainEndPoints) {
   constexpr auto CHLEN = size_t {8U}; // number of stitches in a chain
 
   auto backupAt = CHLEN;
-  if (Instance->StateMap.test(StateFlag::LINCHN)) {
+  if (Instance->stateMap.test(StateFlag::LINCHN)) {
 	--backupAt;
   }
   if (Instance->oSequence.size() >= backupAt) {
@@ -298,7 +298,7 @@ void duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t const start, ui
   chainPoint[2]           = F_POINT {chainEndPoints[finish].x + (delta.x / CHFACTOR),
                            chainEndPoints[finish].y + (delta.y / CHFACTOR)};
   auto chainCount         = CHAINLEN;
-  if (Instance->StateMap.test(StateFlag::LINCHN)) {
+  if (Instance->stateMap.test(StateFlag::LINCHN)) {
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
@@ -842,7 +842,7 @@ auto clip::numclp(uint32_t const formIndex) -> uint32_t {
 }
 
 void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const clipEntries) {
-  if (Instance->StateMap.test(StateFlag::NOCLP)) {
+  if (Instance->stateMap.test(StateFlag::NOCLP)) {
 	return;
   }
   auto& clipBuffer = Instance->clipBuffer;
@@ -892,7 +892,7 @@ void clip::clpout(float const width) {
 
 void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t const startVertex) {
   Instance->oSequence.clear();
-  Instance->StateMap.reset(StateFlag::CLPBAK);
+  Instance->stateMap.reset(StateFlag::CLPBAK);
   auto const clipStitchCount = Instance->clipBuffer.size();
   auto       clipFillData    = std::vector<F_POINT> {};
   clipFillData.resize(clipStitchCount);
@@ -960,7 +960,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   auto const rotationCenter =
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   Instance->oSequence.clear();
-  Instance->StateMap.reset(StateFlag::CLPBAK);
+  Instance->stateMap.reset(StateFlag::CLPBAK);
   ClipReference = F_POINT {rotationCenter.y, clipRect.left};
 
   constexpr auto SATWIDTH = 20.0F;

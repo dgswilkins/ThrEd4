@@ -215,7 +215,7 @@ void dutxmir() {
 	    gsl::narrow_cast<uint16_t>(TextureScreen.lines - tempTexturePoints.operator[](index).line + 1U);
 	tempTexturePoints.emplace_back(TX_PNT {.y = tempTexturePoints.operator[](index).y, .line = newLine});
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void dutxrct(TXTR_RECT& textureRect) noexcept {
@@ -331,7 +331,7 @@ void nutx(uint32_t const formIndex) {
 }
 
 void nxbak() {
-  if (!Instance->StateMap.test(StateFlag::WASTXBAK)) {
+  if (!Instance->stateMap.test(StateFlag::WASTXBAK)) {
 	return;
   }
   auto       flag = false;
@@ -387,7 +387,7 @@ void redtbak() {
 	                         textureHistoryItem.texturePoints.cbegin(),
 	                         textureHistoryItem.texturePoints.cend());
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void ritxfrm(FRM_HEAD const& textureForm) {
@@ -445,7 +445,7 @@ void setxclp(FRM_HEAD const& form) {
   auto editorOffset = F_POINT {};
   deorg(screenOffset);
   px2ed(screenOffset, editorOffset);
-  if (Instance->StateMap.testAndReset(StateFlag::TXHCNTR)) {
+  if (Instance->stateMap.testAndReset(StateFlag::TXHCNTR)) {
 	editorOffset.x = wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing * HALF +
 	                 TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing * HALF;
   }
@@ -468,7 +468,7 @@ void setxclp(FRM_HEAD const& form) {
 }
 
 void setxmov() {
-  Instance->StateMap.set(StateFlag::TXTMOV);
+  Instance->stateMap.set(StateFlag::TXTMOV);
   TextureCursorLocation.x = SelectTexturePointsOrigin.x = WinMsg.pt.x - StitchWindowOrigin.x;
   TextureCursorLocation.y = SelectTexturePointsOrigin.y = WinMsg.pt.y - StitchWindowOrigin.y;
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -478,12 +478,12 @@ void stxlin() {
   auto offset = POINT {};
   auto point0 = F_POINT {};
   auto point1 = F_POINT {};
-  Instance->StateMap.reset(StateFlag::TXTMOV);
+  Instance->stateMap.reset(StateFlag::TXTMOV);
   deorg(offset);
   px2ed(offset, point1);
   px2ed(Instance->formLines.front(), point0);
   dutxlin(point0, point1);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void txang(FRM_HEAD& form) {
@@ -496,7 +496,7 @@ void txang(FRM_HEAD& form) {
 }
 
 void txbak() {
-  if (!Instance->StateMap.test(StateFlag::WASTXBAK)) {
+  if (!Instance->stateMap.test(StateFlag::WASTXBAK)) {
 	return;
   }
   TextureInstance->SelectedTexturePointsList.clear();
@@ -540,11 +540,11 @@ auto tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexcept -
 }
 
 void txcntrv(FRM_HEAD const& textureForm) {
-  if (Instance->StateMap.testAndReset(StateFlag::TXTCLP)) {
-	Instance->StateMap.set(StateFlag::TXHCNTR);
+  if (Instance->stateMap.testAndReset(StateFlag::TXTCLP)) {
+	Instance->stateMap.set(StateFlag::TXHCNTR);
 	texture::savtxt();
 	setxclp(textureForm);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -552,11 +552,11 @@ void txdelal() {
   Instance->textureInputBuffer.clear();
   DestroyWindow(SideWindowButton);
   SideWindowButton = nullptr;
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
   texture::savtxt();
   TextureInstance->TempTexturePoints.clear();
   texture::rstxt();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 auto txdig(wchar_t const keyCode, wchar_t& character) noexcept -> bool {
@@ -654,7 +654,7 @@ void txnudg(int32_t const deltaX, float const deltaY) {
 	}
   }
   dutxrct(TextureRect);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void txpar(FRM_HEAD& form) {
@@ -761,14 +761,14 @@ void txtdel() {
 	  return texturePointsMap.test(index++);
 	});
 	selectedTexturePointsList.clear();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   if (auto iClosestPoint = 0U; !tempTexturePoints.empty() && txtclos(iClosestPoint)) {
 	auto itPoint = tempTexturePoints.cbegin();
 	std::advance(itPoint, iClosestPoint);
 	itPoint = tempTexturePoints.erase(itPoint);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -778,9 +778,9 @@ void txtlin() {
   formLines.resize(2);
   deorg(formLines[0]);
   deorg(formLines[1]);
-  Instance->StateMap.reset(StateFlag::TXTCLP);
-  Instance->StateMap.set(StateFlag::TXTLIN);
-  Instance->StateMap.set(StateFlag::TXTMOV);
+  Instance->stateMap.reset(StateFlag::TXTCLP);
+  Instance->stateMap.set(StateFlag::TXTLIN);
+  Instance->stateMap.set(StateFlag::TXTMOV);
 }
 
 void txtxfn(POINT const& reference, uint16_t const offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
@@ -919,14 +919,14 @@ void chktxnum() {
 		texture::savtxt();
 		TextureScreen.areaHeight = value;
 		IniFile.textureHeight    = value;
-		Instance->StateMap.set(StateFlag::CHKTX);
+		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
 	  case HTXWID: {
 		texture::savtxt();
 		TextureScreen.width  = value;
 		IniFile.textureWidth = value;
-		Instance->StateMap.set(StateFlag::CHKTX);
+		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
 	  case HTXSPAC: {
@@ -934,7 +934,7 @@ void chktxnum() {
 		TextureScreen.spacing  = value;
 		IniFile.textureSpacing = value;
 		TextureScreen.width    = value * wrap::toFloat(TextureScreen.lines) + value * HALF;
-		Instance->StateMap.set(StateFlag::CHKTX);
+		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
 	  default: {
@@ -945,7 +945,7 @@ void chktxnum() {
   }
   DestroyWindow(SideWindowButton);
   SideWindowButton = nullptr;
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void deorg(POINT& point) noexcept {
@@ -964,7 +964,7 @@ void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t
 
 void dutxfn(uint32_t const textureType) {
   altx();
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	txfn(textureType, ClosestFormToCursor);
   }
   else {
@@ -974,7 +974,7 @@ void dutxfn(uint32_t const textureType) {
   }
   texture::txof();
   texture::rstxt();
-  if (Instance->StateMap.testAndReset(StateFlag::WASFRMFRM)) {
+  if (Instance->stateMap.testAndReset(StateFlag::WASFRMFRM)) {
 	formForms::refrm();
   }
 }
@@ -1122,7 +1122,7 @@ void texture::redtx() {
 	  }
 	  ++texture;
 	}
-	Instance->StateMap.set(StateFlag::WASTXBAK);
+	Instance->stateMap.set(StateFlag::WASTXBAK);
 	CloseHandle(handle);
 	break;
   }
@@ -1139,9 +1139,9 @@ void texture::savtxt() {
       !chktxh(currentHistoryItem)) {
 	return;
   }
-  Instance->StateMap.set(StateFlag::WASTXBAK);
-  Instance->StateMap.reset(StateFlag::TXBDIR);
-  Instance->StateMap.reset(StateFlag::LASTXBAK);
+  Instance->stateMap.set(StateFlag::WASTXBAK);
+  Instance->stateMap.reset(StateFlag::TXBDIR);
+  Instance->stateMap.reset(StateFlag::LASTXBAK);
   txrfor();
   auto& currentItem   = textureHistory.operator[](TextureHistoryIndex);
   currentItem.height  = TextureScreen.areaHeight;
@@ -1168,16 +1168,16 @@ auto texture::dutxtfil() -> bool {
   if (IniFile.textureEditorSize == 0U) {
 	IniFile.textureEditorSize = ITXPIX;
   }
-  Instance->StateMap.set(StateFlag::TXTRED);
-  Instance->StateMap.set(StateFlag::ZUMED);
-  Instance->StateMap.reset(StateFlag::WASPAT);
-  Instance->StateMap.reset(StateFlag::RUNPAT);
+  Instance->stateMap.set(StateFlag::TXTRED);
+  Instance->stateMap.set(StateFlag::ZUMED);
+  Instance->stateMap.reset(StateFlag::WASPAT);
+  Instance->stateMap.reset(StateFlag::RUNPAT);
   thred::movStch();
   thred::showScrollBars(false);
   TextureInstance->SelectedTexturePointsList.clear();
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::INIT);
   SideWindowButton = nullptr;
-  if (Instance->StateMap.test(StateFlag::WASTXBAK)) {
+  if (Instance->stateMap.test(StateFlag::WASTXBAK)) {
 	redtbak();
 	if (TextureScreen.areaHeight == 0.0F) {
 	  TextureScreen.areaHeight = IniFile.textureHeight;
@@ -1188,8 +1188,8 @@ auto texture::dutxtfil() -> bool {
 	if (TextureScreen.width == 0.0F) {
 	  TextureScreen.width = IniFile.textureWidth;
 	}
-	Instance->StateMap.set(StateFlag::LASTXBAK);
-	Instance->StateMap.reset(StateFlag::TXBDIR);
+	Instance->stateMap.set(StateFlag::LASTXBAK);
+	Instance->stateMap.reset(StateFlag::TXBDIR);
   }
   else {
 	TextureInstance->TempTexturePoints.clear();
@@ -1197,7 +1197,7 @@ auto texture::dutxtfil() -> bool {
 	TextureScreen.width      = IniFile.textureWidth;
 	TextureScreen.spacing    = IniFile.textureSpacing;
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
   return true;
 }
 
@@ -1210,7 +1210,7 @@ void texture::drwtxtr() {
       wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(StitchWindowClientRect.right);
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
   auto const extraWidth = TextureScreen.spacing * wrap::toFloat(TextureScreen.lines + 2U);
-  if (Instance->StateMap.testAndReset(StateFlag::CHKTX)) {
+  if (Instance->stateMap.testAndReset(StateFlag::CHKTX)) {
 	auto const erased = std::erase_if(TextureInstance->TempTexturePoints, [&](auto const& point) -> bool {
 	  return !(point.line <= TextureScreen.lines && point.y <= TextureScreen.areaHeight);
 	});
@@ -1304,20 +1304,20 @@ void texture::drwtxtr() {
 
 void texture::rstxt() {
   TextureInstance->SelectedTexturePointsList.clear();
-  Instance->StateMap.reset(StateFlag::TXTMOV);
-  Instance->StateMap.reset(StateFlag::BZUM);
-  Instance->StateMap.reset(StateFlag::BZUMIN);
-  Instance->StateMap.set(StateFlag::RESTCH);
-  Instance->StateMap.reset(StateFlag::POLIMOV);
+  Instance->stateMap.reset(StateFlag::TXTMOV);
+  Instance->stateMap.reset(StateFlag::BZUM);
+  Instance->stateMap.reset(StateFlag::BZUMIN);
+  Instance->stateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.reset(StateFlag::POLIMOV);
   DestroyWindow(SideWindowButton);
   SideWindowButton = nullptr;
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void texture::txtrbut() {
   if (txbutfn()) {
 	savtxt();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
   else {
 	rstxt();
@@ -1326,10 +1326,10 @@ void texture::txtrbut() {
 
 void texture::txtrup() {
   auto offset = POINT {};
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
   auto& tempTexturePoints         = TextureInstance->TempTexturePoints;
   auto& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
-  if (Instance->StateMap.testAndReset(StateFlag::TXTMOV)) {
+  if (Instance->stateMap.testAndReset(StateFlag::TXTMOV)) {
 	savtxt();
 	deorg(offset);
 	offset.x -= SelectTexturePointsOrigin.x;
@@ -1366,7 +1366,7 @@ void texture::txtrup() {
 	dutxrct(TextureRect);
 	return;
   }
-  if (!Instance->StateMap.testAndReset(StateFlag::BZUMIN)) {
+  if (!Instance->stateMap.testAndReset(StateFlag::BZUMIN)) {
 	return;
   }
   auto highestTexturePoint = TX_PNT {};
@@ -1412,14 +1412,14 @@ void texture::setxfrm() noexcept {
 }
 
 void texture::txtrmov(FRM_HEAD const& textureForm) {
-  if (Instance->StateMap.test(StateFlag::TXTLIN)) {
+  if (Instance->stateMap.test(StateFlag::TXTLIN)) {
 	dutxtlin();
 	deorg(Instance->formLines.operator[](1));
 	dutxtlin();
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::TXTCLP)) {
-	if (Instance->StateMap.testAndSet(StateFlag::WASWROT)) {
+  if (Instance->stateMap.test(StateFlag::TXTCLP)) {
+	if (Instance->stateMap.testAndSet(StateFlag::WASWROT)) {
 	  ritxfrm(textureForm);
 	}
 	TextureCursorLocation = {.x = WinMsg.pt.x - StitchWindowOrigin.x,
@@ -1485,7 +1485,7 @@ void texture::deltx(uint32_t const formIndex) {
 void texture::txof() {
   displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
   thred::redraw(Instance->buttonWin.operator[](HHID));
-  if (Instance->StateMap.test(StateFlag::UPTO)) {
+  if (Instance->stateMap.test(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
   else {
@@ -1496,19 +1496,19 @@ void texture::txof() {
   thred::zumhom();
   TextureInstance->SelectedTexturePointsList.clear();
   TextureInstance->SelectedTexturePointsList.shrink_to_fit();
-  Instance->StateMap.reset(StateFlag::TXTRED);
+  Instance->stateMap.reset(StateFlag::TXTRED);
 }
 
 void texture::txtlbut(FRM_HEAD const& textureForm) {
   if (chkbut()) {
 	return;
   }
-  if (Instance->StateMap.testAndReset(StateFlag::TXTCLP)) {
+  if (Instance->stateMap.testAndReset(StateFlag::TXTCLP)) {
 	savtxt();
 	setxclp(textureForm);
 	return;
   }
-  if (Instance->StateMap.testAndReset(StateFlag::TXTLIN)) {
+  if (Instance->stateMap.testAndReset(StateFlag::TXTLIN)) {
 	savtxt();
 	stxlin();
 	return;
@@ -1527,13 +1527,13 @@ void texture::txtlbut(FRM_HEAD const& textureForm) {
 	  selectedTexturePointsList.resize(1);
 	  setxmov();
 	  dutxrct(TextureRect);
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
   }
   selectedTexturePointsList.clear();
-  Instance->StateMap.set(StateFlag::BZUMIN);
-  Instance->StateMap.reset(StateFlag::BZUM);
+  Instance->stateMap.set(StateFlag::BZUMIN);
+  Instance->stateMap.reset(StateFlag::BZUM);
   ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = WinMsg.pt.x - StitchWindowOrigin.x;
   ZoomBoxLine[0].y = ZoomBoxLine[1].y = WinMsg.pt.y - StitchWindowOrigin.y;
   ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1L;
@@ -1561,7 +1561,7 @@ void texture::txsnap() {
 	}
   }
   dutxrct(TextureRect);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
@@ -1575,7 +1575,7 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  case VK_ESCAPE:
 	  case 'Q': {
 		rstxt();
-		Instance->StateMap.set(StateFlag::RESTCH);
+		Instance->stateMap.set(StateFlag::RESTCH);
 		break;
 	  }
 	  case VK_BACK: // backspace
@@ -1610,7 +1610,7 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	}
 	case 'Q': {
 	  rstxt();
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  break;
 	}
 	case VK_OEM_4: { //  '[{' for US
@@ -1643,12 +1643,12 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	}
 	case 'Z':
 	case 'B': {
-	  if (!Instance->StateMap.testAndSet(StateFlag::LASTXBAK)) {
+	  if (!Instance->stateMap.testAndSet(StateFlag::LASTXBAK)) {
 		savtxt();
 		txrbak();
 	  }
 	  else {
-		if (Instance->StateMap.testAndReset(StateFlag::TXBDIR)) {
+		if (Instance->stateMap.testAndReset(StateFlag::TXBDIR)) {
 		  txrbak();
 		}
 	  }
@@ -1662,8 +1662,8 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  break;
 	}
 	case 'N': {
-	  Instance->StateMap.set(StateFlag::LASTXBAK);
-	  if (!Instance->StateMap.testAndSet(StateFlag::TXBDIR)) {
+	  Instance->stateMap.set(StateFlag::LASTXBAK);
+	  if (!Instance->stateMap.testAndSet(StateFlag::TXBDIR)) {
 		txrfor();
 	  }
 	  nxbak();
@@ -1708,7 +1708,7 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  break;
 	}
   }
-  Instance->StateMap.reset(StateFlag::LASTXBAK);
+  Instance->stateMap.reset(StateFlag::LASTXBAK);
 }
 
 void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
@@ -1716,7 +1716,7 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
   auto const currentCount = form.texture.count;
   savtxt();
   form.wordParam = 0;
-  Instance->StateMap.set(StateFlag::TXFIL);
+  Instance->stateMap.set(StateFlag::TXFIL);
   ClipRectSize.cx = form.fillSpacing;
   ClipRectSize.cy = form.texture.height;
   if (currentCount == 0U) {
@@ -1763,12 +1763,12 @@ void texture::setshft() {
   }
   savtxt();
   thred::unbBox();
-  Instance->StateMap.reset(StateFlag::BZUMIN);
+  Instance->stateMap.reset(StateFlag::BZUMIN);
   auto const stitchPoint = thred::pxCor2stch(
       POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
   auto const selectionRect =
       F_RECTANGLE {ZoomBoxOrigin.x, ZoomBoxOrigin.y, stitchPoint.x, stitchPoint.y};
-  Instance->StateMap.reset(StateFlag::TXIN);
+  Instance->stateMap.reset(StateFlag::TXIN);
   auto& tempTexturePoints = TextureInstance->TempTexturePoints;
   tempTexturePoints.clear();
   auto line = 1U;
@@ -1794,8 +1794,8 @@ void texture::setshft() {
   TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / wrap::toFloat(line);
   TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
   TextureScreen.width = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing * HALF;
-  Instance->StateMap.set(StateFlag::TXTRED);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::TXTRED);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void texture::writeScreenWidth(int32_t const position) {

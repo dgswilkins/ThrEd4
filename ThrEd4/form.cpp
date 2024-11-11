@@ -736,8 +736,8 @@ void setpoli() {
   form.attribute      = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   form.underlayIndent = IniFile.underlayIndent;
   Instance->formList.push_back(form);
-  Instance->StateMap.set(StateFlag::SATIN);
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::SATIN);
+  Instance->stateMap.set(StateFlag::INIT);
 }
 
 void setlin() {
@@ -745,63 +745,63 @@ void setlin() {
   form.type      = FRMLINE;
   form.attribute = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   Instance->formList.push_back(form);
-  Instance->StateMap.set(StateFlag::SATIN);
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::SATIN);
+  Instance->stateMap.set(StateFlag::INIT);
 }
 
 void setrpoli() {
   thred::unmsg();
   displayText::pntmsg(IDS_REGP);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRPOL);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRPOL);
   thred::numWnd();
 }
 
 void setstar() {
   thred::unmsg();
   displayText::pntmsg(IDS_STAR);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRSTAR);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRSTAR);
   thred::numWnd();
 }
 
 void setspir() {
   thred::unmsg();
   displayText::pntmsg(IDS_SPIR);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRSPIR);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRSPIR);
   thred::numWnd();
 }
 
 void sethart() {
   thred::unmsg();
   displayText::pntmsg(IDS_HEART);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRHART);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRHART);
   thred::numWnd();
 }
 
 void setlens() {
   thred::unmsg();
   displayText::pntmsg(IDS_LENS);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRLENS);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRLENS);
   thred::numWnd();
 }
 
 void seteg() {
   thred::unmsg();
   displayText::pntmsg(IDS_EGG);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTREG);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTREG);
   thred::numWnd();
 }
 
 void setzig() {
   thred::unmsg();
   displayText::pntmsg(IDS_ZIG);
-  Instance->StateMap.set(StateFlag::NUMIN);
-  Instance->StateMap.set(StateFlag::ENTRZIG);
+  Instance->stateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::ENTRZIG);
   thred::numWnd();
 }
 
@@ -1145,13 +1145,13 @@ void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
 }
 
 void duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1, F_POINT const& finish1, F_POINT& stitchPoint) {
-  if (!Instance->StateMap.test(StateFlag::UND)) {
+  if (!Instance->stateMap.test(StateFlag::UND)) {
 	auto const length0 = std::hypot(stitchPoint.x - start0.x, stitchPoint.y - start0.y);
 	if (auto const length1 = std::hypot(stitchPoint.x - start1.x, stitchPoint.y - start1.y); length0 > length1) {
-	  Instance->StateMap.set(StateFlag::FILDIR);
+	  Instance->stateMap.set(StateFlag::FILDIR);
 	}
 	else {
-	  Instance->StateMap.reset(StateFlag::FILDIR);
+	  Instance->stateMap.reset(StateFlag::FILDIR);
 	}
   }
   auto const delta0  = F_POINT {finish0.x - start0.x, finish0.y - start0.y};
@@ -1167,7 +1167,7 @@ void duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1
   auto       start00 = start0; // intentional copy
   auto       start11 = start1; // intentional copy
   for (auto iStep = 0U; iStep < count; ++iStep) {
-	if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+	if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 	  form::filinsb(start00, stitchPoint);
 	}
 	else {
@@ -1245,20 +1245,20 @@ void pbrd(FRM_HEAD const& form) {
   sprct(Instance->formVertices, form.vertexIndex, fillVerticalRect, form.vertexCount - 1U, 0U, outsidePoints);
   spurct(underlayVerticalRect, fillVerticalRect, form.vertexCount - 1U);
   if ((form.edgeType & EGUND) != 0U) {
-	Instance->StateMap.reset(StateFlag::SAT1);
+	Instance->stateMap.reset(StateFlag::SAT1);
 	LineSpacing = USPAC;
-	Instance->StateMap.set(StateFlag::UND);
+	Instance->stateMap.set(StateFlag::UND);
 	auto const width = form.borderSize * URAT;
 	satin::satout(form, width);
-	Instance->StateMap.set(StateFlag::UNDPHAS);
-	Instance->StateMap.set(StateFlag::FILDIR);
+	Instance->stateMap.set(StateFlag::UNDPHAS);
+	Instance->stateMap.set(StateFlag::FILDIR);
 	pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect, width);
-	Instance->StateMap.reset(StateFlag::UNDPHAS);
-	Instance->StateMap.reset(StateFlag::FILDIR);
+	Instance->stateMap.reset(StateFlag::UNDPHAS);
+	Instance->stateMap.reset(StateFlag::FILDIR);
 	pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect, width);
 	LineSpacing = form.edgeSpacing;
 	prsmal(width);
-	Instance->StateMap.reset(StateFlag::UND);
+	Instance->stateMap.reset(StateFlag::UND);
   }
   pfn(underlayVerticalRect, fillVerticalRect, start, fillVerticalRect, form.borderSize);
   LineSpacing = spacing;
@@ -1310,7 +1310,7 @@ void bhfn(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {
 void bhcrnr(FRM_HEAD const& form, uint32_t const vertex) {
   auto const  nextVertex = form::nxt(form, vertex);
   auto const  itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + nextVertex);
-  auto const* ptr      = Instance->StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  auto const* ptr      = Instance->stateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (nullptr == ptr) {
 	return;
   }
@@ -1405,12 +1405,12 @@ void chkbrd(FRM_HEAD const& form) {
 	  break;
 	}
 	case EDGELCHAIN: { // Lin Chain
-	  Instance->StateMap.set(StateFlag::LINCHN);
+	  Instance->stateMap.set(StateFlag::LINCHN);
 	  clip::chnfn(form);
 	  break;
 	}
 	case EDGEOCHAIN: { // Open Chain
-	  Instance->StateMap.reset(StateFlag::LINCHN);
+	  Instance->stateMap.reset(StateFlag::LINCHN);
 	  clip::chnfn(form);
 	  break;
 	}
@@ -1638,15 +1638,15 @@ void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& ang
   auto stitchPoint = *itVertex; // intentional copy
   if ((angledForm.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
-	Instance->StateMap.set(StateFlag::UND);
+	Instance->stateMap.set(StateFlag::UND);
 	auto const width = angledForm.borderSize * URAT;
-	Instance->StateMap.set(StateFlag::UNDPHAS);
-	Instance->StateMap.reset(StateFlag::FILDIR);
+	Instance->stateMap.set(StateFlag::UNDPHAS);
+	Instance->stateMap.reset(StateFlag::FILDIR);
 	plfn(angledForm, underlayVerticalRect, fillVerticalRect, underlayVerticalRect, width, stitchPoint);
 	auto const savedIndex = wrap::toUnsigned(Instance->oSequence.size());
-	Instance->StateMap.reset(StateFlag::UNDPHAS);
+	Instance->stateMap.reset(StateFlag::UNDPHAS);
 	stitchPoint = *itVertex;
-	Instance->StateMap.set(StateFlag::FILDIR);
+	Instance->stateMap.set(StateFlag::FILDIR);
 	plfn(angledForm, underlayVerticalRect, fillVerticalRect, underlayVerticalRect, width, stitchPoint);
 	plbak(savedIndex);
 	prsmal(width);
@@ -1654,7 +1654,7 @@ void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& ang
 	  stitchPoint = Instance->oSequence.back();
 	}
   }
-  Instance->StateMap.reset(StateFlag::UND);
+  Instance->stateMap.reset(StateFlag::UND);
   LineSpacing = angledForm.edgeSpacing;
   plfn(angledForm, underlayVerticalRect, fillVerticalRect, fillVerticalRect, angledForm.borderSize, stitchPoint);
   LineSpacing = form.edgeSpacing;
@@ -1797,7 +1797,7 @@ public:
   }
   // setup the indices and counts
   lowIndex = highIndex = 0;
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   auto lowCount       = 0U;
   auto highCount      = 0U;
   auto itFinishVertex = wrap::next(itFirstVertex, finish);
@@ -1842,7 +1842,7 @@ public:
 	      P_VEC {.angle = std::atan2(delta.y, delta.x), .length = std::hypot(delta.x, delta.y)};
 	  if (auto const polyDiff = P_VEC {.angle  = polyLine.angle - reference.angle,
 	                                   .length = polyLine.length / reference.length};
-	      Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+	      Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 		Instance->oSequence.emplace_back(lowPoint);
 		for (auto iVertex = 0U; iVertex < selectedVertexCount - 1; ++iVertex) {
 		  auto const length = polyLines[iVertex].length * polyDiff.length;
@@ -1865,7 +1865,7 @@ public:
 	lowPoint += lowStep;
 	highPoint += highStep;
   }
-  if (Instance->StateMap.test(StateFlag::FILDIR)) {
+  if (Instance->stateMap.test(StateFlag::FILDIR)) {
 	Instance->oSequence.push_back(*itFirstVertex);
   }
   else {
@@ -1881,10 +1881,10 @@ void duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices) {
 	    return first.x < second.x;
       })->x;
   if (leftEdge >= ClipRectSize.cx) {
-	Instance->StateMap.reset(StateFlag::WASNEG);
+	Instance->stateMap.reset(StateFlag::WASNEG);
 	return;
   }
-  Instance->StateMap.set(StateFlag::WASNEG);
+  Instance->stateMap.set(StateFlag::WASNEG);
   constexpr auto SAFOFFST = 0.01F; // factor to ensure that formOffset is not 0
   formOffset              = ClipRectSize.cx + fabs(leftEdge) + SAFOFFST;
   for (auto& vertex : currentFormVertices) {
@@ -2167,9 +2167,9 @@ void ritseg(FRM_HEAD const&              form,
   if ((form.extendedAttribute & AT_SQR) != 0U) {
 	isPointedEnd = false;
   }
-  if (Instance->StateMap.test(StateFlag::FILDIR)) {
+  if (Instance->stateMap.test(StateFlag::FILDIR)) {
 	auto iPoint = clipSegments[currentSegmentIndex].start;
-	if (Instance->StateMap.test(StateFlag::TXFIL) && isPointedEnd) {
+	if (Instance->stateMap.test(StateFlag::TXFIL) && isPointedEnd) {
 	  ++iPoint;
 	}
 	chksid(form, clipSegments[currentSegmentIndex].asid, clipIntersectSide, currentFormVertices);
@@ -2181,7 +2181,7 @@ void ritseg(FRM_HEAD const&              form,
   }
   else {
 	auto iPoint = clipSegments[currentSegmentIndex].finish;
-	if (Instance->StateMap.test(StateFlag::TXFIL) && isPointedEnd) {
+	if (Instance->stateMap.test(StateFlag::TXFIL) && isPointedEnd) {
 	  --iPoint;
 	}
 	chksid(form, clipSegments[currentSegmentIndex].zsid, clipIntersectSide, currentFormVertices);
@@ -2208,9 +2208,9 @@ auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
             uint32_t&                    outIndex) -> bool {
   auto       index        = 1U;
   auto const indexDoubled = wrap::toUnsigned(clipSegments.size()) * 2U;
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   while (index < clipSegments.size()) {
-	if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+	if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 	  outIndex = (sind + index) % indexDoubled;
 	  if (clipSegments[sortedLengths[outIndex].index].dun == 0) {
 		return false;
@@ -2229,7 +2229,7 @@ auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
 auto nucseg(std::vector<CLIP_SEG> const& clipSegments,
             std::vector<LEN_INFO> const& sortedLengths,
             uint32_t&                    currentSegmentIndex) -> bool {
-  auto const index    = Instance->StateMap.test(StateFlag::FILDIR)
+  auto const index    = Instance->stateMap.test(StateFlag::FILDIR)
                             ? clipSegments[currentSegmentIndex].endIndex
                             : clipSegments[currentSegmentIndex].beginIndex;
   auto       outIndex = 0U;
@@ -2237,10 +2237,10 @@ auto nucseg(std::vector<CLIP_SEG> const& clipSegments,
 	return false;
   }
   if (sortedLengths[outIndex].isEnd) {
-	Instance->StateMap.reset(StateFlag::FILDIR);
+	Instance->stateMap.reset(StateFlag::FILDIR);
   }
   else {
-	Instance->StateMap.set(StateFlag::FILDIR);
+	Instance->stateMap.set(StateFlag::FILDIR);
   }
   currentSegmentIndex = sortedLengths[outIndex].index;
   return true;
@@ -2259,7 +2259,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
   auto       formOffset         = 0.0F;
   duflt(formOffset, currentFormVertices);
   auto clipWidth = ClipRectSize.cx + form.fillSpacing;
-  if (Instance->StateMap.test(StateFlag::ISUND)) {
+  if (Instance->stateMap.test(StateFlag::ISUND)) {
 	clipWidth = form.underlaySpacing;
   }
   auto clipNegative = false;
@@ -2267,7 +2267,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 	clipNegative = true;
   }
   clipWidth = std::max(clipWidth, CLPMINVT);
-  if (Instance->StateMap.test(StateFlag::TXFIL)) {
+  if (Instance->stateMap.test(StateFlag::TXFIL)) {
 	if (!Instance->TexturePointsBuffer.empty() &&
 	    form.texture.index + form.texture.count <=
 	        gsl::narrow<decltype(form.texture.index)>(Instance->TexturePointsBuffer.size())) {
@@ -2399,7 +2399,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 	  auto lineSegmentStart   = F_POINT {}; // vertical clipboard line segment start
 	  auto lineSegmentEnd     = F_POINT {}; // vertical clipboard line segment end
 	  auto clipStitchCount    = wrap::toUnsigned(clipBuffer.size());
-	  if (Instance->StateMap.test(StateFlag::TXFIL)) {
+	  if (Instance->stateMap.test(StateFlag::TXFIL)) {
 		auto const textureLine =
 		    (iRegion + wrap::toUnsigned(clipGrid.left)) % wrap::toUnsigned(form.texture.lines);
 		clipStitchCount = wrap::toUnsigned(textureSegments[textureLine].stitchCount);
@@ -2440,7 +2440,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 		}
 		auto textureIt = texture; // intentional copy
 		for (auto iStitch = 0U; iStitch < clipStitchCount; ++iStitch) {
-		  if (Instance->StateMap.test(StateFlag::TXFIL)) {
+		  if (Instance->stateMap.test(StateFlag::TXFIL)) {
 			lineSegmentEnd = F_POINT {pasteLocation.x, pasteLocation.y + textureIt->y};
 			++textureIt;
 		  }
@@ -2520,7 +2520,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
   auto clipSegments = std::vector<CLIP_SEG> {};
 
 #if (CLPVU == 0) || (CLPVU == 2)
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   if (auto endPoint = wrap::toUnsigned(clipStitchPoints.size()); endPoint != 0U) {
 	--endPoint;
 	// reserve a reasonable amount but not the full amount potentially required
@@ -2530,11 +2530,11 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 	for (auto iPoint = 0U; iPoint < endPoint; ++iPoint) {
 	  switch (clipStitchPoints[iPoint].flag) {
 		case 0: { // inside
-		  Instance->StateMap.set(StateFlag::FILDIR);
+		  Instance->stateMap.set(StateFlag::FILDIR);
 		  break;
 		}
 		case 1: { // line
-		  if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+		  if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 			clpnseg(clipStitchPoints, clipSegments, lengths, previousPoint, iPoint, currentFormVertices);
 		  }
 		  else {
@@ -2543,7 +2543,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 		  break;
 		}
 		case 2: { // outside
-		  Instance->StateMap.reset(StateFlag::FILDIR);
+		  Instance->stateMap.reset(StateFlag::FILDIR);
 		  break;
 		}
 		default: {
@@ -2600,7 +2600,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 #if CLPVU == 0
 
   auto currentSegmentIndex = 0U;
-  Instance->StateMap.set(StateFlag::FILDIR);
+  Instance->stateMap.set(StateFlag::FILDIR);
   Instance->oSequence.clear();
   auto clipIntersectSide = clipSegments[0].asid;
   ritseg(form, clipStitchPoints, clipSegments, currentSegmentIndex, clipIntersectSide, currentFormVertices);
@@ -2616,7 +2616,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 	}
   }
   Instance->oSequence.resize(index);
-  if (Instance->StateMap.test(StateFlag::WASNEG)) {
+  if (Instance->stateMap.test(StateFlag::WASNEG)) {
 	for (auto& iSequence : Instance->oSequence) {
 	  iSequence.x -= formOffset;
 	}
@@ -2991,7 +2991,7 @@ void brkdun(std::vector<SMAL_PNT_L> const& lineEndpoints,
       workingFormVertices.operator[](lineEndpoints[sortedLineIndices[start]].line).x,
       workingFormVertices.operator[](lineEndpoints[sortedLineIndices[start]].line).y,
       0);
-  Instance->StateMap.set(StateFlag::BRKFIX);
+  Instance->stateMap.set(StateFlag::BRKFIX);
 }
 
 void duseq1(std::vector<SMAL_PNT_L> const& lineEndpoints,
@@ -3024,7 +3024,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
             boost::dynamic_bitset<>&       sequenceMap,
             uint32_t&                      lastGroup,
             uint32_t&                      sequenceIndex) {
-  Instance->StateMap.reset(StateFlag::SEQDUN);
+  Instance->stateMap.reset(StateFlag::SEQDUN);
   if (sequenceIndex > lineEndpoints.size()) {
 	sequenceIndex = start;
   }
@@ -3050,7 +3050,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 		sequenceIndex = iLineDec;
 	  }
 	  if (sequenceMap.test_set(iLineDec)) {
-		if (!Instance->StateMap.testAndSet(StateFlag::SEQDUN)) {
+		if (!Instance->stateMap.testAndSet(StateFlag::SEQDUN)) {
 		  duseq1(lineEndpoints, sortedLineIndices, sequenceIndex);
 		}
 	  }
@@ -3079,7 +3079,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 		sequenceIndex = iLine;
 	  }
 	  if (sequenceMap.test_set(iLine)) {
-		if (!Instance->StateMap.testAndSet(StateFlag::SEQDUN)) {
+		if (!Instance->stateMap.testAndSet(StateFlag::SEQDUN)) {
 		  duseq1(lineEndpoints, sortedLineIndices, sequenceIndex);
 		}
 	  }
@@ -3089,7 +3089,7 @@ void brkseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	}
 	lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
   }
-  if (Instance->StateMap.testAndReset(StateFlag::SEQDUN)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SEQDUN)) {
 	duseq1(lineEndpoints, sortedLineIndices, sequenceIndex);
   }
 }
@@ -3129,7 +3129,7 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
            uint32_t&                      lastGroup,
            uint32_t&                      sequenceIndex) {
   auto savedTopLine = lineEndpoints[wrap::toSize(sortedLineIndices[start]) + 1U].line;
-  Instance->StateMap.reset(StateFlag::SEQDUN);
+  Instance->stateMap.reset(StateFlag::SEQDUN);
   bool flag = false;
   if (start > finish) {
 	auto iLine = start + 1U;
@@ -3137,7 +3137,7 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	for (; iLine != finish; --iLine) {
 	  auto const iLineDec = iLine - 1U;
 	  if (sequenceMap.test_set(iLineDec)) {
-		if (!Instance->StateMap.testAndSet(StateFlag::SEQDUN)) {
+		if (!Instance->stateMap.testAndSet(StateFlag::SEQDUN)) {
 		  duseq1(lineEndpoints, sortedLineIndices, iLineDec);
 		  sequenceIndex = iLineDec;
 		  flag          = true;
@@ -3154,14 +3154,14 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 		}
 		continue;
 	  }
-	  if (Instance->StateMap.testAndReset(StateFlag::SEQDUN)) {
+	  if (Instance->stateMap.testAndReset(StateFlag::SEQDUN)) {
 		duseq1(lineEndpoints, sortedLineIndices, iLineDec + 1U);
 	  }
 	  sequenceIndex = iLineDec;
 	  flag          = true;
 	  movseq(lineEndpoints, sortedLineIndices, iLineDec);
 	}
-	if (Instance->StateMap.testAndReset(StateFlag::SEQDUN)) {
+	if (Instance->stateMap.testAndReset(StateFlag::SEQDUN)) {
 	  duseq1(lineEndpoints, sortedLineIndices, iLine);
 	  sequenceIndex = iLine;
 	  flag          = true;
@@ -3174,7 +3174,7 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
   auto iLine = start;
   for (; iLine <= finish; ++iLine) {
 	if (sequenceMap.test_set(iLine)) {
-	  if (!Instance->StateMap.testAndSet(StateFlag::SEQDUN)) {
+	  if (!Instance->stateMap.testAndSet(StateFlag::SEQDUN)) {
 		flag = true;
 		duseq1(lineEndpoints, sortedLineIndices, iLine);
 		sequenceIndex = iLine;
@@ -3191,7 +3191,7 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	  }
 	  continue;
 	}
-	if (Instance->StateMap.testAndReset(StateFlag::SEQDUN)) {
+	if (Instance->stateMap.testAndReset(StateFlag::SEQDUN)) {
 	  if (iLine != 0U) {
 		duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 	  }
@@ -3200,7 +3200,7 @@ void duseq(std::vector<SMAL_PNT_L> const& lineEndpoints,
 	sequenceIndex = iLine;
 	movseq(lineEndpoints, sortedLineIndices, iLine);
   }
-  if (Instance->StateMap.testAndReset(StateFlag::SEQDUN)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SEQDUN)) {
 	flag = true;
 	duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 	sequenceIndex = iLine - 1U;
@@ -3230,7 +3230,7 @@ void durgn(FRM_HEAD const&                form,
   auto const  sequenceEnd   = currentRegion.end;
   auto&       bSequence     = Instance->bSequence;
 
-  if (sequencePath[pthi].skp || Instance->StateMap.testAndReset(StateFlag::BRKFIX)) {
+  if (sequencePath[pthi].skp || Instance->stateMap.testAndReset(StateFlag::BRKFIX)) {
 	if (auto iter = std::prev(bSequence.end()); iter->attribute != SEQBOT) {
 	  --iter;
 	  bSequence.emplace_back(iter->x, iter->y, 0);
@@ -3660,7 +3660,7 @@ void handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
 	slope = delta.x / delta.y;
   }
   if ((form.extendedAttribute & AT_SQR) != 0U) {
-	if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+	if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 	  Instance->oSequence.emplace_back(bPrevious.x, bPrevious.y);
 	  auto yVal = (wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength) +
 	              (wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9);
@@ -3754,7 +3754,7 @@ auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
   auto const& bNext = Instance->bSequence.operator[](iSequence + 1U);
   auto const  delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   auto const length = std::hypot(delta.x, delta.y);
   if (length == 0.0F) {
 	Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
@@ -3799,7 +3799,7 @@ void bakseq() {
 	--iSequence;
   }
   Instance->oSequence.clear();
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   Instance->oSequence.emplace_back(bSequence.operator[](iSequence).x,
                                    bSequence.operator[](iSequence).y);
   if (iSequence != 0U) {
@@ -3982,11 +3982,11 @@ void duspnd(float const                  stitchLen,
             uint32_t const               finish,
             float const                  width,
             F_POINT&                     stitchPoint) {
-  if (!Instance->StateMap.test(StateFlag::UND)) {
+  if (!Instance->stateMap.test(StateFlag::UND)) {
 	spend(fillVerticalRect, start, finish, stitchPoint);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::UNDPHAS)) {
+  if (Instance->stateMap.test(StateFlag::UNDPHAS)) {
 	form::filinsb(underlayVerticalRect[start].copnt, stitchPoint);
 	form::filinsb(underlayVerticalRect[start].cipnt, stitchPoint);
 	auto const delta =
@@ -4078,9 +4078,9 @@ void clpfm() {
 void fmclp(FRM_HEAD& form) {
   auto const savedSpacing = LineSpacing;
   LineSpacing             = ClipRectSize.cx;
-  Instance->StateMap.set(StateFlag::BARSAT);
+  Instance->stateMap.set(StateFlag::BARSAT);
   satin::satfil(form);
-  Instance->StateMap.reset(StateFlag::BARSAT);
+  Instance->stateMap.reset(StateFlag::BARSAT);
   clpfm();
   auto& currentForm    = Instance->formList.operator[](ClosestFormToCursor);
   currentForm.fillType = CLPF;
@@ -4108,14 +4108,14 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  break;
 	}
 	case EDGEANGSAT: {
-	  Instance->StateMap.reset(StateFlag::SAT1);
+	  Instance->stateMap.reset(StateFlag::SAT1);
 	  satin::slbrd(form);
 	  ritbrd(form);
 	  break;
 	}
 	case EDGEPROPSAT: {
 	  if (form.vertexCount > 2) {
-		Instance->StateMap.reset(StateFlag::SAT1);
+		Instance->stateMap.reset(StateFlag::SAT1);
 		plbrd(form, angledForm, Instance->angledFormVertices);
 		ritbrd(form);
 	  }
@@ -4124,7 +4124,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	case EDGEAPPL: {
 	  lapbrd(form);
 	  ritapbrd();
-	  Instance->StateMap.reset(StateFlag::SAT1);
+	  Instance->stateMap.reset(StateFlag::SAT1);
 	  satin::slbrd(form);
 	  ritbrd(form);
 	  break;
@@ -4154,13 +4154,13 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  break;
 	}
 	case EDGELCHAIN: {
-	  Instance->StateMap.set(StateFlag::LINCHN);
+	  Instance->stateMap.set(StateFlag::LINCHN);
 	  clip::chnfn(form);
 	  ritbrd(form);
 	  break;
 	}
 	case EDGEOCHAIN: {
-	  Instance->StateMap.reset(StateFlag::LINCHN);
+	  Instance->stateMap.reset(StateFlag::LINCHN);
 	  clip::chnfn(form);
 	  ritbrd(form);
 	  break;
@@ -4239,7 +4239,7 @@ void swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_COUNT>
 	case ANGCLPF: { // angled clip fill
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.clipIndex, form.clipCount);
-	  Instance->StateMap.reset(StateFlag::ISUND);
+	  Instance->stateMap.reset(StateFlag::ISUND);
 	  form::angclpfn(form, textureSegments, Instance->angledFormVertices);
 	  doFill = false;
 	  break;
@@ -4263,7 +4263,7 @@ void swPolyFillType(FRM_HEAD& form, FRM_HEAD& angledForm, std::vector<RNG_COUNT>
 	}
 	case TXANGF: { // angled fill with texture
 	  texture::setxt(form, textureSegments);
-	  Instance->StateMap.reset(StateFlag::ISUND);
+	  Instance->stateMap.reset(StateFlag::ISUND);
 	  form::angclpfn(form, textureSegments, Instance->angledFormVertices);
 	  doFill = false;
 	  break;
@@ -4303,7 +4303,7 @@ void swSatFillType(FRM_HEAD& form) {
 	  break;
 	}
 	case FTHF: {
-	  Instance->StateMap.set(StateFlag::CNV2FTH);
+	  Instance->stateMap.set(StateFlag::CNV2FTH);
 	  xt::fthrfn(form);
 	  break;
 	}
@@ -4372,7 +4372,7 @@ void ducon() noexcept {
 }
 
 void uncon() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOCON)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOCON)) {
 	ducon();
   }
 }
@@ -4566,7 +4566,7 @@ void resizeFormPoints(const F_POINT& stitchReference, F_POINT const& ratio) {
   thred::setpsel();
   formList.operator[](ClosestFormToCursor).outline();
   form::refil(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void resizeBigBox(F_POINT const& stitchReference, F_POINT const& ratio) {
@@ -4605,7 +4605,7 @@ void resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& ratio) {
 	ClosestFormToCursor = selectedForm;
 	form::refil(ClosestFormToCursor);
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void resizeForm(F_POINT const& reference, F_POINT const& ratio) {
@@ -4618,7 +4618,7 @@ void resizeForm(F_POINT const& reference, F_POINT const& ratio) {
 	++itVertex;
   }
   form::refil(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void resizeStitches(F_POINT const& reference, F_POINT const& ratio) {
@@ -4628,7 +4628,7 @@ void resizeStitches(F_POINT const& reference, F_POINT const& ratio) {
 	itStitch->y = (itStitch->y - reference.y) * ratio.y + reference.y;
 	++itStitch;
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void sbold(uint32_t const formIndex) {
@@ -4755,7 +4755,7 @@ void snp(uint32_t const start, uint32_t const finish) {
   auto xHistogram = std::vector<uint32_t> {};
   xHistogram.resize(wrap::round<size_t>(range.x) + 1U);
   auto const attribute = (ClosestFormToCursor << 4U) & FRMSK;
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	for (auto iStitch = start; iStitch < finish; ++iStitch) {
 	  if ((Instance->stitchBuffer.operator[](iStitch).attribute & NOTFRM) == 0U &&
 	      (Instance->stitchBuffer.operator[](iStitch).attribute & FRMSK) == attribute) {
@@ -4778,7 +4778,7 @@ void snp(uint32_t const start, uint32_t const finish) {
 	accumulator += value;
   }
   xHistogram[endColumn] = accumulator;
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	auto iStitch = 0U;
 	for (auto const& stitch : Instance->stitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) == 0U && (stitch.attribute & FRMSK) == attribute) {
@@ -4815,14 +4815,14 @@ void dufcntr(F_POINT& center) noexcept {
 
 void rotentr(float const rotationAngle) {
   displayText::showMessage(IDS_ROTA, rotationAngle * RADDEGF);
-  Instance->StateMap.set(StateFlag::NUMIN);
+  Instance->stateMap.set(StateFlag::NUMIN);
   thred::numWnd();
 }
 
 void fnagain(float const rotationAngle) {
-  if (!Instance->StateMap.test(StateFlag::FORMSEL) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
-      Instance->selectedFormList.empty() && !Instance->StateMap.test(StateFlag::BIGBOX) &&
-      !Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL) && !Instance->stateMap.test(StateFlag::GRPSEL) &&
+      Instance->selectedFormList.empty() && !Instance->stateMap.test(StateFlag::BIGBOX) &&
+      !Instance->stateMap.test(StateFlag::FPSEL)) {
 	displayText::alrotmsg();
 	return;
   }
@@ -4836,8 +4836,8 @@ void duprot(float const rotationAngle) {
   auto const rotationCenter = form::rotpar();
   thred::rotfn(rotationAngle, rotationCenter);
   form::refil(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::FORMSEL);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::FORMSEL);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void duprotfs(float const rotationAngle) {
@@ -4865,7 +4865,7 @@ void duprots(float const rotationAngle, F_POINT const& rotationCenter) {
   thred::rngadj();
   thred::rotfn(rotationAngle, rotationCenter);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void cplayfn(uint32_t const iForm, uint32_t const layer) {
@@ -5207,7 +5207,7 @@ void chan(uint32_t const formIndex) {
   currentForm.edgeStitchLen      = IniFile.chainRatio;
   currentForm.maxBorderStitchLen = IniFile.maxStitchLength;
   currentForm.minBorderStitchLen = MinStitchLength;
-  currentForm.edgeType = Instance->StateMap.test(StateFlag::LINCHN) ? EDGELCHAIN : EDGEOCHAIN;
+  currentForm.edgeType = Instance->stateMap.test(StateFlag::LINCHN) ? EDGELCHAIN : EDGEOCHAIN;
   form::refilfn(formIndex);
 }
 
@@ -5374,14 +5374,14 @@ auto form::registerPCDFormat() noexcept -> uint32_t {
 }
 
 void form::ispcdclp() {
-  Instance->StateMap.reset(StateFlag::WASPCDCLP);
+  Instance->stateMap.reset(StateFlag::WASPCDCLP);
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
   Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory != nullptr) {
-	Instance->StateMap.set(StateFlag::WASPCDCLP);
+	Instance->stateMap.set(StateFlag::WASPCDCLP);
   }
   CloseClipboard();
 }
@@ -5418,7 +5418,7 @@ void form::dufrm() noexcept {
 }
 
 void form::unfrm() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOFRM)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOFRM)) {
 	dufrm();
   }
 }
@@ -5437,7 +5437,7 @@ void form::mdufrm() noexcept {
 }
 
 void form::munfrm() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOFRM)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOFRM)) {
 	mdufrm();
   }
 }
@@ -5467,15 +5467,15 @@ void form::setfrm() {
 	maxY = std::max(maxY, vertex.y);
   }
   formList.back().rectangle = F_RECTANGLE {minX, maxY, maxX, minY};
-  Instance->StateMap.reset(StateFlag::FORMIN);
-  Instance->StateMap.set(StateFlag::INIT);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.reset(StateFlag::FORMIN);
+  Instance->stateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::form() {
   displayText::shoMsg(displayText::loadStr(IDS_FMEN), true);
-  Instance->StateMap.set(StateFlag::FORMIN);
-  Instance->StateMap.reset(StateFlag::INSRT);
+  Instance->stateMap.set(StateFlag::FORMIN);
+  Instance->stateMap.reset(StateFlag::INSRT);
   thred::duzrat();
 }
 
@@ -5521,11 +5521,11 @@ void form::ritfrct(uint32_t const iForm, HDC hDC) {
 	selsqr(controlPoint, hDC);
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
-  if (Instance->StateMap.testAndReset(StateFlag::GRPSEL)) {
-	Instance->StateMap.reset(StateFlag::SELSHO);
+  if (Instance->stateMap.testAndReset(StateFlag::GRPSEL)) {
+	Instance->stateMap.reset(StateFlag::SELSHO);
 	Instance->searchLine.clear();
 	Instance->searchLine.shrink_to_fit();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 // ReSharper restore CppParameterMayBeConst
@@ -5610,7 +5610,7 @@ void form::dupsel(HDC hDC) {
 // ReSharper restore CppParameterMayBeConst
 
 void form::unpsel() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOPSEL)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOPSEL)) {
 	dupsel(StitchWindowDC);
   }
 }
@@ -5625,8 +5625,8 @@ auto form::sRct2px(F_RECTANGLE const& stitchRect) -> RECT {
 }
 
 void form::drwfrm() {
-  Instance->StateMap.reset(StateFlag::SHOMOV);
-  Instance->StateMap.reset(StateFlag::SHOPSEL);
+  Instance->stateMap.reset(StateFlag::SHOMOV);
+  Instance->stateMap.reset(StateFlag::SHOPSEL);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   thred::ratsr();
   thred::duzrat();
@@ -5678,7 +5678,7 @@ void form::drwfrm() {
 	  }
 	}
 	if (ClosestFormToCursor == iForm &&
-	    Instance->StateMap.test(StateFlag::FRMPSEL)) { // if the form is selected, draw the selection box
+	    Instance->stateMap.test(StateFlag::FRMPSEL)) { // if the form is selected, draw the selection box
 	  drawFormBox(form);
 	}
 	else { // if the form is not selected, draw the form
@@ -5688,12 +5688,12 @@ void form::drwfrm() {
 	  SelectObject(StitchWindowMemDC, FormSelectedPen);
 	  frmsqr0(formLines[0]);
 	}
-	if (Instance->StateMap.test(StateFlag::FPSEL) &&
+	if (Instance->stateMap.test(StateFlag::FPSEL) &&
 	    ClosestFormToCursor == iForm) { // if form points are selected, draw the selection box
 	  dupsel(StitchWindowMemDC);
 	  SelectedPixelsRect = sRct2px(SelectedVerticesRect);
 	  rct2sel(SelectedPixelsRect, Instance->selectedPointsLine);
-	  Instance->StateMap.set(StateFlag::SHOPSEL);
+	  Instance->stateMap.set(StateFlag::SHOPSEL);
 	  dupsel(StitchWindowMemDC);
 	}
   }
@@ -5701,14 +5701,14 @@ void form::drwfrm() {
 	drawFormsBox();
   }
   else { // if there are no selected forms, erase the selection box
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  ritfrct(ClosestFormToCursor, StitchWindowMemDC);
 	}
-	if (Instance->StateMap.test(StateFlag::FRMPMOV)) { // if the user is moving a form point
+	if (Instance->stateMap.test(StateFlag::FRMPMOV)) { // if the user is moving a form point
 	  thred::ritmov(ClosestFormToCursor);
 	  Instance->rubberBandLine.operator[](1) =
 	      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-	  Instance->StateMap.set(StateFlag::SHOMOV);
+	  Instance->stateMap.set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	}
   }
@@ -5760,9 +5760,9 @@ void form::durpoli(uint32_t vertexCount) {
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::SHOFRM);
+  Instance->stateMap.set(StateFlag::SHOFRM);
   mdufrm();
 }
 
@@ -5785,7 +5785,7 @@ auto form::prv(FRM_HEAD const& form, uint32_t iVertex) noexcept -> uint32_t {
 }
 
 auto form::pdir(FRM_HEAD const& form, uint32_t const vertex) -> uint32_t {
-  if (Instance->StateMap.test(StateFlag::PSELDIR)) {
+  if (Instance->stateMap.test(StateFlag::PSELDIR)) {
 	return nxt(form, vertex);
   }
 
@@ -5806,7 +5806,7 @@ void form::pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept 
 void form::flipv() {
   auto& formList = Instance->formList;
 
-  if (Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	auto const& form = formList.operator[](ClosestFormToCursor);
 
 	auto const offset        = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
@@ -5817,10 +5817,10 @@ void form::flipv() {
 	  itVertex->y         = offset - itVertex->y;
 	  currentVertex       = pdir(form, currentVertex);
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+  if (Instance->stateMap.test(StateFlag::BIGBOX)) {
 	auto const offset = AllItemsRect.top + AllItemsRect.bottom;
 	for (auto& formVertice : Instance->formVertices) {
 	  formVertice.y = offset - formVertice.y;
@@ -5832,7 +5832,7 @@ void form::flipv() {
 	  iForm.rectangle.bottom = offset - iForm.rectangle.bottom;
 	  iForm.rectangle.top    = offset - iForm.rectangle.top;
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   if (!Instance->selectedFormList.empty()) {
@@ -5856,10 +5856,10 @@ void form::flipv() {
 		stitch.y = offset - stitch.y;
 	  }
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	auto& form = formList.operator[](ClosestFormToCursor);
 
 	auto const offset   = form.rectangle.top + form.rectangle.bottom;
@@ -5874,10 +5874,10 @@ void form::flipv() {
 	  }
 	}
 	form.outline();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	auto rectangle = F_RECTANGLE {};
@@ -5887,7 +5887,7 @@ void form::flipv() {
 	  Instance->stitchBuffer.operator[](iStitch).y =
 	      offset - Instance->stitchBuffer.operator[](iStitch).y;
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -5953,7 +5953,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
   auto const layerCoded    = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   auto const maxForm       = wrap::toUnsigned(formList.size());
   for (auto iForm = 0U; iForm < maxForm; ++iForm) {
-	if (Instance->StateMap.test(StateFlag::FRMSAM) && iForm == formIndex) {
+	if (Instance->stateMap.test(StateFlag::FRMSAM) && iForm == formIndex) {
 	  continue;
 	}
 	auto const& currentForm = formList.operator[](iForm);
@@ -5994,7 +5994,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
   if (minimumLength < FCLOSNUF) {
 	formIndex             = closestForm;
 	ClosestVertexToCursor = closestVertex;
-	Instance->StateMap.set(StateFlag::RELAYR);
+	Instance->stateMap.set(StateFlag::RELAYR);
 	return true;
   }
   return false;
@@ -6290,15 +6290,15 @@ void form::angclpfn(FRM_HEAD const&               form,
   auto angledForm = form; // intentional copy
   // NOLINTBEGIN(readability-avoid-nested-conditional-operator)
   auto const rotationAngle =
-      Instance->StateMap.test(StateFlag::ISUND)   ? PI_FHALF - angledForm.underlayStitchAngle
-      : Instance->StateMap.test(StateFlag::TXFIL) ? PI_FHALF - angledForm.fillAngle
+      Instance->stateMap.test(StateFlag::ISUND)   ? PI_FHALF - angledForm.underlayStitchAngle
+      : Instance->stateMap.test(StateFlag::TXFIL) ? PI_FHALF - angledForm.fillAngle
                                                   : PI_FHALF - angledForm.clipFillAngle;
   // NOLINTEND(readability-avoid-nested-conditional-operator)
   auto const rotationCenter = F_POINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
                                        wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
   angledFormVertices.clear();
   angledFormVertices.reserve(angledForm.vertexCount);
-  if (Instance->StateMap.test(StateFlag::ISUND)) {
+  if (Instance->stateMap.test(StateFlag::ISUND)) {
 	auto const& vertexList = xt::insid(angledForm);
 	for (auto iVertex = 0U; iVertex < angledForm.vertexCount; ++iVertex) {
 	  angledFormVertices.push_back(vertexList[iVertex]);
@@ -6329,7 +6329,7 @@ void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
 	return;
   }
 
-  if (Instance->StateMap.test(StateFlag::FILDIR)) {
+  if (Instance->stateMap.test(StateFlag::FILDIR)) {
 	++count;
   }
   auto const fCount = wrap::toFloat(count);
@@ -6350,7 +6350,7 @@ void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
 	Instance->oSequence.push_back(currentPoint);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FILDIR)) {
+  if (Instance->stateMap.test(StateFlag::FILDIR)) {
 	++count;
   }
   auto const fCount = wrap::toFloat(count);
@@ -6365,18 +6365,18 @@ void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
 void form::refilfn(uint32_t const formIndex) {
   auto const savedStitchLength = UserStitchLength;
   auto       angledForm        = FRM_HEAD {};
-  Instance->StateMap.reset(StateFlag::TXFIL);
+  Instance->stateMap.reset(StateFlag::TXFIL);
   auto& form = Instance->formList.operator[](formIndex);
   if (form.type == FRMLINE) {
 	form.underlayIndent = 0;
   }
-  if (!(Instance->StateMap.test(StateFlag::FUNCLP) || Instance->StateMap.test(StateFlag::FUNSCLP))) {
+  if (!(Instance->stateMap.test(StateFlag::FUNCLP) || Instance->stateMap.test(StateFlag::FUNSCLP))) {
 	thred::savdo();
   }
   auto fillStartsData = FillStartsDataType {}; // fill start data for refill
   auto fillStartsMap  = 0U;                    // fill starts bitmap
   xt::fdelstch(formIndex, fillStartsData, fillStartsMap);
-  Instance->StateMap.set(StateFlag::WASREFIL);
+  Instance->stateMap.set(StateFlag::WASREFIL);
   constexpr auto MINSPACE = 0.5F;
   if (form.fillSpacing < MINSPACE && !form.isClip()) {
 	form.fillSpacing = MINSPACE;
@@ -6385,17 +6385,17 @@ void form::refilfn(uint32_t const formIndex) {
   if (!form.isClip()) {
 	UserStitchLength = form.stitchLength;
   }
-  if (!(Instance->StateMap.test(StateFlag::WASDO) || Instance->StateMap.test(StateFlag::FUNCLP) ||
-        Instance->StateMap.test(StateFlag::FUNSCLP))) {
+  if (!(Instance->stateMap.test(StateFlag::WASDO) || Instance->stateMap.test(StateFlag::FUNCLP) ||
+        Instance->stateMap.test(StateFlag::FUNSCLP))) {
 	thred::savdo();
   }
-  Instance->StateMap.reset(StateFlag::WASDO);
+  Instance->stateMap.reset(StateFlag::WASDO);
   if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U && form.type == FRMLINE && form.fillType != CONTF) {
 	form.type = FRMFPOLY;
   }
   Instance->interleaveSequence.clear();
   Instance->interleaveSequenceIndices.clear();
-  Instance->StateMap.reset(StateFlag::ISUND);
+  Instance->stateMap.reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};
   textureSegments.resize(wrap::toSize(form.texture.lines));
   switch (form.type) {
@@ -6411,7 +6411,7 @@ void form::refilfn(uint32_t const formIndex) {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, Instance->angledFormVertices);
-	  Instance->StateMap.reset(StateFlag::ISUND);
+	  Instance->stateMap.reset(StateFlag::ISUND);
 	  if (form.fillType == 0U) {
 		chkbrd(form);
 		break;
@@ -6428,7 +6428,7 @@ void form::refilfn(uint32_t const formIndex) {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, Instance->angledFormVertices);
-	  Instance->StateMap.reset(StateFlag::ISUND);
+	  Instance->stateMap.reset(StateFlag::ISUND);
 	  swSatFillType(form);
 	  chkbrd(form);
 	  break;
@@ -6457,14 +6457,14 @@ void form::refil(uint32_t const formIndex) {
 	return;
   }
   if (FormDataSheet != nullptr) {
-	Instance->StateMap.set(StateFlag::WASFRMFRM);
+	Instance->stateMap.set(StateFlag::WASFRMFRM);
   }
   thred::undat();
   if (nullptr == MsgWindow) {
 	displayText::tabmsg(IDS_REFIL, true);
 	displayText::okcan();
   }
-  Instance->StateMap.set(StateFlag::MOVMSG);
+  Instance->stateMap.set(StateFlag::MOVMSG);
 }
 
 void form::setfpnt() {
@@ -6479,11 +6479,11 @@ void form::setfpnt() {
   *itVertex = px2stchf(screenCoordinate);
   form.outline();
   refil(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::WASFPNT);
-  Instance->StateMap.reset(StateFlag::SELBOX);
-  Instance->StateMap.set(StateFlag::FRMPSEL);
+  Instance->stateMap.set(StateFlag::WASFPNT);
+  Instance->stateMap.reset(StateFlag::SELBOX);
+  Instance->stateMap.set(StateFlag::FRMPSEL);
   thred::ritfcor(*itVertex);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::filvrt() {
@@ -6499,17 +6499,17 @@ void form::filvrt() {
 		fsvrt();
 	  }
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	fsvrt();
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -6524,17 +6524,17 @@ void form::filhor() {
 		fshor(form);
 	  }
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	auto& form = Instance->formList.operator[](ClosestFormToCursor);
 	fshor(form);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -6551,18 +6551,18 @@ void form::filangl() {
 		fsangl(form);
 	  }
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	auto& form = formList.operator[](ClosestFormToCursor);
 	fsangl(form);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -6594,15 +6594,15 @@ auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& str
 	  stretchBoxLine.back() = stretchBoxLine.front();
 	  thred::strtchbox(stretchBoxLine);
 	  if ((SelectedFormControlVertex & 1U) != 0U) {
-		Instance->StateMap.set(StateFlag::STRTCH);
+		Instance->stateMap.set(StateFlag::STRTCH);
 	  }
 	  else {
-		Instance->StateMap.set(StateFlag::EXPAND);
+		Instance->stateMap.set(StateFlag::EXPAND);
 		xyRatio = (currentForm.rectangle.right - currentForm.rectangle.left) /
 		          (currentForm.rectangle.top - currentForm.rectangle.bottom);
 	  }
 	  SelectedFormControlVertex >>= 1U;
-	  Instance->StateMap.set(StateFlag::SHOSTRTCH);
+	  Instance->stateMap.set(StateFlag::SHOSTRTCH);
 	  return true;
 	}
 	++formControlIndex;
@@ -6615,7 +6615,7 @@ auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& str
   auto const itVertex   = wrap::next(Instance->formVertices.cbegin(), currentForm.vertexIndex);
   auto const formOrigin = sfCor2px(*itVertex);
   FormMoveDelta         = F_POINT {formOrigin.x - point.x, formOrigin.y - point.y};
-  Instance->StateMap.set(StateFlag::FRMOV);
+  Instance->stateMap.set(StateFlag::FRMOV);
   return true;
 }
 
@@ -6625,7 +6625,7 @@ void form::rstfrm() {
 
   auto const attribute = ClosestFormToCursor << 4U;
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.reset(StateFlag::FRMOV);
+  Instance->stateMap.reset(StateFlag::FRMOV);
   auto const stitchPoint = thred::pxCor2stch(point);
   auto&      currentForm = Instance->formList.operator[](ClosestFormToCursor);
   auto       itVertex    = wrap::next(Instance->formVertices.begin(), currentForm.vertexIndex);
@@ -6662,7 +6662,7 @@ void form::drwcon() {
   uncon();
   auto& formLines = Instance->formLines;
   formLines[1]    = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  Instance->StateMap.set(StateFlag::SHOCON);
+  Instance->stateMap.set(StateFlag::SHOCON);
   ducon();
 }
 
@@ -6674,7 +6674,7 @@ void form::duinsf() noexcept {
 }
 
 void form::uninsf() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOINSF)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOINSF)) {
 	duinsf();
   }
 }
@@ -6739,17 +6739,17 @@ void form::filsat() {
 		filsfn(selectedForm);
 	  }
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	filsfn(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -6784,7 +6784,7 @@ void form::insat() { // insert a point in a form
 	}
   }
   refil(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 auto form::chkdel(FRM_HEAD const& currentForm) noexcept -> bool {
@@ -6821,19 +6821,19 @@ void form::unfil() {
 	}
 	Instance->stitchBuffer.resize(wrap::distance<size_t>(Instance->stitchBuffer.begin(), iDestination));
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
-	if (!Instance->StateMap.testAndReset(StateFlag::IGNOR) && !Instance->userFlagMap.test(UserFlag::WRNOF)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
+	if (!Instance->stateMap.testAndReset(StateFlag::IGNOR) && !Instance->userFlagMap.test(UserFlag::WRNOF)) {
 	  if (auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
 	      std::ranges::any_of(Instance->stitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
 		    return (stitch.attribute & NOTFRM) == 0U && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
 	      })) {
 		displayText::tabmsg(IDS_UNFIL, true);
-		Instance->StateMap.set(StateFlag::FILMSG);
+		Instance->stateMap.set(StateFlag::FILMSG);
 		displayText::okcan();
-		Instance->StateMap.set(StateFlag::IGNOR);
+		Instance->stateMap.set(StateFlag::IGNOR);
 		return;
 	  }
 	}
@@ -6856,12 +6856,12 @@ void form::unfil() {
 	form.edgeType = 0;
 	form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 	thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
 void form::frm0() {
-  if (!Instance->StateMap.test(StateFlag::FRMPSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FRMPSEL)) {
 	return;
   }
   auto& form = Instance->formList.operator[](ClosestFormToCursor);
@@ -6871,7 +6871,7 @@ void form::frm0() {
   satin::satadj(form);
   refil(ClosestFormToCursor);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::rinfrm() {
@@ -6884,7 +6884,7 @@ void form::rinfrm() {
   }
   InsertLine[0] = formLines[FormVertexPrev];
   InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  Instance->StateMap.set(StateFlag::SHOINSF);
+  Instance->stateMap.set(StateFlag::SHOINSF);
   duinsf();
 }
 
@@ -6897,7 +6897,7 @@ void form::infrm() { // insert multiple points into a form
   switch (inOutFlag) {
 	case IntersectionStyles::POINT_BEFORE_LINE: {
 	  FormVertexPrev = 0;
-	  Instance->StateMap.set(StateFlag::PRELIN);
+	  Instance->stateMap.set(StateFlag::PRELIN);
 	  break;
 	}
 	case IntersectionStyles::POINT_IN_LINE: {
@@ -6914,15 +6914,15 @@ void form::infrm() { // insert multiple points into a form
 	  throw std::runtime_error("Invalid Intersection Flag in infrm");
 	}
   }
-  Instance->StateMap.set(StateFlag::INSFRM);
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::INSFRM);
+  Instance->stateMap.set(StateFlag::INIT);
   rinfrm();
 }
 
 void form::setins() {
   auto const stitchPoint = thred::pxCor2stch(WinMsg.pt);
   nufpnt(FormVertexPrev, *FormForInsert, stitchPoint);
-  if (Instance->StateMap.test(StateFlag::PRELIN)) {
+  if (Instance->stateMap.test(StateFlag::PRELIN)) {
 	auto const itVertex = wrap::next(Instance->formVertices.begin(), FormForInsert->vertexIndex);
 	std::swap(itVertex[0], itVertex[1]);
   }
@@ -6933,9 +6933,9 @@ void form::setins() {
   frmToLine(*FormForInsert);
   InsertLine[0] = Instance->formLines.operator[](FormVertexPrev);
   InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  Instance->StateMap.set(StateFlag::INSFRM);
+  Instance->stateMap.set(StateFlag::INSFRM);
   duinsf();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::bsizpar(FRM_HEAD& currentForm) noexcept {
@@ -6956,18 +6956,18 @@ void form::bord() {
 	  form.borderColor = ActiveColor;
 	  sbord(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	auto& form       = formList.operator[](ClosestFormToCursor);
 	form.borderColor = ActiveColor;
 	sbord(ClosestFormToCursor);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::INIT);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -6995,16 +6995,16 @@ void form::fclp() {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  fsclp(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	fsclp(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -7024,12 +7024,12 @@ void form::apliq() {
 	  }
 	  sapliq(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	if (auto& currentForm = formList.operator[](ClosestFormToCursor);
 	    Instance->userFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
@@ -7038,9 +7038,9 @@ void form::apliq() {
 	  currentForm.attribute &= NOBLNT;
 	}
 	sapliq(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -7062,21 +7062,21 @@ void form::stchrct2px(F_RECTANGLE const& stitchRect, RECT& screenRect) {
 }
 
 void form::selal() {
-  Instance->StateMap.reset(StateFlag::FORMSEL);
+  Instance->stateMap.reset(StateFlag::FORMSEL);
   Instance->selectedFormList.clear();
-  Instance->StateMap.reset(StateFlag::SELBOX);
-  Instance->StateMap.reset(StateFlag::GRPSEL);
+  Instance->stateMap.reset(StateFlag::SELBOX);
+  Instance->stateMap.reset(StateFlag::GRPSEL);
   AllItemsRect = getbig(Instance->formList, Instance->stitchBuffer);
   ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
-  Instance->StateMap.reset(StateFlag::ZUMED);
+  Instance->stateMap.reset(StateFlag::ZUMED);
   thred::movStch();
   thred::resetNearest();
-  Instance->StateMap.reset(StateFlag::RUNPAT);
+  Instance->stateMap.reset(StateFlag::RUNPAT);
   thred::duzrat();
   stchrct2px(AllItemsRect, SelectedFormsRect);
-  Instance->StateMap.set(StateFlag::BIGBOX);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::BIGBOX);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::setstrtch() {
@@ -7086,11 +7086,11 @@ void form::setstrtch() {
   auto stitchPoint = F_POINT {};
   thred::savdo();
   auto& form = Instance->formList.operator[](ClosestFormToCursor);
-  if (Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	stitchRect = SelectedVerticesRect;
   }
   else {
-	if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX)) {
+	if (!Instance->selectedFormList.empty() || Instance->stateMap.test(StateFlag::BIGBOX)) {
 	  pxrct2stch(SelectedFormsRect, stitchRect);
 	  stitchPoint = F_POINT {stitchRect.right, stitchRect.bottom};
 	}
@@ -7100,8 +7100,8 @@ void form::setstrtch() {
   }
   switch (SelectedFormControlVertex) {
 	case 0: { // top control
-	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
-	      Instance->StateMap.test(StateFlag::FPSEL)) {
+	  if (!Instance->selectedFormList.empty() || Instance->stateMap.test(StateFlag::BIGBOX) ||
+	      Instance->stateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.bottom;
 
 		auto const offsetY = WinMsg.pt.y - StitchWindowOrigin.y;
@@ -7110,7 +7110,7 @@ void form::setstrtch() {
 		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
 		break;
 	  }
-	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 		reference          = form.rectangle.bottom;
 		ratio              = (stitchPoint.y - reference) / (form.rectangle.top - reference);
 		form.rectangle.top = stitchPoint.y;
@@ -7121,8 +7121,8 @@ void form::setstrtch() {
 	  break;
 	}
 	case 1: { // right control
-	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
-	      Instance->StateMap.test(StateFlag::FPSEL)) {
+	  if (!Instance->selectedFormList.empty() || Instance->stateMap.test(StateFlag::BIGBOX) ||
+	      Instance->stateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.left;
 
 		auto const offsetX = WinMsg.pt.x - StitchWindowOrigin.x;
@@ -7131,7 +7131,7 @@ void form::setstrtch() {
 		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
 		break;
 	  }
-	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 		auto& formRectangle = form.rectangle;
 		reference           = formRectangle.left;
 		ratio               = (stitchPoint.x - reference) / (formRectangle.right - reference);
@@ -7143,8 +7143,8 @@ void form::setstrtch() {
 	  break;
 	}
 	case 2: { // bottom control
-	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
-	      Instance->StateMap.test(StateFlag::FPSEL)) {
+	  if (!Instance->selectedFormList.empty() || Instance->stateMap.test(StateFlag::BIGBOX) ||
+	      Instance->stateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.top;
 
 		auto const offsetY = WinMsg.pt.y - StitchWindowOrigin.y;
@@ -7153,7 +7153,7 @@ void form::setstrtch() {
 		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
 		break;
 	  }
-	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 		reference             = form.rectangle.top;
 		ratio                 = (stitchPoint.y - reference) / (form.rectangle.bottom - reference);
 		form.rectangle.bottom = stitchPoint.y;
@@ -7164,8 +7164,8 @@ void form::setstrtch() {
 	  break;
 	}
 	case 3: { // left control
-	  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
-	      Instance->StateMap.test(StateFlag::FPSEL)) {
+	  if (!Instance->selectedFormList.empty() || Instance->stateMap.test(StateFlag::BIGBOX) ||
+	      Instance->stateMap.test(StateFlag::FPSEL)) {
 		reference = stitchRect.right;
 
 		auto const offsetX = WinMsg.pt.x - StitchWindowOrigin.x;
@@ -7174,7 +7174,7 @@ void form::setstrtch() {
 		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
 		break;
 	  }
-	  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 		reference           = form.rectangle.right;
 		ratio               = (stitchPoint.x - reference) / (form.rectangle.left - reference);
 		form.rectangle.left = stitchPoint.x;
@@ -7190,7 +7190,7 @@ void form::setstrtch() {
   }
   auto& formList = Instance->formList;
   if ((SelectedFormControlVertex & 1U) != 0U) { // right or left control selected
-	if (Instance->StateMap.test(StateFlag::FPSEL)) {
+	if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	  auto currentVertex = SelectedFormVertices.start;
 	  auto itVertex      = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
@@ -7202,10 +7202,10 @@ void form::setstrtch() {
 	  form.outline();
 	  thred::setpsel();
 	  refil(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
-	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+	if (Instance->stateMap.test(StateFlag::BIGBOX)) {
 	  for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 		auto& formIter = formList.operator[](iForm);
 		auto  itVertex = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
@@ -7235,29 +7235,29 @@ void form::setstrtch() {
 		ClosestFormToCursor = selectedForm;
 		refil(ClosestFormToCursor);
 	  }
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  auto itVertex = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		itVertex->x = (itVertex->x - reference) * ratio + reference;
 		++itVertex;
 	  }
 	  refil(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
-	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+	if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 		Instance->stitchBuffer.operator[](iStitch).x =
 		    (Instance->stitchBuffer.operator[](iStitch).x - reference) * ratio + reference;
 	  }
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
   }
   else {
-	if (Instance->StateMap.test(StateFlag::FPSEL)) {
+	if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	  auto currentVertex = SelectedFormVertices.start;
 	  auto itVertex      = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
@@ -7269,10 +7269,10 @@ void form::setstrtch() {
 	  formList.operator[](ClosestFormToCursor).outline();
 	  thred::setpsel();
 	  refil(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
-	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+	if (Instance->stateMap.test(StateFlag::BIGBOX)) {
 	  for (auto iForm = 0U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 		auto& formIter = formList.operator[](iForm);
 		auto  itVertex = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
@@ -7302,25 +7302,25 @@ void form::setstrtch() {
 		ClosestFormToCursor = selectedForm;
 		refil(selectedForm);
 	  }
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  auto itVertex = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		itVertex->y = (itVertex->y - reference) * ratio + reference;
 		++itVertex;
 	  }
 	  refil(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	  return;
 	}
-	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+	if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 		Instance->stitchBuffer.operator[](iStitch).y =
 		    (Instance->stitchBuffer.operator[](iStitch).y - reference) * ratio + reference;
 	  }
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
   }
 }
@@ -7333,8 +7333,8 @@ void form::setexpand(float const xyRatio) {
   auto stitchPoint = F_POINT {};
 
   auto& formList = Instance->formList;
-  if (!Instance->selectedFormList.empty() || Instance->StateMap.test(StateFlag::BIGBOX) ||
-      Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (!Instance->selectedFormList.empty() || Instance->stateMap.test(StateFlag::BIGBOX) ||
+      Instance->stateMap.test(StateFlag::FPSEL)) {
 	// if we have multiple forms selected, or we are in big box mode, or we are in form point select
 	// mode we need to use the selected forms rectangle
 	wrap::narrow_cast(rectangle.left, SelectedFormsRect.left);
@@ -7349,7 +7349,7 @@ void form::setexpand(float const xyRatio) {
   else {
 	// if we are in form select mode, we need to use the form rectangle or if not, the stitch range rectangle
 	stitchPoint = thred::pxCor2stch(WinMsg.pt);
-	rectangle   = Instance->StateMap.test(StateFlag::FORMSEL)
+	rectangle   = Instance->stateMap.test(StateFlag::FORMSEL)
 	                  ? formList.operator[](ClosestFormToCursor).rectangle
 	                  : StitchRangeRect;
 	size0.y     = rectangle.top - rectangle.bottom;
@@ -7366,7 +7366,7 @@ void form::setexpand(float const xyRatio) {
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
-	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->stateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.left  = rectangle.right - size1.x;
 		formRect.top   = rectangle.bottom + size1.y;
@@ -7378,7 +7378,7 @@ void form::setexpand(float const xyRatio) {
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
-	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->stateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.right = rectangle.left + size1.x;
 		formRect.top   = rectangle.bottom + size1.y;
@@ -7390,7 +7390,7 @@ void form::setexpand(float const xyRatio) {
 	  auto size1 = F_POINT {fabs(stitchPoint.x - reference.x), fabs(stitchPoint.y - reference.y)};
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
-	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->stateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect  = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.right  = rectangle.left + size1.x;
 		formRect.bottom = rectangle.top - size1.y;
@@ -7403,7 +7403,7 @@ void form::setexpand(float const xyRatio) {
 	  setSize(size1, xyRatio);
 	  ratio = size1 / size0;
 	  // if we are in form select mode, we need to update the form rectangle
-	  if (Instance->selectedFormList.empty() && Instance->StateMap.test(StateFlag::FORMSEL)) {
+	  if (Instance->selectedFormList.empty() && Instance->stateMap.test(StateFlag::FORMSEL)) {
 		auto& formRect  = formList.operator[](ClosestFormToCursor).rectangle;
 		formRect.left   = rectangle.right - size1.x;
 		formRect.bottom = rectangle.top - size1.y;
@@ -7416,11 +7416,11 @@ void form::setexpand(float const xyRatio) {
   }
   auto const integerReference = POINT {std::lround(reference.x), std::lround(reference.y)};
   auto const stitchReference  = px2stchf(integerReference);
-  if (Instance->StateMap.test(StateFlag::FPSEL)) { // form point selected
+  if (Instance->stateMap.test(StateFlag::FPSEL)) { // form point selected
 	resizeFormPoints(stitchReference, ratio);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::BIGBOX)) { // everything selected
+  if (Instance->stateMap.test(StateFlag::BIGBOX)) { // everything selected
 	resizeBigBox(stitchReference, ratio);
 	return;
   }
@@ -7428,11 +7428,11 @@ void form::setexpand(float const xyRatio) {
 	resizeSelectedForms(stitchReference, ratio);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) { // single form selected
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) { // single form selected
 	resizeForm(reference, ratio);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) { // stitch group selected
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) { // stitch group selected
 	resizeStitches(reference, ratio);
   }
 }
@@ -7503,17 +7503,17 @@ void form::dubold() {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  sbold(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	sbold(ClosestFormToCursor);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -7548,7 +7548,7 @@ void form::dustar(uint32_t starCount, float const length) {
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
   newForm.type = FRMFPOLY;
   auto point   = thred::pxCor2stch(WinMsg.pt);
-  Instance->StateMap.set(StateFlag::FILDIR);
+  Instance->stateMap.set(StateFlag::FILDIR);
   auto const itFirstVertex = wrap::next(Instance->formVertices.begin(), newForm.vertexIndex);
   auto       itVertex      = itFirstVertex;
   for (auto iVertex = 0U; iVertex < vertexCount; ++iVertex) {
@@ -7575,9 +7575,9 @@ void form::dustar(uint32_t starCount, float const length) {
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::SHOFRM);
+  Instance->stateMap.set(StateFlag::SHOFRM);
   mdufrm();
 }
 
@@ -7627,9 +7627,9 @@ void form::duspir(uint32_t stepCount) {
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertexCount + 1U;
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::SHOFRM);
+  Instance->stateMap.set(StateFlag::SHOFRM);
   mdufrm();
 }
 
@@ -7698,9 +7698,9 @@ void form::duhart(uint32_t sideCount) {
   formList.push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::SHOFRM);
+  Instance->stateMap.set(StateFlag::SHOFRM);
   mdufrm();
 }
 
@@ -7750,9 +7750,9 @@ void form::dulens(uint32_t sides) {
   Instance->formList.push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::SHOFRM);
+  Instance->stateMap.set(StateFlag::SHOFRM);
   mdufrm();
 }
 
@@ -7810,15 +7810,15 @@ void form::duzig(uint32_t vertices) {
   ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
   NewFormVertexCount  = vertices + 1U;
-  Instance->StateMap.set(StateFlag::POLIMOV);
+  Instance->stateMap.set(StateFlag::POLIMOV);
   setmfrm(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::SHOFRM);
+  Instance->stateMap.set(StateFlag::SHOFRM);
   mdufrm();
 }
 
 void form::fliph() {
   auto& form = Instance->formList.operator[](ClosestFormToCursor);
-  if (Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	thred::savdo();
 	auto const offset        = SelectedVerticesRect.right + SelectedVerticesRect.left;
 	auto       currentVertex = SelectedFormVertices.start;
@@ -7828,12 +7828,12 @@ void form::fliph() {
 	  itVertex->x         = offset - itVertex->x;
 	  currentVertex       = pdir(form, currentVertex);
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   auto& formList = Instance->formList;
 
-  if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+  if (Instance->stateMap.test(StateFlag::BIGBOX)) {
 	thred::savdo();
 	auto const offset = AllItemsRect.right + AllItemsRect.left;
 	for (auto& formVertice : Instance->formVertices) {
@@ -7847,7 +7847,7 @@ void form::fliph() {
 	  rect.left  = offset - rect.left;
 	  rect.right = offset - rect.right;
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   if (!Instance->selectedFormList.empty()) {
@@ -7874,10 +7874,10 @@ void form::fliph() {
 		stitch.x = offset - stitch.x;
 	  }
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	auto const& srcRect  = form.rectangle;
 	auto const  offset   = srcRect.right + srcRect.left;
@@ -7892,10 +7892,10 @@ void form::fliph() {
 	  }
 	}
 	form.outline();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	auto rectangle = F_RECTANGLE {};
@@ -7905,7 +7905,7 @@ void form::fliph() {
 	  Instance->stitchBuffer.operator[](iStitch).x =
 	      offset - Instance->stitchBuffer.operator[](iStitch).x;
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -7927,13 +7927,13 @@ void form::prpbrd(float const borderStitchSpacing) {
 	  }
 	  prpsbrd(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
 	LineSpacing = savedSpacing;
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	if (auto& currentForm = Instance->formList.operator[](ClosestFormToCursor);
 	    Instance->userFlagMap.test(UserFlag::BLUNT)) {
 	  currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
@@ -7942,32 +7942,32 @@ void form::prpbrd(float const borderStitchSpacing) {
 	  currentForm.attribute &= NOBLNT;
 	}
 	prpsbrd(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
 	thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
 	LineSpacing = savedSpacing;
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
 void form::tglfrm() {
-  if (Instance->StateMap.testAndReset(StateFlag::SATPNT)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SATPNT)) {
 	satin::satfix();
   }
-  Instance->StateMap.reset(StateFlag::HIDSTCH);
+  Instance->stateMap.reset(StateFlag::HIDSTCH);
   menu::flipFormOnOff();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::frmon() {
   thred::unbsho();
-  Instance->StateMap.reset(StateFlag::FRMOF);
+  Instance->stateMap.reset(StateFlag::FRMOF);
   menu::resetFormOnOff();
 }
 
 void form::flpord() {
   auto const& form = Instance->formList.operator[](ClosestFormToCursor);
-  if (Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	thred::savdo();
 	auto start = SelectedFormVertices.start;
 	auto finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % form.vertexCount;
@@ -7977,9 +7977,9 @@ void form::flpord() {
 	  auto itEndVertex   = wrap::next(itFirstVertex, finish);
 	  std::swap(*itStartVertex, *itEndVertex);
 	  start = pdir(form, start);
-	  Instance->StateMap.flip(StateFlag::PSELDIR);
+	  Instance->stateMap.flip(StateFlag::PSELDIR);
 	  finish = pdir(form, finish);
-	  Instance->StateMap.flip(StateFlag::PSELDIR);
+	  Instance->stateMap.flip(StateFlag::PSELDIR);
 	}
 	refil(ClosestFormToCursor);
 	return;
@@ -7991,24 +7991,24 @@ void form::flpord() {
 	  fnord();
 	}
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	fnord();
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	auto const start = wrap::next(Instance->stitchBuffer.begin(), GroupStartStitch);
 	auto const end   = wrap::next(Instance->stitchBuffer.begin(), GroupEndStitch);
 	std::reverse(start, end);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -8038,22 +8038,22 @@ void form::clpfil() {
 		filsclp();
 	  }
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	filsclp();
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
 void form::snap() {
   thred::savdo();
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	snp(GroupStartStitch, GroupEndStitch);
   }
@@ -8061,37 +8061,37 @@ void form::snap() {
 	snp(0, wrap::toUnsigned(Instance->stitchBuffer.size()));
   }
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 auto form::rotpar() -> F_POINT {
   while (true) {
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  RotationRect = Instance->formList.operator[](ClosestFormToCursor).rectangle;
-	  Instance->StateMap.set(StateFlag::FRMROT);
+	  Instance->stateMap.set(StateFlag::FRMROT);
 	  break;
 	}
 	if (!Instance->selectedFormList.empty()) {
 	  pxrct2stch(SelectedFormsRect, RotationRect);
-	  Instance->StateMap.set(StateFlag::FRMSROT);
+	  Instance->stateMap.set(StateFlag::FRMSROT);
 	  break;
 	}
-	if (Instance->StateMap.test(StateFlag::BIGBOX)) {
+	if (Instance->stateMap.test(StateFlag::BIGBOX)) {
 	  RotationRect = AllItemsRect;
 	  break;
 	}
-	if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+	if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	  thred::rngadj();
 	  thred::selRct(RotationRect);
 	  break;
 	}
-	if (Instance->StateMap.test(StateFlag::FPSEL)) {
+	if (Instance->stateMap.test(StateFlag::FPSEL)) {
 	  RotationRect = SelectedVerticesRect;
 	  break;
 	}
 	break;
   }
-  if (Instance->StateMap.test(StateFlag::GMRK)) {
+  if (Instance->stateMap.test(StateFlag::GMRK)) {
 	return ZoomMarkPoint;
   }
   return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
@@ -8100,18 +8100,18 @@ auto form::rotpar() -> F_POINT {
 
 void form::setrang() {
   rotentr(IniFile.rotationAngle);
-  Instance->StateMap.set(StateFlag::NUROT);
+  Instance->stateMap.set(StateFlag::NUROT);
 }
 
 void form::rotcmd() {
-  if (!Instance->StateMap.test(StateFlag::FORMSEL) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
-      Instance->selectedFormList.empty() && !Instance->StateMap.test(StateFlag::BIGBOX) &&
-      !Instance->StateMap.test(StateFlag::FPSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL) && !Instance->stateMap.test(StateFlag::GRPSEL) &&
+      Instance->selectedFormList.empty() && !Instance->stateMap.test(StateFlag::BIGBOX) &&
+      !Instance->stateMap.test(StateFlag::FPSEL)) {
 	displayText::shoseln(IDS_ALLX, IDS_ROTCMD);
 	return;
   }
   rotentr(IniFile.rotationAngle);
-  Instance->StateMap.set(StateFlag::ENTROT);
+  Instance->stateMap.set(StateFlag::ENTROT);
 }
 
 void form::rotagain() {
@@ -8123,13 +8123,13 @@ void form::bakagain() {
 }
 
 void form::rotdup() {
-  if (!Instance->StateMap.test(StateFlag::FORMSEL) && !Instance->StateMap.test(StateFlag::GRPSEL) &&
+  if (!Instance->stateMap.test(StateFlag::FORMSEL) && !Instance->stateMap.test(StateFlag::GRPSEL) &&
       Instance->selectedFormList.empty()) {
 	displayText::shord();
 	return;
   }
   rotentr(IniFile.rotationAngle);
-  Instance->StateMap.set(StateFlag::ENTRDUP);
+  Instance->stateMap.set(StateFlag::ENTRDUP);
 }
 
 void form::cpylayr(uint32_t const layer) {
@@ -8140,12 +8140,12 @@ void form::cpylayr(uint32_t const layer) {
 	}
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	cplayfn(ClosestFormToCursor, layer);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	auto const oldSize = Instance->stitchBuffer.size();
@@ -8161,7 +8161,7 @@ void form::cpylayr(uint32_t const layer) {
 	  currentStitch->attribute |= codedStitchLayer;
 	}
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -8185,31 +8185,31 @@ void form::movlayr(uint32_t layer) {
 	  }
 	}
 	Instance->selectedFormList.clear();
-	Instance->StateMap.reset(StateFlag::FORMSEL);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.reset(StateFlag::FORMSEL);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	auto& formAttr = formList.operator[](ClosestFormToCursor).attribute;
 	wrap::narrow(formAttr, layer << FLAYSHFT | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK));
-	Instance->StateMap.reset(StateFlag::FORMSEL);
+	Instance->stateMap.reset(StateFlag::FORMSEL);
 	for (auto& stitch : Instance->stitchBuffer) {
 	  if ((stitch.attribute & ALTYPMSK) != 0U && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 		stitch.attribute = (stitch.attribute & NLAYMSK) | codedStitchLayer;
 	  }
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; ++iStitch) {
 	  Instance->stitchBuffer.operator[](iStitch).attribute =
 	      (Instance->stitchBuffer.operator[](iStitch).attribute & NLAYMSK) | codedStitchLayer;
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -8221,9 +8221,9 @@ void form::join() {
   auto const& savedform = formList.operator[](ClosestFormToCursor);
   auto const  lastVertex =
       wrap::next(Instance->formVertices.cbegin(), savedform.vertexIndex + savedform.vertexCount - 1U);
-  Instance->StateMap.set(StateFlag::FRMSAM);
-  if (formList.size() <= 1 || !Instance->StateMap.test(StateFlag::FORMSEL) || !closfrm(ClosestFormToCursor)) {
-	Instance->StateMap.reset(StateFlag::FRMSAM);
+  Instance->stateMap.set(StateFlag::FRMSAM);
+  if (formList.size() <= 1 || !Instance->stateMap.test(StateFlag::FORMSEL) || !closfrm(ClosestFormToCursor)) {
+	Instance->stateMap.reset(StateFlag::FRMSAM);
 	return;
   }
   auto const& form = formList.operator[](ClosestFormToCursor);
@@ -8241,7 +8241,7 @@ void form::join() {
 	vertexList.push_back(*itThisVertex);
 	ClosestVertexToCursor = nxt(form, ClosestVertexToCursor);
   }
-  Instance->StateMap.set(StateFlag::DELTO);
+  Instance->stateMap.set(StateFlag::DELTO);
   thred::frmdel();
   if (savedFormIndex > ClosestFormToCursor) {
 	ClosestFormToCursor = savedFormIndex - 1U;
@@ -8259,8 +8259,8 @@ void form::join() {
   toForm.outline();
   refil(ClosestFormToCursor);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
-  Instance->StateMap.reset(StateFlag::FRMSAM);
+  Instance->stateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.reset(StateFlag::FRMSAM);
 }
 
 void form::refilal() {
@@ -8272,22 +8272,22 @@ void form::refilal() {
   }
   ClosestFormToCursor = savedFormIndex;
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::nufsel() {
   if (Instance->formList.empty()) {
 	return;
   }
-  Instance->StateMap.reset(StateFlag::FORMSEL);
-  if (Instance->StateMap.testAndReset(StateFlag::WASEL)) {
+  Instance->stateMap.reset(StateFlag::FORMSEL);
+  if (Instance->stateMap.testAndReset(StateFlag::WASEL)) {
 	thred::pushPreviousForm();
   }
   if (std::ranges::none_of(Instance->selectedFormList,
                            [](uint32_t const intX) { return intX == ClosestFormToCursor; })) {
 	Instance->selectedFormList.push_back(ClosestFormToCursor);
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::frmadj(uint32_t const formIndex) noexcept(!std::is_same_v<ptrdiff_t, int>) {
@@ -8315,7 +8315,7 @@ void form::frmsadj() {
 
 void form::selfil(uint32_t const type) {
   displayText::frm1pnt();
-  if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL)) {
 	displayText::tabmsg(IDS_SEL1FRM, false);
 	return;
   }
@@ -8333,15 +8333,15 @@ void form::selfil(uint32_t const type) {
 	return;
   }
   frmpnts(type);
-  Instance->StateMap.set(StateFlag::GRPSEL);
-  Instance->StateMap.reset(StateFlag::FORMSEL);
+  Instance->stateMap.set(StateFlag::GRPSEL);
+  Instance->stateMap.reset(StateFlag::FORMSEL);
   thred::rngadj();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::selalfil() {
   displayText::frm1pnt();
-  if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL)) {
 	displayText::tabmsg(IDS_SEL1FRM, false);
 	return;
   }
@@ -8356,10 +8356,10 @@ void form::selalfil() {
 	--ClosestPointIndex;
   }
   GroupStitchIndex = thred::findLastStitch(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::GRPSEL);
-  Instance->StateMap.reset(StateFlag::FORMSEL);
+  Instance->stateMap.set(StateFlag::GRPSEL);
+  Instance->stateMap.reset(StateFlag::FORMSEL);
   thred::rngadj();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 auto form::frmrng(uint32_t const iForm, RANGE& range) -> bool {
@@ -8388,18 +8388,18 @@ void form::bhol() {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  bholbrd(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	LineSpacing = savedSpacing;
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	bholbrd(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
 	thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	LineSpacing = savedSpacing;
   }
 }
@@ -8437,17 +8437,17 @@ void form::fcntr() {
 	  }
 	}
   }
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::boxsel() {
-  Instance->StateMap.reset(StateFlag::INSRT);
-  if (!Instance->StateMap.test(StateFlag::THUMSHO)) {
-	Instance->StateMap.reset(StateFlag::BZUM);
-	Instance->StateMap.reset(StateFlag::BZUMIN);
-	Instance->StateMap.set(StateFlag::VCAPT);
+  Instance->stateMap.reset(StateFlag::INSRT);
+  if (!Instance->stateMap.test(StateFlag::THUMSHO)) {
+	Instance->stateMap.reset(StateFlag::BZUM);
+	Instance->stateMap.reset(StateFlag::BZUMIN);
+	Instance->stateMap.set(StateFlag::VCAPT);
 	SetCapture(ThrEdWindow);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -8475,16 +8475,16 @@ void form::picot() {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  fspic(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	fspic(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -8497,16 +8497,16 @@ void form::contfil() {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  contsf(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   thred::savdo();
   if (contsf(ClosestFormToCursor)) {
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   displayText::tabmsg(IDS_CONT, false);
@@ -8515,20 +8515,20 @@ void form::contfil() {
 void form::dupfn(float const rotationAngle) {
   thred::savdo();
   auto usedAngle = rotationAngle;
-  if (Instance->StateMap.test(StateFlag::ROTCLOCK) && rotationAngle != 0.0F) {
+  if (Instance->stateMap.test(StateFlag::ROTCLOCK) && rotationAngle != 0.0F) {
 	usedAngle = PI_F2 - rotationAngle;
   }
   auto const rotationCenter = rotpar();
   if (usedAngle == 0.0F) {
 	rotentr(usedAngle);
-	Instance->StateMap.set(StateFlag::ENTRDUP);
+	Instance->stateMap.set(StateFlag::ENTRDUP);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	duprot(usedAngle);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	duprots(usedAngle, rotationCenter);
 	return;
   }
@@ -8540,7 +8540,7 @@ void form::dupfn(float const rotationAngle) {
 }
 
 void form::shrnk() {
-  if (!Instance->StateMap.test(StateFlag::FORMSEL) ||
+  if (!Instance->stateMap.test(StateFlag::FORMSEL) ||
       Instance->formList.operator[](ClosestFormToCursor).edgeType != EDGECLIP) {
 	displayText::shoseln(IDS_FRMCLP, IDS_SHRNK);
 	return;
@@ -8548,7 +8548,7 @@ void form::shrnk() {
   thred::savdo();
   shrnks();
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::frmnumfn(uint32_t& oldFormIndex, uint32_t const newFormIndex) {
@@ -8642,12 +8642,12 @@ void form::srtbyfrm() {
 	xt::srtcol();
   }
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::cntrx() {
   auto const markCenter =
-      Instance->StateMap.test(StateFlag::GMRK)
+      Instance->stateMap.test(StateFlag::GMRK)
           ? ZoomMarkPoint
           : F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   if (!Instance->selectedFormList.empty()) {
@@ -8655,20 +8655,20 @@ void form::cntrx() {
 	auto selectedCenter = F_POINT {};
 	dufcntr(selectedCenter);
 	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, markCenter.y - selectedCenter.y};
-	if (Instance->StateMap.test(StateFlag::CNTRV)) {
+	if (Instance->stateMap.test(StateFlag::CNTRV)) {
 	  FormMoveDelta.y = 0.0F;
 	}
-	if (Instance->StateMap.test(StateFlag::CNTRH)) {
+	if (Instance->stateMap.test(StateFlag::CNTRH)) {
 	  FormMoveDelta.x = 0.0F;
 	}
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  frmadj(selectedForm);
 	}
 	frmsadj();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	thred::savdo();
 	// clang-format off
 	  auto const& formRect       = Instance->formList.operator[](ClosestFormToCursor).rectangle;
@@ -8676,10 +8676,10 @@ void form::cntrx() {
 										    wrap::midl(formRect.top, formRect.bottom)};
 	// clang-format on
 	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, markCenter.y - selectedCenter.y};
-	if (Instance->StateMap.test(StateFlag::CNTRV)) {
+	if (Instance->stateMap.test(StateFlag::CNTRV)) {
 	  FormMoveDelta.y = 0.0F;
 	}
-	if (Instance->StateMap.test(StateFlag::CNTRH)) {
+	if (Instance->stateMap.test(StateFlag::CNTRH)) {
 	  FormMoveDelta.x = 0.0F;
 	}
 	frmadj(ClosestFormToCursor);
@@ -8688,10 +8688,10 @@ void form::cntrx() {
 		stitch += FormMoveDelta;
 	  }
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	auto const& startStitch = Instance->stitchBuffer.operator[](GroupStartStitch);
@@ -8706,23 +8706,23 @@ void form::cntrx() {
 	auto const selectedCenter = F_POINT {wrap::midl(groupRect.right, groupRect.left),
 	                                     wrap::midl(groupRect.top, groupRect.bottom)};
 	FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, markCenter.y - selectedCenter.y};
-	if (Instance->StateMap.test(StateFlag::CNTRV)) {
+	if (Instance->stateMap.test(StateFlag::CNTRV)) {
 	  FormMoveDelta.y = 0.0F;
 	}
-	if (Instance->StateMap.test(StateFlag::CNTRH)) {
+	if (Instance->stateMap.test(StateFlag::CNTRH)) {
 	  FormMoveDelta.x = 0.0F;
 	}
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	  Instance->stitchBuffer.operator[](iStitch) += FormMoveDelta;
 	}
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   displayText::shoseln(IDS_FGRPF, IDS_CENT);
 }
 
 void form::centir() {
-  Instance->StateMap.reset(StateFlag::BIGBOX);
+  Instance->stateMap.reset(StateFlag::BIGBOX);
   auto& formList        = Instance->formList;
   AllItemsRect          = getbig(formList, Instance->stitchBuffer);
   auto const itemCenter = F_POINT {wrap::midl(AllItemsRect.right, AllItemsRect.left),
@@ -8740,7 +8740,7 @@ void form::centir() {
 	iForm.outline();
   }
   xt::setfchk();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::dubean() {
@@ -8748,7 +8748,7 @@ void form::dubean() {
 	return;
   }
   thred::savdo();
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	if (auto const beanCount = bean(GroupStartStitch, GroupEndStitch); ClosestPointIndex > GroupStitchIndex) {
 	  ClosestPointIndex += beanCount;
@@ -8762,12 +8762,12 @@ void form::dubean() {
 	bean(0, wrap::toUnsigned(Instance->stitchBuffer.size() - 1U));
   }
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::debean() {
   thred::savdo();
-  if (Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	unbean(GroupStartStitch, GroupEndStitch);
 	if (ClosestPointIndex > GroupStitchIndex) {
@@ -8792,7 +8792,7 @@ void form::debean() {
 	}
   }
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::clpspac(uint32_t const insertPoint, uint32_t const count) {
@@ -8814,11 +8814,11 @@ void form::stchadj() {
   refilfn(ClosestFormToCursor);
   ++ClosestFormToCursor;
   refilfn(ClosestFormToCursor);
-  Instance->StateMap.reset(StateFlag::FRMPSEL);
+  Instance->stateMap.reset(StateFlag::FRMPSEL);
 }
 
 void form::spltfrm() {
-  if (!Instance->StateMap.test(StateFlag::FRMPSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FRMPSEL)) {
 	displayText::spltmsg();
 	return;
   }
@@ -8844,12 +8844,12 @@ void form::spltfrm() {
 	  return;
 	}
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
 void form::stchs2frm() {
-  if (!Instance->StateMap.test(StateFlag::GRPSEL)) {
+  if (!Instance->stateMap.test(StateFlag::GRPSEL)) {
 	displayText::shoseln(IDS_GRPMSG, IDS_STCH2FRM);
 	return;
   }
@@ -8874,9 +8874,9 @@ void form::stchs2frm() {
   currentForm.outline();
   Instance->formList.push_back(currentForm);
   thred::delstchm();
-  Instance->StateMap.reset(StateFlag::GRPSEL);
+  Instance->stateMap.reset(StateFlag::GRPSEL);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::vrtsclp(uint32_t const formIndex) {
@@ -8921,23 +8921,23 @@ void form::vrtclp() {
 	return;
   }
   if (!Instance->selectedFormList.empty()) {
-	Instance->StateMap.set(StateFlag::NOCLP);
+	Instance->stateMap.set(StateFlag::NOCLP);
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  if (Instance->formList.operator[](selectedForm).type != FRMLINE) {
 		vrtsclp(selectedForm);
 	  }
 	}
-	Instance->StateMap.reset(StateFlag::NOCLP);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.reset(StateFlag::NOCLP);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	vrtsclp(ClosestFormToCursor);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -8986,24 +8986,24 @@ void form::horclp() {
 	return;
   }
   if (!Instance->selectedFormList.empty()) {
-	Instance->StateMap.set(StateFlag::NOCLP);
+	Instance->stateMap.set(StateFlag::NOCLP);
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (Instance->formList.operator[](ClosestFormToCursor).type != FRMLINE) {
 		horsclp();
 	  }
 	}
-	Instance->StateMap.set(StateFlag::NOCLP);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::NOCLP);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
   else {
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  horsclp();
-	  Instance->StateMap.set(StateFlag::INIT);
+	  Instance->stateMap.set(StateFlag::INIT);
 	  thred::coltab();
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
   }
 }
@@ -9052,25 +9052,25 @@ void form::angclp() {
   auto& formList = Instance->formList;
 
   if (!Instance->selectedFormList.empty()) {
-	Instance->StateMap.set(StateFlag::NOCLP);
+	Instance->stateMap.set(StateFlag::NOCLP);
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (auto& form = formList.operator[](selectedForm); form.type != FRMLINE) {
 		angsclp(form);
 	  }
 	}
-	Instance->StateMap.reset(StateFlag::NOCLP);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.reset(StateFlag::NOCLP);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	auto& form = formList.operator[](ClosestFormToCursor);
 	angsclp(form);
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -9094,17 +9094,17 @@ void form::dubfil() {
 	  auto& form = formList.operator[](selectedForm);
 	  dubsfil(form);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
-  if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	auto& form = formList.operator[](ClosestFormToCursor);
 	dubsfil(form);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::INIT);
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -9229,26 +9229,26 @@ void form::chain() {
   }
   thred::savdo();
   if (Instance->selectedFormList.empty()) {
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  chan(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::INIT);
+	  Instance->stateMap.set(StateFlag::INIT);
 	  thred::coltab();
 	  thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
 	return;
   }
   for (auto const selectedForm : Instance->selectedFormList) {
 	chan(selectedForm);
   }
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::INIT);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::crop() {
   displayText::frm1pnt();
-  if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_CROP);
 	return;
   }
@@ -9264,7 +9264,7 @@ void form::crop() {
   }
   Instance->stitchBuffer.resize(wrap::distance<size_t>(Instance->stitchBuffer.begin(), iDestination));
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::filclpx() {
@@ -9290,20 +9290,20 @@ void form::filclpx() {
 	return;
   }
   if (Instance->selectedFormList.empty()) {
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  fsclpx(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::INIT);
+	  Instance->stateMap.set(StateFlag::INIT);
 	  thred::coltab();
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
 	return;
   }
   for (auto const selectedForm : Instance->selectedFormList) {
 	fsclpx(selectedForm);
   }
-  Instance->StateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::INIT);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::srtfrm() {
@@ -9334,7 +9334,7 @@ void form::srtfrm() {
   }
   std::ranges::copy(highStitchBuffer, Instance->stitchBuffer.begin());
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void form::setLayerPens() noexcept {

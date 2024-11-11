@@ -190,7 +190,7 @@ void satclos() {
 	  ++iVertex;
 	}
   }
-  Instance->StateMap.reset(StateFlag::SATCNKT);
+  Instance->stateMap.reset(StateFlag::SATCNKT);
   if (form.type == FRMLINE) {
 	form.fillType      = CONTF;
 	auto closestVertex = ClosestVertexToCursor;
@@ -274,7 +274,7 @@ void satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width) {
   auto const& formAngles  = Instance->formAngles;
   if ((isBlunt & SBLNT) != 0U) {
 	auto step = F_POINT {sin(formAngles.front()) * width * HALF, cos(formAngles.front()) * width * HALF};
-	if (Instance->StateMap.test(StateFlag::INDIR)) {
+	if (Instance->stateMap.test(StateFlag::INDIR)) {
 	  step = -step;
 	}
 	InsidePoints->front()  = F_POINT {itVertex->x + step.x, itVertex->y - step.y};
@@ -290,7 +290,7 @@ void satends(FRM_HEAD const& form, uint32_t const isBlunt, float const width) {
 
 	auto step = F_POINT {sin(formAngles.operator[](vertexCount - SKIPVL)) * width * HALF,
 	                     cos(formAngles.operator[](vertexCount - SKIPVL)) * width * HALF};
-	if (Instance->StateMap.test(StateFlag::INDIR)) {
+	if (Instance->stateMap.test(StateFlag::INDIR)) {
 	  step = -step;
 	}
 	InsidePoints->back()  = F_POINT {itVertex->x + step.x, itVertex->y - step.y};
@@ -315,8 +315,8 @@ void satfn(FRM_HEAD const&           form,
   auto& bSequence     = Instance->bSequence;
 
   // setup the initial stitch point
-  if (!Instance->StateMap.testAndSet(StateFlag::SAT1)) {
-	if (Instance->StateMap.test(StateFlag::FTHR)) {
+  if (!Instance->stateMap.testAndSet(StateFlag::SAT1)) {
+	if (Instance->stateMap.test(StateFlag::FTHR)) {
 	  if (form.vertexCount != 0U) {
 		// add the first vertex to the bare sequence
 		auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
@@ -324,7 +324,7 @@ void satfn(FRM_HEAD const&           form,
 	  }
 	}
 	else {
-	  if (Instance->StateMap.test(StateFlag::BARSAT)) {
+	  if (Instance->stateMap.test(StateFlag::BARSAT)) {
 		// add the first vertices from line1 and line2 to the bare sequence
 		if (form.vertexCount != 0U) {
 		  auto itVertex = wrap::next(itFirstVertex, line1Start % form.vertexCount);
@@ -412,12 +412,12 @@ void satfn(FRM_HEAD const&           form,
   while (flag && loop < LOOPLIM) {
 	flag = false;
 	++loop;
-	if (Instance->StateMap.test(StateFlag::FTHR)) {
+	if (Instance->stateMap.test(StateFlag::FTHR)) {
 	  // feathered satin
 	  while (line1Count != 0U && line2Count != 0U) {
 		line1Point += line1Step;
 		line2Point += line2Step;
-		if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+		if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 		  bSequence.emplace_back(line1Point.x, line1Point.y, 0);
 		}
 		else {
@@ -428,13 +428,13 @@ void satfn(FRM_HEAD const&           form,
 	  }
 	}
 	else {
-	  if (Instance->StateMap.test(StateFlag::BARSAT)) {
+	  if (Instance->stateMap.test(StateFlag::BARSAT)) {
 		// bare satin
 		while (line1Count != 0U && line2Count != 0U) {
 		  line1Point += line1Step;
 		  line2Point += line2Step;
 		  // zig zag the stitches
-		  if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+		  if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 			bSequence.emplace_back(line1Point.x, line1Point.y, 0);
 			bSequence.emplace_back(line2Point.x, line2Point.y, 1);
 		  }
@@ -453,7 +453,7 @@ void satfn(FRM_HEAD const&           form,
 		  line2Point += line2Step;
 		  // check the direction of the stitches and reverse line 1 or line 2
 		  // depending on the flag for square ends
-		  if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+		  if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 			if (Instance->userFlagMap.test(UserFlag::SQRFIL)) {
 			  form::filinu(line2Point, stitchPoint);
 			  stitchPoint = line2Point;
@@ -613,7 +613,7 @@ void sbfn(std::vector<F_POINT> const& insidePoints, uint32_t const start, uint32
   auto       outerPoint  = F_POINT {outsidePoints[start].x, outsidePoints[start].y};
   auto       innerFlag   = false;
   auto       outerFlag   = false;
-  if (!Instance->StateMap.testAndSet(StateFlag::SAT1)) {
+  if (!Instance->stateMap.testAndSet(StateFlag::SAT1)) {
 	stitchPoint = insidePoints[start];
   }
   if (outerLength > innerLength) {
@@ -648,7 +648,7 @@ void sbfn(std::vector<F_POINT> const& insidePoints, uint32_t const start, uint32
   for (auto iStep = 0U; iStep < count; ++iStep) {
 	innerPoint += innerStep;
 	outerPoint += outerStep;
-	if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
+	if (Instance->stateMap.testAndFlip(StateFlag::FILDIR)) {
 	  if (innerFlag) {
 		auto const offsetDelta = F_POINT {innerPoint.x - stitchPoint.x, innerPoint.y - stitchPoint.y};
 		auto const offsetLength = std::hypot(offsetDelta.x, offsetDelta.y);
@@ -695,7 +695,7 @@ void sfn(FRM_HEAD const& form, uint32_t startVertex, F_POINT& stitchPoint) {
 }
 
 void unsat() {
-  if (Instance->StateMap.testAndReset(StateFlag::SHOSAT)) {
+  if (Instance->stateMap.testAndReset(StateFlag::SHOSAT)) {
 	satin::dusat();
   }
 }
@@ -825,7 +825,7 @@ void satin::spltsat(uint32_t const guideIndex) {
 void satin::satknkt() {
   satclos();
   form::refil(ClosestFormToCursor);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void satin::satsel() {
@@ -837,8 +837,8 @@ void satin::satsel() {
   StartPoint = ClosestVertexToCursor;
   auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + ClosestVertexToCursor);
   Instance->formLines.front() = form::sfCor2px(*itVertex);
-  Instance->StateMap.reset(StateFlag::SHOCON);
-  Instance->StateMap.set(StateFlag::SATCNKT);
+  Instance->stateMap.reset(StateFlag::SHOCON);
+  Instance->stateMap.set(StateFlag::SATCNKT);
   if (form.type == FRMFPOLY) {
 	form.type = SAT;
   }
@@ -1092,7 +1092,7 @@ void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
 	form::refil(ClosestFormToCursor);
   }
   thred::coltab();
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void satin::delspnt() {
@@ -1100,11 +1100,11 @@ void satin::delspnt() {
 
   auto& currentForm = formList.operator[](ClosestFormToCursor);
   if (form::chkdel(currentForm)) {
-	Instance->StateMap.set(StateFlag::DELTO);
+	Instance->stateMap.set(StateFlag::DELTO);
 	thred::frmdel();
-	Instance->StateMap.reset(StateFlag::FRMPSEL);
+	Instance->stateMap.reset(StateFlag::FRMPSEL);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
   if (currentForm.type == SAT && currentForm.fillType == SATF) {
@@ -1157,7 +1157,7 @@ void satin::delspnt() {
   if (ClosestVertexToCursor > currentForm.vertexCount - 1) {
 	ClosestVertexToCursor = currentForm.vertexCount - 1U;
   }
-  Instance->StateMap.set(StateFlag::FRMPSEL);
+  Instance->stateMap.set(StateFlag::FRMPSEL);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(formList.size()); ++iForm) {
 	auto& form = formList.operator[](iForm);
 	--form.vertexIndex;
@@ -1191,12 +1191,12 @@ void satin::satbrd() {
 	  }
 	  satsbrd(selectedForm);
 	}
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
 	thred::coltab();
-	Instance->StateMap.set(StateFlag::RESTCH);
+	Instance->stateMap.set(StateFlag::RESTCH);
   }
   else {
-	if (Instance->StateMap.test(StateFlag::FORMSEL)) {
+	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  auto& form = formList.operator[](ClosestFormToCursor);
 	  if (Instance->userFlagMap.test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow<decltype(form.attribute)>(SBLNT | FBLNT);
@@ -1205,17 +1205,17 @@ void satin::satbrd() {
 		form.attribute &= NOBLNT;
 	  }
 	  satsbrd(ClosestFormToCursor);
-	  Instance->StateMap.set(StateFlag::INIT);
+	  Instance->stateMap.set(StateFlag::INIT);
 	  thred::coltab();
 	  thred::ritot(wrap::toUnsigned(Instance->stitchBuffer.size()));
-	  Instance->StateMap.set(StateFlag::RESTCH);
+	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
   }
 }
 
 void satin::ribon() {
   displayText::frm1pnt();
-  if (!Instance->StateMap.test(StateFlag::FORMSEL)) {
+  if (!Instance->stateMap.test(StateFlag::FORMSEL)) {
 	displayText::shoseln(IDS_FRM1MSG, IDS_CONVRIB);
 	return;
   }
@@ -1270,7 +1270,7 @@ void satin::ribon() {
   newForm.wordParam       = newVertexCount / 2;
   newForm.satinGuideCount = newForm.wordParam - 2U;
   newForm.satinGuideIndex = adsatk(newForm.satinGuideCount);
-  if (Instance->StateMap.test(StateFlag::CNV2FTH)) {
+  if (Instance->stateMap.test(StateFlag::CNV2FTH)) {
 	newForm.fillType              = FTHF;
 	newForm.feather.ratio         = IniFile.featherRatio;
 	newForm.feather.upCount       = IniFile.featherUpCount;
@@ -1295,13 +1295,13 @@ void satin::ribon() {
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   form::refilfn(ClosestFormToCursor);
   ClosestFormToCursor = savedFormIndex;
-  Instance->StateMap.set(StateFlag::DELTO);
+  Instance->stateMap.set(StateFlag::DELTO);
   thred::frmdel();
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   thred::coltab();
-  Instance->StateMap.set(StateFlag::FORMSEL);
-  Instance->StateMap.set(StateFlag::INIT);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::FORMSEL);
+  Instance->stateMap.set(StateFlag::INIT);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void satin::slbrd(FRM_HEAD const& form) {
@@ -1312,13 +1312,13 @@ void satin::slbrd(FRM_HEAD const& form) {
 	auto const width = form.borderSize * URAT;
 	satout(form, width);
 	satends(form, form.attribute, width);
-	Instance->StateMap.reset(StateFlag::SAT1);
-	Instance->StateMap.reset(StateFlag::FILDIR);
+	Instance->stateMap.reset(StateFlag::SAT1);
+	Instance->stateMap.reset(StateFlag::FILDIR);
 	LineSpacing = USPAC;
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	  sbfn(*InsidePoints, iVertex, iVertex + 1U, stitchPoint);
 	}
-	Instance->StateMap.flip(StateFlag::FILDIR);
+	Instance->stateMap.flip(StateFlag::FILDIR);
 	for (auto iVertex = form.vertexCount - 1U; iVertex != 0; --iVertex) {
 	  sbfn(*InsidePoints, iVertex, iVertex - 1, stitchPoint);
 	}
@@ -1326,7 +1326,7 @@ void satin::slbrd(FRM_HEAD const& form) {
   satout(form, form.borderSize);
   satends(form, form.attribute, form.borderSize);
   LineSpacing = form.edgeSpacing;
-  Instance->StateMap.reset(StateFlag::SAT1);
+  Instance->stateMap.reset(StateFlag::SAT1);
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	sbfn(*InsidePoints, iVertex, iVertex + 1U, stitchPoint);
   }
@@ -1339,8 +1339,8 @@ void satin::satfil(FRM_HEAD& form) {
   LineSpacing /= 2;
   Instance->oSequence.clear();
   Instance->bSequence.clear();
-  Instance->StateMap.reset(StateFlag::SAT1);
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::SAT1);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   form.fillType = SATF;
   auto lengths  = std::vector<float> {};
   lengths.reserve(wrap::toSize(form.vertexCount) + 1U);
@@ -1381,7 +1381,7 @@ void satin::satfil(FRM_HEAD& form) {
 	  }
 	  length       = (length - lengths[1]) * HALF;
 	  auto iVertex = 1U;
-	  if (!Instance->StateMap.test(StateFlag::BARSAT)) {
+	  if (!Instance->stateMap.test(StateFlag::BARSAT)) {
 		auto const vNext = std::next(itFirstVertex);
 		Instance->oSequence.push_back(*vNext);
 	  }
@@ -1402,7 +1402,7 @@ void satin::satfil(FRM_HEAD& form) {
 	}
 	length *= HALF;
 	auto iVertex = 0U;
-	if (!Instance->StateMap.test(StateFlag::BARSAT) && !Instance->StateMap.test(StateFlag::FTHR)) {
+	if (!Instance->stateMap.test(StateFlag::BARSAT) && !Instance->stateMap.test(StateFlag::FTHR)) {
 	  Instance->oSequence.push_back(*itFirstVertex);
 	}
 	while (length > lengths[iVertex]) {
@@ -1435,14 +1435,14 @@ void satin::satfix() {
 	form.vertexCount = vertexCount;
 	form.outline();
 	form.satinGuideCount = 0;
-	Instance->StateMap.set(StateFlag::INIT);
+	Instance->stateMap.set(StateFlag::INIT);
   }
   else {
 	tempPolygon.clear();
 	formList.pop_back();
   }
-  Instance->StateMap.reset(StateFlag::SHOSAT);
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.reset(StateFlag::SHOSAT);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void satin::dusat() noexcept {
@@ -1462,7 +1462,7 @@ void satin::drwsat() {
   formLines.resize(vertexCount + 1U);
   formLines[vertexCount] =
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
-  Instance->StateMap.set(StateFlag::SHOSAT);
+  Instance->stateMap.set(StateFlag::SHOSAT);
   dusat();
 }
 
@@ -1471,7 +1471,7 @@ void satin::satpnt0() {
   formLines.clear();
   formLines.push_back(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
   SatinInstance->TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
-  Instance->StateMap.set(StateFlag::SATPNT);
+  Instance->stateMap.set(StateFlag::SATPNT);
 }
 
 void satin::satpnt1() {
@@ -1482,11 +1482,11 @@ void satin::satpnt1() {
       POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
   dusat();
   SatinInstance->TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
-  Instance->StateMap.set(StateFlag::RESTCH);
+  Instance->stateMap.set(StateFlag::RESTCH);
 }
 
 void satin::satzum() {
-  Instance->StateMap.reset(StateFlag::SHOSAT);
+  Instance->stateMap.reset(StateFlag::SHOSAT);
   thred::duzrat();
   auto const vertexCount = wrap::toUnsigned(SatinInstance->TempPolygon.size());
   form::frmlin(SatinInstance->TempPolygon);
@@ -1523,9 +1523,9 @@ void satin::satout(FRM_HEAD const& form, float satinWidth) {
 	outfn(form, iVertex, iVertex + 1, satinWidth);
   }
   outfn(form, form.vertexCount - 1U, 0, satinWidth);
-  Instance->StateMap.reset(StateFlag::INDIR);
+  Instance->stateMap.reset(StateFlag::INDIR);
   if (count < form.vertexCount / 2U) {
-	Instance->StateMap.set(StateFlag::INDIR);
+	Instance->stateMap.set(StateFlag::INDIR);
 	OutsidePoints = std::addressof(Instance->insidePointList);
 	InsidePoints  = std::addressof(Instance->outsidePointList);
   }
@@ -1535,15 +1535,15 @@ void satin::sbrd(FRM_HEAD const& form) {
   auto const savedSpacing = LineSpacing;
   auto const start        = form::getlast(form);
   auto       stitchPoint  = F_POINT {};
-  Instance->StateMap.reset(StateFlag::SAT1);
-  Instance->StateMap.reset(StateFlag::FILDIR);
+  Instance->stateMap.reset(StateFlag::SAT1);
+  Instance->stateMap.reset(StateFlag::FILDIR);
   Instance->oSequence.clear();
   Instance->oSequence.emplace_back();
   if ((form.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
 	satout(form, form.borderSize * URAT);
 	sfn(form, start, stitchPoint);
-	Instance->StateMap.set(StateFlag::FILDIR);
+	Instance->stateMap.set(StateFlag::FILDIR);
 	sfn(form, start, stitchPoint);
   }
   satout(form, form.borderSize);
