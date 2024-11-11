@@ -124,18 +124,6 @@ class SORT_REC
   bool     direction = false; // direction of sort
 };
 
-constexpr auto M_AP     = 1U << 1U;
-constexpr auto M_CWLK   = 1U << 2U;
-constexpr auto M_WALK   = 1U << 3U;
-constexpr auto M_UND    = 1U << 4U;
-constexpr auto M_FIL    = 1U << 5U;
-constexpr auto M_FTH    = 1U << 6U;
-constexpr auto M_BRD    = 1U << 7U;
-constexpr auto M_APCOL  = 1U << 8U;
-constexpr auto M_FCOL   = 1U << 9U;
-constexpr auto M_FTHCOL = 1U << 10U;
-constexpr auto M_ECOL   = 1U << 11U;
-
 enum StitchStyles : char {
   TYPE_APPLIQUE = 1, // applique
   TYPE_CWALK,        // center walk
@@ -144,22 +132,6 @@ enum StitchStyles : char {
   TYPE_FTHR,         // feather
   TYPE_FILL,         // fill
   TYPE_BORDER        // border
-};
-
-static constexpr auto STITCH_TYPES = std::array<char, 13> {
-    0,             // 0 no type
-    TYPE_APPLIQUE, // 1 applique
-    TYPE_CWALK,    // 2 center walk
-    TYPE_EWALK,    // 3 edge walk
-    TYPE_UNDERLAY, // 4 underlay
-    0,             // 5 knot
-    TYPE_FTHR,     // 6 feather
-    0,             // 7 layer
-    0,             // 8 layer
-    0,             // 9 layer
-    0,             // 10 reserved
-    TYPE_FILL,     // 11 fill
-    TYPE_BORDER,   // 12 border
 };
 
 #ifdef _DEBUG
@@ -178,10 +150,39 @@ class ATFLD
 
 // xt internal namespace
 namespace {
+constexpr auto FSED     = uint32_t {1340007303U}; // feather sequence seed
+
+// Type map constants
+constexpr auto M_AP     = 1U << 1U; // Applique
+constexpr auto M_CWLK   = 1U << 2U; // Center walk
+constexpr auto M_WALK   = 1U << 3U; // Walk
+constexpr auto M_UND    = 1U << 4U; // Underlay
+constexpr auto M_FIL    = 1U << 5U; // Fill
+constexpr auto M_FTH    = 1U << 6U; // Feather
+constexpr auto M_BRD    = 1U << 7U; // Border
+constexpr auto M_APCOL  = 1U << 8U; // Applique color
+constexpr auto M_FCOL   = 1U << 9U; // Fill color
+constexpr auto M_FTHCOL = 1U << 10U; // Feather color
+constexpr auto M_ECOL   = 1U << 11U; // Edge color
+
+constexpr auto STITCH_TYPES = std::array<char, 13> {
+    0,             // 0 no type
+    TYPE_APPLIQUE, // 1 applique
+    TYPE_CWALK,    // 2 center walk
+    TYPE_EWALK,    // 3 edge walk
+    TYPE_UNDERLAY, // 4 underlay
+    0,             // 5 knot
+    TYPE_FTHR,     // 6 feather
+    0,             // 7 layer
+    0,             // 8 layer
+    0,             // 9 layer
+    0,             // 10 reserved
+    TYPE_FILL,     // 11 fill
+    TYPE_BORDER,   // 12 border
+};
+
 auto DesignSize = F_POINT {};                        // design size
 auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
-
-constexpr auto FSED = uint32_t {1340007303U}; // feather sequence seed
 
 // Definitions
 void addNewStitches(INT_INFO& ilData, const FRM_HEAD& form);
