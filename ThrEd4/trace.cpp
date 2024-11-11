@@ -108,8 +108,8 @@ class TRACE_SINGLE
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  boost::dynamic_bitset<>        TracedEdges;
-  boost::dynamic_bitset<>        TracedMap;
+  boost::dynamic_bitset<> TracedEdges;
+  boost::dynamic_bitset<> TracedMap;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   TRACE_SINGLE(const TRACE_SINGLE&)                    = delete;
@@ -126,8 +126,8 @@ class TRACE_SINGLE
 namespace {
 constexpr auto TRACE_RGB_FLAG = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
 constexpr auto TRACE_RGB_MASK = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
-constexpr auto TRACE_RGB     = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
-constexpr auto TRACE_SHIFT   = std::array {0U, BYTSHFT, WRDSHFT};   // trace shift values
+constexpr auto TRACE_RGB      = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
+constexpr auto TRACE_SHIFT    = std::array {0U, BYTSHFT, WRDSHFT};   // trace shift values
 
 auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
 auto TraceDownWindow    = std::array<HWND, CHANLCNT> {}; // trace down number windows
@@ -135,7 +135,7 @@ auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select windows
 auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number windows
 auto CurrentTracePoint  = POINT {};                      // current point being traced
 auto TraceDataSize      = uint32_t {};                   // size of the trace bitmap in double words
-auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
+auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr);    // trace stepSize window
 auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
 auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
 auto TraceMsgIndex    = uint32_t {};                          // pointer to the trace buffer
@@ -578,7 +578,7 @@ void tracwnd() {
 auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
     -> bool {
   auto const& tracedEdges = TraceInstance->TracedEdges;
-  auto pixelIndex = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
+  auto        pixelIndex  = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
   switch (traceDirection) {
 	case TRCR: { // was tracing right
@@ -594,7 +594,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCD;
 		}
 		else {
-		  pixelIndex += bitmap::getBitmapWidth();                     // look at the pixel below
+		  pixelIndex += bitmap::getBitmapWidth();           // look at the pixel below
 		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.x;
 		  }
@@ -618,7 +618,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCL;
 		}
 		else {
-		  ++pixelIndex; // look at the pixel to the right
+		  ++pixelIndex;                                     // look at the pixel to the right
 		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.y;
 		  }
@@ -642,7 +642,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCU;
 		}
 		else {
-		  pixelIndex -= bitmap::getBitmapWidth();                     // look at the pixel above
+		  pixelIndex -= bitmap::getBitmapWidth();           // look at the pixel above
 		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			--CurrentTracePoint.x;
 		  }
@@ -666,7 +666,7 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 		  traceDirection = TRCR;
 		}
 		else {
-		  --pixelIndex; // look at the pixel to the left
+		  --pixelIndex;                                     // look at the pixel to the left
 		  if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 			++CurrentTracePoint.y;
 		  }
@@ -697,7 +697,7 @@ auto trcin(COLORREF const color) -> bool {
   if (color == 0U) {
 	return false;
   }
-  auto const colors = trcols(color);
+  auto const colors   = trcols(color);
   auto       colIndex = 3U;
   if (Instance->StateMap.test(StateFlag::TRCRED)) {
 	colIndex = 0U;

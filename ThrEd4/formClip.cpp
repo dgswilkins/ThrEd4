@@ -112,8 +112,8 @@ class FCLIP_SINGLE
 };
 
 namespace {
-auto ClipFormsCount = uint32_t {}; // number of forms the on the clipboard
-auto ClipOrigin     = POINT {};    // origin of clipboard box in stitch coordinates
+auto ClipFormsCount  = uint32_t {}; // number of forms the on the clipboard
+auto ClipOrigin      = POINT {};    // origin of clipboard box in stitch coordinates
 auto LowerLeftStitch = F_POINT {};  // lower left formOrigin in a form
 
 FCLIP_SINGLE* FormClipInstance;

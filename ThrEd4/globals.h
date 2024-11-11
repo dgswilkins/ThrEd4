@@ -171,7 +171,7 @@ extern std::vector<F_POINT>* InsidePoints;
 extern F_POINT LastPoint;
 extern float   LineSpacing;
 
-extern HWND  MainStitchWin;
+extern HWND MainStitchWin;
 
 extern float MinStitchLength;
 extern MSG   WinMsg;
@@ -183,10 +183,10 @@ extern HWND     OKButton;
 
 extern std::vector<F_POINT>* OutsidePoints;
 
-extern float          PicotSpacing;
-extern HWND           PreferencesWindow;
-extern uint32_t       PseudoRandomValue;
-extern F_RECTANGLE    RotationRect;
+extern float       PicotSpacing;
+extern HWND        PreferencesWindow;
+extern uint32_t    PseudoRandomValue;
+extern F_RECTANGLE RotationRect;
 
 extern uint32_t SelectedFormControlVertex;
 
@@ -201,8 +201,8 @@ extern F_RECTANGLE SelectedVerticesRect;
 extern HWND  SideMessageWindow;
 extern float SnapLength;
 
-extern float    SpiralWrap;
-extern float    StarRatio;
+extern float SpiralWrap;
+extern float StarRatio;
 
 extern F_POINT StitchBmpRatio;
 
@@ -212,10 +212,10 @@ extern HDC         StitchWindowDC;
 extern HDC         StitchWindowMemDC;
 extern POINT       StitchWindowOrigin;
 
-extern HINSTANCE      ThrEdInstance;
-extern HWND           ThrEdWindow;
-extern POINT          ThredWindowOrigin;
-extern uint32_t*      TraceBitmapData;
+extern HINSTANCE ThrEdInstance;
+extern HWND      ThrEdWindow;
+extern POINT     ThredWindowOrigin;
+extern uint32_t* TraceBitmapData;
 
 extern SIZE UnzoomedRect;
 

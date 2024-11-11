@@ -4711,7 +4711,7 @@ void snpfn(std::vector<uint32_t> const& xPoints, uint32_t const start, uint32_t 
 }
 
 void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram) {
-  auto const checkLength = wrap::round<uint32_t>((SnapLength * 2.0F) + 1.0F);
+  auto const checkLength   = wrap::round<uint32_t>((SnapLength * 2.0F) + 1.0F);
   auto const stitchWindowX = thred::getStitchWindowX();
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const timeWindow = CreateWindow(L"STATIC",
@@ -5378,7 +5378,7 @@ void form::ispcdclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  Clip = registerPCDFormat();
+  Clip       = registerPCDFormat();
   ClipMemory = GetClipboardData(Clip);
   if (ClipMemory != nullptr) {
 	Instance->StateMap.set(StateFlag::WASPCDCLP);
@@ -5571,7 +5571,7 @@ void form::fselrct(uint32_t const iForm) noexcept(std::is_same_v<size_t, uint32_
 
   SelectedFormsRect = RECT {minX, maxY, maxX, minY};
   // ReSharper disable once CppUnreachableCode
-  if (OUTL_ALL) { 
+  if (OUTL_ALL) {
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }
@@ -8724,7 +8724,7 @@ void form::cntrx() {
 void form::centir() {
   Instance->StateMap.reset(StateFlag::BIGBOX);
   auto& formList        = Instance->FormList;
-  AllItemsRect           = getbig(formList, Instance->StitchBuffer);
+  AllItemsRect          = getbig(formList, Instance->StitchBuffer);
   auto const itemCenter = F_POINT {wrap::midl(AllItemsRect.right, AllItemsRect.left),
                                    wrap::midl(AllItemsRect.top, AllItemsRect.bottom)};
   auto const hoopCenter =

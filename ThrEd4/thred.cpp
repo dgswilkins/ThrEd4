@@ -260,8 +260,8 @@ constexpr auto TSSSIZ   = size_t {32U};         // size of the thumbnail search 
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
 auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-auto ExtendedHeader          = THR_HEAD_EX {};        // ThrEd file header extension
-auto ArgCount                = int32_t {};            // command line argument count
+auto ExtendedHeader          = THR_HEAD_EX {};                     // ThrEd file header extension
+auto ArgCount                = int32_t {};                         // command line argument count
 auto ArgList                 = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
 auto ThredWindowRect         = RECT {};                            // main window size
 auto ColorBarSize            = COLSIZ;                             // Color bar width scaled for DPI
@@ -278,33 +278,33 @@ auto ScrollSize              = SCROLSIZ;                       // Scroll bar wid
 auto StitchWindowAspectRatio = float {};                       // aspect ratio of the stitch window
 auto HorizontalRatio = float {}; // horizontal ratio between the zoom window and the entire stitch space
 auto VerticalRatio = float {}; // vertical ratio between the zoom window and the entire stitch space
-auto SelectBoxSize           = SIZE {};                        // size of the select box
+auto SelectBoxSize = SIZE {};  // size of the select box
 auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
-auto RotationHandleAngle = float {};                   // angle of the rotation handle
-auto ThreadSize30        = TSIZ30;                     // #30 thread size
-auto ThreadSize40        = TSIZ40;                     // #40 thread size
-auto ThreadSize60        = TSIZ60;                     // #60 thread size
-auto RunPoint            = uint32_t {};                // point for animating stitchout
-auto StitchesPerFrame    = uint32_t {};                // number of stitches to draw in each frame
-auto MovieTimeStep       = int32_t {};                 // time delay for stitchout
+auto RotationHandleAngle = float {};    // angle of the rotation handle
+auto ThreadSize30        = TSIZ30;      // #30 thread size
+auto ThreadSize40        = TSIZ40;      // #40 thread size
+auto ThreadSize60        = TSIZ60;      // #60 thread size
+auto RunPoint            = uint32_t {}; // point for animating stitchout
+auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
+auto MovieTimeStep       = int32_t {};  // time delay for stitchout
 auto LastKeyCode         = std::numeric_limits<wchar_t>::max(); // last key code
-auto FileVersionIndex    = uint8_t {};               // points to old version to be read
-auto StitchArrow         = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
+auto FileVersionIndex    = uint8_t {};                          // points to old version to be read
+auto StitchArrow         = std::array<POINT, ARROWPNT> {};      // arrow for selected stitch
 auto SelectedRange       = RANGE {}; // first and last stitch for min/max stitch select
 auto NameOrder           = std::array<uint32_t, DNLEN> {}; // designer name order table
 auto NameEncoder         = std::array<uint8_t, DNELEN> {}; // designer name encoding
 auto NameDecoder         = std::array<uint8_t, DNDLEN> {}; // designer name decode
 auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
-auto SelectedFormsRange = RANGE {};              // range of selected forms
-auto ZoomMin            = float {};              // minimum allowed zoom value
-auto StitchWindowSize   = SIZE {};                    // size of the stitch window in pixels
-auto StitchBoxesThreshold = STCHBOX;               // threshold for drawing stitch boxes
-auto SortIndex            = uint32_t {};                // index for stitch search
-auto SmallStitchLength    = SMALSIZ * PFGRAN;      // user can remove stitches smaller than this
+auto SelectedFormsRange   = RANGE {};            // range of selected forms
+auto ZoomMin              = float {};            // minimum allowed zoom value
+auto StitchWindowSize     = SIZE {};             // size of the stitch window in pixels
+auto StitchBoxesThreshold = STCHBOX;             // threshold for drawing stitch boxes
+auto SortIndex            = uint32_t {};         // index for stitch search
+auto SmallStitchLength    = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 auto ShowStitchThreshold  = SHOPNTS;          // show stitch grid below this zoom level
-auto PreviousFormIndex    = uint32_t {};           // previously selected form
+auto PreviousFormIndex    = uint32_t {};      // previously selected form
 auto PreferenceIndex      = uint32_t {};      // index to the active preference window
-auto NearestCount         = uint32_t {};           // number of boxes selected
+auto NearestCount         = uint32_t {};      // number of boxes selected
 
 // Pens
 auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
@@ -340,11 +340,11 @@ auto           ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size chan
 constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
 
 // windows
-auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
+auto ColorBar              = gsl::narrow_cast<HWND>(nullptr); // color bar
 auto GeneralNumberInputBox = gsl::narrow_cast<HWND>(nullptr); // general number input box
 auto HorizontalScrollBar   = gsl::narrow_cast<HWND>(nullptr); // horizontal scroll bar
-auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
-auto VerticalScrollBar = gsl::narrow_cast<HWND>(nullptr); // vertical scroll bar
+auto SpeedScrollBar        = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
+auto VerticalScrollBar     = gsl::narrow_cast<HWND>(nullptr); // vertical scroll bar
 auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 
 auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
@@ -356,7 +356,7 @@ auto InsertSize       = SIZE {};         // size of file insert window
 auto InsertCenter     = F_POINT {};      // center point in inserted file
 auto NumericCode      = wchar_t {};      // keyboard numerical input
 
-auto SideWinMsgIdx         = uint32_t {}; // track current position in SideWindowEntryBuffer
+auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
 
 // graphics variables
 
@@ -626,7 +626,8 @@ void barnam(HWND window, uint32_t const iThumbnail) {
 	SetWindowText(window, L"");
 	return;
   }
-  auto const thumbPath = fs::path(ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(iThumbnail)).data());
+  auto const thumbPath =
+      fs::path(ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(iThumbnail)).data());
   constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
   auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
@@ -874,7 +875,7 @@ void chknum() {
   auto& formList = Instance->FormList;
 
   if (SideWinMsgIdx != 0U) {
-	auto& valueWindow = Instance->valueWindow;
+	auto& valueWindow           = Instance->valueWindow;
 	auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
@@ -1338,7 +1339,9 @@ void chknum() {
 	}
   }
   if (ThrSingle->MsgBuffer.size() > 1) {
-	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(ThrSingle->MsgBuffer.data()), ThrSingle->MsgBuffer.size());
+	outDebugString(L"chknum: buffer length [{}] size [{}]\n",
+	               wcslen(ThrSingle->MsgBuffer.data()),
+	               ThrSingle->MsgBuffer.size());
 	auto const value = thred::getMsgBufferValue();
 	if (Instance->StateMap.testAndReset(StateFlag::NUROT)) { // rotate
 	  if (value != 0.0F) {
@@ -1920,8 +1923,8 @@ void doDrwInit() {
 void doInitUnzoomed() {
   auto linePoints = std::vector<POINT> {};
   linePoints.reserve(wrap::toSize(getMaxCount()) + 2U);
-  auto const pwid = Instance->StateMap.test(StateFlag::HID);
-  auto const&      colorChangeTable = ThrSingle->ColorChangeTable;
+  auto const  pwid             = Instance->StateMap.test(StateFlag::HID);
+  auto const& colorChangeTable = ThrSingle->ColorChangeTable;
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	DisplayedColorBitmap.set(colorChangeTable.operator[](iColor).colorIndex);
 	auto stitchCount = wrap::toUnsigned(colorChangeTable.operator[](iColor + 1U).stitchIndex) -
@@ -1966,7 +1969,8 @@ void doInitZoomed() {
 	  continue;
 	}
 	auto wascol = 0U;
-	SelectObject(StitchWindowMemDC, ThrSingle->UserPen.operator[](colorChangeTable.operator[](iColor).colorIndex));
+	SelectObject(StitchWindowMemDC,
+	             ThrSingle->UserPen.operator[](colorChangeTable.operator[](iColor).colorIndex));
 	stitchCount = colorChangeTable.operator[](iColor + 1U).stitchIndex -
 	              colorChangeTable.operator[](iColor).stitchIndex;
 	auto const stIndex = colorChangeTable.operator[](iColor).stitchIndex;
@@ -2258,7 +2262,8 @@ void drwStch() {
 }
 
 void drwknot() {
-  if (Instance->userFlagMap.test(UserFlag::KNOTOF) || ThrSingle->Knots.empty() || Instance->StitchBuffer.empty()) {
+  if (Instance->userFlagMap.test(UserFlag::KNOTOF) || ThrSingle->Knots.empty() ||
+      Instance->StitchBuffer.empty()) {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
@@ -2647,7 +2652,7 @@ void ducmd() {
   readBuffer.resize(MAX_PATH + 1);
   auto& balaradName1 = bal::getBN1();
 
-  balaradName1  = balaradFileName;
+  balaradName1   = balaradFileName;
   auto bytesRead = DWORD {};
   if (!wrap::readFile(balaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, L"ReadFile for readBuffer in ducmd")) {
 	return;
@@ -2706,8 +2711,8 @@ void dugrid() {
 }
 
 void duhom() {
-  auto const arg0 = fs::path {*ArgList};
-  ThrSingle->HomeDirectory   = arg0.parent_path();
+  auto const arg0          = fs::path {*ArgList};
+  ThrSingle->HomeDirectory = arg0.parent_path();
 }
 
 void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1) {
@@ -2857,17 +2862,18 @@ void duselrng(RANGE& selectedRange) {
 }
 
 void dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& windowSize) {
-  ThrSingle->SideWindow.operator[](entry.value) = CreateWindow(L"STATIC",
-                                                    displayText::loadStr(entry.stringID).c_str(),
-                                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                                    3,
-                                                    (windowLocation * windowSize.cy) + 3,
-                                                    windowSize.cx + 3,
-                                                    windowSize.cy,
-                                                    SideMessageWindow,
-                                                    nullptr,
-                                                    ThrEdInstance,
-                                                    nullptr);
+  ThrSingle->SideWindow.operator[](entry.value) =
+      CreateWindow(L"STATIC",
+                   displayText::loadStr(entry.stringID).c_str(),
+                   SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                   3,
+                   (windowLocation * windowSize.cy) + 3,
+                   windowSize.cx + 3,
+                   windowSize.cy,
+                   SideMessageWindow,
+                   nullptr,
+                   ThrEdInstance,
+                   nullptr);
   ++windowLocation;
 }
 
@@ -2998,7 +3004,7 @@ void fnamtabs() {
 
 void fndknt() {
   auto& knots     = ThrSingle->Knots;
-  auto endStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
+  auto  endStitch = wrap::toUnsigned(Instance->StitchBuffer.size());
   if (endStitch <= 4U) {
 	knots.clear();
 	return;
@@ -3151,7 +3157,8 @@ void getbak() {
   unthum();
   Instance->StateMap.set(StateFlag::FRMOF);
   auto& workingFileName = Instance->WorkingFileName;
-  workingFileName = ThrSingle->DefaultDirectory / ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(FileVersionIndex));
+  workingFileName       = ThrSingle->DefaultDirectory /
+                    ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(FileVersionIndex));
   thred::insfil(workingFileName);
   if (!wrap::pressed(VK_SHIFT)) {
 	return;
@@ -3185,8 +3192,9 @@ auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t const stitchCount
 auto getMaxCount() -> uint32_t {
   auto maxCount = uint32_t {0U};
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	auto const deltaCount = gsl::narrow<uint32_t>(ThrSingle->ColorChangeTable.operator[](iColor + 1U).stitchIndex -
-	                                              ThrSingle->ColorChangeTable.operator[](iColor).stitchIndex);
+	auto const deltaCount =
+	    gsl::narrow<uint32_t>(ThrSingle->ColorChangeTable.operator[](iColor + 1U).stitchIndex -
+	                          ThrSingle->ColorChangeTable.operator[](iColor).stitchIndex);
 	maxCount = std::max(deltaCount, maxCount);
   }
   return maxCount;
@@ -3257,7 +3265,8 @@ auto getNewFileName(fs::path& newFileName, FileStyles const fileTypes, FileIndic
 #if USE_DEFAULTDIR
   // If we want to, we can set the default directory rather than using the OS mechanism for last used
   auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-  hResult += SHCreateItemFromParsingName(ThrSingle->DefaultDirectory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+  hResult += SHCreateItemFromParsingName(
+      ThrSingle->DefaultDirectory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
   hResult += pFileOpen->SetFolder(psiFrom);
   if (nullptr != psiFrom) {
 	psiFrom->Release();
@@ -3577,7 +3586,7 @@ auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) ->
 // ReSharper restore CppParameterMayBeConst
 
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
-  retflag = true;
+  retflag         = true;
   auto& msgBuffer = ThrSingle->MsgBuffer;
   if (Instance->StateMap.test(StateFlag::SCLPSPAC) && (code == VK_OEM_MINUS || code == VK_SUBTRACT)) {
 	if (msgBuffer.front() != '-') {
@@ -3767,7 +3776,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::
 	keys::navigateThumbnails(code);
 	return true;
   }
-  auto& msgBuffer = ThrSingle->MsgBuffer;
+  auto& msgBuffer             = ThrSingle->MsgBuffer;
   auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
   if (Instance->StateMap.test(StateFlag::FSETFSPAC) || Instance->StateMap.test(StateFlag::GTWLKIND)) {
 	// Check for keycode 'dash' and numpad 'subtract'
@@ -4280,7 +4289,7 @@ void infadj(float& xCoordinate, float& yCoordinate) noexcept {
 
 void init() {
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const deviceContext   = GetDC(nullptr);
+  auto const deviceContext = GetDC(nullptr);
   ReleaseDC(nullptr, deviceContext);
   Instance->TexturePointsBuffer.clear();
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
@@ -5291,15 +5300,16 @@ void nunams() {
   auto const& workingFileName = Instance->WorkingFileName;
   Instance->auxName           = workingFileName;
   xt::duauxnam(Instance->auxName);
-  auto& thrName      = ThrSingle->ThrName;
-  thrName = workingFileName;
+  auto& thrName = ThrSingle->ThrName;
+  thrName       = workingFileName;
   thrName.replace_extension(L".thr");
   auto& previousNames = ThrSingle->PreviousNames;
   if (previousNames.front() == thrName) {
 	return;
   }
   auto flag = true;
-  for (auto  spNames = std::ranges::subrange(std::next(previousNames.begin()), ThrSingle->PreviousNames.end());
+  for (auto spNames =
+           std::ranges::subrange(std::next(previousNames.begin()), ThrSingle->PreviousNames.end());
        auto& previousName : spNames) {
 	if (previousName != thrName) {
 	  continue;
@@ -5347,7 +5357,7 @@ void nuselrct() {
 
 void nuthum(wchar_t const character) {
   Instance->StateMap.set(StateFlag::RESTCH);
-  auto& thumbnailSearchString             = ThrSingle->ThumbnailSearchString;
+  auto& thumbnailSearchString  = ThrSingle->ThumbnailSearchString;
   thumbnailSearchString.back() = character;
   thumbnailSearchString.push_back(0);
 
@@ -5367,7 +5377,8 @@ void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t const iSource, char cons
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
 auto oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (ThrSingle->DefaultColorWin.operator[](iColor) == window || ThrSingle->UserColorWin.operator[](iColor) == window ||
+	if (ThrSingle->DefaultColorWin.operator[](iColor) == window ||
+	    ThrSingle->UserColorWin.operator[](iColor) == window ||
 	    ThrSingle->ThreadSizeWin.operator[](iColor) == window) {
 	  return false;
 	}
@@ -5677,9 +5688,10 @@ auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
 
 void rebak() {
   destroyBV();
-  auto const& thrName        = ThrSingle->ThrName;
-  auto newFileName    = thrName; // intentional copy
-  auto safetyFileName = newFileName;       // initialise from local variable
+  auto const& thrName = ThrSingle->ThrName;
+
+  auto newFileName    = thrName;     // intentional copy
+  auto safetyFileName = newFileName; // initialise from local variable
   auto ext            = newFileName.extension().wstring();
   ext.back()          = FileVersionIndex + L's';
   newFileName.replace_extension(ext);
@@ -5726,8 +5738,8 @@ void redfnam(std::wstring& designerName) {
 
 void redini() {
   duhom();
-  auto& iniFileName      = ThrSingle->IniFileName;
-  iniFileName = ThrSingle->HomeDirectory;
+  auto& iniFileName = ThrSingle->IniFileName;
+  iniFileName       = ThrSingle->HomeDirectory;
   iniFileName /= L"thred.ini";
   // NOLINTNEXTLINE(readability-qualified-auto)
   if (auto const iniFileHandle =
@@ -5911,7 +5923,7 @@ void resetState() {
   Instance->searchLine.shrink_to_fit();
   rstdu();
   thred::unmsg();
-  ZoomFactor   = 1;
+  ZoomFactor = 1;
   thred::resetNearest();
   if (Instance->StateMap.testAndReset(StateFlag::WASPAT)) {
 	DestroyWindow(SpeedScrollBar);
@@ -6534,7 +6546,8 @@ void setScrollVisibility() {
 }
 
 void setSideWinVal(int const index) {
-  SetWindowText(Instance->valueWindow.operator[](wrap::toSize(index)), ThrSingle->SideWindowEntryBuffer.data());
+  SetWindowText(Instance->valueWindow.operator[](wrap::toSize(index)),
+                ThrSingle->SideWindowEntryBuffer.data());
 }
 
 void setbak(int32_t const penWidth) noexcept {
@@ -7366,9 +7379,9 @@ void thred::resetColorChanges() noexcept {
 }
 
 void thred::addColor(uint32_t const stitch, uint32_t const color) {
-  ThrSingle->ColorChangeTable.emplace_back(
-      COL_CHANGE {.stitchIndex = gsl::narrow<decltype(ThrSingle->ColorChangeTable.back().stitchIndex)>(stitch),
-                  .colorIndex  = gsl::narrow<decltype(ThrSingle->ColorChangeTable.back().colorIndex)>(color)});
+  ThrSingle->ColorChangeTable.emplace_back(COL_CHANGE {
+      .stitchIndex = gsl::narrow<decltype(ThrSingle->ColorChangeTable.back().stitchIndex)>(stitch),
+      .colorIndex  = gsl::narrow<decltype(ThrSingle->ColorChangeTable.back().colorIndex)>(color)});
 }
 
 void thred::coltab() {
@@ -8413,8 +8426,9 @@ void thred::zumout() {
 void thred::closPnt() {
   unbox();
   unboxs();
-  auto& nearestPoint = ThrSingle->NearestPoint;
+  auto&       nearestPoint     = ThrSingle->NearestPoint;
   auto const& colorChangeTable = ThrSingle->ColorChangeTable;
+
   auto gapToNearest = std::vector<float> {};          // distances of the closest points
   gapToNearest.resize(nearestPoint.size(), BIGFLOAT); // to a mouse click
   nearestPoint.assign(nearestPoint.size(), BIGUINT);
@@ -8438,7 +8452,7 @@ void thred::closPnt() {
   for (auto const& iNear : nearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
 	  ThrSingle->NearestPixel.operator[](NearestCount++) = stitchCoordsInPixels;
-	  nearestPoint.operator[](NearestCount)   = iNear;
+	  nearestPoint.operator[](NearestCount)              = iNear;
 	}
   }
   boxs();
@@ -8726,7 +8740,7 @@ auto thred::closlin() -> uint32_t {
   auto const tolerance = offset * TLFACTOR;
   for (auto iChange = size_t {}; iChange < maxColor(); ++iChange) {
 	auto& colorChangeTable = ThrSingle->ColorChangeTable;
-	auto stitchCount =
+	auto  stitchCount =
 	    gsl::narrow_cast<ptrdiff_t>(std::abs(colorChangeTable.operator[](iChange + 1U).stitchIndex -
 	                                         colorChangeTable.operator[](iChange).stitchIndex));
 	if (colorChangeTable.operator[](iChange + 1U).stitchIndex == Instance->StitchBuffer.size()) {
@@ -10369,7 +10383,9 @@ void thred::nuthbak(uint32_t count) {
 	while (count != 0U && ThumbnailIndex < MAXFORMS) {
 	  if (ThumbnailIndex != 0U) {
 		--ThumbnailIndex;
-		if (_wcsnicmp(ThrSingle->ThumbnailSearchString.data(), ThrSingle->Thumbnails.operator[](ThumbnailIndex).data(), length) == 0) {
+		if (_wcsnicmp(ThrSingle->ThumbnailSearchString.data(),
+		              ThrSingle->Thumbnails.operator[](ThumbnailIndex).data(),
+		              length) == 0) {
 		  --count;
 		}
 	  }
@@ -11396,7 +11412,7 @@ void thred::handleFormSelected() {
 
 void thred::updateHoopSize() {
   auto&      sideWindow = ThrSingle->SideWindow;
-  auto const itHwnd = std::ranges::find(sideWindow, WinMsg.hwnd);
+  auto const itHwnd     = std::ranges::find(sideWindow, WinMsg.hwnd);
   if (itHwnd == sideWindow.end()) {
 	return;
   }
@@ -11550,7 +11566,8 @@ auto thred::handleSideWindowActive() -> bool {
   if (FormMenuChoice == LLAYR) {
 	if (auto const iLayer = std::ranges::find_if(LAYRLIST,
 	                                             [](LIST_TYPE const& layer) noexcept -> bool {
-	                                               return WinMsg.hwnd == ThrSingle->SideWindow.operator[](layer.value);
+	                                               return WinMsg.hwnd ==
+	                                                      ThrSingle->SideWindow.operator[](layer.value);
 	                                             });
 	    iLayer != LAYRLIST.end()) {
 	  form::movlayr(iLayer->value);
@@ -11834,7 +11851,7 @@ auto thred::handleFormDataSheet() -> bool {
   unsid();
   auto&       form        = Instance->FormList.operator[](ClosestFormToCursor);
   auto const& valueWindow = Instance->valueWindow;
-  auto const&       labelWindow = ThrSingle->LabelWindow;
+  auto const& labelWindow = ThrSingle->LabelWindow;
   while (true) {
 	if (WinMsg.hwnd == valueWindow.operator[](LTXOF) || WinMsg.hwnd == labelWindow.operator[](LTXOF)) {
 	  // draw the texture fill spacing window
@@ -12390,9 +12407,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  Instance->DPI   = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
-	  ScrollSize   = MulDiv(ScrollSize, Instance->DPI, STDDPI);
-	  ColorBarSize = MulDiv(ColorBarSize, Instance->DPI, STDDPI);
+	  Instance->DPI = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
+	  ScrollSize    = MulDiv(ScrollSize, Instance->DPI, STDDPI);
+	  ColorBarSize  = MulDiv(ColorBarSize, Instance->DPI, STDDPI);
 	  init();
 	  if (Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
@@ -12893,7 +12910,7 @@ auto thred::scaleVertical(float const& value) noexcept -> int32_t {
   return std::lround(value * VerticalRatio);
 }
 
-auto thred::getStitchWindowX() noexcept -> LONG{
+auto thred::getStitchWindowX() noexcept -> LONG {
   return StitchWindowSize.cx;
 }
 

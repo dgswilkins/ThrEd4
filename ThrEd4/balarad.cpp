@@ -86,7 +86,7 @@ class BAL_SINGLE
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  fs::path BalaradName0;          // balarad semaphore file
+  fs::path BalaradName0; // balarad semaphore file
   fs::path BalaradName1; // balarad data file
   fs::path BalaradName2;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
@@ -108,7 +108,7 @@ constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
 constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
 constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
 
-auto BalaradOffset = F_POINT {};                           // balarad offset
+auto BalaradOffset = F_POINT {}; // balarad offset
 
 BAL_SINGLE* BalInstance;
 

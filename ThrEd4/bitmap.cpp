@@ -106,19 +106,19 @@ auto BitMapColorStruct    = CHOOSECOLOR {};
 auto BitmapDC             = HDC {};    // bitmap device context
 auto BitmapDstRect        = RECT {};   // stitch window destination rectangle for zooomed view
 auto BitmapFileHandle     = HANDLE {}; // bitmap handle
-auto BitmapFileHeader     = BITMAPFILEHEADER {}; // bitmap file header
-auto BitmapFileHeaderV4   = BITMAPV4HEADER {};   // bitmap version4 file header
-auto BitmapHeight         = LONG {};             // bitmap height
-auto BitmapInfo           = BITMAPINFO {};       // bitmap info
-auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
-auto BitmapPen            = HPEN {};             // bitmap pen
-auto BitmapSizeinStitches = F_POINT {};          // bitmap end points in stitch points
-auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
-auto BitmapWidth          = LONG {};             // bitmap width
-auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
-auto TraceBitmap          = HBITMAP {};          // trace bitmap
-auto TraceDC              = HDC {};              // trace device context
-auto UTF8BMPname          = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
+auto BitmapFileHeader     = BITMAPFILEHEADER {};          // bitmap file header
+auto BitmapFileHeaderV4   = BITMAPV4HEADER {};            // bitmap version4 file header
+auto BitmapHeight         = LONG {};                      // bitmap height
+auto BitmapInfo           = BITMAPINFO {};                // bitmap info
+auto BitmapInfoHeader     = BITMAPINFOHEADER {};          // bitmap info header
+auto BitmapPen            = HPEN {};                      // bitmap pen
+auto BitmapSizeinStitches = F_POINT {};                   // bitmap end points in stitch points
+auto BitmapSrcRect        = RECT {};                      // bitmap source rectangle for zoomed view
+auto BitmapWidth          = LONG {};                      // bitmap width
+auto BmpStitchRatio       = F_POINT {};                   // bitmap to stitch hoop ratios
+auto TraceBitmap          = HBITMAP {};                   // trace bitmap
+auto TraceDC              = HDC {};                       // trace device context
+auto UTF8BMPname          = std::array<char, SZBMPNM> {}; // bitmap file name from pcs file
 
 BMP_SINGLE* BMPInstance;
 

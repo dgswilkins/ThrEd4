@@ -122,16 +122,17 @@ constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should b
 
 // texture internal namespace
 namespace {
-constexpr auto ITXBUFSZ                  = uint32_t {16U}; // texture buffer depth
-auto           TextureWindowId           = uint32_t {};    // id of the window being updated
-auto SideWindowButton          = HWND {};      // button side window
-auto TexturePixelRect          = RECT {};      // screen selected texture points rectangle
-auto TextureRect               = TXTR_RECT {}; // selected texture points rectangle
-auto SelectTexturePointsOrigin = POINT {};     // original location of selected texture points
-auto TextureCursorLocation     = POINT {};     // texture editor move cursor location
-auto TextureCrossPen           = HPEN {};      // texture editor cross pen
-auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
-auto TextureScreen = TXTR_SCREEN {}; // texture editor layout parameters
+constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
+
+auto TextureWindowId           = uint32_t {};    // id of the window being updated
+auto SideWindowButton          = HWND {};        // button side window
+auto TexturePixelRect          = RECT {};        // screen selected texture points rectangle
+auto TextureRect               = TXTR_RECT {};   // selected texture points rectangle
+auto SelectTexturePointsOrigin = POINT {};       // original location of selected texture points
+auto TextureCursorLocation     = POINT {};       // texture editor move cursor location
+auto TextureCrossPen           = HPEN {};        // texture editor cross pen
+auto TextureHistoryIndex       = uint32_t {};    // pointer to the next texture history buffer
+auto TextureScreen             = TXTR_SCREEN {}; // texture editor layout parameters
 
 TXT_SINGLE* TextureInstance;
 
@@ -291,7 +292,7 @@ auto inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept ->
 
 void nutx(uint32_t const formIndex) {
   auto& tempTexturePoints = TextureInstance->TempTexturePoints;
-  auto& formList = Instance->FormList;
+  auto& formList          = Instance->FormList;
 
   if (formList.empty()) {
 	return;
@@ -316,8 +317,7 @@ void nutx(uint32_t const formIndex) {
   if (tempTexturePoints.empty()) {
 	return;
   }
-  auto const tempPointCount =
-      gsl::narrow<decltype(formList.back().texture.index)>(tempTexturePoints.size());
+  auto const tempPointCount = gsl::narrow<decltype(formList.back().texture.index)>(tempTexturePoints.size());
   std::ranges::sort(tempTexturePoints, tpComp);
   auto const itPoint = wrap::next(Instance->TexturePointsBuffer.begin(), index);
   Instance->TexturePointsBuffer.insert(itPoint, tempTexturePoints.cbegin(), tempTexturePoints.cend());
@@ -386,8 +386,8 @@ void redtbak() {
 	tempTexturePoints.clear();
 	tempTexturePoints.reserve(textureHistoryItem.texturePoints.size());
 	tempTexturePoints.insert(tempTexturePoints.begin(),
-	                          textureHistoryItem.texturePoints.cbegin(),
-	                          textureHistoryItem.texturePoints.cend());
+	                         textureHistoryItem.texturePoints.cbegin(),
+	                         textureHistoryItem.texturePoints.cend());
   }
   Instance->StateMap.set(StateFlag::RESTCH);
 }
@@ -433,11 +433,11 @@ void ritxrct() noexcept(std::is_same_v<size_t, uint32_t>) {
 }
 
 void rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
-  auto dist           = wrap::toUnsigned(std::distance(TextureInstance->TextureHistory.begin(), texture));
+  auto dist = wrap::toUnsigned(std::distance(TextureInstance->TextureHistory.begin(), texture));
   TextureHistoryIndex = dist == 0 ? wrap::toUnsigned(TextureInstance->TextureHistory.size() - 1U) : --dist;
-  texture->height     = 0;
-  texture->width      = 0;
-  texture->spacing    = 0;
+  texture->height  = 0;
+  texture->width   = 0;
+  texture->spacing = 0;
   texture->texturePoints.clear();
   texture->texturePoints.shrink_to_fit();
 }
@@ -627,7 +627,7 @@ auto txnam(std::wstring& name) -> bool {
 
 void txnudg(int32_t const deltaX, float const deltaY) {
   auto const& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
-  auto& tempTexturePoints = TextureInstance->TempTexturePoints;
+  auto&       tempTexturePoints         = TextureInstance->TempTexturePoints;
   if (selectedTexturePointsList.empty()) {
 	return;
   }
@@ -1016,7 +1016,8 @@ void dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
 	if (auto const yOffset =
 	        (slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing)) + point0.y;
 	    yOffset > 0 && yOffset < TextureScreen.areaHeight) {
-	  TextureInstance->TempTexturePoints.push_back(TX_PNT {.y = yOffset, .line = gsl::narrow<uint16_t>(integerStart)});
+	  TextureInstance->TempTexturePoints.push_back(
+	      TX_PNT {.y = yOffset, .line = gsl::narrow<uint16_t>(integerStart)});
 	}
 	++integerStart;
   }
@@ -1074,8 +1075,8 @@ void texture::txdun() {
 }
 
 void texture::redtx() {
-  auto name                 = std::wstring {};
-  auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
+  auto  name                 = std::wstring {};
+  auto  textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   auto& textureHistory       = TextureInstance->TextureHistory;
   textureHistoryBuffer.resize(textureHistory.size());
   TextureHistoryIndex = wrap::toUnsigned(textureHistory.size() - 1U);
@@ -1541,7 +1542,7 @@ void texture::txtlbut(FRM_HEAD const& textureForm) {
 }
 
 void texture::txsnap() {
-  auto& tempTexturePoints = TextureInstance->TempTexturePoints;
+  auto&       tempTexturePoints         = TextureInstance->TempTexturePoints;
   auto const& selectedTexturePointsList = TextureInstance->SelectedTexturePointsList;
   if (tempTexturePoints.empty()) {
 	return;
