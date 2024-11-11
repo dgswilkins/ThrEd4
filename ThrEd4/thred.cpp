@@ -181,34 +181,37 @@ class THR_SINGLE
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  std::vector<HWND>       LabelWindow;       // text handles for the form data sheet
-  std::vector<POINT>      FormControlPoints; // form control rectangle in pixel coordinates
-  std::wstring            DesignerName;      // designer name in clear
-  fs::path                HomeDirectory;     // directory from which ThrEd was executed
-  std::vector<POINT>      NearestPixel;      // selected points
-  std::vector<uint32_t>   NearestPoint;      // indices of the closest points
-  std::vector<SEARCH_REC> SortBuffer;        // sort buffer for stitch search
-  std::vector<fs::path>   VersionNames;      // temporary storage for old file version names
-  fs::path                ThrName;           // ThrEd file path
+  std::vector<COL_CHANGE>   ColorChangeTable;      // stitch indices where color changes
+  std::wstring              DesignerName;          // designer name in clear
+  std::vector<POINT>        FormControlPoints;     // form control rectangle in pixel coordinates
+  std::vector<uint32_t>     Knots;                 // indices of knot stitches
+  std::vector<HWND>         LabelWindow;           // text handles for the form data sheet
+  std::vector<wchar_t>      MsgBuffer;             // for user messages
+  std::vector<POINT>        NearestPixel;          // selected points
+  std::vector<uint32_t>     NearestPoint;          // indices of the closest points
+  std::vector<wchar_t>      SideWindowEntryBuffer; // buffer for entering form data sheet numbers
+  std::vector<SEARCH_REC>   SortBuffer;            // sort buffer for stitch search
+  std::vector<wchar_t>      ThumbnailSearchString; // storage for the thumbnail search string
+  std::vector<std::wstring> Thumbnails;            // vector of thumbnail names
+
+  // Paths
+  fs::path DefaultDirectory;
+  fs::path HomeDirectory; // directory from which ThrEd was executed
+  fs::path IniFileName;   //.ini file name
+  fs::path ThrName;       // ThrEd file path
+
+  std::vector<fs::path> PreviousNames; // files in the LRU list
+  std::vector<fs::path> VersionNames; // temporary storage for old file version names
 
   // Pens
   std::vector<HPEN> UserPen; // user color pens
 
   // Windows
-  std::vector<HWND>     DefaultColorWin;       // default color windows
-  std::vector<HWND>     UserColorWin;          // user color windows
-  std::vector<HWND>     SideWindow;            // side message windows
-  std::vector<HWND>     ThreadSizeWin;         // thread size windows
-  std::vector<uint32_t> Knots;                 // indices of knot stitches
-  std::vector<wchar_t>  SideWindowEntryBuffer; // buffer for entering form data sheet numbers
-  std::vector<wchar_t>  MsgBuffer;             // for user messages
+  std::vector<HWND> DefaultColorWin; // default color windows
+  std::vector<HWND> SideWindow;      // side message windows
+  std::vector<HWND> ThreadSizeWin;   // thread size windows
+  std::vector<HWND> UserColorWin;    // user color windows
 
-  fs::path                  DefaultDirectory;
-  fs::path                  IniFileName; //.ini file name
-  std::vector<fs::path>     PreviousNames;
-  std::vector<std::wstring> Thumbnails;            // vector of thumbnail names
-  std::vector<wchar_t>      ThumbnailSearchString; // storage for the thumbnail search string
-  std::vector<COL_CHANGE>   ColorChangeTable;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   THR_SINGLE(const THR_SINGLE&)                    = delete;
@@ -241,15 +244,15 @@ constexpr auto HUPS     = int32_t {5};            // number of hoops the user ca
 constexpr auto KNOTLEN  = int32_t {54};           // set knots for stitches longer than this
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto LRU_MENU_ID = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
-constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
-constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
-constexpr auto MINZUMF  = float {MINZUM};         // minimum zoom in stitch points
-constexpr auto MSGSIZ   = uint32_t {8192U};       // size of the message buffer
-constexpr auto NERCNT   = 4U;                     // number of entries in the nearestxxx arrays;
-constexpr auto NUGINI   = 2.0F;                   // default nudge step
-constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
-constexpr auto SCROLSIZ = int32_t {12};           // logical pixel width of a scroll bar
+constexpr auto MAXDELAY = int32_t {600};         // maximum movie time step
+constexpr auto MINDELAY = int32_t {1};           // minimum movie time step
+constexpr auto MINZUM   = int32_t {5};           // minimum zoom in stitch points
+constexpr auto MINZUMF  = float {MINZUM};        // minimum zoom in stitch points
+constexpr auto MSGSIZ   = uint32_t {8192U};      // size of the message buffer
+constexpr auto NERCNT   = 4U;                    // number of entries in the nearestxxx arrays;
+constexpr auto NUGINI   = 2.0F;                  // default nudge step
+constexpr auto PAGSCROL = 0.9F;                  // page scroll factor
+constexpr auto SCROLSIZ = int32_t {12};          // logical pixel width of a scroll bar
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
 constexpr auto SWCOUNT  = 16U; // number of side windows to create/track
