@@ -54,6 +54,7 @@
 // ReSharper restore CppUnusedIncludeDirective>
 #include <vector>
 
+namespace {
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
@@ -70,17 +71,17 @@ EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
 EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 */
 
-constexpr auto BELEN    = 1U;
-constexpr auto BESPAC   = 1U << 1U;
-constexpr auto BESIZ    = 1U << 2U;
-constexpr auto BNCLP    = 1U << 3U;
-constexpr auto BPICSPAC = 1U << 4U;
-constexpr auto BCNRSIZ  = 1U << 5U;
-constexpr auto BRDEND   = 1U << 6U;
-constexpr auto BRDPOS   = 1U << 7U;
-constexpr auto BEMAX    = 1U << 8U;
-constexpr auto BEMIN    = 1U << 9U;
-constexpr auto CHNPOS   = 1U << 10U;
+constexpr auto BELEN    = 1U;        // border edge stitch length
+constexpr auto BESPAC   = 1U << 1U;  // border edge spacing
+constexpr auto BESIZ    = 1U << 2U;  // border edge width
+constexpr auto BNCLP    = 1U << 3U;  // border clip count
+constexpr auto BPICSPAC = 1U << 4U;  // border picot spacing
+constexpr auto BCNRSIZ  = 1U << 5U;  // buttonhole corner size
+constexpr auto BRDEND   = 1U << 6U;  // border end
+constexpr auto BRDPOS   = 1U << 7U;  // fill phase
+constexpr auto BEMAX    = 1U << 8U;  // maximum border stitch
+constexpr auto BEMIN    = 1U << 9U;  // minimum border stitch
+constexpr auto CHNPOS   = 1U << 10U; // chain position
 
 constexpr auto MEGLIN  = BELEN | BEMAX | BEMIN;
 constexpr auto MEGBLD  = BELEN | BEMAX | BEMIN;
@@ -95,6 +96,15 @@ constexpr auto MEGCHNL = BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS;
 constexpr auto MEGCHNH = BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS;
 constexpr auto MEGCLPX = BNCLP | BEMAX | BEMIN;
 
+auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
+    IDS_DAZCRV,
+    IDS_DAZSAW,
+    IDS_DAZRMP,
+    IDS_DAZRAG,
+    IDS_DAZCOG,
+    IDS_DAZHART,
+};
+
 enum DaisyStyles : uint8_t { // daisy form types
   DSIN,                      // Sine shape
   DRAMP,                     // Ramp shape
@@ -104,19 +114,10 @@ enum DaisyStyles : uint8_t { // daisy form types
   DHART                      // Heart shape
 };
 
-namespace {
-auto LabelWindowCoords            = RECT {}; // location of left windows in the form data sheet
-auto LabelWindowSize              = SIZE {}; // size of the left windows in the form data sheet
-auto ValueWindowCoords            = RECT {}; // location of right windows in the form data sheet
-auto ValueWindowSize              = SIZE {}; // size of the right windows in the form data sheet
-auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
-    IDS_DAZCRV,
-    IDS_DAZSAW,
-    IDS_DAZRMP,
-    IDS_DAZRAG,
-    IDS_DAZCOG,
-    IDS_DAZHART,
-};
+auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
+auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
+auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
+auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
 
 // Definitions
 void chkdaz();
