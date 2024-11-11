@@ -240,6 +240,7 @@ constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
 constexpr auto KNOTLEN  = int32_t {54};           // set knots for stitches longer than this
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
+constexpr auto LRU_MENU_ID = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
 constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
 constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
 constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
@@ -259,7 +260,6 @@ constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeter
 constexpr auto TSSSIZ   = size_t {32U};         // size of the thumbnail search buffer
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
-auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
 auto ExtendedHeader          = THR_HEAD_EX {};                     // ThrEd file header extension
 auto ArgCount                = int32_t {};                         // command line argument count
 auto ArgList                 = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
@@ -3307,7 +3307,7 @@ void gselrng() noexcept {
 void handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
   {
 	auto previousName = ThrSingle->PreviousNames.begin();
-	for (auto const& iLRU : LRUMenuId) {
+	for (auto const& iLRU : LRU_MENU_ID) {
 	  if (WinMsg.wParam == iLRU) {
 		Instance->WorkingFileName = *previousName;
 		Instance->StateMap.set(StateFlag::REDOLD);
@@ -4296,7 +4296,7 @@ void init() {
   menu::init();
   menu::qchk();
   mouse::crtcurs();
-  menu::redfils(LRUMenuId, ThrSingle->PreviousNames);
+  menu::redfils(LRU_MENU_ID, ThrSingle->PreviousNames);
   Instance->StateMap.reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
@@ -5319,7 +5319,7 @@ void nunams() {
 	break;
   }
   if (!flag) {
-	menu::redfils(LRUMenuId, ThrSingle->PreviousNames);
+	menu::redfils(LRU_MENU_ID, ThrSingle->PreviousNames);
 	return;
   }
   for (auto& previousName : ThrSingle->PreviousNames) {
@@ -5334,7 +5334,7 @@ void nunams() {
 	previousNames.insert(previousNames.begin(), thrName);
 	previousNames.pop_back();
   }
-  menu::redfils(LRUMenuId, previousNames);
+  menu::redfils(LRU_MENU_ID, previousNames);
 }
 
 void nuselrct() {
