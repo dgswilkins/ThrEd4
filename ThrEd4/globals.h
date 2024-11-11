@@ -102,7 +102,7 @@ class MY_SINGLE
   std::vector<POINT>        selectedPointsLine;
   ENUM_MAP<StateFlag>       stateMap = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> stitchBuffer;
-  std::vector<TX_PNT>       TexturePointsBuffer;
+  std::vector<TX_PNT>       texturePointsBuffer;
 
   std::array<std::vector<uint32_t>, UNDOLEN> UndoBuffer;
 

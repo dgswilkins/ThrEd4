@@ -113,10 +113,10 @@ void redbak() {
   auto const     spUserColors = gsl::span {UserColor};
   std::ranges::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
   thred::refreshColors();
-  Instance->TexturePointsBuffer.clear();
+  Instance->texturePointsBuffer.clear();
   if (undoData->texturePointCount != 0U) {
 	auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
-	Instance->TexturePointsBuffer.insert(Instance->TexturePointsBuffer.end(), span.begin(), span.end());
+	Instance->texturePointsBuffer.insert(Instance->texturePointsBuffer.end(), span.begin(), span.end());
   }
   thred::coltab();
   Instance->stateMap.set(StateFlag::RESTCH);
@@ -134,7 +134,7 @@ void backup::dudat() {
   auto const size =
       wrap::sizeofVector(formList) + wrap::sizeofVector(Instance->stitchBuffer) +
       wrap::sizeofVector(Instance->formVertices) + wrap::sizeofVector(Instance->clipPoints) +
-      wrap::sizeofVector(Instance->satinGuides) + wrap::sizeofVector(Instance->TexturePointsBuffer) +
+      wrap::sizeofVector(Instance->satinGuides) + wrap::sizeofVector(Instance->texturePointsBuffer) +
       wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   bufferElement.resize(size);
   auto* backupData = convertFromPtr<BACK_HEAD*>(bufferElement.data());
@@ -183,10 +183,10 @@ void backup::dudat() {
 	std::ranges::copy(UserColor, spColors.begin());
   }
   backupData->texturePoints     = convertFromPtr<TX_PNT*>(std::next(backupData->colors, COLORCNT));
-  backupData->texturePointCount = wrap::toUnsigned(Instance->TexturePointsBuffer.size());
-  if (!Instance->TexturePointsBuffer.empty()) {
+  backupData->texturePointCount = wrap::toUnsigned(Instance->texturePointsBuffer.size());
+  if (!Instance->texturePointsBuffer.empty()) {
 	auto const spTexturePoints = gsl::span {backupData->texturePoints, backupData->texturePointCount};
-	std::ranges::copy(Instance->TexturePointsBuffer, spTexturePoints.begin());
+	std::ranges::copy(Instance->texturePointsBuffer, spTexturePoints.begin());
   }
 }
 #pragma warning(pop)

@@ -203,7 +203,7 @@ void clipSelectedForm() {
   }
   auto* textures = convertFromPtr<TX_PNT*>(wrap::next(ptrPoints, iClip));
   if (form.isTexture()) {
-	auto const startTexture = wrap::next(Instance->TexturePointsBuffer.cbegin(), form.texture.index);
+	auto const startTexture = wrap::next(Instance->texturePointsBuffer.cbegin(), form.texture.index);
 	auto const endTexture = wrap::next(startTexture, form.texture.count);
 
 	auto const spDest = gsl::span {textures, form.texture.count};
@@ -354,7 +354,7 @@ void clipSelectedForms() {
 	if (!form.isTexture()) {
 	  continue;
 	}
-	auto       startPoint = wrap::next(Instance->TexturePointsBuffer.cbegin(), form.texture.index);
+	auto       startPoint = wrap::next(Instance->texturePointsBuffer.cbegin(), form.texture.index);
 	auto       endPoint   = wrap::next(startPoint, form.texture.count);
 	auto const spDest     = gsl::span {std::next(textures, textureCount), form.texture.count};
 	std::copy(startPoint, endPoint, spDest.begin());
@@ -635,7 +635,7 @@ void sizclp(FRM_HEAD const& form,
 	fileSize += form.clipCount * wrap::sizeofType(Instance->clipPoints);
   }
   if (form.isTexture()) {
-	fileSize += form.texture.count * wrap::sizeofType(Instance->TexturePointsBuffer);
+	fileSize += form.texture.count * wrap::sizeofType(Instance->texturePointsBuffer);
   }
 }
 
@@ -652,7 +652,7 @@ auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) ->
 	clipSize += form.clipCount * wrap::sizeofType(Instance->clipPoints);
   }
   if (form.isTexture()) {
-	clipSize += form.texture.count * wrap::sizeofType(Instance->TexturePointsBuffer);
+	clipSize += form.texture.count * wrap::sizeofType(Instance->texturePointsBuffer);
   }
   return clipSize;
 }
@@ -865,12 +865,12 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  if (form.isTexture()) {
 			textureCount += form.texture.count;
 			form.texture.index +=
-			    gsl::narrow<decltype(form.texture.index)>(Instance->TexturePointsBuffer.size());
+			    gsl::narrow<decltype(form.texture.index)>(Instance->texturePointsBuffer.size());
 		  }
 		}
 		auto const textureSource = gsl::span {ptrTextureSource, textureCount};
-		Instance->TexturePointsBuffer.insert(
-		    Instance->TexturePointsBuffer.end(), textureSource.begin(), textureSource.end());
+		Instance->texturePointsBuffer.insert(
+		    Instance->texturePointsBuffer.end(), textureSource.begin(), textureSource.end());
 		GlobalUnlock(ClipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
 		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;
@@ -933,9 +933,9 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  if (formIter.isTexture()) {
 			auto* ptrTextureSource   = convertFromPtr<TX_PNT*>(wrap::next(ptrClipData, clipCount));
 			auto const textureSource = gsl::span {ptrTextureSource, formIter.texture.count};
-			wrap::narrow(formIter.texture.index, Instance->TexturePointsBuffer.size());
-			Instance->TexturePointsBuffer.insert(
-			    Instance->TexturePointsBuffer.end(), textureSource.begin(), textureSource.end());
+			wrap::narrow(formIter.texture.index, Instance->texturePointsBuffer.size());
+			Instance->texturePointsBuffer.insert(
+			    Instance->texturePointsBuffer.end(), textureSource.begin(), textureSource.end());
 		  }
 		  NewFormVertexCount = formIter.vertexCount;
 		  if (formIter.type != FRMLINE) {

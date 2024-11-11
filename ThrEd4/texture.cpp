@@ -317,8 +317,8 @@ void nutx(uint32_t const formIndex) {
   }
   auto const tempPointCount = gsl::narrow<decltype(formList.back().texture.index)>(tempTexturePoints.size());
   std::ranges::sort(tempTexturePoints, tpComp);
-  auto const itPoint = wrap::next(Instance->TexturePointsBuffer.begin(), index);
-  Instance->TexturePointsBuffer.insert(itPoint, tempTexturePoints.cbegin(), tempTexturePoints.cend());
+  auto const itPoint = wrap::next(Instance->texturePointsBuffer.begin(), index);
+  Instance->texturePointsBuffer.insert(itPoint, tempTexturePoints.cbegin(), tempTexturePoints.cend());
   for (auto spForms =
            std::ranges::subrange(wrap::next(formList.begin(), formIndex + 1U), Instance->formList.end());
        auto& current : spForms) {
@@ -954,7 +954,7 @@ void deorg(POINT& point) noexcept {
 
 void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer) {
   textureBuffer.resize(textureBuffer.size() + current.texture.count);
-  auto const startSource = wrap::next(Instance->TexturePointsBuffer.cbegin(), current.texture.index);
+  auto const startSource = wrap::next(Instance->texturePointsBuffer.cbegin(), current.texture.index);
   auto const endSource   = wrap::next(startSource, current.texture.count);
   auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
   std::copy(startSource, endSource, destination);
@@ -1441,7 +1441,7 @@ void texture::deltx(uint32_t const formIndex) {
 
   auto const itForm = wrap::next(formList.begin(), formIndex);
   auto const itNext = std::next(itForm);
-  if (Instance->TexturePointsBuffer.empty() || !itForm->isTexture() || itForm->texture.count == 0U) {
+  if (Instance->texturePointsBuffer.empty() || !itForm->isTexture() || itForm->texture.count == 0U) {
 	return;
   }
   auto const& currentIndex = itForm->texture.index;
@@ -1463,7 +1463,7 @@ void texture::deltx(uint32_t const formIndex) {
 	return;
   }
   auto textureBuffer = std::vector<TX_PNT> {};
-  textureBuffer.reserve(Instance->TexturePointsBuffer.size());
+  textureBuffer.reserve(Instance->texturePointsBuffer.size());
   auto iBuffer = uint16_t {};
   // adjust forms before the current form
   for (auto spForms = std::ranges::subrange(formList.begin(), itForm); auto& current : spForms) {
@@ -1479,7 +1479,7 @@ void texture::deltx(uint32_t const formIndex) {
 	}
 	doTexAdjust(current, textureBuffer, iBuffer);
   }
-  Instance->TexturePointsBuffer = std::move(textureBuffer);
+  Instance->texturePointsBuffer = std::move(textureBuffer);
 }
 
 void texture::txof() {
@@ -1723,7 +1723,7 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 	return;
   }
   for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	if (auto const& currentPoint = Instance->TexturePointsBuffer.operator[](
+	if (auto const& currentPoint = Instance->texturePointsBuffer.operator[](
 	        wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
 	    currentPoint.line != 0U) {
 	  auto const iSegment            = currentPoint.line - 1U;
@@ -1737,16 +1737,16 @@ void texture::rtrtx(FRM_HEAD const& form) {
   auto& tempTexturePoints = TextureInstance->TempTexturePoints;
   tempTexturePoints.clear();
   auto const currentIndex = form.texture.index;
-  if (wrap::toUnsigned(Instance->TexturePointsBuffer.size()) < gsl::narrow_cast<uint32_t>(currentIndex)) {
+  if (wrap::toUnsigned(Instance->texturePointsBuffer.size()) < gsl::narrow_cast<uint32_t>(currentIndex)) {
 	return;
   }
   auto currentCount = form.texture.count;
-  if (wrap::toUnsigned(Instance->TexturePointsBuffer.size()) <
+  if (wrap::toUnsigned(Instance->texturePointsBuffer.size()) <
       gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
-	currentCount = gsl::narrow<uint16_t>(Instance->TexturePointsBuffer.size()) - currentIndex;
+	currentCount = gsl::narrow<uint16_t>(Instance->texturePointsBuffer.size()) - currentIndex;
   }
   tempTexturePoints.resize(currentCount);
-  auto const startSource = std::next(Instance->TexturePointsBuffer.cbegin(), currentIndex);
+  auto const startSource = std::next(Instance->texturePointsBuffer.cbegin(), currentIndex);
   auto const endSource   = std::next(startSource, currentCount);
   std::copy(startSource, endSource, tempTexturePoints.begin());
   TextureScreen.areaHeight = form.texture.height;
