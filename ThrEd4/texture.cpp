@@ -118,27 +118,25 @@ class TXT_SINGLE
   ~TXT_SINGLE()         = default;
 };
 
-constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
-
 // texture internal namespace
 namespace {
 constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
-
-auto TextureWindowId           = uint32_t {};    // id of the window being updated
-auto SideWindowButton          = HWND {};        // button side window
-auto TexturePixelRect          = RECT {};        // screen selected texture points rectangle
-auto TextureRect               = TXTR_RECT {};   // selected texture points rectangle
-auto SelectTexturePointsOrigin = POINT {};       // original location of selected texture points
-auto TextureCursorLocation     = POINT {};       // texture editor move cursor location
-auto TextureCrossPen           = HPEN {};        // texture editor cross pen
-auto TextureHistoryIndex       = uint32_t {};    // pointer to the next texture history buffer
-auto TextureScreen             = TXTR_SCREEN {}; // texture editor layout parameters
-
-TXT_SINGLE* TextureInstance;
+constexpr auto OSCLAMP  = -0.5F;          // values below this are off screen and should be clamped
+constexpr auto TXTRAT   = 0.95F;          // texture fill clipboard shrink/grow ratio
 
 enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
-constexpr auto TXTRAT = 0.95F; // texture fill clipboard shrink/grow ratio
+auto SelectTexturePointsOrigin = POINT {};       // original location of selected texture points
+auto SideWindowButton          = HWND {};        // button side window
+auto TextureCrossPen           = HPEN {};        // texture editor cross pen
+auto TextureCursorLocation     = POINT {};       // texture editor move cursor location
+auto TextureHistoryIndex       = uint32_t {};    // pointer to the next texture history buffer
+auto TexturePixelRect          = RECT {};        // screen selected texture points rectangle
+auto TextureRect               = TXTR_RECT {};   // selected texture points rectangle
+auto TextureScreen             = TXTR_SCREEN {}; // texture editor layout parameters
+auto TextureWindowId           = uint32_t {};    // id of the window being updated
+
+TXT_SINGLE* TextureInstance;
 
 // Definitions
 void altx();
