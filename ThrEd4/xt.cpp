@@ -727,13 +727,13 @@ void fminfn(uint32_t const formIndex, float const length) {
 }
 
 void fncwlk(FRM_HEAD& form) {
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
 	if (form.wordParam != 0U) {
 	  auto const thisVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
-	  Instance->OSequence.emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
+	  Instance->oSequence.emplace_back(wrap::midl(thisVertex->x, nextVertex->x),
 	                                   wrap::midl(thisVertex->y, nextVertex->y));
 	}
 	auto itGuide =
@@ -742,12 +742,12 @@ void fncwlk(FRM_HEAD& form) {
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
-	  Instance->OSequence.emplace_back(wrap::midl(finishVertex->x, startVertex->x),
+	  Instance->oSequence.emplace_back(wrap::midl(finishVertex->x, startVertex->x),
 	                                   wrap::midl(finishVertex->y, startVertex->y));
 	  --itGuide;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
-	  Instance->OSequence.emplace_back(wrap::midl(itVertex[0].x, itVertex[1].x),
+	  Instance->oSequence.emplace_back(wrap::midl(itVertex[0].x, itVertex[1].x),
 	                                   wrap::midl(itVertex[0].y, itVertex[1].y));
 	}
   }
@@ -757,7 +757,7 @@ void fncwlk(FRM_HEAD& form) {
 	  start = form.fillStart;
 	}
 	auto endVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + start);
-	Instance->OSequence.push_back(*endVertex);
+	Instance->oSequence.push_back(*endVertex);
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < form.vertexCount / 2U; ++iGuide) {
@@ -766,13 +766,13 @@ void fncwlk(FRM_HEAD& form) {
 	  if (auto const pnt = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
 	                                wrap::midl(finishVertex->y, startVertex->y)};
 	      form::cisin(form, pnt.x, pnt.y)) {
-		Instance->OSequence.push_back(pnt);
+		Instance->oSequence.push_back(pnt);
 	  }
 	  start  = form::nxt(form, start);
 	  finish = form::prv(form, finish);
 	}
 	endVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + start);
-	Instance->OSequence.push_back(*endVertex);
+	Instance->oSequence.push_back(*endVertex);
   }
   ritwlk(form, CWLKMSK);
 }
@@ -808,9 +808,9 @@ void fnwlk(FRM_HEAD& form) {
 	++count;
   }
   auto const& walkPoints = xt::insid(form);
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   while (count != 0U) {
-	Instance->OSequence.push_back(walkPoints[start]);
+	Instance->oSequence.push_back(walkPoints[start]);
 	start = form::nxt(form, start);
 	--count;
   }
@@ -818,7 +818,7 @@ void fnwlk(FRM_HEAD& form) {
 }
 
 void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) {
-  if (Instance->OSequence.empty()) {
+  if (Instance->oSequence.empty()) {
 	return;
   }
   auto const& interleaveSequence        = Instance->InterleaveSequence;
@@ -836,10 +836,10 @@ void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) 
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
-	Instance->OSequence.operator[](iSequence) = featherSequence[iReverseSequence];
+	Instance->oSequence.operator[](iSequence) = featherSequence[iReverseSequence];
 	--iReverseSequence;
   }
-  Instance->OSequence.resize(sequenceMax);
+  Instance->oSequence.resize(sequenceMax);
   form::chkseq(false);
 }
 
@@ -863,8 +863,8 @@ void fthdfn(uint32_t const iSequence, FEATHER& feather) {
 
   auto const length = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   nurat(feather);
-  Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
-  Instance->OSequence.emplace_back(bNext.x, bNext.y);
+  Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
+  Instance->oSequence.emplace_back(bNext.x, bNext.y);
   if (length <= feather.minStitch) {
 	return;
   }
@@ -874,19 +874,19 @@ void fthdfn(uint32_t const iSequence, FEATHER& feather) {
   feather.ratioLocal = HALF;
   duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
   feather.ratioLocal       = feather.minStitch / length / 2;
-  auto const& sequence     = Instance->OSequence.operator[](iSequence);
-  auto const& sequenceFwd1 = Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U);
+  auto const& sequence     = Instance->oSequence.operator[](iSequence);
+  auto const& sequenceFwd1 = Instance->oSequence.operator[](wrap::toSize(iSequence) + 1U);
   xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
   xratf(adjustedPoint, sequenceFwd1, nextPoint, feather.ratioLocal);
   feather.ratioLocal = feather.ratio;
-  xratf(currentPoint, sequence, Instance->OSequence.operator[](iSequence), feather.ratioLocal);
+  xratf(currentPoint, sequence, Instance->oSequence.operator[](iSequence), feather.ratioLocal);
   xratf(
-      nextPoint, sequenceFwd1, Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
+      nextPoint, sequenceFwd1, Instance->oSequence.operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
 }
 
 void fthfn(uint32_t const iSequence, FEATHER& feather) {
   nurat(feather);
-  durats(iSequence, Instance->OSequence, feather);
+  durats(iSequence, Instance->oSequence, feather);
 }
 
 void fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
@@ -921,8 +921,8 @@ void fthrbfn(uint32_t const iSequence, FEATHER& feather, std::vector<F_POINT>& f
 	xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal); // NOLINT(readability-suspicious-call-argument)
   }
   auto const midPoint = midpnt(currentPoint, nextPoint);
-  Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
-  Instance->OSequence.push_back(midPoint);
+  Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
+  Instance->oSequence.push_back(midPoint);
   featherSequence.emplace_back(bNext.x, bNext.y);
   featherSequence.push_back(midPoint);
 }
@@ -1385,11 +1385,11 @@ auto orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC cons
 void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
   auto& interleaveSequence = Instance->InterleaveSequence;
 
-  if (!Instance->OSequence.empty()) {
+  if (!Instance->oSequence.empty()) {
 	Instance->interleaveSequenceIndices.emplace_back(INS_REC {
 	    .code = walkMask, .color = form.underlayColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
 #if BUGBAK
-	for (auto val : Instance->OSequence) {
+	for (auto val : Instance->oSequence) {
 	  Instance->InterleaveSequence.push_back(val);
 	}
 #else
@@ -1398,8 +1398,8 @@ void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 	form.underlayStitchLen = std::clamp(form.underlayStitchLen, MINWLK, MAXWLK);
 
 	auto const underlayStitchLength = form.underlayStitchLen;
-	auto const iSeqMax              = Instance->OSequence.size() - 1U;
-	auto       sequence             = Instance->OSequence.begin();
+	auto const iSeqMax              = Instance->oSequence.size() - 1U;
+	auto       sequence             = Instance->oSequence.begin();
 	auto       sequenceFwd1         = std::next(sequence);
 	for (auto iSequence = size_t {}; iSequence < iSeqMax; ++iSequence) {
 	  auto const delta  = F_POINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
@@ -1419,7 +1419,7 @@ void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 	  ++sequence;
 	  ++sequenceFwd1;
 	}
-	interleaveSequence.push_back(Instance->OSequence.back());
+	interleaveSequence.push_back(Instance->oSequence.back());
 #endif
   }
 }
@@ -1716,12 +1716,12 @@ void xt::fthrfn(FRM_HEAD& form) {
 			fthfn(ind, feather);
 		  }
 		  else {
-			Instance->OSequence.emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
+			Instance->oSequence.emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
 		  }
 		}
 		else {
 		  if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
-			Instance->OSequence.emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
+			Instance->oSequence.emplace_back(bSequence.operator[](ind).x, bSequence.operator[](ind).y);
 		  }
 		  else {
 			fthfn(ind, feather);

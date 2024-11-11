@@ -336,7 +336,7 @@ void satfn(FRM_HEAD const&           form,
 	  else {
 		// add the first vertex to the output sequence
 		auto itVertex = wrap::next(itFirstVertex, line1Start);
-		Instance->OSequence.push_back(*itVertex);
+		Instance->oSequence.push_back(*itVertex);
 	  }
 	}
   }
@@ -634,7 +634,7 @@ void sbfn(std::vector<F_POINT> const& insidePoints, uint32_t const start, uint32
   if (count == 0U) {
 	count = 1;
   }
-  if (form::chkmax(count, wrap::toUnsigned(Instance->OSequence.size()))) {
+  if (form::chkmax(count, wrap::toUnsigned(Instance->oSequence.size()))) {
 	return;
   }
   auto satinBackup = std::vector<F_POINT> {}; // backup stitches in satin fills
@@ -691,7 +691,7 @@ void sfn(FRM_HEAD const& form, uint32_t startVertex, F_POINT& stitchPoint) {
 	sbfn(*InsidePoints, startVertex, nextVertex, stitchPoint);
 	startVertex = nextVertex;
   }
-  Instance->OSequence.front() = Instance->OSequence.back();
+  Instance->oSequence.front() = Instance->oSequence.back();
 }
 
 void unsat() {
@@ -1307,7 +1307,7 @@ void satin::ribon() {
 void satin::slbrd(FRM_HEAD const& form) {
   auto const savedSpacing = LineSpacing;
   auto       stitchPoint  = F_POINT {};
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   if ((form.edgeType & EGUND) != 0U) {
 	auto const width = form.borderSize * URAT;
 	satout(form, width);
@@ -1337,7 +1337,7 @@ void satin::satfil(FRM_HEAD& form) {
   auto const savedSpacing = LineSpacing;
   satadj(form);
   LineSpacing /= 2;
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   Instance->bSequence.clear();
   Instance->StateMap.reset(StateFlag::SAT1);
   Instance->StateMap.reset(StateFlag::FILDIR);
@@ -1383,7 +1383,7 @@ void satin::satfil(FRM_HEAD& form) {
 	  auto iVertex = 1U;
 	  if (!Instance->StateMap.test(StateFlag::BARSAT)) {
 		auto const vNext = std::next(itFirstVertex);
-		Instance->OSequence.push_back(*vNext);
+		Instance->oSequence.push_back(*vNext);
 	  }
 	  while (iVertex < form.vertexCount + 1U && length > lengths[iVertex]) {
 		++iVertex;
@@ -1403,7 +1403,7 @@ void satin::satfil(FRM_HEAD& form) {
 	length *= HALF;
 	auto iVertex = 0U;
 	if (!Instance->StateMap.test(StateFlag::BARSAT) && !Instance->StateMap.test(StateFlag::FTHR)) {
-	  Instance->OSequence.push_back(*itFirstVertex);
+	  Instance->oSequence.push_back(*itFirstVertex);
 	}
 	while (length > lengths[iVertex]) {
 	  ++iVertex;
@@ -1537,8 +1537,8 @@ void satin::sbrd(FRM_HEAD const& form) {
   auto       stitchPoint  = F_POINT {};
   Instance->StateMap.reset(StateFlag::SAT1);
   Instance->StateMap.reset(StateFlag::FILDIR);
-  Instance->OSequence.clear();
-  Instance->OSequence.emplace_back();
+  Instance->oSequence.clear();
+  Instance->oSequence.emplace_back();
   if ((form.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
 	satout(form, form.borderSize * URAT);

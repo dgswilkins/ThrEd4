@@ -92,7 +92,7 @@ class MY_SINGLE
   std::vector<F_POINT>      InterleaveSequence;
   std::vector<INS_REC>      interleaveSequenceIndices;
 
-  std::vector<F_POINT>      OSequence;
+  std::vector<F_POINT>      oSequence;
   std::vector<F_POINT>      outsidePointList;
   std::vector<POINT>        rubberBandLine;
   std::vector<SAT_CON>      satinGuides;

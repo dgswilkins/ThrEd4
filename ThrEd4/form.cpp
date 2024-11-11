@@ -573,7 +573,7 @@ auto fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept ->
 }
 
 void rotbak(float const rotationAngle, F_POINT const& rotationCenter) noexcept {
-  for (auto& iSequence : Instance->OSequence) {
+  for (auto& iSequence : Instance->oSequence) {
 	thred::rotflt(iSequence, rotationAngle, rotationCenter);
   }
 }
@@ -864,7 +864,7 @@ auto ritlin(F_POINT const& start, F_POINT const& finish, float userStitchLen) ->
 }
 
 void ritbrd(FRM_HEAD const& form) {
-  if (Instance->OSequence.empty()) {
+  if (Instance->oSequence.empty()) {
 	return;
   }
   Instance->interleaveSequenceIndices.emplace_back(
@@ -876,7 +876,7 @@ void ritbrd(FRM_HEAD const& form) {
 }
 
 void ritapbrd() {
-  if (Instance->OSequence.empty()) {
+  if (Instance->oSequence.empty()) {
 	return;
   }
   auto const& form = Instance->formList.operator[](ClosestFormToCursor);
@@ -889,7 +889,7 @@ void ritapbrd() {
 }
 
 void ritfil(FRM_HEAD& form) {
-  if (Instance->OSequence.empty()) {
+  if (Instance->oSequence.empty()) {
 	return;
   }
   Instance->interleaveSequenceIndices.emplace_back(
@@ -925,19 +925,19 @@ void bdrlin(uint32_t const vertexIndex, uint32_t const start, uint32_t const fin
 	auto point = F_POINT {itStartVertex->x + step.x, itStartVertex->y + step.y};
 	--stitchCount;
 	while (stitchCount != 0U) {
-	  Instance->OSequence.push_back(point);
+	  Instance->oSequence.push_back(point);
 	  point += step;
 	  --stitchCount;
 	}
   }
-  Instance->OSequence.push_back(*itFinishVertex);
+  Instance->oSequence.push_back(*itFinishVertex);
 }
 
 void brdfil(FRM_HEAD const& form) {
   auto currentVertex = (form.extendedAttribute & AT_STRT) != 0U ? form.fillStart : form::getlast(form);
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + currentVertex);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	auto const nextVertex = form::nxt(form, currentVertex);
 	bdrlin(form.vertexIndex, currentVertex, nextVertex, form.edgeStitchLen);
@@ -961,32 +961,32 @@ void boldlin(uint32_t const vertexIndex, uint32_t const start, uint32_t const fi
   size       = std::max(size, ESCLAMP);
   auto count = wrap::round<uint32_t>(length / size);
   if (count == 0U) {
-	Instance->OSequence.push_back(*itFinishVertex);
-	Instance->OSequence.push_back(*itStartVertex);
-	Instance->OSequence.push_back(*itFinishVertex);
+	Instance->oSequence.push_back(*itFinishVertex);
+	Instance->oSequence.push_back(*itStartVertex);
+	Instance->oSequence.push_back(*itFinishVertex);
 	return;
   }
   auto const step   = F_POINT {delta.x / wrap::toFloat(count), delta.y / wrap::toFloat(count)};
   auto       point0 = *itStartVertex; // intentional copy
   auto       point1 = F_POINT {point0.x + step.x, point0.y + step.y};
   while (count != 0U) {
-	Instance->OSequence.push_back(point1);
-	Instance->OSequence.push_back(point0);
-	Instance->OSequence.push_back(point1);
+	Instance->oSequence.push_back(point1);
+	Instance->oSequence.push_back(point0);
+	Instance->oSequence.push_back(point1);
 	point0 += step;
 	point1 += step;
 	--count;
   }
-  Instance->OSequence.push_back(*itFinishVertex);
+  Instance->oSequence.push_back(*itFinishVertex);
 }
 
 void bold(FRM_HEAD const& form) {
   auto iOutput   = 0U;
   auto iNextLine = form::getlast(form);
   auto iLine     = iNextLine;
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto const itLineVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + iLine);
-  Instance->OSequence.push_back(*itLineVertex);
+  Instance->oSequence.push_back(*itLineVertex);
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	iNextLine = form::nxt(form, iLine);
 	boldlin(form.vertexIndex, iLine, iNextLine, form.edgeStitchLen);
@@ -996,18 +996,18 @@ void bold(FRM_HEAD const& form) {
 	iNextLine = form::nxt(form, iLine);
 	boldlin(form.vertexIndex, iLine, iNextLine, form.edgeStitchLen);
   }
-  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->OSequence.size() - 1U); ++iSequence) {
-	auto const& sequence     = Instance->OSequence.operator[](iSequence);
-	auto const& sequenceFwd1 = Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U);
+  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->oSequence.size() - 1U); ++iSequence) {
+	auto const& sequence     = Instance->oSequence.operator[](iSequence);
+	auto const& sequenceFwd1 = Instance->oSequence.operator[](wrap::toSize(iSequence) + 1U);
 	auto const  deltaX       = sequenceFwd1.x - sequence.x;
 	auto const  deltaY       = sequenceFwd1.y - sequence.y;
 	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length > TNYFLOAT) {
-	  Instance->OSequence.operator[](iOutput++) = sequence;
+	  Instance->oSequence.operator[](iOutput++) = sequence;
 	}
   }
   auto const itNextVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + iNextLine);
-  Instance->OSequence.operator[](iOutput++) = *itNextVertex;
-  Instance->OSequence.resize(iOutput);
+  Instance->oSequence.operator[](iOutput++) = *itNextVertex;
+  Instance->oSequence.resize(iOutput);
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
@@ -1213,25 +1213,25 @@ void prsmal(float const width) {
   }
   auto       iReference  = 0U;
   auto const lengthCheck = minimumLength * minimumLength;
-  for (auto iSequence = 1U; iSequence < wrap::toUnsigned(Instance->OSequence.size()); ++iSequence) {
-	auto const& seq    = Instance->OSequence.operator[](iSequence);
-	auto const& seqRef = Instance->OSequence.operator[](iReference);
+  for (auto iSequence = 1U; iSequence < wrap::toUnsigned(Instance->oSequence.size()); ++iSequence) {
+	auto const& seq    = Instance->oSequence.operator[](iSequence);
+	auto const& seqRef = Instance->oSequence.operator[](iReference);
 	auto const  deltaX = seq.x - seqRef.x;
 	auto const  deltaY = seq.y - seqRef.y;
 	if (auto const length = (deltaX * deltaX) + (deltaY * deltaY); length > lengthCheck) {
-	  Instance->OSequence.operator[](iOutput++) = seq;
+	  Instance->oSequence.operator[](iOutput++) = seq;
 
 	  iReference = iSequence;
 	}
   }
-  Instance->OSequence.resize(iOutput);
+  Instance->oSequence.resize(iOutput);
 }
 
 void pbrd(FRM_HEAD const& form) {
   auto const spacing = LineSpacing;
   auto const start   = form::getlast(form);
   LineSpacing        = form.edgeSpacing;
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto fillVerticalRect = std::vector<V_RECT_2> {};
   fillVerticalRect.resize(form.vertexCount);
   auto underlayVerticalRect = std::vector<V_RECT_2> {};
@@ -1266,9 +1266,9 @@ void pbrd(FRM_HEAD const& form) {
 
 void apbrd(FRM_HEAD const& form) {
   auto currentVertex = 0U;
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
   for (auto iVertex = 0U; iVertex < form.vertexCount * 2U; ++iVertex) {
 	auto const nextVertex = form::nxt(form, currentVertex);
 	bdrlin(form.vertexIndex, currentVertex, nextVertex, IniFile.AppStitchLen);
@@ -1293,18 +1293,18 @@ void bhfn(FRM_HEAD const& form, uint32_t const start, uint32_t const finish) {
   for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
 	auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
 	auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
-	Instance->OSequence.emplace_back(firstPoint);
-	Instance->OSequence.emplace_back(innerPoint);
-	Instance->OSequence.emplace_back(firstPoint);
-	Instance->OSequence.emplace_back(outerPoint);
-	Instance->OSequence.emplace_back(firstPoint);
-	Instance->OSequence.emplace_back(outerPoint);
-	Instance->OSequence.emplace_back(firstPoint);
+	Instance->oSequence.emplace_back(firstPoint);
+	Instance->oSequence.emplace_back(innerPoint);
+	Instance->oSequence.emplace_back(firstPoint);
+	Instance->oSequence.emplace_back(outerPoint);
+	Instance->oSequence.emplace_back(firstPoint);
+	Instance->oSequence.emplace_back(outerPoint);
+	Instance->oSequence.emplace_back(firstPoint);
 	innerPoint += step;
   }
   auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
-  Instance->OSequence.emplace_back(firstPoint);
-  Instance->OSequence.emplace_back(innerPoint);
+  Instance->oSequence.emplace_back(firstPoint);
+  Instance->oSequence.emplace_back(innerPoint);
 }
 
 void bhcrnr(FRM_HEAD const& form, uint32_t const vertex) {
@@ -1320,18 +1320,18 @@ void bhcrnr(FRM_HEAD const& form, uint32_t const vertex) {
   auto const ratio  = ButtonholeCornerLength / length;
   delta *= ratio;
   auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
-  Instance->OSequence.push_back(*itVertex);
-  Instance->OSequence.emplace_back(point);
-  Instance->OSequence.push_back(*itVertex);
-  Instance->OSequence.emplace_back(point);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
+  Instance->oSequence.emplace_back(point);
+  Instance->oSequence.push_back(*itVertex);
+  Instance->oSequence.emplace_back(point);
+  Instance->oSequence.push_back(*itVertex);
 }
 
 void bhbrd(FRM_HEAD const& form) {
   auto vertex = form::getlast(form);
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto const itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex + vertex);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const nextVertex = form::nxt(form, vertex);
 	bhfn(form, vertex, nextVertex);
@@ -1342,8 +1342,8 @@ void bhbrd(FRM_HEAD const& form) {
 
 void dubfn(FRM_HEAD const& currentForm) {
   brdfil(currentForm);
-  for (auto iBackward = Instance->OSequence.size(); iBackward != 0; --iBackward) {
-	Instance->OSequence.push_back(Instance->OSequence.operator[](iBackward - 1U));
+  for (auto iBackward = Instance->oSequence.size(); iBackward != 0; --iBackward) {
+	Instance->oSequence.push_back(Instance->oSequence.operator[](iBackward - 1U));
   }
 }
 
@@ -1588,12 +1588,12 @@ void plfn(FRM_HEAD const&              form,
 }
 
 void plbak(uint32_t backPoint) noexcept(std::is_same_v<size_t, uint32_t>) {
-  if (Instance->OSequence.empty() || backPoint >= Instance->OSequence.size() - 1U) {
+  if (Instance->oSequence.empty() || backPoint >= Instance->oSequence.size() - 1U) {
 	return;
   }
-  auto iSequence = wrap::toUnsigned(Instance->OSequence.size() - 1U);
+  auto iSequence = wrap::toUnsigned(Instance->oSequence.size() - 1U);
   while (iSequence > backPoint) {
-	std::swap(Instance->OSequence.operator[](iSequence), Instance->OSequence.operator[](backPoint));
+	std::swap(Instance->oSequence.operator[](iSequence), Instance->oSequence.operator[](backPoint));
 	--iSequence;
 	++backPoint;
   }
@@ -1634,7 +1634,7 @@ void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& ang
 	underlayVerticalRect[index].dipnt = *itLastVertex;
 	underlayVerticalRect[index].dopnt = *itLastVertex;
   }
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto stitchPoint = *itVertex; // intentional copy
   if ((angledForm.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
@@ -1643,15 +1643,15 @@ void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& ang
 	Instance->StateMap.set(StateFlag::UNDPHAS);
 	Instance->StateMap.reset(StateFlag::FILDIR);
 	plfn(angledForm, underlayVerticalRect, fillVerticalRect, underlayVerticalRect, width, stitchPoint);
-	auto const savedIndex = wrap::toUnsigned(Instance->OSequence.size());
+	auto const savedIndex = wrap::toUnsigned(Instance->oSequence.size());
 	Instance->StateMap.reset(StateFlag::UNDPHAS);
 	stitchPoint = *itVertex;
 	Instance->StateMap.set(StateFlag::FILDIR);
 	plfn(angledForm, underlayVerticalRect, fillVerticalRect, underlayVerticalRect, width, stitchPoint);
 	plbak(savedIndex);
 	prsmal(width);
-	if (!Instance->OSequence.empty()) { // ensure that we can do a valid read from OSequence
-	  stitchPoint = Instance->OSequence.back();
+	if (!Instance->oSequence.empty()) { // ensure that we can do a valid read from oSequence
+	  stitchPoint = Instance->oSequence.back();
 	}
   }
   Instance->StateMap.reset(StateFlag::UND);
@@ -1662,7 +1662,7 @@ void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& ang
 
 void lapbrd(FRM_HEAD const& form) {
   auto const savedStitchLength = UserStitchLength;
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   UserStitchLength = IniFile.AppStitchLen;
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	bdrlin(form.vertexIndex, iVertex, iVertex + 1U, IniFile.AppStitchLen);
@@ -1674,16 +1674,16 @@ void lapbrd(FRM_HEAD const& form) {
 }
 
 void blbrd(FRM_HEAD const& form) {
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
   for (auto iVertex = 0U; iVertex < form.vertexCount - 2U; ++iVertex) {
 	bhfn(form, iVertex, iVertex + 1U);
 	bhcrnr(form, iVertex);
   }
   bhfn(form, form.vertexCount - 2U, form.vertexCount - 1U);
   itVertex = wrap::next(itVertex, form.vertexCount - 1U);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
 }
 
 void contf(FRM_HEAD& form) {
@@ -1727,7 +1727,7 @@ public:
   auto highVertices = std::vector<F_POINT> {};
   highVertices.resize(highVertexIndex);
   auto lowLength = 0.0F;
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto lowIndex = 0U;
   {
 	// setup the low side of the contours
@@ -1843,21 +1843,21 @@ public:
 	  if (auto const polyDiff = P_VEC {.angle  = polyLine.angle - reference.angle,
 	                                   .length = polyLine.length / reference.length};
 	      Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
-		Instance->OSequence.emplace_back(lowPoint);
+		Instance->oSequence.emplace_back(lowPoint);
 		for (auto iVertex = 0U; iVertex < selectedVertexCount - 1; ++iVertex) {
 		  auto const length = polyLines[iVertex].length * polyDiff.length;
 		  auto const angle  = polyLines[iVertex].angle + polyDiff.angle;
-		  Instance->OSequence.emplace_back(lowPoint.x + (cos(angle) * length),
+		  Instance->oSequence.emplace_back(lowPoint.x + (cos(angle) * length),
 		                                   lowPoint.y + (sin(angle) * length));
 		}
 	  }
 	  else {
-		Instance->OSequence.emplace_back(highPoint);
+		Instance->oSequence.emplace_back(highPoint);
 		for (auto iVertex = selectedVertexCount - 1U; iVertex != 0; --iVertex) {
 		  auto const prevVertex = iVertex - 1U;
 		  auto const length     = polyLines[prevVertex].length * polyDiff.length;
 		  auto const angle      = polyLines[prevVertex].angle + polyDiff.angle;
-		  Instance->OSequence.emplace_back(lowPoint.x + (cos(angle) * length),
+		  Instance->oSequence.emplace_back(lowPoint.x + (cos(angle) * length),
 		                                   lowPoint.y + (sin(angle) * length));
 		}
 	  }
@@ -1866,11 +1866,11 @@ public:
 	highPoint += highStep;
   }
   if (Instance->StateMap.test(StateFlag::FILDIR)) {
-	Instance->OSequence.push_back(*itFirstVertex);
+	Instance->oSequence.push_back(*itFirstVertex);
   }
   else {
 	auto itLastVertex = wrap::next(itFirstVertex, form.vertexCount - 1U);
-	Instance->OSequence.push_back(*itLastVertex);
+	Instance->oSequence.push_back(*itLastVertex);
   }
   form.stitchLength = std::max(form.stitchLength, MinStitchLength);
 }
@@ -2174,7 +2174,7 @@ void ritseg(FRM_HEAD const&              form,
 	}
 	chksid(form, clipSegments[currentSegmentIndex].asid, clipIntersectSide, currentFormVertices);
 	while (iPoint <= clipSegments[currentSegmentIndex].finish) {
-	  Instance->OSequence.emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
+	  Instance->oSequence.emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
 	  ++iPoint;
 	}
 	clipIntersectSide = clipSegments[currentSegmentIndex].zsid;
@@ -2187,14 +2187,14 @@ void ritseg(FRM_HEAD const&              form,
 	chksid(form, clipSegments[currentSegmentIndex].zsid, clipIntersectSide, currentFormVertices);
 	if (clipSegments[currentSegmentIndex].start != 0U) {
 	  while (iPoint >= clipSegments[currentSegmentIndex].start) {
-		Instance->OSequence.emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
+		Instance->oSequence.emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
 		--iPoint;
 	  }
 	}
 	else {
 	  // while (iPoint < clipSegments[currentSegmentIndex].start) { // This line makes no sense. Maybe the replacement does?
 	  while (iPoint-- != 0U) {
-		Instance->OSequence.emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
+		Instance->oSequence.emplace_back(clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y);
 	  }
 	}
 	clipIntersectSide = clipSegments[currentSegmentIndex].asid;
@@ -2247,10 +2247,10 @@ auto nucseg(std::vector<CLIP_SEG> const& clipSegments,
 }
 
 auto vscmp(uint32_t const index1, uint32_t const index2) noexcept -> bool {
-  return util::closeEnough(Instance->OSequence.operator[](index1).x,
-                           Instance->OSequence.operator[](index2).x)
-             ? !util::closeEnough(Instance->OSequence.operator[](index1).y,
-                                  Instance->OSequence.operator[](index2).y)
+  return util::closeEnough(Instance->oSequence.operator[](index1).x,
+                           Instance->oSequence.operator[](index2).x)
+             ? !util::closeEnough(Instance->oSequence.operator[](index1).y,
+                                  Instance->oSequence.operator[](index2).y)
              : true;
 }
 
@@ -2601,7 +2601,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 
   auto currentSegmentIndex = 0U;
   Instance->StateMap.set(StateFlag::FILDIR);
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto clipIntersectSide = clipSegments[0].asid;
   ritseg(form, clipStitchPoints, clipSegments, currentSegmentIndex, clipIntersectSide, currentFormVertices);
   while (nucseg(clipSegments, sortedLengths, currentSegmentIndex)) {
@@ -2609,15 +2609,15 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
   }
   chksid(form, 0, clipIntersectSide, currentFormVertices);
   auto index = 0U;
-  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->OSequence.size()); ++iSequence) {
+  for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->oSequence.size()); ++iSequence) {
 	if (vscmp(iSequence, index)) {
 	  ++index;
-	  Instance->OSequence.operator[](index) = Instance->OSequence.operator[](iSequence);
+	  Instance->oSequence.operator[](index) = Instance->oSequence.operator[](iSequence);
 	}
   }
-  Instance->OSequence.resize(index);
+  Instance->oSequence.resize(index);
   if (Instance->StateMap.test(StateFlag::WASNEG)) {
-	for (auto& iSequence : Instance->OSequence) {
+	for (auto& iSequence : Instance->oSequence) {
 	  iSequence.x -= formOffset;
 	}
 	auto vOffset = itFirstVertex; // intentional copy
@@ -3661,48 +3661,48 @@ void handleSeqTop(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
   }
   if ((form.extendedAttribute & AT_SQR) != 0U) {
 	if (Instance->StateMap.testAndFlip(StateFlag::FILDIR)) {
-	  Instance->OSequence.emplace_back(bPrevious.x, bPrevious.y);
+	  Instance->oSequence.emplace_back(bPrevious.x, bPrevious.y);
 	  auto yVal = (wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength) +
 	              (wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9);
 	  while (true) {
-		Instance->OSequence.emplace_back(0.0F, yVal);
+		Instance->oSequence.emplace_back(0.0F, yVal);
 		if (yVal > bCurrent.y) {
 		  break;
 		}
-		Instance->OSequence.back().x = bCurrent.x;
+		Instance->oSequence.back().x = bCurrent.x;
 		yVal += UserStitchLength;
 	  }
-	  Instance->OSequence.back() = bCurrent;
+	  Instance->oSequence.back() = bCurrent;
 	  return;
 	}
-	Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
+	Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
 	auto yVal = (wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength) -
 	            (wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9);
 	while (true) {
-	  Instance->OSequence.emplace_back(0.0F, yVal);
+	  Instance->oSequence.emplace_back(0.0F, yVal);
 	  if (yVal < bPrevious.y) {
 		break;
 	  }
-	  Instance->OSequence.back().x = bCurrent.x;
+	  Instance->oSequence.back().x = bCurrent.x;
 	  yVal -= UserStitchLength;
 	}
-	Instance->OSequence.back() = bPrevious;
+	Instance->oSequence.back() = bPrevious;
 	return;
   }
   auto yVal = (wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength) +
               (wrap::toFloat(std::abs(rit % SEQ_TABLE.at(rcnt))) * userStitchLength9);
   while (true) {
-	Instance->OSequence.emplace_back(0.0F, yVal);
+	Instance->oSequence.emplace_back(0.0F, yVal);
 	if (yVal > bCurrent.y) {
 	  break;
 	}
-	delta.y = Instance->OSequence.back().y - bNext.y;
+	delta.y = Instance->oSequence.back().y - bNext.y;
 	delta.x = slope * delta.y;
 
-	Instance->OSequence.back().x = bNext.x + delta.x;
+	Instance->oSequence.back().x = bNext.x + delta.x;
 	yVal += UserStitchLength;
   }
-  Instance->OSequence.back() = bCurrent;
+  Instance->oSequence.back() = bCurrent;
 }
 
 void handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
@@ -3737,17 +3737,17 @@ void handleSeqBot(size_t const iSequence, B_SEQ_PNT const& bCurrent) {
   auto yVal = (wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength) -
               (wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE.at(rcnt))) * userStitchLength9);
   while (true) {
-	Instance->OSequence.emplace_back(0.0F, yVal);
+	Instance->oSequence.emplace_back(0.0F, yVal);
 	if (yVal < bCurrent.y) {
 	  break;
 	}
-	delta.y = Instance->OSequence.back().y - bNext.y;
+	delta.y = Instance->oSequence.back().y - bNext.y;
 	delta.x = slope * delta.y;
 
-	Instance->OSequence.back().x = bNext.x + delta.x;
+	Instance->oSequence.back().x = bNext.x + delta.x;
 	yVal -= UserStitchLength;
   }
-  Instance->OSequence.back() = bCurrent;
+  Instance->oSequence.back() = bCurrent;
 }
 
 auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
@@ -3757,16 +3757,16 @@ auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
   Instance->StateMap.reset(StateFlag::FILDIR);
   auto const length = std::hypot(delta.x, delta.y);
   if (length == 0.0F) {
-	Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
+	Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
 	return true;
   }
   if (auto const userStitchLength2 = UserStitchLength * 2.0F; length <= userStitchLength2) {
-	Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
+	Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
 	return true;
   }
   auto point = bNext; // intended copy
   auto count = wrap::round<uint32_t>((length / UserStitchLength) - 1.0F);
-  if (form::chkmax(count, wrap::toUnsigned(Instance->OSequence.size()))) {
+  if (form::chkmax(count, wrap::toUnsigned(Instance->oSequence.size()))) {
 	return false;
   }
   auto const fCount = wrap::toFloat(count);
@@ -3774,10 +3774,10 @@ auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
   while (count != 0U) {
 	point.x += step.x;
 	point.y += step.y;
-	Instance->OSequence.emplace_back(point.x, point.y);
+	Instance->oSequence.emplace_back(point.x, point.y);
 	--count;
   }
-  Instance->OSequence.emplace_back(bCurrent.x, bCurrent.y);
+  Instance->oSequence.emplace_back(bCurrent.x, bCurrent.y);
   return true;
 }
 
@@ -3789,7 +3789,7 @@ void bakseq() {
 #if BUGBAK
 
   for (auto val : bSequence) {
-	Instance->OSequence.push_back(F_POINT {val.x, val.y});
+	Instance->oSequence.push_back(F_POINT {val.x, val.y});
   }
   Instance->formList.operator[](ClosestFormToCursor).maxFillStitchLen = 6000;
 #else
@@ -3798,9 +3798,9 @@ void bakseq() {
   if (iSequence != 0U) {
 	--iSequence;
   }
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   Instance->StateMap.reset(StateFlag::FILDIR);
-  Instance->OSequence.emplace_back(bSequence.operator[](iSequence).x,
+  Instance->oSequence.emplace_back(bSequence.operator[](iSequence).x,
                                    bSequence.operator[](iSequence).y);
   if (iSequence != 0U) {
 	--iSequence;
@@ -4036,7 +4036,7 @@ void trfrm(F_POINT const& bottomLeftPoint,
 	                                     (clipRatio.x * bottomDelta.y) + bottomLeftPoint.y};
 
 	auto const middleDelta = topMidpoint - bottomMidpoint;
-	Instance->OSequence.emplace_back((clipRatio.y * middleDelta.x) + bottomMidpoint.x,
+	Instance->oSequence.emplace_back((clipRatio.y * middleDelta.x) + bottomMidpoint.x,
 	                                 (clipRatio.y * middleDelta.y) + bottomMidpoint.y);
   }
 }
@@ -5252,7 +5252,7 @@ void chksid(FRM_HEAD const&             form,
 	auto const limit   = form::nxt(form, vertexIndex);
 	while (iVertex != limit) {
 	  auto const itThisVertex = wrap::next(itVertex, iVertex);
-	  Instance->OSequence.push_back(*itThisVertex);
+	  Instance->oSequence.push_back(*itThisVertex);
 	  iVertex = form::nxt(form, iVertex);
 	}
 	return;
@@ -5260,7 +5260,7 @@ void chksid(FRM_HEAD const&             form,
   auto iVertex = clipIntersectSide;
   while (iVertex != vertexIndex) {
 	auto const itThisVertex = wrap::next(itVertex, iVertex);
-	Instance->OSequence.push_back(*itThisVertex);
+	Instance->oSequence.push_back(*itThisVertex);
 	iVertex = form::prv(form, iVertex);
   }
 }
@@ -6042,7 +6042,7 @@ void form::chkseq(bool border) {
 #if BUGBAK
   UNREFERENCED_PARAMETER(border);
 
-  for (auto val : Instance->OSequence) {
+  for (auto val : Instance->oSequence) {
 	Instance->InterleaveSequence.push_back(val);
   }
 #else
@@ -6073,22 +6073,22 @@ void form::chkseq(bool border) {
   }
   MaxStitchLen  = border ? form.maxBorderStitchLen : form.maxFillStitchLen;
   userStitchLen = std::min(userStitchLen, MaxStitchLen);
-  if (!Instance->OSequence.empty()) {
+  if (!Instance->oSequence.empty()) {
 	bool flag = true;
-	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->OSequence.size()) - 1U; ++iSequence) {
-	  if (!ritlin(Instance->OSequence.operator[](iSequence),
-	              Instance->OSequence.operator[](wrap::toSize(iSequence) + 1U),
+	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(Instance->oSequence.size()) - 1U; ++iSequence) {
+	  if (!ritlin(Instance->oSequence.operator[](iSequence),
+	              Instance->oSequence.operator[](wrap::toSize(iSequence) + 1U),
 	              userStitchLen)) {
 		flag = false;
 		break;
 	  }
 	}
 	if (flag) {
-	  interleaveSequence.push_back(Instance->OSequence.back());
+	  interleaveSequence.push_back(Instance->oSequence.back());
 	}
   }
   else {
-	outDebugString(L"chkseq: OSequence empty! border [{}]\n", border);
+	outDebugString(L"chkseq: oSequence empty! border [{}]\n", border);
   }
   if (minimumStitchLength == 0.0F) {
 	return;
@@ -6145,16 +6145,16 @@ void form::filinsb(F_POINT const& point, F_POINT& stitchPoint) {
   auto const step   = F_POINT {(delta.x / wrap::toFloat(count)), (delta.y / wrap::toFloat(count))};
   if (length > MAXSTCH) {
 	--count;
-	if (chkmax(count, wrap::toUnsigned(Instance->OSequence.size()))) {
+	if (chkmax(count, wrap::toUnsigned(Instance->oSequence.size()))) {
 	  return;
 	}
 	while (count != 0U) {
 	  stitchPoint += step;
-	  Instance->OSequence.push_back(stitchPoint);
+	  Instance->oSequence.push_back(stitchPoint);
 	  --count;
 	}
   }
-  Instance->OSequence.push_back(point);
+  Instance->oSequence.push_back(point);
   stitchPoint = point;
 }
 
@@ -6325,7 +6325,7 @@ void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
   auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
-	Instance->OSequence.push_back(inPoint);
+	Instance->oSequence.push_back(inPoint);
 	return;
   }
 
@@ -6336,7 +6336,7 @@ void form::filinu(F_POINT const& inPoint, F_POINT const& stitchPoint) {
   auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
   while (count > 0) {
 	point += step;
-	Instance->OSequence.push_back(point);
+	Instance->oSequence.push_back(point);
 	--count;
   }
 }
@@ -6347,7 +6347,7 @@ void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
   auto const length = std::hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
   if (count == 0U) {
-	Instance->OSequence.push_back(currentPoint);
+	Instance->oSequence.push_back(currentPoint);
 	return;
   }
   if (Instance->StateMap.test(StateFlag::FILDIR)) {
@@ -6357,7 +6357,7 @@ void form::filin(F_POINT const& currentPoint, F_POINT const& stitchPoint) {
   auto const step   = F_POINT {delta.x / fCount, delta.y / fCount};
   while (count > 0) {
 	point += step;
-	Instance->OSequence.push_back(point);
+	Instance->oSequence.push_back(point);
 	--count;
   }
 }

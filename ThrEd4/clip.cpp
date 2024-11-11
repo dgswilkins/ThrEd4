@@ -153,13 +153,13 @@ void clpcrnr(FRM_HEAD const&       form,
   auto const ratio  = form::getplen() / length;
   delta *= ratio;
   auto const point = F_POINT {itVertex->x + delta.x, itVertex->y + delta.y};
-  Instance->OSequence.push_back(*itVertex);
-  Instance->OSequence.push_back(point);
-  Instance->OSequence.push_back(*itVertex);
-  Instance->OSequence.push_back(point);
+  Instance->oSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(point);
+  Instance->oSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(point);
   if (ritclp(clipFillData, point)) {
-	Instance->OSequence.push_back(point);
-	Instance->OSequence.push_back(*itVertex);
+	Instance->oSequence.push_back(point);
+	Instance->oSequence.push_back(*itVertex);
   }
 }
 
@@ -238,7 +238,7 @@ void clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEn
 }
 
 void duch(std::vector<F_POINT> const& chainEndPoints) {
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto chainLength = wrap::toUnsigned(chainEndPoints.size());
   if (chainLength <= 2U) {
 	displayText::tabmsg(IDS_CHANSMAL, false);
@@ -250,7 +250,7 @@ void duch(std::vector<F_POINT> const& chainEndPoints) {
   }
   if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
 	duchfn(chainEndPoints, chainLength - 1, 0);
-	Instance->OSequence.push_back(chainEndPoints[chainLength]);
+	Instance->oSequence.push_back(chainEndPoints[chainLength]);
 	return;
   }
   duchfn(chainEndPoints, chainLength - 1, chainLength);
@@ -260,10 +260,10 @@ void duch(std::vector<F_POINT> const& chainEndPoints) {
   if (Instance->StateMap.test(StateFlag::LINCHN)) {
 	--backupAt;
   }
-  if (Instance->OSequence.size() >= backupAt) {
-	Instance->OSequence.operator[](Instance->OSequence.size() - backupAt) = chainEndPoints[chainLength];
+  if (Instance->oSequence.size() >= backupAt) {
+	Instance->oSequence.operator[](Instance->oSequence.size() - backupAt) = chainEndPoints[chainLength];
   }
-  Instance->OSequence.push_back(chainEndPoints[chainLength]);
+  Instance->oSequence.push_back(chainEndPoints[chainLength]);
 }
 
 void duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t const start, uint32_t const finish) {
@@ -302,7 +302,7 @@ void duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t const start, ui
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
-	Instance->OSequence.push_back(chainPoint.at(CHAIN_SEQUENCE.at(iChain)));
+	Instance->oSequence.push_back(chainPoint.at(CHAIN_SEQUENCE.at(iChain)));
   }
 }
 
@@ -684,33 +684,33 @@ void picfn(FRM_HEAD const&       form,
   for (auto iStep = 0U; iStep < count - 1U; ++iStep) {
 	auto const firstPoint = F_POINT {innerPoint.x + step.x, innerPoint.y + step.y};
 	auto const outerPoint = F_POINT {firstPoint.x + outerStep.x, firstPoint.y + outerStep.y};
-	Instance->OSequence.push_back(firstPoint);
-	Instance->OSequence.push_back(innerPoint);
-	Instance->OSequence.push_back(firstPoint);
-	Instance->OSequence.push_back(outerPoint);
-	Instance->OSequence.push_back(firstPoint);
-	Instance->OSequence.push_back(outerPoint);
+	Instance->oSequence.push_back(firstPoint);
+	Instance->oSequence.push_back(innerPoint);
+	Instance->oSequence.push_back(firstPoint);
+	Instance->oSequence.push_back(outerPoint);
+	Instance->oSequence.push_back(firstPoint);
+	Instance->oSequence.push_back(outerPoint);
 	if (!ritclp(clipFillData, outerPoint)) {
 	  flag = false;
 	  break;
 	}
-	Instance->OSequence.push_back(outerPoint);
-	Instance->OSequence.push_back(firstPoint);
+	Instance->oSequence.push_back(outerPoint);
+	Instance->oSequence.push_back(firstPoint);
 	innerPoint += step;
   }
   if (flag) {
-	Instance->OSequence.push_back(*itFinishVertex);
-	Instance->OSequence.push_back(innerPoint);
+	Instance->oSequence.push_back(*itFinishVertex);
+	Instance->oSequence.push_back(innerPoint);
   }
 }
 
 auto ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool {
   auto const adjustedPoint = F_POINT {(point.x - ClipReference.x), (point.y - ClipReference.y)};
-  if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(Instance->OSequence.size()))) {
+  if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(Instance->oSequence.size()))) {
 	return false;
   }
   std::ranges::transform(
-      clipFillData, std::back_inserter(Instance->OSequence), [&adjustedPoint](auto const& data) noexcept {
+      clipFillData, std::back_inserter(Instance->oSequence), [&adjustedPoint](auto const& data) noexcept {
 	    return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
       });
   return true;
@@ -739,7 +739,7 @@ void xclpfn(std::vector<F_POINT> const& tempClipPoints,
   auto const rotationAngle = std::atan2(delta.y, delta.x);
   for (auto const& clip : tempClipPoints) {
 	auto const point = thred::rotangf(clip, rotationAngle, rotationCenter);
-	Instance->OSequence.emplace_back(chainStartPoint->x + point.x, chainStartPoint->y + point.y);
+	Instance->oSequence.emplace_back(chainStartPoint->x + point.x, chainStartPoint->y + point.y);
   }
 }
 
@@ -891,7 +891,7 @@ void clip::clpout(float const width) {
 }
 
 void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t const startVertex) {
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   Instance->StateMap.reset(StateFlag::CLPBAK);
   auto const clipStitchCount = Instance->clipBuffer.size();
   auto       clipFillData    = std::vector<F_POINT> {};
@@ -944,13 +944,13 @@ void clip::duxclp(FRM_HEAD const& form) {
   auto tempClipPoints = std::vector<F_POINT> {};
   tempClipPoints.reserve(Instance->clipBuffer.size());
   clpxadj(tempClipPoints, chainEndPoints);
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   auto constexpr ROTATION_CENTER = F_POINT {};
   for (auto iPoint = 0U; iPoint < wrap::toUnsigned(chainEndPoints.size() - 1U); ++iPoint) {
 	xclpfn(tempClipPoints, chainEndPoints, iPoint, ROTATION_CENTER);
   }
   if (form.type != FRMLINE) {
-	Instance->OSequence.push_back(chainEndPoints[0]);
+	Instance->oSequence.push_back(chainEndPoints[0]);
   }
 }
 
@@ -959,7 +959,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   clipFillData.resize(Instance->clipBuffer.size());
   auto const rotationCenter =
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
-  Instance->OSequence.clear();
+  Instance->oSequence.clear();
   Instance->StateMap.reset(StateFlag::CLPBAK);
   ClipReference = F_POINT {rotationCenter.y, clipRect.left};
 
@@ -975,7 +975,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   }
   auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
   if (form.fillType == 0U) {
-	Instance->OSequence.push_back(*itVertex);
+	Instance->oSequence.push_back(*itVertex);
   }
   auto currentVertex = 0U;
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -985,7 +985,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
 	currentVertex = nextVertex;
   }
   itVertex = wrap::next(itVertex, currentVertex);
-  Instance->OSequence.push_back(*itVertex);
+  Instance->oSequence.push_back(*itVertex);
 }
 
 void clip::chnfn(FRM_HEAD const& form) {
