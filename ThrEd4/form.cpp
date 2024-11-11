@@ -173,21 +173,21 @@ class V_RECT_2
   F_POINT dopnt;
 };
 
+namespace {
 constexpr auto BHWIDTH  = 20.0F; // Button hole width
 constexpr auto CLPMIN   = 0.5F;  // if clipboard data width less than this, then don't fill
 constexpr auto CLPMINVT = 1.2F;  // Minimum clip width for skinny vertical clips
 constexpr auto FRECONT  = 0x80U; // 1000 0000 contour refil
-constexpr auto NFRECONT = 0x7fU; // 0111 1111 contour refil
-constexpr auto SEQTOP   = int32_t {2};
-constexpr auto SEQBOT   = int32_t {3};
+constexpr auto NFRECONT = 0x7fU; // 0111 1111 not contour refil
 constexpr auto OUTL_ALL = false; // When selecting multiple forms, should we outline every form?
+constexpr auto SEQBOT   = int32_t {3};
+constexpr auto SEQTOP   = int32_t {2};
 
-namespace {
+auto AllItemsRect   = F_RECTANGLE {};                  // bounding rectangle for all items
 auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 auto FormVertexNext = uint32_t {};                     // form vertex storage for form vertex insert
 auto FormVertexPrev = uint32_t {};                     // form vertex storage for form vertex insert
 auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
-auto AllItemsRect   = F_RECTANGLE {};                  // bounding rectangle for all items
 auto MaxStitchLen   = float {};                        // maximum stitch length
 
 // Definitions
