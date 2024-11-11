@@ -201,7 +201,7 @@ class THR_SINGLE
   fs::path ThrName;       // ThrEd file path
 
   std::vector<fs::path> PreviousNames; // files in the LRU list
-  std::vector<fs::path> VersionNames; // temporary storage for old file version names
+  std::vector<fs::path> VersionNames;  // temporary storage for old file version names
 
   // Pens
   std::vector<HPEN> UserPen; // user color pens
@@ -263,106 +263,7 @@ constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeter
 constexpr auto TSSSIZ   = size_t {32U};         // size of the thumbnail search buffer
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
-auto ExtendedHeader          = THR_HEAD_EX {};                     // ThrEd file header extension
-auto ArgCount                = int32_t {};                         // command line argument count
-auto ArgList                 = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
-auto ThredWindowRect         = RECT {};                            // main window size
-auto ColorBarSize            = COLSIZ;                             // Color bar width scaled for DPI
-auto ColorBarRect            = RECT {};                            // color bar rectangle
-auto SmallestStitchIndex     = uint32_t {}; // pointer to the smallest stitch in the selected range
-auto LargestStitchIndex      = uint32_t {}; // pointer to the largest stitch in the selected range
-auto CurrentStitchIndex      = uint32_t {}; // pointer to the current selection for length search
-auto ThredDC                 = gsl::narrow_cast<HDC>(nullptr); // main device context handle
-auto ScreenSizePixels        = SIZE {};                        // screen size in pixels
-auto StitchWindowAbsRect     = RECT {};                        // stitch window size,absolute
-auto PrevGroupStartStitch    = uint32_t {};                    // lower end of previous selection
-auto PrevGroupEndStitch      = uint32_t {};                    // higher end of previous selection
-auto ScrollSize              = SCROLSIZ;                       // Scroll bar width scaled for DPI
-auto StitchWindowAspectRatio = float {};                       // aspect ratio of the stitch window
-auto HorizontalRatio = float {}; // horizontal ratio between the zoom window and the entire stitch space
-auto VerticalRatio = float {}; // vertical ratio between the zoom window and the entire stitch space
-auto SelectBoxSize = SIZE {};  // size of the select box
-auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
-auto RotationHandleAngle = float {};    // angle of the rotation handle
-auto ThreadSize30        = TSIZ30;      // #30 thread size
-auto ThreadSize40        = TSIZ40;      // #40 thread size
-auto ThreadSize60        = TSIZ60;      // #60 thread size
-auto RunPoint            = uint32_t {}; // point for animating stitchout
-auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
-auto MovieTimeStep       = int32_t {};  // time delay for stitchout
-auto LastKeyCode         = std::numeric_limits<wchar_t>::max(); // last key code
-auto FileVersionIndex    = uint8_t {};                          // points to old version to be read
-auto StitchArrow         = std::array<POINT, ARROWPNT> {};      // arrow for selected stitch
-auto SelectedRange       = RANGE {}; // first and last stitch for min/max stitch select
-auto NameOrder           = std::array<uint32_t, DNLEN> {}; // designer name order table
-auto NameEncoder         = std::array<uint8_t, DNELEN> {}; // designer name encoding
-auto NameDecoder         = std::array<uint8_t, DNDLEN> {}; // designer name decode
-auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
-auto SelectedFormsRange   = RANGE {};            // range of selected forms
-auto ZoomMin              = float {};            // minimum allowed zoom value
-auto StitchWindowSize     = SIZE {};             // size of the stitch window in pixels
-auto StitchBoxesThreshold = STCHBOX;             // threshold for drawing stitch boxes
-auto SortIndex            = uint32_t {};         // index for stitch search
-auto SmallStitchLength    = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
-auto ShowStitchThreshold  = SHOPNTS;          // show stitch grid below this zoom level
-auto PreviousFormIndex    = uint32_t {};      // previously selected form
-auto PreferenceIndex      = uint32_t {};      // index to the active preference window
-auto NearestCount         = uint32_t {};      // number of boxes selected
-
-// Pens
-auto LinePen            = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
-auto BoxPen             = std::array<HPEN, 4> {};          // box pens
-auto CrossPen           = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
-auto GridPen            = gsl::narrow_cast<HPEN>(nullptr); // pen for stitch grid
-auto GroupSelectPen     = gsl::narrow_cast<HPEN>(nullptr); // pen for group select
-auto BackgroundPen      = gsl::narrow_cast<HPEN>(nullptr); // background color pen
-auto ZoomMarkPen        = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
-auto KnotPen            = gsl::narrow_cast<HPEN>(nullptr); // knot pen
-auto BackgroundPenWidth = int32_t {};                      // width of the background pen
-auto SelectAllPen       = gsl::narrow_cast<HPEN>(nullptr); // pen for drawing large boxes
-auto MultiFormPen       = gsl::narrow_cast<HPEN>(nullptr); // multiple selected forms pen
-
-// brushes
-auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
-auto DefaultColorBrush = std::array<HBRUSH, COLORCNT> {};   // default color brushes
-auto UserColorBrush    = std::array<HBRUSH, COLORCNT> {};   // user color brushes
-
-// for the choose color dialog box
-auto ColorStruct = CHOOSECOLOR {};
-auto CustomColor = std::array<COLORREF, COLORCNT> {};
-
-// for the background color dialog box
-auto BackgroundColorStruct = CHOOSECOLOR {};
-auto CustomBackgroundColor = std::array<COLORREF, COLORCNT> {};
-
-// threads
-auto           ThreadSize          = std::array<wchar_t, COLORCNT> {}; // user selected thread sizes
-auto           ThreadSizePixels    = std::array<int32_t, COLORCNT> {}; // thread sizes in pixels
-auto           ThreadSizeIndex     = std::array<uint32_t, COLORCNT> {}; // thread size indices
-auto           ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size change windows
-constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
-
-// windows
-auto ColorBar              = gsl::narrow_cast<HWND>(nullptr); // color bar
-auto GeneralNumberInputBox = gsl::narrow_cast<HWND>(nullptr); // general number input box
-auto HorizontalScrollBar   = gsl::narrow_cast<HWND>(nullptr); // horizontal scroll bar
-auto SpeedScrollBar        = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
-auto VerticalScrollBar     = gsl::narrow_cast<HWND>(nullptr); // vertical scroll bar
-auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
-
-auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
-auto DisplayedColorBitmap =
-    std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are actually displayed
-auto RotateAngle      = float {};        // angle for pixel rotate
-auto PickColorMsgSize = SIZE {};         // size of the pick color message
-auto InsertSize       = SIZE {};         // size of file insert window
-auto InsertCenter     = F_POINT {};      // center point in inserted file
-auto NumericCode      = wchar_t {};      // keyboard numerical input
-
-auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
-
-// graphics variables
-
+// graphics constants
 constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
                                                                 0x00800000,
                                                                 0x00FF0000,
@@ -380,25 +281,118 @@ constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
                                                                 0x00C0C0C0,
                                                                 0x00FFFFFF};
 
-auto BoxOffset = std::array<int32_t, 4> {};
+// Pens
+auto BackgroundPen  = gsl::narrow_cast<HPEN>(nullptr); // background color pen
+auto BoxPen         = std::array<HPEN, 4> {};          // box pens
+auto CrossPen       = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
+auto GridPen        = gsl::narrow_cast<HPEN>(nullptr); // pen for stitch grid
+auto GroupSelectPen = gsl::narrow_cast<HPEN>(nullptr); // pen for group select
+auto KnotPen        = gsl::narrow_cast<HPEN>(nullptr); // knot pen
+auto LinePen        = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
+auto MultiFormPen   = gsl::narrow_cast<HPEN>(nullptr); // multiple selected forms pen
+auto SelectAllPen   = gsl::narrow_cast<HPEN>(nullptr); // pen for drawing large boxes
+auto ZoomMarkPen    = gsl::narrow_cast<HPEN>(nullptr); // zoom mark pen
 
-auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
+auto BackgroundPenWidth = int32_t {}; // width of the background pen
 
-auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
+// brushes
+auto BackgroundBrush   = gsl::narrow_cast<HBRUSH>(nullptr); // background color brush
+auto DefaultColorBrush = std::array<HBRUSH, COLORCNT> {};   // default color brushes
+auto UserColorBrush    = std::array<HBRUSH, COLORCNT> {};   // user color brushes
 
+// for the choose color dialog box
+auto ColorStruct = CHOOSECOLOR {};
+auto CustomColor = std::array<COLORREF, COLORCNT> {};
+
+// for the background color dialog box
+auto BackgroundColorStruct = CHOOSECOLOR {};
+auto CustomBackgroundColor = std::array<COLORREF, COLORCNT> {};
+
+// threads
+auto ThreadSize       = std::array<wchar_t, COLORCNT> {};  // user selected thread sizes
+auto ThreadSize30     = TSIZ30;                            // #30 thread size
+auto ThreadSize40     = TSIZ40;                            // #40 thread size
+auto ThreadSize60     = TSIZ60;                            // #60 thread size
+auto ThreadSizeIndex  = std::array<uint32_t, COLORCNT> {}; // thread size indices
+auto ThreadSizePixels = std::array<int32_t, COLORCNT> {};  // thread sizes in pixels
+
+constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
+
+// windows
+auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
+auto ChangeThreadSizeWin = std::array<HWND, 3> {};          // thread size change windows
+auto ColorBar            = gsl::narrow_cast<HWND>(nullptr); // color bar
+auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
+auto GeneralNumberInputBox = gsl::narrow_cast<HWND>(nullptr); // general number input box
+auto HorizontalScrollBar   = gsl::narrow_cast<HWND>(nullptr); // horizontal scroll bar
+auto SpeedScrollBar        = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
+auto VerticalScrollBar     = gsl::narrow_cast<HWND>(nullptr); // vertical scroll bar
+
+// General variables
+auto ArgCount           = int32_t {};                         // command line argument count
+auto ArgList            = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
+auto BoxOffset          = std::array<int32_t, 4> {};
+auto ClipInsertBoxLine  = std::array<POINT, SQPNTS> {}; // for displaying clipboard insert rectangle
+auto ColorBarRect       = RECT {};                      // color bar rectangle
+auto ColorBarSize       = COLSIZ;                       // Color bar width scaled for DPI
+auto CurrentStitchIndex = uint32_t {}; // pointer to the current selection for length search
+auto DisplayedColorBitmap = std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are displayed
+auto ExtendedHeader   = THR_HEAD_EX {};                          // ThrEd file header extension
+auto FileVersionIndex = uint8_t {};                              // points to old version to be read
+auto HorizontalRatio = float {}; // horizontal ratio between the zoom window and the entire stitch space
+auto InsertCenter           = F_POINT {};  // center point in inserted file
+auto InsertSize             = SIZE {};     // size of file insert window
+auto InsertedFormIndex      = uint32_t {}; // saved form pointer for inserting files
+auto InsertedStitchIndex    = uint32_t {}; // saved stitch pointer for inserting files
+auto InsertedVertexIndex    = uint32_t {}; // saved vertex pointer for inserting files
+auto LargestStitchIndex     = uint32_t {}; // pointer to the largest stitch in the selected range
+auto LastKeyCode            = std::numeric_limits<wchar_t>::max(); // last key code
+auto MoveLine0              = std::array<POINT, LNPNTS> {};        // move point line
+auto MoveLine1              = std::array<POINT, LNPNTS> {};        // move point line
+auto MovieTimeStep          = int32_t {};                          // time delay for stitchout
+auto NameDecoder            = std::array<uint8_t, DNDLEN> {};      // designer name decode
+auto NameEncoder            = std::array<uint8_t, DNELEN> {};      // designer name encoding
+auto NameOrder              = std::array<uint32_t, DNLEN> {};      // designer name order table
+auto NearestCount           = uint32_t {};                         // number of boxes selected
+auto NumericCode            = wchar_t {};                          // keyboard numerical input
+auto PickColorMsgSize       = SIZE {};                             // size of the pick color message
+auto PreferenceIndex        = uint32_t {};                  // index to the active preference window
+auto PrevGroupEndStitch     = uint32_t {};                  // higher end of previous selection
+auto PrevGroupStartStitch   = uint32_t {};                  // lower end of previous selection
+auto PreviousFormIndex      = uint32_t {};                  // previously selected form
+auto RotateAngle            = float {};                     // angle for pixel rotate
+auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part of the rotate cross
+auto RotateBoxCrossVertLine = std::array<POINT, LNPNTS> {}; // vertical part of the rotate cross
+auto RotateBoxOutline       = std::array<POINT, SQPNTS> {}; // for drawing the rotate rectangle
+auto RotateBoxToCursorLine = std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
+auto RotationHandleAngle = float {};                       // angle of the rotation handle
+auto RunPoint            = uint32_t {};                    // point for animating stitchout
+auto ScreenSizePixels    = SIZE {};                        // screen size in pixels
+auto ScrollSize          = SCROLSIZ;                       // Scroll bar width scaled for DPI
+auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
+auto SelectBoxSize           = SIZE {};          // size of the select box
+auto SelectedFormsRange      = RANGE {};         // range of selected forms
+auto SelectedRange           = RANGE {};         // first and last stitch for min/max stitch select
+auto ShowStitchThreshold     = SHOPNTS;          // show stitch grid below this zoom level
+auto SideWinMsgIdx           = uint32_t {};      // track current position in SideWindowEntryBuffer
+auto SmallStitchLength       = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
+auto SmallestStitchIndex     = uint32_t {}; // pointer to the smallest stitch in the selected range
+auto SortIndex               = uint32_t {}; // index for stitch search
+auto StitchArrow             = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
+auto StitchBoxesThreshold    = STCHBOX;                        // threshold for drawing stitch boxes
+auto StitchWindowAbsRect     = RECT {};                        // stitch window size,absolute
+auto StitchWindowAspectRatio = float {};                       // aspect ratio of the stitch window
+auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
+auto StitchWindowSize      = SIZE {};                      // size of the stitch window in pixels
+auto StitchesPerFrame      = uint32_t {}; // number of stitches to draw in each frame
+auto ThredDC               = gsl::narrow_cast<HDC>(nullptr); // main device context handle
+auto ThredWindowRect       = RECT {};                        // main window size
 auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
 auto ThumbnailIndex        = uint32_t {}; // index into the thumbnail filname table
-
-auto InsertedVertexIndex = uint32_t {};                  // saved vertex pointer for inserting files
-auto InsertedFormIndex   = uint32_t {};                  // saved form pointer for inserting files
-auto InsertedStitchIndex = uint32_t {};                  // saved stitch pointer for inserting files
-auto MoveLine0           = std::array<POINT, LNPNTS> {}; // move point line
-auto MoveLine1           = std::array<POINT, LNPNTS> {}; // move point line
-auto ClipInsertBoxLine = std::array<POINT, SQPNTS> {}; // for displaying clipboard insert rectangle
-auto RotateBoxOutline  = std::array<POINT, SQPNTS> {}; // for drawing the rotate rectangle
-auto RotateBoxCrossVertLine = std::array<POINT, LNPNTS> {}; // vertical part of the rotate cross
-auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part of the rotate cross
-auto RotateBoxToCursorLine = std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
+auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
+auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
+auto VerticalRatio = float {}; // vertical ratio between the zoom window and the entire stitch space
+auto ZoomMin       = float {}; // minimum allowed zoom value
 
 THR_SINGLE* ThrSingle;
 
