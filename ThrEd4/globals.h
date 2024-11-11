@@ -15,7 +15,7 @@
 
 constexpr auto OLDVER   = wchar_t {4}; // number of old file versions kept
 constexpr auto RES_SIZE = 26;          // reserved for expansion in the ThrEd v1.0 header
-constexpr auto UNDOLEN  = 16U;         // UndoBuffer length
+constexpr auto UNDOLEN  = 16U;         // undoBuffer length
 
 class FORM_VERTICES
 {
@@ -104,7 +104,7 @@ class MY_SINGLE
   std::vector<F_POINT_ATTR> stitchBuffer;
   std::vector<TX_PNT>       texturePointsBuffer;
 
-  std::array<std::vector<uint32_t>, UNDOLEN> UndoBuffer;
+  std::array<std::vector<uint32_t>, UNDOLEN> undoBuffer;
 
   ENUM_MAP<UserFlag> userFlagMap = ENUM_MAP<UserFlag> {0};
   std::vector<HWND>  valueWindow;
