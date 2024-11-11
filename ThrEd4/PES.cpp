@@ -61,10 +61,6 @@
 #include <string>
 #include <vector>
 
-static constexpr uint8_t THUMBHGT = 38U;
-static constexpr uint8_t THUMBWID = 48U;
-using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
-
 #pragma pack(push, 1)
 // clang-format off
 class PECHDR
@@ -257,6 +253,8 @@ class THREAD
   // NOLINTEND(clang-diagnostic-unused-private-field)
 };
 
+// PES internal namespace
+namespace {
 constexpr auto BIT12    = uint32_t {0x800U}; // Set bit 12 if delta is negative
 constexpr auto BIT8     = uint32_t {0x80U};  // Set bit 8 on the upper byte
 constexpr auto BTSPBYTE = 8U;                // bits per byte
@@ -264,9 +262,10 @@ constexpr auto IPECFACT = 3.0F / 5.0F;       // inverse PEC format scale factor
 constexpr auto PECFACT  = 5.0F / 3.0F;       // PEC format scale factor
 constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value positive
 
-// PES internal namespace
-namespace {
-auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
+// thumbnail image size
+static constexpr uint8_t THUMBHGT = 38U;
+static constexpr uint8_t THUMBWID = 48U;
+using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 constexpr auto INDEX00 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
 constexpr auto INDEX01 = THREAD {{.r = 0x1a, .g = 0x0a, .b = 0x94}, "Prussian Blue", "ETP007"};
@@ -387,6 +386,8 @@ constexpr auto IMAGE_WITH_FRAME = imgArray{{
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } 
 }};
 // clang-format on
+
+auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
 
 // Definitions
 auto dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t;
