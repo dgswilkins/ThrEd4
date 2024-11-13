@@ -263,8 +263,8 @@ constexpr auto PECFACT  = 5.0F / 3.0F;       // PEC format scale factor
 constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value positive
 
 // thumbnail image size
-static constexpr uint8_t THUMBHGT = 38U;
-static constexpr uint8_t THUMBWID = 48U;
+constexpr uint8_t THUMBHGT = 38U;
+constexpr uint8_t THUMBWID = 48U;
 using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 constexpr auto INDEX00 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
