@@ -43,7 +43,7 @@ class BAD_COUNTS
 
 // repair internal namespace
 namespace {
-constexpr enum Repair : uint8_t { BADFLT = 1U, BADCLP = 1U << 1U, BADSAT = 1U << 2U, BADTX = 1U << 3U };
+enum Repair : uint8_t { BADFLT = 1U, BADCLP = 1U << 1U, BADSAT = 1U << 2U, BADTX = 1U << 3U };
 
 // Definitions
 void adbad(std::wstring& repairMessage, uint32_t code, uint32_t count);
