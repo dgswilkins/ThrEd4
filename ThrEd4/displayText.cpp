@@ -49,6 +49,8 @@
 
 // displayText internal namespace
 namespace {
+auto OKButton = gsl::narrow_cast<HWND>(nullptr); // ok button
+
 // Definitions
 void bxtxt(uint32_t iButton, uint32_t iMessage);
 auto clpmsgs(uint32_t code) -> bool;
@@ -86,6 +88,16 @@ void sdmsg() {
 }
 } // namespace
 
+auto displayText::chkok() noexcept -> bool {
+  return thred::chkwnd(OKButton);
+}
+
+auto displayText::destroyOKButton() noexcept -> void {
+  if (OKButton != nullptr) {
+	DestroyWindow(OKButton);
+	OKButton = nullptr;
+  }
+}
 auto displayText::loadStr(uint32_t const stringID) -> std::wstring {
   auto* pBuf  = gsl::narrow_cast<wchar_t*>(nullptr);
   auto  sDest = std::wstring {};

@@ -67,7 +67,6 @@ MSG                            WinMsg                    = {};      // main mess
 RECT                           MsgRect                   = {};      // rectangle containing the text message
 HWND                           MsgWindow                 = nullptr; // message window
 uint32_t                       NewFormVertexCount        = 0U;      // points in the new form
-HWND                           OKButton                  = nullptr; // ok button
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
 float                          PicotSpacing              = IPICSPAC;// space between border picots
 HWND                           PreferencesWindow         = nullptr; // preferences window

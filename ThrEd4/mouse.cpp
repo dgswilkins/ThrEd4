@@ -69,7 +69,6 @@ auto NeedleRightUpCursor   = gsl::narrow_cast<HCURSOR>(nullptr); // right up nee
 auto NeedleUpCursor        = gsl::narrow_cast<HCURSOR>(nullptr); // upright needle
 
 // Definitions
-auto chkok() noexcept -> bool;
 auto finrng(uint32_t find) noexcept -> bool;
 void moveForms();
 
@@ -80,10 +79,6 @@ void unmov();
 void updateCursor();
 
 // Functions
-auto chkok() noexcept -> bool {
-  return thred::chkwnd(OKButton);
-}
-
 auto finrng(uint32_t const find) noexcept -> bool {
   auto const& formList = Instance->formList;
 
@@ -267,7 +262,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	GetWindowRect(FormDataSheet, &formDataRect);
   }
   if (Instance->stateMap.testAndReset(StateFlag::THUMON)) {
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::save();
 	  thred::thumbak();
 	  thred::unmsg();
@@ -397,7 +392,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::DELSFRMS)) { // deleting a group of forms
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::savdo();
 	  Instance->stateMap.reset(StateFlag::DELTO);
 	}
@@ -415,7 +410,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::MOVMSG)) { // tried to move an edited form
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::savdo();
 	  if (!Instance->selectedFormList.empty()) {
 		for (auto const selectedForm : Instance->selectedFormList) {
@@ -471,7 +466,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return thred::updateFillColor();
   }
   if (Instance->stateMap.testAndReset(StateFlag::OSAV)) { // trying to load a new form
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::save();
 	  thred::nuTHRfile();
 	  thred::unmsg();
@@ -486,7 +481,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::FCLOS)) {
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::save();
 	}
 	else {
@@ -498,7 +493,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::SAVEX)) {
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::save();
 	  thred::reldun();
 	}
@@ -544,7 +539,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
   }
   if (Instance->stateMap.testAndReset(StateFlag::NEWBAK)) { // starting a new design
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::unmsg();
 	  thred::save();
 	  thred::newFil();
@@ -559,14 +554,14 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::PRGMSG)) { // deleting backups
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::deldir();
 	  return true;
 	}
   }
   if (Instance->stateMap.test(StateFlag::DELFRM)) { // deleting a form
 	auto code = 0;
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::savdo();
 	  Instance->stateMap.reset(StateFlag::DELTO);
 	  code = 1;
@@ -590,7 +585,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.test(StateFlag::FILMSG)) { // user wants to remove an edited fill
-	if (chkok()) {
+	if (displayText::chkok()) {
 	  thred::savdo();
 	  form::unfil();
 	  thred::coltab();

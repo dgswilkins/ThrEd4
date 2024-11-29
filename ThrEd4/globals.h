@@ -178,7 +178,6 @@ extern MSG   WinMsg;
 extern RECT     MsgRect;
 extern HWND     MsgWindow;
 extern uint32_t NewFormVertexCount;
-extern HWND     OKButton;
 
 extern std::vector<F_POINT>* OutsidePoints;
 

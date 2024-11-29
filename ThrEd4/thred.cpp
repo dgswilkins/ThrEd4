@@ -5089,7 +5089,7 @@ void noMsg() {
   if (DestroyWindow(MsgWindow) != 0) {
 	MsgWindow = nullptr;
   }
-  DestroyWindow(OKButton);
+  displayText::destroyOKButton();
   DestroyWindow(DiscardButton);
   DestroyWindow(CancelButton);
   DestroyWindow(DeleteStitchesDialog);
