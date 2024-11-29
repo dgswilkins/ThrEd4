@@ -23,9 +23,11 @@ namespace displayText {
 void alrotmsg();
 void bfilmsg();
 void butxt(uint32_t iButton, std::wstring const& buttonText);
+auto checkDiscardButton() noexcept -> bool;
 auto chkok() noexcept -> bool;
 void clrhbut(uint32_t startButton);
 void crmsg(fs::path const& fileName);
+auto destroyDiscardButton() noexcept -> void;
 auto destroyOKButton() noexcept -> void;
 void drwtxbut(TXTR_SCREEN const& textureScreen);
 auto filmsgs(uint32_t code) -> bool;

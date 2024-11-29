@@ -5090,7 +5090,7 @@ void noMsg() {
 	MsgWindow = nullptr;
   }
   displayText::destroyOKButton();
-  DestroyWindow(DiscardButton);
+  displayText::destroyDiscardButton();
   DestroyWindow(CancelButton);
   DestroyWindow(DeleteStitchesDialog);
   if (GeneralNumberInputBox != nullptr) {

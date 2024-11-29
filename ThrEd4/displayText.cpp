@@ -50,6 +50,7 @@
 // displayText internal namespace
 namespace {
 auto OKButton = gsl::narrow_cast<HWND>(nullptr); // ok button
+auto DiscardButton = gsl::narrow_cast<HWND>(nullptr); // discard button
 
 // Definitions
 void bxtxt(uint32_t iButton, uint32_t iMessage);
@@ -92,12 +93,24 @@ auto displayText::chkok() noexcept -> bool {
   return thred::chkwnd(OKButton);
 }
 
+auto displayText::checkDiscardButton() noexcept -> bool {
+  return thred::chkwnd(DiscardButton);
+}
+
+auto displayText::destroyDiscardButton() noexcept -> void {
+  if (DiscardButton != nullptr) {
+	DestroyWindow(DiscardButton);
+	DiscardButton = nullptr;
+  }
+}
+
 auto displayText::destroyOKButton() noexcept -> void {
   if (OKButton != nullptr) {
 	DestroyWindow(OKButton);
 	OKButton = nullptr;
   }
 }
+
 auto displayText::loadStr(uint32_t const stringID) -> std::wstring {
   auto* pBuf  = gsl::narrow_cast<wchar_t*>(nullptr);
   auto  sDest = std::wstring {};

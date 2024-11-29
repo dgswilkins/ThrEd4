@@ -268,7 +268,7 @@ auto mouse::handleEitherButtonDown() -> bool {
 	  thred::unmsg();
 	  return true;
 	}
-	if (thred::chkwnd(DiscardButton)) {
+	if (displayText::checkDiscardButton()) {
 	  thred::thumbak();
 	  thred::unmsg();
 	  return true;
@@ -472,7 +472,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::unmsg();
 	  return true;
 	}
-	if (thred::chkwnd(DiscardButton)) {
+	if (displayText::checkDiscardButton()) {
 	  thred::nuTHRfile();
 	  thred::unmsg();
 	  return true;
@@ -497,7 +497,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::save();
 	  thred::reldun();
 	}
-	if (thred::chkwnd(DiscardButton)) {
+	if (displayText::checkDiscardButton()) {
 	  thred::reldun();
 	}
 	thred::unmsg();
@@ -545,7 +545,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::newFil();
 	  return true;
 	}
-	if (thred::chkwnd(DiscardButton)) {
+	if (displayText::checkDiscardButton()) {
 	  thred::unmsg();
 	  thred::newFil();
 	  return true;
