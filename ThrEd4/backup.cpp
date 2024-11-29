@@ -2,6 +2,7 @@
 // Local Headers
 #include "stdafx.h"
 #include "backup.h"
+#include "formForms.h"
 #include "formHeader.h"
 #include "globals.h"
 #include "iniFile.h"
@@ -224,7 +225,7 @@ void backup::bak() {
   thred::undat();
   if (Instance->stateMap.testAndReset(StateFlag::PRFACT)) {
 	Instance->stateMap.reset(StateFlag::WASRT);
-	DestroyWindow(PreferencesWindow);
+	formForms::destroyPreferencesWindow();
 	thred::resetPrefIndex();
 	thred::unsid();
   }

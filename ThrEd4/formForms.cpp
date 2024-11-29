@@ -118,6 +118,7 @@ auto LabelWindowCoords = RECT {}; // location of left windows in the form data s
 auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
 auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
 auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
+auto PreferencesWindow = HWND {}; // preferences window
 
 // Definitions
 void chkdaz();
@@ -919,7 +920,7 @@ void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std:
 void formForms::refrm() {
   auto& form = Instance->formList.operator[](ClosestFormToCursor);
   if (Instance->stateMap.testAndReset(StateFlag::PRFACT)) {
-	DestroyWindow(PreferencesWindow);
+	destroyPreferencesWindow();
 	Instance->stateMap.reset(StateFlag::WASRT);
   }
   LabelWindowSize = ValueWindowSize = {};
@@ -1007,7 +1008,7 @@ void formForms::prfmsg() {
   LabelWindowSize    = maxwid();
   LabelWindowSize.cx += TXTMARG2;
   maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
-  DestroyWindow(PreferencesWindow);
+  destroyPreferencesWindow();
   auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
   PreferencesWindow      = CreateWindow(L"STATIC",
                                    nullptr,
@@ -1416,4 +1417,19 @@ void formForms::wavfrm() {
   NewFormVertexCount  = vertexCount + 1U;
   form::setmfrm(ClosestFormToCursor);
   form::mdufrm();
+}
+
+void formForms::destroyPreferencesWindow() noexcept {
+  if (PreferencesWindow != nullptr) {
+	DestroyWindow(PreferencesWindow);
+	PreferencesWindow = nullptr;
+  }
+}
+
+void formForms::redrawPreferencesWindow() noexcept {
+  thred::redraw(PreferencesWindow);
+}
+
+void formForms::getPreferencesRect(RECT& prefRect) noexcept {
+  GetWindowRect(PreferencesWindow, &prefRect);
 }

@@ -2246,7 +2246,7 @@ void drwStch() {
 	drwmrk(StitchWindowMemDC);
   }
   if (Instance->stateMap.test(StateFlag::PRFACT)) {
-	thred::redraw(PreferencesWindow);
+	formForms::redrawPreferencesWindow();
   }
   if (Instance->stateMap.test(StateFlag::SELBOX)) {
 	displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
@@ -3895,7 +3895,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 		  }
 		}
 		if (Instance->stateMap.test(StateFlag::PRFACT)) {
-		  thred::redraw(PreferencesWindow);
+		  formForms::redrawPreferencesWindow();
 		}
 		else {
 		  if (Instance->stateMap.test(StateFlag::MOVFRM)) {
@@ -4136,7 +4136,7 @@ auto handleWndProcWMHSCROLL(WPARAM const& wParam, float const LINSCROL, LPARAM l
 
 void handleWndProcWMINITMENU() {
   if (Instance->stateMap.testAndReset(StateFlag::PRFACT)) {
-	DestroyWindow(PreferencesWindow);
+	formForms::destroyPreferencesWindow();
 	Instance->stateMap.reset(StateFlag::WASRT);
   }
   thred::unmsg();
@@ -5930,7 +5930,7 @@ void resetState() {
   Instance->selectedFormList.clear();
   Instance->selectedFormList.shrink_to_fit();
   if (Instance->stateMap.test(StateFlag::PRFACT)) {
-	DestroyWindow(PreferencesWindow);
+	formForms::destroyPreferencesWindow();
 	PreferenceIndex = 0;
   }
   bitmap::resetBmpFile(true);
@@ -6673,7 +6673,7 @@ void sidhup() {
   auto preferencesRectangle = RECT {};
   Instance->stateMap.set(StateFlag::HUPMSG);
   GetWindowRect(Instance->valueWindow.operator[](PRFHUPTYP), &hoopRectangle);
-  GetWindowRect(PreferencesWindow, &preferencesRectangle);
+  formForms::getPreferencesRect(preferencesRectangle);
   constexpr auto SMW_FLAGS = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
   SideMessageWindow        = CreateWindow(L"STATIC",
                                    nullptr,
@@ -7788,7 +7788,7 @@ void thred::rstAll() {
   unsid();
   Instance->stateMap.reset(StateFlag::PRFACT);
   Instance->stateMap.reset(StateFlag::WASRT);
-  DestroyWindow(PreferencesWindow);
+  formForms::destroyPreferencesWindow();
   undat();
   if (Instance->stateMap.testAndReset(StateFlag::INSFRM)) {
 	insadj();
@@ -8154,7 +8154,7 @@ void thred::dun() {
   texture::txof();
   texture::rstxt();
   if (Instance->stateMap.testAndReset(StateFlag::PRFACT)) {
-	DestroyWindow(PreferencesWindow);
+	formForms::destroyPreferencesWindow();
 	Instance->stateMap.reset(StateFlag::WASRT);
   }
   unsid();
@@ -11247,7 +11247,7 @@ auto thred::unselectAll() -> bool {
 	  PreferenceIndex = 0;
 	  return true;
 	}
-	DestroyWindow(PreferencesWindow);
+	formForms::destroyPreferencesWindow();
 	Instance->stateMap.reset(StateFlag::PRFACT);
 	if (Instance->stateMap.testAndReset(StateFlag::WASRT)) {
 	  Instance->stateMap.set(StateFlag::INSRT);
