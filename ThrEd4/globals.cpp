@@ -36,7 +36,6 @@ int32_t                        ButtonHeight              = 0;       // button he
 int32_t                        ButtonWidth               = 0;       // button width
 int32_t                        ButtonWidthX3             = 0;       // button width times 3
 float                          ButtonholeCornerLength    = IBFCLEN; // buttonhole corner length
-HWND                           CancelButton              = nullptr; // cancel button
 uint32_t                       Clip                      = 0U;      // pcs format clipboard handle
 HGLOBAL                        ClipMemory                = nullptr; // handle to the clipboard memory
 F_LSIZ                         ClipRectSize              = {};      // clipboard rectangle size

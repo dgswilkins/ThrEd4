@@ -485,7 +485,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::save();
 	}
 	else {
-	  if (!thred::chkwnd(CancelButton)) {
+	  if (!displayText::checkCancelButton()) {
 		thred::closfn();
 	  }
 	}

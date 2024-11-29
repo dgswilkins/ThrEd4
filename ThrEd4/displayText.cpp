@@ -49,8 +49,9 @@
 
 // displayText internal namespace
 namespace {
-auto OKButton = gsl::narrow_cast<HWND>(nullptr); // ok button
+auto CancelButton  = gsl::narrow_cast<HWND>(nullptr); // cancel button
 auto DiscardButton = gsl::narrow_cast<HWND>(nullptr); // discard button
+auto OKButton      = gsl::narrow_cast<HWND>(nullptr); // ok button
 
 // Definitions
 void bxtxt(uint32_t iButton, uint32_t iMessage);
@@ -91,6 +92,17 @@ void sdmsg() {
 
 auto displayText::chkok() noexcept -> bool {
   return thred::chkwnd(OKButton);
+}
+
+auto displayText::checkCancelButton() noexcept -> bool {
+  return thred::chkwnd(CancelButton);
+}
+
+auto displayText::destroyCancelButton() noexcept -> void {
+  if (CancelButton != nullptr) {
+	DestroyWindow(CancelButton);
+	CancelButton = nullptr;
+  }
 }
 
 auto displayText::checkDiscardButton() noexcept -> bool {
