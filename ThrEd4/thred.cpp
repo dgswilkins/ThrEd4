@@ -426,6 +426,9 @@ void delknt();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
 void destroyBV() noexcept;
+void DestroyDelStitchDlg() noexcept;
+void destroyGenNumBox() noexcept;
+void destroyMsgWindow() noexcept;
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
@@ -5085,19 +5088,34 @@ auto getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
   return true;
 }
 
-void noMsg() {
-  if (DestroyWindow(MsgWindow) != 0) {
+void destroyMsgWindow() noexcept {
+  if (MsgWindow != nullptr) {
+	DestroyWindow(MsgWindow);
 	MsgWindow = nullptr;
   }
+}
+
+void destroyGenNumBox() noexcept {
+  if (GeneralNumberInputBox != nullptr) {
+	DestroyWindow(GeneralNumberInputBox);
+	GeneralNumberInputBox = nullptr;
+  }
+}
+
+void DestroyDelStitchDlg() noexcept {
+  if (DeleteStitchesDialog != nullptr) {
+	DestroyWindow(DeleteStitchesDialog);
+	DeleteStitchesDialog = nullptr;
+  }
+}
+
+void noMsg() {
+  destroyMsgWindow();
   displayText::destroyOKButton();
   displayText::destroyDiscardButton();
   displayText::destroyCancelButton();
-  DestroyWindow(DeleteStitchesDialog);
-  if (GeneralNumberInputBox != nullptr) {
-	if (DestroyWindow(GeneralNumberInputBox) != 0) {
-	  GeneralNumberInputBox = nullptr;
-	}
-  }
+  DestroyDelStitchDlg();
+  destroyGenNumBox();
   if (Instance->stateMap.testAndReset(StateFlag::NUMIN) || FormMenuChoice != 0U || PreferenceIndex != 0U) {
 	chknum();
   }
