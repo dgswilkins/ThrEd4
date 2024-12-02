@@ -427,7 +427,6 @@ void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
 void destroyBV() noexcept;
 void DestroyDelStitchDlg() noexcept;
-void destroyGenNumBox() noexcept;
 void destroyMsgWindow() noexcept;
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
@@ -5099,13 +5098,6 @@ void destroyMsgWindow() noexcept {
   }
 }
 
-void destroyGenNumBox() noexcept {
-  if (GeneralNumberInputBox != nullptr) {
-	DestroyWindow(GeneralNumberInputBox);
-	GeneralNumberInputBox = nullptr;
-  }
-}
-
 void DestroyDelStitchDlg() noexcept {
   if (DeleteStitchesDialog != nullptr) {
 	DestroyWindow(DeleteStitchesDialog);
@@ -5119,7 +5111,7 @@ void noMsg() {
   displayText::destroyDiscardButton();
   displayText::destroyCancelButton();
   DestroyDelStitchDlg();
-  destroyGenNumBox();
+  thred::destroyGeneralNumberInputBox();
   if (Instance->stateMap.testAndReset(StateFlag::NUMIN) || FormMenuChoice != 0U || PreferenceIndex != 0U) {
 	chknum();
   }
