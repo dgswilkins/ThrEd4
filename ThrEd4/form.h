@@ -38,7 +38,7 @@ void cntrx();
 void col2frm();
 void contfil();
 void cpylayr(uint32_t layer);
-void createFormSelectedPen();
+void createFormSelectedPen() noexcept;
 void createLayerPens() noexcept;
 void crop();
 void debean();

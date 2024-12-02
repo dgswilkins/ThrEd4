@@ -4444,9 +4444,7 @@ void init() {
   GroupSelectPen = wrap::createPen(PS_SOLID, PENNWID, PENPRPLE);
   GridPen        = wrap::createPen(PS_SOLID, PENNWID, IniFile.gridColor);
   BackgroundPen  = wrap::createPen(PS_SOLID, PENMWID, BackgroundColor);
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const bitmapPen = wrap::createPen(PS_SOLID, PENNWID, bitmap::getBmpColor());
-  bitmap::setBitmapPen(bitmapPen);
+  bitmap::createBitmapPen();
   FormPen         = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
   MultiFormPen    = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
   FormPen3px      = wrap::createPen(PS_SOLID, PENMWID, PENSILVR);

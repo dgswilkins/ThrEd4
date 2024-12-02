@@ -659,11 +659,9 @@ void bitmap::setBitmapColor(COLORREF const& newColor) noexcept {
   BitmapColor = newColor;
 }
 
-// ReSharper disable once CppParameterMayBeConst
-void bitmap::setBitmapPen(HPEN pen) noexcept {
-  BitmapPen = pen;
+void bitmap::createBitmapPen() noexcept {
+  BitmapPen = wrap::createPen(PS_SOLID, PENNWID, BitmapColor);
 }
-// ReSharper restore CppParameterMayBeConst
 
 void bitmap::resetDC() noexcept {
   DeleteObject(TraceBitmap);

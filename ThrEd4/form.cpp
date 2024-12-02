@@ -9350,6 +9350,6 @@ void form::createLayerPens() noexcept {
   LayerPen[4] = wrap::createPen(PS_SOLID, PENNWID, PENTEAL);
 }
 
-void form::createFormSelectedPen() {
+void form::createFormSelectedPen() noexcept {
   FormSelectedPen = wrap::createPen(PS_SOLID, PENNWID, PENSEGRN);
 }

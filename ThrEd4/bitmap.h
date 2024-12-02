@@ -46,7 +46,7 @@ void resetBmpFile(bool reset);
 void resetDC() noexcept;
 void savmap();
 void setBitmapColor(COLORREF const& newColor) noexcept;
-void setBitmapPen(HPEN pen) noexcept;
+void createBitmapPen() noexcept;
 void setBmpBackColor();
 void setBmpColor();
 } // namespace bitmap
