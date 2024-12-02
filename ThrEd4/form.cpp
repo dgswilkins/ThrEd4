@@ -9342,7 +9342,7 @@ void form::srtfrm() {
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
-void form::setLayerPens() noexcept {
+void form::createLayerPens() noexcept {
   LayerPen[0] = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
   LayerPen[1] = wrap::createPen(PS_SOLID, PENNWID, PENTRQSE);
   LayerPen[2] = wrap::createPen(PS_SOLID, PENNWID, PENLILAC);

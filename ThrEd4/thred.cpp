@@ -4454,7 +4454,7 @@ void init() {
   ZoomMarkPen     = wrap::createPen(PS_SOLID, PENMWID, PENLMGRN);
   SelectAllPen    = wrap::createPen(PS_SOLID, PENNWID, PENROSY);
   KnotPen         = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
-  form::setLayerPens();
+  form::createLayerPens();
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
   auto tsi           = ThreadSizeIndex.begin();
