@@ -3318,7 +3318,7 @@ void handleChkMsgWMCOMMAND(F_POINT& rotationCenter) {
   }
   auto const wParameter = LOWORD(WinMsg.wParam);
   if (wParameter >= ID_FILE_OPEN1 && wParameter <= ID_AUXPES) {
-	thred::undat();
+	thred::destroyFormDataSheet();
   }
   if (menu::handleMainMenu(wParameter, rotationCenter)) {
 	return;
@@ -4140,7 +4140,7 @@ void handleWndProcWMINITMENU() {
 	Instance->stateMap.reset(StateFlag::WASRT);
   }
   thred::unmsg();
-  thred::undat();
+  thred::destroyFormDataSheet();
   Instance->stateMap.reset(StateFlag::FORMIN);
   Instance->stateMap.set(StateFlag::RESTCH);
 }
@@ -7330,7 +7330,7 @@ void thred::getdes() noexcept {
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, &dnamproc);
 }
 
-void thred::undat() noexcept {
+void thred::destroyFormDataSheet() noexcept {
   if (FormDataSheet != nullptr) {
 	DestroyWindow(FormDataSheet);
 	FormDataSheet = nullptr;
@@ -7789,7 +7789,7 @@ void thred::rstAll() {
   Instance->stateMap.reset(StateFlag::PRFACT);
   Instance->stateMap.reset(StateFlag::WASRT);
   formForms::destroyPreferencesWindow();
-  undat();
+  destroyFormDataSheet();
   if (Instance->stateMap.testAndReset(StateFlag::INSFRM)) {
 	insadj();
   }
@@ -9399,7 +9399,7 @@ void thred::deltot() {
 }
 
 void thred::delet() {
-  undat();
+  destroyFormDataSheet();
   auto& formList = Instance->formList;
 
   if (Instance->stateMap.testAndReset(StateFlag::FPSEL)) {
@@ -10305,7 +10305,7 @@ auto thred::inrng(uint32_t const iStitch) noexcept -> bool {
 void thred::thumnail() {
   auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
   unbsho();
-  undat();
+  destroyFormDataSheet();
   trace::untrace();
   current_path(ThrSingle->DefaultDirectory);
   auto const searchName = ThrSingle->DefaultDirectory / L"*.thr";
@@ -11408,7 +11408,7 @@ void thred::handleFormSelected() {
 	return;
   }
   if (FormDataSheet != nullptr) {
-	undat();
+	destroyFormDataSheet();
 	unsid();
 	FormMenuChoice = 0;
 	Instance->stateMap.set(StateFlag::RESTCH);
@@ -11847,8 +11847,7 @@ auto thred::handleSideWindowActive() -> bool {
   }
   if (textureFlag) {
 	unsid();
-	DestroyWindow(FormDataSheet);
-	FormDataSheet = nullptr;
+	destroyFormDataSheet();
 	Instance->stateMap.set(StateFlag::WASFRMFRM);
   }
   else {
@@ -12644,7 +12643,7 @@ void thred::openNewFile() {
 	displayText::savdisc();
 	Instance->stateMap.set(StateFlag::NEWBAK);
 	Instance->stateMap.reset(StateFlag::PRFACT);
-	undat();
+	destroyFormDataSheet();
   }
 }
 

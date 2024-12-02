@@ -6462,7 +6462,7 @@ void form::refil(uint32_t const formIndex) {
   if (FormDataSheet != nullptr) {
 	Instance->stateMap.set(StateFlag::WASFRMFRM);
   }
-  thred::undat();
+  thred::destroyFormDataSheet();
   if (nullptr == MsgWindow) {
 	displayText::tabmsg(IDS_REFIL, true);
 	displayText::okcan();

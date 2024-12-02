@@ -244,7 +244,7 @@ void unbBox();
 void unbox();
 void unbsho();
 void unclp();
-void undat() noexcept;
+void destroyFormDataSheet() noexcept;
 void unlin();
 void unmsg();
 void unpat();
