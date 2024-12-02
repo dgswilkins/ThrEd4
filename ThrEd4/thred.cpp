@@ -428,6 +428,7 @@ void delstch1(uint32_t iStitch);
 void destroyBV() noexcept;
 void DestroyDelStitchDlg() noexcept;
 void destroyMsgWindow() noexcept;
+void destroySpeedScrollBar() noexcept;
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
@@ -5910,6 +5911,14 @@ void relin() {
   dulin(MoveLine0, MoveLine1);
 }
 
+void destroySpeedScrollBar() noexcept {
+  if (nullptr == SpeedScrollBar) {
+	return;
+  }
+  DestroyWindow(SpeedScrollBar);
+  SpeedScrollBar = nullptr;
+}
+
 void resetState() {
   fnamtabs();
   trace::untrace();
@@ -5937,7 +5946,7 @@ void resetState() {
   ZoomFactor = 1;
   thred::resetNearest();
   if (Instance->stateMap.testAndReset(StateFlag::WASPAT)) {
-	DestroyWindow(SpeedScrollBar);
+	destroySpeedScrollBar();
   }
   auto textureHistoryFlag = false;
   if (Instance->stateMap.test(StateFlag::WASTXBAK)) {
@@ -9335,7 +9344,7 @@ void thred::unpat() {
 	return;
   }
   ShowWindow(SpeedScrollBar, SW_HIDE);
-  DestroyWindow(SpeedScrollBar);
+  destroySpeedScrollBar();
   movStch();
   Instance->stateMap.set(StateFlag::RESTCH);
 }
@@ -11289,7 +11298,7 @@ void thred::esccode() {
   Instance->stateMap.reset(StateFlag::GTUSPAC);
   Instance->stateMap.reset(StateFlag::GTWLKIND);
   Instance->stateMap.reset(StateFlag::GTWLKLEN);
-  DestroyWindow(SpeedScrollBar);
+  destroySpeedScrollBar();
   Instance->stateMap.reset(StateFlag::GMRK);
   Instance->stateMap.reset(StateFlag::FORMSEL);
   Instance->selectedFormList.clear();
