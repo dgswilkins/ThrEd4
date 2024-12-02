@@ -38,6 +38,7 @@ void cntrx();
 void col2frm();
 void contfil();
 void cpylayr(uint32_t layer);
+void createFormSelectedPen();
 void crop();
 void debean();
 void delflt(uint32_t formIndex) noexcept(!std::is_same_v<ptrdiff_t, int>);

@@ -4450,7 +4450,7 @@ void init() {
   FormPen         = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
   MultiFormPen    = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
   FormPen3px      = wrap::createPen(PS_SOLID, PENMWID, PENSILVR);
-  FormSelectedPen = wrap::createPen(PS_SOLID, PENNWID, PENSEGRN);
+  form::createFormSelectedPen();
   ZoomMarkPen     = wrap::createPen(PS_SOLID, PENMWID, PENLMGRN);
   SelectAllPen    = wrap::createPen(PS_SOLID, PENNWID, PENROSY);
   KnotPen         = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);

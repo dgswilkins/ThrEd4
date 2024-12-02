@@ -50,7 +50,6 @@ uint32_t                       FormMenuChoice            = 0U;      // data type
 F_POINT                        FormMoveDelta             = F_POINT {}; // offset for moving forms
 HPEN                           FormPen                   = nullptr; // form pen
 HPEN                           FormPen3px                = nullptr; // three-pixel form pen
-HPEN                           FormSelectedPen           = nullptr; // form select pen
 uint32_t                       GroupEndStitch            = 0U;      // higher end of selected stitches
 uint32_t                       GroupStartStitch          = 0U;      // lower end of selected stitches
 uint32_t                       GroupStitchIndex          = 0U;      // last point selected in group

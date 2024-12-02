@@ -185,7 +185,8 @@ constexpr auto SEQTOP   = int32_t {2};
 
 auto AllItemsRect   = F_RECTANGLE {};                  // bounding rectangle for all items
 auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
-auto FormVertexNext = uint32_t {};                     // form vertex storage for form vertex insert
+auto FormSelectedPen = HPEN {};                         // form select pen
+auto FormVertexNext  = uint32_t {}; // form vertex storage for form vertex insert
 auto FormVertexPrev = uint32_t {};                     // form vertex storage for form vertex insert
 auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
 auto MaxStitchLen   = float {};                        // maximum stitch length
@@ -9347,4 +9348,8 @@ void form::setLayerPens() noexcept {
   LayerPen[2] = wrap::createPen(PS_SOLID, PENNWID, PENLILAC);
   LayerPen[3] = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
   LayerPen[4] = wrap::createPen(PS_SOLID, PENNWID, PENTEAL);
+}
+
+void form::createFormSelectedPen() {
+  FormSelectedPen = wrap::createPen(PS_SOLID, PENNWID, PENSEGRN);
 }

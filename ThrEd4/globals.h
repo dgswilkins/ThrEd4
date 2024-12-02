@@ -155,7 +155,6 @@ extern F_POINT  FormMoveDelta;
 
 extern HPEN FormPen3px;
 extern HPEN FormPen;
-extern HPEN FormSelectedPen;
 
 extern uint32_t GroupEndStitch;
 extern uint32_t GroupStartStitch;
