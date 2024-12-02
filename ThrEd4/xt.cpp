@@ -638,7 +638,10 @@ void duxrats(uint32_t const start, uint32_t const finish, F_POINT& point, float 
 // ReSharper disable CppParameterMayBeConst
 auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   UNREFERENCED_PARAMETER(lParam);
-  DestroyWindow(hwnd);
+  if (nullptr != hwnd) {
+	DestroyWindow(hwnd);
+	hwnd = nullptr;
+  }
   return TRUE;
 }
 // ReSharper restore CppParameterMayBeConst

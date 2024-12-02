@@ -486,7 +486,10 @@ void dutrnum0(uint32_t const colNum) {
   }
   auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
   thred::redraw(*itTraceControlWindow);
-  DestroyWindow(TraceNumberInput);
+  if (nullptr != TraceNumberInput) {
+	DestroyWindow(TraceNumberInput);
+	TraceNumberInput = nullptr;
+  }
   Instance->stateMap.set(StateFlag::WASTRCOL);
   trace::trace();
 }

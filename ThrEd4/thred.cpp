@@ -1803,8 +1803,10 @@ void delstch1(uint32_t const iStitch) {
 
 void destroyBV() noexcept {
   for (auto& iBackup : BackupViewer) {
-	DestroyWindow(iBackup);
-	iBackup = nullptr;
+	if (nullptr != iBackup) {
+	  DestroyWindow(iBackup);
+	  iBackup = nullptr;
+	}
   }
 }
 
@@ -2918,7 +2920,9 @@ void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const finish) {
 auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   UNREFERENCED_PARAMETER(lParam);
   if (oldwnd(hwnd)) {
-	return DestroyWindow(hwnd);
+	auto const retVal = DestroyWindow(hwnd);
+	hwnd        = nullptr;
+	return retVal;
   }
   if (FirstWin != nullptr) {
 	if (FirstWin == hwnd) {
@@ -7540,7 +7544,7 @@ void thred::unbsho() {
 
 void thred::unsid() noexcept {
   FormMenuChoice = 0;
-  if (SideMessageWindow == nullptr) {
+  if (nullptr == SideMessageWindow) {
 	return;
   }
   DestroyWindow(SideMessageWindow);
@@ -9599,7 +9603,7 @@ void thred::movi() {
   if (Instance->stitchBuffer.empty()) {
 	return;
   }
-  if (MsgWindow != nullptr) {
+  if (nullptr != MsgWindow) {
 	DestroyWindow(MsgWindow);
 	MsgWindow = nullptr;
   }
@@ -12652,9 +12656,10 @@ void thred::openBitMapFile() {
 }
 
 void thred::destroyChangeThreadSizeWindows() noexcept {
-  for (auto const& iWindow : ChangeThreadSizeWin) {
-	if (iWindow != nullptr) {
+  for (auto& iWindow : ChangeThreadSizeWin) {
+	if (nullptr != iWindow) {
 	  DestroyWindow(iWindow);
+	  iWindow = nullptr;
 	}
   }
 }
