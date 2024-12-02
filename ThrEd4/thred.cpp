@@ -404,8 +404,7 @@ void boxs();
 auto centr() noexcept -> F_POINT;
 void chk1col();
 auto chk2of() -> bool;
-auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
-    -> bool;
+auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm) -> bool;
 auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
 auto chkattr(fs::path const& filename) -> bool;
 auto chkhid(size_t colorToCheck) -> bool;
@@ -500,8 +499,9 @@ auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool;
 auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool;
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
 void handleSizeRestored(HWND p_hWnd);
-auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
-    -> bool;
+auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
+                           F_POINT&                  rotationCenter,
+                           std::vector<POINT> const& stretchBoxLine) -> bool;
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
 auto handleWndProcWMHSCROLL(WPARAM const& wParam, float LINSCROL, LPARAM lParam) -> bool;
 void handleWndProcWMINITMENU();
@@ -698,8 +698,7 @@ auto chk2of() -> bool {
   return true;
 }
 
-auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
-    -> bool {
+auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm) -> bool {
   if (WinMsg.message == WM_MOUSEMOVE) {
 	return mouse::handleMouseMove(stretchBoxLine, xyRatio, angle, rotationCenter, textureForm);
   }
@@ -2921,7 +2920,7 @@ auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   UNREFERENCED_PARAMETER(lParam);
   if (oldwnd(hwnd)) {
 	auto const retVal = DestroyWindow(hwnd);
-	hwnd        = nullptr;
+	hwnd              = nullptr;
 	return retVal;
   }
   if (FirstWin != nullptr) {
@@ -3690,8 +3689,9 @@ void handleSizeRestored(HWND p_hWnd) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
-    -> bool {
+auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
+                           F_POINT&                  rotationCenter,
+                           std::vector<POINT> const& stretchBoxLine) -> bool {
   auto const code = gsl::narrow<wchar_t>(WinMsg.wParam & 0xffffU);
   if (Instance->stateMap.test(StateFlag::TXTRED)) {
 	texture::txtkey(code, textureForm);
@@ -4445,13 +4445,13 @@ void init() {
   GridPen        = wrap::createPen(PS_SOLID, PENNWID, IniFile.gridColor);
   BackgroundPen  = wrap::createPen(PS_SOLID, PENMWID, BackgroundColor);
   bitmap::createBitmapPen();
-  FormPen         = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
-  MultiFormPen    = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
-  FormPen3px      = wrap::createPen(PS_SOLID, PENMWID, PENSILVR);
+  FormPen      = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
+  MultiFormPen = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
+  FormPen3px   = wrap::createPen(PS_SOLID, PENMWID, PENSILVR);
   form::createFormSelectedPen();
-  ZoomMarkPen     = wrap::createPen(PS_SOLID, PENMWID, PENLMGRN);
-  SelectAllPen    = wrap::createPen(PS_SOLID, PENNWID, PENROSY);
-  KnotPen         = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
+  ZoomMarkPen  = wrap::createPen(PS_SOLID, PENMWID, PENLMGRN);
+  SelectAllPen = wrap::createPen(PS_SOLID, PENNWID, PENROSY);
+  KnotPen      = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
   form::createLayerPens();
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
@@ -6534,8 +6534,7 @@ void selin(uint32_t start, uint32_t end, HDC hDC) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize)
-    -> bool {
+auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool {
   auto const bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
                                               floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
@@ -9118,8 +9117,9 @@ void thred::unrotu() {
   }
 }
 
-auto thred::rotangf(F_POINT const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
-    -> F_POINT {
+auto thred::rotangf(F_POINT const& unrotatedPoint,
+                    float const    rotationAngle,
+                    F_POINT const& rotationCenter) noexcept -> F_POINT {
   auto const deltaX           = unrotatedPoint.x - rotationCenter.x;
   auto const deltaY           = unrotatedPoint.y - rotationCenter.y;
   auto const distanceToCenter = deltaX != 0.0F ? std::hypot(deltaX, deltaY) : std::abs(deltaY);
@@ -9139,8 +9139,9 @@ auto thred::rotangf(F_POINT const& unrotatedPoint, float const rotationAngle, F_
                   rotationCenter.y + (distanceToCenter * sin(newAngle))};
 }
 
-auto thred::rotang1(F_POINT_ATTR const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
-    -> F_POINT {
+auto thred::rotang1(F_POINT_ATTR const& unrotatedPoint,
+                    float const         rotationAngle,
+                    F_POINT const&      rotationCenter) noexcept -> F_POINT {
   auto const point = F_POINT {unrotatedPoint.x, unrotatedPoint.y};
   return rotangf(point, rotationAngle, rotationCenter);
 }
@@ -12300,8 +12301,10 @@ void thred::tst() {
 }
 
 #pragma warning(suppress : 26461) // pointer to const con.3 NOLINTNEXTLINE(readability-non-const-parameter)
-auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd)
-    -> int32_t {
+auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
+                       _In_opt_ HINSTANCE hPrevInstance,
+                       _In_ LPTSTR        lpCmdLine,
+                       _In_ int32_t       nShowCmd) -> int32_t {
   // to keep the compiler from complaining
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);

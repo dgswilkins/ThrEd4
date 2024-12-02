@@ -76,7 +76,7 @@ auto MainMenu       = gsl::narrow_cast<HMENU>(nullptr); // main menu
 auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
 
-auto MenuInfo       = MENUITEMINFO {};
+auto MenuInfo = MENUITEMINFO {};
 
 // Definitions
 void fil2sel(uint32_t stat);

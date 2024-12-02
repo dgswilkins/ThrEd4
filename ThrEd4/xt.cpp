@@ -150,18 +150,18 @@ class ATFLD
 
 // xt internal namespace
 namespace {
-constexpr auto FSED     = uint32_t {1340007303U}; // feather sequence seed
+constexpr auto FSED = uint32_t {1340007303U}; // feather sequence seed
 
 // Type map constants
-constexpr auto M_AP     = 1U << 1U; // Applique
-constexpr auto M_CWLK   = 1U << 2U; // Center walk
-constexpr auto M_WALK   = 1U << 3U; // Walk
-constexpr auto M_UND    = 1U << 4U; // Underlay
-constexpr auto M_FIL    = 1U << 5U; // Fill
-constexpr auto M_FTH    = 1U << 6U; // Feather
-constexpr auto M_BRD    = 1U << 7U; // Border
-constexpr auto M_APCOL  = 1U << 8U; // Applique color
-constexpr auto M_FCOL   = 1U << 9U; // Fill color
+constexpr auto M_AP     = 1U << 1U;  // Applique
+constexpr auto M_CWLK   = 1U << 2U;  // Center walk
+constexpr auto M_WALK   = 1U << 3U;  // Walk
+constexpr auto M_UND    = 1U << 4U;  // Underlay
+constexpr auto M_FIL    = 1U << 5U;  // Fill
+constexpr auto M_FTH    = 1U << 6U;  // Feather
+constexpr auto M_BRD    = 1U << 7U;  // Border
+constexpr auto M_APCOL  = 1U << 8U;  // Applique color
+constexpr auto M_FCOL   = 1U << 9U;  // Fill color
 constexpr auto M_FTHCOL = 1U << 10U; // Feather color
 constexpr auto M_ECOL   = 1U << 11U; // Edge color
 
@@ -205,8 +205,7 @@ void duatf(uint32_t ind);
 #endif
 
 void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData);
-auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
-    -> uint32_t;
+auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord) -> uint32_t;
 
 constexpr auto durat(float start, float finish, float featherRatio) -> float;
 
@@ -249,8 +248,9 @@ auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_PO
 void notundfn(uint32_t code);
 void nudfn(F_RECTANGLE const& designSizeRect) noexcept;
 void nurat(FEATHER& feather) noexcept;
-auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
-    -> double;
+auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
+              std::vector<O_REC*> const& pRecs,
+              SORT_REC const&            sortRecord) -> double;
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
 auto orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool;
 auto orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool;
@@ -568,8 +568,7 @@ void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t cod
   }
 }
 
-auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
-    -> uint32_t {
+auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord) -> uint32_t {
   sortRecord.direction = false;
   auto const jumps0    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
   sortRecord.direction = true;
@@ -1267,8 +1266,9 @@ void nurat(FEATHER& feather) noexcept {
   feather.globalPosition += feather.globalStep;
 }
 
-auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
-    -> double {
+auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
+              std::vector<O_REC*> const& pRecs,
+              SORT_REC const&            sortRecord) -> double {
   auto currentRegion   = sortRecord.currentRegion;
   auto direction       = sortRecord.direction;
   auto formFillCounter = std::vector<uint32_t> {};
@@ -1366,8 +1366,7 @@ auto orComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const
   return false;
 }
 
-auto orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept
-    -> bool {
+auto orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1->form < record2->form) {
 	return true;

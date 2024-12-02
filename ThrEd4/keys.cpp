@@ -840,8 +840,9 @@ void keys::desiz() {
   displayText::shoMsg(info, true);
 }
 
-auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
-    -> bool {
+auto keys::handleMainWinKeys(wchar_t const&            code,
+                             F_POINT&                  rotationCenter,
+                             std::vector<POINT> const& stretchBoxLine) -> bool {
   switch (code) {
 	case VK_ESCAPE: {
 	  thred::esccode();

@@ -935,8 +935,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   return false;
 }
 
-auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F_POINT& rotationCenter, bool& retflag)
-    -> bool {
+auto mouse::handleLeftButtonUp(float const xyRatio, float const rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool {
   retflag = true;
   if (wrap::pressed(VK_SHIFT) && thred::inStitchWin() && !Instance->stateMap.test(StateFlag::TXTRED)) { // shift key pressed as well
 	texture::setshft();

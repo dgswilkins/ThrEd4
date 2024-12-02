@@ -141,8 +141,8 @@ class REGION // region for sequencing vertical fills
   inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsCount) noexcept;
 };
 
-inline REGION::REGION(uint32_t const rhsStart, uint32_t const rhsEnd, uint32_t const rhsCount) noexcept :
-    start(rhsStart), end(rhsEnd), breakCount(rhsCount) {
+inline REGION::REGION(uint32_t const rhsStart, uint32_t const rhsEnd, uint32_t const rhsCount) noexcept
+    : start(rhsStart), end(rhsEnd), breakCount(rhsCount) {
 }
 
 class RG_SEQ // TempPath: temporary path connections
@@ -183,13 +183,13 @@ constexpr auto OUTL_ALL = false; // When selecting multiple forms, should we out
 constexpr auto SEQBOT   = int32_t {3};
 constexpr auto SEQTOP   = int32_t {2};
 
-auto AllItemsRect   = F_RECTANGLE {};                  // bounding rectangle for all items
-auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
+auto AllItemsRect    = F_RECTANGLE {};                  // bounding rectangle for all items
+auto FormForInsert   = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 auto FormSelectedPen = HPEN {};                         // form select pen
-auto FormVertexNext  = uint32_t {}; // form vertex storage for form vertex insert
-auto FormVertexPrev = uint32_t {};                     // form vertex storage for form vertex insert
-auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
-auto MaxStitchLen   = float {};                        // maximum stitch length
+auto FormVertexNext  = uint32_t {};                   // form vertex storage for form vertex insert
+auto FormVertexPrev  = uint32_t {};                   // form vertex storage for form vertex insert
+auto LayerPen        = std::array<HPEN, LAYERMAX> {}; //
+auto MaxStitchLen    = float {};                      // maximum stitch length
 
 // Definitions
 void adfrm(uint32_t iForm);
@@ -301,8 +301,7 @@ void duspnd(float                        stitchLen,
 void fillSB(const F_POINT& pivot, float angle, float const& radius, F_POINT& stitchPoint, float const& level);
 void filsclp();
 void filsfn(uint32_t formIndex);
-auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POINT const& point, float& distance) noexcept
-    -> float;
+auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POINT const& point, float& distance) noexcept -> float;
 void fmclp(FRM_HEAD& form);
 void fnagain(float rotationAngle);
 void fnang(std::vector<uint32_t>&   groupIndexSequence,
@@ -334,8 +333,8 @@ void fsclpx(uint32_t formIndex);
 void fshor(FRM_HEAD& form);
 void fspic(uint32_t formIndex);
 void fsvrt();
-auto getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR> const& stitchBuffer) noexcept
-    -> F_RECTANGLE;
+auto getbig(std::vector<FRM_HEAD> const&     formList,
+            std::vector<F_POINT_ATTR> const& stitchBuffer) noexcept -> F_RECTANGLE;
 auto getlen(std::vector<CLIP_PNT>&    clipStitchPoints,
             std::vector<float> const& lengths,
             uint32_t                  iPoint,
@@ -356,8 +355,10 @@ auto insect(FRM_HEAD const&             form,
             F_POINT const&              lineSegmentEnd,
             std::vector<F_POINT> const& currentFormVertices) -> uint32_t;
 void inspnt(std::vector<CLIP_PNT>& clipStitchPoints);
-auto isclos(std::vector<SMAL_PNT_L> const& lineEndpoints, uint32_t line0Index, uint32_t line1Index, float gapToClosestRegion) noexcept
-    -> bool;
+auto isclos(std::vector<SMAL_PNT_L> const& lineEndpoints,
+            uint32_t                       line0Index,
+            uint32_t                       line1Index,
+            float                          gapToClosestRegion) noexcept -> bool;
 auto isect(uint32_t       vertex0,
            uint32_t       vertex1,
            F_POINT&       intersection,
@@ -431,12 +432,9 @@ void plfn(FRM_HEAD const&              form,
           float                        width,
           F_POINT&                     stitchPoint);
 void prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
-auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
-    -> bool;
-auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept
-    -> bool;
-auto projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoint, F_POINT& intersection) noexcept
-    -> bool;
+auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept -> bool;
+auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept -> bool;
+auto projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoint, F_POINT& intersection) noexcept -> bool;
 void prpsbrd(uint32_t formIndex);
 void prsmal(float width);
 auto px2stchf(POINT const& screen) noexcept -> F_POINT;
@@ -806,8 +804,7 @@ void setzig() {
   thred::numWnd();
 }
 
-auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POINT const& point, float& distance) noexcept
-    -> float {
+auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POINT const& point, float& distance) noexcept -> float {
   auto const varA = point.x - lineStart.x;
   auto const varB = point.y - lineStart.y;
   auto const varC = lineEnd.x - lineStart.x;
@@ -1012,8 +1009,7 @@ void bold(FRM_HEAD const& form) {
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-auto projh(float const yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept
-    -> bool {
+auto projh(float const yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept -> bool {
   auto const deltaX = point1.x - point0.x;
   intersection.y    = yCoordinate;
   if (deltaX != 0.0F) {
@@ -2041,8 +2037,8 @@ auto isect(uint32_t const vertex0,
   return flag;
 }
 
-auto clipComp(const gsl::not_null<CLIP_SORT const*> arg1, const gsl::not_null<CLIP_SORT const*> arg2) noexcept
-    -> bool {
+auto clipComp(const gsl::not_null<CLIP_SORT const*> arg1,
+              const gsl::not_null<CLIP_SORT const*> arg2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   auto const local1 = arg1->segmentLength;
   auto const local2 = arg2->segmentLength;
@@ -3832,8 +3828,7 @@ void bakseq() {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-auto projv(float const xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoint, F_POINT& intersection) noexcept
-    -> bool {
+auto projv(float const xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoint, F_POINT& intersection) noexcept -> bool {
   auto const deltaX = upperPoint.x - lowerPoint.x;
   if (deltaX == 0.0F) {
 	return false;
@@ -3848,8 +3843,11 @@ auto projv(float const xCoordinate, F_POINT const& lowerPoint, F_POINT const& up
   return xCoordinate >= lower && xCoordinate <= upper;
 }
 
-auto proj(F_POINT const& point, float const slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
-    -> bool {
+auto proj(F_POINT const& point,
+          float const    slope,
+          F_POINT const& point0,
+          F_POINT const& point1,
+          F_POINT&       intersectionPoint) noexcept -> bool {
   auto const delta = F_POINT {point1.x - point0.x, point1.y - point0.y};
   if (delta.x != 0.0F) {
 	auto const sideSlope     = delta.y / delta.x;
@@ -4523,8 +4521,8 @@ void sapliq(uint32_t const formIndex) {
   form::refilfn(formIndex);
 }
 
-auto getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR> const& stitchBuffer) noexcept
-    -> F_RECTANGLE {
+auto getbig(std::vector<FRM_HEAD> const&     formList,
+            std::vector<F_POINT_ATTR> const& stitchBuffer) noexcept -> F_RECTANGLE {
   auto allItemsRect = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
   for (auto const& iForm : formList) {
 	auto const& trct    = iForm.rectangle;
@@ -4716,16 +4714,16 @@ void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std:
   auto const stitchWindowX = thred::getStitchWindowX();
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto timeWindow = CreateWindow(L"STATIC",
-                                       nullptr,
-                                       WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                       ButtonWidthX3,
-                                       0,
-                                       stitchWindowX,
-                                       ButtonHeight,
-                                       ThrEdWindow,
-                                       nullptr,
-                                       ThrEdInstance,
-                                       nullptr);
+                                 nullptr,
+                                 WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                 ButtonWidthX3,
+                                 0,
+                                 stitchWindowX,
+                                 ButtonHeight,
+                                 ThrEdWindow,
+                                 nullptr,
+                                 ThrEdInstance,
+                                 nullptr);
 
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const timeDC       = GetDC(timeWindow);
@@ -6571,8 +6569,7 @@ void form::filangl() {
   }
 }
 
-auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
-    -> bool {
+auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto const point = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = Instance->formList.operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;

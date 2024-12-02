@@ -194,8 +194,8 @@ class PESLED
 class PESSTCHLST
 {
   public:
-  explicit constexpr PESSTCHLST(uint16_t const stype, uint16_t const tIndex, uint16_t const count) noexcept :
-      m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
+  explicit constexpr PESSTCHLST(uint16_t const stype, uint16_t const tIndex, uint16_t const count) noexcept
+      : m_stitchType(stype), m_threadIndex(tIndex), m_stitchCount(count) {
   }
 
   void setStitchType(uint32_t const stype) {
@@ -233,8 +233,8 @@ inline auto PESTCH::operator=(F_POINT const& rhs) -> PESTCH& {
 class THREAD
 {
   public:
-  explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept :
-      m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
+  explicit constexpr THREAD(PEC_COLOR const& color, char const* description, char const* catalogNumber) noexcept
+      : m_color(color), m_description(description), m_catalogNumber(catalogNumber) {
   }
 
   [[nodiscard]] constexpr auto getColor() const noexcept -> PEC_COLOR const& {
@@ -265,7 +265,7 @@ constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value posit
 // thumbnail image size
 constexpr uint8_t THUMBHGT = 38U;
 constexpr uint8_t THUMBWID = 48U;
-using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
+using imgArray             = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
 constexpr auto INDEX00 = THREAD {{.r = 0x00, .g = 0x00, .b = 0x00}, "Unknown", ""};
 constexpr auto INDEX01 = THREAD {{.r = 0x1a, .g = 0x0a, .b = 0x94}, "Prussian Blue", "ETP007"};

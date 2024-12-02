@@ -119,12 +119,12 @@ constexpr auto TRBASE   = 0.1F;             // Trace ratio base
 constexpr auto TROFF    = 1.0F;             // Trace ratio offset
 
 // trace colors
-constexpr auto BLUCOL = uint32_t {0xff0000U}; // code for the color blue
-constexpr auto BLUMSK = uint32_t {0x00ffffU}; // mask for the color blue
-constexpr auto GRNCOL = uint32_t {0x00ff00U}; // code for the color green
-constexpr auto GRNMSK = uint32_t {0xff00ffU}; // mask for the color green
-constexpr auto REDCOL = uint32_t {0x0000ffU}; // code for the color red
-constexpr auto REDMSK = uint32_t {0xffff00U}; // mask for the color red
+constexpr auto BLUCOL    = uint32_t {0xff0000U};                // code for the color blue
+constexpr auto BLUMSK    = uint32_t {0x00ffffU};                // mask for the color blue
+constexpr auto GRNCOL    = uint32_t {0x00ff00U};                // code for the color green
+constexpr auto GRNMSK    = uint32_t {0xff00ffU};                // mask for the color green
+constexpr auto REDCOL    = uint32_t {0x0000ffU};                // code for the color red
+constexpr auto REDMSK    = uint32_t {0xffff00U};                // mask for the color red
 constexpr auto TRACE_RGB = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
 constexpr auto TRACE_RGB_FLAG = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
 constexpr auto TRACE_RGB_MASK = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
@@ -149,12 +149,12 @@ auto UpPixelColor     = COLORREF {};               // color of the up reference 
 TRACE_SINGLE* TraceInstance;
 
 // Trace windows
-auto TraceControlWindow  = std::array<HWND, CHANLCNT> {};     // trace control windows
-auto TraceDownWindow     = std::array<HWND, CHANLCNT> {};     // trace down number windows
-auto TraceSelectWindow   = std::array<HWND, CHANLCNT> {};     // trace select windows
-auto TraceUpWindow       = std::array<HWND, CHANLCNT> {};     // trace up number windows
-auto TraceNumberInput    = gsl::narrow_cast<HWND>(nullptr);   // trace number input window
-auto TraceStepWin        = gsl::narrow_cast<HWND>(nullptr);   // trace stepSize window
+auto TraceControlWindow = std::array<HWND, CHANLCNT> {};   // trace control windows
+auto TraceDownWindow    = std::array<HWND, CHANLCNT> {};   // trace down number windows
+auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {};   // trace select windows
+auto TraceUpWindow      = std::array<HWND, CHANLCNT> {};   // trace up number windows
+auto TraceNumberInput   = gsl::narrow_cast<HWND>(nullptr); // trace number input window
+auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
 
 // Definitions
 void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst);
@@ -579,8 +579,7 @@ void tracwnd() {
   showTraceWin();
 }
 
-auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
-    -> bool {
+auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool {
   auto const& tracedEdges = TraceInstance->TracedEdges;
   auto        pixelIndex  = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
