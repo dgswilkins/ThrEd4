@@ -34,7 +34,6 @@
 
 // Windows Header Files:
 #include <windef.h> // Win32 header
-#include <WinUser.h>
 
 // Standard Libraries
 // ReSharper disable CppUnusedIncludeDirective
