@@ -146,6 +146,7 @@ auto chkbut() -> bool;
 auto chktxh(_In_ TX_HIST const& historyItem) noexcept(std::is_same_v<size_t, uint32_t>) -> bool;
 void chktxnum();
 void deorg(POINT& point) noexcept;
+void destroySideWindowButton() noexcept;
 void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer);
 void dutxfn(uint32_t textureType);
 void dutxlin(F_POINT const& point0in, F_POINT const& point1in);
@@ -548,10 +549,17 @@ void txcntrv(FRM_HEAD const& textureForm) {
   }
 }
 
-void txdelal() {
-  Instance->textureInputBuffer.clear();
+void destroySideWindowButton() noexcept {
+  if (nullptr == SideWindowButton) {
+	return;
+  }
   DestroyWindow(SideWindowButton);
   SideWindowButton = nullptr;
+}
+
+void txdelal() {
+  Instance->textureInputBuffer.clear();
+  destroySideWindowButton();
   Instance->stateMap.set(StateFlag::RESTCH);
   texture::savtxt();
   TextureInstance->TempTexturePoints.clear();
@@ -943,8 +951,7 @@ void chktxnum() {
 	  }
 	}
   }
-  DestroyWindow(SideWindowButton);
-  SideWindowButton = nullptr;
+  destroySideWindowButton();
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
@@ -1309,8 +1316,7 @@ void texture::rstxt() {
   Instance->stateMap.reset(StateFlag::BZUMIN);
   Instance->stateMap.set(StateFlag::RESTCH);
   Instance->stateMap.reset(StateFlag::POLIMOV);
-  DestroyWindow(SideWindowButton);
-  SideWindowButton = nullptr;
+  destroySideWindowButton();
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
