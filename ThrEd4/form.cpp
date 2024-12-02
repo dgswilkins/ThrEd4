@@ -4744,10 +4744,11 @@ void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std:
 	timePosition += timeStep;
 	formLines[0].x = formLines[1].x = std::lround(timePosition);
   }
-  if (timeWindow != nullptr) {
-	DestroyWindow(timeWindow);
-	timeWindow = nullptr;
+  if (nullptr == timeWindow) {
+	return;
   }
+  DestroyWindow(timeWindow);
+  timeWindow = nullptr;
 }
 
 void snp(uint32_t const start, uint32_t const finish) {

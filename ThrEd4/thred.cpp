@@ -5093,17 +5093,19 @@ auto getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
 }
 
 void destroyMsgWindow() noexcept {
-  if (MsgWindow != nullptr) {
-	DestroyWindow(MsgWindow);
-	MsgWindow = nullptr;
+  if (nullptr == MsgWindow) {
+	return;
   }
+  DestroyWindow(MsgWindow);
+  MsgWindow = nullptr;
 }
 
 void destroyDelStitchDlg() noexcept {
-  if (DeleteStitchesDialog != nullptr) {
-	DestroyWindow(DeleteStitchesDialog);
-	DeleteStitchesDialog = nullptr;
+  if (nullptr == DeleteStitchesDialog) {
+	return;
   }
+  DestroyWindow(DeleteStitchesDialog);
+  DeleteStitchesDialog = nullptr;
 }
 
 void noMsg() {
@@ -7336,10 +7338,11 @@ void thred::getdes() noexcept {
 }
 
 void thred::destroyFormDataSheet() noexcept {
-  if (FormDataSheet != nullptr) {
-	DestroyWindow(FormDataSheet);
-	FormDataSheet = nullptr;
+  if (nullptr == FormDataSheet) {
+	return;
   }
+  DestroyWindow(FormDataSheet);
+  FormDataSheet = nullptr;
 }
 
 void thred::duzrat() noexcept {
@@ -13006,10 +13009,11 @@ void thred::numWnd() {
 }
 
 void thred::destroyGeneralNumberInputBox() noexcept {
-  if (nullptr != GeneralNumberInputBox) {
-	DestroyWindow(GeneralNumberInputBox);
-	GeneralNumberInputBox = nullptr;
+  if (nullptr == GeneralNumberInputBox) {
+	return;
   }
+  DestroyWindow(GeneralNumberInputBox);
+  GeneralNumberInputBox = nullptr;
 }
 
 void thred::createTraceNumWin(int32_t const position) noexcept {

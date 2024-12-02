@@ -1418,10 +1418,11 @@ void formForms::wavfrm() {
 }
 
 void formForms::destroyPreferencesWindow() noexcept {
-  if (PreferencesWindow != nullptr) {
-	DestroyWindow(PreferencesWindow);
-	PreferencesWindow = nullptr;
+  if (nullptr == PreferencesWindow) {
+	return;
   }
+  DestroyWindow(PreferencesWindow);
+  PreferencesWindow = nullptr;
 }
 
 void formForms::redrawPreferencesWindow() noexcept {

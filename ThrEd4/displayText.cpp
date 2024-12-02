@@ -99,10 +99,11 @@ auto displayText::checkCancelButton() noexcept -> bool {
 }
 
 auto displayText::destroyCancelButton() noexcept -> void {
-  if (CancelButton != nullptr) {
-	DestroyWindow(CancelButton);
-	CancelButton = nullptr;
+  if (nullptr == CancelButton) {
+	return;
   }
+  DestroyWindow(CancelButton);
+  CancelButton = nullptr;
 }
 
 auto displayText::checkDiscardButton() noexcept -> bool {
@@ -110,17 +111,19 @@ auto displayText::checkDiscardButton() noexcept -> bool {
 }
 
 auto displayText::destroyDiscardButton() noexcept -> void {
-  if (DiscardButton != nullptr) {
-	DestroyWindow(DiscardButton);
-	DiscardButton = nullptr;
+  if (nullptr == DiscardButton) {
+	return;
   }
+  DestroyWindow(DiscardButton);
+  DiscardButton = nullptr;
 }
 
 auto displayText::destroyOKButton() noexcept -> void {
-  if (OKButton != nullptr) {
-	DestroyWindow(OKButton);
-	OKButton = nullptr;
+  if (nullptr == OKButton) {
+	return;
   }
+  DestroyWindow(OKButton);
+  OKButton = nullptr;
 }
 
 auto displayText::loadStr(uint32_t const stringID) -> std::wstring {
