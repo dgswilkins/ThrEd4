@@ -1212,7 +1212,7 @@ void texture::drwtxtr() {
   auto       line      = std::array<POINT, LNPNTS> {};
   auto const editSpace = TextureScreen.areaHeight * 2.0F /
                          (TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F));
-  FillRect(StitchWindowMemDC, &StitchWindowClientRect, thred::getBackGroundBrush());
+  FillRect(StitchWindowMemDC, &StitchWindowClientRect, thred::getBackgroundBrush());
   auto const pixelSpace =
       wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(StitchWindowClientRect.right);
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);

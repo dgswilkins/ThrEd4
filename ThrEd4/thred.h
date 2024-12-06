@@ -74,7 +74,7 @@ void frmdel();
 void frmrct(F_RECTANGLE& rectangle) noexcept;
 auto getAdjustedDelta() -> F_POINT;
 auto getAdjustedPoint(F_POINT stitchPoint) noexcept -> F_POINT;
-auto getBackGroundBrush() noexcept -> HBRUSH;
+auto getBackgroundBrush() noexcept -> HBRUSH;
 auto getBackgroundColor() noexcept -> COLORREF;
 auto getColorbarVertPosition() noexcept -> float;
 auto getColorChangeIndex(uint32_t iColor) noexcept -> uint16_t;

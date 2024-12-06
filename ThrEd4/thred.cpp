@@ -12291,7 +12291,7 @@ auto thred::getHomeDir() noexcept -> fs::path& {
   return ThrSingle->HomeDirectory;
 }
 
-auto thred::getBackGroundBrush() noexcept -> HBRUSH {
+auto thred::getBackgroundBrush() noexcept -> HBRUSH {
   return BackgroundBrush;
 }
 
