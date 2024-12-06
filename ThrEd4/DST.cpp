@@ -254,7 +254,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
 	  CloseHandle(colorFile);
 	  if (bytesRead > wrap::sizeofType(colors) * 2) {
 		if (colors[0] == COLVER) {
-		  BackgroundColor = colors[1];
+		  thred::setBackgroundColor(colors[1]);
 		  thred::resetColorChanges();
 		  UserColor.fill(0);
 		}
@@ -830,7 +830,7 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
   constexpr auto DSTRES = size_t {32U}; // testing shows this to be a good value
   colorData.reserve(DSTRES);
   colorData.push_back(COLVER);
-  colorData.push_back(BackgroundColor);
+  colorData.push_back(thred::getBackgroundColor());
   auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
   auto       iUC   = wrap::next(UserColor.begin(), index);
   colorData.push_back(*iUC);

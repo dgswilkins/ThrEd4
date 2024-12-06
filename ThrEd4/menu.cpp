@@ -1433,7 +1433,7 @@ auto menu::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VIEW_STCHBAK: { // view / Set / Background Color
-	  thred::setBackGroundColor();
+	  thred::updateBackgroundColor();
 	  flag = true;
 	  break;
 	}

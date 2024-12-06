@@ -331,6 +331,7 @@ auto VerticalScrollBar     = gsl::narrow_cast<HWND>(nullptr); // vertical scroll
 // General variables
 auto ArgCount           = int32_t {};                         // command line argument count
 auto ArgList            = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
+auto BackgroundColor    = gsl::narrow_cast<COLORREF>(0);      // stitch window background
 auto BoxOffset          = std::array<int32_t, 4> {};
 auto ClipInsertBoxLine  = std::array<POINT, SQPNTS> {}; // for displaying clipboard insert rectangle
 auto ColorBarRect       = RECT {};                      // color bar rectangle
@@ -12235,7 +12236,7 @@ void thred::updateBackground() {
   DeleteObject(BackgroundBrush);
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   if (bitmap::ismap()) {
-	bitmap::bfil(BackgroundColor);
+	thred::bmpFillBackground();
   }
 }
 
@@ -12610,7 +12611,11 @@ void thred::viewThread60() {
   Instance->stateMap.set(StateFlag::ENTR60);
 }
 
-void thred::setBackGroundColor() {
+void thred::bmpFillBackground() {
+  bitmap::bfil(BackgroundColor);
+}
+
+void thred::updateBackgroundColor() {
   if (nuBak() != 0U) {
 	BackgroundColor = BackgroundColorStruct.rgbResult;
 	nuPen(BackgroundPen, 1, BackgroundColor);
@@ -12618,7 +12623,7 @@ void thred::setBackGroundColor() {
 	DeleteObject(BackgroundBrush);
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
 	if (bitmap::ismap()) {
-	  bitmap::bfil(BackgroundColor);
+	  bmpFillBackground();
 	}
 	zumhom();
   }
@@ -13021,4 +13026,12 @@ void thred::createTraceNumWin(int32_t const position) noexcept {
   constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
   GeneralNumberInputBox   = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+}
+
+void thred::setBackgroundColor(COLORREF const color) noexcept {
+  BackgroundColor = color;
+}
+
+auto thred::getBackgroundColor() noexcept -> COLORREF {
+  return BackgroundColor;
 }

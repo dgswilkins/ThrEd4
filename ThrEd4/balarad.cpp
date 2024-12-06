@@ -164,7 +164,7 @@ void bal::redbal() {
 	return;
   }
   auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
-  BackgroundColor         = balaradHeader.backgroundColor;
+  thred::setBackgroundColor(balaradHeader.backgroundColor);
   IniFile.backgroundColor = balaradHeader.backgroundColor;
   thred::initBackPenBrush();
   constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
@@ -236,7 +236,7 @@ void bal::ritbal() {
 	}
 	constexpr auto DRBM           = 0x6472626d; // integer representation of 'drbm'
 	balaradHeader.signature       = DRBM;
-	balaradHeader.backgroundColor = BackgroundColor;
+	balaradHeader.backgroundColor = thred::getBackgroundColor();
 	balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRATIO;
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
 	auto bytesWritten             = DWORD {};

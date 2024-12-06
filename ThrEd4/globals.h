@@ -127,7 +127,6 @@ extern uint8_t    ActiveLayer;
 
 extern uint8_t AppliqueColor;
 
-extern COLORREF BackgroundColor;
 extern float    BorderWidth;
 extern int32_t  ButtonHeight;
 extern int32_t  ButtonWidth;

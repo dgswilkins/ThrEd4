@@ -571,7 +571,7 @@ void bitmap::lodbmp(fs::path const& directory) {
 #endif
   if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	std::ranges::copy(saveFile, UTF8BMPname.begin());
-	bfil(BackgroundColor);
+	thred::bmpFillBackground();
   }
   else {
 	// THR version 2 file can only store a 16 character filename
@@ -587,7 +587,7 @@ void bitmap::setBmpColor() {
   }
   BitmapColor = fswap(BitMapColorStruct.rgbResult);
   if (ismap()) {
-	bfil(BackgroundColor);
+	thred::bmpFillBackground();
   }
   thred::nuPen(BitmapPen, 1, BitmapColor);
   thred::zumhom();
@@ -598,7 +598,7 @@ void bitmap::assignUBFilename(fs::path const& directory) {
   auto const bmpFileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
   auto const fullPath    = directory / bmpFileName;
   BMPInstance->UTF16BMPname.assign(fullPath);
-  bfil(BackgroundColor);
+  thred::bmpFillBackground();
 }
 
 auto bitmap::getBitmapSizeinStitches() noexcept -> F_POINT {
@@ -684,7 +684,7 @@ void bitmap::chkbit() {
   if (ismap() && (Instance->stateMap.test(StateFlag::WASDIF) || Instance->stateMap.test(StateFlag::WASDSEL) ||
                   Instance->stateMap.test(StateFlag::WASBLAK))) {
 	Instance->stateMap.set(StateFlag::WASESC);
-	bfil(BackgroundColor);
+	thred::bmpFillBackground();
   }
 }
 
