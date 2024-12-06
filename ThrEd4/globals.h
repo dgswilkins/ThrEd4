@@ -79,6 +79,7 @@ class MY_SINGLE
   int32_t                   DPI = 0;
   std::vector<F_POINT>      angledFormVertices;
   fs::path                  auxName;
+  float                     borderWidth = BRDWID; // border width for satin borders
   std::vector<B_SEQ_PNT>    bSequence;
   std::vector<HWND>         buttonWin;
   std::vector<F_POINT_ATTR> clipBuffer;
@@ -127,7 +128,6 @@ extern uint8_t    ActiveLayer;
 
 extern uint8_t AppliqueColor;
 
-extern float    BorderWidth;
 extern int32_t  ButtonHeight;
 extern int32_t  ButtonWidth;
 extern int32_t  ButtonWidthX3;

@@ -30,7 +30,6 @@ MY_SINGLE*                     Instance                  = nullptr; // main inst
 uint8_t                        ActiveColor               = 0U;      // active color selector
 uint8_t                        ActiveLayer               = 0U;      // active layer
 uint8_t                        AppliqueColor             = COLORCNT - 1U; // underlay color
-float                          BorderWidth               = BRDWID;  // border width for satin borders
 int32_t                        ButtonHeight              = 0;       // button height
 int32_t                        ButtonWidth               = 0;       // button width
 int32_t                        ButtonWidthX3             = 0;       // button width times 3

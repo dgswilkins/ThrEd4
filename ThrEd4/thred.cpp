@@ -1217,8 +1217,8 @@ void chknum() {
 				  break;
 				}
 				case PRFBRDWID: {
-				  BorderWidth         = value * PFGRAN;
-				  IniFile.borderWidth = BorderWidth;
+				  Instance->borderWidth = value * PFGRAN;
+				  IniFile.borderWidth   = Instance->borderWidth;
 				  hWnd                = valueWindow.operator[](PRFBRDWID);
 				  break;
 				}
@@ -5825,7 +5825,7 @@ void redini() {
 		Instance->userFlagMap = tmp;
 	  }
 	  if (IniFile.borderWidth != 0.0F) {
-		BorderWidth = IniFile.borderWidth;
+		Instance->borderWidth = IniFile.borderWidth;
 	  }
 	  if (IniFile.appliqueColor != 0U) {
 		AppliqueColor = IniFile.appliqueColor & COLMSK;
@@ -6250,7 +6250,7 @@ void ritini() {
   IniFile.stitchBoxesThreshold   = StitchBoxesThreshold;
   IniFile.stitchSpace            = LineSpacing;
   IniFile.userFlagMap            = Instance->userFlagMap.to_ulong();
-  IniFile.borderWidth            = BorderWidth;
+  IniFile.borderWidth            = Instance->borderWidth;
   IniFile.appliqueColor          = AppliqueColor;
   IniFile.snapLength             = SnapLength;
   IniFile.starRatio              = StarRatio;
@@ -10678,7 +10678,7 @@ void thred::defpref() {
   Instance->userFlagMap.set(UserFlag::DAZD);
   AppliqueColor          = COLORCNT - 1U;
   IniFile.AppStitchLen   = APSPAC;
-  BorderWidth            = BRDWID;
+  Instance->borderWidth  = BRDWID;
   ButtonholeCornerLength = IBFCLEN;
   IniFile.chainSpace     = CHSDEF;
   IniFile.chainRatio     = CHRDEF;

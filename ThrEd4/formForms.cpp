@@ -1032,7 +1032,7 @@ void formForms::prfmsg() {
   auto row                = PREFLIST.begin();
   prflin(format(FMT_COMPILE(L"{}"), AppliqueColor + 1U), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.AppStitchLen * IPFGRAN), *row++);
-  prflin(format(FMT_COMPILE(L"{:.2f}"), BorderWidth * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), Instance->borderWidth * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), ButtonholeCornerLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainSpace * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainRatio), *row++);

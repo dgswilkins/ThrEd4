@@ -4654,7 +4654,7 @@ void prpsbrd(uint32_t const formIndex) {
 	form.edgeType |= EGUND;
   }
   form::bsizpar(form);
-  form.borderSize  = BorderWidth;
+  form.borderSize  = Instance->borderWidth;
   form.edgeSpacing = LineSpacing;
   form.borderColor = ActiveColor;
   form::refilfn(formIndex);
@@ -4936,7 +4936,7 @@ void frmpnts(uint32_t const type) {
 void bholbrd(uint32_t const formIndex) {
   auto& form = Instance->formList.operator[](formIndex);
   clip::deleclp(formIndex);
-  form.borderSize = BorderWidth;
+  form.borderSize = Instance->borderWidth;
   form::bsizpar(form);
   form.edgeType    = EDGEBHOL;
   form.edgeSpacing = LineSpacing;
@@ -5206,7 +5206,7 @@ void chan(uint32_t const formIndex) {
   auto& currentForm              = Instance->formList.operator[](formIndex);
   currentForm.borderColor        = ActiveColor;
   currentForm.edgeSpacing        = IniFile.chainSpace;
-  currentForm.borderSize         = BorderWidth;
+  currentForm.borderSize         = Instance->borderWidth;
   currentForm.edgeStitchLen      = IniFile.chainRatio;
   currentForm.maxBorderStitchLen = IniFile.maxStitchLength;
   currentForm.minBorderStitchLen = MinStitchLength;

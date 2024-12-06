@@ -567,7 +567,7 @@ void satsbrd(uint32_t const formIndex) {
 	currentForm.edgeType |= EGUND;
   }
   form::bsizpar(currentForm);
-  currentForm.borderSize  = BorderWidth;
+  currentForm.borderSize  = Instance->borderWidth;
   currentForm.edgeSpacing = LineSpacing / 2;
   currentForm.borderColor = ActiveColor;
   form::refilfn(formIndex);
@@ -1227,7 +1227,7 @@ void satin::ribon() {
   }
   thred::savdo();
   auto const savedFormIndex = ClosestFormToCursor;
-  satout(formList.operator[](ClosestFormToCursor), BorderWidth);
+  satout(formList.operator[](ClosestFormToCursor), Instance->borderWidth);
   if (formList.empty()) {
 	throw std::runtime_error("formList is empty");
   }
@@ -1242,7 +1242,7 @@ void satin::ribon() {
 	if (Instance->userFlagMap.test(UserFlag::BLUNT)) {
 	  isBlunt = SBLNT | FBLNT;
 	}
-	satends(formList.operator[](ClosestFormToCursor), isBlunt, BorderWidth);
+	satends(formList.operator[](ClosestFormToCursor), isBlunt, Instance->borderWidth);
   }
   newForm.vertexIndex    = currentType == FRMLINE ? thred::adflt(currentVertexCount * 2U)
                                                   : thred::adflt((currentVertexCount * 2U) + 2U);
