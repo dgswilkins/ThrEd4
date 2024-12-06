@@ -238,7 +238,7 @@ void dstin(uint32_t const number, POINT& pout) noexcept {
 
 void dstran(std::vector<DSTREC>& DSTData) {
   auto bytesRead = DWORD {};
-  auto colors    = std::vector<uint32_t> {};
+  auto colors    = std::vector<COLORREF> {};
   if (colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const colorFile = CreateFile(
