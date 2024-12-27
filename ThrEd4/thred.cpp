@@ -12301,10 +12301,10 @@ void thred::tst() {
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
-#pragma warning(suppress : 26461) // pointer to const con.3 NOLINTNEXTLINE(readability-non-const-parameter)
+#pragma warning(suppress : 26461) // pointer to const con.3 
 auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
-                       _In_ LPTSTR        lpCmdLine,
+                       _In_ LPTSTR        lpCmdLine, // NOLINT(readability-non-const-parameter)
                        _In_ int32_t       nShowCmd) -> int32_t {
   // to keep the compiler from complaining
   UNREFERENCED_PARAMETER(hPrevInstance);
