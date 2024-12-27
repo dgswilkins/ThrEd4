@@ -205,7 +205,7 @@ void selectGridPen() noexcept;
 void selectMultiFormPen() noexcept;
 void selfpnt();
 void set1knot();
-void setBackgroundColor(COLORREF const color) noexcept;
+void setBackgroundColor(COLORREF color) noexcept;
 auto setFileName() -> fs::path;
 void setFormControls() noexcept(!std::is_same_v<size_t, uint32_t>);
 void setLargestStitchVal();
