@@ -12236,7 +12236,7 @@ void thred::updateBackground() {
   DeleteObject(BackgroundBrush);
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   if (bitmap::ismap()) {
-	thred::bmpFillBackground();
+	bmpFillBackground();
   }
 }
 
