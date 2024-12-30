@@ -153,8 +153,7 @@ auto registerThredClipFormat() noexcept -> uint32_t {
 }
 
 auto getThredClipMemory() noexcept -> HGLOBAL {
-  auto const clip = registerThredClipFormat();
-  if (clip != 0U) {
+  if (auto const clip = registerThredClipFormat(); clip != 0U) {
 	return GetClipboardData(clip);
   }
   return nullptr;
@@ -232,8 +231,7 @@ void clipSelectedForm() {
 	CloseClipboard();
 	return;
   }
-  auto const clip = registerPCDFormat();
-  if (clip != 0U) {
+  if (auto const clip = registerPCDFormat(); clip != 0U) {
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -404,8 +402,7 @@ void clipSelectedForms() {
 	CloseClipboard();
 	return;
   }
-  auto const clip = registerPCDFormat();
-  if (clip != 0) {
+  if (auto const clip = registerPCDFormat(); clip != 0) {
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -484,8 +481,7 @@ void clipSelectedStitches() {
 	  return;
 	}
 	EmptyClipboard();
-	auto const clip = registerPCDFormat();
-	if (clip != 0) {
+	if (auto const clip = registerPCDFormat(); clip != 0) {
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span {clipStitchData, length};
 	savclp(spData[0], Instance->stitchBuffer.operator[](iSource), length);
@@ -580,8 +576,7 @@ void rtrclpfn(FRM_HEAD const& form) {
   }
   LowerLeftStitch = F_POINT {0.0F, 0.0F};
   EmptyClipboard();
-  auto const clip = registerPCDFormat();
-  if (clip != 0) {
+  if (auto const clip = registerPCDFormat(); clip != 0) {
   auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
   if (nullptr == clipHandle) {
 	CloseClipboard();
@@ -732,8 +727,7 @@ void tfc::rtrclp() {
 }
 
 auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
-  auto const clip = registerPCDFormat();
-  if (clip != 0U) {
+  if (auto const clip = registerPCDFormat(); clip != 0U) {
 	return GetClipboardData(clip);
   }
   return nullptr;

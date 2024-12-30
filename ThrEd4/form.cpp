@@ -5377,8 +5377,7 @@ void form::ispcdclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  auto* clipMemory = tfc::getPCDClipMemory();
-  if (clipMemory != nullptr) {
+  if (auto const* clipMemory = tfc::getPCDClipMemory(); clipMemory != nullptr) {
 	Instance->stateMap.set(StateFlag::WASPCDCLP);
   }
   CloseClipboard();
