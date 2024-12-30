@@ -742,7 +742,7 @@ auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
 auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  if (auto clipMemory = getThredClipMemory(); clipMemory != nullptr) {
+  if (auto* clipMemory = getThredClipMemory(); clipMemory != nullptr) {
 	if (auto* clipPointer = GlobalLock(clipMemory); clipPointer != nullptr) {
 	  if (auto* ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipPointer);
 	      ptrFormVertexData->clipType == CLP_FRMPS) {

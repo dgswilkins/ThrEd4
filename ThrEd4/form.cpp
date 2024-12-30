@@ -5377,7 +5377,7 @@ void form::ispcdclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory != nullptr) {
 	Instance->stateMap.set(StateFlag::WASPCDCLP);
   }
@@ -6975,7 +6975,7 @@ void form::fclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
@@ -8015,7 +8015,7 @@ void form::clpfil() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
@@ -8454,7 +8454,7 @@ void form::picot() {
 	return;
   }
   thred::savdo();
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
@@ -8902,7 +8902,7 @@ void form::vrtclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
@@ -8966,7 +8966,7 @@ void form::horclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
@@ -9029,7 +9029,7 @@ void form::angclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
@@ -9265,7 +9265,7 @@ void form::filclpx() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  auto clipMemory = tfc::getPCDClipMemory();
+  auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
 	auto const str = std::wstring(L"no clipboard data");
 	displayText::shoMsg(str, false);
