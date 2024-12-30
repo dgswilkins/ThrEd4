@@ -6667,7 +6667,7 @@ auto sidclp() -> bool {
 	CloseClipboard();
 	return false;
   }
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   return true;
 }
@@ -9652,9 +9652,9 @@ void thred::movi() {
   setsped();
 }
 
-void thred::redclp() {
+void thred::redclp(HGLOBAL clipMemory) {
   auto const codedLayer  = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
-  auto*      clipPointer = GlobalLock(ClipMemory);
+  auto*      clipPointer = GlobalLock(clipMemory);
   if (clipPointer == nullptr) {
 	return;
   }
@@ -9699,7 +9699,7 @@ void thred::redclp() {
   }
   clipBuffer.front().attribute = ActiveColor | codedLayer;
   ClipRectSize = {.cx = clipRect.right - clipRect.left, .cy = clipRect.top - clipRect.bottom};
-  GlobalUnlock(ClipMemory);
+  GlobalUnlock(clipMemory);
   if (clipRect.left != 0.0F || clipRect.bottom != 0.0F) {
 	for (auto& clip : clipBuffer) {
 	  clip.x -= clipRect.left;

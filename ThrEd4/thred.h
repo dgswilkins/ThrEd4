@@ -163,7 +163,7 @@ void rSelbox();
 void rats();
 void ratsr();
 void rebox();
-void redclp();
+void redclp(HGLOBAL clipMemory);
 void redraw(HWND window) noexcept;
 void redrawColorBar() noexcept;
 void redrawCapturedStitch(uint32_t closestPointIndexClone);

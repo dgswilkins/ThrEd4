@@ -988,7 +988,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
   else {
 	ClipMemory = getPCDClipMemory();
 	if (ClipMemory != nullptr) {
-	  thred::redclp();
+	  thred::redclp(ClipMemory);
 	  thred::clpbox();
 	  Instance->stateMap.set(StateFlag::CLPSHO);
 	}

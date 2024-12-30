@@ -6981,7 +6981,7 @@ void form::fclp() {
 	return;
   }
   thred::savdo();
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8020,7 +8020,7 @@ void form::clpfil() {
 	CloseClipboard();
 	return;
   }
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN || ClipRectSize.cy <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8459,7 +8459,7 @@ void form::picot() {
 	CloseClipboard();
 	return;
   }
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8907,7 +8907,7 @@ void form::vrtclp() {
 	CloseClipboard();
 	return;
   }
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cy <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8971,7 +8971,7 @@ void form::horclp() {
 	CloseClipboard();
 	return;
   }
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cy > CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -9034,7 +9034,7 @@ void form::angclp() {
 	CloseClipboard();
 	return;
   }
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cy <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -9273,7 +9273,7 @@ void form::filclpx() {
 	return;
   }
   thred::savdo();
-  thred::redclp();
+  thred::redclp(ClipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
