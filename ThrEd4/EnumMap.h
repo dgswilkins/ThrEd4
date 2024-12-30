@@ -81,8 +81,7 @@ template <typename EnumType> class ENUM_MAP
   [[nodiscard]] auto all() const -> bool {
 	return m_mask.all();
   }
-  [[nodiscard]] auto mask() const
-      -> std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> {
+  [[nodiscard]] auto mask() const -> std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> {
 	return m_mask;
   }
   void mask(std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> const& i_mask) {

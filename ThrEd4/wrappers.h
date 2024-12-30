@@ -33,8 +33,7 @@ namespace wrap {
 
 template <class inType>
 auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
-                                      (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>)))
-    -> float {
+                                      (std::is_same_v<inType, size_t> && !std::is_same_v<uint32_t, size_t>))) -> float {
   static_assert(std::is_same_v<inType, double> || std::is_same_v<inType, char> ||
                     std::is_same_v<inType, int16_t> || std::is_same_v<inType, int32_t> ||
                     std::is_same_v<inType, LONG> || std::is_same_v<inType, uint8_t> ||
@@ -61,8 +60,8 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape)
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>)
-    -> uint32_t {
+constexpr auto
+sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -73,8 +72,8 @@ constexpr auto sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(s
 
 template <class T>
 #pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape)
-constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>)
-    -> uint32_t {
+constexpr auto
+sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
 	return sizeof(T);
   }
@@ -179,8 +178,7 @@ auto distance(inType const& start, inType const& end) noexcept(std::is_same_v<ou
 template <class itType, class inType>
 auto next(itType const& iterator,
           inType        index) noexcept(!(std::is_same_v<inType, size_t> ||
-                                   (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>)))
-    -> itType {
+                                   (std::is_same_v<ptrdiff_t, int> && std::is_same_v<inType, uint32_t>))) -> itType {
   static_assert(std::is_same_v<inType, size_t> || std::is_same_v<inType, uint32_t> ||
                     std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint8_t> ||
                     std::is_same_v<inType, int> || std::is_same_v<inType, char>,
@@ -227,8 +225,7 @@ void polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
 auto pressed(int virtKey) noexcept -> bool;
 
 template <class bufType, class inType>
-auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD bytesRead, const wchar_t* prompt)
-    -> bool {
+auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD bytesRead, const wchar_t* prompt) -> bool {
   if constexpr (std::is_same_v<inType, DWORD>) {
 	if (0 == ReadFile(fileHandle, gsl::narrow<LPVOID>(buffer), bytesToRead, bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
@@ -273,8 +270,8 @@ void setCursor(HCURSOR hCursor) noexcept;
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 
 template <class inType>
-auto toPtrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
-    -> ptrdiff_t {
+auto toPtrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> ||
+                                      !std::is_same_v<inType, uint32_t>) -> ptrdiff_t {
   static_assert(std::is_same_v<inType, ptrdiff_t> || std::is_same_v<inType, uint32_t> ||
                     std::is_same_v<inType, int> || std::is_same_v<inType, size_t>,
                 "toPtrdiff cannot be used here.");
@@ -302,8 +299,7 @@ template <class inType> auto toDouble(inType invar) noexcept -> double {
 
 template <class inType>
 auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || (std::is_same_v<inType, uint64_t> &&
-                                                                  std::is_same_v<size_t, uint32_t>)))
-    -> size_t {
+                                                                  std::is_same_v<size_t, uint32_t>))) -> size_t {
   static_assert(std::is_signed_v<inType> || std::is_same_v<inType, uint64_t> ||
                     std::is_same_v<inType, uint8_t> || std::is_same_v<inType, uint16_t> ||
                     std::is_same_v<inType, uint32_t> || std::is_same_v<inType, DWORD>,
@@ -327,8 +323,8 @@ auto toSize(inType invar) noexcept(!(std::is_signed_v<inType> || (std::is_same_v
 }
 
 template <class inType>
-auto toUnsigned(inType invar) noexcept(std::is_same_v<inType, uint32_t> || std::is_same_v<inType, uint16_t>)
-    -> uint32_t {
+auto toUnsigned(inType invar) noexcept(std::is_same_v<inType, uint32_t> ||
+                                       std::is_same_v<inType, uint16_t>) -> uint32_t {
   static_assert(std::is_signed_v<inType> || std::is_same_v<inType, ptrdiff_t> ||
                     std::is_same_v<inType, uint16_t> || std::is_same_v<inType, uint32_t> ||
                     std::is_same_v<inType, size_t>,

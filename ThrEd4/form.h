@@ -26,10 +26,12 @@ auto chkdel(FRM_HEAD const& currentForm) noexcept -> bool;
 auto chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
-auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) noexcept(!std::is_same_v<size_t, uint32_t>)
-    -> bool;
-auto closflt(FRM_HEAD const& form, float xCoordinate, float yCoordinate) noexcept(!std::is_same_v<ptrdiff_t, int>)
-    -> uint32_t;
+auto cisin(FRM_HEAD const& form,
+           float           xCoordinate,
+           float           yCoordinate) noexcept(!std::is_same_v<size_t, uint32_t>) -> bool;
+auto closflt(FRM_HEAD const& form,
+             float           xCoordinate,
+             float           yCoordinate) noexcept(!std::is_same_v<ptrdiff_t, int>) -> uint32_t;
 auto closfrm(uint32_t& formIndex) -> bool;
 void clpfil();
 void clpspac(uint32_t insertPoint, uint32_t count);

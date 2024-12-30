@@ -33,9 +33,8 @@ class FMT_WITH_LOC
   // ReSharper disable once CppNonExplicitConvertingConstructor
   // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
   constexpr FMT_WITH_LOC(const wchar_t* fmtString,
-                         const std::source_location& fileLoc = std::source_location::current()) noexcept :
-      strX(fmtString),
-      loc(fileLoc) {
+                         const std::source_location& fileLoc = std::source_location::current()) noexcept
+      : strX(fmtString), loc(fileLoc) {
   }
 };
 

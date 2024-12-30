@@ -163,7 +163,7 @@ void bal::redbal() {
   if (!wrap::readFile(balaradFile, balaradStitch.data(), fileSize - sizeof(balaradHeader), &bytesRead, L"ReadFile for balaradStitch in redbal")) {
 	return;
   }
-  auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
+  auto const stitchCount = bytesRead / wrap::sizeofType(balaradStitch);
   thred::setBackgroundColor(balaradHeader.backgroundColor);
   IniFile.backgroundColor = balaradHeader.backgroundColor;
   thred::initBackPenBrush();

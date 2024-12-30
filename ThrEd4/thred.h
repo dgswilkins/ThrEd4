@@ -183,8 +183,7 @@ void ritot(uint32_t number);
 void ritrot(float rotationAngle, F_POINT const& rotationCenter);
 void rngadj() noexcept(std::is_same_v<size_t, uint32_t>);
 void rot(F_POINT& rotationCenter);
-auto rotang1(F_POINT_ATTR const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept
-    -> F_POINT;
+auto rotang1(F_POINT_ATTR const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept -> F_POINT;
 auto rotangf(F_POINT const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept -> F_POINT;
 void rotflt(F_POINT& point, float rotationAngle, F_POINT const& rotationCenter) noexcept;
 void rotfn(float rotationAngle, F_POINT const& rotationCenter);

@@ -5,8 +5,10 @@ void crtcurs() noexcept;
 void dstcurs() noexcept;
 auto getArrowCursor() noexcept -> HCURSOR;
 auto handleEitherButtonDown() -> bool;
-auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRM_HEAD const& textureForm, bool& retflag)
-    -> bool;
+auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
+                          float&              xyRatio,
+                          FRM_HEAD const&     textureForm,
+                          bool&               retflag) -> bool;
 auto handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool;
 auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                      float               xyRatio,

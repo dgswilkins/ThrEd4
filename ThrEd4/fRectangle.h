@@ -16,6 +16,6 @@ class F_RECTANGLE
 };
 #pragma pack(pop)
 
-constexpr F_RECTANGLE::F_RECTANGLE(float const rhsLeft, float const rhsTop, float const rhsRight, float const rhsBottom) noexcept :
-    left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
+constexpr F_RECTANGLE::F_RECTANGLE(float const rhsLeft, float const rhsTop, float const rhsRight, float const rhsBottom) noexcept
+    : left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
 }

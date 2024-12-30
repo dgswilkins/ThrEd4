@@ -197,8 +197,8 @@ class SMAL_PNT_L
   explicit constexpr SMAL_PNT_L(uint32_t rhsLine, uint32_t rhsGroup, float rhsX, float rhsY) noexcept;
 };
 
-constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t const rhsLine, uint32_t const rhsGroup, float const rhsX, float const rhsY) noexcept :
-    line(rhsLine), group(rhsGroup), x(rhsX), y(rhsY) {
+constexpr SMAL_PNT_L::SMAL_PNT_L(uint32_t const rhsLine, uint32_t const rhsGroup, float const rhsX, float const rhsY) noexcept
+    : line(rhsLine), group(rhsGroup), x(rhsX), y(rhsY) {
 }
 
 class B_SEQ_PNT

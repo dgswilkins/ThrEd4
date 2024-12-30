@@ -232,30 +232,30 @@ void clipSelectedForm() {
 	return;
   }
   if (auto const clip = registerPCDFormat(); clip != 0U) {
-  clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
-  if (clipHandle == nullptr) {
-	CloseClipboard();
-	return;
-  }
-  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-  auto const spData         = gsl::span {clipStitchData, stitchCount};
-  auto       iTexture       = firstStitch;
-  savclp(spData[0], Instance->stitchBuffer.operator[](iTexture), length);
-  ++iTexture;
-  auto       iDestination   = 1U;
-  auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
-  while (iTexture < Instance->stitchBuffer.size()) {
-	if ((Instance->stitchBuffer.operator[](iTexture).attribute & FRMSK) == codedAttribute &&
-	    (Instance->stitchBuffer.operator[](iTexture).attribute & NOTFRM) == 0U) {
-	  savclp(spData[iDestination++],
-	         Instance->stitchBuffer.operator[](iTexture),
-	         Instance->stitchBuffer.operator[](iTexture).attribute & COLMSK);
+	clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
+	if (clipHandle == nullptr) {
+	  CloseClipboard();
+	  return;
 	}
+	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+	auto const spData         = gsl::span {clipStitchData, stitchCount};
+	auto       iTexture       = firstStitch;
+	savclp(spData[0], Instance->stitchBuffer.operator[](iTexture), length);
 	++iTexture;
-  }
-  GlobalUnlock(clipHandle);
-  SetClipboardData(clip, clipHandle);
-  Instance->stateMap.set(StateFlag::WASPCDCLP);
+	auto       iDestination   = 1U;
+	auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
+	while (iTexture < Instance->stitchBuffer.size()) {
+	  if ((Instance->stitchBuffer.operator[](iTexture).attribute & FRMSK) == codedAttribute &&
+	      (Instance->stitchBuffer.operator[](iTexture).attribute & NOTFRM) == 0U) {
+		savclp(spData[iDestination++],
+		       Instance->stitchBuffer.operator[](iTexture),
+		       Instance->stitchBuffer.operator[](iTexture).attribute & COLMSK);
+	  }
+	  ++iTexture;
+	}
+	GlobalUnlock(clipHandle);
+	SetClipboardData(clip, clipHandle);
+	Instance->stateMap.set(StateFlag::WASPCDCLP);
   }
   CloseClipboard();
 }
@@ -403,25 +403,25 @@ void clipSelectedForms() {
 	return;
   }
   if (auto const clip = registerPCDFormat(); clip != 0) {
-  clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
-  if (clipHandle == nullptr) {
-	CloseClipboard();
-	return;
-  }
-  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-  auto const spData         = gsl::span {clipStitchData, stitchCount};
-  auto       iStitch        = 0U;
-  auto       iDestination   = 0U;
-  savclp(spData[0], astch[0], stitchCount);
-  ++iStitch;
-  ++iDestination;
-  while (iStitch < stitchCount) {
-	savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
+	clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
+	if (clipHandle == nullptr) {
+	  CloseClipboard();
+	  return;
+	}
+	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+	auto const spData         = gsl::span {clipStitchData, stitchCount};
+	auto       iStitch        = 0U;
+	auto       iDestination   = 0U;
+	savclp(spData[0], astch[0], stitchCount);
 	++iStitch;
 	++iDestination;
-  }
-  GlobalUnlock(clipHandle);
-  SetClipboardData(clip, clipHandle);
+	while (iStitch < stitchCount) {
+	  savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
+	  ++iStitch;
+	  ++iDestination;
+	}
+	GlobalUnlock(clipHandle);
+	SetClipboardData(clip, clipHandle);
   }
   CloseClipboard();
 }
@@ -482,18 +482,18 @@ void clipSelectedStitches() {
 	}
 	EmptyClipboard();
 	if (auto const clip = registerPCDFormat(); clip != 0) {
-	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-	auto const spData         = gsl::span {clipStitchData, length};
-	savclp(spData[0], Instance->stitchBuffer.operator[](iSource), length);
-	++iSource;
-	for (auto iStitch = 1U; iStitch < length; ++iStitch) {
-	  savclp(spData[iStitch],
-	         Instance->stitchBuffer.operator[](iSource),
-	         Instance->stitchBuffer.operator[](iSource).attribute & COLMSK);
+	  auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+	  auto const spData         = gsl::span {clipStitchData, length};
+	  savclp(spData[0], Instance->stitchBuffer.operator[](iSource), length);
 	  ++iSource;
-	}
-	GlobalUnlock(clipHandle);
-	SetClipboardData(clip, clipHandle);
+	  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
+		savclp(spData[iStitch],
+		       Instance->stitchBuffer.operator[](iSource),
+		       Instance->stitchBuffer.operator[](iSource).attribute & COLMSK);
+		++iSource;
+	  }
+	  GlobalUnlock(clipHandle);
+	  SetClipboardData(clip, clipHandle);
 	}
 	CloseClipboard();
   }
@@ -577,25 +577,25 @@ void rtrclpfn(FRM_HEAD const& form) {
   LowerLeftStitch = F_POINT {0.0F, 0.0F};
   EmptyClipboard();
   if (auto const clip = registerPCDFormat(); clip != 0) {
-  auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
-  if (nullptr == clipHandle) {
-	CloseClipboard();
-	return;
-  }
-  auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
-  if (nullptr == clipStitchData) {
-	CloseClipboard();
-	return;
-  }
-  auto const  spClipData = gsl::span {clipStitchData, count};
-  auto const& clipBuffer = Instance->clipBuffer;
+	auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
+	if (nullptr == clipHandle) {
+	  CloseClipboard();
+	  return;
+	}
+	auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+	if (nullptr == clipStitchData) {
+	  CloseClipboard();
+	  return;
+	}
+	auto const  spClipData = gsl::span {clipStitchData, count};
+	auto const& clipBuffer = Instance->clipBuffer;
 
-  savclp(spClipData[0], clipBuffer.operator[](0), count);
-  for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-	savclp(spClipData[iStitch], clipBuffer.operator[](iStitch), 0);
-  }
-  GlobalUnlock(clipHandle);
-  SetClipboardData(clip, clipHandle);
+	savclp(spClipData[0], clipBuffer.operator[](0), count);
+	for (auto iStitch = 1U; iStitch < count; ++iStitch) {
+	  savclp(spClipData[iStitch], clipBuffer.operator[](iStitch), 0);
+	}
+	GlobalUnlock(clipHandle);
+	SetClipboardData(clip, clipHandle);
   }
   CloseClipboard();
 }
@@ -726,7 +726,7 @@ void tfc::rtrclp() {
   }
 }
 
-auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
+auto tfc::getPCDClipMemory() noexcept -> HGLOBAL {
   if (auto const clip = registerPCDFormat(); clip != 0U) {
 	return GetClipboardData(clip);
   }

@@ -1219,7 +1219,7 @@ void chknum() {
 				case PRFBRDWID: {
 				  Instance->borderWidth = value * PFGRAN;
 				  IniFile.borderWidth   = Instance->borderWidth;
-				  hWnd                = valueWindow.operator[](PRFBRDWID);
+				  hWnd                  = valueWindow.operator[](PRFBRDWID);
 				  break;
 				}
 				case PRFSTCMAX: {
@@ -12300,7 +12300,7 @@ void thred::tst() {
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
-#pragma warning(suppress : 26461) // pointer to const con.3 
+#pragma warning(suppress : 26461) // pointer to const con.3
 auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
                        _In_ LPTSTR        lpCmdLine, // NOLINT(readability-non-const-parameter)
