@@ -15,6 +15,7 @@ void duclip();
 void fClipInit() noexcept;
 void fpUnClip();
 auto getClipFormCount() noexcept -> uint32_t;
+auto getPCDClipMemory() noexcept-> HGLOBAL;
 void lodclp(uint32_t iStitch);
 void rtrclp();
 void setClipOrigin(POINT source) noexcept;

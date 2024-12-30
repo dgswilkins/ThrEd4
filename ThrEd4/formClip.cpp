@@ -126,6 +126,7 @@ void clipSelectedStitches();
 void dupclp() noexcept(std::is_same_v<size_t, uint32_t>);
 auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
 auto getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD*;
+auto registerPCDFormat() noexcept -> uint32_t;
 auto registerThredClipFormat() noexcept -> uint32_t;
 void rtrclpfn(FRM_HEAD const& form);
 void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t led);
@@ -139,6 +140,12 @@ auto sizfclp(FRM_HEAD const& form) noexcept(std::is_same_v<size_t, uint32_t>) ->
 void unpclp();
 
 // Functions
+
+auto registerPCDFormat() noexcept -> uint32_t {
+  constexpr auto PCD_CLIP_FORMAT = L"PMust_Format";
+  return RegisterClipboardFormat(PCD_CLIP_FORMAT);
+}
+
 auto registerThredClipFormat() noexcept -> uint32_t {
   constexpr auto THRED_CLIP_FORMAT = L"threditor"; //
   return RegisterClipboardFormat(THRED_CLIP_FORMAT);
@@ -706,6 +713,14 @@ void tfc::rtrclp() {
   else {
 	rtrclpfn(form);
   }
+}
+
+auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
+  auto const clip = registerPCDFormat();
+  if (clip != 0U) {
+	return GetClipboardData(registerPCDFormat());
+  }
+  return nullptr;
 }
 
 auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {

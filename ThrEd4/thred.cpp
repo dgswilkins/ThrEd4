@@ -6662,8 +6662,7 @@ auto sidclp() -> bool {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return false;
   }
-  Clip       = form::registerPCDFormat();
-  ClipMemory = GetClipboardData(Clip);
+  ClipMemory = tfc::getPCDClipMemory();
   if (ClipMemory == nullptr) {
 	CloseClipboard();
 	return false;
