@@ -5377,8 +5377,8 @@ void form::ispcdclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory != nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory != nullptr) {
 	Instance->stateMap.set(StateFlag::WASPCDCLP);
   }
   CloseClipboard();
@@ -6975,13 +6975,13 @@ void form::fclp() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
   }
   thred::savdo();
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8015,12 +8015,12 @@ void form::clpfil() {
   if (OpenClipboard(ThrEdWindow) == 0) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
   }
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN || ClipRectSize.cy <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8454,12 +8454,12 @@ void form::picot() {
 	return;
   }
   thred::savdo();
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
   }
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8902,12 +8902,12 @@ void form::vrtclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
   }
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cy <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -8966,12 +8966,12 @@ void form::horclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
   }
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cy > CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -9029,12 +9029,12 @@ void form::angclp() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	CloseClipboard();
 	return;
   }
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cy <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);
@@ -9265,15 +9265,15 @@ void form::filclpx() {
   if (OpenClipboard(ThrEdWindow) == FALSE) {
 	return;
   }
-  ClipMemory = tfc::getPCDClipMemory();
-  if (ClipMemory == nullptr) {
+  auto clipMemory = tfc::getPCDClipMemory();
+  if (clipMemory == nullptr) {
 	auto const str = std::wstring(L"no clipboard data");
 	displayText::shoMsg(str, false);
 	CloseClipboard();
 	return;
   }
   thred::savdo();
-  thred::redclp(ClipMemory);
+  thred::redclp(clipMemory);
   CloseClipboard();
   if (ClipRectSize.cx <= CLPMIN) {
 	displayText::tabmsg(IDS_CLP, false);

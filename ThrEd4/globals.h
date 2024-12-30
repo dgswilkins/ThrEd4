@@ -134,8 +134,6 @@ extern int32_t  ButtonWidthX3;
 
 extern float    ButtonholeCornerLength;
 
-extern HGLOBAL ClipMemory;
-
 extern F_LSIZ   ClipRectSize;
 extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;

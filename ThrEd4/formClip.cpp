@@ -742,9 +742,8 @@ auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
 auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  ClipMemory = getThredClipMemory();
-  if (ClipMemory != nullptr) {
-	if (auto* clipPointer = GlobalLock(ClipMemory); clipPointer != nullptr) {
+  if (auto clipMemory = getThredClipMemory(); clipMemory != nullptr) {
+	if (auto* clipPointer = GlobalLock(clipMemory); clipPointer != nullptr) {
 	  if (auto* ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipPointer);
 	      ptrFormVertexData->clipType == CLP_FRMPS) {
 		thred::duzrat();
@@ -755,7 +754,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto* const ptrClip        = convertFromPtr<uint8_t*>(clipPointer);
 		auto const  clips          = gsl::span {ptrClip, byteCount};
 		clipCopyBuffer.insert(clipCopyBuffer.end(), clips.begin(), clips.end());
-		GlobalUnlock(ClipMemory);
+		GlobalUnlock(clipMemory);
 		CloseClipboard();
 		ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipCopyBuffer.data());
 		if (Instance->stateMap.test(StateFlag::FRMPSEL)) {
@@ -901,7 +900,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const textureSource = gsl::span {ptrTextureSource, textureCount};
 		Instance->texturePointsBuffer.insert(
 		    Instance->texturePointsBuffer.end(), textureSource.begin(), textureSource.end());
-		GlobalUnlock(ClipMemory);
+		GlobalUnlock(clipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.right = LOWLONG;
 		SelectedFormsRect.bottom = SelectedFormsRect.left = BIGLONG;
 		thred::ratsr();
@@ -980,15 +979,15 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  Instance->stateMap.set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
-		GlobalUnlock(ClipMemory);
+		GlobalUnlock(clipMemory);
 	  }
 	}
 	CloseClipboard();
   }
   else {
-	ClipMemory = getPCDClipMemory();
-	if (ClipMemory != nullptr) {
-	  thred::redclp(ClipMemory);
+	clipMemory = getPCDClipMemory();
+	if (clipMemory != nullptr) {
+	  thred::redclp(clipMemory);
 	  thred::clpbox();
 	  Instance->stateMap.set(StateFlag::CLPSHO);
 	}
