@@ -233,6 +233,7 @@ void clipSelectedForm() {
 	return;
   }
   auto const clip = registerPCDFormat();
+  if (clip != 0U) {
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -257,6 +258,7 @@ void clipSelectedForm() {
   GlobalUnlock(clipHandle);
   SetClipboardData(clip, clipHandle);
   Instance->stateMap.set(StateFlag::WASPCDCLP);
+  }
   CloseClipboard();
 }
 
@@ -403,6 +405,7 @@ void clipSelectedForms() {
 	return;
   }
   auto const clip = registerPCDFormat();
+  if (clip != 0) {
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -422,6 +425,7 @@ void clipSelectedForms() {
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(clip, clipHandle);
+  }
   CloseClipboard();
 }
 
@@ -481,6 +485,7 @@ void clipSelectedStitches() {
 	}
 	EmptyClipboard();
 	auto const clip = registerPCDFormat();
+	if (clip != 0) {
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span {clipStitchData, length};
 	savclp(spData[0], Instance->stitchBuffer.operator[](iSource), length);
@@ -493,6 +498,7 @@ void clipSelectedStitches() {
 	}
 	GlobalUnlock(clipHandle);
 	SetClipboardData(clip, clipHandle);
+	}
 	CloseClipboard();
   }
   else {
@@ -575,7 +581,7 @@ void rtrclpfn(FRM_HEAD const& form) {
   LowerLeftStitch = F_POINT {0.0F, 0.0F};
   EmptyClipboard();
   auto const clip = registerPCDFormat();
-
+  if (clip != 0) {
   auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
   if (nullptr == clipHandle) {
 	CloseClipboard();
@@ -595,6 +601,7 @@ void rtrclpfn(FRM_HEAD const& form) {
   }
   GlobalUnlock(clipHandle);
   SetClipboardData(clip, clipHandle);
+  }
   CloseClipboard();
 }
 
