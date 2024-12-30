@@ -9652,7 +9652,7 @@ void thred::movi() {
   setsped();
 }
 
-void thred::redclp(HGLOBAL clipMemory) {
+void thred::redclp(HGLOBAL const clipMemory) {
   auto const codedLayer  = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
   auto*      clipPointer = GlobalLock(clipMemory);
   if (clipPointer == nullptr) {
