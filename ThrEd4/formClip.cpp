@@ -734,7 +734,7 @@ void tfc::rtrclp() {
 auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
   auto const clip = registerPCDFormat();
   if (clip != 0U) {
-	return GetClipboardData(registerPCDFormat());
+	return GetClipboardData(clip);
   }
   return nullptr;
 }
