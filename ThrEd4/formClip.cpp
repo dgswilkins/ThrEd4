@@ -126,6 +126,7 @@ void clipSelectedStitches();
 void dupclp() noexcept(std::is_same_v<size_t, uint32_t>);
 auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
 auto getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD*;
+auto getThredClipMemory() noexcept -> HGLOBAL;
 auto registerPCDFormat() noexcept -> uint32_t;
 auto registerThredClipFormat() noexcept -> uint32_t;
 void rtrclpfn(FRM_HEAD const& form);
@@ -149,6 +150,14 @@ auto registerPCDFormat() noexcept -> uint32_t {
 auto registerThredClipFormat() noexcept -> uint32_t {
   constexpr auto THRED_CLIP_FORMAT = L"threditor"; //
   return RegisterClipboardFormat(THRED_CLIP_FORMAT);
+}
+
+auto getThredClipMemory() noexcept -> HGLOBAL {
+  auto const clip = registerThredClipFormat();
+  if (clip != 0U) {
+	return GetClipboardData(clip);
+  }
+  return nullptr;
 }
 
 void clipSelectedForm() {
@@ -726,8 +735,7 @@ auto tfc::getPCDClipMemory() noexcept -> HGLOBAL{
 auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  auto const thrEdClip = registerThredClipFormat();
-  ClipMemory           = GetClipboardData(thrEdClip);
+  ClipMemory = getThredClipMemory();
   if (ClipMemory != nullptr) {
 	if (auto* clipPointer = GlobalLock(ClipMemory); clipPointer != nullptr) {
 	  if (auto* ptrFormVertexData = convertFromPtr<FORM_VERTEX_CLIP*>(clipPointer);
