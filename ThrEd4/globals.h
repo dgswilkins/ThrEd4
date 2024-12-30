@@ -133,7 +133,6 @@ extern int32_t  ButtonWidth;
 extern int32_t  ButtonWidthX3;
 
 extern float    ButtonholeCornerLength;
-extern uint32_t Clip;
 
 extern HGLOBAL ClipMemory;
 

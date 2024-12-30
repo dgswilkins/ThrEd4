@@ -232,7 +232,7 @@ void clipSelectedForm() {
 	CloseClipboard();
 	return;
   }
-  Clip       = form::registerPCDFormat();
+  auto const clip = registerPCDFormat();
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -255,7 +255,7 @@ void clipSelectedForm() {
 	++iTexture;
   }
   GlobalUnlock(clipHandle);
-  SetClipboardData(Clip, clipHandle);
+  SetClipboardData(clip, clipHandle);
   Instance->stateMap.set(StateFlag::WASPCDCLP);
   CloseClipboard();
 }
@@ -402,7 +402,7 @@ void clipSelectedForms() {
 	CloseClipboard();
 	return;
   }
-  Clip       = form::registerPCDFormat();
+  auto const clip = registerPCDFormat();
   clipHandle = GlobalAlloc(GHND, (stitchCount * sizeof(CLIP_STITCH)) + 2U);
   if (clipHandle == nullptr) {
 	CloseClipboard();
@@ -421,7 +421,7 @@ void clipSelectedForms() {
 	++iDestination;
   }
   GlobalUnlock(clipHandle);
-  SetClipboardData(Clip, clipHandle);
+  SetClipboardData(clip, clipHandle);
   CloseClipboard();
 }
 
@@ -480,7 +480,7 @@ void clipSelectedStitches() {
 	  return;
 	}
 	EmptyClipboard();
-	Clip                      = form::registerPCDFormat();
+	auto const clip = registerPCDFormat();
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span {clipStitchData, length};
 	savclp(spData[0], Instance->stitchBuffer.operator[](iSource), length);
@@ -492,7 +492,7 @@ void clipSelectedStitches() {
 	  ++iSource;
 	}
 	GlobalUnlock(clipHandle);
-	SetClipboardData(Clip, clipHandle);
+	SetClipboardData(clip, clipHandle);
 	CloseClipboard();
   }
   else {
@@ -574,7 +574,7 @@ void rtrclpfn(FRM_HEAD const& form) {
   }
   LowerLeftStitch = F_POINT {0.0F, 0.0F};
   EmptyClipboard();
-  Clip = form::registerPCDFormat();
+  auto const clip = registerPCDFormat();
 
   auto* const clipHandle = GlobalAlloc(GHND, (count * sizeof(CLIP_STITCH)) + 2U);
   if (nullptr == clipHandle) {
@@ -594,7 +594,7 @@ void rtrclpfn(FRM_HEAD const& form) {
 	savclp(spClipData[iStitch], clipBuffer.operator[](iStitch), 0);
   }
   GlobalUnlock(clipHandle);
-  SetClipboardData(Clip, clipHandle);
+  SetClipboardData(clip, clipHandle);
   CloseClipboard();
 }
 
@@ -979,8 +979,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 	CloseClipboard();
   }
   else {
-	Clip       = form::registerPCDFormat();
-	ClipMemory = GetClipboardData(Clip);
+	ClipMemory = getPCDClipMemory();
 	if (ClipMemory != nullptr) {
 	  thred::redclp();
 	  thred::clpbox();
