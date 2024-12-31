@@ -52,6 +52,7 @@ namespace {
 auto CancelButton  = gsl::narrow_cast<HWND>(nullptr); // cancel button
 auto DiscardButton = gsl::narrow_cast<HWND>(nullptr); // discard button
 auto OKButton      = gsl::narrow_cast<HWND>(nullptr); // ok button
+auto DeleteStitchesDialog = HWND {}; // asking user if they want to delete the stitches associated with a form
 
 // Definitions
 void bxtxt(uint32_t iButton, uint32_t iMessage);
@@ -417,6 +418,18 @@ void displayText::tomsg() {
                                       ThrEdInstance,
                                       nullptr);
   updateWinFont(MainStitchWin);
+}
+
+void displayText::destroyDelStitchDlg() noexcept {
+  if (nullptr == DeleteStitchesDialog) {
+	return;
+  }
+  DestroyWindow(DeleteStitchesDialog);
+  DeleteStitchesDialog = nullptr;
+}
+
+void displayText::getDelStitchDlgRect(RECT& windowRect) noexcept {
+  GetWindowRect(DeleteStitchesDialog, &windowRect);
 }
 
 void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {

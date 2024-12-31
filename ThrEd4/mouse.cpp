@@ -398,7 +398,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	else {
 	  auto windowRect = RECT {};
-	  GetWindowRect(DeleteStitchesDialog, &windowRect);
+	  displayText::getDelStitchDlgRect(windowRect);
 	  if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
 	      WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
 		thred::savdo();
@@ -568,7 +568,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	else {
 	  auto windowRect = RECT {};
-	  GetWindowRect(DeleteStitchesDialog, &windowRect);
+	  displayText::getDelStitchDlgRect(windowRect);
 	  if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
 	      WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
 		thred::savdo();

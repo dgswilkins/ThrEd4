@@ -426,7 +426,6 @@ void delknt();
 void delsmal(uint32_t startStitch, uint32_t endStitch);
 void delstch1(uint32_t iStitch);
 void destroyBV() noexcept;
-void destroyDelStitchDlg() noexcept;
 void destroyMsgWindow() noexcept;
 void destroySpeedScrollBar() noexcept;
 
@@ -5099,20 +5098,12 @@ void destroyMsgWindow() noexcept {
   MsgWindow = nullptr;
 }
 
-void destroyDelStitchDlg() noexcept {
-  if (nullptr == DeleteStitchesDialog) {
-	return;
-  }
-  DestroyWindow(DeleteStitchesDialog);
-  DeleteStitchesDialog = nullptr;
-}
-
 void noMsg() {
   destroyMsgWindow();
   displayText::destroyOKButton();
   displayText::destroyDiscardButton();
   displayText::destroyCancelButton();
-  destroyDelStitchDlg();
+  displayText::destroyDelStitchDlg();
   thred::destroyGeneralNumberInputBox();
   if (Instance->stateMap.testAndReset(StateFlag::NUMIN) || FormMenuChoice != 0U || PreferenceIndex != 0U) {
 	chknum();

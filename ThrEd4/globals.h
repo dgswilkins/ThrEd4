@@ -139,8 +139,6 @@ extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
 
-extern HWND DeleteStitchesDialog;
-
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
 

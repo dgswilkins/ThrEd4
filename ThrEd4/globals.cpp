@@ -38,7 +38,6 @@ F_LSIZ                         ClipRectSize              = {};      // clipboard
 uint32_t                       ClosestFormToCursor       = 0U;      // closest form to the cursor
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
-HWND                           DeleteStitchesDialog      = nullptr; // asking user if they want to delete the stitches associated with a form
 DRAWITEMSTRUCT*                DrawItem                  = nullptr; // for owner-draw windows
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
 HWND                           FormDataSheet             = nullptr; // form data sheet
