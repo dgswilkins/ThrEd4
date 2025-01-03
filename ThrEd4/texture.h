@@ -28,6 +28,6 @@ void txtrbut();
 void txtrmov(FRM_HEAD const& textureForm);
 void txtrup();
 void textureInit() noexcept;
-void writeScreenWidth(int32_t position);
+void writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t position);
 
 } // namespace texture

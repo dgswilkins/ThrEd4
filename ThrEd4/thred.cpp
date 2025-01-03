@@ -3960,7 +3960,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 	}
 	if (Instance->stateMap.test(StateFlag::TXTRED)) {
-	  texture::writeScreenWidth(position);
+	  texture::writeScreenWidth(*DrawItem, position);
 	}
 	else {
 	  auto const pikol = displayText::loadStr(IDS_PIKOL);

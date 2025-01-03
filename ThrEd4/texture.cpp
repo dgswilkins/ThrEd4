@@ -1804,9 +1804,9 @@ void texture::setshft() {
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
-void texture::writeScreenWidth(int32_t const position) {
+void texture::writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t const position) {
   auto const scrWidth = displayText::format(IDS_TXWID, TextureScreen.width * IPFGRAN);
-  wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
+  wrap::textOut(drawItem.hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }
 
 void texture::textureInit() noexcept {
