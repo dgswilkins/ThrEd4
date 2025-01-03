@@ -431,7 +431,7 @@ void destroySpeedScrollBar() noexcept;
 
 auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
-void doDrwInit();
+void doDrwInit(DRAWITEMSTRUCT const& drawItem);
 void doInitUnzoomed();
 void doInitZoomed(DRAWITEMSTRUCT const& drawItem);
 void doStretch(uint32_t start, uint32_t end);
@@ -1856,7 +1856,7 @@ auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> 
 }
 // ReSharper restore CppParameterMayBeConst
 
-void doDrwInit() {
+void doDrwInit(DRAWITEMSTRUCT const& drawItem) {
   setScrollVisibility();
   thred::duzrat();
   auto const dub6        = ZoomRatio.x * 6.0F;
@@ -1874,7 +1874,7 @@ void doDrwInit() {
   }
   DisplayedColorBitmap.reset();
   if (Instance->stateMap.test(StateFlag::ZUMED)) {
-	doInitZoomed(*DrawItem);
+	doInitZoomed(drawItem);
   }
   else {
 	doInitUnzoomed();
@@ -2221,7 +2221,7 @@ void drwStch() {
   Instance->stateMap.reset(StateFlag::SHOFRM);
   drawBackground();
   if (Instance->stateMap.test(StateFlag::INIT)) {
-	doDrwInit();
+	doDrwInit(*DrawItem);
   }
   if (Instance->stateMap.test(StateFlag::ROTAT) || Instance->stateMap.test(StateFlag::ROTCAPT) ||
       Instance->stateMap.test(StateFlag::MOVCNTR)) {
