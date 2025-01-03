@@ -433,7 +433,7 @@ auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> 
 
 void doDrwInit();
 void doInitUnzoomed();
-void doInitZoomed();
+void doInitZoomed(DRAWITEMSTRUCT const& drawItem);
 void doStretch(uint32_t start, uint32_t end);
 void drawBackground();
 void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStitch, const float& maxYcoord);
@@ -1874,7 +1874,7 @@ void doDrwInit() {
   }
   DisplayedColorBitmap.reset();
   if (Instance->stateMap.test(StateFlag::ZUMED)) {
-	doInitZoomed();
+	doInitZoomed(*DrawItem);
   }
   else {
 	doInitUnzoomed();
@@ -1940,7 +1940,7 @@ void doInitUnzoomed() {
   }
 }
 
-void doInitZoomed() {
+void doInitZoomed(DRAWITEMSTRUCT const& drawItem) {
   if (Instance->stitchBuffer.empty()) {
 	return;
   }
@@ -1979,7 +1979,7 @@ void doInitZoomed() {
 	auto const stStart   = wrap::next(Instance->stitchBuffer.begin(), stIndex);
 	stitchCount          = chkup(stitchCount, iColor);
 	auto const stitches  = std::ranges::subrange(stStart, wrap::next(stStart, stitchCount));
-	auto const maxYcoord = wrap::toFloat(DrawItem->rcItem.bottom);
+	auto const maxYcoord = wrap::toFloat(drawItem.rcItem.bottom);
 	for (auto& iStitch : stitches) { // iterate through all stitches of the current color
 	  if (auto const layer = (iStitch.attribute & LAYMSK) >> LAYSHFT;
 	      ActiveLayer != 0U && layer != 0U && layer != ActiveLayer) {
