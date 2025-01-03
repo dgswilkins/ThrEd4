@@ -176,7 +176,7 @@ void showTraceWin() noexcept;
 void tracwnd();
 auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
 auto trcin(COLORREF color) -> bool;
-void trcnum(uint32_t shift, COLORREF color, uint32_t backColor);
+void trcnum(DRAWITEMSTRUCT const& drawItem, uint32_t shift, COLORREF color, uint32_t backColor);
 auto trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT>;
 void trcratnum();
 void trcstpnum();
@@ -722,14 +722,14 @@ auto trcin(COLORREF const color) -> bool {
   return true;
 }
 
-void trcnum(uint32_t const shift, COLORREF color, uint32_t const backColor) {
+void trcnum(DRAWITEMSTRUCT const& drawItem, uint32_t const shift, COLORREF color, uint32_t const backColor) {
   auto const zeroWidth = thred::txtWid(L"0");
   color >>= shift;
   color &= BYTMASK;
   auto const val       = std::to_wstring(color);
   auto const xPosition = zeroWidth.cx * gsl::narrow<int32_t>(3U - val.size() + 1U);
-  SetBkColor(DrawItem->hDC, backColor);
-  wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
+  SetBkColor(drawItem.hDC, backColor);
+  wrap::textOut(drawItem.hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
 
 auto trcols(COLORREF const color) noexcept -> std::array<uint32_t, CHANLCNT> {
@@ -1346,12 +1346,12 @@ void trace::wasTrace() {
   for (auto const& brush : TraceBrush) {
 	if (DrawItem->hwndItem == *iTraceUpWindow++) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
-	  trcnum(*iTraceShift, InvertUpColor, *iTraceRGB);
+	  trcnum(*DrawItem, *iTraceShift, InvertUpColor, *iTraceRGB);
 	  break;
 	}
 	if (DrawItem->hwndItem == *iTraceDownWindow++) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
-	  trcnum(*iTraceShift, InvertDownColor, *iTraceRGB);
+	  trcnum(*DrawItem, *iTraceShift, InvertDownColor, *iTraceRGB);
 	}
 	if (DrawItem->hwndItem == *iTraceControlWindow++) {
 	  durct(*iTraceShift, DrawItem->rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
