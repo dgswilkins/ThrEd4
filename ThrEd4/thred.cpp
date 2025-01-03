@@ -448,7 +448,7 @@ void duClos(uint32_t            startStitch,
             F_POINT const&      stitchPoint,
             std::vector<float>& gapToNearest) noexcept(!std::is_same_v<ptrdiff_t, int>);
 void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uint32_t>);
-void dubar();
+void dubar(DRAWITEMSTRUCT const& drawItem);
 void dubuf(std::vector<char>& buffer);
 void duclp() noexcept(std::is_same_v<size_t, uint32_t>);
 void ducmd();
@@ -2426,17 +2426,17 @@ void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uin
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
-void dubar() {
-  auto colorBarRect = RECT {DrawItem->rcItem.left, 0, DrawItem->rcItem.right, DrawItem->rcItem.bottom};
+void dubar(DRAWITEMSTRUCT const& drawItem) {
+  auto colorBarRect = RECT {drawItem.rcItem.left, 0, drawItem.rcItem.right, drawItem.rcItem.bottom};
   auto       indicatorLine = std::array<POINT, 2> {};
   auto const buffSize      = wrap::toFloat(Instance->stitchBuffer.size());
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
 	auto&      colorChangeTable = ThrSingle->ColorChangeTable;
 	auto const barSectionHeight =
 	    wrap::toFloat(colorChangeTable.operator[](iColorChange + 1U).stitchIndex) / buffSize;
-	colorBarRect.bottom = std::lround(barSectionHeight * wrap::toFloat(DrawItem->rcItem.bottom));
+	colorBarRect.bottom = std::lround(barSectionHeight * wrap::toFloat(drawItem.rcItem.bottom));
 	auto ucb = wrap::next(UserColorBrush.begin(), colorChangeTable.operator[](iColorChange).colorIndex);
-	FillRect(DrawItem->hDC, &colorBarRect, *ucb);
+	FillRect(drawItem.hDC, &colorBarRect, *ucb);
 	colorBarRect.top = colorBarRect.bottom;
   }
   if (!Instance->stateMap.test(StateFlag::SELBOX) && !Instance->stateMap.test(StateFlag::GRPSEL)) {
@@ -2447,16 +2447,16 @@ void dubar() {
       wrap::ceil<decltype(indicatorLine[0].y)>(wrap::toFloat(colorBarRect.bottom) * selectedIndicator);
   indicatorLine[0].x = colorBarRect.left;
   indicatorLine[1].x = colorBarRect.right;
-  SelectObject(DrawItem->hDC, CrossPen);
+  SelectObject(drawItem.hDC, CrossPen);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-  wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+  wrap::polyline(drawItem.hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
   if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	selectedIndicator  = wrap::toFloat(GroupStitchIndex) / buffSize;
 	indicatorLine[0].y = indicatorLine[1].y =
 	    wrap::ceil<decltype(indicatorLine[0].y)>(wrap::toFloat(colorBarRect.bottom) * selectedIndicator);
 	indicatorLine[0].x = colorBarRect.left;
 	indicatorLine[1].x = colorBarRect.right;
-	wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+	wrap::polyline(drawItem.hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
   }
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
@@ -3940,7 +3940,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
   }
   if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
 	if (!Instance->stitchBuffer.empty()) {
-	  dubar();
+	  dubar(*DrawItem);
 	}
 	else {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
