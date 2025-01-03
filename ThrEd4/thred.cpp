@@ -439,7 +439,7 @@ void drawBackground();
 void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStitch, const float& maxYcoord);
 void drawStitchBoxes();
 void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
-void drwStch();
+void drwStch(DRAWITEMSTRUCT const& drawItem);
 void drwknot();
 void drwlstch(uint32_t finish);
 void drwmrk(HDC hDC);
@@ -2208,7 +2208,7 @@ void drwLin(std::vector<POINT>& linePoints, uint32_t const currentStitch, uint32
 }
 // ReSharper restore CppParameterMayBeConst
 
-void drwStch() {
+void drwStch(DRAWITEMSTRUCT const& drawItem) {
   Instance->stateMap.set(StateFlag::RELAYR);
   Instance->stateMap.reset(StateFlag::SELSHO);
   Instance->stateMap.reset(StateFlag::ILIN1);
@@ -2221,7 +2221,7 @@ void drwStch() {
   Instance->stateMap.reset(StateFlag::SHOFRM);
   drawBackground();
   if (Instance->stateMap.test(StateFlag::INIT)) {
-	doDrwInit(*DrawItem);
+	doDrwInit(drawItem);
   }
   if (Instance->stateMap.test(StateFlag::ROTAT) || Instance->stateMap.test(StateFlag::ROTCAPT) ||
       Instance->stateMap.test(StateFlag::MOVCNTR)) {
@@ -3888,7 +3888,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	      (!ThrSingle->ThrName.empty() || Instance->stateMap.test(StateFlag::INIT) ||
 	       !Instance->formList.empty() || Instance->stateMap.test(StateFlag::SATPNT)) &&
 	      !Instance->stateMap.test(StateFlag::BAKSHO)) {
-		drwStch();
+		drwStch(*DrawItem);
 	  }
 	  else {
 		drawBackground();
