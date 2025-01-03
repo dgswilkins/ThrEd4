@@ -17,6 +17,6 @@ void trcsel();
 void trdif();
 void trinit();
 void untrace();
-void wasTrace();
+void wasTrace(DRAWITEMSTRUCT const& drawItem);
 void wasTrace1();
 } // namespace trace

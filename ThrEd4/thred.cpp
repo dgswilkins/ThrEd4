@@ -3969,7 +3969,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	return true;
   }
   if (Instance->stateMap.test(StateFlag::WASTRAC)) {
-	trace::wasTrace();
+	trace::wasTrace(*DrawItem);
 	return true;
   }
   auto dcb = DefaultColorBrush.begin();

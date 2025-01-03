@@ -1330,7 +1330,7 @@ void trace::tracpar() {
   }
 }
 
-void trace::wasTrace() {
+void trace::wasTrace(DRAWITEMSTRUCT const& drawItem) {
   auto traceHighMaskRect   = RECT {}; // high trace mask rectangle
   auto traceMiddleMaskRect = RECT {}; // middle trace mask rectangle
   auto traceLowMaskRect    = RECT {}; // low trace mask rectangle
@@ -1344,43 +1344,43 @@ void trace::wasTrace() {
   auto       iTraceRGB           = TRACE_RGB.begin();
   auto       iTraceRGBFlag       = TRACE_RGB_FLAG.begin();
   for (auto const& brush : TraceBrush) {
-	if (DrawItem->hwndItem == *iTraceUpWindow++) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
-	  trcnum(*DrawItem, *iTraceShift, InvertUpColor, *iTraceRGB);
+	if (drawItem.hwndItem == *iTraceUpWindow++) {
+	  FillRect(drawItem.hDC, &drawItem.rcItem, brush);
+	  trcnum(drawItem, *iTraceShift, InvertUpColor, *iTraceRGB);
 	  break;
 	}
-	if (DrawItem->hwndItem == *iTraceDownWindow++) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
-	  trcnum(*DrawItem, *iTraceShift, InvertDownColor, *iTraceRGB);
+	if (drawItem.hwndItem == *iTraceDownWindow++) {
+	  FillRect(drawItem.hDC, &drawItem.rcItem, brush);
+	  trcnum(drawItem, *iTraceShift, InvertDownColor, *iTraceRGB);
 	}
-	if (DrawItem->hwndItem == *iTraceControlWindow++) {
-	  durct(*iTraceShift, DrawItem->rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
-	  FillRect(DrawItem->hDC, &traceMiddleMaskRect, brush);
-	  dublk(DrawItem->hDC, traceHighMaskRect, traceLowMaskRect, blackBrush);
+	if (drawItem.hwndItem == *iTraceControlWindow++) {
+	  durct(*iTraceShift, drawItem.rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
+	  FillRect(drawItem.hDC, &traceMiddleMaskRect, brush);
+	  dublk(drawItem.hDC, traceHighMaskRect, traceLowMaskRect, blackBrush);
 	  break;
 	}
-	if (DrawItem->hwndItem == *iTraceSelectWindow++) {
+	if (drawItem.hwndItem == *iTraceSelectWindow++) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto tempBrush = blackBrush;
-	  SetBkColor(DrawItem->hDC, 0);
-	  SetTextColor(DrawItem->hDC, *iTraceRGB);
+	  SetBkColor(drawItem.hDC, 0);
+	  SetTextColor(drawItem.hDC, *iTraceRGB);
 	  if (Instance->stateMap.test(*iTraceRGBFlag)) {
 		tempBrush = brush;
-		SetTextColor(DrawItem->hDC, 0);
-		SetBkColor(DrawItem->hDC, *iTraceRGB);
+		SetTextColor(drawItem.hDC, 0);
+		SetBkColor(drawItem.hDC, *iTraceRGB);
 	  }
 #pragma warning(suppress : 26812) // Enum.3 prefer 'enum class' over 'enum'
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, tempBrush);
+	  FillRect(drawItem.hDC, &drawItem.rcItem, tempBrush);
 	  auto const strOnOff = displayText::loadStr(Instance->stateMap.test(*iTraceRGBFlag) ? IDS_ON : IDS_OFF);
-	  wrap::textOut(DrawItem->hDC, 1, 1, strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
+	  wrap::textOut(drawItem.hDC, 1, 1, strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
 	  break;
 	}
-	if (DrawItem->hwndItem == TraceNumberInput) {
+	if (drawItem.hwndItem == TraceNumberInput) {
 	  auto const itColTraceBrush = wrap::next(TraceBrush.begin(), ColumnColor);
 	  auto const itColTraceRGB   = wrap::next(TRACE_RGB.begin(), ColumnColor);
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *itColTraceBrush);
-	  SetBkColor(DrawItem->hDC, *itColTraceRGB);
-	  wrap::textOut(DrawItem->hDC,
+	  FillRect(drawItem.hDC, &drawItem.rcItem, *itColTraceBrush);
+	  SetBkColor(drawItem.hDC, *itColTraceRGB);
+	  wrap::textOut(drawItem.hDC,
 	                1,
 	                1,
 	                TraceInputBuffer.data(),
