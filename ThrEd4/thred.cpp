@@ -3877,7 +3877,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 // owner draw windows
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+  auto const* DrawItem = reinterpret_cast<DRAWITEMSTRUCT const*>(lParam);
   if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 	if (Instance->stateMap.test(StateFlag::TXTRED)) {
 	  texture::drwtxtr();
