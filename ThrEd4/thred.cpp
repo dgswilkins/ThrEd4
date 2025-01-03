@@ -3877,8 +3877,8 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 // owner draw windows
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-  auto const* DrawItem = reinterpret_cast<DRAWITEMSTRUCT const*>(lParam);
-  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
+  auto const drawItem = *(reinterpret_cast<DRAWITEMSTRUCT const*>(lParam)); // dereference pointer to DRAWITEMSTRUCT
+  if (drawItem.hwndItem == MainStitchWin && drawItem.itemAction == ODA_DRAWENTIRE) {
 	if (Instance->stateMap.test(StateFlag::TXTRED)) {
 	  texture::drwtxtr();
 	  return true;
@@ -3888,7 +3888,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	      (!ThrSingle->ThrName.empty() || Instance->stateMap.test(StateFlag::INIT) ||
 	       !Instance->formList.empty() || Instance->stateMap.test(StateFlag::SATPNT)) &&
 	      !Instance->stateMap.test(StateFlag::BAKSHO)) {
-		drwStch(*DrawItem);
+		drwStch(drawItem);
 	  }
 	  else {
 		drawBackground();
@@ -3938,52 +3938,52 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	}
 	return true;
   }
-  if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
+  if (drawItem.hwndItem == ColorBar && drawItem.itemAction == ODA_DRAWENTIRE) {
 	if (!Instance->stitchBuffer.empty()) {
-	  dubar(*DrawItem);
+	  dubar(drawItem);
 	}
 	else {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_WINDOW));
+	  FillRect(drawItem.hDC, &drawItem.rcItem, GetSysColorBrush(COLOR_WINDOW));
 	}
 	return true;
   }
-  if (!Instance->buttonWin.empty() && DrawItem->hwndItem == Instance->buttonWin.operator[](HHID) &&
-      DrawItem->itemAction == ODA_DRAWENTIRE) {
+  if (!Instance->buttonWin.empty() && drawItem.hwndItem == Instance->buttonWin.operator[](HHID) &&
+      drawItem.itemAction == ODA_DRAWENTIRE) {
 	auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 	if (Instance->stateMap.test(StateFlag::HID)) {
 	  auto const ucb         = wrap::next(UserColorBrush.begin(), ActiveColor);
 	  auto const itUserColor = wrap::next(UserColor.begin(), ActiveColor);
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
-	  SetBkColor(DrawItem->hDC, *itUserColor);
+	  FillRect(drawItem.hDC, &drawItem.rcItem, *ucb);
+	  SetBkColor(drawItem.hDC, *itUserColor);
 	}
 	else {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
+	  FillRect(drawItem.hDC, &drawItem.rcItem, GetSysColorBrush(COLOR_BTNFACE));
 	}
 	if (Instance->stateMap.test(StateFlag::TXTRED)) {
-	  texture::writeScreenWidth(*DrawItem, position);
+	  texture::writeScreenWidth(drawItem, position);
 	}
 	else {
 	  auto const pikol = displayText::loadStr(IDS_PIKOL);
-	  wrap::textOut(DrawItem->hDC, position, 1, pikol.c_str(), wrap::toUnsigned(pikol.size()));
+	  wrap::textOut(drawItem.hDC, position, 1, pikol.c_str(), wrap::toUnsigned(pikol.size()));
 	}
 	return true;
   }
   if (Instance->stateMap.test(StateFlag::WASTRAC)) {
-	trace::wasTrace(*DrawItem);
+	trace::wasTrace(drawItem);
 	return true;
   }
   auto dcb = DefaultColorBrush.begin();
   auto ucb = UserColorBrush.begin();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (DrawItem->hwndItem == ThrSingle->DefaultColorWin.operator[](iColor)) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
+	if (drawItem.hwndItem == ThrSingle->DefaultColorWin.operator[](iColor)) {
+	  FillRect(drawItem.hDC, &drawItem.rcItem, *dcb);
 	  if (DisplayedColorBitmap.test(iColor)) {
-		SetBkColor(DrawItem->hDC, DEFAULT_COLORS.at(iColor));
-		SetTextColor(DrawItem->hDC, defTxt(iColor));
+		SetBkColor(drawItem.hDC, DEFAULT_COLORS.at(iColor));
+		SetTextColor(drawItem.hDC, defTxt(iColor));
 		auto const colorNum = format(FMT_COMPILE(L"{}"), iColor + 1U);
 		auto       textSize = SIZE {};
-		wrap::getTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
-		wrap::textOut(DrawItem->hDC,
+		wrap::getTextExtentPoint32(drawItem.hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
+		wrap::textOut(drawItem.hDC,
 		              (ButtonWidth - textSize.cx) / 2,
 		              0,
 		              colorNum.c_str(),
@@ -3991,18 +3991,18 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	  }
 	  return true;
 	}
-	if (DrawItem->hwndItem == ThrSingle->UserColorWin.operator[](iColor)) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
+	if (drawItem.hwndItem == ThrSingle->UserColorWin.operator[](iColor)) {
+	  FillRect(drawItem.hDC, &drawItem.rcItem, *ucb);
 	  if (iColor == ActiveColor) {
-		SelectObject(DrawItem->hDC, CrossPen);
+		SelectObject(drawItem.hDC, CrossPen);
 		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 		auto line = std::array<POINT, 2> {};
-		line[0]   = POINT {DrawItem->rcItem.right / 2, 0};
-		line[1]   = POINT {DrawItem->rcItem.right / 2, DrawItem->rcItem.bottom};
-		wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
-		line[0] = POINT {0, DrawItem->rcItem.bottom / 2};
-		line[1] = POINT {DrawItem->rcItem.right, DrawItem->rcItem.bottom / 2};
-		wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
+		line[0]   = POINT {drawItem.rcItem.right / 2, 0};
+		line[1]   = POINT {drawItem.rcItem.right / 2, drawItem.rcItem.bottom};
+		wrap::polyline(drawItem.hDC, line.data(), wrap::toUnsigned(line.size()));
+		line[0] = POINT {0, drawItem.rcItem.bottom / 2};
+		line[1] = POINT {drawItem.rcItem.right, drawItem.rcItem.bottom / 2};
+		wrap::polyline(drawItem.hDC, line.data(), wrap::toUnsigned(line.size()));
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	  }
 	  return true;
@@ -4010,12 +4010,12 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	++dcb;
 	++ucb;
   }
-  if (Instance->stateMap.test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
+  if (Instance->stateMap.test(StateFlag::BAKSHO) && drawItem.itemAction == ODA_DRAWENTIRE) {
 	if (Instance->stateMap.test(StateFlag::THUMSHO)) {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
-		if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
-		  ritbak(ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(iThumb)).data(), *DrawItem);
+		if (iThumb < ThumbnailDisplayCount && drawItem.hwndItem == *itHWndBV) {
+		  ritbak(ThrSingle->Thumbnails.operator[](ThumbnailsSelected.at(iThumb)).data(), drawItem);
 		  rthumnam(iThumb);
 		  return true;
 		}
@@ -4025,12 +4025,12 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	else {
 	  auto itHWndBV = BackupViewer.begin();
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-		if (DrawItem->hwndItem == *itHWndBV) {
+		if (drawItem.hwndItem == *itHWndBV) {
 		  auto fileName = ThrSingle->ThrName; // intentional copy
 		  auto ext      = fileName.extension().wstring();
 		  ext.back()    = iVersion + 's';
 		  fileName.replace_extension(ext);
-		  ritbak(fileName, *DrawItem);
+		  ritbak(fileName, drawItem);
 		  return true;
 		}
 		++itHWndBV;
