@@ -583,7 +583,7 @@ void shft2box();
 void shownd(HWND hwnd) noexcept;
 auto sidclp() -> bool;
 void sidhup();
-void sidmsg(FRM_HEAD const& form, HWND window);
+void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice);
 void srchk();
 auto srchknot(uint32_t source) -> uint32_t;
 void stCor2px(F_POINT_ATTR const& stitch, POINT& point);
@@ -6700,7 +6700,8 @@ void sidhup() {
 }
 
 // ReSharper disable CppParameterMayBeConst
-void sidmsg(FRM_HEAD const& form, HWND window) {
+void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
+  auto window         = Instance->valueWindow.operator[](formMenuChoice);
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
   std::ranges::fill(Instance->valueWindow, nullptr);
@@ -6756,7 +6757,7 @@ void sidmsg(FRM_HEAD const& form, HWND window) {
   }
   auto entryCount = int32_t {0};
   // choose the side window vertical size based on the form menu choice
-  switch (FormMenuChoice) {
+  switch (formMenuChoice) {
 	case LLAYR: {
 	  entryCount      = gsl::narrow<int32_t>(LAYRLIST.size());
 	  auto const zero = displayText::loadStr(IDS_LAY03);
@@ -6787,7 +6788,7 @@ void sidmsg(FRM_HEAD const& form, HWND window) {
 	  break;
 	}
 	default: {
-	  outDebugString(L"default hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
+	  outDebugString(L"default hit in sidmsg: formMenuChoice [{}]\n", formMenuChoice);
 	  break;
 	}
   }
@@ -6802,7 +6803,7 @@ void sidmsg(FRM_HEAD const& form, HWND window) {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-  switch (FormMenuChoice) {
+  switch (formMenuChoice) {
 	// fill the side window with the appropriate entries
 	case LLAYR: { // if we are choosing a layer
 	  for (auto const& iEntry : LAYRLIST) {
@@ -6834,7 +6835,7 @@ void sidmsg(FRM_HEAD const& form, HWND window) {
 	  break;
 	}
 	default: {
-	  outDebugString(L"default 2 hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
+	  outDebugString(L"default 2 hit in sidmsg: formMenuChoice [{}]\n", formMenuChoice);
 	  break;
 	}
   }
@@ -11954,7 +11955,7 @@ auto thred::handleFormDataSheet() -> bool {
 	if (WinMsg.hwnd == valueWindow.operator[](LFTHTYP) || WinMsg.hwnd == labelWindow.operator[](LFTHTYP)) {
 	  // draw the feather fill type window
 	  FormMenuChoice = LFTHTYP;
-	  sidmsg(form, valueWindow.operator[](LFTHTYP));
+	  sidmsg(form, FormMenuChoice);
 	  break;
 	}
 	if (WinMsg.hwnd == valueWindow.operator[](LFRM) || WinMsg.hwnd == labelWindow.operator[](LFRM)) {
@@ -11976,14 +11977,14 @@ auto thred::handleFormDataSheet() -> bool {
 	  // draw the layer window
 	  FormMenuChoice = LLAYR;
 	  Instance->stateMap.reset(StateFlag::FILTYP);
-	  sidmsg(form, valueWindow.operator[](LLAYR));
+	  sidmsg(form, FormMenuChoice);
 	  break;
 	}
 	if (WinMsg.hwnd == valueWindow.operator[](LFRMFIL) || WinMsg.hwnd == labelWindow.operator[](LFRMFIL)) {
 	  // draw the fill type window
 	  Instance->stateMap.reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
-	  sidmsg(form, valueWindow.operator[](LFRMFIL));
+	  sidmsg(form, FormMenuChoice);
 	  break;
 	}
 	if (WinMsg.hwnd == valueWindow.operator[](LFRMCOL) || WinMsg.hwnd == labelWindow.operator[](LFRMCOL)) {
@@ -12023,8 +12024,9 @@ auto thred::handleFormDataSheet() -> bool {
 	}
 	if (WinMsg.hwnd == valueWindow.operator[](LBRD) || WinMsg.hwnd == labelWindow.operator[](LBRD)) {
 	  // draw the border window
+	  FormMenuChoice = LBRD;
 	  Instance->stateMap.set(StateFlag::FILTYP);
-	  sidmsg(form, valueWindow.operator[](LBRD));
+	  sidmsg(form, FormMenuChoice);
 	  Instance->stateMap.set(StateFlag::BRDACT);
 	  break;
 	}
