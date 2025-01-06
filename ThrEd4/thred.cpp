@@ -8036,7 +8036,7 @@ void thred::nuPen(HPEN& pen, int32_t const width, COLORREF const color) noexcept
 }
 
 void thred::dubox(POINT const& stitchCoordsInPixels) {
-  if (Instance->stitchBuffer.empty()) {
+  if (Instance->stitchBuffer.size() <= 1) {
 	return;
   }
   auto const stitch = wrap::next(Instance->stitchBuffer.begin(), ClosestPointIndex);
