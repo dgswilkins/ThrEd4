@@ -1421,6 +1421,8 @@ void formForms::destroyPreferencesWindow() noexcept {
   if (nullptr == PreferencesWindow) {
 	return;
   }
+  thred::clearLabelWindow();
+  std::ranges::fill(Instance->valueWindow, nullptr);
   DestroyWindow(PreferencesWindow);
   PreferencesWindow = nullptr;
 }

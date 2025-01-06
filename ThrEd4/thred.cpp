@@ -6704,7 +6704,6 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
   auto window         = Instance->valueWindow.operator[](formMenuChoice);
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
-  std::ranges::fill(Instance->valueWindow, nullptr);
   auto sideWindowSize     = SIZE {};
   auto sideWindowLocation = int32_t {};
   GetWindowRect(window, &childListRect);
@@ -7330,6 +7329,8 @@ void thred::destroyFormDataSheet() noexcept {
   if (nullptr == FormDataSheet) {
 	return;
   }
+  thred::clearLabelWindow();
+  std::ranges::fill(Instance->valueWindow, nullptr);
   DestroyWindow(FormDataSheet);
   FormDataSheet = nullptr;
 }
@@ -12891,6 +12892,10 @@ void thred::setLargestStitchVal() {
 
 auto thred::getLabelWindow() noexcept -> std::vector<HWND>& {
   return ThrSingle->LabelWindow;
+}
+
+void thred::clearLabelWindow() noexcept {
+  std::ranges::fill(ThrSingle->LabelWindow, nullptr);
 }
 
 auto thred::getThrEdName() noexcept -> fs::path const& {

@@ -25,6 +25,7 @@ auto chkForm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
 void chkhup();
 auto chkwnd(HWND window) noexcept -> bool;
 void chkrng(F_POINT& range);
+void clearLabelWindow() noexcept;
 void closPnt();
 auto closPnt1(uint32_t& closestStitch) -> bool;
 void closfn();
