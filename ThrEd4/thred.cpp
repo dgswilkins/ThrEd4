@@ -874,7 +874,7 @@ void chknum() {
   auto& formList = Instance->formList;
 
   if (SideWinMsgIdx != 0U) {
-	auto& valueWindow           = Instance->valueWindow;
+	auto const& valueWindow           = Instance->valueWindow;
 	auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
