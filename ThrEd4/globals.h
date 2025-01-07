@@ -123,29 +123,22 @@ class MY_SINGLE
 };
 
 extern MY_SINGLE* Instance;
-extern uint8_t    ActiveColor;
-extern uint8_t    ActiveLayer;
 
-extern uint8_t AppliqueColor;
-
-extern int32_t ButtonHeight;
-extern int32_t ButtonWidth;
-extern int32_t ButtonWidthX3;
-
-extern float ButtonholeCornerLength;
-
+extern uint8_t  ActiveColor;
+extern uint8_t  ActiveLayer;
+extern uint8_t  AppliqueColor;
+extern int32_t  ButtonHeight;
+extern int32_t  ButtonWidth;
+extern int32_t  ButtonWidthX3;
+extern float    ButtonholeCornerLength;
 extern F_LSIZ   ClipRectSize;
 extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
-
-extern POINT           EndPointCross;
-
+extern POINT    EndPointCross;
 extern F_POINT  FormMoveDelta;
-
-extern HPEN FormPen3px;
-extern HPEN FormPen;
-
+extern HPEN     FormPen3px;
+extern HPEN     FormPen;
 extern uint32_t GroupEndStitch;
 extern uint32_t GroupStartStitch;
 extern uint32_t GroupStitchIndex;
@@ -154,14 +147,11 @@ extern INI_FILE IniFile;
 extern std::array<POINT, 3>  InsertLine;
 extern std::vector<F_POINT>* InsidePoints;
 
-extern F_POINT LastPoint;
-extern float   LineSpacing;
-
-extern HWND MainStitchWin;
-
-extern float MinStitchLength;
-extern MSG   WinMsg;
-
+extern F_POINT  LastPoint;
+extern float    LineSpacing;
+extern HWND     MainStitchWin;
+extern float    MinStitchLength;
+extern MSG      WinMsg;
 extern RECT     MsgRect;
 extern HWND     MsgWindow;
 extern uint32_t NewFormVertexCount;
@@ -184,24 +174,21 @@ extern F_RECTANGLE SelectedVerticesRect;
 
 extern HWND  SideMessageWindow;
 extern float SnapLength;
-
 extern float SpiralWrap;
 extern float StarRatio;
-
 extern F_POINT StitchBmpRatio;
 
 extern F_RECTANGLE StitchRangeRect;
-extern RECT        StitchWindowClientRect;
-extern HDC         StitchWindowDC;
-extern HDC         StitchWindowMemDC;
-extern POINT       StitchWindowOrigin;
 
+extern RECT      StitchWindowClientRect;
+extern HDC       StitchWindowDC;
+extern HDC       StitchWindowMemDC;
+extern POINT     StitchWindowOrigin;
 extern HINSTANCE ThrEdInstance;
 extern HWND      ThrEdWindow;
 extern POINT     ThredWindowOrigin;
 extern uint32_t* TraceBitmapData;
-
-extern SIZE UnzoomedRect;
+extern SIZE      UnzoomedRect;
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 
