@@ -257,10 +257,6 @@ void mouse::dstcurs() noexcept {
 }
 
 auto mouse::handleEitherButtonDown() -> bool {
-  if (FormDataSheet != nullptr) {
-	auto formDataRect = RECT {};
-	GetWindowRect(FormDataSheet, &formDataRect);
-  }
   if (Instance->stateMap.testAndReset(StateFlag::THUMON)) {
 	if (displayText::chkok()) {
 	  thred::save();

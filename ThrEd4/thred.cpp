@@ -11413,7 +11413,6 @@ void thred::handleFormSelected() {
   if (FormDataSheet != nullptr) {
 	destroyFormDataSheet();
 	unsid(true);
-	FormMenuChoice = 0;
 	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
   }
