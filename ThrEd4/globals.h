@@ -143,7 +143,6 @@ extern POINT           EndPointCross;
 
 extern HWND FormDataSheet;
 
-extern uint32_t FormMenuChoice;
 extern F_POINT  FormMoveDelta;
 
 extern HPEN FormPen3px;

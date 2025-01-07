@@ -340,6 +340,7 @@ auto CurrentStitchIndex = uint32_t {}; // pointer to the current selection for l
 auto DisplayedColorBitmap = std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are displayed
 auto ExtendedHeader   = THR_HEAD_EX {};                          // ThrEd file header extension
 auto FileVersionIndex = uint8_t {};                              // points to old version to be read
+auto FormMenuChoice   = uint32_t {}; // data type for form data form numerical entry
 auto HorizontalRatio = float {}; // horizontal ratio between the zoom window and the entire stitch space
 auto InsertCenter           = F_POINT {};  // center point in inserted file
 auto InsertSize             = SIZE {};     // size of file insert window
