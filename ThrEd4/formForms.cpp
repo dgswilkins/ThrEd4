@@ -1425,7 +1425,9 @@ void formForms::destroyPreferencesWindow() noexcept {
 }
 
 void formForms::redrawPreferencesWindow() noexcept {
-  thred::redraw(PreferencesWindow);
+  if (nullptr != PreferencesWindow) {
+	RedrawWindow(PreferencesWindow, nullptr, nullptr, RDW_INVALIDATE);
+  }
 }
 
 void formForms::getPreferencesRect(RECT& prefRect) noexcept {
