@@ -6706,7 +6706,7 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
   auto sideWindowSize     = SIZE {};
   auto sideWindowLocation = int32_t {};
   GetWindowRect(window, &childListRect);
-  GetWindowRect(FormDataSheet, &parentListRect);
+  formForms::getFormDataSheetRect(parentListRect);
   form::ispcdclp();
   if (Instance->stateMap.test(StateFlag::FILTYP)) { // if we are choosing a border fill type
 	auto entryCount = gsl::narrow<int32_t>(EDGELIST.size());

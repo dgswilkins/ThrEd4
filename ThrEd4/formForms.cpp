@@ -1453,3 +1453,7 @@ void formForms::redrawFormDataSheet() noexcept {
 	RedrawWindow(FormDataSheet, nullptr, nullptr, RDW_INVALIDATE);
   }
 }
+
+void formForms::getFormDataSheetRect(RECT& dataRect) noexcept {
+  GetWindowRect(FormDataSheet, &dataRect);
+}
