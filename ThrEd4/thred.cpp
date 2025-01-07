@@ -2269,9 +2269,9 @@ void drwknot() {
 	return;
   }
   constexpr auto KBOFFSET = 5; // offset of the knot box sides
-  auto const     kOffset  = MulDiv(KBOFFSET, Instance->DPI, STDDPI);
+  auto const     kOffset  = MulDiv(KBOFFSET, DPI, STDDPI);
   constexpr auto KLINELEN = 10; // length of the knot line
-  auto const     kLine    = MulDiv(KLINELEN, Instance->DPI, STDDPI);
+  auto const     kLine    = MulDiv(KLINELEN, DPI, STDDPI);
   auto           point    = POINT {};
   auto           kOutline = std::array<POINT, SQPNTS> {};
   auto           tLine    = std::array<POINT, LNPNTS> {};
@@ -2373,7 +2373,7 @@ void drwlstch(uint32_t const finish) {
 void drwmrk(HDC hDC) {
   auto       markCoordinates = POINT {};
   auto       markLine        = std::array<POINT, 2> {};
-  auto const markOffset      = MulDiv(6, Instance->DPI, STDDPI);
+  auto const markOffset      = MulDiv(6, DPI, STDDPI);
   thred::sCor2px(F_POINT {ZoomMarkPoint}, markCoordinates);
   SelectObject(hDC, ZoomMarkPen);
   SetROP2(hDC, R2_XORPEN);
@@ -2411,7 +2411,7 @@ void duClos(uint32_t const      startStitch,
 }
 
 void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
-  auto const offset = MulDiv(10, Instance->DPI, STDDPI);
+  auto const offset = MulDiv(10, DPI, STDDPI);
   auto arrowCenter  = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
   StitchArrow[1]    = stitchCoordsInPixels;
   rotpix(arrowCenter, StitchArrow[0], stitchCoordsInPixels);
@@ -6980,7 +6980,7 @@ void stchWnd() {
 void stchbox(uint32_t const iStitch, HDC hDC) {
   auto       line   = std::array<POINT, SQPNTS> {};
   auto const layer  = (Instance->stitchBuffer.operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
-  auto const offset = MulDiv(IniFile.stitchSizePixels, Instance->DPI, STDDPI);
+  auto const offset = MulDiv(IniFile.stitchSizePixels, DPI, STDDPI);
   if (ActiveLayer != 0U && layer != 0U && layer != ActiveLayer) {
 	return;
   }
@@ -12414,9 +12414,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  Instance->DPI = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
-	  ScrollSize    = MulDiv(ScrollSize, Instance->DPI, STDDPI);
-	  ColorBarSize  = MulDiv(ColorBarSize, Instance->DPI, STDDPI);
+	  DPI = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
+	  ScrollSize    = MulDiv(ScrollSize, DPI, STDDPI);
+	  ColorBarSize  = MulDiv(ColorBarSize, DPI, STDDPI);
 	  init();
 	  if (Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);

@@ -76,7 +76,6 @@ class MY_SINGLE
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  int32_t                   DPI = 0;
   std::vector<F_POINT>      angledFormVertices;
   fs::path                  auxName;
   float                     borderWidth = BRDWID; // border width for satin borders
@@ -135,6 +134,7 @@ extern F_LSIZ   ClipRectSize;
 extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
+extern int32_t  DPI;
 extern POINT    EndPointCross;
 extern F_POINT  FormMoveDelta;
 extern HPEN     FormPen3px;

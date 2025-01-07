@@ -38,6 +38,7 @@ F_LSIZ                         ClipRectSize              = {};      // clipboard
 uint32_t                       ClosestFormToCursor       = 0U;      // closest form to the cursor
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
+int32_t                        DPI                       = 0;       // dots per inch
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
 F_POINT                        FormMoveDelta             = F_POINT {}; // offset for moving forms
 HPEN                           FormPen                   = nullptr; // form pen
