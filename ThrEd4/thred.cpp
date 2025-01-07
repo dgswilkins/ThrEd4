@@ -6700,7 +6700,7 @@ void sidhup() {
 
 // ReSharper disable CppParameterMayBeConst
 void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
-  auto window         = Instance->valueWindow.operator[](formMenuChoice);
+  auto const window = Instance->valueWindow.operator[](formMenuChoice); // NOLINT(readability-qualified-auto)
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
   auto sideWindowSize     = SIZE {};
@@ -7525,7 +7525,7 @@ void thred::unbsho() {
   destroyBV();
 }
 
-void thred::unsid(bool clearChoice) noexcept {
+void thred::unsid(bool const clearChoice) noexcept {
   if (clearChoice) {
 	FormMenuChoice = 0;
   }
