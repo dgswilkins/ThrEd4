@@ -3924,9 +3924,7 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 	         0,                             // y-coordinate of source upper-left corner
 	         SRCCOPY                        // raster operation code
 	  );
-	  if (FormDataSheet != nullptr) {
-		thred::redraw(FormDataSheet);
-	  }
+	  formForms::redrawFormDataSheet();
 	  if (Instance->stateMap.test(StateFlag::ROTSHO)) {
 		durot();
 	  }

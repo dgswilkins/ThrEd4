@@ -1445,3 +1445,9 @@ void formForms::destroyFormDataSheet() noexcept {
 auto formForms::inFormDataSheet() noexcept -> bool {
   return nullptr != FormDataSheet;
 }
+
+void formForms::redrawFormDataSheet() noexcept {
+  if (nullptr != FormDataSheet) {
+	RedrawWindow(FormDataSheet, nullptr, nullptr, RDW_INVALIDATE);
+  }
+}
