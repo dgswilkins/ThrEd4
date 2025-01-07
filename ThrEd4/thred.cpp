@@ -934,7 +934,7 @@ void chknum() {
 			setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
-		  thred::unsid();
+		  thred::unsid(true);
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
@@ -948,7 +948,7 @@ void chknum() {
 			SetWindowText(valueWindow.operator[](LFRMCOL), fmtStr.c_str());
 			thred::coltab();
 		  }
-		  thred::unsid();
+		  thred::unsid(true);
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
@@ -963,7 +963,7 @@ void chknum() {
 			form::refilfn(ClosestFormToCursor);
 			thred::coltab();
 		  }
-		  thred::unsid();
+		  thred::unsid(true);
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
@@ -977,14 +977,14 @@ void chknum() {
 			SetWindowText(valueWindow.operator[](LBRDCOL), fmtStr.c_str());
 			thred::coltab();
 		  }
-		  thred::unsid();
+		  thred::unsid(true);
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
 		case LBRDPIC: { // update picot spacing
 		  thred::savdo();
 		  form.edgeSpacing = value;
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LBRDPIC);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -992,7 +992,7 @@ void chknum() {
 		case LFRMFAZ: { // update clip phase angle
 		  thred::savdo();
 		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LFRMFAZ);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -1000,7 +1000,7 @@ void chknum() {
 		case LBRDPOS: { // update chain position
 		  thred::savdo();
 		  form.edgeStitchLen = value * IPFGRAN;
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LBRDPOS);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -1008,7 +1008,7 @@ void chknum() {
 		case LMAXFIL: { // update max fill stitch length
 		  thred::savdo();
 		  form.maxFillStitchLen = value;
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LMAXFIL);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -1016,7 +1016,7 @@ void chknum() {
 		case LMINFIL: { // update min fill stitch length
 		  thred::savdo();
 		  form.minFillStitchLen = value;
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LMINFIL);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -1024,7 +1024,7 @@ void chknum() {
 		case LMAXBRD: { // update max border stitch length
 		  thred::savdo();
 		  form.maxBorderStitchLen = value;
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LMAXBRD);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -1032,7 +1032,7 @@ void chknum() {
 		case LMINBRD: { // update min border stitch length
 		  thred::savdo();
 		  form.minBorderStitchLen = value;
-		  thred::unsid();
+		  thred::unsid(true);
 		  setSideWinVal(LMINBRD);
 		  form::refil(ClosestFormToCursor);
 		  return;
@@ -1147,7 +1147,7 @@ void chknum() {
 		  }
 		}
 	  }
-	  thred::unsid();
+	  thred::unsid(true);
 	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();
 	}
@@ -1332,7 +1332,7 @@ void chknum() {
 		if (nullptr != hWnd && !fmtStr.empty()) {
 		  SetWindowText(hWnd, fmtStr.c_str());
 		}
-		thred::unsid();
+		thred::unsid(true);
 		PreferenceIndex = 0;
 	  }
 	}
@@ -3816,7 +3816,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
 		  StitchBoxesThreshold = unthrsh(NumericCode - L'0');
 		  SetWindowText(valueWindow.operator[](PRFSBXCUT), buffer.data());
 		}
-		thred::unsid();
+		thred::unsid(true);
 	  }
 	  else {
 		if (SideWinMsgIdx < sideWindowEntryBuffer.size() - 1U) {
@@ -7536,8 +7536,10 @@ void thred::unbsho() {
   destroyBV();
 }
 
-void thred::unsid() noexcept {
-  FormMenuChoice = 0;
+void thred::unsid(bool clearChoice) noexcept {
+  if (clearChoice) {
+	FormMenuChoice = 0;
+  }
   if (nullptr == SideMessageWindow) {
 	return;
   }
@@ -7783,7 +7785,7 @@ void thred::rstAll() {
   ShowWindow(MainStitchWin, SW_SHOWNORMAL);
   unbsho();
   Instance->stateMap.reset(StateFlag::SIDACT);
-  unsid();
+  unsid(true);
   Instance->stateMap.reset(StateFlag::PRFACT);
   Instance->stateMap.reset(StateFlag::WASRT);
   formForms::destroyPreferencesWindow();
@@ -8155,7 +8157,7 @@ void thred::dun() {
 	formForms::destroyPreferencesWindow();
 	Instance->stateMap.reset(StateFlag::WASRT);
   }
-  unsid();
+  unsid(true);
   unbsho();
   rstAll();
   //	if(savcmp() || (*BalaradName0 && *BalaradName1 && PCSHeader.stitchCount && !FormIndex))
@@ -11238,12 +11240,12 @@ auto thred::unselectAll() -> bool {
   }
   if (Instance->stateMap.test(StateFlag::PRFACT)) {
 	if (Instance->stateMap.testAndReset(StateFlag::HUPMSG)) {
-	  unsid();
+	  unsid(true);
 	  return true;
 	}
 	if (PreferenceIndex != 0U) {
 	  chknum();
-	  unsid();
+	  unsid(true);
 	  PreferenceIndex = 0;
 	  return true;
 	}
@@ -11409,7 +11411,7 @@ void thred::handleFormSelected() {
   }
   if (FormDataSheet != nullptr) {
 	destroyFormDataSheet();
-	unsid();
+	unsid(true);
 	FormMenuChoice = 0;
 	Instance->stateMap.set(StateFlag::RESTCH);
 	return;
@@ -11469,7 +11471,7 @@ void thred::updateHoopSize() {
   UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   form::sethup();
   chkhup();
-  unsid();
+  unsid(true);
   formForms::prfmsg();
 }
 
@@ -11508,7 +11510,7 @@ auto thred::updateFillColor() -> bool {
   auto buffer = std::array<wchar_t, 2> {};
   wrap::narrow(buffer[0], VerticalIndex + '0');
   SetWindowText(Instance->valueWindow.operator[](LBRDCOL), buffer.data());
-  unsid();
+  unsid(true);
   coltab();
   Instance->stateMap.set(StateFlag::RESTCH);
   Instance->stateMap.reset(StateFlag::SIDCOL);
@@ -11572,7 +11574,7 @@ auto thred::handleSideWindowActive() -> bool {
 	                                               });
 	    iFeather != FTHRLIST.end()) {
 	  form.feather.fillType = iFeather->value;
-	  unsid();
+	  unsid(true);
 	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();
 	}
@@ -11590,7 +11592,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  auto const layerStr = displayText::loadStr(iLayer->stringID);
 	  SetWindowText(Instance->valueWindow.operator[](LLAYR), layerStr.c_str());
 	}
-	unsid();
+	unsid(true);
 	formForms::refrm();
 	return true;
   }
@@ -11666,7 +11668,7 @@ auto thred::handleSideWindowActive() -> bool {
 	formForms::refrm();
 	form::refil(ClosestFormToCursor);
 	unmsg();
-	unsid();
+	unsid(true);
 	Instance->stateMap.set(StateFlag::RESTCH);
 	return true;
   }
@@ -11846,7 +11848,7 @@ auto thred::handleSideWindowActive() -> bool {
 	break;
   }
   if (textureFlag) {
-	unsid();
+	unsid(true);
 	destroyFormDataSheet();
 	Instance->stateMap.set(StateFlag::WASFRMFRM);
   }
@@ -11854,7 +11856,7 @@ auto thred::handleSideWindowActive() -> bool {
 	formForms::refrm();
 	form::refil(ClosestFormToCursor);
 	unmsg();
-	unsid();
+	unsid(true);
 	Instance->stateMap.set(StateFlag::RESTCH);
   }
   return true;
@@ -11862,7 +11864,7 @@ auto thred::handleSideWindowActive() -> bool {
 
 auto thred::handleFormDataSheet() -> bool {
   chknum();
-  unsid();
+  unsid(true);
   auto&       form        = Instance->formList.operator[](ClosestFormToCursor);
   auto const& valueWindow = Instance->valueWindow;
   auto const& labelWindow = ThrSingle->LabelWindow;
@@ -11931,7 +11933,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  form.extendedAttribute ^= AT_FTHBLND;
 	  formForms::refrm();
 	  form::refil(ClosestFormToCursor);
-	  unsid();
+	  unsid(true);
 	  Instance->stateMap.set(StateFlag::RESTCH);
 	  break;
 	}
@@ -11949,7 +11951,7 @@ auto thred::handleFormDataSheet() -> bool {
 	  form.extendedAttribute ^= AT_FTHBTH;
 	  formForms::refrm();
 	  form::refil(ClosestFormToCursor);
-	  unsid();
+	  unsid(true);
 	  Instance->stateMap.set(StateFlag::RESTCH);
 	  break;
 	}

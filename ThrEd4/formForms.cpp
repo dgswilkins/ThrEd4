@@ -947,9 +947,7 @@ void formForms::refrm() {
 void formForms::sidwnd(HWND wnd) {
   auto windowRect = RECT {};
   thred::resetSideBuffer();
-  auto const savedChoice = FormMenuChoice;
-  thred::unsid();
-  FormMenuChoice = savedChoice;
+  thred::unsid(false);
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
   SideMessageWindow = CreateWindow(L"STATIC",
@@ -969,7 +967,7 @@ void formForms::sidwnd(HWND wnd) {
 // ReSharper disable CppParameterMayBeConst
 void formForms::prfsid(HWND wnd) {
   thred::resetSideBuffer();
-  thred::unsid();
+  thred::unsid(true);
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
@@ -996,8 +994,7 @@ void formForms::prfmsg() {
   Instance->selectedFormList.clear();
   if (FormDataSheet != nullptr) {
 	thred::destroyFormDataSheet();
-	thred::unsid();
-	FormMenuChoice = 0U;
+	thred::unsid(true);
   }
   LabelWindowSize.cx = 0;
   LabelWindowSize.cy = 0;

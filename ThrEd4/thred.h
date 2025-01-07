@@ -254,7 +254,7 @@ void unrot();
 void unrotu();
 void unsel();
 auto unselectAll() -> bool;
-void unsid() noexcept;
+void unsid(bool clearChoice) noexcept;
 void unstrtch(std::vector<POINT> const& stretchBoxLine);
 void updateBackground();
 void updateBackgroundColor();

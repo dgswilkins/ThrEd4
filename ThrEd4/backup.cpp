@@ -226,7 +226,7 @@ void backup::bak() {
 	Instance->stateMap.reset(StateFlag::WASRT);
 	formForms::destroyPreferencesWindow();
 	thred::resetPrefIndex();
-	thred::unsid();
+	thred::unsid(true);
   }
   if (!Instance->stateMap.testAndSet(StateFlag::BAKING)) {
 	dudat();

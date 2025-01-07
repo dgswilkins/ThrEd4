@@ -346,7 +346,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::FSETFCOL)) { // setting fill color for forms
-	thred::unsid();
+	thred::unsid(true);
 	thred::unmsg();
 	if (thred::inDefaultColorWindows()) {
 	  xt::dufcol(thred::getVerticalIndex() + 1U);
@@ -354,7 +354,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
   }
   if (Instance->stateMap.testAndReset(StateFlag::FSETBCOL)) { // setting border color for forms
-	thred::unsid();
+	thred::unsid(true);
 	thred::unmsg();
 	if (thred::inDefaultColorWindows()) {
 	  xt::dubcol(thred::getVerticalIndex() + 1U);
@@ -642,7 +642,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	AppliqueColor = thred::getVerticalIndex();
 	SetWindowText(Instance->valueWindow.operator[](PRFAPPCOL),
 	              format(FMT_COMPILE(L"{}"), AppliqueColor).c_str());
-	thred::unsid();
+	thred::unsid(true);
 	return true;
   }
   if (Instance->stateMap.testAndReset(StateFlag::SIDACT)) {
