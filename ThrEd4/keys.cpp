@@ -1279,7 +1279,7 @@ auto keys::handleMainWinKeys(wchar_t const&            code,
 		Instance->stateMap.set(StateFlag::RESTCH);
 		break;
 	  }
-	  if (FormDataSheet == nullptr) {
+	  if (!formForms::inFormDataSheet()) {
 		if (wrap::pressed(VK_CONTROL)) {
 		  form::setrang();
 		  return true;

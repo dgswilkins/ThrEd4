@@ -1441,3 +1441,7 @@ void formForms::destroyFormDataSheet() noexcept {
   DestroyWindow(FormDataSheet);
   FormDataSheet = nullptr;
 }
+
+auto formForms::inFormDataSheet() noexcept -> bool {
+  return nullptr != FormDataSheet;
+}

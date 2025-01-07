@@ -6453,7 +6453,7 @@ void form::refil(uint32_t const formIndex) {
 	refilfn(formIndex);
 	return;
   }
-  if (FormDataSheet != nullptr) {
+  if (formForms::inFormDataSheet()) {
 	Instance->stateMap.set(StateFlag::WASFRMFRM);
   }
   formForms::destroyFormDataSheet();

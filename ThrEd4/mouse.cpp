@@ -644,7 +644,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (Instance->stateMap.testAndReset(StateFlag::SIDACT)) {
 	return thred::handleSideWindowActive();
   }
-  if (FormDataSheet != nullptr) {
+  if (formForms::inFormDataSheet()) {
 	return thred::handleFormDataSheet();
   }
   if (Instance->stateMap.test(StateFlag::INSFRM)) {
@@ -1142,7 +1142,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		thred::ritfcor(thred::pxCor2stch(WinMsg.pt));
 	  }
 	  if (Instance->stateMap.test(StateFlag::PRFACT) || Instance->stateMap.test(StateFlag::FORMIN) ||
-	      Instance->stateMap.test(StateFlag::POLIMOV) || FormDataSheet != nullptr) {
+	      Instance->stateMap.test(StateFlag::POLIMOV) || formForms::inFormDataSheet()) {
 		wrap::setCursor(ArrowCursor);
 		break;
 	  }

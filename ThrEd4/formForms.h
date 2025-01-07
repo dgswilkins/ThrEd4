@@ -20,6 +20,7 @@ void destroyFormDataSheet() noexcept;
 void destroyPreferencesWindow() noexcept;
 void frmnum();
 void getPreferencesRect(RECT& prefRect) noexcept;
+auto inFormDataSheet() noexcept -> bool;
 void maxtsiz(std::wstring const& label, SIZE& textSize) noexcept(std::is_same_v<size_t, uint32_t>);
 void prfmsg();
 void prfsid(HWND wnd);
