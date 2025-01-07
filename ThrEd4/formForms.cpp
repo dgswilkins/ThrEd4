@@ -927,7 +927,7 @@ void formForms::refrm() {
   Instance->stateMap.set(StateFlag::REFCNT); // don't create windows - just size them
   auto formMenuEntryCount = 0U;
   refrmfn(form, formMenuEntryCount);
-  thred::destroyFormDataSheet();
+  destroyFormDataSheet();
   FormDataSheet = CreateWindow(L"STATIC",
                                nullptr,
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -993,7 +993,7 @@ void formForms::prfmsg() {
   Instance->stateMap.reset(StateFlag::BIGBOX);
   Instance->selectedFormList.clear();
   if (FormDataSheet != nullptr) {
-	thred::destroyFormDataSheet();
+	destroyFormDataSheet();
 	thred::unsid(true);
   }
   LabelWindowSize.cx = 0;
@@ -1430,4 +1430,14 @@ void formForms::redrawPreferencesWindow() noexcept {
 
 void formForms::getPreferencesRect(RECT& prefRect) noexcept {
   GetWindowRect(PreferencesWindow, &prefRect);
+}
+
+void formForms::destroyFormDataSheet() noexcept {
+  if (nullptr == FormDataSheet) {
+	return;
+  }
+  thred::clearLabelWindow();
+  std::ranges::fill(Instance->valueWindow, nullptr);
+  DestroyWindow(FormDataSheet);
+  FormDataSheet = nullptr;
 }

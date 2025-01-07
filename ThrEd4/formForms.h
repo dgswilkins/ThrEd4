@@ -16,6 +16,7 @@
 
 namespace formForms {
 void dasyfrm();
+void destroyFormDataSheet() noexcept;
 void destroyPreferencesWindow() noexcept;
 void frmnum();
 void getPreferencesRect(RECT& prefRect) noexcept;

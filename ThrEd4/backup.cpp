@@ -221,7 +221,7 @@ void backup::bak() {
   Instance->stateMap.reset(StateFlag::FRMPSEL);
   Instance->stateMap.reset(StateFlag::BIGBOX);
   Instance->selectedFormList.clear();
-  thred::destroyFormDataSheet();
+  formForms::destroyFormDataSheet();
   if (Instance->stateMap.testAndReset(StateFlag::PRFACT)) {
 	Instance->stateMap.reset(StateFlag::WASRT);
 	formForms::destroyPreferencesWindow();
