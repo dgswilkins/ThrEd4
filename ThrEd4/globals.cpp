@@ -39,7 +39,6 @@ uint32_t                       ClosestFormToCursor       = 0U;      // closest f
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
-HWND                           FormDataSheet             = nullptr; // form data sheet
 F_POINT                        FormMoveDelta             = F_POINT {}; // offset for moving forms
 HPEN                           FormPen                   = nullptr; // form pen
 HPEN                           FormPen3px                = nullptr; // three-pixel form pen

@@ -114,6 +114,7 @@ enum DaisyStyles : uint8_t { // daisy form types
   DHART                      // Heart shape
 };
 
+auto FormDataSheet     = HWND {}; // form data sheet
 auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
 auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
 auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet

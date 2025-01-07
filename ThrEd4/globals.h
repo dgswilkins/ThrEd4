@@ -141,8 +141,6 @@ extern uint32_t ClosestVertexToCursor;
 
 extern POINT           EndPointCross;
 
-extern HWND FormDataSheet;
-
 extern F_POINT  FormMoveDelta;
 
 extern HPEN FormPen3px;
