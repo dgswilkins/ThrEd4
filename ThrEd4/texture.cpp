@@ -102,6 +102,11 @@ class TXT_SINGLE
 	return &instance;
   }
 
+  void initialize() {
+	constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
+	TextureHistory.resize(ITXBUFSZ);
+  }
+
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   std::vector<TX_HIST>  TextureHistory;            // texture editor history headers
   std::vector<TX_PNT>   TempTexturePoints;         // temporary storage for textured fill data
@@ -120,7 +125,6 @@ class TXT_SINGLE
 
 // texture internal namespace
 namespace {
-constexpr auto ITXBUFSZ = uint32_t {16U}; // texture buffer depth
 constexpr auto OSCLAMP  = -0.5F;          // values below this are off screen and should be clamped
 constexpr auto TXTRAT   = 0.95F;          // texture fill clipboard shrink/grow ratio
 
@@ -1034,10 +1038,6 @@ void texture::setTxtCurLoc(POINT const location) noexcept {
   TextureCursorLocation = location;
 }
 
-void texture::initTextureHistory() {
-  TextureInstance->TextureHistory.resize(ITXBUFSZ);
-}
-
 void texture::txdun() {
   constexpr auto SIGNATURE            = std::array<char, 4> {"txh"};
   auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
@@ -1809,6 +1809,22 @@ void texture::writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t const pos
   wrap::textOut(drawItem.hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }
 
-void texture::textureInit() noexcept {
+auto texture::textureInit() noexcept -> uint32_t {
   TextureInstance = TXT_SINGLE::getInstance();
+  try {
+	TextureInstance->initialize();
+  }
+  catch (std::bad_alloc const&) {
+	outDebugString(L"Memory allocation failure in ThrSingle\n");
+	return EXIT_FAILURE;
+  }
+  catch (std::exception const& e) {
+	outDebugString(L"Exception caught in ThrSingle: {}\n", static_cast<const void*>(e.what()));
+	return EXIT_FAILURE;
+  }
+  catch (...) {
+	outDebugString(L"Unknown exception caught in ThrSingle\n");
+	return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }

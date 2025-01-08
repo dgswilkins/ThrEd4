@@ -12354,7 +12354,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 		return EXIT_FAILURE;
 	  }
 	  satin::satinInit();
-	  texture::textureInit();
+	  if (EXIT_FAILURE == texture::textureInit()) {
+		return EXIT_FAILURE;
+	  }
 	  tfc::fClipInit();
 	  trace::traceInit();
 	  thrInit();
@@ -12380,7 +12382,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 		ThrSingle->VersionNames.emplace_back(L"");
 	  }
 
-	  texture::initTextureHistory();
 	  redini();
 
 	  createParams createParams {};

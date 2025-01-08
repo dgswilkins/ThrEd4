@@ -10,7 +10,6 @@ namespace texture {
 void deltx(uint32_t formIndex);
 void drwtxtr();
 auto dutxtfil() -> bool;
-void initTextureHistory();
 void redtx();
 void rstxt();
 void rtrtx(FRM_HEAD const& form);
@@ -27,7 +26,7 @@ void txtlbut(FRM_HEAD const& textureForm);
 void txtrbut();
 void txtrmov(FRM_HEAD const& textureForm);
 void txtrup();
-void textureInit() noexcept;
+auto textureInit() noexcept -> uint32_t;
 void writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t position);
 
 } // namespace texture
