@@ -180,6 +180,35 @@ class THR_SINGLE
 	return &instance;
   }
 
+  void initialize() {
+	constexpr auto MSGSIZ  = uint32_t {8192U}; // size of the message buffer
+	constexpr auto NERCNT  = 4U;               // number of entries in the nearestxxx arrays;
+	constexpr auto SWBLEN  = 11U; // Side Window buffer length including the zero terminator
+	constexpr auto SWCOUNT = 16U; // number of side windows to create/track
+	constexpr auto TSSSIZ  = size_t {32U}; // size of the thumbnail search buffer
+
+	DefaultColorWin.resize(COLORCNT);
+	FormControlPoints.resize(OUTPNTS);
+	LabelWindow.resize(LASTLIN);
+	MsgBuffer.reserve(MSGSIZ);
+	NearestPixel.resize(NERCNT);
+	NearestPoint.resize(NERCNT);
+	PreviousNames.reserve(OLDNUM);
+	for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
+	  PreviousNames.emplace_back(L"");
+	}
+	SideWindow.resize(SWCOUNT);
+	SideWindowEntryBuffer.resize(SWBLEN);
+	ThreadSizeWin.resize(COLORCNT);
+	ThumbnailSearchString.reserve(TSSSIZ);
+	UserColorWin.resize(COLORCNT);
+	UserPen.resize(COLORCNT);
+	VersionNames.reserve(OLDVER);
+	for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
+	  VersionNames.emplace_back(L"");
+	}
+  }
+
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   std::vector<COL_CHANGE>   ColorChangeTable;      // stitch indices where color changes
   std::wstring              DesignerName;          // designer name in clear
@@ -248,19 +277,14 @@ constexpr auto MAXDELAY = int32_t {600};         // maximum movie time step
 constexpr auto MINDELAY = int32_t {1};           // minimum movie time step
 constexpr auto MINZUM   = int32_t {5};           // minimum zoom in stitch points
 constexpr auto MINZUMF  = float {MINZUM};        // minimum zoom in stitch points
-constexpr auto MSGSIZ   = uint32_t {8192U};      // size of the message buffer
-constexpr auto NERCNT   = 4U;                    // number of entries in the nearestxxx arrays;
 constexpr auto NUGINI   = 2.0F;                  // default nudge step
 constexpr auto PAGSCROL = 0.9F;                  // page scroll factor
 constexpr auto SCROLSIZ = int32_t {12};          // logical pixel width of a scroll bar
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
-constexpr auto SWBLEN   = 11U; // Side Window buffer length including the zero terminator
-constexpr auto SWCOUNT  = 16U; // number of side windows to create/track
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
-constexpr auto TSSSIZ   = size_t {32U};         // size of the thumbnail search buffer
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
 
 // graphics constants
@@ -596,7 +620,7 @@ void stchout();
 void stchsnap(uint32_t start, uint32_t finish) noexcept(!std::is_same_v<ptrdiff_t, int>);
 auto stlen(uint32_t iStitch) -> float;
 void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
-void thrInit() noexcept;
+auto thrInit() noexcept -> uint32_t;
 void thrsav();
 void unboxs();
 void uncros();
@@ -7046,8 +7070,25 @@ void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const start) {
   }
 }
 
-void thrInit() noexcept {
+auto thrInit() noexcept -> uint32_t {
   ThrSingle = THR_SINGLE::getInstance();
+
+  try {
+	ThrSingle->initialize();
+  }
+  catch (std::bad_alloc const&) {
+	outDebugString(L"Memory allocation failure in ThrSingle\n");
+	return EXIT_FAILURE;
+  }
+  catch (std::exception const& e) {
+	outDebugString(L"Exception caught in ThrSingle: {}\n", static_cast<const void*>(e.what()));
+	return EXIT_FAILURE;
+  }
+  catch (...) {
+	outDebugString(L"Unknown exception caught in ThrSingle\n");
+	return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }
 
 void thrsav() {
@@ -12332,19 +12373,20 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 
 	if (RegisterClassEx(&winClass)) {
 	  Instance = MY_SINGLE::getInstance();
+
 	  try {
 		Instance->initialize();
 	  }
 	  catch (std::bad_alloc const&) {
-		outDebugString(L"Memory allocation failure\n");
+		outDebugString(L"Memory allocation failure in Instance\n");
 		return EXIT_FAILURE;
 	  }
 	  catch (std::exception const& e) {
-		outDebugString(L"Exception caught: {}\n", static_cast<const void*>(e.what()));
+		outDebugString(L"Exception caught in Instance: {}\n", static_cast<const void*>(e.what()));
 		return EXIT_FAILURE;
 	  }
 	  catch (...) {
-		outDebugString(L"Unknown exception caught\n");
+		outDebugString(L"Unknown exception caught in Instance\n");
 		return EXIT_FAILURE;
 	  }
 
@@ -12359,27 +12401,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 	  }
 	  tfc::fClipInit();
 	  trace::traceInit();
-	  thrInit();
-
-	  ThrSingle->DefaultColorWin.resize(COLORCNT);
-	  ThrSingle->FormControlPoints.resize(OUTPNTS);
-	  ThrSingle->LabelWindow.resize(LASTLIN);
-	  ThrSingle->MsgBuffer.reserve(MSGSIZ);
-	  ThrSingle->NearestPixel.resize(NERCNT);
-	  ThrSingle->NearestPoint.resize(NERCNT);
-	  ThrSingle->PreviousNames.reserve(OLDNUM);
-	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
-		ThrSingle->PreviousNames.emplace_back(L"");
-	  }
-	  ThrSingle->SideWindow.resize(SWCOUNT);
-	  ThrSingle->SideWindowEntryBuffer.resize(SWBLEN);
-	  ThrSingle->ThreadSizeWin.resize(COLORCNT);
-	  ThrSingle->ThumbnailSearchString.reserve(TSSSIZ);
-	  ThrSingle->UserColorWin.resize(COLORCNT);
-	  ThrSingle->UserPen.resize(COLORCNT);
-	  ThrSingle->VersionNames.reserve(OLDVER);
-	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-		ThrSingle->VersionNames.emplace_back(L"");
+	  if (EXIT_FAILURE == thrInit()) {
+		return EXIT_FAILURE;
 	  }
 
 	  redini();
