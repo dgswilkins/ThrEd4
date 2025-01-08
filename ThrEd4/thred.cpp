@@ -5779,7 +5779,6 @@ void redini() {
 	  }
 	  ThrSingle->DesignerName.assign(utf::utf8ToUtf16(std::string(IniFile.designerName.data())));
 	  loadColors();
-	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
 	  bitmap::setBitmapColor(IniFile.bitmapColor);
 	  MinStitchLength             = IniFile.minStitchLength;
@@ -10655,7 +10654,7 @@ void thred::defpref() {
                            0x009acddc};
   // NOLINTEND(readability-magic-numbers)
 
-  bitmap::setBmpBackColor();
+  bitmap::bmpInit(); // we expect this to succeed so ignore the return value
   IniFile.dazdef();
   Instance->userFlagMap.set(UserFlag::DAZHOL);
   Instance->userFlagMap.set(UserFlag::DAZD);
@@ -12351,7 +12350,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 
 	  DST::dstInit();
 	  bal::balInit();
-	  bitmap::bmpInit();
+	  if (EXIT_FAILURE == bitmap::bmpInit()) {
+		return EXIT_FAILURE;
+	  }
 	  satin::satinInit();
 	  texture::textureInit();
 	  tfc::fClipInit();

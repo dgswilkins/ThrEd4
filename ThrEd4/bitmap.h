@@ -25,7 +25,7 @@ void assignUBFilename(fs::path const& directory);
 void bfil(COLORREF const& backgroundColor);
 void bfrm(FRM_HEAD const& form);
 void bitbltBitmap() noexcept;
-void bmpInit() noexcept;
+auto bmpInit() -> uint32_t;
 void chkbit();
 void delmap();
 void drawBmpBackground();
@@ -47,6 +47,5 @@ void resetDC() noexcept;
 void savmap();
 void setBitmapColor(COLORREF const& newColor) noexcept;
 void createBitmapPen() noexcept;
-void setBmpBackColor();
 void setBmpColor();
 } // namespace bitmap

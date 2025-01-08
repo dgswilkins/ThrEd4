@@ -76,6 +76,28 @@ class BMP_SINGLE
 	return &instance;
   }
 
+  void initialize() {
+	constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
+	                                                                0x00c8dfee,
+	                                                                0x00708189,
+	                                                                0x00a5a97a,
+	                                                                0x00b8d6fe,
+	                                                                0x008a8371,
+	                                                                0x004b6cb8,
+	                                                                0x009cdcc2,
+	                                                                0x00366d39,
+	                                                                0x00dcfcfb,
+	                                                                0x003c4f75,
+	                                                                0x0095b086,
+	                                                                0x00c9dcba,
+	                                                                0x0043377b,
+	                                                                0x00b799ae,
+	                                                                0x0054667a};
+	BitmapBackgroundColors.clear();
+	BitmapBackgroundColors.resize(DEFAULT_COLORS.size());
+	std::ranges::copy(DEFAULT_COLORS, BitmapBackgroundColors.begin());
+  }
+
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   std::vector<COLORREF> BitmapBackgroundColors; // for the bitmap color dialog box
   fs::path              UTF16BMPname;           // bitmap file name from user load
@@ -609,28 +631,6 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
   return BMPInstance->BitmapBackgroundColors.operator[](index);
 }
 
-void bitmap::setBmpBackColor() {
-  constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
-                                                                  0x00c8dfee,
-                                                                  0x00708189,
-                                                                  0x00a5a97a,
-                                                                  0x00b8d6fe,
-                                                                  0x008a8371,
-                                                                  0x004b6cb8,
-                                                                  0x009cdcc2,
-                                                                  0x00366d39,
-                                                                  0x00dcfcfb,
-                                                                  0x003c4f75,
-                                                                  0x0095b086,
-                                                                  0x00c9dcba,
-                                                                  0x0043377b,
-                                                                  0x00b799ae,
-                                                                  0x0054667a};
-  BMPInstance->BitmapBackgroundColors.clear();
-  BMPInstance->BitmapBackgroundColors.resize(DEFAULT_COLORS.size());
-  std::ranges::copy(DEFAULT_COLORS, BMPInstance->BitmapBackgroundColors.begin());
-}
-
 auto bitmap::getBmpColor() noexcept -> COLORREF {
   return BitmapColor;
 }
@@ -769,6 +769,23 @@ void bitmap::bfrm(FRM_HEAD const& form) {
   }
 }
 
-void bitmap::bmpInit() noexcept {
+auto bitmap::bmpInit() -> uint32_t {
   BMPInstance = BMP_SINGLE::getInstance();
+
+  try {
+	BMPInstance->initialize();
+  }
+  catch (std::bad_alloc const&) {
+	outDebugString(L"Memory allocation failure in BMPInstance\n");
+	return EXIT_FAILURE;
+  }
+  catch (std::exception const& e) {
+	outDebugString(L"Exception caught in BMPInstance: {}\n", static_cast<const void*>(e.what()));
+	return EXIT_FAILURE;
+  }
+  catch (...) {
+	outDebugString(L"Unknown exception caught in BMPInstance\n");
+	return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }
