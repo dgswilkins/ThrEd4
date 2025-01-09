@@ -59,7 +59,10 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
+#include <exception>
 #include <filesystem>
+#include <new>
 #include <stdexcept>
 #include <string>
 // ReSharper disable CppUnusedIncludeDirective

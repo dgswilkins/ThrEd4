@@ -56,9 +56,12 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cctype>
+#include <exception>
 #include <filesystem>
 #include <iterator>
+#include <new>
 #include <ranges>
 #include <string>
 #include <type_traits>
