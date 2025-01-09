@@ -1812,7 +1812,7 @@ void texture::writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t const pos
   wrap::textOut(drawItem.hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }
 
-auto texture::textureInit() noexcept -> uint32_t {
+auto texture::textureInit() -> uint32_t {
   TextureInstance = TXT_SINGLE::getInstance();
   try {
 	TextureInstance->initialize();

@@ -620,7 +620,7 @@ void stchout();
 void stchsnap(uint32_t start, uint32_t finish) noexcept(!std::is_same_v<ptrdiff_t, int>);
 auto stlen(uint32_t iStitch) -> float;
 void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
-auto thrInit() noexcept -> uint32_t;
+auto thrInit() -> uint32_t;
 void thrsav();
 void unboxs();
 void uncros();
@@ -7070,7 +7070,7 @@ void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const start) {
   }
 }
 
-auto thrInit() noexcept -> uint32_t {
+auto thrInit() -> uint32_t {
   ThrSingle = THR_SINGLE::getInstance();
 
   try {

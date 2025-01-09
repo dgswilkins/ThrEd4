@@ -26,7 +26,7 @@ void txtlbut(FRM_HEAD const& textureForm);
 void txtrbut();
 void txtrmov(FRM_HEAD const& textureForm);
 void txtrup();
-auto textureInit() noexcept -> uint32_t;
+auto textureInit() -> uint32_t;
 void writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t position);
 
 } // namespace texture
