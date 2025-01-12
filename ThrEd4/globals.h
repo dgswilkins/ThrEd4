@@ -179,7 +179,6 @@ extern F_RECTANGLE SelectedVerticesRect;
 
 extern HWND  SideMessageWindow;
 extern float SnapLength;
-extern float StarRatio;
 extern F_POINT StitchBmpRatio;
 
 extern F_RECTANGLE StitchRangeRect;

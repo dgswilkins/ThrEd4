@@ -405,6 +405,7 @@ auto SmallStitchLength       = SMALSIZ * PFGRAN; // user can remove stitches sma
 auto SmallestStitchIndex     = uint32_t {}; // pointer to the smallest stitch in the selected range
 auto SortIndex               = uint32_t {}; // index for stitch search
 auto SpiralWrap              = SPIRWRAP;    // number of revolutions in a spiral
+auto StarRatio               = STARAT;      // star origin to body ratio
 auto StitchArrow             = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
 auto StitchBoxesThreshold    = STCHBOX;                        // threshold for drawing stitch boxes
 auto StitchWindowAbsRect     = RECT {};                        // stitch window size,absolute
