@@ -177,7 +177,6 @@ extern RECT    SelectedPixelsRect;
 
 extern F_RECTANGLE SelectedVerticesRect;
 
-extern HWND  SideMessageWindow;
 extern float SnapLength;
 extern F_POINT StitchBmpRatio;
 

@@ -400,6 +400,7 @@ auto SelectBoxSize           = SIZE {};          // size of the select box
 auto SelectedFormsRange      = RANGE {};         // range of selected forms
 auto SelectedRange           = RANGE {};         // first and last stitch for min/max stitch select
 auto ShowStitchThreshold     = SHOPNTS;          // show stitch grid below this zoom level
+auto SideMessageWindow       = HWND {};          // main side message window
 auto SideWinMsgIdx           = uint32_t {};      // track current position in SideWindowEntryBuffer
 auto SmallStitchLength       = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 auto SmallestStitchIndex     = uint32_t {}; // pointer to the smallest stitch in the selected range
