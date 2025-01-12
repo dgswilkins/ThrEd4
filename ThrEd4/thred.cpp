@@ -4318,13 +4318,11 @@ void init() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const deviceContext = GetDC(nullptr);
   ReleaseDC(nullptr, deviceContext);
-  Instance->texturePointsBuffer.clear();
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
   menu::init();
   menu::qchk();
   mouse::crtcurs();
   menu::redfils(LRU_MENU_ID, ThrSingle->PreviousNames);
-  Instance->stateMap.reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
   SetStretchBltMode(ThredDC, COLORONCOLOR);
@@ -4405,7 +4403,6 @@ void init() {
   }
   thred::setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
-  Instance->buttonWin.resize(BTNCOUNT);
   auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
 	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
@@ -4489,7 +4486,6 @@ void init() {
   // create brushes
   createBrushes();
   ZoomFactor = 1;
-  Instance->stitchBuffer.clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
   menu::ladj();
   auto const pikol = displayText::loadStr(IDS_PIKOL);

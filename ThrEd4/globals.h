@@ -69,10 +69,15 @@ class MY_SINGLE
   }
 
   void initialize() {
+	buttonWin.resize(BTNCOUNT);
 	rubberBandLine.resize(3U);
 	selectedFormsLine.resize(OUTPNTS);
 	selectedPointsLine.resize(OUTPNTS);
 	valueWindow.resize(LASTLIN);
+
+	texturePointsBuffer.clear();
+	stitchBuffer.clear();
+	stateMap.reset(); // clear the bitmap
   }
 
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
