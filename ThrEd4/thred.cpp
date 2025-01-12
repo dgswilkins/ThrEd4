@@ -1398,7 +1398,7 @@ void chknum() {
 	if (Instance->stateMap.testAndReset(StateFlag::ENTRSTAR)) { // number of points in star
 	  thred::savdo();
 	  constexpr auto STARSIZE = 250.0F; // star size factor
-	  form::dustar(uintValue,
+	  form::dustar(uintValue, StarRatio,
 	               STARSIZE / value * ZoomFactor *
 	                   wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
 	  return;
@@ -13032,4 +13032,8 @@ auto thred::getBackgroundColor() noexcept -> COLORREF {
 
 auto thred::getZoomMarkPoint() noexcept -> F_POINT {
   return ZoomMarkPoint;
+}
+
+auto thred::getStarRatio() noexcept -> float {
+  return StarRatio;
 }

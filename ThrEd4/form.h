@@ -65,7 +65,7 @@ void dupfn(float rotationAngle);
 void dupsel(HDC hDC);
 void durpoli(uint32_t vertexCount);
 void duspir(uint32_t stepCount);
-void dustar(uint32_t starCount, float length);
+void dustar(uint32_t starCount, float starRatio, float length);
 void duzig(uint32_t vertices);
 void fclp();
 void fcntr();

@@ -7528,7 +7528,7 @@ void form::sethup() noexcept {
   IniFile.hoopType = CUSTHUP;
 }
 
-void form::dustar(uint32_t starCount, float const length) {
+void form::dustar(uint32_t starCount, float starRatio, float const length) {
   constexpr auto STARMIN = 3U;   // minimum star vertices
   constexpr auto STARMAX = 100U; // maximum star vertices
 
@@ -7559,10 +7559,10 @@ void form::dustar(uint32_t starCount, float const length) {
                                wrap::midl(itEndVertex->y, itFirstVertex->y)};
   ++itVertex;
   for (auto iVertex = 1U; iVertex < starCount; ++iVertex) {
-	*itVertex = (*itVertex - center) * StarRatio + center;
+	*itVertex = (*itVertex - center) * starRatio + center;
 	itVertex += 2;
   }
-  *itVertex = (*itVertex - center) * StarRatio + center;
+  *itVertex = (*itVertex - center) * starRatio + center;
   newForm.outline();
   auto& formList = Instance->formList;
 
