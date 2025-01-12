@@ -69,7 +69,6 @@ RECT                           SelectedPixelsRect        = {};      // display f
 F_RECTANGLE                    SelectedVerticesRect      = F_RECTANGLE {}; // rectangle enclosing selected form verticess
 HWND                           SideMessageWindow         = nullptr; // main side message window
 float                          SnapLength                = SNPLEN * PFGRAN;  // snap together length
-float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral
 float                          StarRatio                 = STARAT;  // star formOrigin to body ratio
 F_POINT                        StitchBmpRatio            = F_POINT {}; // stitch hoop to bitmap ratios
 F_RECTANGLE                    StitchRangeRect           = F_RECTANGLE {}; // stitch range rectangle

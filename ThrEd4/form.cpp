@@ -7587,7 +7587,7 @@ void form::duspir(uint32_t stepCount) {
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto newForm           = FRM_HEAD {};
   newForm.type           = FRMLINE;
-  auto const vertexCount = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
+  auto const vertexCount = wrap::round<uint32_t>(wrap::toFloat(stepCount) * thred::getSpiralWrap());
   newForm.vertexIndex    = thred::adflt(vertexCount);
   newForm.vertexCount    = vertexCount;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);

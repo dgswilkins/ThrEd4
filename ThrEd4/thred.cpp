@@ -404,6 +404,7 @@ auto SideWinMsgIdx           = uint32_t {};      // track current position in Si
 auto SmallStitchLength       = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 auto SmallestStitchIndex     = uint32_t {}; // pointer to the smallest stitch in the selected range
 auto SortIndex               = uint32_t {}; // index for stitch search
+auto SpiralWrap              = SPIRWRAP;    // number of revolutions in a spiral
 auto StitchArrow             = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
 auto StitchBoxesThreshold    = STCHBOX;                        // threshold for drawing stitch boxes
 auto StitchWindowAbsRect     = RECT {};                        // stitch window size,absolute
@@ -13036,4 +13037,8 @@ auto thred::getZoomMarkPoint() noexcept -> F_POINT {
 
 auto thred::getStarRatio() noexcept -> float {
   return StarRatio;
+}
+
+auto thred::getSpiralWrap() noexcept -> float {
+  return SpiralWrap;
 }

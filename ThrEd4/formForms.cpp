@@ -1060,7 +1060,7 @@ void formForms::prfmsg() {
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getSmallStitchLength() * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
-  prflin(format(FMT_COMPILE(L"{:.2f}"), SpiralWrap), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getSpiralWrap()), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getStarRatio()), *row++);
   prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getStitchBoxesThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.maxStitchLength * IPFGRAN), *row++);

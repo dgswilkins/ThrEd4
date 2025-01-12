@@ -90,6 +90,7 @@ auto getMsgBufferValue() -> float;
 auto getRotationHandleAngle() noexcept -> float;
 auto getShowStitchThreshold() noexcept -> float;
 auto getSmallStitchLength() noexcept -> float;
+auto getSpiralWrap() noexcept -> float;
 auto getStarRatio() noexcept -> float;
 auto getStitchWindowX() noexcept -> LONG;
 auto getStitchBoxesThreshold() noexcept -> float;
