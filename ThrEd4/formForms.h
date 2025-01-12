@@ -29,6 +29,6 @@ void redrawFormDataSheet() noexcept;
 void redrawPreferencesWindow() noexcept;
 void refrm();
 void setear();
-void sidwnd(HWND wnd);
+void sidwnd(HWND wnd, HWND sideMessageWindow);
 void wavfrm();
 } // namespace formForms
