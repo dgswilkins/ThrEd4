@@ -88,7 +88,6 @@ float                          UserStitchLength          = USESIZ * PFGRAN; // u
 std::array<POINT, SQPNTS>      ZoomBoxLine               = {};      // the zoom box
 F_POINT                        ZoomBoxOrigin             = F_POINT {}; // zoom box origin
 float                          ZoomFactor                = 1.0F;    // zoom factor
-F_POINT                        ZoomMarkPoint             = F_POINT {}; // stitch coordinates of the zoom mark
 F_POINT                        ZoomRatio                 = F_POINT {}; // zoom ratio used to draw stitch window
 F_RECTANGLE                    ZoomRect                  = F_RECTANGLE {}; // zoom rectangle
 // ReSharper restore CppUseAuto

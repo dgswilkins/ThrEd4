@@ -95,6 +95,7 @@ auto getStitchBoxesThreshold() noexcept -> float;
 auto getThrEdName() noexcept -> fs::path const&;
 auto getUserPen(uint32_t iPen) noexcept -> HPEN;
 auto getVerticalIndex() noexcept -> uint8_t;
+auto getZoomMarkPoint() noexcept -> F_POINT;
 auto getZoomMin() noexcept -> float;
 void getdes() noexcept;
 void gotbox();

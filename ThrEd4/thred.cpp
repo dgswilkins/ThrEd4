@@ -418,6 +418,7 @@ auto ThumbnailIndex        = uint32_t {}; // index into the thumbnail filname ta
 auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
 auto VerticalRatio = float {}; // vertical ratio between the zoom window and the entire stitch space
+auto ZoomMarkPoint = F_POINT {}; // stitch coordinates of the zoom mark
 auto ZoomMin       = float {}; // minimum allowed zoom value
 
 THR_SINGLE* ThrSingle;
@@ -13027,4 +13028,8 @@ void thred::setBackgroundColor(COLORREF const color) noexcept {
 
 auto thred::getBackgroundColor() noexcept -> COLORREF {
   return BackgroundColor;
+}
+
+auto thred::getZoomMarkPoint() noexcept -> F_POINT {
+  return ZoomMarkPoint;
 }

@@ -8086,7 +8086,7 @@ auto form::rotpar() -> F_POINT {
 	break;
   }
   if (Instance->stateMap.test(StateFlag::GMRK)) {
-	return ZoomMarkPoint;
+	return thred::getZoomMarkPoint();
   }
   return F_POINT {wrap::midl(RotationRect.right, RotationRect.left),
                   wrap::midl(RotationRect.top, RotationRect.bottom)};
@@ -8641,7 +8641,7 @@ void form::srtbyfrm() {
 void form::cntrx() {
   auto const markCenter =
       Instance->stateMap.test(StateFlag::GMRK)
-          ? ZoomMarkPoint
+          ? thred::getZoomMarkPoint()
           : F_POINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   if (!Instance->selectedFormList.empty()) {
 	thred::savdo();

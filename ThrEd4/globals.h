@@ -203,7 +203,6 @@ extern std::array<POINT, SQPNTS> ZoomBoxLine;
 
 extern F_POINT     ZoomBoxOrigin;
 extern float       ZoomFactor;
-extern F_POINT     ZoomMarkPoint;
 extern F_POINT     ZoomRatio;
 extern F_RECTANGLE ZoomRect;
 
