@@ -201,3 +201,7 @@ extern float       ZoomFactor;
 extern F_POINT     ZoomMarkPoint;
 extern F_POINT     ZoomRatio;
 extern F_RECTANGLE ZoomRect;
+
+namespace globals {
+auto globalsInit() -> uint32_t;
+} // namespace globals

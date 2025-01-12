@@ -93,3 +93,24 @@ F_POINT                        ZoomRatio                 = F_POINT {}; // zoom r
 F_RECTANGLE                    ZoomRect                  = F_RECTANGLE {}; // zoom rectangle
 // ReSharper restore CppUseAuto
 // clang-format on
+
+auto globals::globalsInit() -> uint32_t {
+  Instance = MY_SINGLE::getInstance();
+
+  try {
+	Instance->initialize();
+  }
+  catch (std::bad_alloc const&) {
+	outDebugString(L"Memory allocation failure in Instance\n");
+	return EXIT_FAILURE;
+  }
+  catch (std::exception const& e) {
+	outDebugString(L"Exception caught in Instance: {}\n", static_cast<const void*>(e.what()));
+	return EXIT_FAILURE;
+  }
+  catch (...) {
+	outDebugString(L"Unknown exception caught in Instance\n");
+	return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
+}
