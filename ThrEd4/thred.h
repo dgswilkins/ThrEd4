@@ -87,6 +87,7 @@ auto getHomeDir() noexcept -> fs::path&;
 auto getLabelWindow() noexcept -> std::vector<HWND>&;
 auto getMoveDelta(const POINT& point) noexcept -> F_POINT;
 auto getMsgBufferValue() -> float;
+auto getPicotSpacing() noexcept -> float;
 auto getRotationHandleAngle() noexcept -> float;
 auto getShowStitchThreshold() noexcept -> float;
 auto getSmallStitchLength() noexcept -> float;

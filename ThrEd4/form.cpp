@@ -4956,7 +4956,7 @@ void fspic(uint32_t const formIndex) {
   form.clipEntries    = clipSize;
   form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
   form.borderSize     = ClipRectSize.cy;
-  form.edgeSpacing    = PicotSpacing;
+  form.edgeSpacing    = thred::getPicotSpacing();
   form.borderColor    = ActiveColor;
   form::bsizpar(form);
   form::savplen(ButtonholeCornerLength);

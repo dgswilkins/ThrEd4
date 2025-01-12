@@ -382,6 +382,7 @@ auto NameOrder              = std::array<uint32_t, DNLEN> {};      // designer n
 auto NearestCount           = uint32_t {};                         // number of boxes selected
 auto NumericCode            = wchar_t {};                          // keyboard numerical input
 auto PickColorMsgSize       = SIZE {};                             // size of the pick color message
+auto PicotSpacing           = IPICSPAC;    // space between border picots
 auto PreferenceIndex        = uint32_t {};                  // index to the active preference window
 auto PrevGroupEndStitch     = uint32_t {};                  // higher end of previous selection
 auto PrevGroupStartStitch   = uint32_t {};                  // lower end of previous selection
@@ -13043,4 +13044,8 @@ auto thred::getStarRatio() noexcept -> float {
 
 auto thred::getSpiralWrap() noexcept -> float {
   return SpiralWrap;
+}
+
+auto thred::getPicotSpacing() noexcept -> float {
+  return PicotSpacing;
 }

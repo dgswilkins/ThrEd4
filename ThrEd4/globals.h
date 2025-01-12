@@ -163,7 +163,6 @@ extern uint32_t NewFormVertexCount;
 
 extern std::vector<F_POINT>* OutsidePoints;
 
-extern float       PicotSpacing;
 extern uint32_t    PseudoRandomValue;
 extern F_RECTANGLE RotationRect;
 

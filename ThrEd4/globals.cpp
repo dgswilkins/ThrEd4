@@ -58,7 +58,6 @@ RECT                           MsgRect                   = {};      // rectangle
 HWND                           MsgWindow                 = nullptr; // message window
 uint32_t                       NewFormVertexCount        = 0U;      // points in the new form
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
-float                          PicotSpacing              = IPICSPAC;// space between border picots
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle
 uint32_t                       SelectedFormControlVertex = 0U;      // user selected form control formOrigin

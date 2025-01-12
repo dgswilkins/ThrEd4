@@ -1051,7 +1051,7 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.cursorNudgeStep), *row++);
-  prflin(format(FMT_COMPILE(L"{:.2f}"), PicotSpacing * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getPicotSpacing() * IPFGRAN), *row++);
   choice = Instance->userFlagMap.test(UserFlag::BLUNT) ? displayText::loadStr(IDS_BLUNT)
                                                        : displayText::loadStr(IDS_TAPR);
   prflin(choice, *row++);
