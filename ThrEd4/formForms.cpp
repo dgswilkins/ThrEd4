@@ -966,13 +966,13 @@ void formForms::sidwnd(HWND wnd, HWND sideMessageWindow) {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-void formForms::prfsid(HWND wnd) {
+void formForms::prfsid(HWND wnd, HWND sideMessageWindow) {
   thred::resetSideBuffer();
   thred::unsid(true);
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
-  SideMessageWindow = CreateWindow(L"STATIC",
+  sideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    windowRect.right - ThredWindowOrigin.x + 6,

@@ -11583,7 +11583,7 @@ auto thred::updatePreferences() -> bool {
 	if (WinMsg.hwnd == valueWindow.operator[](iPreference)) {
 	  PreferenceIndex = iPreference + 1U;
 	  outDebugString(L"handleLeftButtonDown:PreferenceIndex [{}]\n", PreferenceIndex);
-	  formForms::prfsid(valueWindow.operator[](iPreference));
+	  formForms::prfsid(valueWindow.operator[](iPreference), SideMessageWindow);
 	  break;
 	}
   }
