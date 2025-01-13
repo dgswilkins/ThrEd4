@@ -1287,7 +1287,7 @@ void formForms::setear() {
   }
   firstVertex->y = verticalPosition;
   ++form.vertexCount;
-  ++NewFormVertexCount;
+  form::setNewFormVertexCount(form.vertexCount + 1);
   Instance->stateMap.set(StateFlag::FORMSEL);
   form::flipv();
   Instance->stateMap.reset(StateFlag::FORMSEL);
