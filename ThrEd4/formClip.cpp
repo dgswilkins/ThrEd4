@@ -960,9 +960,11 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			Instance->texturePointsBuffer.insert(
 			    Instance->texturePointsBuffer.end(), textureSource.begin(), textureSource.end());
 		  }
-		  NewFormVertexCount = formIter.vertexCount;
-		  if (formIter.type != FRMLINE) {
-			++NewFormVertexCount;
+		  if (formIter.type == FRMLINE) {
+			form::setNewFormVertexCount(formIter.vertexCount);
+		  }
+		  else {
+			form::setNewFormVertexCount(formIter.vertexCount + 1U);
 		  }
 		  formList.push_back(formIter);
 		  ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
