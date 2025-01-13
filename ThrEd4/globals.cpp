@@ -22,6 +22,9 @@
 // Standard Libraries
 #include <array>
 #include <cstdint>
+#include <cstdlib>
+#include <exception>
+#include <new>
 #include <vector>
 
 // clang-format off
