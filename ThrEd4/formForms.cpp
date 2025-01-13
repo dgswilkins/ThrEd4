@@ -945,7 +945,7 @@ void formForms::refrm() {
 }
 
 // ReSharper disable CppParameterMayBeConst
-void formForms::sidwnd(HWND wnd, HWND sideMessageWindow) {
+void formForms::sidwnd(HWND wnd, HWND& sideMessageWindow) {
   auto windowRect = RECT {};
   thred::resetSideBuffer();
   thred::unsid(false);
@@ -966,7 +966,7 @@ void formForms::sidwnd(HWND wnd, HWND sideMessageWindow) {
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-void formForms::prfsid(HWND wnd, HWND sideMessageWindow) {
+void formForms::prfsid(HWND wnd, HWND& sideMessageWindow) {
   thred::resetSideBuffer();
   thred::unsid(true);
   auto windowRect = RECT {};
