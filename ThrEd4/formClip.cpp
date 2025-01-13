@@ -786,7 +786,7 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  Instance->formList.push_back(formIter);
 		  ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
 		  Instance->stateMap.set(StateFlag::INIT);
-		  NewFormVertexCount = formIter.vertexCount;
+		  form::setNewFormVertexCount(formIter.vertexCount);
 		  form::unfrm();
 		  form::setmfrm(ClosestFormToCursor);
 		  Instance->stateMap.set(StateFlag::SHOFRM);

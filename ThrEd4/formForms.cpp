@@ -1231,7 +1231,7 @@ void formForms::dasyfrm() {
 	++itVertex;
   }
   FormMoveDelta      = F_POINT {};
-  NewFormVertexCount = iVertex + 1U;
+  form::setNewFormVertexCount(iVertex + 1U);
   Instance->stateMap.set(StateFlag::POLIMOV);
   form::setmfrm(ClosestFormToCursor);
   form::mdufrm();
@@ -1410,7 +1410,7 @@ void formForms::wavfrm() {
   }
   ClosestFormToCursor = wrap::toUnsigned(formList.size() - 1U);
   FormMoveDelta       = F_POINT {};
-  NewFormVertexCount  = vertexCount + 1U;
+  form::setNewFormVertexCount(vertexCount + 1U);
   form::setmfrm(ClosestFormToCursor);
   form::mdufrm();
 }

@@ -9808,7 +9808,7 @@ void thred::insfil(fs::path& insertedFile) {
   InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
   auto const initialInsertPoint = POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
   insflin(initialInsertPoint);
-  NewFormVertexCount = 5U; // inserted file is a rectangle NOLINT(readability-magic-numbers)
+  form::setNewFormVertexCount(5U); // inserted file is a rectangle NOLINT(readability-magic-numbers)
   Instance->stateMap.set(StateFlag::SHOFRM);
   Instance->stateMap.set(StateFlag::INSFIL);
   form::dufrm();
