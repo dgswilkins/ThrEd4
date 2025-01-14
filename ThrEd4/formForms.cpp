@@ -166,7 +166,7 @@ auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
-  return CreateWindow(L"STATIC",
+  return CreateWindowEx(0, L"STATIC",
                       windowName.c_str(),
                       SS_NOTIFY | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -184,7 +184,7 @@ auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  return CreateWindow(L"STATIC",
+  return CreateWindowEx(0, L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -202,7 +202,7 @@ auto numwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  return CreateWindow(L"STATIC",
+  return CreateWindowEx(0, L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -538,7 +538,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 }
 
 void prftwin(std::wstring const& text) noexcept {
-  CreateWindow(L"STATIC",
+  CreateWindowEx(0, L"STATIC",
                text.c_str(),
                WS_CHILD | WS_VISIBLE,
                LabelWindowCoords.left,
@@ -552,7 +552,7 @@ void prftwin(std::wstring const& text) noexcept {
 }
 
 auto prfnwin(std::wstring const& text) noexcept -> HWND {
-  return CreateWindow(L"STATIC",
+  return CreateWindowEx(0, L"STATIC",
                       text.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       ValueWindowCoords.left,
@@ -929,7 +929,7 @@ void formForms::refrm() {
   auto formMenuEntryCount = 0U;
   refrmfn(form, formMenuEntryCount);
   destroyFormDataSheet();
-  FormDataSheet = CreateWindow(L"STATIC",
+  FormDataSheet = CreateWindowEx(0, L"STATIC",
                                nullptr,
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 3,
@@ -951,7 +951,7 @@ void formForms::sidwnd(HWND wnd, HWND& sideMessageWindow) {
   thred::unsid(false);
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
-  sideMessageWindow = CreateWindow(L"STATIC",
+  sideMessageWindow = CreateWindowEx(0, L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    MsgRect.right - ThredWindowOrigin.x + 3,
@@ -972,7 +972,7 @@ void formForms::prfsid(HWND wnd, HWND& sideMessageWindow) {
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
-  sideMessageWindow = CreateWindow(L"STATIC",
+  sideMessageWindow = CreateWindowEx(0, L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    windowRect.right - ThredWindowOrigin.x + 6,
@@ -1006,7 +1006,7 @@ void formForms::prfmsg() {
   maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   destroyPreferencesWindow();
   auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
-  PreferencesWindow      = CreateWindow(L"STATIC",
+  PreferencesWindow      = CreateWindowEx(0, L"STATIC",
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    ButtonWidthX3 + 3,

@@ -848,7 +848,7 @@ void butsid(uint32_t const windowId) {
   chktxnum();
   TextureWindowId = windowId;
   GetWindowRect(Instance->buttonWin.operator[](windowId), &buttonRect);
-  SideWindowButton = CreateWindow(L"STATIC",
+  SideWindowButton = CreateWindowEx(0, L"STATIC",
                                   nullptr,
                                   SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                   buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,

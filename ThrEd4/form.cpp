@@ -4715,7 +4715,7 @@ void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std:
   auto const checkLength   = wrap::round<uint32_t>((SnapLength * 2.0F) + 1.0F);
   auto const stitchWindowX = thred::getStitchWindowX();
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto timeWindow = CreateWindow(L"STATIC",
+  auto timeWindow = CreateWindowEx(0, L"STATIC",
                                  nullptr,
                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
                                  ButtonWidthX3,

@@ -177,7 +177,7 @@ void displayText::shoMsg(std::wstring const& message, bool const top) {
 
 	yOffset = mainRect.bottom - mainRect.top - PXOFFSET - messageSize.cy;
   }
-  MsgWindow = CreateWindow(L"STATIC",
+  MsgWindow = CreateWindowEx(0, L"STATIC",
                            message.c_str(),
                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                            xOffset,
@@ -329,7 +329,7 @@ void displayText::spltmsg() {
 
 void displayText::okcan() {
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton     = CreateWindow(L"STATIC",
+  OKButton     = CreateWindowEx(0, L"STATIC",
                           displayText::loadStr(IDS_OKENT).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -340,7 +340,7 @@ void displayText::okcan() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  CancelButton = CreateWindow(L"STATIC",
+  CancelButton = CreateWindowEx(0, L"STATIC",
                               displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               ButtonWidth * 5,
@@ -357,7 +357,7 @@ void displayText::savdisc() {
   sdmsg();
   Instance->stateMap.reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton      = CreateWindow(L"STATIC",
+  OKButton      = CreateWindowEx(0, L"STATIC",
                           displayText::loadStr(IDS_SAV).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -368,7 +368,7 @@ void displayText::savdisc() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  DiscardButton = CreateWindow(L"STATIC",
+  DiscardButton = CreateWindowEx(0, L"STATIC",
                                displayText::loadStr(IDS_DISC).c_str(),
                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 15,
@@ -379,7 +379,7 @@ void displayText::savdisc() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  CancelButton  = CreateWindow(L"STATIC",
+  CancelButton  = CreateWindowEx(0, L"STATIC",
                               displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               (2 * ButtonWidthX3) + 25,
@@ -406,7 +406,7 @@ void displayText::tomsg() {
   GetWindowRect(OKButton, &okRect);
   auto const winName = loadStr(IDS_DELST2);
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);
-  DeleteStitchesDialog = CreateWindow(L"STATIC",
+  DeleteStitchesDialog = CreateWindowEx(0, L"STATIC",
                                       winName.c_str(),
                                       SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                       3,
