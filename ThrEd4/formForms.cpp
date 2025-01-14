@@ -977,7 +977,6 @@ void formForms::prfsid(HWND wnd, HWND& sideMessageWindow) {
   thred::unsid(true);
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
-  GetClientRect(PreferencesWindow, &MsgRect);
   sideMessageWindow = CreateWindowEx(0,
                                      L"STATIC",
                                      nullptr,
