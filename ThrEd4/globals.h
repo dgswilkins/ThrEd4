@@ -152,13 +152,13 @@ extern INI_FILE IniFile;
 extern std::array<POINT, 3>  InsertLine;
 extern std::vector<F_POINT>* InsidePoints;
 
-extern F_POINT  LastPoint;
-extern float    LineSpacing;
-extern HWND     MainStitchWin;
-extern float    MinStitchLength;
-extern MSG      WinMsg;
-extern RECT     MsgRect;
-extern HWND     MsgWindow;
+extern F_POINT LastPoint;
+extern float   LineSpacing;
+extern HWND    MainStitchWin;
+extern float   MinStitchLength;
+extern MSG     WinMsg;
+extern RECT    MsgRect;
+extern HWND    MsgWindow;
 
 extern std::vector<F_POINT>* OutsidePoints;
 
@@ -175,7 +175,7 @@ extern RECT    SelectedPixelsRect;
 
 extern F_RECTANGLE SelectedVerticesRect;
 
-extern float SnapLength;
+extern float   SnapLength;
 extern F_POINT StitchBmpRatio;
 
 extern F_RECTANGLE StitchRangeRect;

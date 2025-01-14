@@ -1380,11 +1380,8 @@ void trace::wasTrace(DRAWITEMSTRUCT const& drawItem) {
 	  auto const itColTraceRGB   = wrap::next(TRACE_RGB.begin(), ColumnColor);
 	  FillRect(drawItem.hDC, &drawItem.rcItem, *itColTraceBrush);
 	  SetBkColor(drawItem.hDC, *itColTraceRGB);
-	  wrap::textOut(drawItem.hDC,
-	                1,
-	                1,
-	                TraceInputBuffer.data(),
-	                gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
+	  wrap::textOut(
+	      drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
 	  break;
 	}
 	++iTraceShift;

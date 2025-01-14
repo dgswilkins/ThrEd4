@@ -184,13 +184,13 @@ constexpr auto OUTL_ALL = false; // When selecting multiple forms, should we out
 constexpr auto SEQBOT   = int32_t {3};
 constexpr auto SEQTOP   = int32_t {2};
 
-auto AllItemsRect    = F_RECTANGLE {};                  // bounding rectangle for all items
-auto FormForInsert   = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
-auto FormSelectedPen = HPEN {};                         // form select pen
-auto FormVertexNext  = uint32_t {};                   // form vertex storage for form vertex insert
-auto FormVertexPrev  = uint32_t {};                   // form vertex storage for form vertex insert
-auto LayerPen        = std::array<HPEN, LAYERMAX> {}; //
-auto MaxStitchLen    = float {};                      // maximum stitch length
+auto AllItemsRect       = F_RECTANGLE {};                  // bounding rectangle for all items
+auto FormForInsert      = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
+auto FormSelectedPen    = HPEN {};                         // form select pen
+auto FormVertexNext     = uint32_t {}; // form vertex storage for form vertex insert
+auto FormVertexPrev     = uint32_t {}; // form vertex storage for form vertex insert
+auto LayerPen           = std::array<HPEN, LAYERMAX> {}; //
+auto MaxStitchLen       = float {};                      // maximum stitch length
 auto NewFormVertexCount = uint32_t {};                   // points in the new form
 
 // Definitions
@@ -613,7 +613,7 @@ void frmsqr(uint32_t const vertexIndex, uint32_t const iVertex) {
   auto const itCurrentVertex  = wrap::next(Instance->formVertices.cbegin(), vertexIndex + iVertex);
   auto const itPreviousVertex = std::next(itCurrentVertex, -1);
   line[1]                     = thred::stch2pxr(*itCurrentVertex);
-  auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, DPI, STDDPI)) /
+  auto const ratio            = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, DPI, STDDPI)) /
                      wrap::toFloat(StitchWindowClientRect.right);
   constexpr auto DFACT  = 2.0F;
   auto           length = (ZoomRect.right - ZoomRect.left) * ratio * DFACT;
@@ -638,8 +638,7 @@ void frmsqr(uint32_t const vertexIndex, uint32_t const iVertex) {
 
 void frmsqr0(POINT const& controlPoint) {
   auto line = std::array<POINT, SQPNTS> {};
-  if (auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), DPI, STDDPI);
-      offset != 0) {
+  if (auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), DPI, STDDPI); offset != 0) {
 	line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
 	line[0].y = line[1].y = controlPoint.y - offset;
 	line[1].x = line[2].x = controlPoint.x + offset + 1;
@@ -4715,17 +4714,8 @@ void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std:
   auto const checkLength   = wrap::round<uint32_t>((SnapLength * 2.0F) + 1.0F);
   auto const stitchWindowX = thred::getStitchWindowX();
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto timeWindow = CreateWindowEx(0, L"STATIC",
-                                 nullptr,
-                                 WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                 ButtonWidthX3,
-                                 0,
-                                 stitchWindowX,
-                                 ButtonHeight,
-                                 ThrEdWindow,
-                                 nullptr,
-                                 ThrEdInstance,
-                                 nullptr);
+  auto timeWindow = CreateWindowEx(
+      0, L"STATIC", nullptr, WS_CHILD | WS_VISIBLE | WS_BORDER, ButtonWidthX3, 0, stitchWindowX, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const timeDC       = GetDC(timeWindow);
@@ -5480,6 +5470,7 @@ void form::form() {
 // ReSharper disable CppParameterMayBeConst
 void form::selsqr(POINT const& controlPoint, HDC hDC) {
   auto line = std::array<POINT, SQPNTS> {};
+
   auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), DPI, STDDPI);
   line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
   line[0].y = line[1].y = controlPoint.y - offset;

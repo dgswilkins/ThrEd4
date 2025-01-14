@@ -128,8 +128,8 @@ class TXT_SINGLE
 
 // texture internal namespace
 namespace {
-constexpr auto OSCLAMP  = -0.5F;          // values below this are off screen and should be clamped
-constexpr auto TXTRAT   = 0.95F;          // texture fill clipboard shrink/grow ratio
+constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
+constexpr auto TXTRAT  = 0.95F; // texture fill clipboard shrink/grow ratio
 
 enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
@@ -848,17 +848,18 @@ void butsid(uint32_t const windowId) {
   chktxnum();
   TextureWindowId = windowId;
   GetWindowRect(Instance->buttonWin.operator[](windowId), &buttonRect);
-  SideWindowButton = CreateWindowEx(0, L"STATIC",
-                                  nullptr,
-                                  SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                  buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,
-                                  buttonRect.top - StitchWindowOrigin.y,
-                                  ButtonWidthX3,
-                                  ButtonHeight,
-                                  MainStitchWin,
-                                  nullptr,
-                                  ThrEdInstance,
-                                  nullptr);
+  SideWindowButton = CreateWindowEx(0,
+                                    L"STATIC",
+                                    nullptr,
+                                    SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                    buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,
+                                    buttonRect.top - StitchWindowOrigin.y,
+                                    ButtonWidthX3,
+                                    ButtonHeight,
+                                    MainStitchWin,
+                                    nullptr,
+                                    ThrEdInstance,
+                                    nullptr);
   displayText::updateWinFont(MainStitchWin);
 }
 

@@ -177,17 +177,18 @@ void displayText::shoMsg(std::wstring const& message, bool const top) {
 
 	yOffset = mainRect.bottom - mainRect.top - PXOFFSET - messageSize.cy;
   }
-  MsgWindow = CreateWindowEx(0, L"STATIC",
-                           message.c_str(),
-                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                           xOffset,
-                           yOffset,
-                           messageSize.cx + 20,
-                           messageSize.cy + 6,
-                           ThrEdWindow,
-                           nullptr,
-                           ThrEdInstance,
-                           nullptr);
+  MsgWindow = CreateWindowEx(0,
+                             L"STATIC",
+                             message.c_str(),
+                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                             xOffset,
+                             yOffset,
+                             messageSize.cx + 20,
+                             messageSize.cy + 6,
+                             ThrEdWindow,
+                             nullptr,
+                             ThrEdInstance,
+                             nullptr);
 }
 
 void displayText::tabmsg(uint32_t const code, bool const top) {
@@ -329,67 +330,75 @@ void displayText::spltmsg() {
 
 void displayText::okcan() {
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton     = CreateWindowEx(0, L"STATIC",
-                          displayText::loadStr(IDS_OKENT).c_str(),
-                          SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                          5,
-                          MsgRect.bottom + 15,
-                          ButtonWidth * 4,
-                          ButtonHeight,
-                          MainStitchWin,
-                          nullptr,
-                          ThrEdInstance,
-                          nullptr);
-  CancelButton = CreateWindowEx(0, L"STATIC",
-                              displayText::loadStr(IDS_CANCEL).c_str(),
-                              SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                              ButtonWidth * 5,
-                              MsgRect.bottom + 15,
-                              ButtonWidthX3,
-                              ButtonHeight,
-                              MainStitchWin,
-                              nullptr,
-                              ThrEdInstance,
-                              nullptr);
+  OKButton = CreateWindowEx(0,
+                            L"STATIC",
+                            displayText::loadStr(IDS_OKENT).c_str(),
+                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                            5,
+                            MsgRect.bottom + 15,
+                            ButtonWidth * 4,
+                            ButtonHeight,
+                            MainStitchWin,
+                            nullptr,
+                            ThrEdInstance,
+                            nullptr);
+
+  CancelButton = CreateWindowEx(0,
+                                L"STATIC",
+                                displayText::loadStr(IDS_CANCEL).c_str(),
+                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                ButtonWidth * 5,
+                                MsgRect.bottom + 15,
+                                ButtonWidthX3,
+                                ButtonHeight,
+                                MainStitchWin,
+                                nullptr,
+                                ThrEdInstance,
+                                nullptr);
 }
 
 void displayText::savdisc() {
   sdmsg();
   Instance->stateMap.reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton      = CreateWindowEx(0, L"STATIC",
-                          displayText::loadStr(IDS_SAV).c_str(),
-                          SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                          5,
-                          MsgRect.bottom + 15,
-                          ButtonWidthX3,
-                          ButtonHeight,
-                          MainStitchWin,
-                          nullptr,
-                          ThrEdInstance,
-                          nullptr);
-  DiscardButton = CreateWindowEx(0, L"STATIC",
-                               displayText::loadStr(IDS_DISC).c_str(),
-                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                               ButtonWidthX3 + 15,
-                               MsgRect.bottom + 15,
-                               ButtonWidthX3,
-                               ButtonHeight,
-                               MainStitchWin,
-                               nullptr,
-                               ThrEdInstance,
-                               nullptr);
-  CancelButton  = CreateWindowEx(0, L"STATIC",
-                              displayText::loadStr(IDS_CANCEL).c_str(),
-                              SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                              (2 * ButtonWidthX3) + 25,
-                              MsgRect.bottom + 15,
-                              ButtonWidthX3,
-                              ButtonHeight,
-                              MainStitchWin,
-                              nullptr,
-                              ThrEdInstance,
-                              nullptr);
+  OKButton = CreateWindowEx(0,
+                            L"STATIC",
+                            displayText::loadStr(IDS_SAV).c_str(),
+                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                            5,
+                            MsgRect.bottom + 15,
+                            ButtonWidthX3,
+                            ButtonHeight,
+                            MainStitchWin,
+                            nullptr,
+                            ThrEdInstance,
+                            nullptr);
+
+  DiscardButton = CreateWindowEx(0,
+                                 L"STATIC",
+                                 displayText::loadStr(IDS_DISC).c_str(),
+                                 SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                 ButtonWidthX3 + 15,
+                                 MsgRect.bottom + 15,
+                                 ButtonWidthX3,
+                                 ButtonHeight,
+                                 MainStitchWin,
+                                 nullptr,
+                                 ThrEdInstance,
+                                 nullptr);
+
+  CancelButton = CreateWindowEx(0,
+                                L"STATIC",
+                                displayText::loadStr(IDS_CANCEL).c_str(),
+                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                (2 * ButtonWidthX3) + 25,
+                                MsgRect.bottom + 15,
+                                ButtonWidthX3,
+                                ButtonHeight,
+                                MainStitchWin,
+                                nullptr,
+                                ThrEdInstance,
+                                nullptr);
 }
 
 // ReSharper disable CppParameterMayBeConst
@@ -406,17 +415,18 @@ void displayText::tomsg() {
   GetWindowRect(OKButton, &okRect);
   auto const winName = loadStr(IDS_DELST2);
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);
-  DeleteStitchesDialog = CreateWindowEx(0, L"STATIC",
-                                      winName.c_str(),
-                                      SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                      3,
-                                      okRect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
-                                      textSize.cx + 6,
-                                      textSize.cy + 6,
-                                      MainStitchWin,
-                                      nullptr,
-                                      ThrEdInstance,
-                                      nullptr);
+  DeleteStitchesDialog = CreateWindowEx(0,
+                                        L"STATIC",
+                                        winName.c_str(),
+                                        SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                        3,
+                                        okRect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
+                                        textSize.cx + 6,
+                                        textSize.cy + 6,
+                                        MainStitchWin,
+                                        nullptr,
+                                        ThrEdInstance,
+                                        nullptr);
   updateWinFont(MainStitchWin);
 }
 

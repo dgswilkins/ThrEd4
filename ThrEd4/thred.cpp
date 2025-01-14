@@ -382,7 +382,7 @@ auto NameOrder              = std::array<uint32_t, DNLEN> {};      // designer n
 auto NearestCount           = uint32_t {};                         // number of boxes selected
 auto NumericCode            = wchar_t {};                          // keyboard numerical input
 auto PickColorMsgSize       = SIZE {};                             // size of the pick color message
-auto PicotSpacing           = IPICSPAC;    // space between border picots
+auto PicotSpacing           = IPICSPAC;                            // space between border picots
 auto PreferenceIndex        = uint32_t {};                  // index to the active preference window
 auto PrevGroupEndStitch     = uint32_t {};                  // higher end of previous selection
 auto PrevGroupStartStitch   = uint32_t {};                  // lower end of previous selection
@@ -423,7 +423,7 @@ auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails s
 auto VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
 auto VerticalRatio = float {}; // vertical ratio between the zoom window and the entire stitch space
 auto ZoomMarkPoint = F_POINT {}; // stitch coordinates of the zoom mark
-auto ZoomMin       = float {}; // minimum allowed zoom value
+auto ZoomMin       = float {};   // minimum allowed zoom value
 
 THR_SINGLE* ThrSingle;
 
@@ -905,7 +905,7 @@ void chknum() {
 
   if (SideWinMsgIdx != 0U) {
 	auto const& valueWindow           = Instance->valueWindow;
-	auto& sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
+	auto&       sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
 
@@ -1402,7 +1402,8 @@ void chknum() {
 	if (Instance->stateMap.testAndReset(StateFlag::ENTRSTAR)) { // number of points in star
 	  thred::savdo();
 	  constexpr auto STARSIZE = 250.0F; // star size factor
-	  form::dustar(uintValue, StarRatio,
+	  form::dustar(uintValue,
+	               StarRatio,
 	               STARSIZE / value * ZoomFactor *
 	                   wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
 	  return;
@@ -2458,8 +2459,8 @@ void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uin
 
 void dubar(DRAWITEMSTRUCT const& drawItem) {
   auto colorBarRect = RECT {drawItem.rcItem.left, 0, drawItem.rcItem.right, drawItem.rcItem.bottom};
-  auto       indicatorLine = std::array<POINT, 2> {};
-  auto const buffSize      = wrap::toFloat(Instance->stitchBuffer.size());
+  auto indicatorLine  = std::array<POINT, 2> {};
+  auto const buffSize = wrap::toFloat(Instance->stitchBuffer.size());
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
 	auto&      colorChangeTable = ThrSingle->ColorChangeTable;
 	auto const barSectionHeight =
@@ -2894,17 +2895,18 @@ void duselrng(RANGE& selectedRange) {
 
 void dusid(LIST_TYPE const entry, int32_t& windowLocation, SIZE const& windowSize) {
   ThrSingle->SideWindow.operator[](entry.value) =
-      CreateWindowEx(0, L"STATIC",
-                   displayText::loadStr(entry.stringID).c_str(),
-                   SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                   3,
-                   (windowLocation * windowSize.cy) + 3,
-                   windowSize.cx + 3,
-                   windowSize.cy,
-                   SideMessageWindow,
-                   nullptr,
-                   ThrEdInstance,
-                   nullptr);
+      CreateWindowEx(0,
+                     L"STATIC",
+                     displayText::loadStr(entry.stringID).c_str(),
+                     SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                     3,
+                     (windowLocation * windowSize.cy) + 3,
+                     windowSize.cx + 3,
+                     windowSize.cy,
+                     SideMessageWindow,
+                     nullptr,
+                     ThrEdInstance,
+                     nullptr);
   ++windowLocation;
 }
 
@@ -4433,30 +4435,32 @@ void init() {
 	  }
 	}
 	Instance->buttonWin.operator[](iButton) =
-	    CreateWindowEx(0, L"STATIC",
-	                 buttonTxt.c_str(),
-	                 windowFlags,
-	                 0,
-	                 ButtonHeight * (16 + gsl::narrow_cast<int32_t>(iButton)),
-	                 ButtonWidthX3,
-	                 ButtonHeight,
-	                 ThrEdWindow,
-	                 nullptr,
-	                 ThrEdInstance,
-	                 nullptr);
+	    CreateWindowEx(0,
+	                   L"STATIC",
+	                   buttonTxt.c_str(),
+	                   windowFlags,
+	                   0,
+	                   ButtonHeight * (16 + gsl::narrow_cast<int32_t>(iButton)),
+	                   ButtonWidthX3,
+	                   ButtonHeight,
+	                   ThrEdWindow,
+	                   nullptr,
+	                   ThrEdInstance,
+	                   nullptr);
   }
   trace::initTraceWindows();
-  ColorBar = CreateWindowEx(0, L"STATIC",
-                          L"",
-                          SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                          ThredWindowRect.right - ColorBarSize,
-                          0,
-                          ColorBarSize,
-                          ThredWindowRect.bottom,
-                          ThrEdWindow,
-                          nullptr,
-                          ThrEdInstance,
-                          nullptr);
+  ColorBar = CreateWindowEx(0,
+                            L"STATIC",
+                            L"",
+                            SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                            ThredWindowRect.right - ColorBarSize,
+                            0,
+                            ColorBarSize,
+                            ThredWindowRect.bottom,
+                            ThrEdWindow,
+                            nullptr,
+                            ThrEdInstance,
+                            nullptr);
   nuRct();
   // create pens
   static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
@@ -4938,22 +4942,11 @@ void makCol() noexcept {
   auto       yOffset      = int32_t {};
 
   for (auto& tsw : ThrSingle->ThreadSizeWin) {
-	*dcw = CreateWindowEx(0, L"STATIC",
-	                    nullptr,
-	                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                    0,
-	                    yOffset,
-	                    ButtonWidth,
-	                    ButtonHeight,
-	                    ThrEdWindow,
-	                    nullptr,
-	                    ThrEdInstance,
-	                    nullptr);
-	displayText::setWindowFont(*dcw++, hFont);
-	*ucw++ = CreateWindowEx(0, L"STATIC",
+	*dcw = CreateWindowEx(0,
+	                      L"STATIC",
 	                      nullptr,
 	                      SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                      ButtonWidth,
+	                      0,
 	                      yOffset,
 	                      ButtonWidth,
 	                      ButtonHeight,
@@ -4961,19 +4954,34 @@ void makCol() noexcept {
 	                      nullptr,
 	                      ThrEdInstance,
 	                      nullptr);
+	displayText::setWindowFont(*dcw++, hFont);
+	*ucw++ = CreateWindowEx(0,
+	                        L"STATIC",
+	                        nullptr,
+	                        SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                        ButtonWidth,
+	                        yOffset,
+	                        ButtonWidth,
+	                        ButtonHeight,
+	                        ThrEdWindow,
+	                        nullptr,
+	                        ThrEdInstance,
+	                        nullptr);
 
 	buffer[0] = *itThreadSize++;
-	tsw       = CreateWindowEx(0, L"STATIC",
-                       buffer.data(),
-                       SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                       ButtonWidth * 2,
-                       yOffset,
-                       ButtonWidth,
-                       ButtonHeight,
-                       ThrEdWindow,
-                       nullptr,
-                       ThrEdInstance,
-                       nullptr);
+
+	tsw = CreateWindowEx(0,
+	                     L"STATIC",
+	                     buffer.data(),
+	                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                     ButtonWidth * 2,
+	                     yOffset,
+	                     ButtonWidth,
+	                     ButtonHeight,
+	                     ThrEdWindow,
+	                     nullptr,
+	                     ThrEdInstance,
+	                     nullptr);
 	displayText::setWindowFont(tsw, hFont);
 	yOffset += ButtonHeight;
   }
@@ -6693,40 +6701,44 @@ void sidhup() {
   GetWindowRect(Instance->valueWindow.operator[](PRFHUPTYP), &hoopRectangle);
   formForms::getPreferencesRect(preferencesRectangle);
   constexpr auto SMW_FLAGS = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
-  SideMessageWindow        = CreateWindowEx(0, L"STATIC",
-                                   nullptr,
-                                   SMW_FLAGS,
-                                   preferencesRectangle.right + 3 - ThredWindowOrigin.x,
-                                   hoopRectangle.top - ThredWindowOrigin.y,
-                                   ButtonWidthX3 + (ButtonWidth * 2) + 6,
-                                   (ButtonHeight * HUPS) + 6,
-                                   ThrEdWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
-  constexpr auto SW_FLAGS  = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
+
+  SideMessageWindow = CreateWindowEx(0,
+                                     L"STATIC",
+                                     nullptr,
+                                     SMW_FLAGS,
+                                     preferencesRectangle.right + 3 - ThredWindowOrigin.x,
+                                     hoopRectangle.top - ThredWindowOrigin.y,
+                                     ButtonWidthX3 + (ButtonWidth * 2) + 6,
+                                     (ButtonHeight * HUPS) + 6,
+                                     ThrEdWindow,
+                                     nullptr,
+                                     ThrEdInstance,
+                                     nullptr);
+
+  constexpr auto SW_FLAGS = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
 	ThrSingle->SideWindow.operator[](iHoop) =
-	    CreateWindowEx(0, L"STATIC",
-	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
-	                 SW_FLAGS,
-	                 3,
-	                 (ButtonHeight * idx) + 3,
-	                 ButtonWidthX3 + (ButtonWidth * 2),
-	                 ButtonHeight,
-	                 SideMessageWindow,
-	                 nullptr,
-	                 ThrEdInstance,
-	                 nullptr);
+	    CreateWindowEx(0,
+	                   L"STATIC",
+	                   displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
+	                   SW_FLAGS,
+	                   3,
+	                   (ButtonHeight * idx) + 3,
+	                   ButtonWidthX3 + (ButtonWidth * 2),
+	                   ButtonHeight,
+	                   SideMessageWindow,
+	                   nullptr,
+	                   ThrEdInstance,
+	                   nullptr);
   }
 }
 
 // ReSharper disable CppParameterMayBeConst
 void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
   auto const window = Instance->valueWindow.operator[](formMenuChoice); // NOLINT(readability-qualified-auto)
-  auto childListRect  = RECT {};
-  auto parentListRect = RECT {};
+  auto childListRect      = RECT {};
+  auto parentListRect     = RECT {};
   auto sideWindowSize     = SIZE {};
   auto sideWindowLocation = int32_t {};
   GetWindowRect(window, &childListRect);
@@ -6750,17 +6762,18 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
 	  }
 	}
 	// create the side window
-	SideMessageWindow = CreateWindowEx(0, L"STATIC",
-	                                 nullptr,
-	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
-	                                 parentListRect.right - ThredWindowOrigin.x + 3,
-	                                 childListRect.top - ThredWindowOrigin.y - 3,
-	                                 sideWindowSize.cx + 12,
-	                                 (sideWindowSize.cy * entryCount) + 12,
-	                                 ThrEdWindow,
-	                                 nullptr,
-	                                 ThrEdInstance,
-	                                 nullptr);
+	SideMessageWindow = CreateWindowEx(0,
+	                                   L"STATIC",
+	                                   nullptr,
+	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
+	                                   parentListRect.right - ThredWindowOrigin.x + 3,
+	                                   childListRect.top - ThredWindowOrigin.y - 3,
+	                                   sideWindowSize.cx + 12,
+	                                   (sideWindowSize.cy * entryCount) + 12,
+	                                   ThrEdWindow,
+	                                   nullptr,
+	                                   ThrEdInstance,
+	                                   nullptr);
 	for (auto const& iEntry : EDGELIST) {
 	  // set the side window entries
 	  if ((form.edgeType & NEGUND) != iEntry.value) {
@@ -6814,17 +6827,18 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
 	  break;
 	}
   }
-  SideMessageWindow = CreateWindowEx(0, L"STATIC",
-                                   nullptr,
-                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
-                                   parentListRect.right - ThredWindowOrigin.x + 3,
-                                   childListRect.top - ThredWindowOrigin.y - 3,
-                                   sideWindowSize.cx + 12,
-                                   (sideWindowSize.cy * entryCount) + 12,
-                                   ThrEdWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
+  SideMessageWindow = CreateWindowEx(0,
+                                     L"STATIC",
+                                     nullptr,
+                                     WS_BORDER | WS_CHILD | WS_VISIBLE,
+                                     parentListRect.right - ThredWindowOrigin.x + 3,
+                                     childListRect.top - ThredWindowOrigin.y - 3,
+                                     sideWindowSize.cx + 12,
+                                     (sideWindowSize.cy * entryCount) + 12,
+                                     ThrEdWindow,
+                                     nullptr,
+                                     ThrEdInstance,
+                                     nullptr);
   switch (formMenuChoice) {
 	// fill the side window with the appropriate entries
 	case LLAYR: { // if we are choosing a layer
@@ -6957,17 +6971,18 @@ void stchPars() {
 void stchWnd() {
   stchPars();
   MainStitchWin = nullptr;
-  MainStitchWin = CreateWindowEx(0, L"STATIC",
-                               nullptr,
-                               SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                               ButtonWidthX3,
-                               0,
-                               StitchWindowSize.cx,
-                               StitchWindowSize.cy,
-                               ThrEdWindow,
-                               nullptr,
-                               ThrEdInstance,
-                               nullptr);
+  MainStitchWin = CreateWindowEx(0,
+                                 L"STATIC",
+                                 nullptr,
+                                 SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                 ButtonWidthX3,
+                                 0,
+                                 StitchWindowSize.cx,
+                                 StitchWindowSize.cy,
+                                 ThrEdWindow,
+                                 nullptr,
+                                 ThrEdInstance,
+                                 nullptr);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont = displayText::getThrEdFont(FONTSIZE);
   SelectObject(GetDC(MainStitchWin), hFont);
@@ -6975,28 +6990,30 @@ void stchWnd() {
 	return;
   }
   GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
-  VerticalScrollBar   = CreateWindowEx(0, L"SCROLLBAR",
-                                   nullptr,
-                                   SBS_VERT | WS_CHILD | WS_VISIBLE,
-                                   StitchWindowSize.cx + ButtonWidthX3,
-                                   0,
-                                   ScrollSize,
-                                   StitchWindowSize.cy,
-                                   ThrEdWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
-  HorizontalScrollBar = CreateWindowEx(0, L"SCROLLBAR",
+  VerticalScrollBar   = CreateWindowEx(0,
+                                     L"SCROLLBAR",
                                      nullptr,
-                                     SBS_HORZ | WS_CHILD | WS_VISIBLE,
-                                     ButtonWidthX3,
-                                     StitchWindowSize.cy,
-                                     StitchWindowSize.cx,
+                                     SBS_VERT | WS_CHILD | WS_VISIBLE,
+                                     StitchWindowSize.cx + ButtonWidthX3,
+                                     0,
                                      ScrollSize,
+                                     StitchWindowSize.cy,
                                      ThrEdWindow,
                                      nullptr,
                                      ThrEdInstance,
                                      nullptr);
+  HorizontalScrollBar = CreateWindowEx(0,
+                                       L"SCROLLBAR",
+                                       nullptr,
+                                       SBS_HORZ | WS_CHILD | WS_VISIBLE,
+                                       ButtonWidthX3,
+                                       StitchWindowSize.cy,
+                                       StitchWindowSize.cx,
+                                       ScrollSize,
+                                       ThrEdWindow,
+                                       nullptr,
+                                       ThrEdInstance,
+                                       nullptr);
   thred::showScrollBars(false);
 }
 
@@ -9645,17 +9662,18 @@ void thred::movi() {
   }
   movStch();
   if (!Instance->stateMap.test(StateFlag::WASPAT)) {
-	SpeedScrollBar = CreateWindowEx(0, L"SCROLLBAR",
-	                              nullptr,
-	                              SBS_HORZ | WS_CHILD | WS_VISIBLE,
-	                              ButtonWidthX3,
-	                              0,
-	                              StitchWindowSize.cx,
-	                              ScrollSize,
-	                              ThrEdWindow,
-	                              nullptr,
-	                              ThrEdInstance,
-	                              nullptr);
+	SpeedScrollBar = CreateWindowEx(0,
+	                                L"SCROLLBAR",
+	                                nullptr,
+	                                SBS_HORZ | WS_CHILD | WS_VISIBLE,
+	                                ButtonWidthX3,
+	                                0,
+	                                StitchWindowSize.cx,
+	                                ScrollSize,
+	                                ThrEdWindow,
+	                                nullptr,
+	                                ThrEdInstance,
+	                                nullptr);
   }
   auto const stepCount = Instance->stateMap.test(StateFlag::ZUMED)
                              ? gsl::narrow_cast<float>(Instance->stitchBuffer.size()) * ZoomFactor * ZoomFactor
@@ -9748,17 +9766,18 @@ void thred::vubak() {
 	if ((iPosition & 2U) != 0U) {
 	  verticalLocation = deltaY;
 	}
-	*itHWndBV = CreateWindowEx(0, L"STATIC",
-	                         L"",
-	                         SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                         (deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U)) + ButtonWidthX3,
-	                         verticalLocation,
-	                         deltaX,
-	                         deltaY,
-	                         ThrEdWindow,
-	                         nullptr,
-	                         ThrEdInstance,
-	                         nullptr);
+	*itHWndBV = CreateWindowEx(0,
+	                           L"STATIC",
+	                           L"",
+	                           SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                           (deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U)) + ButtonWidthX3,
+	                           verticalLocation,
+	                           deltaX,
+	                           deltaY,
+	                           ThrEdWindow,
+	                           nullptr,
+	                           ThrEdInstance,
+	                           nullptr);
 	++itHWndBV;
   }
   Instance->stateMap.set(StateFlag::BAKSHO);
@@ -12397,37 +12416,30 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 	  createParams.bEnableNonClientDpiScaling = TRUE;
 
 	  if (IniFile.initialWindowCoords.right != 0) {
-		ThrEdWindow = CreateWindowEx(0, L"thred",
-		                           L"",
-		                           WS_OVERLAPPEDWINDOW,
-		                           IniFile.initialWindowCoords.left,
-		                           IniFile.initialWindowCoords.right,
-		                           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
-		                           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
-		                           nullptr,
-		                           nullptr,
-		                           hInstance,
-		                           &createParams);
+		ThrEdWindow =
+		    CreateWindowEx(0,
+		                   L"thred",
+		                   L"",
+		                   WS_OVERLAPPEDWINDOW,
+		                   IniFile.initialWindowCoords.left,
+		                   IniFile.initialWindowCoords.right,
+		                   IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
+		                   IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
+		                   nullptr,
+		                   nullptr,
+		                   hInstance,
+		                   &createParams);
 	  }
 	  else {
-		ThrEdWindow = CreateWindowEx(0, L"thred",
-		                           L"",
-		                           WS_OVERLAPPEDWINDOW,
-		                           CW_USEDEFAULT,
-		                           CW_USEDEFAULT,
-		                           CW_USEDEFAULT,
-		                           CW_USEDEFAULT,
-		                           nullptr,
-		                           nullptr,
-		                           hInstance,
-		                           &createParams);
+		ThrEdWindow = CreateWindowEx(
+		    0, L"thred", L"", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, hInstance, &createParams);
 		GetClientRect(ThrEdWindow, &ThredWindowRect);
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  DPI = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
-	  ScrollSize    = MulDiv(ScrollSize, DPI, STDDPI);
-	  ColorBarSize  = MulDiv(ColorBarSize, DPI, STDDPI);
+	  DPI          = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
+	  ScrollSize   = MulDiv(ScrollSize, DPI, STDDPI);
+	  ColorBarSize = MulDiv(ColorBarSize, DPI, STDDPI);
 	  init();
 	  if (Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
@@ -12692,17 +12704,18 @@ auto thred::createChangeThreadSizeWindows() -> uint32_t {
   auto       idx                = gsl::narrow_cast<int32_t>(VerticalIndex);
   auto       iStr               = THREAD_SIZES.begin();
   std::ranges::generate(ChangeThreadSizeWin, [&idx, &iStr]() mutable noexcept -> HWND {
-	return CreateWindowEx(0, L"STATIC",
-	                    *iStr++,
-	                    WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                    ButtonWidthX3,
-	                    ButtonHeight * idx++,
-	                    ButtonWidth,
-	                    ButtonHeight,
-	                    ThrEdWindow,
-	                    nullptr,
-	                    ThrEdInstance,
-	                    nullptr);
+	return CreateWindowEx(0,
+	                      L"STATIC",
+	                      *iStr++,
+	                      WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                      ButtonWidthX3,
+	                      ButtonHeight * idx++,
+	                      ButtonWidth,
+	                      ButtonHeight,
+	                      ThrEdWindow,
+	                      nullptr,
+	                      ThrEdInstance,
+	                      nullptr);
   });
   Instance->stateMap.set(StateFlag::SIZSEL);
   return threadSizeSelected;
@@ -12994,17 +13007,18 @@ void thred::numWnd() {
   GetWindowRect(ThrEdWindow, &wRect);
   xOffset -= wRect.left;
   if (nullptr == GeneralNumberInputBox) {
-	GeneralNumberInputBox = CreateWindowEx(0, L"STATIC",
-	                                     nullptr,
-	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                     xOffset + 5,
-	                                     messageRect.bottom + 15,
-	                                     ButtonWidthX3,
-	                                     ButtonHeight,
-	                                     ThrEdWindow,
-	                                     nullptr,
-	                                     ThrEdInstance,
-	                                     nullptr);
+	GeneralNumberInputBox = CreateWindowEx(0,
+	                                       L"STATIC",
+	                                       nullptr,
+	                                       SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                       xOffset + 5,
+	                                       messageRect.bottom + 15,
+	                                       ButtonWidthX3,
+	                                       ButtonHeight,
+	                                       ThrEdWindow,
+	                                       nullptr,
+	                                       ThrEdInstance,
+	                                       nullptr);
   }
   else { // The window has not been destroyed, so we are in a indeterminate state
 	throw std::runtime_error("GeneralNumberInputBox is null"); // we should never reach this

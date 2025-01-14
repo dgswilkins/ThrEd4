@@ -166,17 +166,18 @@ auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
-  return CreateWindowEx(0, L"STATIC",
-                      windowName.c_str(),
-                      SS_NOTIFY | WS_CHILD | WS_VISIBLE,
-                      location.left,
-                      location.top,
-                      location.right - location.left,
-                      location.bottom - location.top,
-                      FormDataSheet,
-                      nullptr,
-                      ThrEdInstance,
-                      nullptr);
+  return CreateWindowEx(0,
+                        L"STATIC",
+                        windowName.c_str(),
+                        SS_NOTIFY | WS_CHILD | WS_VISIBLE,
+                        location.left,
+                        location.top,
+                        location.right - location.left,
+                        location.bottom - location.top,
+                        FormDataSheet,
+                        nullptr,
+                        ThrEdInstance,
+                        nullptr);
 }
 
 auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
@@ -184,17 +185,18 @@ auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  return CreateWindowEx(0, L"STATIC",
-                      winName.c_str(),
-                      SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
-                      location.left,
-                      location.top,
-                      location.right - location.left,
-                      location.bottom - location.top,
-                      FormDataSheet,
-                      nullptr,
-                      ThrEdInstance,
-                      nullptr);
+  return CreateWindowEx(0,
+                        L"STATIC",
+                        winName.c_str(),
+                        SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
+                        location.left,
+                        location.top,
+                        location.right - location.left,
+                        location.bottom - location.top,
+                        FormDataSheet,
+                        nullptr,
+                        ThrEdInstance,
+                        nullptr);
 }
 
 auto numwin(std::wstring const& winName, RECT const& location) -> HWND {
@@ -202,17 +204,18 @@ auto numwin(std::wstring const& winName, RECT const& location) -> HWND {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  return CreateWindowEx(0, L"STATIC",
-                      winName.c_str(),
-                      SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
-                      location.left,
-                      location.top,
-                      location.right - location.left,
-                      location.bottom - location.top,
-                      FormDataSheet,
-                      nullptr,
-                      ThrEdInstance,
-                      nullptr);
+  return CreateWindowEx(0,
+                        L"STATIC",
+                        winName.c_str(),
+                        SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
+                        location.left,
+                        location.top,
+                        location.right - location.left,
+                        location.bottom - location.top,
+                        FormDataSheet,
+                        nullptr,
+                        ThrEdInstance,
+                        nullptr);
 }
 
 void nxtlin(uint32_t& formMenuEntryCount) noexcept {
@@ -538,31 +541,33 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 }
 
 void prftwin(std::wstring const& text) noexcept {
-  CreateWindowEx(0, L"STATIC",
-               text.c_str(),
-               WS_CHILD | WS_VISIBLE,
-               LabelWindowCoords.left,
-               LabelWindowCoords.top,
-               LabelWindowCoords.right - LabelWindowCoords.left,
-               LabelWindowCoords.bottom - LabelWindowCoords.top,
-               PreferencesWindow,
-               nullptr,
-               ThrEdInstance,
-               nullptr);
+  CreateWindowEx(0,
+                 L"STATIC",
+                 text.c_str(),
+                 WS_CHILD | WS_VISIBLE,
+                 LabelWindowCoords.left,
+                 LabelWindowCoords.top,
+                 LabelWindowCoords.right - LabelWindowCoords.left,
+                 LabelWindowCoords.bottom - LabelWindowCoords.top,
+                 PreferencesWindow,
+                 nullptr,
+                 ThrEdInstance,
+                 nullptr);
 }
 
 auto prfnwin(std::wstring const& text) noexcept -> HWND {
-  return CreateWindowEx(0, L"STATIC",
-                      text.c_str(),
-                      SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
-                      ValueWindowCoords.left,
-                      ValueWindowCoords.top,
-                      ValueWindowCoords.right - ValueWindowCoords.left,
-                      ValueWindowCoords.bottom - ValueWindowCoords.top,
-                      PreferencesWindow,
-                      nullptr,
-                      ThrEdInstance,
-                      nullptr);
+  return CreateWindowEx(0,
+                        L"STATIC",
+                        text.c_str(),
+                        SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
+                        ValueWindowCoords.left,
+                        ValueWindowCoords.top,
+                        ValueWindowCoords.right - ValueWindowCoords.left,
+                        ValueWindowCoords.bottom - ValueWindowCoords.top,
+                        PreferencesWindow,
+                        nullptr,
+                        ThrEdInstance,
+                        nullptr);
 }
 
 void prflin(std::wstring const& msg, LIST_TYPE const& row) {
@@ -929,17 +934,18 @@ void formForms::refrm() {
   auto formMenuEntryCount = 0U;
   refrmfn(form, formMenuEntryCount);
   destroyFormDataSheet();
-  FormDataSheet = CreateWindowEx(0, L"STATIC",
-                               nullptr,
-                               WS_CHILD | WS_VISIBLE | WS_BORDER,
-                               ButtonWidthX3 + 3,
-                               3,
-                               LabelWindowSize.cx + ValueWindowSize.cx + 18,
-                               (LabelWindowSize.cy * gsl::narrow<LONG>(formMenuEntryCount)) + 12,
-                               ThrEdWindow,
-                               nullptr,
-                               ThrEdInstance,
-                               nullptr);
+  FormDataSheet = CreateWindowEx(0,
+                                 L"STATIC",
+                                 nullptr,
+                                 WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                 ButtonWidthX3 + 3,
+                                 3,
+                                 LabelWindowSize.cx + ValueWindowSize.cx + 18,
+                                 (LabelWindowSize.cy * gsl::narrow<LONG>(formMenuEntryCount)) + 12,
+                                 ThrEdWindow,
+                                 nullptr,
+                                 ThrEdInstance,
+                                 nullptr);
   Instance->stateMap.reset(StateFlag::REFCNT); // this time create the windows
   refrmfn(form, formMenuEntryCount);
 }
@@ -951,17 +957,18 @@ void formForms::sidwnd(HWND wnd, HWND& sideMessageWindow) {
   thred::unsid(false);
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
-  sideMessageWindow = CreateWindowEx(0, L"STATIC",
-                                   nullptr,
-                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
-                                   MsgRect.right - ThredWindowOrigin.x + 3,
-                                   windowRect.top - ThredWindowOrigin.y - 3,
-                                   ButtonWidthX3,
-                                   windowRect.bottom - windowRect.top + 3,
-                                   ThrEdWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
+  sideMessageWindow = CreateWindowEx(0,
+                                     L"STATIC",
+                                     nullptr,
+                                     WS_BORDER | WS_CHILD | WS_VISIBLE,
+                                     MsgRect.right - ThredWindowOrigin.x + 3,
+                                     windowRect.top - ThredWindowOrigin.y - 3,
+                                     ButtonWidthX3,
+                                     windowRect.bottom - windowRect.top + 3,
+                                     ThrEdWindow,
+                                     nullptr,
+                                     ThrEdInstance,
+                                     nullptr);
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -972,17 +979,18 @@ void formForms::prfsid(HWND wnd, HWND& sideMessageWindow) {
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
-  sideMessageWindow = CreateWindowEx(0, L"STATIC",
-                                   nullptr,
-                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
-                                   windowRect.right - ThredWindowOrigin.x + 6,
-                                   windowRect.top - ThredWindowOrigin.y - 3,
-                                   ValueWindowSize.cx,
-                                   windowRect.bottom - windowRect.top + 3,
-                                   ThrEdWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
+  sideMessageWindow = CreateWindowEx(0,
+                                     L"STATIC",
+                                     nullptr,
+                                     WS_BORDER | WS_CHILD | WS_VISIBLE,
+                                     windowRect.right - ThredWindowOrigin.x + 6,
+                                     windowRect.top - ThredWindowOrigin.y - 3,
+                                     ValueWindowSize.cx,
+                                     windowRect.bottom - windowRect.top + 3,
+                                     ThrEdWindow,
+                                     nullptr,
+                                     ThrEdInstance,
+                                     nullptr);
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -1006,17 +1014,19 @@ void formForms::prfmsg() {
   maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   destroyPreferencesWindow();
   auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
-  PreferencesWindow      = CreateWindowEx(0, L"STATIC",
-                                   nullptr,
-                                   WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                   ButtonWidthX3 + 3,
-                                   3,
-                                   windowWidth,
-                                   (LabelWindowSize.cy * PRFLINS) + 12,
-                                   ThrEdWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
+
+  PreferencesWindow = CreateWindowEx(0,
+                                     L"STATIC",
+                                     nullptr,
+                                     WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                     ButtonWidthX3 + 3,
+                                     3,
+                                     windowWidth,
+                                     (LabelWindowSize.cy * PRFLINS) + 12,
+                                     ThrEdWindow,
+                                     nullptr,
+                                     ThrEdInstance,
+                                     nullptr);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const preferenceDC = GetDC(PreferencesWindow);
   GetClientRect(PreferencesWindow, &preferenceRect);
@@ -1230,7 +1240,7 @@ void formForms::dasyfrm() {
 	itVertex->y -= form.rectangle.bottom;
 	++itVertex;
   }
-  FormMoveDelta      = F_POINT {};
+  FormMoveDelta = F_POINT {};
   form::setNewFormVertexCount(iVertex + 1U);
   Instance->stateMap.set(StateFlag::POLIMOV);
   form::setmfrm(ClosestFormToCursor);
