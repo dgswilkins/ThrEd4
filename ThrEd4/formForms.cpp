@@ -956,12 +956,11 @@ void formForms::sidwnd(HWND wnd, HWND& sideMessageWindow) {
   thred::unsid(false);
   auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
-  GetWindowRect(FormDataSheet, &MsgRect);
   sideMessageWindow = CreateWindowEx(0,
                                      L"STATIC",
                                      nullptr,
                                      WS_BORDER | WS_CHILD | WS_VISIBLE,
-                                     MsgRect.right - ThredWindowOrigin.x + 3,
+                                     windowRect.right - ThredWindowOrigin.x + 3,
                                      windowRect.top - ThredWindowOrigin.y - 3,
                                      ButtonWidthX3,
                                      windowRect.bottom - windowRect.top + 3,
