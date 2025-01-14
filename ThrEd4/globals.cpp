@@ -59,7 +59,6 @@ float                          MinStitchLength           = MINSIZ * PFGRAN; // m
 MSG                            WinMsg                    = {};      // main message loop message
 RECT                           MsgRect                   = {};      // rectangle containing the text message
 HWND                           MsgWindow                 = nullptr; // message window
-uint32_t                       NewFormVertexCount        = 0U;      // points in the new form
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register
 F_RECTANGLE                    RotationRect              = F_RECTANGLE {}; // rotation rectangle

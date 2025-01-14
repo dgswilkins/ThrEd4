@@ -191,6 +191,7 @@ auto FormVertexNext  = uint32_t {};                   // form vertex storage for
 auto FormVertexPrev  = uint32_t {};                   // form vertex storage for form vertex insert
 auto LayerPen        = std::array<HPEN, LAYERMAX> {}; //
 auto MaxStitchLen    = float {};                      // maximum stitch length
+auto NewFormVertexCount = uint32_t {};                   // points in the new form
 
 // Definitions
 void adfrm(uint32_t iForm);
