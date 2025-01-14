@@ -329,13 +329,14 @@ void displayText::spltmsg() {
 }
 
 void displayText::okcan() {
-  GetClientRect(MsgWindow, &MsgRect);
+  auto msgRect = RECT {};
+  GetClientRect(MsgWindow, &msgRect);
   OKButton = CreateWindowEx(0,
                             L"STATIC",
                             displayText::loadStr(IDS_OKENT).c_str(),
                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                             5,
-                            MsgRect.bottom + 15,
+                            msgRect.bottom + 15,
                             ButtonWidth * 4,
                             ButtonHeight,
                             MainStitchWin,
@@ -348,7 +349,7 @@ void displayText::okcan() {
                                 displayText::loadStr(IDS_CANCEL).c_str(),
                                 SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                 ButtonWidth * 5,
-                                MsgRect.bottom + 15,
+                                msgRect.bottom + 15,
                                 ButtonWidthX3,
                                 ButtonHeight,
                                 MainStitchWin,
