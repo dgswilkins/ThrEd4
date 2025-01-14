@@ -57,7 +57,6 @@ float                          LineSpacing               = DEFSPACE * PFGRAN; //
 HWND                           MainStitchWin             = nullptr; // stitch window
 float                          MinStitchLength           = MINSIZ * PFGRAN; // minimum stitch size
 MSG                            WinMsg                    = {};      // main message loop message
-RECT                           MsgRect                   = {};      // rectangle containing the text message
 HWND                           MsgWindow                 = nullptr; // message window
 std::vector<F_POINT>*          OutsidePoints             = nullptr; // pointer to the list of outside outline points
 uint32_t                       PseudoRandomValue         = 0U;      // pseudo-random sequence register

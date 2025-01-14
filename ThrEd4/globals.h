@@ -157,7 +157,6 @@ extern float   LineSpacing;
 extern HWND    MainStitchWin;
 extern float   MinStitchLength;
 extern MSG     WinMsg;
-extern RECT    MsgRect;
 extern HWND    MsgWindow;
 
 extern std::vector<F_POINT>* OutsidePoints;
