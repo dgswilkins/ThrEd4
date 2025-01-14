@@ -361,13 +361,14 @@ void displayText::okcan() {
 void displayText::savdisc() {
   sdmsg();
   Instance->stateMap.reset(StateFlag::BIGBOX);
-  GetClientRect(MsgWindow, &MsgRect);
+  auto msgRect = RECT {};
+  GetClientRect(MsgWindow, &msgRect);
   OKButton = CreateWindowEx(0,
                             L"STATIC",
                             displayText::loadStr(IDS_SAV).c_str(),
                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                             5,
-                            MsgRect.bottom + 15,
+                            msgRect.bottom + 15,
                             ButtonWidthX3,
                             ButtonHeight,
                             MainStitchWin,
@@ -380,7 +381,7 @@ void displayText::savdisc() {
                                  displayText::loadStr(IDS_DISC).c_str(),
                                  SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                  ButtonWidthX3 + 15,
-                                 MsgRect.bottom + 15,
+                                 msgRect.bottom + 15,
                                  ButtonWidthX3,
                                  ButtonHeight,
                                  MainStitchWin,
@@ -393,7 +394,7 @@ void displayText::savdisc() {
                                 displayText::loadStr(IDS_CANCEL).c_str(),
                                 SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                 (2 * ButtonWidthX3) + 25,
-                                MsgRect.bottom + 15,
+                                msgRect.bottom + 15,
                                 ButtonWidthX3,
                                 ButtonHeight,
                                 MainStitchWin,
