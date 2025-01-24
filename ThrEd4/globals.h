@@ -139,7 +139,7 @@ extern F_LSIZ   ClipRectSize;
 extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
-extern int32_t  DPI;
+extern int32_t  DisplayDPI;
 extern POINT    EndPointCross;
 extern F_POINT  FormMoveDelta;
 extern HPEN     FormPen3px;

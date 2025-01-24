@@ -149,7 +149,7 @@ constexpr auto PENWHITE = COLORREF {0xffffffU}; // White pen
 constexpr auto PENNWID  = 1;                    // Narrow pen width
 constexpr auto PENMWID  = 3;                    // Medium pen width
 constexpr auto PENWWID  = 5;                    // Wide pen width
-constexpr auto STDDPI   = int32_t {96};         // Default DPI
+constexpr auto STDDPI   = int32_t {96};         // Default Display DPI
 
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
 constexpr auto HALF   = 0.5F;     // factor for halving

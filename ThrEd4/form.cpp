@@ -613,7 +613,7 @@ void frmsqr(uint32_t const vertexIndex, uint32_t const iVertex) {
   auto const itCurrentVertex  = wrap::next(Instance->formVertices.cbegin(), vertexIndex + iVertex);
   auto const itPreviousVertex = std::next(itCurrentVertex, -1);
   line[1]                     = thred::stch2pxr(*itCurrentVertex);
-  auto const ratio            = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, DPI, STDDPI)) /
+  auto const ratio            = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, DisplayDPI, STDDPI)) /
                      wrap::toFloat(StitchWindowClientRect.right);
   constexpr auto DFACT  = 2.0F;
   auto           length = (ZoomRect.right - ZoomRect.left) * ratio * DFACT;
@@ -638,7 +638,7 @@ void frmsqr(uint32_t const vertexIndex, uint32_t const iVertex) {
 
 void frmsqr0(POINT const& controlPoint) {
   auto line = std::array<POINT, SQPNTS> {};
-  if (auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), DPI, STDDPI); offset != 0) {
+  if (auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), DisplayDPI, STDDPI); offset != 0) {
 	line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
 	line[0].y = line[1].y = controlPoint.y - offset;
 	line[1].x = line[2].x = controlPoint.x + offset + 1;
@@ -651,7 +651,7 @@ void frmsqr0(POINT const& controlPoint) {
 // ReSharper disable CppParameterMayBeConst
 void frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto       line   = std::array<POINT, LNPNTS> {};
-  auto const offset = MulDiv(8, DPI, STDDPI);
+  auto const offset = MulDiv(8, DisplayDPI, STDDPI);
   SelectObject(hDC, FormSelectedPen);
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;
@@ -5471,7 +5471,7 @@ void form::form() {
 void form::selsqr(POINT const& controlPoint, HDC hDC) {
   auto line = std::array<POINT, SQPNTS> {};
 
-  auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), DPI, STDDPI);
+  auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), DisplayDPI, STDDPI);
   line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
   line[0].y = line[1].y = controlPoint.y - offset;
   line[1].x = line[2].x = controlPoint.x + offset;
