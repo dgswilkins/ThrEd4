@@ -4411,7 +4411,7 @@ void init() {
   thred::setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
   auto const blank = std::wstring {};
-  for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
+  for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) { // create the buttons below the color windows
 	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
 	auto buttonTxt = std::wstring {};
 	switch (iButton) {
@@ -4440,7 +4440,7 @@ void init() {
 	                   buttonTxt.c_str(),
 	                   windowFlags,
 	                   0,
-	                   ButtonHeight * (16 + gsl::narrow_cast<int32_t>(iButton)),
+	                   ButtonHeight * (COLORCNT + gsl::narrow_cast<int32_t>(iButton)),
 	                   ButtonWidthX3,
 	                   ButtonHeight,
 	                   ThrEdWindow,
