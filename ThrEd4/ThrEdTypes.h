@@ -94,7 +94,7 @@ constexpr auto     ITXHI    = 9.0F * PFGRAN; // default texture editor height
 constexpr auto     ITXWID   = 9.0F * PFGRAN; // default texture editor width
 constexpr auto     ITXSPAC  = 0.4F * PFGRAN; // default texture editor spacing
 constexpr uint16_t ITXPIX   = 5U;            // default texture editor cross pixels
-constexpr uint32_t BTNCOUNT = 9U;            // Maximum number of buttons
+constexpr uint32_t BTNCOUNT = 9U;            // Maximum number of buttons below the color buttons
 constexpr int32_t  FONTSIZE = 400;           // default font size
 constexpr uint32_t B1MASK   = 0x000000ffU;   // mask for the least significant byte
 constexpr uint32_t B2MASK   = 0x0000ff00U;   // mask for the middle byte
@@ -155,6 +155,11 @@ constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part
 constexpr auto HALF   = 0.5F;     // factor for halving
 constexpr auto DBLF   = 2.0F;     // factor for doubling
 constexpr auto DECRAD = 10;       // decimal radix
+
+// Dialog border offsets
+constexpr auto DLGN = 6; // dialog border narrow offset 
+constexpr auto DLGW = DLGN * 2; // dialog border left/right or top/bottom combined offset
+constexpr auto DLGH = 15; // dialog border huge offset
 
 // rectangle position indices
 constexpr auto PTL  = 0; // top left corner       80-1-2
@@ -782,7 +787,7 @@ enum FillMessageCodes : uint16_t {
   FML_CHAIN = 0x10A
 };
 
-// button windows
+// button windows. Note that BUTTONCNT should match the number of buttons
 enum StitchButtons : uint8_t { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
 
 enum TextureButtons : uint8_t { // text button windows
