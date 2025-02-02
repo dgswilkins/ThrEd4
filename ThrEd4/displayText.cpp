@@ -331,7 +331,7 @@ void displayText::okcan() {
   GetClientRect(MsgWindow, &msgRect);
   OKButton = CreateWindowEx(0,
                             L"STATIC",
-                            displayText::loadStr(IDS_OKENT).c_str(),
+                            loadStr(IDS_OKENT).c_str(),
                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                             DLGN,
                             msgRect.bottom + DLGH,
@@ -344,7 +344,7 @@ void displayText::okcan() {
 
   CancelButton = CreateWindowEx(0,
                                 L"STATIC",
-                                displayText::loadStr(IDS_CANCEL).c_str(),
+                                loadStr(IDS_CANCEL).c_str(),
                                 SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                 ButtonWidth * DLGN,
                                 msgRect.bottom + DLGH,
@@ -363,7 +363,7 @@ void displayText::savdisc() {
   GetClientRect(MsgWindow, &msgRect);
   OKButton = CreateWindowEx(0,
                             L"STATIC",
-                            displayText::loadStr(IDS_SAV).c_str(),
+                            loadStr(IDS_SAV).c_str(),
                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                             DLGN,
                             msgRect.bottom + DLGH,
@@ -376,7 +376,7 @@ void displayText::savdisc() {
 
   DiscardButton = CreateWindowEx(0,
                                  L"STATIC",
-                                 displayText::loadStr(IDS_DISC).c_str(),
+                                 loadStr(IDS_DISC).c_str(),
                                  SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                  ButtonWidthX3 + (2 * DLGN),
                                  msgRect.bottom + DLGH,
@@ -389,7 +389,7 @@ void displayText::savdisc() {
 
   CancelButton = CreateWindowEx(0,
                                 L"STATIC",
-                                displayText::loadStr(IDS_CANCEL).c_str(),
+                                loadStr(IDS_CANCEL).c_str(),
                                 SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                 ((ButtonWidthX3 + DLGN) * 2) + DLGN,
                                 msgRect.bottom + DLGH,
