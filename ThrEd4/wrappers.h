@@ -58,8 +58,9 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
 
+// NOLINTBEGIN(bugprone-exception-escape)
 template <class T>
-#pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape)
+#pragma warning(suppress : 4100) 
 constexpr auto
 sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
@@ -71,7 +72,7 @@ sizeofType([[maybe_unused]] std::vector<T> const& vec) noexcept(std::is_same_v<u
 }
 
 template <class T>
-#pragma warning(suppress : 4100) // NOLINTNEXTLINE(bugprone-exception-escape)
+#pragma warning(suppress : 4100)
 constexpr auto
 sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<uint32_t, size_t>) -> uint32_t {
   if constexpr (std::is_same_v<uint32_t, size_t>) {
@@ -81,6 +82,7 @@ sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<u
 	return gsl::narrow<uint32_t>(sizeof(T));
   }
 }
+// NOLINTEND(bugprone-exception-escape)
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
