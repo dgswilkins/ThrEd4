@@ -7520,7 +7520,7 @@ void form::sethup() noexcept {
   IniFile.hoopType = CUSTHUP;
 }
 
-void form::dustar(uint32_t starCount, float starRatio, float const length) {
+void form::dustar(uint32_t starCount, float const starRatio, float const length) {
   constexpr auto STARMIN = 3U;   // minimum star vertices
   constexpr auto STARMAX = 100U; // maximum star vertices
 
