@@ -9330,6 +9330,6 @@ void form::createFormSelectedPen() noexcept {
   FormSelectedPen = wrap::createPen(PS_SOLID, PENNWID, PENSEGRN);
 }
 
-void form::setNewFormVertexCount(uint32_t vertexCount) noexcept {
+void form::setNewFormVertexCount(uint32_t const vertexCount) noexcept {
   NewFormVertexCount = vertexCount;
 }
