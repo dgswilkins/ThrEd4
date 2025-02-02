@@ -5,7 +5,7 @@
 #define BUGSEQ
 #define CALLBACK
 #define CLPVU
-#define CreateWindow
+#define CreateWindowEx
 #define EN_CHANGE
 #define FALSE
 #define FMT_COMPILE(s) FMT_STRING(s)
