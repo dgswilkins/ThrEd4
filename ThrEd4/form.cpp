@@ -185,6 +185,7 @@ constexpr auto SEQBOT   = int32_t {3};
 constexpr auto SEQTOP   = int32_t {2};
 
 auto AllItemsRect       = F_RECTANGLE {};                  // bounding rectangle for all items
+auto ButtonholeCornerLength = IBFCLEN;                         // buttonhole corner length
 auto FormForInsert      = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 auto FormSelectedPen    = HPEN {};                         // form select pen
 auto FormVertexNext     = uint32_t {}; // form vertex storage for form vertex insert

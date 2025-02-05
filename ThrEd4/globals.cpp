@@ -36,7 +36,6 @@ uint8_t               AppliqueColor             = COLORCNT - 1U;     // underlay
 int32_t               ButtonHeight              = 0;                 // button height
 int32_t               ButtonWidth               = 0;                 // button width
 int32_t               ButtonWidthX3             = 0;                 // button width times 3
-float                 ButtonholeCornerLength    = IBFCLEN;           // buttonhole corner length
 F_LSIZ                ClipRectSize              = {};                // clipboard rectangle size
 uint32_t              ClosestFormToCursor       = 0U;                // closest form to the cursor
 uint32_t              ClosestPointIndex         = 0U;                // index of closest point

@@ -134,7 +134,6 @@ extern uint8_t  AppliqueColor;
 extern int32_t  ButtonHeight;
 extern int32_t  ButtonWidth;
 extern int32_t  ButtonWidthX3;
-extern float    ButtonholeCornerLength;
 extern F_LSIZ   ClipRectSize;
 extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
