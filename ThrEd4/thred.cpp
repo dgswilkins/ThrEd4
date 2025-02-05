@@ -1316,7 +1316,7 @@ void chknum() {
 				  break;
 				}
 				case PRFBCNLEN: {
-				  ButtonholeCornerLength = value * PFGRAN;
+				  form::setButtonholeCornerLength(value * PFGRAN);
 				  fmtStr                 = format(FMT_COMPILE(L"{:.2f}"), value);
 				  hWnd                   = valueWindow.operator[](PRFBCNLEN);
 				  break;
@@ -5862,7 +5862,7 @@ void redini() {
 		SpiralWrap = IniFile.spiralWrap;
 	  }
 	  if (IniFile.buttonholeCornerLength != 0.0F) {
-		ButtonholeCornerLength = IniFile.buttonholeCornerLength;
+		form::setButtonholeCornerLength(IniFile.buttonholeCornerLength);
 	  }
 	  if (IniFile.gridSize == 0.0F) {
 		IniFile.gridSize = 12.0F; // set this to a sensible value NOLINT(readability-magic-numbers)
@@ -6277,7 +6277,7 @@ void ritini() {
   IniFile.snapLength             = SnapLength;
   IniFile.starRatio              = StarRatio;
   IniFile.spiralWrap             = SpiralWrap;
-  IniFile.buttonholeCornerLength = ButtonholeCornerLength;
+  IniFile.buttonholeCornerLength = form::getButtonholeCornerLength();
   IniFile.picotSpace             = PicotSpacing;
   if (!Instance->userFlagMap.test(UserFlag::SAVMAX)) {
 	auto windowRect = RECT {};
@@ -10722,7 +10722,7 @@ void thred::defpref() {
   AppliqueColor          = COLORCNT - 1U;
   IniFile.AppStitchLen   = APSPAC;
   Instance->borderWidth  = BRDWID;
-  ButtonholeCornerLength = IBFCLEN;
+  form::setButtonholeCornerLength(IBFCLEN);
   IniFile.chainSpace     = CHSDEF;
   IniFile.chainRatio     = CHRDEF;
   IniFile.fillAngle      = DEFANG;
