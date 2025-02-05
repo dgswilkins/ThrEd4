@@ -9333,3 +9333,11 @@ void form::createFormSelectedPen() noexcept {
 void form::setNewFormVertexCount(uint32_t const vertexCount) noexcept {
   NewFormVertexCount = vertexCount;
 }
+
+void form::setButtonholeCornerLength(float const length) noexcept {
+  ButtonholeCornerLength = length;
+}
+
+auto form::getButtonholeCornerLength() noexcept -> float {
+  return ButtonholeCornerLength;
+}
