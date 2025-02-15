@@ -52,6 +52,7 @@ void destroyGeneralNumberInputBox() noexcept;
 auto displayBackups() -> bool;
 void drawCapturedStitchBox();
 void duIns();
+auto duScale(int32_t value) noexcept -> int32_t;
 void duSelbox() noexcept;
 void dubox(POINT const& stitchCoordsInPixels);
 void dufdef() noexcept;

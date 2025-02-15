@@ -13063,3 +13063,7 @@ auto thred::getSpiralWrap() noexcept -> float {
 auto thred::getPicotSpacing() noexcept -> float {
   return PicotSpacing;
 }
+
+auto thred::duScale(int32_t const value) noexcept -> int32_t {
+  return MulDiv(value, DisplayDPI, STDDPI);
+}
