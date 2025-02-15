@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "globals.h"
 #include "point.h"
+#include "thred.h"
 #include "ThrEdTypes.h"
 // ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
@@ -89,7 +90,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
 // ReSharper restore CppParameterMayBeConst
 
 auto wrap::createPen(int32_t const iStyle, int32_t const width, COLORREF const color) noexcept -> HPEN {
-  auto const scaledWidth = MulDiv(width, DisplayDPI, STDDPI);
+  auto const scaledWidth = thred::duScale(width);
   return CreatePen(iStyle, scaledWidth, color);
 }
 
