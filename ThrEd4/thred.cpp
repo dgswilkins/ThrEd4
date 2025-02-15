@@ -362,6 +362,7 @@ auto ColorBarRect       = RECT {};                      // color bar rectangle
 auto ColorBarSize       = COLSIZ;                       // Color bar width scaled for DPI
 auto CurrentStitchIndex = uint32_t {}; // pointer to the current selection for length search
 auto DisplayedColorBitmap = std::bitset<COLORCNT + COLORCNT> {}; // Map of color numbers in design that are displayed
+auto DisplayDPI       = int32_t {};                              // dots per inch
 auto ExtendedHeader   = THR_HEAD_EX {};                          // ThrEd file header extension
 auto FileVersionIndex = uint8_t {};                              // points to old version to be read
 auto FormMenuChoice   = uint32_t {}; // data type for form data form numerical entry
