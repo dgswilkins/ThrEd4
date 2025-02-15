@@ -28,7 +28,6 @@
 #include <fileapi.h>
 #include <minwinbase.h>
 #include <minwindef.h>
-#include <WinBase.h>
 #include <windef.h>
 #include <wingdi.h>
 #include <winnt.h>

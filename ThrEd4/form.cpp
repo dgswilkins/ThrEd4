@@ -46,7 +46,6 @@
 
 // Windows Header Files:
 #include <minwindef.h>
-#include <WinBase.h>
 #include <windef.h>
 #include <wingdi.h>
 #include <winnt.h>
