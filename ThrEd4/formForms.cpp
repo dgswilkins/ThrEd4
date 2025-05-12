@@ -1067,7 +1067,7 @@ void formForms::prfmsg() {
                                                       : displayText::loadStr(IDS_OFF);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getSmallStitchLength() * IPFGRAN), *row++);
-  prflin(format(FMT_COMPILE(L"{:.2f}"), SnapLength * IPFGRAN), *row++);
+  prflin(format(FMT_COMPILE(L"{:.2f}"), Instance->SnapLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getSpiralWrap()), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getStarRatio()), *row++);
   prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getStitchBoxesThreshold())), *row++);

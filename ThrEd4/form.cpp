@@ -4695,7 +4695,7 @@ void snpfn(std::vector<uint32_t> const& xPoints, uint32_t const start, uint32_t 
   if (finish == start) {
 	return;
   }
-  auto const checkLength = SnapLength * SnapLength;
+  auto const checkLength = Instance->SnapLength * Instance->SnapLength;
   for (auto current = start; current < end; ++current) {
 	auto const& referencePoint = Instance->stitchBuffer.operator[](xPoints[current]);
 	for (auto iPoint = current + 1U; iPoint < finish; ++iPoint) {
@@ -4711,7 +4711,7 @@ void snpfn(std::vector<uint32_t> const& xPoints, uint32_t const start, uint32_t 
 }
 
 void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram) {
-  auto const checkLength   = wrap::round<uint32_t>((SnapLength * 2.0F) + 1.0F);
+  auto const checkLength   = wrap::round<uint32_t>((Instance->SnapLength * 2.0F) + 1.0F);
   auto const stitchWindowX = thred::getStitchWindowX();
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto timeWindow = CreateWindowEx(

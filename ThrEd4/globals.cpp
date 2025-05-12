@@ -65,7 +65,6 @@ RECT                  SelectedFormsRect         = {};                // for mult
 F_POINT               SelectedFormsSize         = F_POINT {};        // size of multiple select rectangle
 RECT                  SelectedPixelsRect        = {};                // display form vertex select rectangle
 F_RECTANGLE           SelectedVerticesRect      = F_RECTANGLE {};    // rectangle enclosing selected form verticess
-float                 SnapLength                = SNPLEN * PFGRAN;   // snap together length
 F_POINT               StitchBmpRatio            = F_POINT {};        // stitch hoop to bitmap ratios
 F_RECTANGLE           StitchRangeRect           = F_RECTANGLE {};    // stitch range rectangle
 RECT                  StitchWindowClientRect    = {};                // stitch window size,client

@@ -104,7 +104,8 @@ class MY_SINGLE
   std::vector<uint32_t>     selectedFormList;
   std::vector<POINT>        selectedFormsLine;
   std::vector<POINT>        selectedPointsLine;
-  ENUM_MAP<StateFlag>       stateMap = ENUM_MAP<StateFlag> {0};
+  float                     SnapLength = SNPLEN * PFGRAN; // snap together length
+  ENUM_MAP<StateFlag>       stateMap   = ENUM_MAP<StateFlag> {0};
   std::vector<F_POINT_ATTR> stitchBuffer;
   std::wstring              textureInputBuffer;
   std::vector<TX_PNT>       texturePointsBuffer;
@@ -172,7 +173,6 @@ extern RECT    SelectedPixelsRect;
 
 extern F_RECTANGLE SelectedVerticesRect;
 
-extern float   SnapLength;
 extern F_POINT StitchBmpRatio;
 
 extern F_RECTANGLE StitchRangeRect;

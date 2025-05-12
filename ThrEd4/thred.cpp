@@ -1279,7 +1279,7 @@ void chknum() {
 				  break;
 				}
 				case PRFSNPSIZ: {
-				  SnapLength = value * PFGRAN;
+				  Instance->SnapLength = value * PFGRAN;
 				  hWnd       = valueWindow.operator[](PRFSNPSIZ);
 				  break;
 				}
@@ -5854,7 +5854,7 @@ void redini() {
 		AppliqueColor = IniFile.appliqueColor & COLMSK;
 	  }
 	  if (IniFile.snapLength != 0.0F) {
-		SnapLength = IniFile.snapLength;
+		Instance->SnapLength = IniFile.snapLength;
 	  }
 	  if (IniFile.starRatio != 0.0F) {
 		StarRatio = IniFile.starRatio;
@@ -6275,7 +6275,7 @@ void ritini() {
   IniFile.userFlagMap            = Instance->userFlagMap.to_ulong();
   IniFile.borderWidth            = Instance->borderWidth;
   IniFile.appliqueColor          = AppliqueColor;
-  IniFile.snapLength             = SnapLength;
+  IniFile.snapLength             = Instance->SnapLength;
   IniFile.starRatio              = StarRatio;
   IniFile.spiralWrap             = SpiralWrap;
   IniFile.buttonholeCornerLength = form::getButtonholeCornerLength();
@@ -10738,7 +10738,7 @@ void thred::defpref() {
   IniFile.nudgePixels     = DEFPIX;
   Instance->userFlagMap.set(UserFlag::BLUNT);
   SmallStitchLength       = SMALSIZ * PFGRAN;
-  SnapLength              = SNPLEN * PFGRAN;
+  Instance->SnapLength    = SNPLEN * PFGRAN;
   SpiralWrap              = SPIRWRAP;
   StarRatio               = STARAT;
   StitchBoxesThreshold    = STCHBOX;
