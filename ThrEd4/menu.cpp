@@ -183,7 +183,7 @@ void shoknot() {
 
 void vuselthr() {
   if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_UNCHECKED);
 	Instance->stateMap.reset(StateFlag::COL);
   }
   else {
@@ -412,7 +412,7 @@ void menu::redfils(std::array<uint32_t, OLDNUM> const& lruMenuId, std::vector<fs
   for (auto const& iLRU : lruMenuId) {
 	if (!previousName->empty()) {
 	  if (Instance->stateMap.test(StateFlag::SAVAS)) {
-		AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, iLRU, previousName->wstring().c_str());
+		AppendMenu(FileMenu, MF_STRING, iLRU, previousName->wstring().c_str());
 	  }
 	  else {
 		// NOLINTNEXTLINE(readability-qualified-auto)
@@ -421,7 +421,7 @@ void menu::redfils(std::array<uint32_t, OLDNUM> const& lruMenuId, std::vector<fs
 		  previousName->clear();
 		}
 		else {
-		  AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, iLRU, previousName->wstring().c_str());
+		  AppendMenu(FileMenu, MF_STRING, iLRU, previousName->wstring().c_str());
 		  FindClose(fileHandle);
 		}
 	  }
@@ -456,15 +456,15 @@ void menu::init() noexcept {
 }
 
 void menu::resetThreadView() {
-  CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+  CheckMenuItem(MainMenu, ID_VUTHRDS, MF_UNCHECKED);
   Instance->stateMap.reset(StateFlag::COL);
-  CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+  CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_UNCHECKED);
   Instance->stateMap.set(StateFlag::DUMEN);
 }
 
 void menu::vuthrds() {
   if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_UNCHECKED);
 	Instance->stateMap.reset(StateFlag::THRDS);
   }
   else {
