@@ -4997,7 +4997,7 @@ auto makbig(uint32_t const start, uint32_t finish) -> uint32_t {
   auto stitchIt     = wrap::next(Instance->stitchBuffer.begin(), start);
   auto nextStitchIt = stitchIt + 1U;
   for (auto iSource = start; iSource < finish; ++iSource) {
-	auto const delta = F_POINT {nextStitchIt->x - nextStitchIt->x, nextStitchIt->y - nextStitchIt->y};
+	auto const delta = F_POINT {nextStitchIt->x - stitchIt->x, nextStitchIt->y - stitchIt->y};
 	auto const length = std::hypot(delta.x, delta.y);
 	newStitches.push_back(*stitchIt);
 	if (length > IniFile.maxStitchLength) {
