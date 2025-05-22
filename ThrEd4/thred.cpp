@@ -3597,7 +3597,7 @@ auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool {
 auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
   SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-  if (lparam != 0U) {
+  if (lparam != 0) {
 	// ToDo - investigate C++17 option shown here: https://web.archive.org/web/20220812120940/https://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	auto*      fileInfo   = reinterpret_cast<std::vector<WIN32_FIND_DATA>*>(lparam);

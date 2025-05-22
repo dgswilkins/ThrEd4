@@ -2799,7 +2799,7 @@ auto notdun(std::vector<RG_SEQ>&           tempPath,
             uint32_t                       doneRegion,
             uint32_t const                 sequencePathIndex) -> bool {
   auto previousLevel = pathLength;
-  if (previousLevel != 0U) {
+  if (previousLevel != 0) {
 	--previousLevel;
   }
   auto const itRegionPath = wrap::next(tempPath.begin(), sequencePathIndex);
@@ -2821,7 +2821,7 @@ auto notdun(std::vector<RG_SEQ>&           tempPath,
 	auto pivot = previousLevel;
 	auto flag  = true;
 	while (flag) {
-	  if (pivot != 0U) {
+	  if (pivot != 0) {
 		--pivot;
 	  }
 	  else {
@@ -2835,7 +2835,7 @@ auto notdun(std::vector<RG_SEQ>&           tempPath,
 	}
 	++pivot;
 	while (pivot <= previousLevel) {
-	  if (pivot != 0U) {
+	  if (pivot != 0) {
 		auto const prevPivot      = pivot - 1;
 		itRegionPath[pivot].pcon  = mapIndexSequence[pathMap[itRegionPath[prevPivot].pcon].node];
 		itRegionPath[pivot].count = gsl::narrow<int32_t>(
