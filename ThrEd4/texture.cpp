@@ -658,7 +658,7 @@ void txnudg(int32_t const deltaX, float const deltaY) {
   }
   else {
 	for (auto const& point : selectedTexturePointsList) {
-	  if (auto const textureLine = tempTexturePoints.operator[](point).line + deltaX;
+	  if (auto const textureLine = gsl::narrow<uint16_t>(tempTexturePoints.operator[](point).line + deltaX);
 	      textureLine < 1 || textureLine > TextureScreen.lines) {
 		return;
 	  }
