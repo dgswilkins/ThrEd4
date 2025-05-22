@@ -6,7 +6,6 @@
 // Standard Libraries
 #include <type_traits>
 #include <bitset>
-#include <cstddef>
 
 // struct for ensuring an enum has a count element.
 // this does NOT validate that the EnumCount element is the last element
