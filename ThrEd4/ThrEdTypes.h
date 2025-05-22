@@ -19,6 +19,8 @@
 #include <numbers>
 #ifdef _DEBUG
 #include <source_location>
+#else
+#include <stdexcept>
 #endif
 
 #ifdef _DEBUG
