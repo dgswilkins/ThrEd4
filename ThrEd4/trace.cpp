@@ -872,7 +872,7 @@ void trace::trdif() {
   Instance->stateMap.reset(StateFlag::HIDMAP);
   untrace();
   auto const bitmapSize = bitmap::getBitmapHeight() * bitmap::getBitmapWidth();
-  if (bitmapSize == 0U) {
+  if (bitmapSize == 0) {
 	return;
   }
   auto differenceBitmap = std::vector<uint32_t> {};

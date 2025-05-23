@@ -462,7 +462,7 @@ void setxclp(FRM_HEAD const& form) {
   }
   editorOffset.y -= TextureScreen.formCenter.y;
   auto& angledFormVertices = Instance->angledFormVertices;
-  std::ranges::transform(angledFormVertices, angledFormVertices.begin(), [editorOffset](auto& vertex) {
+  std::ranges::transform(angledFormVertices, angledFormVertices.begin(), [editorOffset](auto& vertex) noexcept {
 	return vertex + editorOffset;
   });
   auto lineCount = form.vertexCount - 1U;
@@ -658,7 +658,7 @@ void txnudg(int32_t const deltaX, float const deltaY) {
   }
   else {
 	for (auto const& point : selectedTexturePointsList) {
-	  if (auto const textureLine = tempTexturePoints.operator[](point).line + deltaX;
+	  if (auto const textureLine = gsl::narrow<uint16_t>(tempTexturePoints.operator[](point).line + deltaX);
 	      textureLine < 1 || textureLine > TextureScreen.lines) {
 		return;
 	  }
@@ -1460,10 +1460,10 @@ void texture::deltx(uint32_t const formIndex) {
   auto const flagShared =
       std::any_of(formList.begin(),
                   itForm,
-                  [currentIndex](const auto& current) {
+                  [currentIndex](const auto& current) noexcept {
 	                return current.isTexture() && current.texture.index == currentIndex;
                   }) ||
-      std::any_of(std::next(itForm), formList.end(), [currentIndex](const auto& current) {
+      std::any_of(std::next(itForm), formList.end(), [currentIndex](const auto& current) noexcept {
 	    return current.isTexture() && current.texture.index == currentIndex;
       });
   // clear the texture info from the form

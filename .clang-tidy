@@ -16,6 +16,7 @@ Checks:            "*,\
 -llvm-qualified-auto,\
 -readability-function-cognitive-complexity
 "
+HeaderFilterRegex: '^.*ThrEd4\\ThrEd4\\(?!Resources\\).*\.(h|hxx|cxx)$'
 WarningsAsErrors:  ''
 FormatStyle:       'file'
 User:              dwilkins

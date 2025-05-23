@@ -45,7 +45,6 @@
 #include <WinUser.h>
 
 // Standard Libraries
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>

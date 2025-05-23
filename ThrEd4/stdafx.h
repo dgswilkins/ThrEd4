@@ -5,6 +5,7 @@
 
 #pragma once
 
+// used to exclude the precompiled headers from the build process
 #ifndef DEBUG_PCH
 
 #include "warnings.h"

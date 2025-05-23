@@ -39,7 +39,6 @@
 // ReSharper disable CppUnusedIncludeDirective
 #include <algorithm>
 // ReSharper restore CppUnusedIncludeDirective
-#include <cstddef>
 #include <cstdint>
 #include <iterator>
 

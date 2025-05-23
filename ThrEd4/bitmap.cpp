@@ -471,7 +471,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	constexpr auto SR5 = uint8_t {5}; // Shift Right
 
 	auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> SR5) << 2U;
-	if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
+	if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0) {
 	  bitmapWidthBytes += 4U;
 	}
 	auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);

@@ -17,6 +17,7 @@
 // Standard Libraries
 #include <cfloat>
 #include <cstdint>
+#include <stdexcept>
 
 namespace util {
 auto inline closeEnough(float const first, float const second) noexcept -> bool {
