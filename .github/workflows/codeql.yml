@@ -78,7 +78,7 @@ jobs:
 
       - name: Install vcpkg
         if: ${{ matrix.language == 'c-cpp' }}
-        uses: lukka/run-vcpkg@7d259227a1fb6471a0253dd5ab7419835228f7d7 # v11
+        uses: lukka/run-vcpkg@5e0cab206a5ea620130caf672fce3e4a6b5666a1 # v11.5
         with:
           runVcpkgInstall: true
 
