@@ -73,9 +73,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Add MSBuild to PATH
+        if: ${{ matrix.language == 'c-cpp' }}
         uses: microsoft/setup-msbuild@v2
 
       - name: Install vcpkg
+        if: ${{ matrix.language == 'c-cpp' }}
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
@@ -105,7 +107,7 @@ jobs:
       # Also filter out warnings in third-party code
       # typical pattern for filtering out a rule: -**:cpp/poorly-documented-function
       - name: Filter code checks for main
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main'  && matrix.language == 'c-cpp' }}
         uses: advanced-security/filter-sarif@v1
         with:
           patterns: |
@@ -116,7 +118,7 @@ jobs:
           output: ${{ steps.step1.outputs.sarif-output }}/cpp.sarif
 
       - name: Filter code checks for Develop
-        if: ${{ github.ref == 'refs/heads/Develop' }}
+        if: ${{ github.ref == 'refs/heads/Develop'  && matrix.language == 'c-cpp' }}
         uses: advanced-security/filter-sarif@v1
         with:
           patterns: |
