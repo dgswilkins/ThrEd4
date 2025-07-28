@@ -172,9 +172,6 @@ extern F_POINT SelectedFormsSize;
 extern RECT    SelectedPixelsRect;
 
 extern F_RECTANGLE SelectedVerticesRect;
-
-extern F_POINT StitchBmpRatio;
-
 extern F_RECTANGLE StitchRangeRect;
 
 extern RECT      StitchWindowClientRect;

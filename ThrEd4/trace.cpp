@@ -191,8 +191,9 @@ auto icolsum(COLORREF col) -> uint32_t;
 
 // Functions
 void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
-  dst.emplace_back(wrap::toFloat(src[0].x) * StitchBmpRatio.x,
-                   wrap::toFloat(src[0].y) * StitchBmpRatio.y);
+  auto const stitchBmpRatio = bitmap::getBmpStitchRatio();
+  dst.emplace_back(wrap::toFloat(src[0].x) / stitchBmpRatio.x,
+                   wrap::toFloat(src[0].y) / stitchBmpRatio.y);
   auto itTP             = src.begin();
   auto itNext           = src.begin();
   auto traceLengthSum1  = 0.0F;
@@ -206,8 +207,8 @@ void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
 	if (auto const traceLength =
 	        std::hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
 	    traceLengthSum1 > traceLength * IniFile.traceRatio) {
-	  dst.emplace_back(wrap::toFloat(itTP->x) * StitchBmpRatio.x,
-	                   (wrap::toFloat(itTP->y) * StitchBmpRatio.y) + landscapeOffset1);
+	  dst.emplace_back(wrap::toFloat(itTP->x) / stitchBmpRatio.x,
+	                   (wrap::toFloat(itTP->y) / stitchBmpRatio.y) + landscapeOffset1);
 
 	  itNext          = itTP;
 	  itTP1           = itTP;
