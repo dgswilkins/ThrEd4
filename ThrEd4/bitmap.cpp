@@ -195,10 +195,10 @@ auto bitar() -> bool {
 	BitmapSrcRect.bottom = BitmapHeight;
 	Instance->stateMap.set(StateFlag::LANDSCAP);
   }
-  auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
-                                        wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
-                                        wrap::toFloat(BitmapSrcRect.right) * StitchBmpRatio.x,
-                                        wrap::toFloat(BitmapSrcRect.bottom) * StitchBmpRatio.y};
+  auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) / BmpStitchRatio.x,
+                                        wrap::toFloat(BitmapSrcRect.top) / BmpStitchRatio.y,
+                                        wrap::toFloat(BitmapSrcRect.right) / BmpStitchRatio.x,
+                                        wrap::toFloat(BitmapSrcRect.bottom) / BmpStitchRatio.y};
 
   auto const differenceRect = F_RECTANGLE {backingRect.left - zoomedInRect.left,
                                            backingRect.top - zoomedInRect.top,
@@ -253,8 +253,6 @@ void bitsiz() {
   }
   BmpStitchRatio = F_POINT {(wrap::toFloat(BitmapWidth) / BitmapSizeinStitches.x),
                             (wrap::toFloat(BitmapHeight) / BitmapSizeinStitches.y)};
-  StitchBmpRatio = F_POINT {(BitmapSizeinStitches.x / wrap::toFloat(BitmapWidth)),
-                            (BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight))};
 }
 
 constexpr auto fswap(COLORREF const color) noexcept -> COLORREF {
