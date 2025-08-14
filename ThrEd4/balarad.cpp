@@ -40,6 +40,7 @@
 // Standard Libraries
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <iterator>
