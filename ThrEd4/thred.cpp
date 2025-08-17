@@ -89,7 +89,9 @@
 #include <algorithm>
 #include <array>
 #include <bitset>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cctype>
+// ReSharper restore CppUnusedIncludeDirective
 #include <cmath>
 #include <cstddef>
 #include <cstdint>

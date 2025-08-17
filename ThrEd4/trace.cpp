@@ -45,9 +45,11 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstddef>
 #include <cstdint>
 #include <cwchar>
+// ReSharper restore CppUnusedIncludeDirective
 #include <iterator>
 #include <numeric>
 #include <stdexcept>

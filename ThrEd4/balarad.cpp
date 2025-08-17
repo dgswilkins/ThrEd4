@@ -40,8 +40,10 @@
 // Standard Libraries
 #include <array>
 #include <cmath>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstddef>
 #include <cstdint>
+// ReSharper restore CppUnusedIncludeDirective
 #include <filesystem>
 #include <iterator>
 #include <vector>

@@ -43,8 +43,10 @@
 // Standard Libraries
 #include <algorithm>
 #include <cmath>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstddef>
 #include <cstdint>
+// ReSharper restore CppUnusedIncludeDirective
 #include <iterator>
 #include <memory>
 // ReSharper disable CppUnusedIncludeDirective

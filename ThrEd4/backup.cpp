@@ -39,8 +39,8 @@
 // ReSharper disable CppUnusedIncludeDirective
 #include <algorithm>
 #include <cstddef>
-// ReSharper restore CppUnusedIncludeDirective
 #include <cstdint>
+// ReSharper restore CppUnusedIncludeDirective
 #include <iterator>
 
 class BACK_HEAD // Backup header

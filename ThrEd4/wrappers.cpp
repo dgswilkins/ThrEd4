@@ -34,8 +34,10 @@
 #include <WinUser.h>
 
 // Standard Libraries
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
 #include <cwchar>
+// ReSharper restore CppUnusedIncludeDirective
 #include <vector>
 
 auto wrap::wcsToFloat(wchar_t const* buffer) -> float {

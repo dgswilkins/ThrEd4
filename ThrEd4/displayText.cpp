@@ -39,7 +39,9 @@
 
 // Standard Libraries
 #include <algorithm>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
+// ReSharper restore CppUnusedIncludeDirective
 #include <filesystem>
 // ReSharper disable CppUnusedIncludeDirective
 #include <ranges>

@@ -57,8 +57,10 @@
 #include <bitset>
 #include <cmath>
 #include <climits>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstddef>
 #include <cstdint>
+// ReSharper restore CppUnusedIncludeDirective
 #include <cstdlib>
 #include <exception>
 #include <filesystem>

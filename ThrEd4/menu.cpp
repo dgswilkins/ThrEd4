@@ -53,7 +53,9 @@
 
 // Standard Libraries
 #include <array>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
+// ReSharper restore CppUnusedIncludeDirective
 #include <filesystem>
 #include <memory>
 #include <string>
