@@ -27,7 +27,9 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstddef>
+// ReSharper restore CppUnusedIncludeDirective
 #include <iterator>
 #include <ranges>
 // ReSharper disable CppUnusedIncludeDirective
