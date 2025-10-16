@@ -457,7 +457,7 @@ void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
   SetWindowText(Instance->buttonWin.operator[](INDEX), L"");
 }
 
-auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
+auto displayText::getThrEdFont(int32_t const weight) noexcept -> HFONT {
   auto lfText = LOGFONT {0L, 0L, 0L, 0L, 0L, 0, 0, 0, 0, 0, 0, 0, 0, L""};
 #if HIGHDPI
   auto const uDpi = GetDpiForWindow(ThrEdWindow);
