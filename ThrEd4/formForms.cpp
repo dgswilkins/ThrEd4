@@ -778,6 +778,7 @@ void handlePaisleyDefault(HWND hwndlg) {
 }
 // ReSharper restore CppParameterMayBeConst
 
+// ReSharper disable CppParameterMayBeConst
 void handleTearInit(HWND hwndlg) {
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 #ifdef TESTCODE
@@ -799,6 +800,7 @@ void handleTearInit(HWND hwndlg) {
 #endif // !TESTCODE
   initTearDlg(hwndlg);
 }
+// ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
 auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
