@@ -13,6 +13,7 @@ Checks:            "*,\
 -hicpp-avoid-c-arrays,\
 -llvm-header-guard,\
 -llvm-include-order,\
+-llvm-prefer-static-over-anonymous-namespace,\
 -llvm-qualified-auto,\
 -readability-function-cognitive-complexity
 "
