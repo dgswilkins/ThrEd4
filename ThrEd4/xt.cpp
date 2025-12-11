@@ -692,7 +692,7 @@ void fhifn(uint32_t const formIndex, float const length) {
   auto const ratio     = length / (form.rectangle.top - reference);
   auto       itVertex  = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	itVertex->y = (itVertex->y - reference) * ratio + reference;
+	itVertex->y = ((itVertex->y - reference) * ratio) + reference;
 	++itVertex;
   }
   form.outline();
@@ -957,7 +957,7 @@ void fwidfn(uint32_t const formIndex, float const length) {
   auto const ratio     = length / (form.rectangle.right - reference);
   auto       itVertex  = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	itVertex->x = (itVertex->x - reference) * ratio + reference;
+	itVertex->x = ((itVertex->x - reference) * ratio) + reference;
 	++itVertex;
   }
   form.outline();
@@ -1228,10 +1228,10 @@ void nurat(FEATHER& feather) noexcept {
 	}
 	case FTHSIN: {
 	  if (remainder > feather.globalRatio) {
-		feather.ratio = sin(((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F) + PI_F) * HALF + HALF;
+		feather.ratio = (sin(((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F) + PI_F) * HALF) + HALF;
 	  }
 	  else {
-		feather.ratio = sin(remainder / feather.globalRatio * PI_F) * HALF + HALF;
+		feather.ratio = (sin(remainder / feather.globalRatio * PI_F) * HALF) + HALF;
 	  }
 	  feather.ratio *= feather.formRatio;
 	  break;
@@ -1427,13 +1427,13 @@ void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 }
 
 void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
-  point.x = (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
-  point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
+  point.x = ((point.x - designSizeRect.left) * designSizeRatio.x) + designSizeRect.left;
+  point.y = ((point.y - designSizeRect.bottom) * designSizeRatio.y) + designSizeRect.bottom;
 }
 
 void sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
-  stitch.x = (stitch.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
-  stitch.y = (stitch.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
+  stitch.x = ((stitch.x - designSizeRect.left) * designSizeRatio.x) + designSizeRect.left;
+  stitch.y = ((stitch.y - designSizeRect.bottom) * designSizeRatio.y) + designSizeRect.bottom;
 }
 
 void setColorOrder() noexcept {

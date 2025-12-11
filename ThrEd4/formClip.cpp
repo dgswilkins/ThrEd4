@@ -638,7 +638,7 @@ void sizclp(FRM_HEAD const& form,
             uint32_t&       formStitchCount,
             uint32_t&       length,
             uint32_t&       fileSize) noexcept(std::is_same_v<size_t, uint32_t>) {
-  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(Instance->formVertices);
+  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + (form.vertexCount * wrap::sizeofType(Instance->formVertices));
   length = fileSize;
   if (form.type == SAT && form.satinGuideCount != 0U) {
 	fileSize += form.satinGuideCount * wrap::sizeofType(Instance->satinGuides);

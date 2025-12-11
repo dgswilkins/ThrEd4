@@ -1018,7 +1018,7 @@ auto projh(float const yCoordinate, F_POINT const& point0, F_POINT const& point1
   if (deltaX != 0.0F) {
 	if (auto const deltaY = point1.y - point0.y; deltaY != 0.0F) {
 	  auto const slope = deltaY / deltaX;
-	  intersection.x   = (yCoordinate - point0.y) / slope + point0.x;
+	  intersection.x   = ((yCoordinate - point0.y) / slope) + point0.x;
 	}
 	else {
 	  return false;
@@ -2428,7 +2428,7 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 		    wrap::toFloat(iRegion % clipGridOffset) / (wrap::toFloat(clipGridOffset) * ClipRectSize.cy);
 	  }
 	  for (auto iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; ++iVerticalGrid) {
-		pasteLocation.y = wrap::toFloat(iVerticalGrid) * ClipRectSize.cy - clipVerticalOffset;
+		pasteLocation.y = (wrap::toFloat(iVerticalGrid) * ClipRectSize.cy) - clipVerticalOffset;
 		if (!clipBuffer.empty()) {
 		  lineSegmentEnd = pasteLocation + clipBuffer.front();
 		}
@@ -4561,8 +4561,8 @@ void resizeFormPoints(const F_POINT& stitchReference, F_POINT const& ratio) {
   for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 	auto const itCurrentVertex = wrap::next(itVertex, iCurrent);
 
-	itCurrentVertex->x = (itCurrentVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
-	itCurrentVertex->y = (itCurrentVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
+	itCurrentVertex->x = ((itCurrentVertex->x - stitchReference.x) * ratio.x) + stitchReference.x;
+	itCurrentVertex->y = ((itCurrentVertex->y - stitchReference.y) * ratio.y) + stitchReference.y;
 	iCurrent           = form::pdir(formList.operator[](ClosestFormToCursor), iCurrent);
   }
   thred::setpsel();
@@ -4579,15 +4579,15 @@ void resizeBigBox(F_POINT const& stitchReference, F_POINT const& ratio) {
 	auto        itVertex        = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
 	auto const& formVertexCount = formIter.vertexCount;
 	for (auto iVertex = 0U; iVertex < formVertexCount; ++iVertex) {
-	  itVertex->x = (itVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
-	  itVertex->y = (itVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
+	  itVertex->x = ((itVertex->x - stitchReference.x) * ratio.x) + stitchReference.x;
+	  itVertex->y = ((itVertex->y - stitchReference.y) * ratio.y) + stitchReference.y;
 	  ++itVertex;
 	}
 	formIter.outline();
   }
   for (auto& stitch : Instance->stitchBuffer) {
-	stitch.x = (stitch.x - stitchReference.x) * ratio.x + stitchReference.x;
-	stitch.y = (stitch.y - stitchReference.y) * ratio.y + stitchReference.y;
+	stitch.x = ((stitch.x - stitchReference.x) * ratio.x) + stitchReference.x;
+	stitch.y = ((stitch.y - stitchReference.y) * ratio.y) + stitchReference.y;
   }
   form::selal();
 }
@@ -4599,8 +4599,8 @@ void resizeSelectedForms(F_POINT const& stitchReference, F_POINT const& ratio) {
 	auto const& formVertexCount = form.vertexCount;
 	auto        itVertex        = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < formVertexCount; ++iVertex) {
-	  itVertex->x = (itVertex->x - stitchReference.x) * ratio.x + stitchReference.x;
-	  itVertex->y = (itVertex->y - stitchReference.y) * ratio.y + stitchReference.y;
+	  itVertex->x = ((itVertex->x - stitchReference.x) * ratio.x) + stitchReference.x;
+	  itVertex->y = ((itVertex->y - stitchReference.y) * ratio.y) + stitchReference.y;
 	  ++itVertex;
 	}
 	form.outline();
@@ -4615,8 +4615,8 @@ void resizeForm(F_POINT const& reference, F_POINT const& ratio) {
 
   auto itVertex = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	itVertex->x = (itVertex->x - reference.x) * ratio.x + reference.x;
-	itVertex->y = (itVertex->y - reference.y) * ratio.y + reference.y;
+	itVertex->x = ((itVertex->x - reference.x) * ratio.x) + reference.x;
+	itVertex->y = ((itVertex->y - reference.y) * ratio.y) + reference.y;
 	++itVertex;
   }
   form::refil(ClosestFormToCursor);
@@ -4626,8 +4626,8 @@ void resizeForm(F_POINT const& reference, F_POINT const& ratio) {
 void resizeStitches(F_POINT const& reference, F_POINT const& ratio) {
   auto itStitch = wrap::next(Instance->stitchBuffer.begin(), GroupStartStitch);
   for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-	itStitch->x = (itStitch->x - reference.x) * ratio.x + reference.x;
-	itStitch->y = (itStitch->y - reference.y) * ratio.y + reference.y;
+	itStitch->x = ((itStitch->x - reference.x) * ratio.x) + reference.x;
+	itStitch->y = ((itStitch->y - reference.y) * ratio.y) + reference.y;
 	++itStitch;
   }
   Instance->stateMap.set(StateFlag::RESTCH);
@@ -7185,7 +7185,7 @@ void form::setstrtch() {
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 		auto const itCurrentVertex = wrap::next(itVertex, currentVertex);
 
-		itCurrentVertex->x = (itCurrentVertex->x - reference) * ratio + reference;
+		itCurrentVertex->x = ((itCurrentVertex->x - reference) * ratio) + reference;
 		currentVertex      = pdir(form, currentVertex);
 	  }
 	  form.outline();
@@ -7199,13 +7199,13 @@ void form::setstrtch() {
 		auto& formIter = formList.operator[](iForm);
 		auto  itVertex = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
 		for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
-		  itVertex->x = (itVertex->x - reference) * ratio + reference;
+		  itVertex->x = ((itVertex->x - reference) * ratio) + reference;
 		  ++itVertex;
 		}
 		formIter.outline();
 	  }
 	  for (auto& stitch : Instance->stitchBuffer) {
-		stitch.x = (stitch.x - reference) * ratio + reference;
+		stitch.x = ((stitch.x - reference) * ratio) + reference;
 	  }
 	  selal();
 	  return;
@@ -7215,7 +7215,7 @@ void form::setstrtch() {
 		auto& formIter = formList.operator[](selectedForm);
 		auto  itVertex = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
 		for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
-		  itVertex->x = (itVertex->x - reference) * ratio + reference;
+		  itVertex->x = ((itVertex->x - reference) * ratio) + reference;
 		  ++itVertex;
 		}
 	  }
@@ -7230,7 +7230,7 @@ void form::setstrtch() {
 	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  auto itVertex = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		itVertex->x = (itVertex->x - reference) * ratio + reference;
+		itVertex->x = ((itVertex->x - reference) * ratio) + reference;
 		++itVertex;
 	  }
 	  refil(ClosestFormToCursor);
@@ -7240,7 +7240,7 @@ void form::setstrtch() {
 	if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 		Instance->stitchBuffer.operator[](iStitch).x =
-		    (Instance->stitchBuffer.operator[](iStitch).x - reference) * ratio + reference;
+		    ((Instance->stitchBuffer.operator[](iStitch).x - reference) * ratio) + reference;
 	  }
 	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
@@ -7252,7 +7252,7 @@ void form::setstrtch() {
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 		auto const itCurrentVertex = wrap::next(itVertex, currentVertex);
 
-		itCurrentVertex->y = (itCurrentVertex->y - reference) * ratio + reference;
+		itCurrentVertex->y = ((itCurrentVertex->y - reference) * ratio) + reference;
 		currentVertex      = pdir(form, currentVertex);
 	  }
 	  formList.operator[](ClosestFormToCursor).outline();
@@ -7266,13 +7266,13 @@ void form::setstrtch() {
 		auto& formIter = formList.operator[](iForm);
 		auto  itVertex = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
 		for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
-		  itVertex->y = (itVertex->y - reference) * ratio + reference;
+		  itVertex->y = ((itVertex->y - reference) * ratio) + reference;
 		  ++itVertex;
 		}
 		formIter.outline();
 	  }
 	  for (auto& stitch : Instance->stitchBuffer) {
-		stitch.y = (stitch.y - reference) * ratio + reference;
+		stitch.y = ((stitch.y - reference) * ratio) + reference;
 	  }
 	  selal();
 	  return;
@@ -7282,7 +7282,7 @@ void form::setstrtch() {
 		auto& formIter = formList.operator[](selectedForm);
 		auto  itVertex = wrap::next(Instance->formVertices.begin(), formIter.vertexIndex);
 		for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
-		  itVertex->y = (itVertex->y - reference) * ratio + reference;
+		  itVertex->y = ((itVertex->y - reference) * ratio) + reference;
 		  ++itVertex;
 		}
 	  }
@@ -7297,7 +7297,7 @@ void form::setstrtch() {
 	if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	  auto itVertex = wrap::next(Instance->formVertices.begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		itVertex->y = (itVertex->y - reference) * ratio + reference;
+		itVertex->y = ((itVertex->y - reference) * ratio) + reference;
 		++itVertex;
 	  }
 	  refil(ClosestFormToCursor);
@@ -7307,7 +7307,7 @@ void form::setstrtch() {
 	if (Instance->stateMap.test(StateFlag::GRPSEL)) {
 	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 		Instance->stitchBuffer.operator[](iStitch).y =
-		    (Instance->stitchBuffer.operator[](iStitch).y - reference) * ratio + reference;
+		    ((Instance->stitchBuffer.operator[](iStitch).y - reference) * ratio) + reference;
 	  }
 	  Instance->stateMap.set(StateFlag::RESTCH);
 	}
@@ -7665,7 +7665,7 @@ void form::duhart(uint32_t sideCount) {
   auto const ratio = (nVert->x - itFirstVertex->x) / (nVert->x - itFirstVertex[firstVertex - 1].x);
   auto       itVertex = std::next(itFirstVertex, lastVertex);
   for (iVertex = lastVertex; iVertex < firstVertex; ++iVertex) {
-	itVertex->x = (itVertex->x - nVert->x) * ratio + nVert->x;
+	itVertex->x = ((itVertex->x - nVert->x) * ratio) + nVert->x;
 	++itVertex;
   }
   auto iDestination = wrap::toUnsigned(iVertex);
@@ -7758,7 +7758,7 @@ void form::dueg(uint32_t sides) {
   auto const  maximumY     = itVertex[quarterSides].y - itVertex[0].y;
   for (uint32_t iVertex = 0; iVertex < sides; ++iVertex) {
 	if (itVertex->y < reference) {
-	  itVertex->y = reference - (reference - itVertex->y) * IniFile.eggRatio;
+	  itVertex->y = reference - ((reference - itVertex->y) * IniFile.eggRatio);
 	}
 	++itVertex;
   }

@@ -826,8 +826,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   pesHeader.ysiz         = wrap::round<int16_t>(designSizeY);
   auto const hoopSizeX   = IniFile.hoopSizeX * PECFACT;
   auto const hoopSizeY   = IniFile.hoopSizeY * PECFACT;
-  pesHeader.atfm5        = AT5OFF + hoopSizeX * HALF - designSizeX * HALF;
-  pesHeader.atfm6        = AT6OFF + designSizeY + hoopSizeY * HALF - designSizeY * HALF;
+  pesHeader.atfm5        = AT5OFF + (hoopSizeX * HALF) - (designSizeX * HALF);
+  pesHeader.atfm6        = AT6OFF + designSizeY + (hoopSizeY * HALF) - (designSizeY * HALF);
   auto pesBuffer         = std::vector<uint8_t> {};
   // ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
   auto const pesSize = sizeof(PESSTCHLST) + (Instance->stitchBuffer.size() * sizeof(PESTCH)) + 1000U;

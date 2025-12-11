@@ -474,7 +474,7 @@ void fxlen(FRM_HEAD const&           form,
 		  smallestSpacing = adjustedSpace;
 		}
 	  }
-	  adjustedSpace = smallestSpacing + (largestSpacing - smallestSpacing) / 2;
+	  adjustedSpace = smallestSpacing + ((largestSpacing - smallestSpacing) / 2);
 	}
 	++loopCount;
   }

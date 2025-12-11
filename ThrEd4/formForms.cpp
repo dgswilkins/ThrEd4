@@ -1148,7 +1148,7 @@ void formForms::dasyfrm() {
   auto const deltaPetalAngle   = PI_F / wrap::toFloat(IniFile.daisyPetalPoints);
   if (Instance->userFlagMap.test(UserFlag::DAZD)) { // add the satin guides
 	form.satinGuideCount = IniFile.daisyPetalCount - 1U;
-	form.wordParam       = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
+	form.wordParam       = (IniFile.daisyPetalCount * IniFile.daisyInnerCount) + 1U;
 	form.satinGuideIndex = satin::adsatk(IniFile.daisyPetalCount - 1);
   }
   auto const halfPetalPointCount = IniFile.daisyPetalPoints / 2;
@@ -1160,7 +1160,7 @@ void formForms::dasyfrm() {
 	  auto distanceFromDaisyCenter = 0.0F;
 	  switch (borderType) {
 		case DSIN: { // sin wave
-		  distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
+		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  petalPointAngle += deltaPetalAngle;
 		  break;
 		}
@@ -1177,8 +1177,8 @@ void formForms::dasyfrm() {
 		  break;
 		}
 		case DRAG: { // ragged
-		  distanceFromDaisyCenter = diameter + wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
-		                                           wrap::toFloat(IniFile.daisyPetalPoints) * petalLength;
+		  distanceFromDaisyCenter = diameter + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
+		                                           wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
 		case DCOG: { // cog wheel
@@ -1189,7 +1189,7 @@ void formForms::dasyfrm() {
 		  break;
 		}
 		case DHART: { // heart shaped
-		  distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
+		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  if (iPoint > IniFile.daisyHeartCount) {
 			petalPointAngle -= deltaPetalAngle;
 		  }
@@ -1209,7 +1209,7 @@ void formForms::dasyfrm() {
 	  angle += petalSegmentAngle;
 	  if (Instance->userFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
 		auto const itGuide = wrap::next(Instance->satinGuides.begin(), form.satinGuideIndex + iMacroPetal);
-		itGuide->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
+		itGuide->start = ((IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount) + 1U;
 		itGuide->finish = iVertex;
 	  }
 	}
@@ -1289,7 +1289,7 @@ void formForms::setear() {
   firstVertex = wrap::next(Instance->formVertices.begin(), formVertexIndex); // iterator invalidated by push_back
   nextVertex = std::next(firstVertex);
   if (twistStep != 0.0F) {
-	firstVertex->x = nextVertex->x + twistStep / TWSTFACT;
+	firstVertex->x = nextVertex->x + (twistStep / TWSTFACT);
   }
   else {
 	firstVertex->x = middle;
@@ -1310,8 +1310,8 @@ void formForms::setear() {
 	auto       scaledVertex = firstVertex;
 	auto const vertexMax    = form.vertexCount;
 	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
-	  scaledVertex->x = (scaledVertex->x - firstVertex->x) * horizontalRatio + firstVertex->x;
-	  scaledVertex->y = (scaledVertex->y - firstVertex->y) * horizontalRatio + firstVertex->y;
+	  scaledVertex->x = ((scaledVertex->x - firstVertex->x) * horizontalRatio) + firstVertex->x;
+	  scaledVertex->y = ((scaledVertex->y - firstVertex->y) * horizontalRatio) + firstVertex->y;
 	  ++scaledVertex;
 	}
   }
@@ -1403,8 +1403,8 @@ void formForms::wavfrm() {
   if (horizontalRatio < 1.0F) {
 	auto vScaled = firstVertex; // copy intended
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  vScaled->x = (vScaled->x - firstVertex->x) * horizontalRatio + firstVertex->x;
-	  vScaled->y = (vScaled->y - firstVertex->y) * horizontalRatio + firstVertex->y;
+	  vScaled->x = ((vScaled->x - firstVertex->x) * horizontalRatio) + firstVertex->x;
+	  vScaled->y = ((vScaled->y - firstVertex->y) * horizontalRatio) + firstVertex->y;
 	  ++vScaled;
 	}
   }

@@ -1743,7 +1743,7 @@ void delsmal(uint32_t const startStitch, uint32_t const endStitch) {
 	  }
 	  auto const deltaX = stitch.x - prevStitch.x;
 	  auto const deltaY = stitch.y - prevStitch.y;
-	  stitchSize        = deltaX * deltaX + deltaY * deltaY;
+	  stitchSize        = (deltaX * deltaX) + (deltaY * deltaY);
 	  if (stitchSize > minStitchLength) {
 		++iPrevStitch;
 		++iStitch;
@@ -1772,7 +1772,7 @@ void delsmal(uint32_t const startStitch, uint32_t const endStitch) {
 		  else {
 			auto const deltaX = stitch.x - prevPoint.x;
 			auto const deltaY = stitch.y - prevPoint.y;
-			stitchSize        = deltaX * deltaX + deltaY * deltaY;
+			stitchSize        = (deltaX * deltaX) + (deltaY * deltaY);
 			if (stitchSize > minStitchLength) {
 			  outStitch = stitch;
 			  prevPoint = stitch;
@@ -1809,7 +1809,7 @@ void delsmal(uint32_t const startStitch, uint32_t const endStitch) {
 	  else {
 		auto const deltaX = stitch.x - prevPoint.x;
 		auto const deltaY = stitch.y - prevPoint.y;
-		stitchSize        = deltaX * deltaX + deltaY * deltaY;
+		stitchSize        = (deltaX * deltaX) + (deltaY * deltaY);
 		if (stitchSize > minStitchLength) {
 		  Instance->stitchBuffer.operator[](iNextStitch++) = stitch;
 		  prevPoint                                        = stitch;
@@ -2146,7 +2146,7 @@ void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStit
 	return;
   }
   // does the line intersect the bottom of the screen?
-  gapToEdge = offset - slope * ZoomRect.bottom;
+  gapToEdge = offset - (slope * ZoomRect.bottom);
   if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 	stitchLine[0] =
 	    POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
@@ -2931,7 +2931,7 @@ void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const finish) {
   while (length == 0.0F && startIt != Instance->stitchBuffer.begin()) {
 	deltaX = finishIt->x - startIt->x;
 	deltaY = finishIt->y - startIt->y;
-	length = deltaX * deltaX + deltaY * deltaY;
+	length = (deltaX * deltaX) + (deltaY * deltaY);
 	--startIt;
   }
   length = std::sqrt(length);
@@ -4608,10 +4608,10 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
   if (version != 0U) {
 	gethand(Instance->stitchBuffer, wrap::toUnsigned(Instance->stitchBuffer.size()));
 	// ToDo - replace constants with sizes of data structures?
-	homscor = wrap::toUnsigned(formList.size()) * FRMW +
-	          gethand(Instance->stitchBuffer, wrap::toUnsigned(Instance->stitchBuffer.size())) * HANDW +
-	          wrap::toUnsigned(Instance->formVertices.size()) * FRMPW +
-	          wrap::toUnsigned(Instance->stitchBuffer.size()) * STCHW;
+	homscor = (wrap::toUnsigned(formList.size()) * FRMW) +
+	          (gethand(Instance->stitchBuffer, wrap::toUnsigned(Instance->stitchBuffer.size())) * HANDW) +
+	          (wrap::toUnsigned(Instance->formVertices.size()) * FRMPW) +
+	          (wrap::toUnsigned(Instance->stitchBuffer.size()) * STCHW);
 	if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in insTHR")) {
 	  return false;
 	}
@@ -7072,7 +7072,7 @@ void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t const start) {
   while (length < KNL && finishIt != Instance->stitchBuffer.end()) {
 	deltaX = finishIt->x - startIt->x;
 	deltaY = finishIt->y - startIt->y;
-	length = deltaX * deltaX + deltaY * deltaY;
+	length = (deltaX * deltaX) + (deltaY * deltaY);
 	++finishIt;
   }
   if (finishIt == Instance->stitchBuffer.end()) {
@@ -8848,19 +8848,19 @@ auto thred::closlin() -> uint32_t {
 			bottom += tolerance;
 			if (offsetY > top) {
 			  deltaY = offsetY - top;
-			  tsum   = deltaX * deltaX + deltaY * deltaY;
+			  tsum   = (deltaX * deltaX) + (deltaY * deltaY);
 			  break;
 			}
 			if (offsetY < bottom) {
 			  deltaY = offsetY - bottom;
-			  tsum   = deltaX * deltaX + deltaY * deltaY;
+			  tsum   = (deltaX * deltaX) + (deltaY * deltaY);
 			  break;
 			}
 			tsum = deltaX * deltaX;
 			break;
 		  }
 		  auto const slope = wrap::toFloat(xba) / wrap::toFloat(yab);
-		  offset           = stitches[iStitch].x + slope * stitches[iStitch].y;
+		  offset           = stitches[iStitch].x + (slope * stitches[iStitch].y);
 		  auto const poff  = offsetX - (offsetY / slope);
 
 		  intersection = F_POINT {offset - (slope * intersection.y),
@@ -8895,7 +8895,7 @@ auto thred::closlin() -> uint32_t {
 			}
 		  }
 		}
-		tsum = deltaX * deltaX + deltaY * deltaY;
+		tsum = (deltaX * deltaX) + (deltaY * deltaY);
 		break;
 	  }
 	  if (tsum < sum) {
@@ -9107,8 +9107,8 @@ void thred::rSelbox() {
   frmCtrls[PTL].y = frmCtrls[PTM].y = frmCtrls[PTR].y = frmCtrls[PTLE].y = stitchCoordsInPixels.y;
   frmCtrls[PBR].y = frmCtrls[PBM].y = frmCtrls[PBL].y = stitchCoordsInPixels.y + adjustedSelectSize.cy;
   frmCtrls[PTR].x = frmCtrls[PRM].x = frmCtrls[PBR].x = stitchCoordsInPixels.x + adjustedSelectSize.cx;
-  frmCtrls[PTM].x = frmCtrls[PBM].x = stitchCoordsInPixels.x + adjustedSelectSize.cx / 2;
-  frmCtrls[PRM].y = frmCtrls[PLM].y = stitchCoordsInPixels.y + adjustedSelectSize.cy / 2;
+  frmCtrls[PTM].x = frmCtrls[PBM].x = stitchCoordsInPixels.x + (adjustedSelectSize.cx / 2);
+  frmCtrls[PRM].y = frmCtrls[PLM].y = stitchCoordsInPixels.y + (adjustedSelectSize.cy / 2);
   Instance->stateMap.set(StateFlag::SELSHO);
   dusel(StitchWindowDC);
 }

@@ -381,8 +381,8 @@ auto px2txt(POINT const& offset) -> bool {
 	return false;
   }
   txPoint.y = TextureScreen.areaHeight -
-              (wrap::toFloat(offset.y - TextureScreen.top) / wrap::toFloat(TextureScreen.height)) *
-                  TextureScreen.areaHeight;
+              ((wrap::toFloat(offset.y - TextureScreen.top) / wrap::toFloat(TextureScreen.height)) *
+                  TextureScreen.areaHeight);
   TextureInstance->TempTexturePoints.push_back(txPoint);
   return true;
 }
@@ -460,8 +460,8 @@ void setxclp(FRM_HEAD const& form) {
   deorg(screenOffset);
   px2ed(screenOffset, editorOffset);
   if (Instance->stateMap.testAndReset(StateFlag::TXHCNTR)) {
-	editorOffset.x = wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing * HALF +
-	                 TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing * HALF;
+	editorOffset.x = (wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing * HALF) +
+	                 TextureScreen.xOffset - TextureScreen.formCenter.x + (TextureScreen.spacing * HALF);
   }
   else {
 	editorOffset.x -= TextureScreen.formCenter.x;
@@ -955,7 +955,7 @@ void chktxnum() {
 		texture::savtxt();
 		TextureScreen.spacing  = value;
 		IniFile.textureSpacing = value;
-		TextureScreen.width    = value * wrap::toFloat(TextureScreen.lines) + value * HALF;
+		TextureScreen.width    = (value * wrap::toFloat(TextureScreen.lines)) + (value * HALF);
 		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
@@ -1769,7 +1769,7 @@ void texture::rtrtx(FRM_HEAD const& form) {
   TextureScreen.spacing    = form.fillSpacing;
   TextureScreen.lines      = gsl::narrow<uint16_t>(form.texture.lines);
   TextureScreen.width =
-      wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing * HALF;
+      (wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing) + (TextureScreen.spacing * HALF);
   savtxt();
 }
 
@@ -1809,7 +1809,7 @@ void texture::setshft() {
   }
   TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / wrap::toFloat(line);
   TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
-  TextureScreen.width = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing * HALF;
+  TextureScreen.width = (TextureScreen.spacing * wrap::toFloat(line)) + (TextureScreen.spacing * HALF);
   Instance->stateMap.set(StateFlag::TXTRED);
   Instance->stateMap.set(StateFlag::RESTCH);
 }

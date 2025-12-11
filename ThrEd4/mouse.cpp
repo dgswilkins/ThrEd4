@@ -1238,11 +1238,11 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	                               (newSize.y - wrap::toFloat(stretchBoxLine[iSide].y)));
 	  if ((iSide & 1U) != 0U) { // If the side is horizontal
 		if (ratio < xyRatio) {
-		  newSize.x = (wrap::toFloat(stretchBoxLine[iSide].y) - newSize.y) * xyRatio +
+		  newSize.x = ((wrap::toFloat(stretchBoxLine[iSide].y) - newSize.y) * xyRatio) +
 		              wrap::toFloat(stretchBoxLine[iSide].x);
 		}
 		else {
-		  newSize.y = (wrap::toFloat(stretchBoxLine[iSide].x) - newSize.x) / xyRatio +
+		  newSize.y = ((wrap::toFloat(stretchBoxLine[iSide].x) - newSize.x) / xyRatio) +
 		              wrap::toFloat(stretchBoxLine[iSide].y);
 		}
 		iSide                   = nxtcrnr(iSide);
@@ -1255,11 +1255,11 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  else {
 		if (ratio < xyRatio) {
-		  newSize.x = (newSize.y - wrap::toFloat(stretchBoxLine[iSide].y)) * xyRatio +
+		  newSize.x = ((newSize.y - wrap::toFloat(stretchBoxLine[iSide].y)) * xyRatio) +
 		              wrap::toFloat(stretchBoxLine[iSide].x);
 		}
 		else {
-		  newSize.y = (newSize.x - wrap::toFloat(stretchBoxLine[iSide].x)) / xyRatio +
+		  newSize.y = ((newSize.x - wrap::toFloat(stretchBoxLine[iSide].x)) / xyRatio) +
 		              wrap::toFloat(stretchBoxLine[iSide].y);
 		}
 		iSide                   = nxtcrnr(iSide);
