@@ -54,7 +54,7 @@ auto toFloat(inType invar) noexcept(!(std::is_same_v<inType, double> ||
   }
 }
 
-#if defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
@@ -85,7 +85,7 @@ sizeofType([[maybe_unused]] std::vector<T> const* vec) noexcept(std::is_same_v<u
 }
 // NOLINTEND(bugprone-exception-escape)
 
-#if defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic pop
 #endif
 
