@@ -521,14 +521,14 @@ void pecdat(std::vector<uint8_t>& buffer) {
 #pragma warning(disable : 4996)
 // ReSharper disable CppDeprecatedEntity
 void pecnam(gsl::span<char> const& label) {
-  strncpy(label.data(), "LA:", 3);
+  strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::utf16ToUtf8(Instance->auxName.stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
   auto* ptr = std::next(label.data(), 3U);
-  strncpy(ptr, fileStem.c_str(), lblSize);
+  strncpy(ptr, fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 }
 // ReSharper restore CppDeprecatedEntity
 #pragma warning(pop)
@@ -640,7 +640,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());
 
   // Check for the PES lead in value
-  if (constexpr auto PESSTR = "#PES"; strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) {
+  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
+  if (constexpr auto PESSTR = "#PES"; strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) { 
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
@@ -651,7 +652,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 
   auto contFlag = false;
   for (auto const& version : VER_STRINGS) {
-	if (strncmp(pesHeader->ledV.data(), version, pesHeader->ledV.size()) == 0) {
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
+	if (strncmp(pesHeader->ledV.data(), version, pesHeader->ledV.size()) == 0) { 
 	  contFlag = true;
 	  break;
 	}
@@ -791,12 +793,14 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
   constexpr auto AT6OFF  = 100.0F;    // Affine transform offset 6
 
   // ReSharper disable CppDeprecatedEntity
-  strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
-  strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR)); // NO LINT(clang-diagnostic-deprecated-declarations)
+  // NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
+  strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); 
+  strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR));
   wrap::narrow(pesHeader.celn, strlen(EMBSTR));
-  strncpy(pesHeader.ce.data(), EMBSTR, pesHeader.celn); // NO LINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.ce.data(), EMBSTR, pesHeader.celn);
   wrap::narrow(pesHeader.cslen, strlen(SEWSTR));
-  strncpy(pesHeader.cs.data(), SEWSTR, pesHeader.cslen); // NO LINT(clang-diagnostic-deprecated-declarations)
+  strncpy(pesHeader.cs.data(), SEWSTR, pesHeader.cslen);
+  // NOLINTEND(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   // ReSharper restore CppDeprecatedEntity
   {
 	auto iPEC = PESequivColors.begin();

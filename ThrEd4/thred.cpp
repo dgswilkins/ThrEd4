@@ -1371,9 +1371,11 @@ void chknum() {
 	}
   }
   if (ThrSingle->MsgBuffer.size() > 1) {
+	// NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	outDebugString(L"chknum: buffer length [{}] size [{}]\n",
 	               wcslen(ThrSingle->MsgBuffer.data()),
 	               ThrSingle->MsgBuffer.size());
+	// NOLINTEND(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	auto const value = thred::getMsgBufferValue();
 	if (Instance->stateMap.testAndReset(StateFlag::NUROT)) { // rotate
 	  if (value != 0.0F) {
@@ -3443,6 +3445,7 @@ void handleFeatherIDOK(HWND hwndlg) {
   auto buffer = std::wstring {};
   for (auto const& iFeatherStyle : FTHRLIST) {
 	buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	if (wcscmp(buf.data(), buffer.c_str()) == 0) {
 	  IniFile.featherFillType = iFeatherStyle.value;
 	  break;
@@ -3886,6 +3889,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
   }
   if (Instance->stateMap.testAndReset(StateFlag::ENTRDUP)) {
 	if (msgBuffer.size() > 1) {
+	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(msgBuffer.data()), msgBuffer.size());
 	  if (auto const value = thred::getMsgBufferValue(); value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
@@ -3897,6 +3901,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
   }
   if (Instance->stateMap.testAndReset(StateFlag::ENTROT)) {
 	if (msgBuffer.size() > 1) {
+	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(msgBuffer.data()), msgBuffer.size());
 	  if (auto const value = thred::getMsgBufferValue(); value != 0.0F) {
 		IniFile.rotationAngle = value * DEGRADF;
@@ -5804,6 +5809,7 @@ void redini() {
 	  {
 		auto previousName = ThrSingle->PreviousNames.begin();
 		for (auto const& prevName : IniFile.prevNames) {
+		  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 		  if (strlen(prevName.data()) != 0U) {
 			previousName->assign(utf::utf8ToUtf16(std::string(prevName.data())));
 		  }
@@ -10408,6 +10414,7 @@ void thred::nuthsel() {
   }
   auto const savedIndex = ThumbnailIndex;
   auto       iThumbnail = uint32_t {};
+  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   auto const length     = wcslen(ThrSingle->ThumbnailSearchString.data());
   Instance->stateMap.set(StateFlag::RESTCH);
   if (length != 0U) {
@@ -10448,6 +10455,7 @@ void thred::nuthbak(uint32_t count) {
 	return;
   }
   constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
+  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   if (auto const length = wcslen(ThrSingle->ThumbnailSearchString.data()); length != 0U) {
 	while (count != 0U && ThumbnailIndex < MAXFORMS) {
 	  if (ThumbnailIndex != 0U) {
@@ -12329,6 +12337,7 @@ void thred::otherReturn() {
 // return the width of a text item
 auto thred::txtWid(wchar_t const* string) noexcept(std::is_same_v<size_t, uint32_t>) -> SIZE {
   auto textSize = SIZE {};
+  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   wrap::getTextExtentPoint32(ThredDC, string, wrap::toUnsigned(wcslen(string)), &textSize);
   return textSize;
 }

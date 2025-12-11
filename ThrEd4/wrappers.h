@@ -354,6 +354,7 @@ void wcsToULong(outType& outvar, wchar_t const* invar) noexcept(std::is_same_v<o
 	outvar = std::wcstoul(invar, nullptr, DECRAD);
   }
   else {
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, DECRAD));
   }
 }
@@ -362,9 +363,11 @@ template <class outType>
 auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) -> outType { // NOLINT(google-runtime-int)
   // static_assert(!std::is_same_v<outType, long>, "no need to use wrap::wcstoLong here.");
   if constexpr (std::is_same_v<outType, long>) { // NOLINT(google-runtime-int)
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	return std::wcstol(buffer, nullptr, DECRAD);
   }
   else {
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	return gsl::narrow<outType>(std::wcstol(buffer, nullptr, DECRAD));
   }
 }

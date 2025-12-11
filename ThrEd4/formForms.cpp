@@ -653,6 +653,7 @@ void handleDaisyIDOK(HWND hwndlg) {
   GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
   for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
 	auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
 	  IniFile.daisyBorderType = iType;
 	  break;

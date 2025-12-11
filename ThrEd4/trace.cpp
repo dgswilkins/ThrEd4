@@ -1199,6 +1199,7 @@ void trace::trcsel() {
 }
 
 void trace::dutrnum2() {
+  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   dutrnum0(wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD)));
 }
 
@@ -1383,8 +1384,8 @@ void trace::wasTrace(DRAWITEMSTRUCT const& drawItem) {
 	  auto const itColTraceRGB   = wrap::next(TRACE_RGB.begin(), ColumnColor);
 	  FillRect(drawItem.hDC, &drawItem.rcItem, *itColTraceBrush);
 	  SetBkColor(drawItem.hDC, *itColTraceRGB);
-	  wrap::textOut(
-	      drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
+	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
+	  wrap::textOut(drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
 	  break;
 	}
 	++iTraceShift;
@@ -1411,6 +1412,7 @@ void trace::traceNumberInput(wchar_t const NumericCode) {
   *itTraceInputBuffer     = 0;
   ++TraceMsgIndex;
   // ToDo - should this be uint8_t?
+  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, DECRAD));
   switch (TraceMsgIndex) {
 	case 2: {

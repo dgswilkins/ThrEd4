@@ -1110,7 +1110,7 @@ void texture::redtx() {
 	if (!wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, L"ReadFile for sig in redtx")) {
 	  break;
 	}
-	if (strcmp(sig.data(), "txh") != 0) {
+	if (strcmp(sig.data(), "txh") != 0) { // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	  break;
 	}
 	if (!wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {

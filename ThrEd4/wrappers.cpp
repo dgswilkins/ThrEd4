@@ -42,6 +42,7 @@
 
 auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   try {
+	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	return std::wcstof(buffer, nullptr);
   }
   catch (...) {
