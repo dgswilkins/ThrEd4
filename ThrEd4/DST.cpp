@@ -90,7 +90,7 @@ class DSTHED // dst file header
 
   void writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset);
   [[nodiscard]] auto chkdst() const noexcept -> bool {
-	return strncmp(m_desched.data(), "LA:", 3) == 0;
+	return strncmp(m_desched.data(), "LA:", 3) == 0; // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   }
 
   private:
@@ -951,7 +951,7 @@ void savdst(std::vector<DSTREC>& DSTRecords, uint32_t const data) {
 void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRecSize, DST_OFFSETS const& dstOffset) {
   // dstHeader fields are fixed width, so use strncpy in its intended way.
   // Use sizeof to ensure no overrun if the format string is wrong length
-  strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NO LINT(clang-diagnostic-deprecated-declarations)
+  strncpy(m_desched.data(), "LA:", sizeof(m_desched)); // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   std::ranges::fill(m_desc, ' ');
   auto const convAuxName  = utf::utf16ToUtf8(auxName);
   auto const spDstHdrDesc = gsl::span {m_desc};
@@ -977,6 +977,7 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
   auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().y);
   auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().y);
   // clang-format off
+  // NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   strncpy(m_recshed.data(),  "ST:",          m_recshed.size());
   strncpy(m_recs.data(),     recs.c_str(),   m_recs.size());
   strncpy(m_cohed.data(),    "CO:",          m_cohed.size());
@@ -1000,6 +1001,7 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
   strncpy(m_pdhed.data(),    "PD",           m_pdhed.size());
   strncpy(m_pd.data(),       "******\r",     m_pd.size());
   strncpy(m_eof.data(),      "\x1a",         m_eof.size());
+  // NOLINTEND(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   // clang-format on
   std::ranges::fill(m_res, ' ');
 }
