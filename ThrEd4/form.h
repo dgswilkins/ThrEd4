@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_FORM_H
+#define THRED_FORM_H
 
 // Local Headers
 #include "formHeader.h"
@@ -172,3 +173,5 @@ void vrtclp();
 void vrtsclp(uint32_t formIndex);
 
 } // namespace form
+
+#endif // THRED_FORM_H

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef THRED_TEXTURE_HEADER_H
+#define THRED_TEXTURE_HEADER_H
+
 // Local Headers
 #include "point.h"
 
@@ -46,3 +48,5 @@ class TX_HIST
   float width {};
   float spacing {};
 };
+
+#endif // THRED_TEXTURE_HEADER_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_CLIPSTITCH_H
+#define THRED_CLIPSTITCH_H
 
 // Standard Libraries
 #include <cstdint>
@@ -12,3 +13,5 @@ class CLIP_STITCH
   uint8_t  fy {};  // fractional part of y coord
   uint16_t y {};   // integer part of y coord
 };
+
+#endif // THRED_CLIPSTITCH_H

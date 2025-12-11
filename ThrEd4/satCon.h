@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_SAT_CON_H
+#define THRED_SAT_CON_H
 
 // Open Source headers
 #include "gsl/gsl"
@@ -63,3 +64,5 @@ inline auto SAT_CON::operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON& {
 
   return *this;
 }
+
+#endif // THRED_SAT_CON_H

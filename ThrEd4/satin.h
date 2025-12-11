@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_SATIN_H
+#define THRED_SATIN_H
 
 // Local Headers
 #include "formHeader.h"
@@ -27,3 +28,5 @@ auto scomp(SAT_CON const& arg1, SAT_CON const& arg2) noexcept -> bool;
 void slbrd(FRM_HEAD const& form);
 void spltsat(uint32_t guideIndex);
 } // namespace satin
+
+#endif // THRED_SATIN_H

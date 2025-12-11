@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_MENU_H
+#define THRED_MENU_H
 
 // Local Headers
 #include "stdafx.h"
@@ -45,3 +46,5 @@ void setpcs();
 void vuthrds();
 void wrnmen();
 } // namespace menu
+
+#endif // THRED_MENU_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_MOUSE_H
+#define THRED_MOUSE_H
 
 namespace mouse {
 void crtcurs() noexcept;
@@ -17,3 +18,5 @@ auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                      FRM_HEAD const&     textureForm) -> bool;
 auto handleRightButtonDown() -> bool;
 } // namespace mouse
+
+#endif // THRED_MOUSE_H

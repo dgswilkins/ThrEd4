@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_FORM_HEADER_H
+#define THRED_FORM_HEADER_H
 
 // Local Headers
 // ReSharper disable CppUnusedIncludeDirective
@@ -661,3 +662,5 @@ inline void FRM_HEAD::squareEnd(bool const flag) noexcept {
 	extendedAttribute &= ~AT_SQR;
   }
 }
+
+#endif // THRED_FORM_HEADER_H

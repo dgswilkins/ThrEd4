@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_BITMAP_H
+#define THRED_BITMAP_H
 
 // Local Headers
 #include "formHeader.h"
@@ -49,3 +50,5 @@ void setBitmapColor(COLORREF const& newColor) noexcept;
 void createBitmapPen() noexcept;
 void setBmpColor();
 } // namespace bitmap
+
+#endif // THRED_BITMAP_H

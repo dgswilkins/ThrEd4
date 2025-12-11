@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_DST_H
+#define THRED_DST_H
 
 // Local Headers
 #include "point.h"
@@ -36,3 +37,5 @@ void dstInit() noexcept;
 auto readDSTFile(fs::path const& newFileName) -> bool;
 auto saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 } // namespace DST
+
+#endif // THRED_DST_H

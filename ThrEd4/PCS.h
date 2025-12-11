@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_PCS_H
+#define THRED_PCS_H
 
 // Local Headers
 #include "fRectangle.h"
@@ -16,3 +17,5 @@ auto isPCS(fs::path const& path) -> bool;
 auto readPCSFile(fs::path const& newFileName) -> bool;
 auto savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool;
 } // namespace PCS
+
+#endif // THRED_PCS_H

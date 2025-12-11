@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_CLIP_H
+#define THRED_CLIP_H
 
 // Local Headers
 #include "formHeader.h"
@@ -20,3 +21,5 @@ auto nueclp(uint32_t currentForm, uint32_t count) -> uint32_t;
 auto numclp(uint32_t formIndex) -> uint32_t;
 void oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries);
 } // namespace clip
+
+#endif // THRED_CLIP_H

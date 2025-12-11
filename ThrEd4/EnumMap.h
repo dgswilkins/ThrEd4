@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_ENUM_MAP_H
+#define THRED_ENUM_MAP_H
 
 // Open Source headers
 #include "gsl/gsl"
@@ -125,3 +126,5 @@ template <typename EnumType> class ENUM_MAP
   private:
   std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> m_mask;
 };
+
+#endif // THRED_ENUM_MAP_H

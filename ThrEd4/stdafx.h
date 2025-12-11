@@ -3,7 +3,8 @@
 // are changed infrequently
 //
 
-#pragma once
+#ifndef PRECOMPILED_HEADER_H
+#define PRECOMPILED_HEADER_H
 
 // used to exclude the precompiled headers from the build process
 #ifndef DEBUG_PCH
@@ -65,3 +66,5 @@
 #include <xutility>
 
 #endif // DEBUG_PCH
+
+#endif // PRECOMPILED_HEADER_H

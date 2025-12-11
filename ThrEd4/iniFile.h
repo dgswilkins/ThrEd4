@@ -1,4 +1,6 @@
-#pragma once
+#ifndef THRED_INIFILE_H
+#define THRED_INIFILE_H
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -243,3 +245,5 @@ inline void INI_FILE::setDaisy() noexcept {
 	daisyPetalLen = DAZPLEN;
   }
 }
+
+#endif // THRED_INIFILE_H

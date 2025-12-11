@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_FRECTANGLE_H
+#define THRED_FRECTANGLE_H
 
 #pragma pack(push, 1)
 class F_RECTANGLE
@@ -19,3 +20,5 @@ class F_RECTANGLE
 constexpr F_RECTANGLE::F_RECTANGLE(float const rhsLeft, float const rhsTop, float const rhsRight, float const rhsBottom) noexcept
     : left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
 }
+
+#endif // THRED_FRECTANGLE_H

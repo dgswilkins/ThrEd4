@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_FORM_FORMS_H
+#define THRED_FORM_FORMS_H
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -32,3 +33,5 @@ void setear();
 void sidwnd(HWND wnd, HWND& sideMessageWindow);
 void wavfrm();
 } // namespace formForms
+
+#endif // THRED_FORM_FORMS_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_TRACE_H
+#define THRED_TRACE_H
 
 namespace trace {
 void blak();
@@ -20,3 +21,5 @@ void untrace();
 void wasTrace(DRAWITEMSTRUCT const& drawItem);
 void wasTrace1();
 } // namespace trace
+
+#endif // THRED_TRACE_H

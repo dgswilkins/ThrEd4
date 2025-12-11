@@ -1,5 +1,6 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
-#pragma once
+#ifndef THRED_THRED_TYPES_H
+#define THRED_THRED_TYPES_H
 
 // Local Headers
 #include "Resources/resource.h"
@@ -993,3 +994,5 @@ template <class T2, class T1> _Ret_notnull_ auto convertFromPtr(T1* pointer) -> 
 
   throw std::runtime_error("Could Not cast pointer");
 }
+
+#endif // THRED_THRED_TYPES_H

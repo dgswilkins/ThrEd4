@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_XT_H
+#define THRED_XT_H
 
 // Local Headers
 #include "formHeader.h"
@@ -81,3 +82,5 @@ void setwlk();
 void setwlkind();
 void srtcol();
 } // namespace xt
+
+#endif // THRED_XT_H

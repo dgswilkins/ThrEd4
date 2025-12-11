@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_TEXTURE_H
+#define THRED_TEXTURE_H
 
 // Local Headers
 #include "formHeader.h"
@@ -30,3 +31,5 @@ auto textureInit() -> uint32_t;
 void writeScreenWidth(DRAWITEMSTRUCT const& drawItem, int32_t position);
 
 } // namespace texture
+
+#endif // THRED_TEXTURE_H

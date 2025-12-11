@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_WRAPPERS_H
+#define THRED_WRAPPERS_H
 
 // Local Headers
 #include "point.h"
@@ -370,3 +371,5 @@ auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) ->
 
 void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 } // namespace wrap
+
+#endif // THRED_WRAPPERS_H

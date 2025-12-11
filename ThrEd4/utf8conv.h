@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_UTF8CONV_H
+#define THRED_UTF8CONV_H
 
 // Open Source headers
 #include "gsl/gsl"
@@ -38,3 +39,5 @@ inline auto utf16ToUtf8(std::wstring const& utf16) -> std::string {
 }
 
 } // namespace utf
+
+#endif // THRED_UTF8CONV_H

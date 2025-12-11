@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_FORM_CLIP_H
+#define THRED_FORM_CLIP_H
 
 // Local Headers
 #include "formHeader.h"
@@ -21,3 +22,5 @@ void rtrclp();
 void setClipOrigin(POINT source) noexcept;
 void txtclp(FRM_HEAD& textureForm);
 } // namespace tfc
+
+#endif // THRED_FORM_CLIP_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_BALARAD_H
+#define THRED_BALARAD_H
 
 // Standard Libraries
 #include <filesystem>
@@ -13,3 +14,5 @@ auto getBN0() noexcept -> fs::path&;
 auto getBN1() noexcept -> fs::path&;
 auto getBN2() noexcept -> fs::path&;
 } // namespace bal
+
+#endif // THRED_BALARAD_H

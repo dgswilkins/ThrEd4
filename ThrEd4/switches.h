@@ -1,6 +1,7 @@
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 // ReSharper disable CppClangTidyModernizeMacroToEnum
-#pragma once
+#ifndef THRED_SWITCHES_H
+#define THRED_SWITCHES_H
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
 // compile switches
@@ -16,3 +17,5 @@
 #define USE_DEFAULTDIR 0 // set the default directory rather than using the OS mechanism
 #define SHOW_ERROR 1     // show error messages
 // NOLINTEND(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
+
+#endif // THRED_SWITCHES_H

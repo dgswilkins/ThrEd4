@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_DISPLAY_TEXT_H
+#define THRED_DISPLAY_TEXT_H
 
 // Local Headers
 #include "textureHeader.h"
@@ -79,3 +80,5 @@ template <class inType> void showMessage(uint32_t messageId, inType const& value
 }
 
 } // namespace displayText
+
+#endif // THRED_DISPLAY_TEXT_H

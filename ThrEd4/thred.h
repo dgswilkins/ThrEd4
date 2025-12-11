@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_THRED_H
+#define THRED_THRED_H
 
 // Local Headers
 #include "fRectangle.h"
@@ -282,3 +283,5 @@ void zumout();
 void zumshft();
 
 } // namespace thred
+
+#endif // THRED_THRED_H

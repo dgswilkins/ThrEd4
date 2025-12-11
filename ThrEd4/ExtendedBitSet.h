@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_EXTENDED_BIT_SET_H
+#define THRED_EXTENDED_BIT_SET_H
 
 // Open Source headers
 #include "boost/dynamic_bitset.hpp"
@@ -50,3 +51,5 @@ class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
 	return foundBit;
   }
 };
+
+#endif // THRED_EXTENDED_BIT_SET_H

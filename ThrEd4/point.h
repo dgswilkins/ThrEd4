@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_POINT_H
+#define THRED_POINT_H
 
 // Open Source headers
 #include "gsl/gsl"
@@ -295,3 +296,5 @@ inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
     x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
 }
 #endif
+
+#endif // THRED_POINT_H

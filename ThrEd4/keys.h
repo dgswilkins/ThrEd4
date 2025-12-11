@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_KEYS_H
+#define THRED_KEYS_H
 
 namespace keys {
 void desiz();
@@ -12,3 +13,5 @@ void setmov();
 void ungrphi();
 void ungrplo();
 } // namespace keys
+
+#endif // THRED_KEYS_H

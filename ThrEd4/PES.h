@@ -1,4 +1,5 @@
-#pragma once
+#ifndef THRED_PES_H
+#define THRED_PES_H
 
 // Local Headers
 #include "switches.h"
@@ -18,3 +19,5 @@ auto readPESFile(fs::path const& newFileName) -> bool;
 auto savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 } // namespace PES
 #endif
+
+#endif // THRED_PES_H
