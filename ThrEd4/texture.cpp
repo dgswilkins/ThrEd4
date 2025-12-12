@@ -136,6 +136,7 @@ class TXT_SINGLE
 namespace {
 constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
 constexpr auto TXTRAT  = 0.95F; // texture fill clipboard shrink/grow ratio
+constexpr auto SIGNATURE = std::array<char, 4> {'t', 'x', 'h', 0}; // texture history signature
 
 enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
 
@@ -1049,7 +1050,6 @@ void texture::setTxtCurLoc(POINT const location) noexcept {
 }
 
 void texture::txdun() {
-  constexpr auto SIGNATURE            = std::array<char, 4> {"txh"};
   auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(TextureInstance->TextureHistory.size());
   if (TextureInstance->TextureHistory.operator[](0).texturePoints.empty()) {
@@ -1110,7 +1110,7 @@ void texture::redtx() {
 	if (!wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, L"ReadFile for sig in redtx")) {
 	  break;
 	}
-	if (strcmp(sig.data(), "txh") != 0) { // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
+	if (sig != SIGNATURE) {
 	  break;
 	}
 	if (!wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
