@@ -9,6 +9,28 @@
 #include <filesystem>
 #include <vector>
 
+#pragma pack(push, 1)
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+class THR_HEAD // ThrEd file header
+{
+  public:
+  uint32_t headerType {};
+  uint32_t fileLength {};    // length of strhed + length of stitch data
+  uint16_t stitchCount {};   // number of stitches
+  uint16_t hoopType {};      // size of hoop
+  uint16_t formCount {};     // number of forms
+  uint16_t vertexLen {};     // points to form points
+  uint16_t vertexCount {};   // number of form points
+  uint16_t dlineLen {};      // points to dline data
+  uint16_t dlineCount {};    // dline data count
+  uint16_t clipDataLen {};   // points to clipboard data
+  uint16_t clipDataCount {}; // clipboard data count
+  [[nodiscard]] auto isValid() const noexcept -> bool;
+  [[nodiscard]] auto getVersion() const noexcept -> uint32_t;
+};
+// NOLINTEND(misc-non-private-member-variables-in-classes)
+#pragma pack(pop)
+
 namespace fs = std::filesystem;
 
 namespace thred {
@@ -81,7 +103,9 @@ auto getBackgroundBrush() noexcept -> HBRUSH;
 auto getBackgroundColor() noexcept -> COLORREF;
 auto getColorbarVertPosition() noexcept -> float;
 auto getColorChangeIndex(uint32_t iColor) noexcept -> uint16_t;
-auto getDesigner() -> std::wstring;
+auto getDefaultThreadColors() noexcept -> std::array<COLORREF, COLORCNT>;
+auto getDesignerFormatted() -> std::wstring;
+auto getDesignerName() noexcept -> std::wstring&;
 auto getFileHandle(fs::path const& newFileName, HANDLE& fileHandle) -> bool;
 auto getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool;
 auto getFormControlPoints() noexcept -> std::vector<POINT>&;
@@ -117,6 +141,7 @@ void ilin1() noexcept;
 auto inChangeThreadWindows() -> bool;
 auto inDefaultColorWindows() -> bool;
 auto inColorbar() noexcept -> bool;
+void initBackgroundBrush(COLORREF const& color) noexcept;
 auto inrng(uint32_t iStitch) noexcept -> bool;
 auto inStitchWin() noexcept -> bool;
 auto inThreadWindows() -> bool;
@@ -161,6 +186,7 @@ void pgrit();
 void pgup();
 void pntmrk();
 auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;
+void prtred(HANDLE fileHandle, uint32_t code);
 void purg();
 void purgdir();
 void pushPreviousForm();
@@ -171,6 +197,7 @@ void rats();
 void ratsr();
 void rebox();
 void redclp(HGLOBAL clipMemory);
+void redfnam(std::wstring& designerName);
 void redraw(HWND window) noexcept;
 void redrawColorBar() noexcept;
 void redrawCapturedStitch(uint32_t closestPointIndexClone);
@@ -185,6 +212,7 @@ void resetPrefIndex() noexcept;
 void resetSideBuffer();
 void retrac();
 void ritfcor(F_POINT const& point);
+void ritfnam(std::wstring const& designerName);
 void ritmov(uint32_t formIndex) noexcept;
 void ritot(uint32_t number);
 void ritrot(float rotationAngle, F_POINT const& rotationCenter);
@@ -212,6 +240,7 @@ void selectMultiFormPen() noexcept;
 void selfpnt();
 void set1knot();
 void setBackgroundColor(COLORREF color) noexcept;
+void setDesignerName(std::array<char, NAME_LEN> designerName);
 auto setFileName() -> fs::path;
 void setFormControls() noexcept(!std::is_same_v<size_t, uint32_t>);
 void setLargestStitchVal();

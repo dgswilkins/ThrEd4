@@ -39,6 +39,7 @@
     <ClCompile Include="reporting.cpp" />
     <ClCompile Include="satin.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="thredFile.cpp" />
     <ClCompile Include="trace.cpp" />
     <ClCompile Include="wrappers.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -84,6 +85,7 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="textureHeader.h" />
     <ClInclude Include="thred.h" />
+    <ClInclude Include="thredFile.h" />
     <ClInclude Include="ThrEdTypes.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="utf8conv.h" />

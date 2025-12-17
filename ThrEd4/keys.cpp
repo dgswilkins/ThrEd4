@@ -837,7 +837,7 @@ void keys::desiz() {
   }
   info += displayText::format2(IDS_HUPWID, IniFile.hoopSizeX * IPFGRAN, IniFile.hoopSizeY * IPFGRAN);
   if (!Instance->stitchBuffer.empty()) {
-	info += thred::getDesigner();
+	info += thred::getDesignerFormatted();
   }
   displayText::shoMsg(info, true);
 }

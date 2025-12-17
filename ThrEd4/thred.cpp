@@ -30,6 +30,7 @@
 #include "texture.h"
 #include "textureHeader.h"
 #include "thred.h"
+#include "thredFile.h"
 #include "ThrEdTypes.h"
 #include "trace.h"
 #include "utf8conv.h"
@@ -159,24 +160,6 @@ enum FileMenuItems : uint8_t {
   FM_ONAM3
 };
 
-#pragma pack(push, 1)
-class THR_HEAD // ThrEd file header
-{
-  public:
-  uint32_t headerType {};
-  uint32_t fileLength {};    // length of strhed + length of stitch data
-  uint16_t stitchCount {};   // number of stitches
-  uint16_t hoopType {};      // size of hoop
-  uint16_t formCount {};     // number of forms
-  uint16_t vertexLen {};     // points to form points
-  uint16_t vertexCount {};   // number of form points
-  uint16_t dlineLen {};      // points to dline data
-  uint16_t dlineCount {};    // dline data count
-  uint16_t clipDataLen {};   // points to clipboard data
-  uint16_t clipDataCount {}; // clipboard data count
-};
-#pragma pack(pop)
-
 class THR_SINGLE
 {
   public:
@@ -274,7 +257,6 @@ constexpr auto FLTDST = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"}; // Display only
 constexpr auto FLTPCS = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"}; // Display only Pfaff format files (.pcs)
 constexpr auto FLTPES = COMDLG_FILTERSPEC {L"Brother", L"*.pes"}; // Display only Brother format files (.pes)
 constexpr auto FLTTHR = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Display only ThrEd format files (.thr)
-constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
 constexpr auto KNOTLEN  = int32_t {54};           // set knots for stitches longer than this
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
@@ -286,7 +268,6 @@ constexpr auto MINZUMF  = float {MINZUM};        // minimum zoom in stitch point
 constexpr auto NUGINI   = 2.0F;                  // default nudge step
 constexpr auto PAGSCROL = 0.9F;                  // page scroll factor
 constexpr auto SCROLSIZ = int32_t {12};          // logical pixel width of a scroll bar
-constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
@@ -332,7 +313,7 @@ auto UserColorBrush    = std::array<HBRUSH, COLORCNT> {};   // user color brushe
 
 // for the choose color dialog box
 auto ColorStruct = CHOOSECOLOR {};
-auto CustomColor = std::array<COLORREF, COLORCNT> {};
+auto CustomThreadColor = std::array<COLORREF, COLORCNT> {};
 
 // for the background color dialog box
 auto BackgroundColorStruct = CHOOSECOLOR {};
@@ -578,18 +559,14 @@ void nuthum(wchar_t character);
 void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& knotStep, uint32_t knotAttribute);
 auto oldwnd(HWND window) noexcept -> bool;
 void patdun();
-void prtred(HANDLE fileHandle, uint32_t code);
 auto pxchk(float pixelSize) -> uint16_t;
-auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
 void rebak();
-void redfnam(std::wstring& designerName);
 void redini();
 void relin();
 void resetState();
 void respac(FRM_HEAD& form) noexcept;
 void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem);
 void ritcor(F_POINT_ATTR const& pointAttribute);
-void ritfnam(std::wstring const& designerName);
 void ritini();
 void ritlayr();
 void ritloc();
@@ -1377,8 +1354,8 @@ void chknum() {
   if (ThrSingle->MsgBuffer.size() > 1) {
 	// NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	outDebugString(L"chknum: buffer length [{}] size [{}]\n",
-	               wcslen(ThrSingle->MsgBuffer.data()),
-	               ThrSingle->MsgBuffer.size());
+	               wcslen(ThrSingle->MsgBuffer.data()), 
+	               ThrSingle->MsgBuffer.size()); 
 	// NOLINTEND(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	auto const value = thred::getMsgBufferValue();
 	if (Instance->stateMap.testAndReset(StateFlag::NUROT)) { // rotate
@@ -2543,7 +2520,7 @@ void dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.clipDataCount, clipDataCount);
   // calculate the offset to the form data entry point
   auto const formDataOffset = bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
-                              sizeof(UserColor) + sizeof(CustomColor) + TSSIZE;
+                              sizeof(UserColor) + sizeof(CustomThreadColor) + TSSIZE;
   auto vtxLen = sizeof(stitchHeader) + wrap::sizeofVector(Instance->stitchBuffer) + formDataOffset;
   // calculate the design data size
   auto const thredDataSize = wrap::sizeofVector(formList) +
@@ -2571,7 +2548,7 @@ void dubuf(std::vector<char>& buffer) {
   durit(buffer, bitmap::getBmpNameData(), bitmap::getBmpNameLength());
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
   durit(buffer, UserColor.data(), sizeof(UserColor));
-  durit(buffer, CustomColor.data(), sizeof(CustomColor));
+  durit(buffer, CustomThreadColor.data(), sizeof(CustomThreadColor));
   // write the thread size data to the buffer
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(TSSIZE);
@@ -4513,7 +4490,7 @@ void init() {
   wrap::getTextExtentPoint32(ThredDC, pikol.c_str(), wrap::toUnsigned(pikol.size()), &PickColorMsgSize);
   menu::auxmen();
   fnamtabs();
-  ritfnam(ThrSingle->DesignerName);
+  thred::ritfnam(ThrSingle->DesignerName);
   auto       designer       = utf::utf16ToUtf8(ThrSingle->DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
@@ -4600,7 +4577,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
   if (!wrap::readFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, L"ReadFile for fileHeader in insTHR")) {
 	return false;
   }
-  if ((fileHeader.headerType & SIGMASK) != THREDSIG) {
+  if (!fileHeader.isValid()) {
 	displayText::tabmsg(IDS_NOTHR, false);
 	CloseHandle(fileHandle);
 	return false;
@@ -4611,7 +4588,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
   constexpr auto STCHW       = 1;
   auto           homscor     = 0U;
   auto           thredHeader = THR_HEAD_EX {};
-  auto const     version     = (fileHeader.headerType & FTYPMASK) >> TBYTSHFT;
+  auto const     version     = fileHeader.getVersion();
   auto&          formList    = Instance->formList;
 
   if (version != 0U) {
@@ -4635,7 +4612,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	}
   }
   auto const formDataOffset = gsl::narrow<LONG>(bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
-                                                sizeof(UserColor) + sizeof(CustomColor) + TSSIZE);
+                                                sizeof(UserColor) + sizeof(CustomThreadColor) + TSSIZE);
   SetFilePointer(fileHandle, formDataOffset, nullptr, FILE_CURRENT);
   InsertedVertexIndex = wrap::toUnsigned(Instance->formVertices.size());
   InsertedFormIndex   = wrap::toUnsigned(formList.size());
@@ -4812,7 +4789,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	    filscor > homscor) {
 	  auto const spEHCN = gsl::span {ExtendedHeader.creatorName};
 	  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
-	  redfnam(ThrSingle->DesignerName);
+	  thred::redfnam(ThrSingle->DesignerName);
 	  auto fmtStr = displayText::format2(IDS_THRDBY, ThrSingle->ThrName.wstring(), ThrSingle->DesignerName);
 	  SetWindowText(ThrEdWindow, fmtStr.c_str());
 	}
@@ -4910,7 +4887,7 @@ void loadColors() noexcept {
   auto       iISPC  = spISPC.begin();
   auto const spIBPC = gsl::span {IniFile.backgroundPreferredColors};
   auto       iIBPC  = spIBPC.begin();
-  auto       iCC    = CustomColor.begin();
+  auto       iCC    = CustomThreadColor.begin();
   auto       iCBC   = CustomBackgroundColor.begin();
   for (auto& color : UserColor) {
 	color   = *iISC++;
@@ -5180,7 +5157,7 @@ auto nuCol(COLORREF const init) noexcept -> BOOL {
   ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   ColorStruct.hwndOwner      = ThrEdWindow;
   ColorStruct.lCustData      = 0;
-  ColorStruct.lpCustColors   = CustomColor.data();
+  ColorStruct.lpCustColors   = CustomThreadColor.data();
   ColorStruct.lpfnHook       = nullptr;
   ColorStruct.lpTemplateName = nullptr;
   ColorStruct.rgbResult      = init;
@@ -5205,7 +5182,7 @@ void nuFil(FileIndices const fileIndex) {
 	return;
   }
   if (auto const firstCharacter = tolower(fileExt[1]); firstCharacter == 't') {
-	if (!readTHRFile(newFileName)) {
+	if (!thredFile::readTHRFile(newFileName, ExtendedHeader, BackgroundColor, CustomThreadColor, ThreadSize)) {
 	  return;
 	}
   }
@@ -5464,274 +5441,12 @@ void patdun() {
   displayText::tabmsg(IDS_END, false);
 }
 
-// ReSharper disable CppParameterMayBeConst
-void prtred(HANDLE fileHandle, uint32_t const code) {
-  CloseHandle(fileHandle);
-  Instance->stateMap.reset(StateFlag::INIT);
-  Instance->formList.clear();
-  displayText::tabmsg(code, false);
-  thred::coltab();
-  Instance->stateMap.set(StateFlag::RESTCH);
-}
-// ReSharper restore CppParameterMayBeConst
-
 auto pxchk(float pixelSize) -> uint16_t {
   constexpr auto MINLIMIT = 1.0F;
   constexpr auto MAXLIMIT = 20.0F;
 
   pixelSize = std::clamp(pixelSize, MINLIMIT, MAXLIMIT);
   return wrap::round<uint16_t>(pixelSize);
-}
-
-auto readTHRFile(std::filesystem::path const& newFileName) -> bool {
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto fileHandle = HANDLE {nullptr};
-  if (!thred::getFileHandle(newFileName, fileHandle)) {
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  auto bytesRead   = DWORD {};
-  auto thredHeader = THR_HEAD {};
-  if (!wrap::readFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, L"ReadFile for ThrEd Header in readTHRFile")) { // check is we even have a file
-	return false;
-  }
-  if ((thredHeader.headerType & SIGMASK) != THREDSIG) { // does the file have the correct signature
-	prtred(fileHandle, IDS_NOTHR);
-	return false;
-  }
-  if (bytesRead != sizeof(thredHeader)) { // is there enough data in the file to read the header
-	prtred(fileHandle, IDS_SHRTF);
-	return false;
-  }
-  auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
-  auto const spIDN   = gsl::span {IniFile.designerName};
-  ThrSingle->DesignerName.assign(utf::utf8ToUtf16(std::string(spIDN.data())));
-  switch (version) { // handle the different versions of the file format
-	case 0: {
-	  if (thredHeader.hoopType == SMALHUP) {
-		IniFile.hoopSizeX = SHUPX;
-		IniFile.hoopSizeY = SHUPY;
-		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
-	  }
-	  else {
-		IniFile.hoopSizeX = LHUPX;
-		IniFile.hoopSizeY = LHUPY;
-		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
-	  }
-	  ritfnam(ThrSingle->DesignerName);
-	  auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
-	  std::copy(spIDN.begin(), wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U), spModifierName.begin());
-	  break;
-	}
-	case 1:
-	case 2: {
-	  if (!wrap::readFile(fileHandle, &ExtendedHeader, sizeof(ExtendedHeader), &bytesRead, L"ReadFile for ExtendedHeader in readTHRFile")) {
-		return false;
-	  }
-	  if (bytesRead != sizeof(ExtendedHeader)) { // is there enough data in the file to read the extended header
-		prtred(fileHandle, IDS_SHRTF);
-		return false;
-	  }
-	  IniFile.hoopSizeX = ExtendedHeader.hoopSizeX;
-	  IniFile.hoopSizeY = ExtendedHeader.hoopSizeY;
-
-	  UnzoomedRect = {.cx = std::lround(ExtendedHeader.hoopSizeX), .cy = std::lround(ExtendedHeader.hoopSizeY)};
-	  redfnam(ThrSingle->DesignerName);
-	  break;
-	}
-	default: {
-	  prtred(fileHandle, IDS_NOTVER);
-	  return false;
-	}
-  }
-  ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
-  UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
-  Instance->stitchBuffer.resize(thredHeader.stitchCount);
-  if (thredHeader.stitchCount != 0U) { // read the stitch buffer if there are stitches
-	auto const bytesToRead = thredHeader.stitchCount * wrap::sizeofType(Instance->stitchBuffer);
-	if (!wrap::readFile(fileHandle, Instance->stitchBuffer.data(), bytesToRead, &bytesRead, L"ReadFile for stitchBuffer in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  prtred(fileHandle, IDS_PRT);
-	  return false;
-	}
-  }
-  Instance->stitchBuffer.shrink_to_fit();
-  auto bytesToRead = bitmap::getBmpNameLength();
-  if (!wrap::readFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, L"ReadFile for getBmpNameData in readTHRFile")) {
-	return false;
-  }
-  if (bytesRead != bytesToRead) { // if we can't read the bitmap name, reset the bitmap and return
-	bitmap::resetBmpFile(true);
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  bytesToRead = sizeof(BackgroundColor);
-  if (!wrap::readFile(fileHandle, &BackgroundColor, bytesToRead, &bytesRead, L"ReadFile for BackgroundColor in readTHRFile")) {
-	return false;
-  }
-  if (bytesRead != bytesToRead) { // if we can't read the background color, default it and return
-	BackgroundColor = IniFile.backgroundColor;
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  BackgroundBrush = CreateSolidBrush(BackgroundColor);
-  bytesToRead     = sizeof(UserColor);
-  if (!wrap::readFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, L"ReadFile for UserColor in readTHRFile")) {
-	return false;
-  }
-  if (bytesRead != bytesToRead) { // if we can't read the user colors, default them and return
-	UserColor = DEFAULT_COLORS;
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  bytesToRead = sizeof(CustomColor);
-  if (!wrap::readFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, L"ReadFile for CustomColor in readTHRFile")) {
-	return false;
-  }
-  if (bytesRead != bytesToRead) { // if we can't read the custom colors, default them and return
-	CustomColor = DEFAULT_COLORS;
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  auto msgBuffer = std::array<char, TSSIZE> {};
-  if (!wrap::readFile(fileHandle, msgBuffer.data(), sizeof(msgBuffer), &bytesRead, L"ReadFile for msgBuffer in readTHRFile")) {
-	return false;
-  }
-  if (bytesRead != TSSIZE) { // if we can't read the thread size buffer, bail
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
-  auto       threadSizeBufW = utf::utf8ToUtf16(threadSizebuf);
-  std::ranges::generate(ThreadSize, [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
-	return *tsBuffer++;
-  });
-  if (thredHeader.formCount == 0) {
-	CloseHandle(fileHandle);
-	return true;
-  }
-  Instance->stateMap.reset(StateFlag::BADFIL);
-  auto& formList = Instance->formList;
-
-  if (version < 2) {
-	auto formListOriginal = std::vector<FRM_HEAD_O> {};
-	formListOriginal.resize(thredHeader.formCount);
-	bytesToRead = thredHeader.formCount * wrap::sizeofType(formListOriginal);
-	if (!wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, L"ReadFile for formListOriginal in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) { // if the header and available data don't match, resize the form list with the data we do have but set the bad file flag
-	  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(formListOriginal));
-	  formListOriginal.resize(thredHeader.formCount);
-	  Instance->stateMap.set(StateFlag::BADFIL);
-	}
-	formList.reserve(formListOriginal.size());
-	formList.insert(formList.end(), formListOriginal.begin(), formListOriginal.end());
-  }
-  else {
-	auto inFormList = std::vector<FRM_HEAD_OUT> {};
-	inFormList.resize(thredHeader.formCount);
-	bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
-	if (!wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, L"ReadFile for inFormList in readTHRFile")) { // read the form list
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(inFormList));
-	  inFormList.resize(thredHeader.formCount);
-	  Instance->stateMap.set(StateFlag::BADFIL);
-	}
-	formList.reserve(inFormList.size());
-	formList.insert(formList.end(), inFormList.begin(), inFormList.end());
-  }
-  formList.shrink_to_fit();
-  if (thredHeader.vertexCount != 0U) { // read the form vertices
-	Instance->formVertices.resize(thredHeader.vertexCount);
-	bytesToRead = thredHeader.vertexCount * wrap::sizeofType(Instance->formVertices);
-	if (!wrap::readFile(fileHandle, Instance->formVertices.data(), bytesToRead, &bytesRead, L"ReadFile for formVertices in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  Instance->formVertices.resize(bytesRead / wrap::sizeofType(Instance->formVertices));
-	  Instance->stateMap.set(StateFlag::BADFIL);
-	}
-  }
-  else {
-	// We have forms but no vertices - blow up the read
-	prtred(fileHandle, IDS_PRT);
-	return false;
-  }
-  Instance->formVertices.shrink_to_fit();
-  if (thredHeader.dlineCount != 0U) { // read the satin guide list
-	auto inGuideList = std::vector<SAT_CON_OUT>(thredHeader.dlineCount);
-	bytesToRead      = thredHeader.dlineCount * wrap::sizeofType(inGuideList);
-	if (!wrap::readFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, L"ReadFile for inGuideList in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  inGuideList.resize(bytesRead / wrap::sizeofType(inGuideList));
-	  Instance->stateMap.set(StateFlag::BADFIL);
-	}
-	Instance->satinGuides.reserve(inGuideList.size());
-	Instance->satinGuides.insert(Instance->satinGuides.end(), inGuideList.begin(), inGuideList.end());
-  }
-  Instance->satinGuides.shrink_to_fit();
-  if (thredHeader.clipDataCount != 0U) { // read the clip points
-	Instance->clipPoints.resize(thredHeader.clipDataCount);
-	bytesToRead = thredHeader.clipDataCount * wrap::sizeofType(Instance->clipPoints);
-	if (!wrap::readFile(fileHandle, Instance->clipPoints.data(), bytesToRead, &bytesRead, L"ReadFile for clipPoints in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  Instance->clipPoints.resize(bytesRead / wrap::sizeofType(Instance->clipPoints));
-	  Instance->stateMap.set(StateFlag::BADFIL);
-	}
-  }
-  Instance->clipPoints.shrink_to_fit();
-  if (ExtendedHeader.texturePointCount != 0U) { // read the texture points
-	Instance->texturePointsBuffer.resize(ExtendedHeader.texturePointCount);
-	bytesToRead = ExtendedHeader.texturePointCount * wrap::sizeofType(Instance->texturePointsBuffer);
-	if (!wrap::readFile(fileHandle, Instance->texturePointsBuffer.data(), bytesToRead, &bytesRead, L"ReadFile for texturePointsBuffer in readTHRFile")) {
-	  return false;
-	}
-	if (bytesRead != bytesToRead) {
-	  Instance->texturePointsBuffer.resize(bytesRead / wrap::sizeofType(Instance->texturePointsBuffer));
-	  Instance->stateMap.set(StateFlag::BADFIL);
-	}
-  }
-  else {
-	Instance->texturePointsBuffer.clear();
-  }
-  Instance->texturePointsBuffer.shrink_to_fit();
-  if (Instance->stateMap.testAndReset(StateFlag::BADFIL)) {
-	displayText::bfilmsg();
-  }
-  // now re-create all the pointers/indexes in the form data
-  auto clipOffset   = 0U;
-  auto vertexOffset = 0U;
-  auto guideOffset  = 0U;
-  for (auto& iForm : formList) {
-	iForm.vertexIndex = vertexOffset;
-	vertexOffset += iForm.vertexCount;
-	if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
-	  iForm.satinGuideIndex = guideOffset;
-	  guideOffset += iForm.satinGuideCount;
-	}
-	// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
-	// where we could not store the pointer in v2)
-	if (iForm.isClip()) {
-	  iForm.clipIndex = clipOffset;
-	  clipOffset += iForm.clipCount;
-	}
-	if (iForm.isEdgeClipX()) {
-	  iForm.borderClipData = clipOffset;
-	  clipOffset += iForm.clipEntries;
-	}
-  }
-  xt::setfchk();
-  CloseHandle(fileHandle);
-  return true;
 }
 
 void rebak() {
@@ -5754,34 +5469,6 @@ void rebak() {
   Instance->stateMap.set(StateFlag::REDOLD);
   nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
-}
-
-void redfnam(std::wstring& designerName) {
-  constexpr auto NNN           = uint8_t {111U}; // string substitute character
-  auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
-  auto           designer      = std::string {};
-  auto           iNameOrder    = NameOrder.begin();
-  auto const     spCreatorName = gsl::span {ExtendedHeader.creatorName};
-  for (auto& iTmpName : tmpName) {
-	if (auto const& index = *iNameOrder; index < spCreatorName.size()) {
-	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[index]);
-	}
-	else {
-	  iTmpName = NNN;
-	}
-	++iNameOrder;
-  }
-  designer.reserve(tmpName.size());
-  for (auto const& character : tmpName) {
-	if (auto iND = wrap::next(NameDecoder.begin(), character); *iND != 0U) {
-	  designer.push_back(gsl::narrow<char>(*iND));
-	}
-	else {
-	  break;
-	}
-  }
-  auto const decoded = utf::utf8ToUtf16(designer);
-  designerName.assign(decoded);
 }
 
 void redini() {
@@ -6018,8 +5705,8 @@ void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	return;
   }
   auto       stitchSourceSize = F_POINT {1.0F, 1.0F};
-  auto const fileTypeVersion  = (stitchHeader.headerType & FTYPMASK) >> TBYTSHFT;
-  if ((stitchHeader.headerType & SIGMASK) == THREDSIG) {
+  auto const fileTypeVersion  = stitchHeader.getVersion();
+  if (stitchHeader.isValid()) {
 	switch (fileTypeVersion) {
 	  case 0: {
 		if (stitchHeader.hoopType == SMALHUP) {
@@ -6196,49 +5883,6 @@ void ritcor(F_POINT_ATTR const& pointAttribute) {
   thred::ritfcor(point);
 }
 
-void ritfnam(std::wstring const& designerName) {
-  constexpr auto NAMELEN  = NameOrder.size();
-  auto const     designer = utf::utf16ToUtf8(designerName);
-  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
-  if (NameOrder[0] > NameOrder.size()) {
-	fnamtabs();
-  }
-  PseudoRandomValue = rsed();
-  auto iName        = 0U;
-  std::ranges::generate(tmpName, []() noexcept -> uint8_t { return form::psg() & BYTMASK; });
-  // encode the designer name
-  for (auto& iTmpName : tmpName) {
-	// encode the name
-	if (designer[iName++] != 0) {
-	  auto iNE = wrap::next(NameEncoder.begin(), designer[iName]);
-	  iTmpName = *iNE;
-	  continue;
-	}
-	auto iND = wrap::next(NameDecoder.begin(), iTmpName);
-	// salt the name
-	while (*iND != 0U) {
-	  iTmpName = form::psg() & BYTMASK;
-	  iND      = wrap::next(NameDecoder.begin(), iTmpName);
-	}
-	break;
-  }
-  if (iName == NAMELEN) {
-	auto const spNameDecoder = gsl::span {NameDecoder};
-	auto&      index         = tmpName.back();
-	while (spNameDecoder[wrap::toSize(index)] != 0U) {
-	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
-	}
-  }
-  auto iTmpName = tmpName.begin();
-  // write the encoded name
-  auto const spCreatorName = gsl::span {ExtendedHeader.creatorName};
-  for (auto const& iNameOrder : NameOrder) {
-	if (iNameOrder < NAMELEN) {
-	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*iTmpName++);
-	}
-  }
-}
-
 void ritini() {
   auto const     directory = utf::utf16ToUtf8(ThrSingle->DefaultDirectory.wstring());
   constexpr char FILLCHAR  = '\0';
@@ -6264,7 +5908,7 @@ void ritini() {
   auto const spIBPC = gsl::span {IniFile.backgroundPreferredColors};
   std::ranges::copy(CustomBackgroundColor, spIBPC.begin());
   auto const spISPC = gsl::span {IniFile.stitchPreferredColors};
-  std::ranges::copy(CustomColor, spISPC.begin());
+  std::ranges::copy(CustomThreadColor, spISPC.begin());
   std::ranges::generate(IniFile.bitmapBackgroundColors, [bcIndex = 0U]() mutable noexcept -> COLORREF {
 	return bitmap::getBmpBackColor(bcIndex++);
   });
@@ -7340,6 +6984,88 @@ void handle_program_memory_depletion() {
 #endif
 
 } // namespace
+
+// ReSharper disable CppParameterMayBeConst
+void thred::prtred(HANDLE fileHandle, uint32_t const code) {
+  CloseHandle(fileHandle);
+  Instance->stateMap.reset(StateFlag::INIT);
+  Instance->formList.clear();
+  displayText::tabmsg(code, false);
+  thred::coltab();
+  Instance->stateMap.set(StateFlag::RESTCH);
+}
+// ReSharper restore CppParameterMayBeConst
+
+void thred::redfnam(std::wstring& designerName) {
+  constexpr auto NNN           = uint8_t {111U}; // string substitute character
+  auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
+  auto           designer      = std::string {};
+  auto           iNameOrder    = NameOrder.begin();
+  auto const     spCreatorName = gsl::span {ExtendedHeader.creatorName};
+  for (auto& iTmpName : tmpName) {
+	if (auto const& index = *iNameOrder; index < spCreatorName.size()) {
+	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[index]);
+	}
+	else {
+	  iTmpName = NNN;
+	}
+	++iNameOrder;
+  }
+  designer.reserve(tmpName.size());
+  for (auto const& character : tmpName) {
+	if (auto iND = wrap::next(NameDecoder.begin(), character); *iND != 0U) {
+	  designer.push_back(gsl::narrow<char>(*iND));
+	}
+	else {
+	  break;
+	}
+  }
+  auto const decoded = utf::utf8ToUtf16(designer);
+  designerName.assign(decoded);
+}
+
+void thred::ritfnam(std::wstring const& designerName) {
+  constexpr auto NAMELEN  = NameOrder.size();
+  auto const     designer = utf::utf16ToUtf8(designerName);
+  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
+  if (NameOrder[0] > NameOrder.size()) {
+	fnamtabs();
+  }
+  PseudoRandomValue = rsed();
+  auto iName        = 0U;
+  std::ranges::generate(tmpName, []() noexcept -> uint8_t { return form::psg() & BYTMASK; });
+  // encode the designer name
+  for (auto& iTmpName : tmpName) {
+	// encode the name
+	if (designer[iName++] != 0) {
+	  auto iNE = wrap::next(NameEncoder.begin(), designer[iName]);
+	  iTmpName = *iNE;
+	  continue;
+	}
+	auto iND = wrap::next(NameDecoder.begin(), iTmpName);
+	// salt the name
+	while (*iND != 0U) {
+	  iTmpName = form::psg() & BYTMASK;
+	  iND      = wrap::next(NameDecoder.begin(), iTmpName);
+	}
+	break;
+  }
+  if (iName == NAMELEN) {
+	auto const spNameDecoder = gsl::span {NameDecoder};
+	auto&      index         = tmpName.back();
+	while (spNameDecoder[wrap::toSize(index)] != 0U) {
+	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
+	}
+  }
+  auto iTmpName = tmpName.begin();
+  // write the encoded name
+  auto const spCreatorName = gsl::span {ExtendedHeader.creatorName};
+  for (auto const& iNameOrder : NameOrder) {
+	if (iNameOrder < NAMELEN) {
+	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*iTmpName++);
+	}
+  }
+}
 
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = ThrSingle->DefaultColorWin.begin();
@@ -8965,7 +8691,7 @@ void thred::newFil() {
   auto const fmtStr = displayText::format(IDS_THRED, designerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
   ThrSingle->ThrName = ThrSingle->DefaultDirectory / displayText::loadStr(IDS_NUFIL).c_str();
-  ritfnam(designerName);
+  thred::ritfnam(designerName);
   auto const designer       = utf::utf16ToUtf8(designerName);
   auto const spModifierName = gsl::span {ExtendedHeader.modifierName};
   std::ranges::copy(designer, spModifierName.begin());
@@ -10695,7 +10421,7 @@ void thred::defpref() {
                0x00156a1e,
                0x00dbe6e3};
 
-  CustomColor = {0x00729674,
+  CustomThreadColor = {0x00729674,
                  0x001a1eb9,
                  0x00427347,
                  0x0000bfff,
@@ -12550,7 +12276,7 @@ auto thred::setFileName() -> fs::path {
   return workingFileName.empty() ? ThrSingle->DefaultDirectory / L"balfil.thr" : workingFileName;
 }
 
-auto thred::getDesigner() -> std::wstring {
+auto thred::getDesignerFormatted() -> std::wstring {
   auto const modifier = utf::utf8ToUtf16(std::string(ExtendedHeader.modifierName.data()));
   return displayText::format2(IDS_CREATBY, ThrSingle->DesignerName, modifier);
 }
@@ -13082,4 +12808,31 @@ auto thred::getPicotSpacing() noexcept -> float {
 
 auto thred::duScale(int32_t const value) noexcept -> int32_t {
   return MulDiv(value, DisplayDPI, STDDPI);
+}
+
+auto THR_HEAD::isValid() const noexcept -> bool {
+  constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
+  return (headerType & SIGMASK) == THREDSIG;
+}
+
+auto THR_HEAD::getVersion() const noexcept -> uint32_t {
+  constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
+  return (headerType & FTYPMASK) >> TBYTSHFT;
+}
+
+auto thred::getDefaultThreadColors() noexcept -> std::array<COLORREF, COLORCNT> {
+  return DEFAULT_COLORS;
+}
+
+void thred::initBackgroundBrush(COLORREF const& color) noexcept {
+  BackgroundBrush = CreateSolidBrush(color);
+}
+
+void thred::setDesignerName(std::array<char, NAME_LEN> designerName) {
+  auto const spIDN = gsl::span {designerName};
+  ThrSingle->DesignerName.assign(utf::utf8ToUtf16(std::string(spIDN.data())));
+}
+
+auto thred::getDesignerName() noexcept -> std::wstring& {
+  return ThrSingle->DesignerName;
 }
