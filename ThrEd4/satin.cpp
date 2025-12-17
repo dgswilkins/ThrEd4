@@ -114,7 +114,7 @@ void unsat();
 // Functions
 auto chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool {
   auto const lenCheck = LineSpacing * LineSpacing;
-  return std::ranges::any_of(satinBackup, [&](auto const& backup) {
+  return std::ranges::any_of(satinBackup, [&](auto const& backup) -> auto {
 	auto const deltaX = backup.x - pnt.x;
 	auto const deltaY = backup.y - pnt.y;
 	auto const length = (deltaX * deltaX) + (deltaY * deltaY);
@@ -715,7 +715,7 @@ void satin::delsac(uint32_t const formIndex) {
   auto const endGuide   = wrap::next(startGuide, currentForm.satinGuideCount);
   Instance->satinGuides.erase(startGuide, endGuide);
   auto const sgCount = currentForm.satinGuideCount;
-  std::for_each(std::next(formList.begin(), wrap::toPtrdiff(formIndex + 1U)), formList.end(), [sgCount](auto& iForm) {
+  std::for_each(std::next(formList.begin(), wrap::toPtrdiff(formIndex + 1U)), formList.end(), [sgCount](auto& iForm) -> auto {
 	if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex >= sgCount) {
 	  iForm.satinGuideIndex -= sgCount;
 	}
@@ -885,7 +885,7 @@ void satin::satadj(FRM_HEAD& form) {
   std::copy_if(itFirstGuide,
                std::next(itFirstGuide, wrap::toPtrdiff(currentGuidesCount)),
                std::back_inserter(interiorGuides),
-               [](const SAT_CON& guide) { return guide.start != guide.finish; });
+               [](const SAT_CON& guide) -> bool { return guide.start != guide.finish; });
   auto iDestination = wrap::toUnsigned(interiorGuides.size());
   if (currentGuidesCount > iDestination) {
 	outDebugString(L"Removed {} zero distance guides\n", currentGuidesCount - iDestination);
@@ -910,7 +910,7 @@ void satin::satadj(FRM_HEAD& form) {
 	std::copy_if(itFirstGuide,
 	             std::next(itFirstGuide, wrap::toPtrdiff(currentGuidesCount)),
 	             std::back_inserter(interiorGuides),
-	             [&satinMap](const auto& guide) {
+	             [&satinMap](const auto& guide) -> auto {
 	               return !satinMap.test(guide.start) && !satinMap.test(guide.finish);
 	             });
 	iDestination = wrap::toUnsigned(interiorGuides.size());
@@ -926,7 +926,7 @@ void satin::satadj(FRM_HEAD& form) {
 	  std::copy_if(itFirstGuide,
 	               std::next(itFirstGuide, wrap::toPtrdiff(currentGuidesCount)),
 	               std::back_inserter(interiorGuides),
-	               [endGuide](const auto& guide) { return guide.start < endGuide; });
+	               [endGuide](const auto& guide) -> auto { return guide.start < endGuide; });
 	  iDestination = wrap::toUnsigned(interiorGuides.size());
 	  if (currentGuidesCount > iDestination) {
 		outDebugString(L"Removed {} reversed guides\n", currentGuidesCount - iDestination);
@@ -1070,7 +1070,7 @@ void satin::satadj(FRM_HEAD& form) {
 	outDebugString(L"Guides adjusted by {}, so updating forms\n", iGuide);
 	std::for_each(wrap::next(Instance->formList.begin(), ClosestFormToCursor + 1U),
 	              Instance->formList.end(),
-	              [iGuide](auto& iForm) {
+	              [iGuide](auto& iForm) -> auto {
 	                if (iForm.type == SAT && iForm.satinGuideIndex >= iGuide) {
 		              iForm.satinGuideIndex -= iGuide;
 	                }
@@ -1084,7 +1084,7 @@ void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
   Instance->satinGuides.erase(itGuide);
   std::for_each(wrap::next(Instance->formList.begin(), ClosestFormToCursor + 1U),
                 Instance->formList.end(),
-                [](auto& iForm) {
+                [](auto& iForm) -> auto {
 	              if (iForm.type == SAT && iForm.satinGuideCount != 0U && iForm.satinGuideIndex != 0U) {
 	                --iForm.satinGuideIndex;
 	              }
@@ -1134,7 +1134,7 @@ void satin::delspnt() {
 		  ++iGuide;
 		}
 		--currentForm.satinGuideCount;
-		std::for_each(wrap::next(formList.begin(), ClosestFormToCursor + 1U), formList.end(), [](auto& iForm) {
+		std::for_each(wrap::next(formList.begin(), ClosestFormToCursor + 1U), formList.end(), [](auto& iForm) -> auto {
 		  if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
 			++iForm.satinGuideIndex;
 		  }

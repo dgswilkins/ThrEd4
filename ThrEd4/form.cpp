@@ -1427,7 +1427,7 @@ void fnvrt(std::vector<F_POINT>&    currentFillVertices,
            std::vector<SMAL_PNT_L>& lineEndpoints) {
   if (!currentFillVertices.empty()) {
 	auto const mmTuple =
-	    std::ranges::minmax_element(currentFillVertices, [](F_POINT const& first, F_POINT const& second) {
+	    std::ranges::minmax_element(currentFillVertices, [](F_POINT const& first, F_POINT const& second) -> bool {
 	      return first.x < second.x;
 	    });
 	auto const highX           = mmTuple.max->x;
@@ -1877,7 +1877,7 @@ public:
 
 void duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices) {
   auto const leftEdge =
-      std::ranges::min_element(currentFormVertices, [](F_POINT const& first, F_POINT const& second) {
+      std::ranges::min_element(currentFormVertices, [](F_POINT const& first, F_POINT const& second) -> bool {
 	    return first.x < second.x;
       })->x;
   if (leftEdge >= ClipRectSize.cx) {
@@ -8272,7 +8272,7 @@ void form::nufsel() {
 	thred::pushPreviousForm();
   }
   if (std::ranges::none_of(Instance->selectedFormList,
-                           [](uint32_t const intX) { return intX == ClosestFormToCursor; })) {
+                           [](uint32_t const intX) -> bool { return intX == ClosestFormToCursor; })) {
 	Instance->selectedFormList.push_back(ClosestFormToCursor);
   }
   Instance->stateMap.set(StateFlag::RESTCH);

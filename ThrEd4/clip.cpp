@@ -229,12 +229,12 @@ void clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEn
 
   if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
-	std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
+	std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept -> auto {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
 	});
 	return;
   }
-  std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
+  std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept -> auto {
 	return F_POINT {clip.x, (-clip.y)};
   });
 }
@@ -712,7 +712,7 @@ auto ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> b
 	return false;
   }
   std::ranges::transform(
-      clipFillData, std::back_inserter(Instance->oSequence), [&adjustedPoint](auto const& data) noexcept {
+      clipFillData, std::back_inserter(Instance->oSequence), [&adjustedPoint](auto const& data) noexcept -> auto {
 	    return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
       });
   return true;
