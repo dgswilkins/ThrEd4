@@ -50,8 +50,8 @@
 // ReSharper restore CppUnusedIncludeDirective
 #include <array>
 #include <cmath>
-#include <cstdint>
 // ReSharper disable CppUnusedIncludeDirective
+#include <cstdint>
 #include <ranges>
 // ReSharper restore CppUnusedIncludeDirective
 #include <string>

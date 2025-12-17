@@ -53,11 +53,11 @@
 #include <algorithm>
 #include <array>
 #include <bit>
-#include <cstring>
 #include <cmath>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstddef>
 #include <cstdint>
-#include <cwchar>
+// ReSharper restore CppUnusedIncludeDirective
 #include <filesystem>
 #include <iterator>
 #include <stdexcept>

@@ -93,11 +93,15 @@
 #include <cctype>
 // ReSharper restore CppUnusedIncludeDirective
 #include <cmath>
-#include <cstddef>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
+#include <cstddef>
+// ReSharper restore CppUnusedIncludeDirective
 #include <cstdlib>
+// ReSharper disable CppUnusedIncludeDirective
 #include <cstring>
 #include <cwchar>
+// ReSharper restore CppUnusedIncludeDirective
 #include <cwctype>
 #include <exception>
 #include <filesystem>
