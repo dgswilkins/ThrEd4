@@ -8,18 +8,18 @@
 #include <vector>
 
 enum FSI : uint8_t { // fill starts index values
-  applique,
-  fill,
-  feather,
-  border,
-  appliqueColor,
-  fillColor,
-  featherColor,
-  borderColor,
-  fsi_size
+  kApplique,
+  kFill,
+  kFeather,
+  kBorder,
+  kAppliqueColor,
+  kFillColor,
+  kFeatherColor,
+  kBorderColor,
+  kFsi_Size
 };
 
-using FillStartsDataType = std::array<uint32_t, fsi_size>;
+using FillStartsDataType = std::array<uint32_t, FSI::kFsi_Size>;
 
 namespace xt {
 
