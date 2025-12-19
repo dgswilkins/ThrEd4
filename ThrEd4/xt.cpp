@@ -123,14 +123,15 @@ class SORT_REC
   bool     direction = false; // direction of sort
 };
 
-enum StitchStyles : char {
-  TYPE_APPLIQUE = 1, // applique
-  TYPE_CWALK,        // center walk
-  TYPE_EWALK,        // edge walk
-  TYPE_UNDERLAY,     // underlay
-  TYPE_FTHR,         // feather
-  TYPE_FILL,         // fill
-  TYPE_BORDER        // border
+enum class StitchStyle : char {
+  NONE     = 0, // no type
+  APPLIQUE,     // applique
+  CWALK,        // center walk
+  EWALK,        // edge walk
+  UNDERLAY,     // underlay
+  FTHR,         // feather
+  FILL,         // fill
+  BORDER        // border
 };
 
 #ifdef _DEBUG
@@ -164,20 +165,20 @@ constexpr auto M_FCOL   = 1U << 9U;  // Fill color
 constexpr auto M_FTHCOL = 1U << 10U; // Feather color
 constexpr auto M_ECOL   = 1U << 11U; // Edge color
 
-constexpr auto STITCH_TYPES = std::array<char, 13> {
-    0,             // 0 no type
-    TYPE_APPLIQUE, // 1 applique
-    TYPE_CWALK,    // 2 center walk
-    TYPE_EWALK,    // 3 edge walk
-    TYPE_UNDERLAY, // 4 underlay
-    0,             // 5 knot
-    TYPE_FTHR,     // 6 feather
-    0,             // 7 layer
-    0,             // 8 layer
-    0,             // 9 layer
-    0,             // 10 reserved
-    TYPE_FILL,     // 11 fill
-    TYPE_BORDER,   // 12 border
+constexpr auto STITCH_TYPES = std::array<StitchStyle, 13> {
+    StitchStyle::NONE,     // 0 no type
+    StitchStyle::APPLIQUE, // 1 applique
+    StitchStyle::CWALK,    // 2 center walk
+    StitchStyle::EWALK,    // 3 edge walk
+    StitchStyle::UNDERLAY, // 4 underlay
+    StitchStyle::NONE,     // 5 knot
+    StitchStyle::FTHR,     // 6 feather
+    StitchStyle::NONE,     // 7 layer
+    StitchStyle::NONE,     // 8 layer
+    StitchStyle::NONE,     // 9 layer
+    StitchStyle::NONE,     // 10 reserved
+    StitchStyle::FILL,     // 11 fill
+    StitchStyle::BORDER,   // 12 border
 };
 
 auto DesignSize = F_POINT {};                        // design size
@@ -1949,36 +1950,39 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	}
 	if (auto const attribute = Instance->stitchBuffer.operator[](iSourceStitch).attribute;
 	    codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
-	  switch (auto const type = STITCH_TYPES.at(dutyp(attribute)); type) {
-		case TYPE_APPLIQUE: {
+	  switch (auto const type = STITCH_TYPES.at(dutyp(attribute)); type) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
+ 		case StitchStyle::APPLIQUE: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;
 			fillStartsData[FSI::kApplique] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case TYPE_FTHR: {
+		case StitchStyle::FTHR: {
 		  if ((tmap & M_FTH) == 0U) {
 			tmap |= M_FTH;
 			fillStartsData[FSI::kFeather] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case TYPE_FILL: {
+		case StitchStyle::FILL: {
 		  if ((tmap & M_FIL) == 0U) {
 			tmap |= M_FIL;
 			fillStartsData[FSI::kFill] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case TYPE_BORDER: {
+		case StitchStyle::BORDER: {
 		  if ((tmap & M_BRD) == 0U) {
 			tmap |= M_BRD;
 			fillStartsData[FSI::kBorder] = iDestinationStitch;
 		  }
 		  break;
 		}
-		default: {
+		case StitchStyle::NONE:
+		case StitchStyle::CWALK:
+		case StitchStyle::EWALK:
+		case StitchStyle::UNDERLAY: {
 		  if (form.fillType != 0U && (tmap & M_FIL) == 0U) {
 			tmap |= M_FIL;
 			fillStartsData[FSI::kFill] = iDestinationStitch;
