@@ -5,21 +5,59 @@
 #include "formHeader.h"
 
 // Standard Libraries
+#include <array>
 #include <vector>
 
-enum FSI : uint8_t { // fill starts index values
-  kApplique,
-  kFill,
-  kFeather,
-  kBorder,
-  kAppliqueColor,
-  kFillColor,
-  kFeatherColor,
-  kBorderColor,
-  kFsi_Size
+enum class FSI : uint8_t { // fill starts index values
+  kApplique = 0,
+  kFill = 1,
+  kFeather = 2,
+  kBorder = 3,
+  kAppliqueColor = 4,
+  kFillColor = 5,
+  kFeatherColor = 6,
+  kBorderColor = 7,
+  kMaxValue = kBorderColor
 };
 
-using FillStartsDataType = std::array<uint32_t, FSI::kFsi_Size>;
+template <class IndexType, class ValueType> class ENUM_ARRAY
+{
+  public:
+  auto operator[](IndexType idx) noexcept -> ValueType& {
+	return m_Array.at(static_cast<size_t>(idx));
+  }
+
+  auto operator[](IndexType idx) const noexcept -> const ValueType& {
+	return m_Array.at(static_cast<size_t>(idx));
+  }
+
+  auto operator[](uint32_t idx) noexcept -> ValueType& {
+	return m_Array.at(idx);
+  }
+
+  auto operator[](uint32_t idx) const noexcept -> const ValueType& {
+	return m_Array.at(idx);
+  }
+
+  [[nodiscard]] auto size() const -> auto {
+	return m_Size;
+  }
+
+  auto begin() noexcept -> auto {
+	return m_Array.begin();
+  }
+
+  auto end() noexcept -> auto {
+	return m_Array.end();
+  }
+
+  private:
+  std::array<ValueType, static_cast<size_t>(IndexType::kMaxValue) + 1> m_Array = {};
+
+  size_t m_Size = static_cast<size_t>(IndexType::kMaxValue) + 1;
+}; 
+
+using FillStartsDataType = ENUM_ARRAY<FSI, uint32_t>;
 
 namespace xt {
 
