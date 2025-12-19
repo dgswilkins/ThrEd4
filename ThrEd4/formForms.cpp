@@ -106,13 +106,13 @@ auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZHART,
 };
 
-enum DaisyStyles : uint8_t { // daisy form types
-  DSIN,                      // Sine shape
-  DRAMP,                     // Ramp shape
-  DSAW,                      // Sawtooth shape
-  DRAG,                      // Ragged shape
-  DCOG,                      // Cog shape
-  DHART                      // Heart shape
+enum class DaisyStyle : uint8_t { // daisy form types
+  SIN,                      // Sine shape
+  RAMP,                     // Ramp shape
+  SAW,                      // Sawtooth shape
+  RAG,                      // Ragged shape
+  COG,                      // Cog shape
+  HART                      // Heart shape
 };
 
 auto FormDataSheet     = HWND {}; // form data sheet
@@ -1142,8 +1142,8 @@ void formForms::dasyfrm() {
   }
   auto       petalVertexCount = IniFile.daisyPetalCount * IniFile.daisyPetalPoints;
   auto       petalPointCount  = IniFile.daisyPetalPoints;
-  auto const borderType       = IniFile.daisyBorderType;
-  if (borderType == DHART) { // update the petal count for heart shaped daisies
+  auto const borderType       = static_cast<DaisyStyle>(IniFile.daisyBorderType);
+  if (borderType == DaisyStyle::HART) { // update the petal count for heart shaped daisies
 	petalPointCount  = (IniFile.daisyHeartCount + 1U) * 2U;
 	petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
   }
@@ -1162,36 +1162,36 @@ void formForms::dasyfrm() {
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
 	  switch (borderType) {
-		case DSIN: { // sin wave
+		case DaisyStyle::SIN: { // sin wave
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  petalPointAngle += deltaPetalAngle;
 		  break;
 		}
-		case DRAMP: { // ramp
+		case DaisyStyle::RAMP: { // ramp
 		  distanceFromDaisyCenter =
 		      diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DSAW: { // sawtooth
+		case DaisyStyle::SAW: { // sawtooth
 		  auto const sawPointCount =
 		      wrap::toFloat(iPoint > halfPetalPointCount ? IniFile.daisyPetalPoints - iPoint : iPoint);
 		  auto const offset = (sawPointCount / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  distanceFromDaisyCenter = diameter + offset;
 		  break;
 		}
-		case DRAG: { // ragged
+		case DaisyStyle::RAG: { // ragged
 		  distanceFromDaisyCenter = diameter + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
 		                                           wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DCOG: { // cog wheel
+		case DaisyStyle::COG: { // cog wheel
 		  distanceFromDaisyCenter = diameter;
 		  if (iPoint > halfPetalPointCount) {
 			distanceFromDaisyCenter += petalLength;
 		  }
 		  break;
 		}
-		case DHART: { // heart shaped
+		case DaisyStyle::HART: { // heart shaped
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  if (iPoint > IniFile.daisyHeartCount) {
 			petalPointAngle -= deltaPetalAngle;
@@ -1202,7 +1202,7 @@ void formForms::dasyfrm() {
 		  break;
 		}
 		default: {
-		  outDebugString(L"Unknown borderType [{}]", borderType);
+		  outDebugString(L"Unknown borderType [{}]", static_cast<uint8_t>(borderType));
 		  break;
 		}
 	  }

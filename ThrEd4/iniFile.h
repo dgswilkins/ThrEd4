@@ -210,7 +210,7 @@ constexpr auto DAZICNT = 2U;  // petal inner points
 constexpr auto DAZLEN  = 15U; // diameter
 constexpr auto DAZPLEN = 20U; // petal length
 constexpr auto DAZHLEN = 5U;  // hole size
-constexpr auto DAZTYP  = 5U;  // border type
+constexpr auto DAZTYP  = 5U;  // border type (corresponds to DaisyStyle::HART)
 constexpr auto DAZMCNT = 7U;  // mirror count
 // end of daisy initial values
 
