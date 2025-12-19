@@ -29,7 +29,6 @@
 #include "fmt/compile.h"
 #include "gsl/narrow"
 #include "gsl/pointers"
-#include "gsl/span"
 #include "gsl/util"
 #pragma warning(pop)
 
@@ -2069,10 +2068,9 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
-	auto const spFillArray = gsl::span {fillStartsData};
 	iDestinationStitch     = ind - 1U;
 	while (iDestinationStitch < ind) {
-	  spFillArray[ind] = std::max(spFillArray[iDestinationStitch], spFillArray[ind]);
+	  fillStartsData[ind] = std::max(fillStartsData[iDestinationStitch], fillStartsData[ind]);
 	  --iDestinationStitch;
 	}
   }
