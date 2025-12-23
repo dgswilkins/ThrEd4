@@ -138,7 +138,7 @@ constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should b
 constexpr auto TXTRAT  = 0.95F; // texture fill clipboard shrink/grow ratio
 constexpr auto SIGNATURE = std::array<char, 4> {'t', 'x', 'h', 0}; // texture history signature
 
-enum TextureStyles : uint8_t { VRTYP, HORTYP, ANGTYP };
+enum class TextureStyle : uint8_t { VERTICAL, HORIZONTAL, ANGLED };
 
 auto SelectTexturePointsOrigin = POINT {};       // original location of selected texture points
 auto SideWindowButton          = HWND {};        // button side window
@@ -162,7 +162,7 @@ void chktxnum();
 void deorg(POINT& point) noexcept;
 void destroySideWindowButton() noexcept;
 void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer);
-void dutxfn(uint32_t textureType);
+void dutxfn(TextureStyle textureType);
 void dutxlin(F_POINT const& point0in, F_POINT const& point1in);
 void dutxmir();
 void dutxrct(TXTR_RECT& textureRect) noexcept;
@@ -190,7 +190,7 @@ auto tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexcept -
 void txcntrv(FRM_HEAD const& textureForm);
 void txdelal();
 auto txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool;
-void txfn(uint32_t textureType, uint32_t formIndex);
+void txfn(TextureStyle textureType, uint32_t formIndex);
 void txgro(FRM_HEAD const& textureForm);
 void txhor(FRM_HEAD& form);
 auto txnam(std::wstring& name) -> bool;
@@ -597,7 +597,7 @@ auto txdig(wchar_t const keyCode, wchar_t& character) noexcept -> bool {
   return false;
 }
 
-void txfn(uint32_t const textureType, uint32_t const formIndex) {
+void txfn(TextureStyle const textureType, uint32_t const formIndex) {
   auto& form = Instance->formList.operator[](formIndex);
   clip::delmclp(formIndex);
   if (form.satinGuideCount != 0U) {
@@ -607,20 +607,20 @@ void txfn(uint32_t const textureType, uint32_t const formIndex) {
   nutx(formIndex);
   form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
   switch (textureType) {
-	case VRTYP: {
+	case TextureStyle::VERTICAL: {
 	  txvrt(form);
 	  break;
 	}
-	case HORTYP: {
+	case TextureStyle::HORIZONTAL: {
 	  txhor(form);
 	  break;
 	}
-	case ANGTYP: {
+	case TextureStyle::ANGLED: {
 	  txang(form);
 	  break;
 	}
 	default: {
-	  outDebugString(L"default hit in dutxfn: textureType [{}]\n", textureType);
+	  outDebugString(L"default hit in dutxfn: textureType [{}]\n", static_cast<uint8_t>(textureType));
 	  break;
 	}
   }
@@ -888,15 +888,15 @@ auto chkbut() -> bool {
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXVRT)) {
-	dutxfn(VRTYP);
+	dutxfn(TextureStyle::VERTICAL);
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXHOR)) {
-	dutxfn(HORTYP);
+	dutxfn(TextureStyle::HORIZONTAL);
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXANG)) {
-	dutxfn(ANGTYP);
+	dutxfn(TextureStyle::ANGLED);
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXMIR)) {
@@ -984,7 +984,7 @@ void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t
   iBuffer += current.texture.count;
 }
 
-void dutxfn(uint32_t const textureType) {
+void dutxfn(TextureStyle const textureType) {
   altx();
   if (Instance->stateMap.test(StateFlag::FORMSEL)) {
 	txfn(textureType, ClosestFormToCursor);
@@ -1642,15 +1642,15 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  break;
 	}
 	case 'R': {
-	  dutxfn(VRTYP);
+	  dutxfn(TextureStyle::VERTICAL);
 	  break;
 	}
 	case 'A': {
-	  dutxfn(ANGTYP);
+	  dutxfn(TextureStyle::ANGLED);
 	  break;
 	}
 	case 'H': {
-	  dutxfn(HORTYP);
+	  dutxfn(TextureStyle::HORIZONTAL);
 	  break;
 	}
 	case 'E': {
