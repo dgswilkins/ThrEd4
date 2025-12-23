@@ -1161,7 +1161,7 @@ void formForms::dasyfrm() {
 	PseudoRandomValue    = SEED;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
-	  switch (borderType) {
+	  switch (borderType) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
 		case DaisyStyle::SIN: { // sin wave
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  petalPointAngle += deltaPetalAngle;
@@ -1199,10 +1199,6 @@ void formForms::dasyfrm() {
 		  else {
 			petalPointAngle += deltaPetalAngle;
 		  }
-		  break;
-		}
-		default: {
-		  outDebugString(L"Unknown borderType [{}]", static_cast<uint8_t>(borderType));
 		  break;
 		}
 	  }
