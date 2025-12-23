@@ -606,7 +606,7 @@ void txfn(TextureStyle const textureType, uint32_t const formIndex) {
   texture::savtxt();
   nutx(formIndex);
   form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
-  switch (textureType) {
+  switch (textureType) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
 	case TextureStyle::VERTICAL: {
 	  txvrt(form);
 	  break;
@@ -617,10 +617,6 @@ void txfn(TextureStyle const textureType, uint32_t const formIndex) {
 	}
 	case TextureStyle::ANGLED: {
 	  txang(form);
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in dutxfn: textureType [{}]\n", static_cast<uint8_t>(textureType));
 	  break;
 	}
   }
