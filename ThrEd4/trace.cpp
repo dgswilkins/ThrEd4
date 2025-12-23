@@ -57,19 +57,6 @@
 #include <type_traits>
 #include <vector>
 
-enum TraceWin : int8_t {
-  TRWINROW01 = 15,
-  TRWINROW02,
-  TRWINROW03,
-  TRWINROW04,
-  TRWINROW05,
-  TRWINROW06,
-  TRWINROW07,
-  TRWINROW08,
-  TRWINROW09,
-  TRWINROW10
-};
-
 // edge tracing directions
 enum class TraceDir : uint8_t {
   UP, // top edge
@@ -131,6 +118,17 @@ constexpr auto TRACE_RGB = std::array {BLUCOL, GRNCOL, REDCOL}; // trace colors
 constexpr auto TRACE_RGB_FLAG = std::array {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
 constexpr auto TRACE_RGB_MASK = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
 constexpr auto TRACE_SHIFT    = std::array {0U, BYTSHFT, WRDSHFT};   // trace shift values
+
+constexpr auto TRWINROW01 = int8_t {15}; // row 1
+constexpr auto TRWINROW02 = int8_t {16}; // row 2
+constexpr auto TRWINROW03 = int8_t {17}; // row 3
+constexpr auto TRWINROW04 = int8_t {18}; // row 4
+constexpr auto TRWINROW05 = int8_t {19}; // row 5
+constexpr auto TRWINROW06 = int8_t {20}; // row 6
+constexpr auto TRWINROW07 = int8_t {21}; // row 7
+constexpr auto TRWINROW08 = int8_t {22}; // row 8
+constexpr auto TRWINROW09 = int8_t {23}; // row 9
+constexpr auto TRWINROW10 = int8_t {24}; // row 10
 
 auto BlackPen          = gsl::narrow_cast<HPEN>(nullptr);   // black pen
 auto ColumnColor       = uint32_t {};                       // trace color column
