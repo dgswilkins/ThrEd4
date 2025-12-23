@@ -45,7 +45,10 @@ class BAD_COUNTS
 
 // repair internal namespace
 namespace {
-enum Repair : uint8_t { BADFLT = 1U, BADCLP = 1U << 1U, BADSAT = 1U << 2U, BADTX = 1U << 3U };
+constexpr auto BADFLT = uint8_t {1U};       // bad form list
+constexpr auto BADCLP = uint8_t {1U << 1U}; // bad clip
+constexpr auto BADSAT = uint8_t {1U << 2U}; // bad satin
+constexpr auto BADTX  = uint8_t {1U << 3U}; // bad texture
 
 // Definitions
 void adbad(std::wstring& repairMessage, uint32_t code, uint32_t count);
