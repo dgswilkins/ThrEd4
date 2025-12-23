@@ -71,11 +71,11 @@ enum TraceWin : int8_t {
 };
 
 // edge tracing directions
-enum TraceDirection : uint8_t {
-  TRCU, // top edge
-  TRCR, // right edge
-  TRCD, // bottom edge
-  TRCL  // left edge
+enum class TraceDir : uint8_t {
+  UP, // top edge
+  RIGHT, // right edge
+  DOWN, // bottom edge
+  LEFT  // left edge
 };
 
 class TRACE_PNT
@@ -176,7 +176,7 @@ void ritrcol(COLORREF& colRef, uint32_t colNum) noexcept;
 void shownd(HWND hwnd) noexcept;
 void showTraceWin() noexcept;
 void tracwnd();
-auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
+auto trcbit(TraceDir initialDirection, TraceDir& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
 auto trcin(COLORREF color) -> bool;
 void trcnum(DRAWITEMSTRUCT const& drawItem, uint32_t shift, COLORREF color, uint32_t backColor);
 auto trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT>;
@@ -356,7 +356,7 @@ void dutrac() {
   CurrentTracePoint.x   = std::min(CurrentTracePoint.x, bitmap::getBitmapWidth());
   CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
-  auto       traceDirection = 0U;
+  auto       traceDirection = TraceDir::UP;
   if (auto const& tracedEdges = TraceInstance->TracedEdges; !tracedEdges.test(wrap::toSize(savedPoint))) {
 	auto point = savedPoint;
 	auto limit = (CurrentTracePoint.y + 1L) * bitmap::getBitmapWidth();
@@ -391,56 +391,54 @@ void dutrac() {
 	  point += bitmap::getBitmapWidth();
 	}
 	auto const top  = point < limit ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
-	auto       flag = 0U;
+	auto       flag = TraceDir::UP;
 	auto       minimumEdgeDistance = BIGINT32;
 	if (left != 0) { // trace left edge
 	  minimumEdgeDistance = CurrentTracePoint.x - left;
-	  flag                = TRCL;
+	  flag                = TraceDir::LEFT;
 	}
 	if (right < bitmap::getBitmapWidth()) { // trace right edge
 	  if (auto const edgeDistance = right - CurrentTracePoint.x; edgeDistance < minimumEdgeDistance) {
 		minimumEdgeDistance = edgeDistance;
-		flag                = TRCR;
+		flag                = TraceDir::RIGHT;
 	  }
 	}
 	if (bottom != 0) { // trace bottom edge
 	  if (auto const edgeDistance = CurrentTracePoint.y - bottom; edgeDistance < minimumEdgeDistance) {
 		minimumEdgeDistance = edgeDistance;
-		flag                = TRCD;
+		flag                = TraceDir::DOWN;
 	  }
 	}
 	if (top < bitmap::getBitmapHeight()) { // trace top edge
 	  if (auto const edgeDistance = top - CurrentTracePoint.y; edgeDistance < minimumEdgeDistance) {
-		flag = TRCU;
+		flag = TraceDir::UP;
 	  }
 	}
 	// trace in the direction of the closest edge
-	switch (flag) {
-	  case TRCU: {
+	switch (flag) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
+	  case TraceDir::UP: {
 		CurrentTracePoint.y = top;
-		traceDirection      = TRCR;
+		traceDirection      = TraceDir::RIGHT;
 		break;
 	  }
-	  case TRCR: {
+	  case TraceDir::RIGHT: {
 		CurrentTracePoint.x = right;
-		traceDirection      = TRCD;
+		traceDirection      = TraceDir::DOWN;
 		break;
 	  }
-	  case TRCD: {
+	  case TraceDir::DOWN: {
 		CurrentTracePoint.y = bottom;
-		traceDirection      = TRCL;
+		traceDirection      = TraceDir::LEFT;
 		break;
 	  }
-	  case TRCL: {
+	  case TraceDir::LEFT: {
 		CurrentTracePoint.x = left;
-		traceDirection      = TRCU;
+		traceDirection      = TraceDir::UP;
 		break;
 	  }
-	  default:
-		return;
 	}
   }
-  uint32_t const initialDirection = traceDirection;
+  auto const initialDirection = traceDirection;
   auto           tracedPoints     = std::vector<TRACE_PNT> {};
   tracedPoints.push_back(TRACE_PNT {.x = gsl::narrow<int16_t>(CurrentTracePoint.x),
                                     .y = gsl::narrow<int16_t>(CurrentTracePoint.y)});
@@ -582,22 +580,22 @@ void tracwnd() {
   showTraceWin();
 }
 
-auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool {
+auto trcbit(TraceDir const initialDirection, TraceDir& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool {
   auto const& tracedEdges = TraceInstance->TracedEdges;
   auto        pixelIndex  = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
-  switch (traceDirection) {
-	case TRCR: { // was tracing right
+  switch (traceDirection) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
+	case TraceDir::RIGHT: { // was tracing right
 
 	  pixelIndex += 1 - bitmap::getBitmapWidth(); // look at the pixel down and to the right
 	  if (CurrentTracePoint.x == gsl::narrow<int32_t>(bitmap::getBitmapWidth()) - 1) { // at the edge go up
-		traceDirection = TRCU;
+		traceDirection = TraceDir::UP;
 	  }
 	  else {
 		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
-		  traceDirection = TRCD;
+		  traceDirection = TraceDir::DOWN;
 		}
 		else {
 		  pixelIndex += bitmap::getBitmapWidth();           // look at the pixel below
@@ -605,23 +603,23 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 			++CurrentTracePoint.x;
 		  }
 		  else { // start tracing up
-			traceDirection = TRCU;
+			traceDirection = TraceDir::UP;
 		  }
 		}
 	  }
 	  break;
 	}
-	case TRCD: { // was tracing down
+	case TraceDir::DOWN: { // was tracing down
 
 	  pixelIndex -= bitmap::getBitmapWidth() + 1; // look at the pixel down and to the left
 	  if (CurrentTracePoint.y == 0) {             // if we are at the bottom edge
-		traceDirection = TRCR;
+		traceDirection = TraceDir::RIGHT;
 	  }
 	  else {
 		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  --CurrentTracePoint.y;
-		  traceDirection = TRCL;
+		  traceDirection = TraceDir::LEFT;
 		}
 		else {
 		  ++pixelIndex;                                     // look at the pixel to the right
@@ -629,23 +627,23 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 			--CurrentTracePoint.y;
 		  }
 		  else { // start tracing right
-			traceDirection = TRCR;
+			traceDirection = TraceDir::RIGHT;
 		  }
 		}
 	  }
 	  break;
 	}
-	case TRCL: { // was tracing left
+	case TraceDir::LEFT: { // was tracing left
 
 	  pixelIndex += bitmap::getBitmapWidth() - 1; // look at the pixel above and to the left
 	  if (CurrentTracePoint.x == 0) {
-		traceDirection = TRCD;
+		traceDirection = TraceDir::DOWN;
 	  }
 	  else {
 		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  --CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
-		  traceDirection = TRCU;
+		  traceDirection = TraceDir::UP;
 		}
 		else {
 		  pixelIndex -= bitmap::getBitmapWidth();           // look at the pixel above
@@ -653,23 +651,23 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 			--CurrentTracePoint.x;
 		  }
 		  else { // start tracing down
-			traceDirection = TRCD;
+			traceDirection = TraceDir::DOWN;
 		  }
 		}
 	  }
 	  break;
 	}
-	case TRCU: { // was tracing up
+	case TraceDir::UP: { // was tracing up
 
 	  pixelIndex += 1 + bitmap::getBitmapWidth(); // look at the pixel up and to the right
 	  if (CurrentTracePoint.y == bitmap::getBitmapHeight() - 1) { // if we are at the top edge
-		traceDirection = TRCL;
+		traceDirection = TraceDir::LEFT;
 	  }
 	  else {
 		if (tracedEdges.test(wrap::toSize(pixelIndex))) { // if pixel already traced
 		  ++CurrentTracePoint.x;
 		  ++CurrentTracePoint.y;
-		  traceDirection = TRCR;
+		  traceDirection = TraceDir::RIGHT;
 		}
 		else {
 		  --pixelIndex;                                     // look at the pixel to the left
@@ -677,14 +675,10 @@ auto trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vect
 			++CurrentTracePoint.y;
 		  }
 		  else {
-			traceDirection = TRCL;
+			traceDirection = TraceDir::LEFT;
 		  }
 		}
 	  }
-	  break;
-	}
-	default: {
-	  outDebugString(L"default hit in trcbit: traceDirection [{}]\n", traceDirection);
 	  break;
 	}
   }
