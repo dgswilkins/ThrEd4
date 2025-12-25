@@ -137,29 +137,6 @@ enum class FileIndices : uint8_t {
   DST  // Tajima
 };
 
-// file menu items
-enum FileMenuItems : uint8_t {
-  FM_NEW,
-  FM_OPEN,
-  FM_CLOS,
-  FM_THUMB,
-  FM_OPNPCS,
-  FM_INSRT,
-  FM_OVRLAY,
-  FM_SAV,
-  FM_SAVAS,
-  FM_LODBIT,
-  FM_SAVBIT,
-  FM_HIDBIT,
-  FM_RMVBIT,
-  FM_PURG,
-  FM_LOCK,
-  FM_ONAM0,
-  FM_ONAM1,
-  FM_ONAM2,
-  FM_ONAM3
-};
-
 class THR_SINGLE
 {
   public:
@@ -257,6 +234,13 @@ constexpr auto FLTDST = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"}; // Display only
 constexpr auto FLTPCS = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"}; // Display only Pfaff format files (.pcs)
 constexpr auto FLTPES = COMDLG_FILTERSPEC {L"Brother", L"*.pes"}; // Display only Brother format files (.pes)
 constexpr auto FLTTHR = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Display only ThrEd format files (.thr)
+
+// file menu recently used file menu positions. These must be updated if the file menu is changed
+constexpr auto FM_ONAM0 = uint8_t {15U};
+constexpr auto FM_ONAM1 = uint8_t {16U};
+constexpr auto FM_ONAM2 = uint8_t {17U};
+constexpr auto FM_ONAM3 = uint8_t {18U};
+
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
 constexpr auto KNOTLEN  = int32_t {54};           // set knots for stitches longer than this
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
