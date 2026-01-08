@@ -374,15 +374,15 @@ auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) ->
 
 void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 
-template <typename EnumType> auto toIntegralType(EnumType invar) noexcept {
-  static_assert(std::is_enum<EnumType>::value, "Enum type required");
+template <typename EnumType> constexpr auto toIntegralType(EnumType invar) noexcept {
+  static_assert(std::is_enum_v<EnumType>, "Enum type required");
   return static_cast<std::underlying_type_t<EnumType>>(invar);
 }
 
 template <typename EnumType, typename IntegralType>
-constexpr inline EnumType toEnumType(IntegralType value) {
-  static_assert(std::is_enum<EnumType>::value, "Enum type required");
-  static_assert(std::is_integral<IntegralType>::value, "Integer required");
+constexpr auto toEnumType(IntegralType value) -> EnumType {
+  static_assert(std::is_enum_v<EnumType>, "Enum type required");
+  static_assert(std::is_integral_v<IntegralType>, "Integer required");
   return static_cast<EnumType>(value);
 }
 
