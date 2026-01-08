@@ -176,56 +176,51 @@ constexpr auto PLM  = 7; // left midpoint
 constexpr auto PTLE = 8; // top left endpoint
 
 // main menu items
-enum MainMenuItems : int8_t {
-  M_FILE,
-  M_VIEW,
-  M_FORM,
-  M_EDIT,
-  M_IN,
-  M_OUT,
-  M_UNDO,
-  M_REDO,
-  M_ROT,
-  M_PREF,
-  M_FILL,
-  M_ADD,
-  M_FRM,
-  M_ALL,
-  M_1,
-  M_2,
-  M_3,
-  M_4,
-  M_HELP
-};
+constexpr auto M_FILE = int8_t {0};
+constexpr auto M_VIEW = int8_t {1};
+//constexpr auto M_FORM = int8_t {2};
+constexpr auto M_EDIT = int8_t {3};
+//constexpr auto M_IN   = int8_t {4};
+//constexpr auto M_OUT  = int8_t {5};
+constexpr auto M_UNDO = int8_t {6};
+constexpr auto M_REDO = int8_t {7};
+//constexpr auto M_ROT  = int8_t {8};
+//constexpr auto M_PREF = int8_t {9};
+constexpr auto M_FILL = int8_t {10};
+//constexpr auto M_ADD  = int8_t {11};
+//constexpr auto M_FRM  = int8_t {12};
+constexpr auto M_ALL  = int8_t {13};
+//constexpr auto M_1    = int8_t {14};
+//constexpr auto M_2    = int8_t {15};
+//constexpr auto M_3    = int8_t {16};
+//constexpr auto M_4    = int8_t {17};
+//constexpr auto M_HELP = int8_t {18};
 
 // fill menu items
-enum FillMenuItems : int8_t {
-  MFIL_SAT,
-  MFIL_FTH,
-  MFIL_VERT,
-  MFIL_HOR,
-  MFIL_ANG,
-  MFIL_CLP,
-  MFIL_CONT,
-  MFIL_TED,
-  MFIL_BORD,
-  MFIL_UNFIL
-};
+//constexpr auto MFIL_SAT  = int8_t {0};
+//constexpr auto MFIL_FTH  = int8_t {1};
+//constexpr auto MFIL_VERT = int8_t {2};
+//constexpr auto MFIL_HOR  = int8_t {3};
+//constexpr auto MFIL_ANG  = int8_t {4};
+//constexpr auto MFIL_CLP  = int8_t {5};
+//constexpr auto MFIL_CONT = int8_t {6};
+//constexpr auto MFIL_TED  = int8_t {7};
+constexpr auto MFIL_BORD = int8_t {8};
+//constexpr auto MFIL_UNFIL= int8_t {9};
 
 // view menu items
-enum ViewMenuItems : int8_t {
-  MVW_MOVIE,
-  MVW_SET,
-  MVW_BACK,
-  MVW_ZOOM,
-  MVW_THRD,
-  MVW_SHWT,
-  MVW_SHWTCOL,
-  MVW_DSGN,
-  MVW_KNOT,
-  MVW_MARK,
-  MVW_ABOUT
-};
+//constexpr auto MVW_MOVIE = int8_t {0};
+constexpr auto MVW_SET = int8_t {1};
+//constexpr auto MVW_BACK = int8_t {2};
+//constexpr auto MVW_ZOOM = int8_t {3};
+//constexpr auto MVW_THRD = int8_t {4};
+//constexpr auto MVW_SHWT = int8_t {5};
+//constexpr auto MVW_SHWTCOL = int8_t {6};
+//constexpr auto MVW_DSGN = int8_t {7};
+//constexpr auto MVW_KNOT = int8_t {8};
+//constexpr auto MVW_MARK = int8_t {9};
+//constexpr auto MVW_ABOUT = int8_t {10};
+
 
 enum HoopSize : int8_t {
   SETCUST = 1, // set the custom hoop
