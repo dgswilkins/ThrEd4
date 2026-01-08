@@ -78,7 +78,7 @@ auto thredFile::readTHRFile(std::filesystem::path const& newFileName,
   thred::setDesignerName(IniFile.designerName);
   switch (version) { // handle the different versions of the file format
 	case 0: {
-	  if (thredHeader.hoopType == SMALHUP) {
+	  if (thredHeader.hoopType == wrap::toIntegralType(HoopSize::kSmall)) {
 		IniFile.hoopSizeX = SHUPX;
 		IniFile.hoopSizeY = SHUPY;
 		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};

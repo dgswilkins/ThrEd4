@@ -5554,18 +5554,18 @@ void redini() {
 	  IniFile.setWav();
 	  IniFile.setFeather();
 	  IniFile.setDaisy();
-	  switch (IniFile.hoopType) {
-		case SMALHUP: {
+	  switch (IniFile.hoopType) { // NOLINT(clang-diagnostic-switch-default)
+		case HoopSize::kSmall: {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
 		  break;
 		}
-		case LARGHUP: {
+		case HoopSize::kLarge: {
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
 		  break;
 		}
-		case CUSTHUP: {
+		case HoopSize::kUserDefined: {
 		  if (IniFile.hoopSizeX == 0.0F) {
 			IniFile.hoopSizeX = LHUPX;
 		  }
@@ -5574,7 +5574,7 @@ void redini() {
 		  }
 		  break;
 		}
-		case HUP100: {
+		case HoopSize::kHundredMM: {
 		  if (IniFile.hoopSizeX == 0.0F) {
 			IniFile.hoopSizeX = HUP100XY;
 		  }
@@ -5583,8 +5583,8 @@ void redini() {
 		  }
 		  break;
 		}
-		default: {
-		  IniFile.hoopType  = LARGHUP;
+		case HoopSize::kSetCustom: {
+		  IniFile.hoopType  = HoopSize::kLarge;
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
 		}
@@ -5693,7 +5693,7 @@ void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
   if (stitchHeader.isValid()) {
 	switch (fileTypeVersion) {
 	  case 0: {
-		if (stitchHeader.hoopType == SMALHUP) {
+		if (stitchHeader.hoopType == wrap::toIntegralType(HoopSize::kSmall)) {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
 		  stitchSourceSize  = F_POINT {SHUPX, SHUPY};
@@ -10455,7 +10455,7 @@ void thred::defpref() {
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
   IniFile.gridSize        = 2.0F * PFGRAN; // 2mm default spacing NOLINT(readability-magic-numbers)
-  IniFile.hoopType        = LARGHUP;
+  IniFile.hoopType        = HoopSize::kLarge;
   IniFile.hoopSizeX       = LHUPX;
   IniFile.hoopSizeY       = LHUPY;
   IniFile.cursorNudgeStep = NUGINI;
@@ -11206,40 +11206,45 @@ void thred::updateHoopSize() {
   if (itHwnd == sideWindow.end()) {
 	return;
   }
-  switch (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1; option) {
-	case SETCUST: {
+  if (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1;
+ option >= wrap::toIntegralType(HoopSize::kSetCustom) && option <= wrap::toIntegralType(HoopSize::kUserDefined)) {
+	switch (auto const optionVal = wrap::toEnumType<HoopSize>(option); optionVal) { // NOLINT(clang-diagnostic-switch-default)
+    case HoopSize::kSetCustom: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
 	  IniFile.customHoopY = IniFile.hoopSizeY;
 	  break;
 	}
-	case SMALHUP: {
+	case HoopSize::kSmall: {
 	  IniFile.hoopSizeX = SHUPX;
 	  IniFile.hoopSizeY = SHUPY;
-	  IniFile.hoopType  = SMALHUP;
+	  IniFile.hoopType  = HoopSize::kSmall;
 	  break;
 	}
-	case LARGHUP: {
+	case HoopSize::kLarge: {
 	  IniFile.hoopSizeX = LHUPX;
 	  IniFile.hoopSizeY = LHUPY;
-	  IniFile.hoopType  = LARGHUP;
+	  IniFile.hoopType  = HoopSize::kLarge;
 	  break;
 	}
-	case HUP100: {
+	case HoopSize::kHundredMM: {
 	  IniFile.hoopSizeX = HUP100XY;
 	  IniFile.hoopSizeY = HUP100XY;
-	  IniFile.hoopType  = HUP100;
+	  IniFile.hoopType  = HoopSize::kHundredMM;
 	  break;
 	}
-	case CUSTHUP: {
+	case HoopSize::kUserDefined: {
 	  IniFile.hoopSizeX = IniFile.customHoopX;
 	  IniFile.hoopSizeY = IniFile.customHoopY;
-	  IniFile.hoopType  = CUSTHUP;
+	  IniFile.hoopType  = HoopSize::kUserDefined;
 	  break;
 	}
-	default: {
-	  outDebugString(L"default hit in updateHoopSize: option [{}]\n", option);
-	  break;
 	}
+  }
+  else { // Set a safe default if the window option is invalid
+	IniFile.hoopSizeX = LHUPX;
+	IniFile.hoopSizeY = LHUPY;
+	IniFile.hoopType  = HoopSize::kLarge;
+	outDebugString(L"updateHoopSize: Invalid hoop size option [{}], setting to Large Hoop\n", option);
   }
   UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   form::sethup();

@@ -303,7 +303,7 @@ void dstran(std::vector<DSTREC>& DSTData) {
   }
   auto const dstSize =
       F_POINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
-  IniFile.hoopType = CUSTHUP;
+  IniFile.hoopType = HoopSize::kUserDefined;
   UnzoomedRect     = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   if (dstSize.x > wrap::toFloat(UnzoomedRect.cx) || dstSize.y > wrap::toFloat(UnzoomedRect.cy)) {
 	constexpr auto EXPRATIO = 1.1F; // 10% expansion ratio

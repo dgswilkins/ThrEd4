@@ -1048,7 +1048,7 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getShowStitchThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
-  prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
+  prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(wrap::toIntegralType(IniFile.hoopType)) - 1U + IDS_HUP0)),
          *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);

@@ -222,12 +222,12 @@ constexpr auto MVW_SET = int8_t {1};
 //constexpr auto MVW_ABOUT = int8_t {10};
 
 
-enum HoopSize : int8_t {
-  SETCUST = 1, // set the custom hoop
-  SMALHUP = 2, // pfaf code for small hoop
-  LARGHUP = 3, // pfaf code for large hoop
-  HUP100  = 4, // 100 millimeter hoop
-  CUSTHUP = 5  // user defined hoop size
+enum class HoopSize : int8_t {
+  kSetCustom = 1, // set the custom hoop
+  kSmall = 2, // pfaf code for small hoop
+  kLarge = 3, // pfaf code for large hoop
+  kHundredMM  = 4, // 100 millimeter hoop
+  kUserDefined = 5  // user defined hoop size
 };
 
 // bitmap

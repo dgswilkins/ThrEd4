@@ -7508,18 +7508,18 @@ void form::dubold() {
 
 void form::sethup() noexcept {
   if (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY)) {
-	IniFile.hoopType = LARGHUP;
+	IniFile.hoopType = HoopSize::kLarge;
 	return;
   }
   if (util::closeEnough(IniFile.hoopSizeX, SHUPX) && util::closeEnough(IniFile.hoopSizeY, SHUPY)) {
-	IniFile.hoopType = SMALHUP;
+	IniFile.hoopType = HoopSize::kSmall;
 	return;
   }
   if (util::closeEnough(IniFile.hoopSizeX, HUP100XY) && util::closeEnough(IniFile.hoopSizeY, HUP100XY)) {
-	IniFile.hoopType = HUP100;
+	IniFile.hoopType = HoopSize::kHundredMM;
 	return;
   }
-  IniFile.hoopType = CUSTHUP;
+  IniFile.hoopType = HoopSize::kUserDefined;
 }
 
 void form::dustar(uint32_t starCount, float const starRatio, float const length) {
