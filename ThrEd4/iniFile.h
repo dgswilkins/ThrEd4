@@ -23,6 +23,15 @@ constexpr auto DPLEN    = 180;                     // default directory path len
 
 constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 
+enum class DaisyStyle : uint8_t { // daisy form types
+  kSine,                          // Sine shape
+  kRamp,                          // Ramp shape
+  kSaw,                           // Sawtooth shape
+  kRagged,                        // Ragged shape
+  kCog,                           // Cog shape
+  kHeart                          // Heart shape
+};
+
 #pragma pack(push, 1)
 class INI_FILE // ini file structure
 {
@@ -111,7 +120,7 @@ class INI_FILE // ini file structure
   uint32_t daisyPetalCount {};   // daisy petals
   uint32_t daisyPetalPoints {};  // daisy petal points
   uint32_t daisyInnerCount {};   // daisy inner count
-  uint8_t  daisyBorderType {};   // daisy border type
+  DaisyStyle  daisyBorderType {};   // daisy border type
   uint8_t  dataCheck {};         // data check
   float    textureHeight {};     // textured fill height
   float    textureWidth {};      // textured fill width
@@ -210,7 +219,6 @@ constexpr auto DAZICNT = 2U;  // petal inner points
 constexpr auto DAZLEN  = 15U; // diameter
 constexpr auto DAZPLEN = 20U; // petal length
 constexpr auto DAZHLEN = 5U;  // hole size
-constexpr auto DAZTYP  = 5U;  // border type
 constexpr auto DAZMCNT = 7U;  // mirror count
 // end of daisy initial values
 
@@ -222,7 +230,7 @@ inline void INI_FILE::dazdef() noexcept {
   daisyPetalCount   = DAZPETS;
   daisyPetalLen     = DAZPLEN;
   daisyHeartCount   = DAZMCNT;
-  daisyBorderType   = DAZTYP;
+  daisyBorderType   = DaisyStyle::kHeart;
 }
 
 inline void INI_FILE::setDaisy() noexcept {

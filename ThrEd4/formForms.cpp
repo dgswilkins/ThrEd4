@@ -106,15 +106,6 @@ auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZHART,
 };
 
-enum DaisyStyles : uint8_t { // daisy form types
-  DSIN,                      // Sine shape
-  DRAMP,                     // Ramp shape
-  DSAW,                      // Sawtooth shape
-  DRAG,                      // Ragged shape
-  DCOG,                      // Cog shape
-  DHART                      // Heart shape
-};
-
 auto FormDataSheet     = HWND {}; // form data sheet
 auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
 auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
@@ -619,7 +610,7 @@ void initdaz(HWND hWinDialog) {
 	            0,
 	            reinterpret_cast<LPARAM>(displayText::loadStr(daisyTypeString).c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
-  SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
+  SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, wrap::toIntegralType(IniFile.daisyBorderType), 0);
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -657,7 +648,7 @@ void handleDaisyIDOK(HWND hwndlg) {
 	auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
 	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
-	  IniFile.daisyBorderType = iType;
+	  IniFile.daisyBorderType = wrap::toEnumType<DaisyStyle>(iType);
 	  break;
 	}
   }
@@ -1143,7 +1134,7 @@ void formForms::dasyfrm() {
   auto       petalVertexCount = IniFile.daisyPetalCount * IniFile.daisyPetalPoints;
   auto       petalPointCount  = IniFile.daisyPetalPoints;
   auto const borderType       = IniFile.daisyBorderType;
-  if (borderType == DHART) { // update the petal count for heart shaped daisies
+  if (borderType == DaisyStyle::kHeart) { // update the petal count for heart shaped daisies
 	petalPointCount  = (IniFile.daisyHeartCount + 1U) * 2U;
 	petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
   }
@@ -1161,37 +1152,37 @@ void formForms::dasyfrm() {
 	PseudoRandomValue    = SEED;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
-	  switch (borderType) {
-		case DSIN: { // sin wave
+	  switch (borderType) {       // NOLINT(clang-diagnostic-switch-default)
+		case DaisyStyle::kSine: { // sine wave
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  petalPointAngle += deltaPetalAngle;
 		  break;
 		}
-		case DRAMP: { // ramp
+		case DaisyStyle::kRamp: { // ramp
 		  distanceFromDaisyCenter =
 		      diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DSAW: { // sawtooth
+		case DaisyStyle::kSaw: { // sawtooth
 		  auto const sawPointCount =
 		      wrap::toFloat(iPoint > halfPetalPointCount ? IniFile.daisyPetalPoints - iPoint : iPoint);
 		  auto const offset = (sawPointCount / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  distanceFromDaisyCenter = diameter + offset;
 		  break;
 		}
-		case DRAG: { // ragged
+		case DaisyStyle::kRagged: { // ragged
 		  distanceFromDaisyCenter = diameter + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
 		                                           wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DCOG: { // cog wheel
+		case DaisyStyle::kCog: { // cog wheel
 		  distanceFromDaisyCenter = diameter;
 		  if (iPoint > halfPetalPointCount) {
 			distanceFromDaisyCenter += petalLength;
 		  }
 		  break;
 		}
-		case DHART: { // heart shaped
+		case DaisyStyle::kHeart: { // heart shaped
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  if (iPoint > IniFile.daisyHeartCount) {
 			petalPointAngle -= deltaPetalAngle;
@@ -1199,10 +1190,6 @@ void formForms::dasyfrm() {
 		  else {
 			petalPointAngle += deltaPetalAngle;
 		  }
-		  break;
-		}
-		default: {
-		  outDebugString(L"Unknown borderType [{}]", borderType);
 		  break;
 		}
 	  }
