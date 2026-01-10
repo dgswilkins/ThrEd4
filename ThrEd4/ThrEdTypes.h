@@ -686,20 +686,21 @@ constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {
      {.stringID = IDS_PRF5, .value = PRFSTCUSR},  {.stringID = IDS_PRF6, .value = PRFSTCMIN}}};
 
 // form types
-enum FormStyles : int8_t {
-  FRMLINE = 1U, // Line form
-  FRMFPOLY,     // Freehand polygon form
-  FRMRPOLY,     // Regular polygon form
-  FRMSTAR,      // Star form
-  FRMSPIRAL,    // Spiral Form
-  SAT,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
-  FRMHEART,     // Heart Form
-  FRMLENS,      // Lens form
-  FRMEGG,       // Egg form
-  FRMTEAR,      // Teardrop form
-  FRMZIGZAG,    // Zig-Zag form
-  FRMWAVE,      // Wave Form
-  FRMDAISY      // Daisy form
+enum class FormStyles : uint8_t {
+  kNone = 0U, // No form
+  kLine, // Line form
+  kFreehand,     // Freehand polygon form
+  kRegular,     // Regular polygon form
+  kStar,      // Star form
+  kSpiral,    // Spiral Form
+  kSatin,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
+  kHeart,     // Heart Form
+  kLens,      // Lens form
+  kEgg,       // Egg form
+  kTear,      // Teardrop form
+  kZigzag,    // Zig-Zag form
+  kWave,      // Wave Form
+  kDaisy      // Daisy form
 };
 
 // clipboard data types

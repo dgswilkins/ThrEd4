@@ -286,7 +286,7 @@ auto thredFile::readTHRFile(std::filesystem::path const& newFileName,
   for (auto& iForm : formList) {
 	iForm.vertexIndex = vertexOffset;
 	vertexOffset += iForm.vertexCount;
-	if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
+	if (iForm.type == FormStyles::kSatin && iForm.satinGuideCount != 0U) {
 	  iForm.satinGuideIndex = guideOffset;
 	  guideOffset += iForm.satinGuideCount;
 	}

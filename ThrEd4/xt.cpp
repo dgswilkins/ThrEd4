@@ -646,7 +646,7 @@ auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 // ReSharper restore CppParameterMayBeConst
 
 void fangfn(uint32_t const formIndex, float const angle) {
-  if (auto& form = Instance->formList.operator[](formIndex); form.type == FRMFPOLY && form.fillType != 0U) {
+  if (auto& form = Instance->formList.operator[](formIndex); form.type == FormStyles::kFreehand && form.fillType != 0U) {
 	switch (form.fillType) {
 	  case VRTF:
 	  case HORF:
@@ -798,15 +798,15 @@ void fnund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSegmen
 }
 
 void fnwlk(FRM_HEAD& form) {
-  if (form.type == FRMLINE) {
-	form.type = FRMFPOLY;
+  if (form.type == FormStyles::kLine) {
+	form.type = FormStyles::kFreehand;
   }
   auto start = 0U;
-  if ((form.extendedAttribute & AT_STRT) != 0U && form.type != FRMLINE) {
+  if ((form.extendedAttribute & AT_STRT) != 0U && form.type != FormStyles::kLine) {
 	start = form.fillStart;
   }
   auto count = form.vertexCount;
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	++count;
   }
   auto const& walkPoints = xt::insid(form);
@@ -1149,7 +1149,7 @@ void notundfn(uint32_t code) {
   auto& formList = Instance->formList;
 
   if (Instance->stateMap.test(StateFlag::FORMSEL)) {
-	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
+	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FormStyles::kLine) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute &= code;
 	  if (savedAttribute != form.extendedAttribute) {
@@ -1160,7 +1160,7 @@ void notundfn(uint32_t code) {
   else {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
-	  if (form.type == FRMLINE) {
+	  if (form.type == FormStyles::kLine) {
 		continue;
 	  }
 	  auto const savedAttribute = form.extendedAttribute;
@@ -1482,7 +1482,7 @@ void setundfn(uint32_t const code) {
   auto& formList = Instance->formList;
 
   if (Instance->stateMap.test(StateFlag::FORMSEL)) {
-	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
+	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FormStyles::kLine) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute |= code;
 	  if (savedAttribute != form.extendedAttribute) {
@@ -1493,7 +1493,7 @@ void setundfn(uint32_t const code) {
   else {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
-	  if (form.type == FRMLINE) {
+	  if (form.type == FormStyles::kLine) {
 		continue;
 	  }
 	  auto const savedAttribute = form.extendedAttribute;
@@ -1745,7 +1745,7 @@ void xt::fethrf(uint32_t const formIndex) {
   auto& form = Instance->formList.operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.type                  = SAT;
+  form.type                  = FormStyles::kSatin;
   form.feather.ratio         = IniFile.featherRatio;
   form.feather.upCount       = IniFile.featherUpCount;
   form.feather.downCount     = IniFile.featherDownCount;
@@ -1829,8 +1829,8 @@ void xt::srtcol() {
 void xt::dubit(FRM_HEAD& form, uint32_t const bit) {
   thred::savdo();
   Instance->stateMap.set(StateFlag::WASDO);
-  if (form.type == FRMLINE) {
-	form.type = FRMFPOLY;
+  if (form.type == FormStyles::kLine) {
+	form.type = FormStyles::kFreehand;
   }
   if ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) == 0U &&
       (bit & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {

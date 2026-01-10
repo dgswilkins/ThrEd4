@@ -90,7 +90,7 @@ void bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.isEdgeClip()) {
 	badData.clip += form.clipEntries;
   }
-  if (form.type == SAT && form.satinGuideCount != 0U) {
+  if (form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 	badData.guideCount += form.satinGuideCount;
   }
   if (form.isTexture()) {
@@ -252,7 +252,7 @@ auto frmchkfn() noexcept(std::is_same_v<size_t, uint32_t>) -> uint32_t {
 		}
 	  }
 	  if ((badData.attribute & BADSAT) == 0U) {
-		if (form.type == SAT && form.satinGuideCount != 0U) {
+		if (form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 		  chkSat(form, badData);
 		}
 	  }
@@ -352,7 +352,7 @@ void repsat() {
   auto guideCount = 0U;
   auto badData    = BAD_COUNTS {};
   for (auto& form : Instance->formList) {
-	if (form.type != SAT || form.satinGuideCount == 0U) {
+	if (form.type != FormStyles::kSatin || form.satinGuideCount == 0U) {
 	  continue;
 	}
 	auto const guideDifference = form.satinGuideIndex;
@@ -424,11 +424,11 @@ void repair::lodchk() {
 	return;
   }
   for (auto& form : formList) {
-	if (form.type == 0U) {
-	  form.type = FRMFPOLY;
+	if (form.type == FormStyles::kNone) {
+	  form.type = FormStyles::kFreehand;
 	}
 	else {
-	  if (form.type == FRMLINE) {
+	  if (form.type == FormStyles::kLine) {
 		if (form.fillType != CONTF) {
 		  form.fillType  = 0;
 		  form.clipCount = 0;

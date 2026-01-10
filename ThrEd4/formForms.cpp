@@ -240,7 +240,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   // label and fill the form field
   labelWindow[LFRM] = txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
-  auto choice = form.type == FRMLINE ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
+  auto choice = form.type == FormStyles::kLine ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
   valueWindow[LFRM] = txtrwin(choice, ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   // label and fill the layer field
@@ -249,7 +249,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   auto itLayer       = wrap::next(LAYRLIST.begin(), (form.attribute & FRMLMSK) >> 1U);
   valueWindow[LLAYR] = txtrwin(displayText::loadStr(itLayer->stringID), ValueWindowCoords);
   nxtlin(formMenuEntryCount);
-  if (form.type != FRMLINE) { // not a line form
+  if (form.type != FormStyles::kLine) { // not a line form
 	// label and fill the center walk, walk, and underlay fields with 'on' or 'off'
 	labelWindow[LCWLK] = txtwin(displayText::loadStr(IDS_CWLK), LabelWindowCoords);
 	choice             = (form.extendedAttribute & AT_CWLK) != 0U ? strOn : strOff;
@@ -519,7 +519,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	valueWindow[LBCSIZ] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
-  if (form.type == FRMLINE && (EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0) {
+  if (form.type == FormStyles::kLine && (EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0) {
 	// label and fill the border start & end fields
 	labelWindow[LBSTRT] = txtwin(displayText::loadStr(IDS_TXT14), LabelWindowCoords);
 	choice = (form.attribute & SBLNT) != 0U ? displayText::loadStr(IDS_BLUNT) : displayText::loadStr(IDS_TAPR);
@@ -1113,7 +1113,7 @@ void formForms::dasyfrm() {
   diameter *= ratio;
   petalLength *= ratio;
   holeDiameter *= ratio;
-  form.type    = FRMFPOLY;
+  form.type    = FormStyles::kFreehand;
   auto iVertex = 0U;
   auto fref    = 0U;
   if (Instance->userFlagMap.test(UserFlag::DAZHOL)) { // add the hole at the center of the daisy
@@ -1215,7 +1215,7 @@ void formForms::dasyfrm() {
   }
   form.vertexCount = iVertex;
   if (Instance->userFlagMap.test(UserFlag::DAZD)) {
-	form.type      = SAT;
+	form.type      = FormStyles::kSatin;
 	form.attribute = 1;
   }
   Instance->stateMap.set(StateFlag::INIT);
@@ -1379,7 +1379,7 @@ void formForms::wavfrm() {
 	thred::rotflt(*rotatedVertex, rotationAngle, F_POINT {});
 	++rotatedVertex;
   }
-  form.type        = FRMLINE;
+  form.type        = FormStyles::kLine;
   form.vertexCount = vertexCount;
   form.outline();
   Instance->stateMap.reset(StateFlag::FORMSEL);

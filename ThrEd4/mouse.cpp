@@ -608,6 +608,20 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	GetWindowRect(MsgWindow, &windowRect);
 	if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
 	    WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
+
+	  constexpr auto FRMLINE = 0;
+	  constexpr auto FRMFPOLY  = 1;
+	  constexpr auto FRMRPOLY  = 2;
+	  constexpr auto FRMSTAR   = 3;
+	  constexpr auto FRMSPIRAL = 4;
+	  constexpr auto FRMHEART  = 5;
+	  constexpr auto FRMLENS   = 6;
+	  constexpr auto FRMEGG    = 7;
+	  constexpr auto FRMTEAR   = 8;
+	  constexpr auto FRMZIGZAG = 9;
+	  constexpr auto FRMWAVE   = 10;
+	  constexpr auto FRMDAISY  = 11;
+
 	  auto const iFillType = (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
 	  if (Instance->stateMap.testAndReset(StateFlag::FENDIN)) {
 		if (iFillType == 3) {
@@ -618,16 +632,56 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  else {
-		form::duform(iFillType);
+		switch (iFillType) {
+		  case FRMLINE:
+			form::duform(FormStyles::kLine);
+			break;
+		  case FRMFPOLY:
+			form::duform(FormStyles::kFreehand);
+			break;
+		  case FRMRPOLY:
+			form::duform(FormStyles::kRegular);
+			break;
+		  case FRMSTAR:
+			form::duform(FormStyles::kStar);
+			break;
+		  case FRMSPIRAL:
+			form::duform(FormStyles::kSpiral);
+			break;
+		  case FRMHEART:
+			form::duform(FormStyles::kHeart);
+			break;
+		  case FRMLENS:
+			form::duform(FormStyles::kLens);
+			break;
+		  case FRMEGG:
+			form::duform(FormStyles::kEgg);
+			break;
+		  case FRMTEAR:
+			form::duform(FormStyles::kTear);
+			break;
+		  case FRMZIGZAG:
+			form::duform(FormStyles::kZigzag);
+			break;
+		  case FRMWAVE:
+			form::duform(FormStyles::kWave);
+			break;
+		  case FRMDAISY:
+			form::duform(FormStyles::kDaisy);
+			break;
+		  default: {
+			break;
+		  }
+		}
 	  }
 	  switch (iFillType) {
-		case FRMRPOLY - 1:
-		case FRMSTAR - 1:
-		case FRMSPIRAL - 1:
-		case FRMHEART - 2:
-		case FRMLENS - 2:
-		case FRMEGG - 2:
-		case FRMZIGZAG - 2:
+		case FRMRPOLY:
+		case FRMSTAR:
+		case FRMSPIRAL:
+		case FRMHEART:
+		case FRMLENS:
+		case FRMEGG:
+		case FRMZIGZAG:
 		  return true;
 		default: {
 		}

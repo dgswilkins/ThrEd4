@@ -458,7 +458,7 @@ void dutrac() {
   form.vertexIndex = wrap::toUnsigned(Instance->formVertices.size());
   decForm(tracedPoints, Instance->formVertices);
   form.vertexCount     = wrap::toUnsigned(Instance->formVertices.size() - form.vertexIndex);
-  form.type            = FRMFPOLY;
+  form.type            = FormStyles::kFreehand;
   form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   form.satinGuideCount = 0;
   form.outline();

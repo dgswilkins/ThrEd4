@@ -530,7 +530,7 @@ void adfrm(uint32_t const iForm) {
   auto const itVertex            = wrap::next(Instance->formVertices.cbegin(), originalVertexIndex);
   Instance->formVertices.insert(
       Instance->formVertices.end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
-  if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
+  if (currentForm.type == FormStyles::kSatin && currentForm.satinGuideCount != 0U) {
 	auto const originalGuide    = currentForm.satinGuideIndex;
 	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
 
@@ -734,7 +734,7 @@ void drawFormsBox() {
 
 void setpoli() {
   auto form           = FRM_HEAD {};
-  form.type           = FRMFPOLY;
+  form.type           = FormStyles::kFreehand;
   form.attribute      = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   form.underlayIndent = IniFile.underlayIndent;
   Instance->formList.push_back(form);
@@ -744,7 +744,7 @@ void setpoli() {
 
 void setlin() {
   auto form      = FRM_HEAD {};
-  form.type      = FRMLINE;
+  form.type      = FormStyles::kLine;
   form.attribute = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
   Instance->formList.push_back(form);
   Instance->stateMap.set(StateFlag::SATIN);
@@ -944,7 +944,7 @@ void brdfil(FRM_HEAD const& form) {
 	bdrlin(form.vertexIndex, currentVertex, nextVertex, form.edgeStitchLen);
 	currentVertex = nextVertex;
   }
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	auto const nextVertex = form::nxt(form, currentVertex);
 	bdrlin(form.vertexIndex, currentVertex, nextVertex, form.edgeStitchLen);
   }
@@ -993,7 +993,7 @@ void bold(FRM_HEAD const& form) {
 	boldlin(form.vertexIndex, iLine, iNextLine, form.edgeStitchLen);
 	iLine = iNextLine;
   }
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	iNextLine = form::nxt(form, iLine);
 	boldlin(form.vertexIndex, iLine, iNextLine, form.edgeStitchLen);
   }
@@ -4318,10 +4318,10 @@ void swSatFillType(FRM_HEAD& form) {
 
 void makpoli() {
   auto& currentForm = Instance->formList.operator[](ClosestFormToCursor);
-  if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
+  if (currentForm.type == FormStyles::kSatin && currentForm.satinGuideCount != 0U) {
 	satin::delsac(ClosestFormToCursor);
   }
-  currentForm.type = FRMFPOLY;
+  currentForm.type = FormStyles::kFreehand;
 }
 
 void fsvrt() {
@@ -4329,7 +4329,7 @@ void fsvrt() {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type        = FRMFPOLY;
+  form.type        = FormStyles::kFreehand;
   form.fillColor   = ActiveColor;
   form.fillType    = VRTF;
   form.fillSpacing = LineSpacing;
@@ -4342,7 +4342,7 @@ void fshor(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type        = FRMFPOLY;
+  form.type        = FormStyles::kFreehand;
   form.fillColor   = ActiveColor;
   form.fillType    = HORF;
   form.fillSpacing = LineSpacing;
@@ -4356,7 +4356,7 @@ void fsangl(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   makpoli();
-  form.type        = FRMFPOLY;
+  form.type        = FormStyles::kFreehand;
   form.fillColor   = ActiveColor;
   form.fillType    = ANGF;
   form.fillAngle   = IniFile.fillAngle;
@@ -4383,7 +4383,7 @@ void filsfn(uint32_t const formIndex) {
   auto& form = Instance->formList.operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.type        = SAT;
+  form.type        = FormStyles::kSatin;
   form.fillColor   = ActiveColor;
   form.fillType    = SATF;
   form.fillSpacing = LineSpacing;
@@ -4406,7 +4406,7 @@ auto closat(IntersectionStyles& inOutFlag) -> bool {
 	    ActiveLayer != 0U && layer != ActiveLayer && (formIter.attribute & FRMLMSK) != 0U) {
 	  continue;
 	}
-	auto const lastVertex = formIter.type == FRMLINE ? formIter.vertexCount - 1U : formIter.vertexCount;
+	auto const lastVertex = formIter.type == FormStyles::kLine ? formIter.vertexCount - 1U : formIter.vertexCount;
 	// Loop through for all line segments
 	auto       length   = 0.0F;
 	auto const itVertex = wrap::next(Instance->formVertices.cbegin(), formIter.vertexIndex);
@@ -4515,7 +4515,7 @@ void sapliq(uint32_t const formIndex) {
   form.borderSize  = IniFile.borderWidth;
   form::bsizpar(form);
   wrap::narrow_cast(form.borderColor, ActiveColor | gsl::narrow_cast<uint8_t>(AppliqueColor << 4U));
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	if (form.fillType == SAT && form.satinGuideCount != 0U) {
 	  satin::delsac(ClosestFormToCursor);
 	}
@@ -4676,10 +4676,10 @@ void fnord() {
 void filsclp() {
   texture::deltx(ClosestFormToCursor);
   auto& currentForm = Instance->formList.operator[](ClosestFormToCursor);
-  if (currentForm.type != SAT) {
+  if (currentForm.type != FormStyles::kSatin) {
 	currentForm.wordParam = 0;
   }
-  currentForm.type       = SAT;
+  currentForm.type       = FormStyles::kSatin;
   currentForm.fillType   = CLPF;
   currentForm.clipIndex  = clip::numclp(ClosestFormToCursor);
   auto const& clipBuffer = Instance->clipBuffer;
@@ -4876,7 +4876,7 @@ void cplayfn(uint32_t const iForm, uint32_t const layer) {
   std::copy(itVertex,
             wrap::next(itVertex, currentForm.vertexCount),
             wrap::next(Instance->formVertices.begin(), currentForm.vertexIndex));
-  if (currentForm.type == SAT && currentForm.satinGuideCount != 0U) {
+  if (currentForm.type == FormStyles::kSatin && currentForm.satinGuideCount != 0U) {
 	auto const originalGuide    = currentForm.satinGuideIndex;
 	currentForm.satinGuideIndex = wrap::toUnsigned(Instance->satinGuides.size());
 
@@ -5361,7 +5361,7 @@ void form::chkcont() {
 	}
   }
   form.attribute |= FRECONT;
-  form.type     = FRMLINE;
+  form.type     = FormStyles::kLine;
   form.fillType = CONTF;
 }
 
@@ -5417,7 +5417,7 @@ void form::mdufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   auto const& formLines = Instance->formLines;
-  if (Instance->formList.operator[](ClosestFormToCursor).type == FRMLINE) {
+  if (Instance->formList.operator[](ClosestFormToCursor).type == FormStyles::kLine) {
 	wrap::polyline(StitchWindowDC, formLines.data(), NewFormVertexCount - 1);
   }
   else {
@@ -5635,7 +5635,7 @@ void form::drwfrm() {
 	  continue;
 	}
 	auto lastPoint = 0U;
-	if (form.type == SAT) {
+	if (form.type == FormStyles::kSatin) {
 	  if ((form.attribute & FRMEND) != 0U) { // if the form has an end guide, draw it
 		SelectObject(StitchWindowMemDC, FormPen3px);
 		wrap::polyline(StitchWindowMemDC, formLines.data(), LNPNTS);
@@ -5649,7 +5649,7 @@ void form::drwfrm() {
 	  }
 	}
 	SelectObject(StitchWindowMemDC, getLayerPen(layer));
-	if (form.type == FRMLINE) { // if the form is a line, draw it
+	if (form.type == FormStyles::kLine) { // if the form is a line, draw it
 	  if (form.vertexCount > 0) {
 		frmpoly(gsl::span(formLines.data(), form.vertexCount - 1));
 		if (form.fillType == CONTF) { // if the form is a contour fill, draw the fill guide
@@ -5734,7 +5734,7 @@ void form::durpoli(uint32_t vertexCount) {
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
   newForm.attribute   = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
-  newForm.type        = FRMFPOLY;
+  newForm.type        = FormStyles::kFreehand;
   auto point          = thred::pxCor2stch(WinMsg.pt);
   auto angle          = 0.0F;
   auto itVertex       = wrap::next(Instance->formVertices.begin(), newForm.vertexIndex);
@@ -5882,48 +5882,51 @@ void form::flipv() {
   }
 }
 
-void form::duform(int32_t const formType) {
-  switch (formType + 1) {
-	case FRMLINE:
+void form::duform(FormStyles const formType) {
+  switch (formType) { // NOLINT(clang-diagnostic-switch-default) 
+	case FormStyles::kNone:
+	  // Do nothing, no form to draw
+	  break;
+	case FormStyles::kLine:
 	  thred::savdo();
 	  setlin();
 	  break;
-	case FRMFPOLY:
+	case FormStyles::kFreehand:
 	  thred::savdo();
 	  setpoli();
 	  break;
-	case FRMRPOLY:
+	case FormStyles::kRegular:
 	  setrpoli();
 	  break;
-	case FRMSTAR:
+	case FormStyles::kStar:
 	  setstar();
 	  break;
-	case FRMSPIRAL:
+	case FormStyles::kSpiral:
 	  setspir();
 	  break;
-	case FRMHEART - 1:
+	case FormStyles::kSatin:
+	  // Do nothing, satin forms are handled elsewhere
+	  break;
+	case FormStyles::kHeart:
 	  sethart();
 	  break;
-	case FRMLENS - 1:
+	case FormStyles::kLens:
 	  setlens();
 	  break;
-	case FRMEGG - 1:
+	case FormStyles::kEgg:
 	  seteg();
 	  break;
-	case FRMTEAR - 1:
+	case FormStyles::kTear:
 	  formForms::setear();
 	  break;
-	case FRMZIGZAG - 1:
+	case FormStyles::kZigzag:
 	  setzig();
 	  break;
-	case FRMWAVE - 1:
+	case FormStyles::kWave:
 	  formForms::wavfrm();
 	  break;
-	case FRMDAISY - 1:
+	case FormStyles::kDaisy:
 	  formForms::dasyfrm();
-	  break;
-	default:
-	  outDebugString(L"default hit in duform: formType [{}]\n", formType);
 	  break;
   }
 }
@@ -5994,7 +5997,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 void form::frmovlin() {
   auto const& form = Instance->formList.operator[](ClosestFormToCursor);
   thred::ratsr();
-  if (form.type == FRMLINE) {
+  if (form.type == FormStyles::kLine) {
 	NewFormVertexCount = form.vertexCount;
   }
   else {
@@ -6191,7 +6194,7 @@ void form::duangs(FRM_HEAD const& form) {
   auto& formAngles = Instance->formAngles;
   formAngles.clear();
   auto itVertex = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
-  if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
+  if (form.type == FormStyles::kLine && (form.edgeType & NEGUND) == EDGEPROPSAT) {
 	itVertex = wrap::next(Instance->angledFormVertices.cbegin(), form.vertexIndex);
   }
   auto const vMax = gsl::narrow<ptrdiff_t>(form.vertexCount - 1U);
@@ -6214,7 +6217,7 @@ auto form::cisin(FRM_HEAD const& form,
   auto count        = 0U;
   auto intersection = F_POINT {};
   auto itVertex     = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
-  if (form.type == FRMLINE && (form.edgeType & NEGUND) == EDGEPROPSAT) {
+  if (form.type == FormStyles::kLine && (form.edgeType & NEGUND) == EDGEPROPSAT) {
 	itVertex = wrap::next(Instance->angledFormVertices.cbegin(), form.vertexIndex);
   }
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -6358,7 +6361,7 @@ void form::refilfn(uint32_t const formIndex) {
   auto       angledForm        = FRM_HEAD {};
   Instance->stateMap.reset(StateFlag::TXFIL);
   auto& form = Instance->formList.operator[](formIndex);
-  if (form.type == FRMLINE) {
+  if (form.type == FormStyles::kLine) {
 	form.underlayIndent = 0;
   }
   if (!(Instance->stateMap.test(StateFlag::FUNCLP) || Instance->stateMap.test(StateFlag::FUNSCLP))) {
@@ -6381,16 +6384,16 @@ void form::refilfn(uint32_t const formIndex) {
 	thred::savdo();
   }
   Instance->stateMap.reset(StateFlag::WASDO);
-  if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U && form.type == FRMLINE && form.fillType != CONTF) {
-	form.type = FRMFPOLY;
+  if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U && form.type == FormStyles::kLine && form.fillType != CONTF) {
+	form.type = FormStyles::kFreehand;
   }
   Instance->interleaveSequence.clear();
   Instance->interleaveSequenceIndices.clear();
   Instance->stateMap.reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};
   textureSegments.resize(wrap::toSize(form.texture.lines));
-  switch (form.type) {
-	case FRMLINE: {
+  switch (form.type) { // NOLINT(clang-diagnostic-switch-default) 
+	case FormStyles::kLine: {
 	  swEdgeType(form, angledForm);
 	  if (form.fillType == CONTF && (form.attribute & FRECONT) != 0) {
 		contf(form);
@@ -6398,7 +6401,7 @@ void form::refilfn(uint32_t const formIndex) {
 	  }
 	  break;
 	}
-	case FRMFPOLY: {
+	case FormStyles::kFreehand: {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, Instance->angledFormVertices);
@@ -6415,7 +6418,7 @@ void form::refilfn(uint32_t const formIndex) {
 	  chkbrd(form);
 	  break;
 	}
-	case SAT: {
+	case FormStyles::kSatin: {
 	  xt::chkcwlk(formIndex);
 	  xt::chkwlk(formIndex);
 	  xt::chkund(formIndex, textureSegments, Instance->angledFormVertices);
@@ -6424,8 +6427,18 @@ void form::refilfn(uint32_t const formIndex) {
 	  chkbrd(form);
 	  break;
 	}
-	default: {
-	  outDebugString(L"default hit in refilfn 4: type [{}]\n", form.type);
+	case FormStyles::kNone:
+	case FormStyles::kRegular:
+	case FormStyles::kStar:
+	case FormStyles::kSpiral:
+	case FormStyles::kHeart:
+	case FormStyles::kLens:
+	case FormStyles::kEgg:
+	case FormStyles::kTear:
+	case FormStyles::kZigzag:
+	case FormStyles::kWave:
+	case FormStyles::kDaisy: {
+	  // Do nothing, these are handled elsewhere
 	  break;
 	}
   }
@@ -6486,7 +6499,7 @@ void form::filvrt() {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
 	  if (auto const& currentForm = Instance->formList.operator[](ClosestFormToCursor);
-	      currentForm.type != FRMLINE) {
+	      currentForm.type != FormStyles::kLine) {
 		fsvrt();
 	  }
 	}
@@ -6511,7 +6524,7 @@ void form::filhor() {
   if (!Instance->selectedFormList.empty()) {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
-	  if (auto& form = Instance->formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
+	  if (auto& form = Instance->formList.operator[](ClosestFormToCursor); form.type != FormStyles::kLine) {
 		fshor(form);
 	  }
 	}
@@ -6538,7 +6551,7 @@ void form::filangl() {
 	thred::savdo();
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
-	  if (auto& form = formList.operator[](selectedForm); form.type != FRMLINE) {
+	  if (auto& form = formList.operator[](selectedForm); form.type != FormStyles::kLine) {
 		fsangl(form);
 	  }
 	}
@@ -6680,7 +6693,7 @@ void form::rotfrm(FRM_HEAD& form, uint32_t const newStartVertex) {
 	iRotated  = nxt(form, iRotated);
 	++itVertex;
   }
-  if (form.type == SAT) {
+  if (form.type == FormStyles::kSatin) {
 	if (form.vertexCount != 0U) {
 	  if (form.wordParam != 0U) {
 		form.wordParam = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
@@ -6725,7 +6738,7 @@ void form::filsat() {
   if (!Instance->selectedFormList.empty()) {
 	thred::savdo();
 	for (auto const selectedForm : Instance->selectedFormList) {
-	  if (auto const& currentForm = Instance->formList.operator[](selectedForm); currentForm.type != FRMLINE) {
+	  if (auto const& currentForm = Instance->formList.operator[](selectedForm); currentForm.type != FormStyles::kLine) {
 		filsfn(selectedForm);
 	  }
 	}
@@ -6778,7 +6791,7 @@ void form::insat() { // insert a point in a form
 }
 
 auto form::chkdel(FRM_HEAD const& currentForm) noexcept -> bool {
-  if (currentForm.type == FRMLINE) {
+  if (currentForm.type == FormStyles::kLine) {
 	return currentForm.vertexCount <= 2;
   }
 
@@ -6869,7 +6882,7 @@ void form::rinfrm() {
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   auto const& formLines = Instance->formLines;
-  if (FormVertexNext != 0U || FormForInsert->type != FRMLINE) {
+  if (FormVertexNext != 0U || FormForInsert->type != FormStyles::kLine) {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
   InsertLine[0] = formLines[FormVertexPrev];
@@ -7535,7 +7548,7 @@ void form::dustar(uint32_t starCount, float const starRatio, float const length)
   newForm.vertexIndex    = thred::adflt(vertexCount);
   newForm.vertexCount    = vertexCount;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
-  newForm.type = FRMFPOLY;
+  newForm.type = FormStyles::kFreehand;
   auto point   = thred::pxCor2stch(WinMsg.pt);
   Instance->stateMap.set(StateFlag::FILDIR);
   auto const itFirstVertex = wrap::next(Instance->formVertices.begin(), newForm.vertexIndex);
@@ -7580,7 +7593,7 @@ void form::duspir(uint32_t stepCount) {
   auto const length    = 800.0F / wrap::toFloat(stepCount) * ZoomFactor *
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto newForm           = FRM_HEAD {};
-  newForm.type           = FRMLINE;
+  newForm.type           = FormStyles::kLine;
   auto const vertexCount = wrap::round<uint32_t>(wrap::toFloat(stepCount) * thred::getSpiralWrap());
   newForm.vertexIndex    = thred::adflt(vertexCount);
   newForm.vertexCount    = vertexCount;
@@ -7680,7 +7693,7 @@ void form::duhart(uint32_t sideCount) {
   }
   NewFormVertexCount      = iDestination + 1U;
   currentForm.vertexCount = iDestination;
-  currentForm.type        = FRMFPOLY;
+  currentForm.type        = FormStyles::kFreehand;
   currentForm.outline();
   auto& formList = Instance->formList;
 
@@ -7734,7 +7747,7 @@ void form::dulens(uint32_t sides) {
   }
   currentForm.vertexCount = wrap::toUnsigned(Instance->formVertices.size() - currentForm.vertexIndex);
   NewFormVertexCount = currentForm.vertexCount + 1U;
-  currentForm.type   = FRMFPOLY;
+  currentForm.type   = FormStyles::kFreehand;
   currentForm.outline();
   Instance->formList.push_back(currentForm);
   ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
@@ -7793,7 +7806,7 @@ void form::duzig(uint32_t vertices) {
 	  stitchPoint.x -= offset.x;
 	}
   }
-  newForm.type = FRMLINE;
+  newForm.type = FormStyles::kLine;
   newForm.outline();
   Instance->formList.push_back(newForm);
   ClosestFormToCursor = wrap::toUnsigned(Instance->formList.size() - 1U);
@@ -8022,7 +8035,7 @@ void form::clpfil() {
   if (!Instance->selectedFormList.empty()) {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
-	  if (Instance->formList.operator[](ClosestFormToCursor).type != FRMLINE) {
+	  if (Instance->formList.operator[](ClosestFormToCursor).type != FormStyles::kLine) {
 		filsclp();
 	  }
 	}
@@ -8811,7 +8824,7 @@ void form::spltfrm() {
   }
   thred::savdo();
   auto const& currentForm = Instance->formList.operator[](ClosestFormToCursor);
-  if (currentForm.type == SAT) {
+  if (currentForm.type == FormStyles::kSatin) {
 	if (currentForm.satinGuideCount == 0U) {
 	  return;
 	}
@@ -8825,7 +8838,7 @@ void form::spltfrm() {
 	}
 	return;
   }
-  if (currentForm.type == FRMLINE) {
+  if (currentForm.type == FormStyles::kLine) {
 	if (!spltlin()) {
 	  displayText::tabmsg(IDS_FRM3, false);
 	  return;
@@ -8850,7 +8863,7 @@ void form::stchs2frm() {
   }
   auto const vertexCount  = GroupEndStitch - GroupStartStitch + 1U;
   auto       currentForm  = FRM_HEAD {};
-  currentForm.type        = FRMLINE;
+  currentForm.type        = FormStyles::kLine;
   currentForm.vertexCount = vertexCount;
   currentForm.vertexIndex = thred::adflt(vertexCount);
   auto itVertex           = wrap::next(Instance->formVertices.begin(), currentForm.vertexIndex);
@@ -8884,7 +8897,7 @@ void form::vrtsclp(uint32_t const formIndex) {
   }
   form.fillType  = VCLPF;
   form.fillColor = ActiveColor;
-  form.type      = FRMFPOLY;
+  form.type      = FormStyles::kFreehand;
   refilfn(formIndex);
 }
 
@@ -8909,7 +8922,7 @@ void form::vrtclp() {
   if (!Instance->selectedFormList.empty()) {
 	Instance->stateMap.set(StateFlag::NOCLP);
 	for (auto const selectedForm : Instance->selectedFormList) {
-	  if (Instance->formList.operator[](selectedForm).type != FRMLINE) {
+	  if (Instance->formList.operator[](selectedForm).type != FormStyles::kLine) {
 		vrtsclp(selectedForm);
 	  }
 	}
@@ -8948,7 +8961,7 @@ void form::horsclp() {
   }
   form.fillType  = HCLPF;
   form.fillColor = ActiveColor;
-  form.type      = FRMFPOLY;
+  form.type      = FormStyles::kFreehand;
   refilfn(ClosestFormToCursor);
 }
 
@@ -8974,7 +8987,7 @@ void form::horclp() {
 	Instance->stateMap.set(StateFlag::NOCLP);
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
-	  if (Instance->formList.operator[](ClosestFormToCursor).type != FRMLINE) {
+	  if (Instance->formList.operator[](ClosestFormToCursor).type != FormStyles::kLine) {
 		horsclp();
 	  }
 	}
@@ -9011,7 +9024,7 @@ void form::angsclp(FRM_HEAD& form) {
   }
   form.fillType  = ANGCLPF;
   form.fillColor = ActiveColor;
-  form.type      = FRMFPOLY;
+  form.type      = FormStyles::kFreehand;
   refilfn(ClosestFormToCursor);
 }
 
@@ -9039,7 +9052,7 @@ void form::angclp() {
 	Instance->stateMap.set(StateFlag::NOCLP);
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  ClosestFormToCursor = selectedForm;
-	  if (auto& form = formList.operator[](selectedForm); form.type != FRMLINE) {
+	  if (auto& form = formList.operator[](selectedForm); form.type != FormStyles::kLine) {
 		angsclp(form);
 	  }
 	}

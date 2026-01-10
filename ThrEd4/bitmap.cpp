@@ -767,7 +767,7 @@ void bitmap::bfrm(FRM_HEAD const& form) {
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	pxlin(form, iVertex, iVertex + 1U);
   }
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	pxlin(form, form.vertexCount - 1U, 0);
   }
 }

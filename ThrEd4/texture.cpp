@@ -420,7 +420,7 @@ void ritxfrm(FRM_HEAD const& textureForm) {
   }
   formLines.back() = formLines.front();
   auto vertexCount = wrap::toUnsigned(angledFormVertices.size());
-  if (textureForm.type != FRMLINE) {
+  if (textureForm.type != FormStyles::kLine) {
 	++vertexCount;
   }
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -473,7 +473,7 @@ void setxclp(FRM_HEAD const& form) {
 	return vertex + editorOffset;
   });
   auto lineCount = form.vertexCount - 1U;
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	++lineCount;
   }
   for (auto iLine = 0U; iLine < lineCount; ++iLine) {
@@ -676,7 +676,7 @@ void txnudg(int32_t const deltaX, float const deltaY) {
 }
 
 void txpar(FRM_HEAD& form) {
-  form.type = FRMFPOLY;
+  form.type = FormStyles::kFreehand;
   wrap::narrow(form.texture.lines, TextureScreen.lines);
   form.texture.height   = TextureScreen.areaHeight;
   form.fillSpacing      = TextureScreen.spacing;

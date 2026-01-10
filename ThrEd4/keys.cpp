@@ -1404,53 +1404,53 @@ auto keys::createFormType(wchar_t const code) -> bool {
 	case L'E': {
 	  Instance->stateMap.reset(StateFlag::FORMIN);
 	  thred::unmsg();
-	  form::duform(FRMLINE - 1);
+	  form::duform(FormStyles::kLine);
 	  return true;
 	}
 	case L'F': {
 	  Instance->stateMap.reset(StateFlag::FORMIN);
 	  thred::unmsg();
-	  form::duform(FRMFPOLY - 1);
+	  form::duform(FormStyles::kFreehand);
 	  return true;
 	}
 	case L'R': {
-	  form::duform(FRMRPOLY - 1);
+	  form::duform(FormStyles::kRegular);
 	  return true;
 	}
 	case L'S': {
-	  form::duform(FRMSTAR - 1);
+	  form::duform(FormStyles::kStar);
 	  return true;
 	}
 	case L'A': {
-	  form::duform(FRMSPIRAL - 1);
+	  form::duform(FormStyles::kSpiral);
 	  return true;
 	}
 	case L'H': {
-	  form::duform(FRMHEART - 2);
+	  form::duform(FormStyles::kHeart);
 	  return true;
 	}
 	case L'L': {
-	  form::duform(FRMLENS - 2);
+	  form::duform(FormStyles::kLens);
 	  return true;
 	}
 	case L'G': {
-	  form::duform(FRMEGG - 2);
+	  form::duform(FormStyles::kEgg);
 	  return true;
 	}
 	case L'T': {
-	  form::duform(FRMTEAR - 2);
+	  form::duform(FormStyles::kTear);
 	  return true;
 	}
 	case L'Z': {
-	  form::duform(FRMZIGZAG - 2);
+	  form::duform(FormStyles::kZigzag);
 	  return true;
 	}
 	case L'W': {
-	  form::duform(FRMWAVE - 2);
+	  form::duform(FormStyles::kWave);
 	  return true;
 	}
 	case L'D': {
-	  form::duform(FRMDAISY - 2);
+	  form::duform(FormStyles::kDaisy);
 	  return true;
 	}
 	default: {
