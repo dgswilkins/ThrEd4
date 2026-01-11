@@ -11461,7 +11461,7 @@ auto thred::handleSideWindowActive() -> bool {
 	return true;
   }
 
-  if (form.fillType == SAT && form.satinGuideCount != 0U) {
+  if (form.fillType == SATF && form.satinGuideCount != 0U) {
 	satin::delsac(ClosestFormToCursor);
   }
   if ((form.edgeType & NEGUND) == EDGEAPPL) {

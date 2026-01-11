@@ -4516,7 +4516,7 @@ void sapliq(uint32_t const formIndex) {
   form::bsizpar(form);
   wrap::narrow_cast(form.borderColor, ActiveColor | gsl::narrow_cast<uint8_t>(AppliqueColor << 4U));
   if (form.type != FormStyles::kLine) {
-	if (form.fillType == SAT && form.satinGuideCount != 0U) {
+	if (form.fillType == SATF && form.satinGuideCount != 0U) {
 	  satin::delsac(ClosestFormToCursor);
 	}
   }
