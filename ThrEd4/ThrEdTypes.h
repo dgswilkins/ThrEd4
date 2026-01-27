@@ -653,8 +653,9 @@ constexpr auto FILLLIST = std::array<LIST_TYPE, FILLTMAX> {{{.stringID = IDS_FIL
                                                             {.stringID = IDS_FIL12, .value = TXHORF},
                                                             {.stringID = IDS_FIL13, .value = TXANGF}}};
 
+constexpr auto EDGEUNFIL = uint8_t {0U}; // unfilled edge
 constexpr auto EDGELIST =
-    std::array<LIST_TYPE, EDGETMAX> {{{.stringID = IDS_EDG0, .value = 0},
+    std::array<LIST_TYPE, EDGETMAX> {{{.stringID = IDS_EDG0, .value = EDGEUNFIL},
                                       {.stringID = IDS_EDG1, .value = EDGELINE},
                                       {.stringID = IDS_EDG2, .value = EDGEBEAN},
                                       {.stringID = IDS_EDG3, .value = EDGECLIP},
