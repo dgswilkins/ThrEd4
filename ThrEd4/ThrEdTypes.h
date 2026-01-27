@@ -800,7 +800,8 @@ enum TextureButtons : uint8_t { // text button windows
   HTXMIR
 };
 
-enum MachineType : int8_t { AUXPCS, AUXDST, AUXPES };
+// Machine types
+enum class Machine : int8_t { PCS, DST, PES };
 
 #ifdef DOUBLE_REQUIRED
 class D_RECTANGLE

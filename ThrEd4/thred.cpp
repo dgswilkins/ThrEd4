@@ -2522,7 +2522,7 @@ void dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(Instance->clipPoints) * clipDataCount);
   // write the header to the buffer
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
-  ExtendedHeader.auxFormat         = IniFile.auxFileType;
+  ExtendedHeader.auxFormat         = wrap::toIntegralType(IniFile.auxFileType);
   ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
   ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
   ExtendedHeader.texturePointCount = wrap::toUnsigned(Instance->texturePointsBuffer.size());
@@ -6125,18 +6125,18 @@ void sav() {
   }
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
+  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+	case Machine::DST: {
 	  flag = DST::saveDST(auxName, saveStitches);
 	  break;
 	}
 #if PESACT
-	case AUXPES: {
+	case Machine::PES: {
 	  flag = PES::savePES(auxName, saveStitches);
 	  break;
 	}
 #endif
-	default: {
+	case Machine::PCS: {
 	  flag = PCS::savePCS(auxName, saveStitches);
 	}
   }
@@ -12377,18 +12377,18 @@ void thred::updateBackgroundColor() {
 }
 
 void thred::openAuxFile() {
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
+  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+	case Machine::DST: {
 	  nuFil(FileIndices::DST);
 	  break;
 	}
 #if PESACT
-	case AUXPES: {
+	case Machine::PES: {
 	  nuFil(FileIndices::PES);
 	  break;
 	}
 #endif
-	default: {
+	case Machine::PCS: {
 	  nuFil(FileIndices::PCS);
 	}
   }

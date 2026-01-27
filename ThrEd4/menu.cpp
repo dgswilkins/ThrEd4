@@ -197,19 +197,19 @@ void vuselthr() {
 } // namespace
 
 void menu::setpcs() {
-  IniFile.auxFileType = AUXPCS;
+  IniFile.auxFileType = Machine::PCS;
   auxmen();
 }
 
 #if PESACT
 void menu::setpes() {
-  IniFile.auxFileType = AUXPES;
+  IniFile.auxFileType = Machine::PES;
   auxmen();
 }
 #endif
 
 void menu::setdst() {
-  IniFile.auxFileType = AUXDST;
+  IniFile.auxFileType = Machine::DST;
   auxmen();
 }
 
@@ -374,13 +374,13 @@ void menu::auxmen() {
   EnableMenuItem(MainMenu, ID_AUXPES, MF_DISABLED | MF_GRAYED);
 #endif
   CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
+  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+	case Machine::DST: {
 	  auxMsg.assign(displayText::format(IDS_AUXTXT, L"DST"));
 	  CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 	  break;
 	}
-	case AUXPES:
+	case Machine::PES:
 #if PESACT
 	{
 	  auxMsg.assign(displayText::format(IDS_AUXTXT, L"PES"));
@@ -389,10 +389,10 @@ void menu::auxmen() {
 	}
 #else
 	{
-	  IniFile.auxFileType = AUXPCS;
+	  IniFile.auxFileType = Machine::PCS;
 	}
 #endif
-	default: {
+	case Machine::PCS: {
 	  auxMsg.assign(displayText::format(IDS_AUXTXT, L"PCS"));
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
