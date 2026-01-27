@@ -300,7 +300,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 	return false;
   }
-  IniFile.auxFileType = Machine::PCS;
+  IniFile.auxFileType = Machine::kPfaff;
   auto hoopSize       = PCSHeader.getHoopType();
   if (hoopSize != HoopSize::kLarge && hoopSize != HoopSize::kSmall) {
 	hoopSize = HoopSize::kLarge;

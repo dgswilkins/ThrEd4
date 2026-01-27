@@ -1071,7 +1071,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	return false;
   }
   dstran(dstData);
-  IniFile.auxFileType = Machine::DST;
+  IniFile.auxFileType = Machine::kTajima;
   CloseHandle(fileHandle);
   return true;
 }

@@ -6126,17 +6126,17 @@ void sav() {
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
   switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
-	case Machine::DST: {
+	case Machine::kTajima: {
 	  flag = DST::saveDST(auxName, saveStitches);
 	  break;
 	}
 #if PESACT
-	case Machine::PES: {
+	case Machine::kBrother: {
 	  flag = PES::savePES(auxName, saveStitches);
 	  break;
 	}
 #endif
-	case Machine::PCS: {
+	case Machine::kPfaff: {
 	  flag = PCS::savePCS(auxName, saveStitches);
 	}
   }
@@ -12378,17 +12378,17 @@ void thred::updateBackgroundColor() {
 
 void thred::openAuxFile() {
   switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
-	case Machine::DST: {
+	case Machine::kTajima: {
 	  nuFil(FileIndices::DST);
 	  break;
 	}
 #if PESACT
-	case Machine::PES: {
+	case Machine::kBrother: {
 	  nuFil(FileIndices::PES);
 	  break;
 	}
 #endif
-	case Machine::PCS: {
+	case Machine::kPfaff: {
 	  nuFil(FileIndices::PCS);
 	}
   }

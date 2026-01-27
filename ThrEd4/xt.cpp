@@ -2498,17 +2498,17 @@ void xt::setfilend() {
 
 void xt::duauxnam(fs::path& auxName) {
   switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
-	case Machine::DST: {
+	case Machine::kTajima: {
 	  auxName.replace_extension(".dst");
 	  break;
 	}
 #if PESACT
-	case Machine::PES: {
+	case Machine::kBrother: {
 	  auxName.replace_extension(".pes");
 	  break;
 	}
 #endif
-	case Machine::PCS: {
+	case Machine::kPfaff: {
 	  auxName.replace_extension("pcs");
 	  break;
 	}

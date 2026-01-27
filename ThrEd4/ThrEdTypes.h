@@ -795,7 +795,7 @@ constexpr auto HTXANG  = uint8_t {6U};
 constexpr auto HTXMIR  = uint8_t {7U};
 
 // Machine types
-enum class Machine : int8_t { PCS, DST, PES };
+enum class Machine : int8_t { kPfaff, kTajima, kBrother };
 
 #ifdef DOUBLE_REQUIRED
 class D_RECTANGLE
