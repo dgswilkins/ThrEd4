@@ -707,7 +707,8 @@ void unsat() {
 void satin::delsac(uint32_t const formIndex) {
   auto& formList    = Instance->formList;
   auto& currentForm = formList[formIndex];
-  if (Instance->satinGuides.empty() || currentForm.type != FormStyles::kSatin || currentForm.satinGuideCount == 0U) {
+  if (Instance->satinGuides.empty() || currentForm.type != FormStyles::kSatin ||
+      currentForm.satinGuideCount == 0U) {
 	formList[formIndex].satinGuideCount = 0;
 	return;
   }
@@ -1085,7 +1086,8 @@ void satin::delcon(FRM_HEAD& form, uint32_t const GuideIndex) {
   std::for_each(wrap::next(Instance->formList.begin(), ClosestFormToCursor + 1U),
                 Instance->formList.end(),
                 [](auto& iForm) -> auto {
-	              if (iForm.type == FormStyles::kSatin && iForm.satinGuideCount != 0U && iForm.satinGuideIndex != 0U) {
+	              if (iForm.type == FormStyles::kSatin && iForm.satinGuideCount != 0U &&
+	                  iForm.satinGuideIndex != 0U) {
 	                --iForm.satinGuideIndex;
 	              }
                 });
@@ -1247,7 +1249,7 @@ void satin::ribon() {
 	satends(formList.operator[](ClosestFormToCursor), isBlunt, Instance->borderWidth);
   }
   newForm.vertexIndex    = currentType == FormStyles::kLine ? thred::adflt(currentVertexCount * 2U)
-                                                  : thred::adflt((currentVertexCount * 2U) + 2U);
+                                                            : thred::adflt((currentVertexCount * 2U) + 2U);
   auto const startVertex = wrap::next(Instance->formVertices.begin(), newForm.vertexIndex);
   auto       itVertex    = startVertex;
   *itVertex++            = OutsidePoints->front();

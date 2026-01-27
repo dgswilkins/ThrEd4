@@ -59,10 +59,10 @@
 
 // edge tracing directions
 enum class TraceDir : uint8_t {
-  kTop, // top edge
-  kRight, // right edge
+  kTop,    // top edge
+  kRight,  // right edge
   kBottom, // bottom edge
-  kLeft  // left edge
+  kLeft    // left edge
 };
 
 class TRACE_PNT
@@ -437,7 +437,7 @@ void dutrac() {
 	}
   }
   auto const initialDirection = traceDirection;
-  auto           tracedPoints     = std::vector<TRACE_PNT> {};
+  auto       tracedPoints     = std::vector<TRACE_PNT> {};
   tracedPoints.push_back(TRACE_PNT {.x = gsl::narrow<int16_t>(CurrentTracePoint.x),
                                     .y = gsl::narrow<int16_t>(CurrentTracePoint.y)});
   while (trcbit(initialDirection, traceDirection, tracedPoints)) { }
@@ -578,7 +578,8 @@ void tracwnd() {
   showTraceWin();
 }
 
-auto trcbit(TraceDir const initialDirection, TraceDir& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool {
+auto trcbit(TraceDir const initialDirection, TraceDir& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
+    -> bool {
   auto const& tracedEdges = TraceInstance->TracedEdges;
   auto        pixelIndex  = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
@@ -1377,7 +1378,8 @@ void trace::wasTrace(DRAWITEMSTRUCT const& drawItem) {
 	  FillRect(drawItem.hDC, &drawItem.rcItem, *itColTraceBrush);
 	  SetBkColor(drawItem.hDC, *itColTraceRGB);
 	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
-	  wrap::textOut(drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
+	  wrap::textOut(
+	      drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
 	  break;
 	}
 	++iTraceShift;

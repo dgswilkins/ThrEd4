@@ -134,8 +134,8 @@ class TXT_SINGLE
 
 // texture internal namespace
 namespace {
-constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
-constexpr auto TXTRAT  = 0.95F; // texture fill clipboard shrink/grow ratio
+constexpr auto OSCLAMP   = -0.5F; // values below this are off screen and should be clamped
+constexpr auto TXTRAT    = 0.95F; // texture fill clipboard shrink/grow ratio
 constexpr auto SIGNATURE = std::array<char, 4> {'t', 'x', 'h', 0}; // texture history signature
 
 enum class TextureStyle : uint8_t { kVertical, kHorizontal, kAngled };
@@ -383,7 +383,7 @@ auto px2txt(POINT const& offset) -> bool {
   }
   txPoint.y = TextureScreen.areaHeight -
               ((wrap::toFloat(offset.y - TextureScreen.top) / wrap::toFloat(TextureScreen.height)) *
-                  TextureScreen.areaHeight);
+               TextureScreen.areaHeight);
   TextureInstance->TempTexturePoints.push_back(txPoint);
   return true;
 }
@@ -1046,7 +1046,7 @@ void texture::setTxtCurLoc(POINT const location) noexcept {
 }
 
 void texture::txdun() {
-  auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
+  auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(TextureInstance->TextureHistory.size());
   if (TextureInstance->TextureHistory.operator[](0).texturePoints.empty()) {
 	return;

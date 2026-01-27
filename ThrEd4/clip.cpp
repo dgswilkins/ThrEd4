@@ -711,10 +711,11 @@ auto ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> b
   if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(Instance->oSequence.size()))) {
 	return false;
   }
-  std::ranges::transform(
-      clipFillData, std::back_inserter(Instance->oSequence), [&adjustedPoint](auto const& data) noexcept -> auto {
-	    return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
-      });
+  std::ranges::transform(clipFillData,
+                         std::back_inserter(Instance->oSequence),
+                         [&adjustedPoint](auto const& data) noexcept -> auto {
+	                       return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
+                         });
   return true;
 }
 

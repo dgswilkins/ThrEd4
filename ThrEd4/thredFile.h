@@ -11,9 +11,9 @@
 #include <filesystem>
 
 namespace thredFile {
-auto readTHRFile(std::filesystem::path const& newFileName,
-                 THR_HEAD_EX&                 extendedHeader,
-                 COLORREF&                    backgroundColor,
+auto readTHRFile(std::filesystem::path const&    newFileName,
+                 THR_HEAD_EX&                    extendedHeader,
+                 COLORREF&                       backgroundColor,
                  std::array<COLORREF, COLORCNT>& customThreadColor,
                  std::array<wchar_t, COLORCNT>&  threadSizeArray) -> bool;
 } // namespace thredFile

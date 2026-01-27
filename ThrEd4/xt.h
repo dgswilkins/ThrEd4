@@ -9,15 +9,15 @@
 #include <vector>
 
 enum class FSI : uint8_t { // fill starts index values
-  kApplique = 0,
-  kFill = 1,
-  kFeather = 2,
-  kBorder = 3,
+  kApplique      = 0,
+  kFill          = 1,
+  kFeather       = 2,
+  kBorder        = 3,
   kAppliqueColor = 4,
-  kFillColor = 5,
-  kFeatherColor = 6,
-  kBorderColor = 7,
-  kMaxValue = kBorderColor
+  kFillColor     = 5,
+  kFeatherColor  = 6,
+  kBorderColor   = 7,
+  kMaxValue      = kBorderColor
 };
 
 template <class IndexType, class ValueType> class ENUM_ARRAY
@@ -55,7 +55,7 @@ template <class IndexType, class ValueType> class ENUM_ARRAY
   std::array<ValueType, static_cast<size_t>(IndexType::kMaxValue) + 1> m_Array = {};
 
   size_t m_Size = static_cast<size_t>(IndexType::kMaxValue) + 1;
-}; 
+};
 
 using FillStartsDataType = ENUM_ARRAY<FSI, uint32_t>;
 

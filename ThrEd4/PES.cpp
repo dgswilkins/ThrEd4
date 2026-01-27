@@ -641,7 +641,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 
   // Check for the PES lead in value
   // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
-  if (constexpr auto PESSTR = "#PES"; strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) { 
+  if (constexpr auto PESSTR = "#PES"; strncmp(pesHeader->ledI.data(), PESSTR, strlen(PESSTR)) != 0) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
@@ -653,7 +653,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto contFlag = false;
   for (auto const& version : VER_STRINGS) {
 	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
-	if (strncmp(pesHeader->ledV.data(), version, pesHeader->ledV.size()) == 0) { 
+	if (strncmp(pesHeader->ledV.data(), version, pesHeader->ledV.size()) == 0) {
 	  contFlag = true;
 	  break;
 	}
@@ -794,7 +794,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 
   // ReSharper disable CppDeprecatedEntity
   // NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
-  strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR)); 
+  strncpy(pesHeader.ledI.data(), PESISTR, strlen(PESISTR));
   strncpy(pesHeader.ledV.data(), PESVSTR, strlen(PESVSTR));
   wrap::narrow(pesHeader.celn, strlen(EMBSTR));
   strncpy(pesHeader.ce.data(), EMBSTR, pesHeader.celn);

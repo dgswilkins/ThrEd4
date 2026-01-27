@@ -50,11 +50,11 @@
 #include <filesystem>
 #include <vector>
 
-auto thredFile::readTHRFile(std::filesystem::path const& newFileName,
-                            THR_HEAD_EX&                 extendedHeader,
-                            COLORREF&                    backgroundColor,
+auto thredFile::readTHRFile(std::filesystem::path const&    newFileName,
+                            THR_HEAD_EX&                    extendedHeader,
+                            COLORREF&                       backgroundColor,
                             std::array<COLORREF, COLORCNT>& customThreadColor,
-                            std::array<wchar_t, COLORCNT>& threadSizeArray) -> bool {
+                            std::array<wchar_t, COLORCNT>&  threadSizeArray) -> bool {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = HANDLE {nullptr};
   if (!thred::getFileHandle(newFileName, fileHandle)) {
@@ -92,7 +92,9 @@ auto thredFile::readTHRFile(std::filesystem::path const& newFileName,
 	  auto const spModifierName = gsl::span {extendedHeader.modifierName};
 	  auto const spIDN          = gsl::span {IniFile.designerName};
 	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
-	  std::copy(spIDN.begin(), wrap::next(spIDN.begin(), std::strlen(spIDN.data()) + 1U), spModifierName.begin());
+	  std::copy(spIDN.begin(),
+	            wrap::next(spIDN.begin(), std::strlen(spIDN.data()) + 1U),
+	            spModifierName.begin());
 	  break;
 	}
 	case 1:

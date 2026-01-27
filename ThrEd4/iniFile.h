@@ -69,8 +69,8 @@ class INI_FILE // ini file structure
 
   float    buttonholeCornerLength {}; // buttonhole fill corner length
   float    picotSpace {};             // space between border picots
-  HoopSize   hoopType {};               // hoop type
-  Machine   auxFileType {};            // machine file type
+  HoopSize hoopType {};               // hoop type
+  Machine  auxFileType {};            // machine file type
   float    hoopSizeX {};              // hoop x size
   float    hoopSizeY {};              // hoop y size
   float    rotationAngle {};          // rotation angle
@@ -110,25 +110,29 @@ class INI_FILE // ini file structure
 
   std::array<char, MAX_PATH> p2cName {}; // pes2card file
 
-  float    underlayIndent {};    // edge walk/underlay indent
-  float    underlayAngle {};     // underlay angle
-  float    underlaySpacing {};   // underlay spacing
-  float    underlayStitchLen {}; // underlay stitch length
-  float    daisyDiameter {};     // daisy diameter
-  float    daisyPetalLen {};     // daisy petal length
-  float    daisyHoleDiameter {}; // daisy hole diameter
-  uint32_t daisyPetalCount {};   // daisy petals
-  uint32_t daisyPetalPoints {};  // daisy petal points
-  uint32_t daisyInnerCount {};   // daisy inner count
-  DaisyStyle  daisyBorderType {};   // daisy border type
-  uint8_t  dataCheck {};         // data check
-  float    textureHeight {};     // textured fill height
-  float    textureWidth {};      // textured fill width
-  float    textureSpacing {};    // textured fill spacing
+  float underlayIndent {};    // edge walk/underlay indent
+  float underlayAngle {};     // underlay angle
+  float underlaySpacing {};   // underlay spacing
+  float underlayStitchLen {}; // underlay stitch length
+  float daisyDiameter {};     // daisy diameter
+  float daisyPetalLen {};     // daisy petal length
+  float daisyHoleDiameter {}; // daisy hole diameter
+
+  uint32_t   daisyPetalCount {};  // daisy petals
+  uint32_t   daisyPetalPoints {}; // daisy petal points
+  uint32_t   daisyInnerCount {};  // daisy inner count
+  DaisyStyle daisyBorderType {};  // daisy border type
+  uint8_t    dataCheck {};        // data check
+
+  float textureHeight {};  // textured fill height
+  float textureWidth {};   // textured fill width
+  float textureSpacing {}; // textured fill spacing
+
   uint16_t formBoxSizePixels {}; // form box pixels
   uint16_t daisyHeartCount {};   // daisy heart count
   uint16_t textureEditorSize {}; // texture editor pixels
-  float    clpspc {};            // clipboard fill spacing
+
+  float clpspc {}; // clipboard fill spacing
 
   std::array<char, NAME_LEN> designerName {}; // designer name
   // NOLINTEND(misc-non-private-member-variables-in-classes)

@@ -124,12 +124,12 @@ class SORT_REC
 };
 
 enum class StitchStyle : char {
-  kNone     = 0, // no type
+  kNone = 0,     // no type
   kApplique,     // applique
-  kCenterWalk,        // center walk
-  kEdgeWalk,        // edge walk
-  kUnderlayFill,     // underlay
-  kFeather,         // feather
+  kCenterWalk,   // center walk
+  kEdgeWalk,     // edge walk
+  kUnderlayFill, // underlay
+  kFeather,      // feather
   kFill,         // fill
   kBorder        // border
 };
@@ -166,19 +166,19 @@ constexpr auto M_FTHCOL = 1U << 10U; // Feather color
 constexpr auto M_ECOL   = 1U << 11U; // Edge color
 
 constexpr auto STITCH_TYPES = std::array<StitchStyle, 13> {
-    StitchStyle::kNone,             // 0 no type
-    StitchStyle::kApplique, // 1 applique
-    StitchStyle::kCenterWalk,    // 2 center walk
-    StitchStyle::kEdgeWalk,    // 3 edge walk
+    StitchStyle::kNone,         // 0 no type
+    StitchStyle::kApplique,     // 1 applique
+    StitchStyle::kCenterWalk,   // 2 center walk
+    StitchStyle::kEdgeWalk,     // 3 edge walk
     StitchStyle::kUnderlayFill, // 4 underlay
-    StitchStyle::kNone,             // 5 knot
-    StitchStyle::kFeather,     // 6 feather
-    StitchStyle::kNone,             // 7 layer
-    StitchStyle::kNone,             // 8 layer
-    StitchStyle::kNone,             // 9 layer
-    StitchStyle::kNone,             // 10 reserved
-    StitchStyle::kFill,     // 11 fill
-    StitchStyle::kBorder,   // 12 border
+    StitchStyle::kNone,         // 5 knot
+    StitchStyle::kFeather,      // 6 feather
+    StitchStyle::kNone,         // 7 layer
+    StitchStyle::kNone,         // 8 layer
+    StitchStyle::kNone,         // 9 layer
+    StitchStyle::kNone,         // 10 reserved
+    StitchStyle::kFill,         // 11 fill
+    StitchStyle::kBorder,       // 12 border
 };
 
 auto DesignSize = F_POINT {};                        // design size
@@ -205,7 +205,8 @@ void duatf(uint32_t ind);
 #endif
 
 void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData);
-auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord) -> uint32_t;
+auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
+    -> uint32_t;
 
 constexpr auto durat(float start, float finish, float featherRatio) -> float;
 
@@ -248,9 +249,8 @@ auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_PO
 void notundfn(uint32_t code);
 void nudfn(F_RECTANGLE const& designSizeRect) noexcept;
 void nurat(FEATHER& feather) noexcept;
-auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
-              std::vector<O_REC*> const& pRecs,
-              SORT_REC const&            sortRecord) -> double;
+auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
+    -> double;
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
 auto orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool;
 auto orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool;
@@ -568,7 +568,8 @@ void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t cod
   }
 }
 
-auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord) -> uint32_t {
+auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
+    -> uint32_t {
   sortRecord.direction = false;
   auto const jumps0    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
   sortRecord.direction = true;
@@ -646,7 +647,8 @@ auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 // ReSharper restore CppParameterMayBeConst
 
 void fangfn(uint32_t const formIndex, float const angle) {
-  if (auto& form = Instance->formList.operator[](formIndex); form.type == FormStyles::kFreehand && form.fillType != 0U) {
+  if (auto& form = Instance->formList.operator[](formIndex);
+      form.type == FormStyles::kFreehand && form.fillType != 0U) {
 	switch (form.fillType) {
 	  case VRTF:
 	  case HORF:
@@ -1266,9 +1268,8 @@ void nurat(FEATHER& feather) noexcept {
   feather.globalPosition += feather.globalStep;
 }
 
-auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
-              std::vector<O_REC*> const& pRecs,
-              SORT_REC const&            sortRecord) -> double {
+auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
+    -> double {
   auto currentRegion   = sortRecord.currentRegion;
   auto direction       = sortRecord.direction;
   auto formFillCounter = std::vector<uint32_t> {};
@@ -1366,7 +1367,8 @@ auto orComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const
   return false;
 }
 
-auto orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept -> bool {
+auto orfComp(gsl::not_null<O_REC const*> const record1, gsl::not_null<O_REC const*> const record2) noexcept
+    -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1->form < record2->form) {
 	return true;
@@ -1951,7 +1953,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	if (auto const attribute = Instance->stitchBuffer.operator[](iSourceStitch).attribute;
 	    codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
 	  switch (auto const type = STITCH_TYPES.at(dutyp(attribute)); type) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
- 		case StitchStyle::kApplique: {
+		case StitchStyle::kApplique: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;
 			fillStartsData[FSI::kApplique] = iDestinationStitch;
@@ -2072,7 +2074,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
-	iDestinationStitch     = ind - 1U;
+	iDestinationStitch = ind - 1U;
 	while (iDestinationStitch < ind) {
 	  fillStartsData[ind] = std::max(fillStartsData[iDestinationStitch], fillStartsData[ind]);
 	  --iDestinationStitch;

@@ -240,7 +240,8 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   // label and fill the form field
   labelWindow[LFRM] = txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
-  auto choice = form.type == FormStyles::kLine ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
+  auto choice       = form.type == FormStyles::kLine ? displayText::loadStr(IDS_EDG1)
+                                                     : displayText::loadStr(IDS_FREH);
   valueWindow[LFRM] = txtrwin(choice, ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   // label and fill the layer field
@@ -1048,7 +1049,8 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getShowStitchThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
-  prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(wrap::toIntegralType(IniFile.hoopType)) - 1U + IDS_HUP0)),
+  prflin(format(FMT_COMPILE(L"{}"),
+                displayText::loadStr(wrap::toUnsigned(wrap::toIntegralType(IniFile.hoopType)) - 1U + IDS_HUP0)),
          *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);
@@ -1172,7 +1174,7 @@ void formForms::dasyfrm() {
 		}
 		case DaisyStyle::kRagged: { // ragged
 		  distanceFromDaisyCenter = diameter + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
-		                                           wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
+		                                        wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
 		case DaisyStyle::kCog: { // cog wheel

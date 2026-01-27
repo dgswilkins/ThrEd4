@@ -241,17 +241,17 @@ constexpr auto FM_ONAM1 = uint8_t {16U};
 constexpr auto FM_ONAM2 = uint8_t {17U};
 constexpr auto FM_ONAM3 = uint8_t {18U};
 
-constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
-constexpr auto KNOTLEN  = int32_t {54};           // set knots for stitches longer than this
-constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
+constexpr auto HUPS     = int32_t {5};  // number of hoops the user can select
+constexpr auto KNOTLEN  = int32_t {54}; // set knots for stitches longer than this
+constexpr auto KNOTSCNT = 5U;           // length of knot pattern in stitches
 constexpr auto LRU_MENU_ID = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-constexpr auto MAXDELAY = int32_t {600};         // maximum movie time step
-constexpr auto MINDELAY = int32_t {1};           // minimum movie time step
-constexpr auto MINZUM   = int32_t {5};           // minimum zoom in stitch points
-constexpr auto MINZUMF  = float {MINZUM};        // minimum zoom in stitch points
-constexpr auto NUGINI   = 2.0F;                  // default nudge step
-constexpr auto PAGSCROL = 0.9F;                  // page scroll factor
-constexpr auto SCROLSIZ = int32_t {12};          // logical pixel width of a scroll bar
+constexpr auto MAXDELAY = int32_t {600};        // maximum movie time step
+constexpr auto MINDELAY = int32_t {1};          // minimum movie time step
+constexpr auto MINZUM   = int32_t {5};          // minimum zoom in stitch points
+constexpr auto MINZUMF  = float {MINZUM};       // minimum zoom in stitch points
+constexpr auto NUGINI   = 2.0F;                 // default nudge step
+constexpr auto PAGSCROL = 0.9F;                 // page scroll factor
+constexpr auto SCROLSIZ = int32_t {12};         // logical pixel width of a scroll bar
 constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
@@ -296,7 +296,7 @@ auto DefaultColorBrush = std::array<HBRUSH, COLORCNT> {};   // default color bru
 auto UserColorBrush    = std::array<HBRUSH, COLORCNT> {};   // user color brushes
 
 // for the choose color dialog box
-auto ColorStruct = CHOOSECOLOR {};
+auto ColorStruct       = CHOOSECOLOR {};
 auto CustomThreadColor = std::array<COLORREF, COLORCNT> {};
 
 // for the background color dialog box
@@ -407,7 +407,8 @@ void boxs();
 auto centr() noexcept -> F_POINT;
 void chk1col();
 auto chk2of() -> bool;
-auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm) -> bool;
+auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
+    -> bool;
 auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
 auto chkattr(fs::path const& filename) -> bool;
 auto chkhid(size_t colorToCheck) -> bool;
@@ -501,9 +502,8 @@ auto handleLockWMCOMMAND(HWND hwndlg, WPARAM const& wparam) -> bool;
 auto handleLockWMINITDIALOG(HWND hwndlg, LPARAM lparam, WPARAM const& wparam) -> bool;
 auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
 void handleSizeRestored(HWND p_hWnd);
-auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
-                           F_POINT&                  rotationCenter,
-                           std::vector<POINT> const& stretchBoxLine) -> bool;
+auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
+    -> bool;
 auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool;
 auto handleWndProcWMHSCROLL(WPARAM const& wParam, float LINSCROL, LPARAM lParam) -> bool;
 void handleWndProcWMINITMENU();
@@ -696,7 +696,8 @@ auto chk2of() -> bool {
   return true;
 }
 
-auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm) -> bool {
+auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
+    -> bool {
   if (WinMsg.message == WM_MOUSEMOVE) {
 	return mouse::handleMouseMove(stretchBoxLine, xyRatio, angle, rotationCenter, textureForm);
   }
@@ -1247,7 +1248,7 @@ void chknum() {
 				}
 				case PRFSNPSIZ: {
 				  Instance->SnapLength = value * PFGRAN;
-				  hWnd       = valueWindow.operator[](PRFSNPSIZ);
+				  hWnd                 = valueWindow.operator[](PRFSNPSIZ);
 				  break;
 				}
 				case PRFSTRRAT: {
@@ -1285,8 +1286,8 @@ void chknum() {
 				}
 				case PRFBCNLEN: {
 				  form::setButtonholeCornerLength(value * PFGRAN);
-				  fmtStr                 = format(FMT_COMPILE(L"{:.2f}"), value);
-				  hWnd                   = valueWindow.operator[](PRFBCNLEN);
+				  fmtStr = format(FMT_COMPILE(L"{:.2f}"), value);
+				  hWnd   = valueWindow.operator[](PRFBCNLEN);
 				  break;
 				}
 				case PRFHUPWID: {
@@ -1338,8 +1339,8 @@ void chknum() {
   if (ThrSingle->MsgBuffer.size() > 1) {
 	// NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	outDebugString(L"chknum: buffer length [{}] size [{}]\n",
-	               wcslen(ThrSingle->MsgBuffer.data()), 
-	               ThrSingle->MsgBuffer.size()); 
+	               wcslen(ThrSingle->MsgBuffer.data()),
+	               ThrSingle->MsgBuffer.size());
 	// NOLINTEND(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	auto const value = thred::getMsgBufferValue();
 	if (Instance->stateMap.testAndReset(StateFlag::NUROT)) { // rotate
@@ -3692,9 +3693,8 @@ void handleSizeRestored(HWND p_hWnd) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
-                           F_POINT&                  rotationCenter,
-                           std::vector<POINT> const& stretchBoxLine) -> bool {
+auto handleWndMsgWMKEYDOWN(FRM_HEAD& textureForm, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine)
+    -> bool {
   auto const code = gsl::narrow<wchar_t>(WinMsg.wParam & 0xffffU);
   if (Instance->stateMap.test(StateFlag::TXTRED)) {
 	texture::txtkey(code, textureForm);
@@ -4968,7 +4968,7 @@ auto makbig(uint32_t const start, uint32_t finish) -> uint32_t {
   auto stitchIt     = wrap::next(Instance->stitchBuffer.begin(), start);
   auto nextStitchIt = stitchIt + 1U;
   for (auto iSource = start; iSource < finish; ++iSource) {
-	auto const delta = F_POINT {nextStitchIt->x - stitchIt->x, nextStitchIt->y - stitchIt->y};
+	auto const delta  = F_POINT {nextStitchIt->x - stitchIt->x, nextStitchIt->y - stitchIt->y};
 	auto const length = std::hypot(delta.x, delta.y);
 	newStitches.push_back(*stitchIt);
 	if (length > IniFile.maxStitchLength) {
@@ -6088,7 +6088,8 @@ void rthumnam(uint32_t const iThumbnail) {
 
 void sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(Instance->formList.size()); ++iForm) {
-	if (auto const& form = Instance->formList.operator[](iForm); form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
+	if (auto const& form = Instance->formList.operator[](iForm);
+	    form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 	  auto itGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
@@ -6197,7 +6198,8 @@ void selin(uint32_t start, uint32_t end, HDC hDC) {
 }
 // ReSharper restore CppParameterMayBeConst
 
-auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool {
+auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize)
+    -> bool {
   auto const bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
                                               floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
@@ -8881,9 +8883,8 @@ void thred::unrotu() {
   }
 }
 
-auto thred::rotangf(F_POINT const& unrotatedPoint,
-                    float const    rotationAngle,
-                    F_POINT const& rotationCenter) noexcept -> F_POINT {
+auto thred::rotangf(F_POINT const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
+    -> F_POINT {
   auto const deltaX           = unrotatedPoint.x - rotationCenter.x;
   auto const deltaY           = unrotatedPoint.y - rotationCenter.y;
   auto const distanceToCenter = deltaX != 0.0F ? std::hypot(deltaX, deltaY) : std::abs(deltaY);
@@ -8903,9 +8904,8 @@ auto thred::rotangf(F_POINT const& unrotatedPoint,
                   rotationCenter.y + (distanceToCenter * sin(newAngle))};
 }
 
-auto thred::rotang1(F_POINT_ATTR const& unrotatedPoint,
-                    float const         rotationAngle,
-                    F_POINT const&      rotationCenter) noexcept -> F_POINT {
+auto thred::rotang1(F_POINT_ATTR const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
+    -> F_POINT {
   auto const point = F_POINT {unrotatedPoint.x, unrotatedPoint.y};
   return rotangf(point, rotationAngle, rotationCenter);
 }
@@ -10139,7 +10139,7 @@ void thred::nuthsel() {
   auto const savedIndex = ThumbnailIndex;
   auto       iThumbnail = uint32_t {};
   // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
-  auto const length     = wcslen(ThrSingle->ThumbnailSearchString.data());
+  auto const length = wcslen(ThrSingle->ThumbnailSearchString.data());
   Instance->stateMap.set(StateFlag::RESTCH);
   if (length != 0U) {
 	auto itHWndBV = BackupViewer.begin();
@@ -10416,21 +10416,21 @@ void thred::defpref() {
                0x00dbe6e3};
 
   CustomThreadColor = {0x00729674,
-                 0x001a1eb9,
-                 0x00427347,
-                 0x0000bfff,
-                 0x00d3c25f,
-                 0xc003ced0,
-                 0x004a8459,
-                 0x008cacd0,
-                 0x0081aeb6,
-                 0x007243a5,
-                 0x00bdadda,
-                 0x009976c5,
-                 0x0096d9f5,
-                 0x00e2ddd6,
-                 0x00245322,
-                 0x007b60ae};
+                       0x001a1eb9,
+                       0x00427347,
+                       0x0000bfff,
+                       0x00d3c25f,
+                       0xc003ced0,
+                       0x004a8459,
+                       0x008cacd0,
+                       0x0081aeb6,
+                       0x007243a5,
+                       0x00bdadda,
+                       0x009976c5,
+                       0x0096d9f5,
+                       0x00e2ddd6,
+                       0x00245322,
+                       0x007b60ae};
 
   CustomBackgroundColor = {0x00a3c5dc,
                            0x00adc7b6,
@@ -10454,13 +10454,13 @@ void thred::defpref() {
   IniFile.dazdef();
   Instance->userFlagMap.set(UserFlag::DAZHOL);
   Instance->userFlagMap.set(UserFlag::DAZD);
-  AppliqueColor          = COLORCNT - 1U;
-  IniFile.AppStitchLen   = APSPAC;
-  Instance->borderWidth  = BRDWID;
+  AppliqueColor         = COLORCNT - 1U;
+  IniFile.AppStitchLen  = APSPAC;
+  Instance->borderWidth = BRDWID;
   form::setButtonholeCornerLength(IBFCLEN);
-  IniFile.chainSpace     = CHSDEF;
-  IniFile.chainRatio     = CHRDEF;
-  IniFile.fillAngle      = DEFANG;
+  IniFile.chainSpace = CHSDEF;
+  IniFile.chainRatio = CHRDEF;
+  IniFile.fillAngle  = DEFANG;
   Instance->userFlagMap.reset(UserFlag::SQRFIL);
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
@@ -11217,37 +11217,38 @@ void thred::updateHoopSize() {
 	return;
   }
   if (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1;
- option >= wrap::toIntegralType(HoopSize::kSetCustom) && option <= wrap::toIntegralType(HoopSize::kUserDefined)) {
+      option >= wrap::toIntegralType(HoopSize::kSetCustom) &&
+      option <= wrap::toIntegralType(HoopSize::kUserDefined)) {
 	switch (auto const optionVal = wrap::toEnumType<HoopSize>(option); optionVal) { // NOLINT(clang-diagnostic-switch-default)
-    case HoopSize::kSetCustom: {
-	  IniFile.customHoopX = IniFile.hoopSizeX;
-	  IniFile.customHoopY = IniFile.hoopSizeY;
-	  break;
-	}
-	case HoopSize::kSmall: {
-	  IniFile.hoopSizeX = SHUPX;
-	  IniFile.hoopSizeY = SHUPY;
-	  IniFile.hoopType  = HoopSize::kSmall;
-	  break;
-	}
-	case HoopSize::kLarge: {
-	  IniFile.hoopSizeX = LHUPX;
-	  IniFile.hoopSizeY = LHUPY;
-	  IniFile.hoopType  = HoopSize::kLarge;
-	  break;
-	}
-	case HoopSize::kHundredMM: {
-	  IniFile.hoopSizeX = HUP100XY;
-	  IniFile.hoopSizeY = HUP100XY;
-	  IniFile.hoopType  = HoopSize::kHundredMM;
-	  break;
-	}
-	case HoopSize::kUserDefined: {
-	  IniFile.hoopSizeX = IniFile.customHoopX;
-	  IniFile.hoopSizeY = IniFile.customHoopY;
-	  IniFile.hoopType  = HoopSize::kUserDefined;
-	  break;
-	}
+	  case HoopSize::kSetCustom: {
+		IniFile.customHoopX = IniFile.hoopSizeX;
+		IniFile.customHoopY = IniFile.hoopSizeY;
+		break;
+	  }
+	  case HoopSize::kSmall: {
+		IniFile.hoopSizeX = SHUPX;
+		IniFile.hoopSizeY = SHUPY;
+		IniFile.hoopType  = HoopSize::kSmall;
+		break;
+	  }
+	  case HoopSize::kLarge: {
+		IniFile.hoopSizeX = LHUPX;
+		IniFile.hoopSizeY = LHUPY;
+		IniFile.hoopType  = HoopSize::kLarge;
+		break;
+	  }
+	  case HoopSize::kHundredMM: {
+		IniFile.hoopSizeX = HUP100XY;
+		IniFile.hoopSizeY = HUP100XY;
+		IniFile.hoopType  = HoopSize::kHundredMM;
+		break;
+	  }
+	  case HoopSize::kUserDefined: {
+		IniFile.hoopSizeX = IniFile.customHoopX;
+		IniFile.hoopSizeY = IniFile.customHoopY;
+		IniFile.hoopType  = HoopSize::kUserDefined;
+		break;
+	  }
 	}
   }
   else { // Set a safe default if the window option is invalid

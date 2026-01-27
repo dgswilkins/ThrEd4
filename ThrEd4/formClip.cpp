@@ -312,7 +312,8 @@ void clipSelectedForms() {
   auto* ptrGuides  = convertFromPtr<SAT_CON*>(wrap::next(ptrFormVertices, iVertex));
   auto  guidesSize = 0U;
   for (auto& selectedForm : Instance->selectedFormList) {
-	if (auto& form = formList.operator[](selectedForm); form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
+	if (auto& form = formList.operator[](selectedForm);
+	    form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 	  guidesSize += form.satinGuideCount;
 	}
   }
@@ -320,7 +321,8 @@ void clipSelectedForms() {
   if (guidesSize != 0U) {
 	auto const guides = gsl::span {ptrGuides, guidesSize};
 	for (auto& selectedForm : Instance->selectedFormList) {
-	  if (auto& form = formList.operator[](selectedForm); form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
+	  if (auto& form = formList.operator[](selectedForm);
+	      form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 		auto itGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 		for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		  guides[guideCount++] = *itGuide;
@@ -827,7 +829,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto  guideCount = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
-		  if (auto& form = formList.operator[](offset); form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
+		  if (auto& form = formList.operator[](offset);
+		      form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 			guideCount += form.satinGuideCount;
 		  }
 		}
@@ -835,7 +838,8 @@ auto tfc::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto const guides       = gsl::span {ptrGuides, guideCount};
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
-		  if (auto& form = formList.operator[](offset); form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
+		  if (auto& form = formList.operator[](offset);
+		      form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 			form.satinGuideIndex = satin::adsatk(form.satinGuideCount);
 			auto itGuide         = wrap::next(Instance->satinGuides.begin(), form.satinGuideIndex);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
