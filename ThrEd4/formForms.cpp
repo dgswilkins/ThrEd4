@@ -106,15 +106,6 @@ auto constexpr DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZHART,
 };
 
-enum class DaisyStyle : uint8_t { // daisy form types
-  SIN,                      // Sine shape
-  RAMP,                     // Ramp shape
-  SAW,                      // Sawtooth shape
-  RAG,                      // Ragged shape
-  COG,                      // Cog shape
-  HART                      // Heart shape
-};
-
 auto FormDataSheet     = HWND {}; // form data sheet
 auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
 auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
@@ -249,7 +240,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   // label and fill the form field
   labelWindow[LFRM] = txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
-  auto choice = form.type == FRMLINE ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
+  auto choice = form.type == FormStyles::kLine ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
   valueWindow[LFRM] = txtrwin(choice, ValueWindowCoords);
   nxtlin(formMenuEntryCount);
   // label and fill the layer field
@@ -258,7 +249,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   auto itLayer       = wrap::next(LAYRLIST.begin(), (form.attribute & FRMLMSK) >> 1U);
   valueWindow[LLAYR] = txtrwin(displayText::loadStr(itLayer->stringID), ValueWindowCoords);
   nxtlin(formMenuEntryCount);
-  if (form.type != FRMLINE) { // not a line form
+  if (form.type != FormStyles::kLine) { // not a line form
 	// label and fill the center walk, walk, and underlay fields with 'on' or 'off'
 	labelWindow[LCWLK] = txtwin(displayText::loadStr(IDS_CWLK), LabelWindowCoords);
 	choice             = (form.extendedAttribute & AT_CWLK) != 0U ? strOn : strOff;
@@ -528,7 +519,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	valueWindow[LBCSIZ] = numwin(choice, ValueWindowCoords);
 	nxtlin(formMenuEntryCount);
   }
-  if (form.type == FRMLINE && (EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0) {
+  if (form.type == FormStyles::kLine && (EDGE_ARRAY.at(edgeIdx) & BRDEND) != 0) {
 	// label and fill the border start & end fields
 	labelWindow[LBSTRT] = txtwin(displayText::loadStr(IDS_TXT14), LabelWindowCoords);
 	choice = (form.attribute & SBLNT) != 0U ? displayText::loadStr(IDS_BLUNT) : displayText::loadStr(IDS_TAPR);
@@ -619,7 +610,7 @@ void initdaz(HWND hWinDialog) {
 	            0,
 	            reinterpret_cast<LPARAM>(displayText::loadStr(daisyTypeString).c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
-  SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
+  SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, wrap::toIntegralType(IniFile.daisyBorderType), 0);
 }
 // ReSharper restore CppParameterMayBeConst
 
@@ -657,7 +648,7 @@ void handleDaisyIDOK(HWND hwndlg) {
 	auto compareBuffer = displayText::loadStr(DAISY_TYPE_STRINGS.at(iType));
 	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
-	  IniFile.daisyBorderType = iType;
+	  IniFile.daisyBorderType = wrap::toEnumType<DaisyStyle>(iType);
 	  break;
 	}
   }
@@ -1057,7 +1048,7 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getShowStitchThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
-  prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
+  prflin(format(FMT_COMPILE(L"{}"), displayText::loadStr(wrap::toUnsigned(wrap::toIntegralType(IniFile.hoopType)) - 1U + IDS_HUP0)),
          *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeX * IPFGRAN), *row++);
@@ -1122,7 +1113,7 @@ void formForms::dasyfrm() {
   diameter *= ratio;
   petalLength *= ratio;
   holeDiameter *= ratio;
-  form.type    = FRMFPOLY;
+  form.type    = FormStyles::kFreehand;
   auto iVertex = 0U;
   auto fref    = 0U;
   if (Instance->userFlagMap.test(UserFlag::DAZHOL)) { // add the hole at the center of the daisy
@@ -1142,8 +1133,8 @@ void formForms::dasyfrm() {
   }
   auto       petalVertexCount = IniFile.daisyPetalCount * IniFile.daisyPetalPoints;
   auto       petalPointCount  = IniFile.daisyPetalPoints;
-  auto const borderType       = static_cast<DaisyStyle>(IniFile.daisyBorderType);
-  if (borderType == DaisyStyle::HART) { // update the petal count for heart shaped daisies
+  auto const borderType       = IniFile.daisyBorderType;
+  if (borderType == DaisyStyle::kHeart) { // update the petal count for heart shaped daisies
 	petalPointCount  = (IniFile.daisyHeartCount + 1U) * 2U;
 	petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
   }
@@ -1161,37 +1152,37 @@ void formForms::dasyfrm() {
 	PseudoRandomValue    = SEED;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
-	  switch (borderType) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
-		case DaisyStyle::SIN: { // sin wave
+	  switch (borderType) {       // NOLINT(clang-diagnostic-switch-default)
+		case DaisyStyle::kSine: { // sine wave
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  petalPointAngle += deltaPetalAngle;
 		  break;
 		}
-		case DaisyStyle::RAMP: { // ramp
+		case DaisyStyle::kRamp: { // ramp
 		  distanceFromDaisyCenter =
 		      diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DaisyStyle::SAW: { // sawtooth
+		case DaisyStyle::kSaw: { // sawtooth
 		  auto const sawPointCount =
 		      wrap::toFloat(iPoint > halfPetalPointCount ? IniFile.daisyPetalPoints - iPoint : iPoint);
 		  auto const offset = (sawPointCount / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  distanceFromDaisyCenter = diameter + offset;
 		  break;
 		}
-		case DaisyStyle::RAG: { // ragged
+		case DaisyStyle::kRagged: { // ragged
 		  distanceFromDaisyCenter = diameter + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints) /
 		                                           wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 		  break;
 		}
-		case DaisyStyle::COG: { // cog wheel
+		case DaisyStyle::kCog: { // cog wheel
 		  distanceFromDaisyCenter = diameter;
 		  if (iPoint > halfPetalPointCount) {
 			distanceFromDaisyCenter += petalLength;
 		  }
 		  break;
 		}
-		case DaisyStyle::HART: { // heart shaped
+		case DaisyStyle::kHeart: { // heart shaped
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  if (iPoint > IniFile.daisyHeartCount) {
 			petalPointAngle -= deltaPetalAngle;
@@ -1224,7 +1215,7 @@ void formForms::dasyfrm() {
   }
   form.vertexCount = iVertex;
   if (Instance->userFlagMap.test(UserFlag::DAZD)) {
-	form.type      = SAT;
+	form.type      = FormStyles::kSatin;
 	form.attribute = 1;
   }
   Instance->stateMap.set(StateFlag::INIT);
@@ -1388,7 +1379,7 @@ void formForms::wavfrm() {
 	thred::rotflt(*rotatedVertex, rotationAngle, F_POINT {});
 	++rotatedVertex;
   }
-  form.type        = FRMLINE;
+  form.type        = FormStyles::kLine;
   form.vertexCount = vertexCount;
   form.outline();
   Instance->stateMap.reset(StateFlag::FORMSEL);

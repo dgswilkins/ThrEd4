@@ -227,7 +227,7 @@ void clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEn
   dulast(chainEndPoints);
   auto& clipBuffer = Instance->clipBuffer;
 
-  if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.type == FRMLINE) {
+  if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.type == FormStyles::kLine) {
 	auto const pivot = ClipRectSize.cy / 2;
 	std::ranges::transform(clipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept -> auto {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
@@ -250,7 +250,7 @@ void duch(std::vector<F_POINT> const& chainEndPoints) {
   for (auto iPoint = 0U; iPoint < chainLength - 1U; ++iPoint) {
 	duchfn(chainEndPoints, iPoint, iPoint + 1U);
   }
-  if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
+  if (auto const& form = Instance->formList.operator[](ClosestFormToCursor); form.type != FormStyles::kLine) {
 	duchfn(chainEndPoints, chainLength - 1, 0);
 	Instance->oSequence.push_back(chainEndPoints[chainLength]);
 	return;
@@ -436,7 +436,7 @@ void fxlen(FRM_HEAD const&           form,
 	  nextStart = currentSide + 1U;
 	  fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount, adjustedSpace, nextStart);
 	}
-	if (form.type != FRMLINE) {
+	if (form.type != FormStyles::kLine) {
 	  nextStart = 0;
 	  fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjCount, adjustedSpace, nextStart);
 	}
@@ -486,7 +486,7 @@ void fxlen(FRM_HEAD const&           form,
 	nextStart = currentSide + 1U;
 	fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart);
   }
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	nextStart = 0;
 	fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
   }
@@ -879,7 +879,7 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t const clipIndex, uint32_t const 
 
 void clip::clpout(float const width) {
   auto const& form = Instance->formList.operator[](ClosestFormToCursor);
-  if (form.type == FRMLINE) {
+  if (form.type == FormStyles::kLine) {
 	satin::satout(form, width);
 	return;
   }
@@ -904,7 +904,7 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t co
       F_POINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   ClipReference = F_POINT {clipRect.left, rotationCenter.y};
   durev(clipRect, clipReversedData);
-  if (form.type == FRMLINE) {
+  if (form.type == FormStyles::kLine) {
 	auto const itVertex    = wrap::next(Instance->formVertices.cbegin(), form.vertexIndex);
 	auto       stitchPoint = *itVertex;
 	auto       clipAngle   = 0.0F;       // for clipboard border fill
@@ -951,7 +951,7 @@ void clip::duxclp(FRM_HEAD const& form) {
   for (auto iPoint = 0U; iPoint < wrap::toUnsigned(chainEndPoints.size() - 1U); ++iPoint) {
 	xclpfn(tempClipPoints, chainEndPoints, iPoint, ROTATION_CENTER);
   }
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	Instance->oSequence.push_back(chainEndPoints[0]);
   }
 }
@@ -967,7 +967,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
 
   constexpr auto SATWIDTH = 20.0F;
   satin::satout(form, SATWIDTH);
-  if (form.type == FRMLINE) {
+  if (form.type == FormStyles::kLine) {
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 2U; ++iVertex) {
 	  picfn(form, clipRect, clipFillData, iVertex, iVertex + 1, form.edgeSpacing, rotationCenter);
 	  clpcrnr(form, clipRect, clipFillData, iVertex, rotationCenter);

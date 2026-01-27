@@ -373,6 +373,19 @@ auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) ->
 }
 
 void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
+
+template <typename EnumType> constexpr auto toIntegralType(EnumType invar) noexcept {
+  static_assert(std::is_enum_v<EnumType>, "Enum type required");
+  return static_cast<std::underlying_type_t<EnumType>>(invar);
+}
+
+template <typename EnumType, typename IntegralType>
+constexpr auto toEnumType(IntegralType value) -> EnumType {
+  static_assert(std::is_enum_v<EnumType>, "Enum type required");
+  static_assert(std::is_integral_v<IntegralType>, "Integer required");
+  return static_cast<EnumType>(value);
+}
+
 } // namespace wrap
 
 #endif // THRED_WRAPPERS_H

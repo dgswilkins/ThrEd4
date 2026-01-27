@@ -124,14 +124,14 @@ class SORT_REC
 };
 
 enum class StitchStyle : char {
-  NONE     = 0, // no type
-  APPLIQUE,     // applique
-  CWALK,        // center walk
-  EWALK,        // edge walk
-  UNDERLAY,     // underlay
-  FTHR,         // feather
-  FILL,         // fill
-  BORDER        // border
+  kNone     = 0, // no type
+  kApplique,     // applique
+  kCenterWalk,        // center walk
+  kEdgeWalk,        // edge walk
+  kUnderlayFill,     // underlay
+  kFeather,         // feather
+  kFill,         // fill
+  kBorder        // border
 };
 
 #ifdef _DEBUG
@@ -166,19 +166,19 @@ constexpr auto M_FTHCOL = 1U << 10U; // Feather color
 constexpr auto M_ECOL   = 1U << 11U; // Edge color
 
 constexpr auto STITCH_TYPES = std::array<StitchStyle, 13> {
-    StitchStyle::NONE,     // 0 no type
-    StitchStyle::APPLIQUE, // 1 applique
-    StitchStyle::CWALK,    // 2 center walk
-    StitchStyle::EWALK,    // 3 edge walk
-    StitchStyle::UNDERLAY, // 4 underlay
-    StitchStyle::NONE,     // 5 knot
-    StitchStyle::FTHR,     // 6 feather
-    StitchStyle::NONE,     // 7 layer
-    StitchStyle::NONE,     // 8 layer
-    StitchStyle::NONE,     // 9 layer
-    StitchStyle::NONE,     // 10 reserved
-    StitchStyle::FILL,     // 11 fill
-    StitchStyle::BORDER,   // 12 border
+    StitchStyle::kNone,             // 0 no type
+    StitchStyle::kApplique, // 1 applique
+    StitchStyle::kCenterWalk,    // 2 center walk
+    StitchStyle::kEdgeWalk,    // 3 edge walk
+    StitchStyle::kUnderlayFill, // 4 underlay
+    StitchStyle::kNone,             // 5 knot
+    StitchStyle::kFeather,     // 6 feather
+    StitchStyle::kNone,             // 7 layer
+    StitchStyle::kNone,             // 8 layer
+    StitchStyle::kNone,             // 9 layer
+    StitchStyle::kNone,             // 10 reserved
+    StitchStyle::kFill,     // 11 fill
+    StitchStyle::kBorder,   // 12 border
 };
 
 auto DesignSize = F_POINT {};                        // design size
@@ -646,7 +646,7 @@ auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 // ReSharper restore CppParameterMayBeConst
 
 void fangfn(uint32_t const formIndex, float const angle) {
-  if (auto& form = Instance->formList.operator[](formIndex); form.type == FRMFPOLY && form.fillType != 0U) {
+  if (auto& form = Instance->formList.operator[](formIndex); form.type == FormStyles::kFreehand && form.fillType != 0U) {
 	switch (form.fillType) {
 	  case VRTF:
 	  case HORF:
@@ -798,15 +798,15 @@ void fnund(uint32_t const formIndex, std::vector<RNG_COUNT> const& textureSegmen
 }
 
 void fnwlk(FRM_HEAD& form) {
-  if (form.type == FRMLINE) {
-	form.type = FRMFPOLY;
+  if (form.type == FormStyles::kLine) {
+	form.type = FormStyles::kFreehand;
   }
   auto start = 0U;
-  if ((form.extendedAttribute & AT_STRT) != 0U && form.type != FRMLINE) {
+  if ((form.extendedAttribute & AT_STRT) != 0U && form.type != FormStyles::kLine) {
 	start = form.fillStart;
   }
   auto count = form.vertexCount;
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	++count;
   }
   auto const& walkPoints = xt::insid(form);
@@ -1149,7 +1149,7 @@ void notundfn(uint32_t code) {
   auto& formList = Instance->formList;
 
   if (Instance->stateMap.test(StateFlag::FORMSEL)) {
-	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
+	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FormStyles::kLine) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute &= code;
 	  if (savedAttribute != form.extendedAttribute) {
@@ -1160,7 +1160,7 @@ void notundfn(uint32_t code) {
   else {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
-	  if (form.type == FRMLINE) {
+	  if (form.type == FormStyles::kLine) {
 		continue;
 	  }
 	  auto const savedAttribute = form.extendedAttribute;
@@ -1482,7 +1482,7 @@ void setundfn(uint32_t const code) {
   auto& formList = Instance->formList;
 
   if (Instance->stateMap.test(StateFlag::FORMSEL)) {
-	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FRMLINE) {
+	if (auto& form = formList.operator[](ClosestFormToCursor); form.type != FormStyles::kLine) {
 	  auto const savedAttribute = form.extendedAttribute;
 	  form.extendedAttribute |= code;
 	  if (savedAttribute != form.extendedAttribute) {
@@ -1493,7 +1493,7 @@ void setundfn(uint32_t const code) {
   else {
 	for (auto const selectedForm : Instance->selectedFormList) {
 	  auto& form = formList.operator[](selectedForm);
-	  if (form.type == FRMLINE) {
+	  if (form.type == FormStyles::kLine) {
 		continue;
 	  }
 	  auto const savedAttribute = form.extendedAttribute;
@@ -1745,7 +1745,7 @@ void xt::fethrf(uint32_t const formIndex) {
   auto& form = Instance->formList.operator[](formIndex);
   clip::delmclp(formIndex);
   texture::deltx(formIndex);
-  form.type                  = SAT;
+  form.type                  = FormStyles::kSatin;
   form.feather.ratio         = IniFile.featherRatio;
   form.feather.upCount       = IniFile.featherUpCount;
   form.feather.downCount     = IniFile.featherDownCount;
@@ -1829,8 +1829,8 @@ void xt::srtcol() {
 void xt::dubit(FRM_HEAD& form, uint32_t const bit) {
   thred::savdo();
   Instance->stateMap.set(StateFlag::WASDO);
-  if (form.type == FRMLINE) {
-	form.type = FRMFPOLY;
+  if (form.type == FormStyles::kLine) {
+	form.type = FormStyles::kFreehand;
   }
   if ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) == 0U &&
       (bit & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
@@ -1951,38 +1951,38 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	if (auto const attribute = Instance->stitchBuffer.operator[](iSourceStitch).attribute;
 	    codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
 	  switch (auto const type = STITCH_TYPES.at(dutyp(attribute)); type) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
- 		case StitchStyle::APPLIQUE: {
+ 		case StitchStyle::kApplique: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;
 			fillStartsData[FSI::kApplique] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case StitchStyle::FTHR: {
+		case StitchStyle::kFeather: {
 		  if ((tmap & M_FTH) == 0U) {
 			tmap |= M_FTH;
 			fillStartsData[FSI::kFeather] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case StitchStyle::FILL: {
+		case StitchStyle::kFill: {
 		  if ((tmap & M_FIL) == 0U) {
 			tmap |= M_FIL;
 			fillStartsData[FSI::kFill] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case StitchStyle::BORDER: {
+		case StitchStyle::kBorder: {
 		  if ((tmap & M_BRD) == 0U) {
 			tmap |= M_BRD;
 			fillStartsData[FSI::kBorder] = iDestinationStitch;
 		  }
 		  break;
 		}
-		case StitchStyle::NONE:
-		case StitchStyle::CWALK:
-		case StitchStyle::EWALK:
-		case StitchStyle::UNDERLAY: {
+		case StitchStyle::kNone:
+		case StitchStyle::kCenterWalk:
+		case StitchStyle::kEdgeWalk:
+		case StitchStyle::kUnderlayFill: {
 		  if (form.fillType != 0U && (tmap & M_FIL) == 0U) {
 			tmap |= M_FIL;
 			fillStartsData[FSI::kFill] = iDestinationStitch;
@@ -2497,18 +2497,18 @@ void xt::setfilend() {
 }
 
 void xt::duauxnam(fs::path& auxName) {
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
+  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+	case Machine::kTajima: {
 	  auxName.replace_extension(".dst");
 	  break;
 	}
 #if PESACT
-	case AUXPES: {
+	case Machine::kBrother: {
 	  auxName.replace_extension(".pes");
 	  break;
 	}
 #endif
-	default: {
+	case Machine::kPfaff: {
 	  auxName.replace_extension("pcs");
 	  break;
 	}

@@ -138,7 +138,7 @@ constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should b
 constexpr auto TXTRAT  = 0.95F; // texture fill clipboard shrink/grow ratio
 constexpr auto SIGNATURE = std::array<char, 4> {'t', 'x', 'h', 0}; // texture history signature
 
-enum class TextureStyle : uint8_t { VERTICAL, HORIZONTAL, ANGLED };
+enum class TextureStyle : uint8_t { kVertical, kHorizontal, kAngled };
 
 auto SelectTexturePointsOrigin = POINT {};       // original location of selected texture points
 auto SideWindowButton          = HWND {};        // button side window
@@ -420,7 +420,7 @@ void ritxfrm(FRM_HEAD const& textureForm) {
   }
   formLines.back() = formLines.front();
   auto vertexCount = wrap::toUnsigned(angledFormVertices.size());
-  if (textureForm.type != FRMLINE) {
+  if (textureForm.type != FormStyles::kLine) {
 	++vertexCount;
   }
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -473,7 +473,7 @@ void setxclp(FRM_HEAD const& form) {
 	return vertex + editorOffset;
   });
   auto lineCount = form.vertexCount - 1U;
-  if (form.type != FRMLINE) {
+  if (form.type != FormStyles::kLine) {
 	++lineCount;
   }
   for (auto iLine = 0U; iLine < lineCount; ++iLine) {
@@ -606,16 +606,16 @@ void txfn(TextureStyle const textureType, uint32_t const formIndex) {
   texture::savtxt();
   nutx(formIndex);
   form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
-  switch (textureType) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
-	case TextureStyle::VERTICAL: {
+  switch (textureType) { // NOLINT(clang-diagnostic-switch-default)
+	case TextureStyle::kVertical: {
 	  txvrt(form);
 	  break;
 	}
-	case TextureStyle::HORIZONTAL: {
+	case TextureStyle::kHorizontal: {
 	  txhor(form);
 	  break;
 	}
-	case TextureStyle::ANGLED: {
+	case TextureStyle::kAngled: {
 	  txang(form);
 	  break;
 	}
@@ -676,7 +676,7 @@ void txnudg(int32_t const deltaX, float const deltaY) {
 }
 
 void txpar(FRM_HEAD& form) {
-  form.type = FRMFPOLY;
+  form.type = FormStyles::kFreehand;
   wrap::narrow(form.texture.lines, TextureScreen.lines);
   form.texture.height   = TextureScreen.areaHeight;
   form.fillSpacing      = TextureScreen.spacing;
@@ -884,15 +884,15 @@ auto chkbut() -> bool {
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXVRT)) {
-	dutxfn(TextureStyle::VERTICAL);
+	dutxfn(TextureStyle::kVertical);
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXHOR)) {
-	dutxfn(TextureStyle::HORIZONTAL);
+	dutxfn(TextureStyle::kHorizontal);
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXANG)) {
-	dutxfn(TextureStyle::ANGLED);
+	dutxfn(TextureStyle::kAngled);
 	return true;
   }
   if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXMIR)) {
@@ -1638,15 +1638,15 @@ void texture::txtkey(wchar_t const keyCode, FRM_HEAD& textureForm) {
 	  break;
 	}
 	case 'R': {
-	  dutxfn(TextureStyle::VERTICAL);
+	  dutxfn(TextureStyle::kVertical);
 	  break;
 	}
 	case 'A': {
-	  dutxfn(TextureStyle::ANGLED);
+	  dutxfn(TextureStyle::kAngled);
 	  break;
 	}
 	case 'H': {
-	  dutxfn(TextureStyle::HORIZONTAL);
+	  dutxfn(TextureStyle::kHorizontal);
 	  break;
 	}
 	case 'E': {

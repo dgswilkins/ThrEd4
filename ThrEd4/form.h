@@ -57,7 +57,7 @@ void dubig();
 void dubold();
 void dubsfil(FRM_HEAD& form);
 void dueg(uint32_t sides);
-void duform(int32_t formType);
+void duform(FormStyles formType);
 void dufrm() noexcept;
 void duhart(uint32_t sideCount);
 void dulens(uint32_t sides);

@@ -208,7 +208,6 @@ constexpr auto M_ALL  = int8_t {13};
 constexpr auto MFIL_BORD = int8_t {8};
 //constexpr auto MFIL_UNFIL= int8_t {9};
 
-
 // view menu items
 //constexpr auto MVW_MOVIE = int8_t {0};
 constexpr auto MVW_SET = int8_t {1};
@@ -223,12 +222,12 @@ constexpr auto MVW_SET = int8_t {1};
 //constexpr auto MVW_ABOUT = int8_t {10};
 
 
-enum HoopSize : int8_t {
-  SETCUST = 1, // set the custom hoop
-  SMALHUP = 2, // pfaf code for small hoop
-  LARGHUP = 3, // pfaf code for large hoop
-  HUP100  = 4, // 100 millimeter hoop
-  CUSTHUP = 5  // user defined hoop size
+enum class HoopSize : int8_t {
+  kSetCustom = 1, // set the custom hoop
+  kSmall = 2, // pfaf code for small hoop
+  kLarge = 3, // pfaf code for large hoop
+  kHundredMM  = 4, // 100 millimeter hoop
+  kUserDefined = 5  // user defined hoop size
 };
 
 // bitmap
@@ -525,112 +524,27 @@ class LIST_TYPE
 };
 
 // Layer values
-enum Layers : uint8_t {
-  LAYER0, // All Layers
-  LAYER1, // Layer 1
-  LAYER2, // Layer 2
-  LAYER3, // Layer 3
-  LAYER4  // Layer 4
-};
-
-constexpr auto LAYERMAX = 5U; // number of layers
-
-// Feather types
-enum FeatherStyles : uint8_t {
-  FTHSIN = 1, // sine
-  FTHSIN2,    // half sine
-  FTHLIN,     // line
-  FTHPSG,     // ragged
-  FTHRMP,     // sawtooth
-  FTHFAZ      // picket
-};
-
-constexpr auto FSTYLMAX = uint8_t {6U}; // count of feather styles
-
-// fill types
-enum FillStyles : uint8_t {
-  VRTF = 1, // Vertical fill
-  HORF,     // Horizontal fill
-  ANGF,     // Angle fill
-  SATF,     // Fan fill
-  CLPF,     // Fan clip Fill
-  CONTF,    // Contour fill
-  VCLPF,    // Vertical clip fill
-  HCLPF,    // Horizontal clip fill
-  ANGCLPF,  // Angle clip fill
-  FTHF,     // Feather fill
-  TXVRTF,   // Vertical texture fill
-  TXHORF,   // Horizontal texture fill
-  TXANGF    // Angle texture fill
-};
-
-constexpr auto FILLTMAX = uint32_t {14U}; // number of fill types
-
-constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
-constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
-constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
-constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
-constexpr auto CLIPTYPEMAP = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
-
-// edge fill types
-enum EdgeFillStyles : uint8_t {
-  EDGELINE = 1U, // Line
-  EDGEBEAN,      // Bean
-  EDGECLIP,      // Clipboard
-  EDGEANGSAT,    // Angle Satin
-  EDGEAPPL,      // Applique
-  EDGEPROPSAT,   // Proportional Satin
-  EDGEBHOL,      // Buttonhole
-  EDGEPICOT,     // Picot
-  EDGEDOUBLE,    // Double
-  EDGELCHAIN,    // Line Chain
-  EDGEOCHAIN,    // Open Chain
-  EDGECLIPX      // Even Clipboard
-};
-
-constexpr auto EDGETMAX = uint32_t {13U}; // number of edge fill types
-
-// preference window entries
-enum PrefWin : uint8_t {
-  PRFAPPCOL, // Applique color
-  PRFAPSLEN, // Applique stitchLen
-  PRFBRDWID, // Border width
-  PRFBCNLEN, // Button corner length
-  PRFCHFLEN, // Chain fill length
-  PRFCHFPOS, // Chain fill position
-  PRFCLPOFF, // Clipboard offset
-  PRFCLPPHS, // Clipboard phase
-  PRFEGGRAT, // Egg ratio
-  PRFFILANG, // Fill angle
-  PRFFILEND, // Fill ends
-  PRFFILSPC, // Fill spacing
-  PRFGRDCUT, // Grid cutoff
-  PRFGRDSIZ, // Grid size
-  PRFHUPTYP, // Hoop type
-  PRFHUPHGT, // Hoop height
-  PRFHUPWID, // Hoop width
-  PRFLENRAT, // Lens ratio
-  PRFNUGSTP, // Nudge
-  PRFPCTSPC, // Picot spacing
-  PRFSATEND, // Satin form ends
-  PRFSATUND, // Satin underlay
-  PRFSMLSTH, // Small stitch size
-  PRFSNPSIZ, // Snap to size
-  PRFSPLWRP, // Spiral wrap
-  PRFSTRRAT, // Star ratio
-  PRFSBXCUT, // Stitch box cutoff
-  PRFSTCMAX, // Stitch length, maximum
-  PRFSTCUSR, // Stitch length, user
-  PRFSTCMIN  // Stitch length, minimum
-};
-
-constexpr auto PREFTMAX = uint32_t {30U}; // number of edge fill types
+constexpr auto LAYER0   = uint8_t {0U}; // all layers
+constexpr auto LAYER1   = uint8_t {1U}; // layer 1
+constexpr auto LAYER2   = uint8_t {2U}; // layer 2
+constexpr auto LAYER3   = uint8_t {3U}; // layer 3
+constexpr auto LAYER4   = uint8_t {4U}; // layer 4
+constexpr auto LAYERMAX = uint8_t {5U}; // number of layers
 
 constexpr auto LAYRLIST = std::array<LIST_TYPE, LAYERMAX> {{{.stringID = IDS_LAY00, .value = LAYER0},
                                                             {.stringID = IDS_LAY01, .value = LAYER1},
                                                             {.stringID = IDS_LAY02, .value = LAYER2},
                                                             {.stringID = IDS_LAY03, .value = LAYER3},
                                                             {.stringID = IDS_LAY04, .value = LAYER4}}};
+
+// feather styles
+constexpr auto FTHSIN   = uint8_t {1U}; // sine
+constexpr auto FTHSIN2  = uint8_t {2U}; // half sine
+constexpr auto FTHLIN   = uint8_t {3U}; // line
+constexpr auto FTHPSG   = uint8_t {4U}; // ragged
+constexpr auto FTHRMP   = uint8_t {5U}; // sawtooth
+constexpr auto FTHFAZ   = uint8_t {6U}; // picket
+constexpr auto FSTYLMAX = uint8_t {6U}; // count of feather styles
 
 constexpr auto FTHRLIST = std::array<LIST_TYPE, FSTYLMAX> {{{.stringID = IDS_FTH0, .value = FTHSIN},
                                                             {.stringID = IDS_FTH1, .value = FTHSIN2},
@@ -639,7 +553,24 @@ constexpr auto FTHRLIST = std::array<LIST_TYPE, FSTYLMAX> {{{.stringID = IDS_FTH
                                                             {.stringID = IDS_FTH4, .value = FTHRMP},
                                                             {.stringID = IDS_FTH5, .value = FTHFAZ}}};
 
-constexpr auto FILLLIST = std::array<LIST_TYPE, FILLTMAX> {{{.stringID = IDS_FIL0, .value = 0},
+// fill types
+constexpr auto NOFILL   = uint8_t {0U};  // no fill
+constexpr auto VRTF     = uint8_t {1U};  // Vertical fill
+constexpr auto HORF     = uint8_t {2U};  // Horizontal fill
+constexpr auto ANGF     = uint8_t {3U};  // Angle fill
+constexpr auto SATF     = uint8_t {4U};  // Fan fill
+constexpr auto CLPF     = uint8_t {5U};  // Fan clip Fill
+constexpr auto CONTF    = uint8_t {6U};  // Contour fill
+constexpr auto VCLPF    = uint8_t {7U};  // Vertical clip fill
+constexpr auto HCLPF    = uint8_t {8U};  // Horizontal clip fill
+constexpr auto ANGCLPF  = uint8_t {9U};  // Angle clip fill
+constexpr auto FTHF     = uint8_t {10U}; // Feather fill
+constexpr auto TXVRTF   = uint8_t {11U}; // Vertical texture fill
+constexpr auto TXHORF   = uint8_t {12U}; // Horizontal texture fill
+constexpr auto TXANGF   = uint8_t {13U}; // Angle texture fill
+constexpr auto FILLTMAX = uint8_t {14U}; // number of fill types
+
+constexpr auto FILLLIST = std::array<LIST_TYPE, FILLTMAX> {{{.stringID = IDS_FIL0, .value = NOFILL},
                                                             {.stringID = IDS_FIL1, .value = VRTF},
                                                             {.stringID = IDS_FIL2, .value = HORF},
                                                             {.stringID = IDS_FIL3, .value = ANGF},
@@ -654,8 +585,30 @@ constexpr auto FILLLIST = std::array<LIST_TYPE, FILLTMAX> {{{.stringID = IDS_FIL
                                                             {.stringID = IDS_FIL12, .value = TXHORF},
                                                             {.stringID = IDS_FIL13, .value = TXANGF}}};
 
+constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
+constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
+constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
+constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
+constexpr auto CLIPTYPEMAP = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
+
+// edge fill types
+constexpr auto EDGEUNFIL = uint8_t {0U}; // unfilled edge
+constexpr auto EDGELINE = uint8_t {1U}; // line
+constexpr auto EDGEBEAN  = uint8_t {2U}; // bean
+constexpr auto EDGECLIP  = uint8_t {3U}; // clipboard
+constexpr auto EDGEANGSAT = uint8_t {4U}; // angle satin
+constexpr auto EDGEAPPL   = uint8_t {5U}; // applique
+constexpr auto EDGEPROPSAT = uint8_t {6U}; // proportional satin
+constexpr auto EDGEBHOL    = uint8_t {7U}; // buttonhole
+constexpr auto EDGEPICOT   = uint8_t {8U}; // picot
+constexpr auto EDGEDOUBLE  = uint8_t {9U}; // double
+constexpr auto EDGELCHAIN  = uint8_t {10U}; // line chain
+constexpr auto EDGEOCHAIN  = uint8_t {11U}; // open chain
+constexpr auto EDGECLIPX   = uint8_t {12U}; // even clipboard
+constexpr auto EDGETMAX = uint8_t {13U}; // number of edge fill types
+
 constexpr auto EDGELIST =
-    std::array<LIST_TYPE, EDGETMAX> {{{.stringID = IDS_EDG0, .value = 0},
+    std::array<LIST_TYPE, EDGETMAX> {{{.stringID = IDS_EDG0, .value = EDGEUNFIL},
                                       {.stringID = IDS_EDG1, .value = EDGELINE},
                                       {.stringID = IDS_EDG2, .value = EDGEBEAN},
                                       {.stringID = IDS_EDG3, .value = EDGECLIP},
@@ -668,6 +621,39 @@ constexpr auto EDGELIST =
                                       {.stringID = IDS_EDG10, .value = EDGELCHAIN},
                                       {.stringID = IDS_EDG11, .value = EDGEOCHAIN},
                                       {.stringID = IDS_EDG12, .value = EDGECLIPX}}};
+
+// preference window entries
+constexpr auto PRFAPPCOL = uint8_t {0U}; // Applique color
+constexpr auto PRFAPSLEN = uint8_t {1U}; // Applique stitchLen
+constexpr auto PRFBRDWID = uint8_t {2U}; // Border width
+constexpr auto PRFBCNLEN = uint8_t {3U}; // Button corner length
+constexpr auto PRFCHFLEN = uint8_t {4U}; // Chain fill length
+constexpr auto PRFCHFPOS = uint8_t {5U}; // Chain fill position
+constexpr auto PRFCLPOFF = uint8_t {6U}; // Clipboard offset
+constexpr auto PRFCLPPHS = uint8_t {7U}; // Clipboard phase
+constexpr auto PRFEGGRAT = uint8_t {8U}; // Egg ratio
+constexpr auto PRFFILANG = uint8_t {9U}; // Fill angle
+constexpr auto PRFFILEND = uint8_t {10U}; // Fill ends
+constexpr auto PRFFILSPC = uint8_t {11U}; // Fill spacing
+constexpr auto PRFGRDCUT = uint8_t {12U}; // Grid cutoff
+constexpr auto PRFGRDSIZ = uint8_t {13U}; // Grid size
+constexpr auto PRFHUPTYP = uint8_t {14U}; // Hoop type
+constexpr auto PRFHUPHGT = uint8_t {15U}; // Hoop height
+constexpr auto PRFHUPWID = uint8_t {16U}; // Hoop width
+constexpr auto PRFLENRAT = uint8_t {17U}; // Lens ratio
+constexpr auto PRFNUGSTP = uint8_t {18U}; // Nudge
+constexpr auto PRFPCTSPC = uint8_t {19U}; // Picot spacing
+constexpr auto PRFSATEND = uint8_t {20U}; // Satin form ends
+constexpr auto PRFSATUND = uint8_t {21U}; // Satin underlay
+constexpr auto PRFSMLSTH = uint8_t {22U}; // Small stitch size
+constexpr auto PRFSNPSIZ = uint8_t {23U}; // Snap to size
+constexpr auto PRFSPLWRP = uint8_t {24U}; // Spiral wrap
+constexpr auto PRFSTRRAT = uint8_t {25U}; // Star ratio
+constexpr auto PRFSBXCUT = uint8_t {26U}; // Stitch box cutoff
+constexpr auto PRFSTCMAX = uint8_t {27U}; // Stitch length, maximum
+constexpr auto PRFSTCUSR = uint8_t {28U}; // Stitch length, user
+constexpr auto PRFSTCMIN = uint8_t {29U}; // Stitch length, minimum
+constexpr auto PREFTMAX = uint32_t {30U}; // number of edge fill types
 
 constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {
     {{.stringID = IDS_PRF10, .value = PRFAPPCOL}, {.stringID = IDS_PRF29, .value = PRFAPSLEN},
@@ -687,120 +673,129 @@ constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {
      {.stringID = IDS_PRF5, .value = PRFSTCUSR},  {.stringID = IDS_PRF6, .value = PRFSTCMIN}}};
 
 // form types
-enum FormStyles : int8_t {
-  FRMLINE = 1U, // Line form
-  FRMFPOLY,     // Freehand polygon form
-  FRMRPOLY,     // Regular polygon form
-  FRMSTAR,      // Star form
-  FRMSPIRAL,    // Spiral Form
-  SAT,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
-  FRMHEART,     // Heart Form
-  FRMLENS,      // Lens form
-  FRMEGG,       // Egg form
-  FRMTEAR,      // Teardrop form
-  FRMZIGZAG,    // Zig-Zag form
-  FRMWAVE,      // Wave Form
-  FRMDAISY      // Daisy form
+enum class FormStyles : uint8_t {
+  kNone = 0U, // No form
+  kLine, // Line form
+  kFreehand,     // Freehand polygon form
+  kRegular,     // Regular polygon form
+  kStar,      // Star form
+  kSpiral,    // Spiral Form
+  kSatin,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
+  kHeart,     // Heart Form
+  kLens,      // Lens form
+  kEgg,       // Egg form
+  kTear,      // Teardrop form
+  kZigzag,    // Zig-Zag form
+  kWave,      // Wave Form
+  kDaisy      // Daisy form
 };
 
 // clipboard data types
-enum ClipDataType : uint8_t { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
+constexpr auto CLP_STCH = uint8_t {1U}; // stitch data
+constexpr auto CLP_FRM  = uint8_t {2U}; // single form data
+constexpr auto CLP_FRMS = uint8_t {3U}; // multiple form data
+constexpr auto CLP_FRMPS = uint8_t {4U}; // form points data
 
 // edge underlay bit
 constexpr auto EGUND  = uint8_t {0x80U};
 constexpr auto NEGUND = uint8_t {0x7fU};
 
 // form data lines
-enum FormData : uint8_t {
-  LFRM,       // form 0
-  LLAYR,      // layer 1
-  LFRMFIL,    // form fill 2
-  LFRMCOL,    // form fill color 3
-  LFRMSPAC,   // form fill space 4
-  LFRMLEN,    // form stitch length 5
-  LFRMANG,    // angle of angle fill 6
-  LBRD,       // border 7
-  LBRDCOL,    // border color 8
-  LBRDSPAC,   // border space 9
-  LBRDLEN,    // border stitch length 10
-  LBRDSIZ,    // border size 11
-  LAPCOL,     // applique color 12
-  LBCSIZ,     // buttonhole corner size 13
-  LBSTRT,     // form start style 14
-  LBFIN,      // form end style 15
-  LBRDPIC,    // picot border spacing 16
-  LBRDUND,    // border underlay 17
-  LSACANG,    // angle clipboard angle 18
-  LFRMFAZ,    // clipboard phase 19
-  LBRDPOS,    // chain position 20
-  LBFILSQR,   // square/pointed fill ends 21
-  LMAXFIL,    // maximum fill stitch length 22
-  LMINFIL,    // minimum fill stitch length 23
-  LMAXBRD,    // maximum border stitch length 24
-  LMINBRD,    // minimum border stitch length 25
-  LFTHCOL,    // feather color 26
-  LFTHTYP,    // feather fill type
-  LFTHBLND,   // feather blend
-  LFTHBTH,    // feather both up and down
-  LFTHUP,     // feather up or down
-  LFTHUPCNT,  // feather up count
-  LFTHDWNCNT, // feather down count
-  LFTHSIZ,    // feather size
-  LFTHNUM,    // feather number
-  LFTHFLR,    // feather floor
-  LFSTRT,     // form fill start on/off
-  LDSTRT,     // form fill start data
-  LFEND,      // form fill end on/off
-  LDEND,      // form fill end data
-  LCWLK,      // center walk
-  LWALK,      // edge walk
-  LWLKIND,    // edge walk/underlay indent
-  LUND,       // underlay
-  LULEN,      // underaly stitch length
-  LUANG,      // underlay angle
-  LUSPAC,     // underlay spacing
-  LUNDCOL,    // underlay color
-  LTXOF,      // texture fill spacing
-  LASTLIN     // must be the last entry
-};
+constexpr auto LFRM = uint8_t {0U}; // form 0
+constexpr auto LLAYR = uint8_t {1U}; // layer 1
+constexpr auto LFRMFIL = uint8_t {2U}; // form fill 2
+constexpr auto LFRMCOL = uint8_t {3U}; // form fill color 3
+constexpr auto LFRMSPAC = uint8_t {4U}; // form fill space 4
+constexpr auto LFRMLEN  = uint8_t {5U}; // form stitch length 5
+constexpr auto LFRMANG  = uint8_t {6U}; // angle of angle fill 6
+constexpr auto LBRD     = uint8_t {7U}; // border 7
+constexpr auto LBRDCOL  = uint8_t {8U}; // border color 8
+constexpr auto LBRDSPAC = uint8_t {9U}; // border space 9
+constexpr auto LBRDLEN  = uint8_t {10U}; // border stitch length 10
+constexpr auto LBRDSIZ  = uint8_t {11U}; // border size 11
+constexpr auto LAPCOL   = uint8_t {12U}; // applique color 12
+constexpr auto LBCSIZ   = uint8_t {13U}; // buttonhole corner size 13
+constexpr auto LBSTRT   = uint8_t {14U}; // form start style 14
+constexpr auto LBFIN    = uint8_t {15U}; // form end style 15
+constexpr auto LBRDPIC  = uint8_t {16U}; // picot border spacing 16
+constexpr auto LBRDUND  = uint8_t {17U}; // border underlay 17
+constexpr auto LSACANG  = uint8_t {18U}; // angle clipboard angle 18
+constexpr auto LFRMFAZ  = uint8_t {19U}; // clipboard phase 19
+constexpr auto LBRDPOS  = uint8_t {20U}; // chain position 20
+constexpr auto LBFILSQR = uint8_t {21U}; // square/pointed fill ends 21
+constexpr auto LMAXFIL  = uint8_t {22U}; // maximum fill stitch length 22
+constexpr auto LMINFIL  = uint8_t {23U}; // minimum fill stitch length 23
+constexpr auto LMAXBRD  = uint8_t {24U}; // maximum border stitch length 24
+constexpr auto LMINBRD  = uint8_t {25U}; // minimum border stitch length 25
+constexpr auto LFTHCOL  = uint8_t {26U}; // feather color 26
+constexpr auto LFTHTYP  = uint8_t {27U}; // feather fill type
+constexpr auto LFTHBLND = uint8_t {28U}; // feather blend
+constexpr auto LFTHBTH  = uint8_t {29U}; // feather both up and down
+constexpr auto LFTHUP   = uint8_t {30U}; // feather up or down
+constexpr auto LFTHUPCNT = uint8_t {31U}; // feather up count
+constexpr auto LFTHDWNCNT = uint8_t {32U}; // feather down count
+constexpr auto LFTHSIZ    = uint8_t {33U}; // feather size
+constexpr auto LFTHNUM    = uint8_t {34U}; // feather number
+constexpr auto LFTHFLR    = uint8_t {35U}; // feather floor
+constexpr auto LFSTRT     = uint8_t {36U}; // form fill start on/off
+constexpr auto LDSTRT     = uint8_t {37U}; // form fill start data
+constexpr auto LFEND      = uint8_t {38U}; // form fill end on/off
+constexpr auto LDEND      = uint8_t {39U}; // form fill end data
+constexpr auto LCWLK      = uint8_t {40U}; // center walk
+constexpr auto LWALK      = uint8_t {41U}; // edge walk
+constexpr auto LWLKIND    = uint8_t {42U}; // edge walk/underlay indent
+constexpr auto LUND       = uint8_t {43U}; // underlay
+constexpr auto LULEN      = uint8_t {44U}; // underlay stitch length
+constexpr auto LUANG      = uint8_t {45U}; // underlay angle
+constexpr auto LUSPAC     = uint8_t {46U}; // underlay spacing
+constexpr auto LUNDCOL    = uint8_t {47U}; // underlay color
+constexpr auto LTXOF      = uint8_t {48U}; // texture fill spacing
+constexpr auto LASTLIN    = uint8_t {49U}; // must be the last entry
 
 // fill message codes
-enum FillMessageCodes : uint16_t {
-  FMM_FAN   = 0U,
-  FMM_VRT   = 1U,
-  FMM_HOR   = 2U,
-  FMM_TXTR  = 3U,
-  FMM_ANG   = 4U,
-  FMM_CLP   = 5U,
-  FMM_FTH   = 6U,
-  FML_LIN   = 0x100,
-  FML_BLD   = 0x101,
-  FML_ANGS  = 0x102,
-  FML_PRPS  = 0x103,
-  FML_APLQ  = 0x104,
-  FML_BHOL  = 0x105,
-  FML_CLP   = 0x106,
-  FML_PIC   = 0x107,
-  FMX_UNF   = 0x108,
-  FML_CONT  = 0x109,
-  FML_CHAIN = 0x10A
-};
+constexpr auto FMM_FAN = uint16_t {0U};
+constexpr auto FMM_VRT = uint16_t {1U};
+constexpr auto FMM_HOR = uint16_t {2U};
+constexpr auto FMM_TXTR = uint16_t {3U};
+constexpr auto FMM_ANG  = uint16_t {4U};
+constexpr auto FMM_CLP  = uint16_t {5U};
+constexpr auto FMM_FTH  = uint16_t {6U};
+constexpr auto FML_LIN  = uint16_t {0x100U};
+constexpr auto FML_BLD  = uint16_t {0x101U};
+constexpr auto FML_ANGS = uint16_t {0x102U};
+constexpr auto FML_PRPS = uint16_t {0x103U};
+constexpr auto FML_APLQ = uint16_t {0x104U};
+constexpr auto FML_BHOL = uint16_t {0x105U};
+constexpr auto FML_CLP  = uint16_t {0x106U};
+constexpr auto FML_PIC  = uint16_t {0x107U};
+constexpr auto FMX_UNF  = uint16_t {0x108U};
+constexpr auto FML_CONT = uint16_t {0x109U};
+constexpr auto FML_CHAIN = uint16_t {0x10AU};
 
 // button windows. Note that BUTTONCNT should match the number of buttons
-enum StitchButtons : uint8_t { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
+constexpr auto HBOXSEL = uint8_t {0U};
+constexpr auto HUPTO   = uint8_t {1U};
+constexpr auto HHID    = uint8_t {2U};
+constexpr auto HNUM    = uint8_t {3U};
+constexpr auto HTOT    = uint8_t {4U};
+constexpr auto HMINLEN = uint8_t {5U};
+constexpr auto HMAXLEN = uint8_t {6U};
+constexpr auto HCOR    = uint8_t {7U};
+constexpr auto HLAYR   = uint8_t {8U};
+constexpr auto BUTTONCNT = uint8_t {9U};
 
-enum TextureButtons : uint8_t { // text button windows
-  HTXCLR,
-  HTXHI,
-  HTXWID,
-  HTXSPAC,
-  HTXVRT,
-  HTXHOR,
-  HTXANG,
-  HTXMIR
-};
+// text button windows
+constexpr auto HTXCLR = uint8_t {0U};
+constexpr auto HTXHI  = uint8_t {1U};
+constexpr auto HTXWID = uint8_t {2U};
+constexpr auto HTXSPAC = uint8_t {3U};
+constexpr auto HTXVRT  = uint8_t {4U};
+constexpr auto HTXHOR  = uint8_t {5U};
+constexpr auto HTXANG  = uint8_t {6U};
+constexpr auto HTXMIR  = uint8_t {7U};
 
-enum MachineType : int8_t { AUXPCS, AUXDST, AUXPES };
+// Machine types
+enum class Machine : int8_t { kPfaff, kTajima, kBrother };
 
 #ifdef DOUBLE_REQUIRED
 class D_RECTANGLE
@@ -958,12 +953,11 @@ class INS_REC
   uint32_t seq {};
 };
 
-enum InterleaveTypes : uint8_t { // interleave sequence identifiers
-  I_AP,
-  I_FIL,
-  I_FTH,
-  I_BRD
-};
+// interleave sequence identifiers
+constexpr auto I_AP  = uint8_t {0U};
+constexpr auto I_FIL = uint8_t {1U};
+constexpr auto I_FTH = uint8_t {2U};
+constexpr auto I_BRD = uint8_t {3U};
 
 class RNG_COUNT
 {

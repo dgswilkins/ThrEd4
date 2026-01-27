@@ -84,15 +84,19 @@ class PCSHEADER // pcs file header structure
   }
 
   constexpr void setHoopType(bool const flag) noexcept {
-	m_hoopType = flag ? LARGHUP : SMALHUP;
+	m_hoopType = wrap::toIntegralType(flag ? HoopSize::kLarge : HoopSize::kSmall);
   }
 
   [[nodiscard]] constexpr auto getStitchCount() const noexcept -> uint16_t {
 	return m_stitchCount;
   }
 
-  [[nodiscard]] constexpr auto getHoopType() const noexcept -> int8_t {
-	return m_hoopType;
+  [[nodiscard]] constexpr auto getHoopType() const noexcept -> HoopSize {
+	if (m_hoopType < wrap::toIntegralType(HoopSize::kSetCustom) ||
+	    m_hoopType > wrap::toIntegralType(HoopSize::kUserDefined)) {
+	  return HoopSize::kSmall;
+	}
+	return wrap::toEnumType<HoopSize>(m_hoopType);
   }
 
   private:
@@ -296,10 +300,10 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 	return false;
   }
-  IniFile.auxFileType = AUXPCS;
+  IniFile.auxFileType = Machine::kPfaff;
   auto hoopSize       = PCSHeader.getHoopType();
-  if (hoopSize != LARGHUP && hoopSize != SMALHUP) {
-	hoopSize = LARGHUP;
+  if (hoopSize != HoopSize::kLarge && hoopSize != HoopSize::kSmall) {
+	hoopSize = HoopSize::kLarge;
   }
   auto stitchRect = F_RECTANGLE {};
   thred::stchrct(stitchRect);
@@ -310,21 +314,21 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return true;
   }
-  if (hoopSize == LARGHUP) {
-	IniFile.hoopType  = LARGHUP;
+  if (hoopSize == HoopSize::kLarge) {
+	IniFile.hoopType  = HoopSize::kLarge;
 	IniFile.hoopSizeX = LHUPX;
 	IniFile.hoopSizeY = LHUPY;
 	CloseHandle(fileHandle);
 	return true;
   }
   if (stitchRect.right > SHUPX || stitchRect.top > SHUPY) {
-	IniFile.hoopType  = LARGHUP;
+	IniFile.hoopType  = HoopSize::kLarge;
 	IniFile.hoopSizeX = SHUPX;
 	IniFile.hoopSizeY = SHUPY;
 	CloseHandle(fileHandle);
 	return true;
   }
-  IniFile.hoopType  = SMALHUP;
+  IniFile.hoopType  = HoopSize::kSmall;
   IniFile.hoopSizeX = SHUPX;
   IniFile.hoopSizeY = SHUPY;
   CloseHandle(fileHandle);

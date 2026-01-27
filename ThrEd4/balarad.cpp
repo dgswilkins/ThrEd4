@@ -174,7 +174,7 @@ void bal::redbal() {
   IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
   UnzoomedRect     = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   BalaradOffset    = F_POINT {IniFile.hoopSizeX * HALF, IniFile.hoopSizeY * HALF};
-  IniFile.hoopType = CUSTHUP;
+  IniFile.hoopType = HoopSize::kUserDefined;
   UserColor.fill(0);
   auto const spBHC = gsl::span {balaradHeader.color};
   auto       iBHC  = spBHC.begin();

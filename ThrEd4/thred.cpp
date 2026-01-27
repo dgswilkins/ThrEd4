@@ -2486,7 +2486,7 @@ void dubuf(std::vector<char>& buffer) {
 	// count the number of vertices, satin guides, and clip data points in all forms
 	for (auto& iForm : formList) {
 	  vertexCount += iForm.vertexCount;
-	  if (iForm.type == SAT && iForm.satinGuideCount != 0U) {
+	  if (iForm.type == FormStyles::kSatin && iForm.satinGuideCount != 0U) {
 		guideCount += iForm.satinGuideCount;
 	  }
 	  if (iForm.isClip()) {
@@ -2522,7 +2522,7 @@ void dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.clipDataLen, wrap::sizeofType(Instance->clipPoints) * clipDataCount);
   // write the header to the buffer
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
-  ExtendedHeader.auxFormat         = IniFile.auxFileType;
+  ExtendedHeader.auxFormat         = wrap::toIntegralType(IniFile.auxFileType);
   ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
   ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
   ExtendedHeader.texturePointCount = wrap::toUnsigned(Instance->texturePointsBuffer.size());
@@ -2563,7 +2563,7 @@ void dubuf(std::vector<char>& buffer) {
 	  vertices.push_back(*itVertex);
 	  ++itVertex;
 	}
-	if (srcForm.type == SAT) { // write the satin guide data to the guide buffer
+	if (srcForm.type == FormStyles::kSatin) { // write the satin guide data to the guide buffer
 	  wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
 	  if (srcForm.satinGuideCount != 0U) {
 		auto itGuide = wrap::next(Instance->satinGuides.cbegin(), srcForm.satinGuideIndex);
@@ -3700,8 +3700,7 @@ auto handleWndMsgWMKEYDOWN(FRM_HEAD&                 textureForm,
 	texture::txtkey(code, textureForm);
 	return true;
   }
-  // ToDo - value passed to duform is weird because it is dependant on order of enumeration of the form types.
-  //        and value 'SAT' throws it off
+
   if (Instance->stateMap.test(StateFlag::FORMIN)) {
 	if (wrap::pressed(VK_CONTROL)) {
 	  return true;
@@ -4702,7 +4701,7 @@ auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> boo
 	  auto& formIter       = formList.operator[](iFormList);
 	  formIter.vertexIndex = vertexOffset;
 	  vertexOffset += formIter.vertexCount;
-	  if (formIter.type == SAT && formIter.satinGuideCount != 0U) {
+	  if (formIter.type == FormStyles::kSatin && formIter.satinGuideCount != 0U) {
 		formIter.satinGuideIndex = guideOffset;
 		guideOffset += formIter.satinGuideCount;
 	  }
@@ -5554,18 +5553,18 @@ void redini() {
 	  IniFile.setWav();
 	  IniFile.setFeather();
 	  IniFile.setDaisy();
-	  switch (IniFile.hoopType) {
-		case SMALHUP: {
+	  switch (IniFile.hoopType) { // NOLINT(clang-diagnostic-switch-default)
+		case HoopSize::kSmall: {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
 		  break;
 		}
-		case LARGHUP: {
+		case HoopSize::kLarge: {
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
 		  break;
 		}
-		case CUSTHUP: {
+		case HoopSize::kUserDefined: {
 		  if (IniFile.hoopSizeX == 0.0F) {
 			IniFile.hoopSizeX = LHUPX;
 		  }
@@ -5574,7 +5573,7 @@ void redini() {
 		  }
 		  break;
 		}
-		case HUP100: {
+		case HoopSize::kHundredMM: {
 		  if (IniFile.hoopSizeX == 0.0F) {
 			IniFile.hoopSizeX = HUP100XY;
 		  }
@@ -5583,8 +5582,8 @@ void redini() {
 		  }
 		  break;
 		}
-		default: {
-		  IniFile.hoopType  = LARGHUP;
+		case HoopSize::kSetCustom: {
+		  IniFile.hoopType  = HoopSize::kLarge;
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
 		}
@@ -5693,7 +5692,7 @@ void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
   if (stitchHeader.isValid()) {
 	switch (fileTypeVersion) {
 	  case 0: {
-		if (stitchHeader.hoopType == SMALHUP) {
+		if (stitchHeader.hoopType == wrap::toIntegralType(HoopSize::kSmall)) {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
 		  stitchSourceSize  = F_POINT {SHUPX, SHUPY};
@@ -5851,7 +5850,7 @@ void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	    .y = std::lround(wrap::toFloat(drawingDestinationSize.cy) - (vertexList[iLine].y * ratio))};
 	SelectObject(drawItem.hDC, FormPen);
 	SetROP2(drawItem.hDC, R2_XORPEN);
-	if (formList[iForm].type == FRMLINE) {
+	if (formList[iForm].type == FormStyles::kLine) {
 	  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount);
 	}
 	else {
@@ -6089,7 +6088,7 @@ void rthumnam(uint32_t const iThumbnail) {
 
 void sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(Instance->formList.size()); ++iForm) {
-	if (auto const& form = Instance->formList.operator[](iForm); form.type == SAT && form.satinGuideCount != 0U) {
+	if (auto const& form = Instance->formList.operator[](iForm); form.type == FormStyles::kSatin && form.satinGuideCount != 0U) {
 	  auto itGuide = wrap::next(Instance->satinGuides.cbegin(), form.satinGuideIndex);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
@@ -6126,18 +6125,18 @@ void sav() {
   }
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
+  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+	case Machine::kTajima: {
 	  flag = DST::saveDST(auxName, saveStitches);
 	  break;
 	}
 #if PESACT
-	case AUXPES: {
+	case Machine::kBrother: {
 	  flag = PES::savePES(auxName, saveStitches);
 	  break;
 	}
 #endif
-	default: {
+	case Machine::kPfaff: {
 	  flag = PCS::savePCS(auxName, saveStitches);
 	}
   }
@@ -9206,7 +9205,7 @@ void thred::delet() {
 	}
 	form.vertexCount -= SelectedFormVertices.vertexCount + 1U;
 	form.outline();
-	if (form.type == SAT) {
+	if (form.type == FormStyles::kSatin) {
 	  // Make sure the end guides are still valid
 	  if (vertexMap.test(0) || vertexMap.test(1)) {
 		form.wordParam = 0; // Satin end guide
@@ -9312,19 +9311,30 @@ void thred::delet() {
   }
   if (Instance->stateMap.test(StateFlag::FRMPSEL) || form::closfrm(ClosestFormToCursor)) {
 	auto& form = formList.operator[](ClosestFormToCursor);
-	switch (form.type) {
-	  case FRMLINE: {
+	switch (form.type) { // NOLINT(clang-diagnostic-switch-default)
+	  case FormStyles::kLine: {
 		if (handleDeleteLineForm(form)) {
 		  return;
 		}
 		break;
 	  }
-	  case SAT: {
+	  case FormStyles::kSatin: {
 		handleDeleteSatinForm(form, satinFlag);
 		break;
 	  }
-	  default: {
-		outDebugString(L"default hit in delet: type [{}]\n", form.type);
+	  case FormStyles::kNone:
+	  case FormStyles::kFreehand:
+	  case FormStyles::kRegular:
+	  case FormStyles::kStar:
+	  case FormStyles::kSpiral:
+	  case FormStyles::kHeart:
+	  case FormStyles::kLens:
+	  case FormStyles::kEgg:
+	  case FormStyles::kTear:
+	  case FormStyles::kZigzag:
+	  case FormStyles::kWave:
+	  case FormStyles::kDaisy: {
+		// Do nothing - these forms are handled elsewhere
 		break;
 	  }
 	}
@@ -9742,7 +9752,7 @@ void thred::ritmov(uint32_t const formIndex) noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   if (ClosestVertexToCursor != 0U) {
-	if (ClosestVertexToCursor == form.vertexCount - 1U && form.type == FRMLINE) {
+	if (ClosestVertexToCursor == form.vertexCount - 1U && form.type == FormStyles::kLine) {
 	  Polyline(StitchWindowDC, Instance->rubberBandLine.data(), 2);
 	}
 	else {
@@ -9751,7 +9761,7 @@ void thred::ritmov(uint32_t const formIndex) noexcept {
   }
   else {
 	Instance->rubberBandLine.operator[](2) = Instance->formLines.operator[](1);
-	if (form.type == FRMLINE) {
+	if (form.type == FormStyles::kLine) {
 	  Polyline(StitchWindowDC, std::addressof(Instance->rubberBandLine.operator[](1)), 2);
 	}
 	else {
@@ -10455,7 +10465,7 @@ void thred::defpref() {
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
   IniFile.gridSize        = 2.0F * PFGRAN; // 2mm default spacing NOLINT(readability-magic-numbers)
-  IniFile.hoopType        = LARGHUP;
+  IniFile.hoopType        = HoopSize::kLarge;
   IniFile.hoopSizeX       = LHUPX;
   IniFile.hoopSizeY       = LHUPY;
   IniFile.cursorNudgeStep = NUGINI;
@@ -11206,40 +11216,45 @@ void thred::updateHoopSize() {
   if (itHwnd == sideWindow.end()) {
 	return;
   }
-  switch (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1; option) {
-	case SETCUST: {
+  if (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1;
+ option >= wrap::toIntegralType(HoopSize::kSetCustom) && option <= wrap::toIntegralType(HoopSize::kUserDefined)) {
+	switch (auto const optionVal = wrap::toEnumType<HoopSize>(option); optionVal) { // NOLINT(clang-diagnostic-switch-default)
+    case HoopSize::kSetCustom: {
 	  IniFile.customHoopX = IniFile.hoopSizeX;
 	  IniFile.customHoopY = IniFile.hoopSizeY;
 	  break;
 	}
-	case SMALHUP: {
+	case HoopSize::kSmall: {
 	  IniFile.hoopSizeX = SHUPX;
 	  IniFile.hoopSizeY = SHUPY;
-	  IniFile.hoopType  = SMALHUP;
+	  IniFile.hoopType  = HoopSize::kSmall;
 	  break;
 	}
-	case LARGHUP: {
+	case HoopSize::kLarge: {
 	  IniFile.hoopSizeX = LHUPX;
 	  IniFile.hoopSizeY = LHUPY;
-	  IniFile.hoopType  = LARGHUP;
+	  IniFile.hoopType  = HoopSize::kLarge;
 	  break;
 	}
-	case HUP100: {
+	case HoopSize::kHundredMM: {
 	  IniFile.hoopSizeX = HUP100XY;
 	  IniFile.hoopSizeY = HUP100XY;
-	  IniFile.hoopType  = HUP100;
+	  IniFile.hoopType  = HoopSize::kHundredMM;
 	  break;
 	}
-	case CUSTHUP: {
+	case HoopSize::kUserDefined: {
 	  IniFile.hoopSizeX = IniFile.customHoopX;
 	  IniFile.hoopSizeY = IniFile.customHoopY;
-	  IniFile.hoopType  = CUSTHUP;
+	  IniFile.hoopType  = HoopSize::kUserDefined;
 	  break;
 	}
-	default: {
-	  outDebugString(L"default hit in updateHoopSize: option [{}]\n", option);
-	  break;
 	}
+  }
+  else { // Set a safe default if the window option is invalid
+	IniFile.hoopSizeX = LHUPX;
+	IniFile.hoopSizeY = LHUPY;
+	IniFile.hoopType  = HoopSize::kLarge;
+	outDebugString(L"updateHoopSize: Invalid hoop size option [{}], setting to Large Hoop\n", option);
   }
   UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
   form::sethup();
@@ -11446,7 +11461,7 @@ auto thred::handleSideWindowActive() -> bool {
 	return true;
   }
 
-  if (form.fillType == SAT && form.satinGuideCount != 0U) {
+  if (form.fillType == SATF && form.satinGuideCount != 0U) {
 	satin::delsac(ClosestFormToCursor);
   }
   if ((form.edgeType & NEGUND) == EDGEAPPL) {
@@ -11458,7 +11473,7 @@ auto thred::handleSideWindowActive() -> bool {
   auto textureFlag = false;
   while (true) {
 	if (WinMsg.hwnd == sideWindow.operator[](0)) { // none
-	  form.type = FRMFPOLY;
+	  form.type = FormStyles::kFreehand;
 	  form::delmfil(ClosestFormToCursor);
 	  form.fillType = 0;
 	  coltab();
@@ -11467,11 +11482,11 @@ auto thred::handleSideWindowActive() -> bool {
 	}
 	if (WinMsg.hwnd == sideWindow.operator[](VRTF)) { // vertical fill
 	  savdo();
-	  form.type = FRMFPOLY;
+	  form.type = FormStyles::kFreehand;
 	  if (form.fillType != 0U) {
 		respac(form);
 		form.fillType = VRTF;
-		form.type     = FRMFPOLY;
+		form.type     = FormStyles::kFreehand;
 		clip::delmclp(ClosestFormToCursor);
 		break;
 	  }
@@ -11479,7 +11494,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == sideWindow.operator[](HORF)) { // horizontal fill
-	  form.type = FRMFPOLY;
+	  form.type = FormStyles::kFreehand;
 	  if (form.fillType != 0U) {
 		respac(form);
 		form.fillType = HORF;
@@ -11490,7 +11505,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == sideWindow.operator[](ANGF)) { // angle fill
-	  form.type = FRMFPOLY;
+	  form.type = FormStyles::kFreehand;
 	  if (form.fillType != 0U) {
 		if (form.satinGuideCount != 0U) {
 		  satin::delsac(ClosestFormToCursor);
@@ -11506,7 +11521,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == sideWindow.operator[](SATF)) { // fan fill
-	  form.type = SAT;
+	  form.type = FormStyles::kSatin;
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
 	  }
@@ -11521,7 +11536,7 @@ auto thred::handleSideWindowActive() -> bool {
 	  break;
 	}
 	if (WinMsg.hwnd == sideWindow.operator[](CLPF)) { // fan clip
-	  form.type = SAT;
+	  form.type = FormStyles::kSatin;
 	  if (form.fillType == ANGF || form.fillType == ANGCLPF || form.fillType == TXANGF) {
 		form.satinGuideIndex = 0;
 	  }
@@ -11738,11 +11753,11 @@ auto thred::handleFormDataSheet() -> bool {
 	  // draw the form type window
 	  savdo();
 	  form::unfil();
-	  if (form.type == FRMLINE) {
-		form.type = FRMFPOLY;
+	  if (form.type == FormStyles::kLine) {
+		form.type = FormStyles::kFreehand;
 	  }
 	  else {
-		form.type = FRMLINE;
+		form.type = FormStyles::kLine;
 	  }
 	  coltab();
 	  satin::delsac(ClosestFormToCursor);
@@ -12362,18 +12377,18 @@ void thred::updateBackgroundColor() {
 }
 
 void thred::openAuxFile() {
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
+  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+	case Machine::kTajima: {
 	  nuFil(FileIndices::DST);
 	  break;
 	}
 #if PESACT
-	case AUXPES: {
+	case Machine::kBrother: {
 	  nuFil(FileIndices::PES);
 	  break;
 	}
 #endif
-	default: {
+	case Machine::kPfaff: {
 	  nuFil(FileIndices::PCS);
 	}
   }

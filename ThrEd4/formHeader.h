@@ -229,7 +229,7 @@ class FRM_HEAD
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint8_t     attribute {};           // attribute
   uint32_t    vertexCount {};         // number of sides
-  uint8_t     type {};                // type
+  FormStyles     type {};                // type
   uint8_t     fillColor {};           // fill color
   uint8_t     borderColor {};         // border color
   uint32_t    clipEntries {};         // number of border clipboard entries
@@ -344,7 +344,7 @@ class FRM_HEAD_OUT
 // NOLINTBEGIN(cppcoreguidelines-pro-type-union-access)
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
-    attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type),
+    attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(wrap::toEnumType<FormStyles>(rhs.type)),
     fillColor(rhs.fillColor), borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
     borderClipData(rhs.borderClipData), // Todo - Should we be copying this value?
     satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam), rectangle(rhs.rectangle),
@@ -361,7 +361,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
 	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
-	if (type == FRMLINE) {
+	if (type == FormStyles::kLine) {
 	  if (fillType == CONTF) {
 		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
@@ -381,7 +381,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
 inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
-  type            = rhs.type;
+  type            = wrap::toEnumType<FormStyles>(rhs.type);
   fillColor       = rhs.fillColor;
   borderColor     = rhs.borderColor;
   clipEntries     = rhs.clipEntries;
@@ -409,7 +409,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
 	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
-	if (type == FRMLINE) {
+	if (type == FormStyles::kLine) {
 	  if (fillType == CONTF) {
 		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
@@ -427,7 +427,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
 }
 
 inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
-    attribute(rhs.attribute), vertexCount(gsl::narrow<uint16_t>(rhs.vertexCount)), type(rhs.type),
+    attribute(rhs.attribute), vertexCount(gsl::narrow<uint16_t>(rhs.vertexCount)), type(wrap::toIntegralType(rhs.type)),
     fillColor(rhs.fillColor), borderColor(rhs.borderColor),
     clipEntries(gsl::narrow<uint16_t>(rhs.clipEntries)),
     satinGuideCount(gsl::narrow<uint16_t>(rhs.satinGuideCount)),
@@ -450,7 +450,7 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 	angleOrClipData.setClip(rhs.clipIndex);
   }
   else {
-	if (type == FRMLINE) {
+	if (type == wrap::toIntegralType(FormStyles::kLine)) {
 	  if (fillType == CONTF) {
 		angleOrClipData.setGuide(rhs.fillGuide);
 	  }
@@ -474,7 +474,7 @@ inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
 }
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
-    attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
+    attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(wrap::toEnumType<FormStyles>(rhs.type)), fillColor(rhs.fillColor),
     borderColor(rhs.borderColor), clipEntries(rhs.clipEntries), satinGuideCount(rhs.satinGuideCount),
     wordParam(rhs.wordParam), rectangle(rhs.rectangle), fillType(rhs.fillType),
     edgeType(rhs.edgeType), fillSpacing(rhs.fillSpacing), borderSize(rhs.borderSize),
@@ -495,7 +495,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
-	if (type == FRMLINE) {
+	if (type == FormStyles::kLine) {
 	  if (fillType == CONTF) {
 		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
@@ -521,7 +521,7 @@ inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
 inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
-  type            = rhs.type;
+  type            = wrap::toEnumType<FormStyles>(rhs.type);
   fillColor       = rhs.fillColor;
   borderColor     = rhs.borderColor;
   clipEntries     = rhs.clipEntries;
@@ -549,7 +549,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
 	clipIndex = rhs.angleOrClipData.getClip();
   }
   else {
-	if (type == FRMLINE) {
+	if (type == FormStyles::kLine) {
 	  if (fillType == CONTF) {
 		fillGuide = rhs.angleOrClipData.getGuide();
 	  }
