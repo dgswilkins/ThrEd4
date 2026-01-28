@@ -1377,9 +1377,8 @@ void trace::wasTrace(DRAWITEMSTRUCT const& drawItem) {
 	  auto const itColTraceRGB   = wrap::next(TRACE_RGB.begin(), ColumnColor);
 	  FillRect(drawItem.hDC, &drawItem.rcItem, *itColTraceBrush);
 	  SetBkColor(drawItem.hDC, *itColTraceRGB);
-	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	  wrap::textOut(
-	      drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
+	      drawItem.hDC, 1, 1, TraceInputBuffer.data(), gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data()))); // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	  break;
 	}
 	++iTraceShift;

@@ -91,9 +91,8 @@ auto thredFile::readTHRFile(std::filesystem::path const&    newFileName,
 	  thred::ritfnam(thred::getDesignerName());
 	  auto const spModifierName = gsl::span {extendedHeader.modifierName};
 	  auto const spIDN          = gsl::span {IniFile.designerName};
-	  // NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	  std::copy(spIDN.begin(),
-	            wrap::next(spIDN.begin(), std::strlen(spIDN.data()) + 1U),
+	            wrap::next(spIDN.begin(), std::strlen(spIDN.data()) + 1U), // NOLINT(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	            spModifierName.begin());
 	  break;
 	}
