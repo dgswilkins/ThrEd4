@@ -63,7 +63,7 @@ class MY_SINGLE
 {
   public:
   static auto getInstance() -> MY_SINGLE* {
-	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
+	// NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors, clang-diagnostic-unique-object-duplication)
 	static MY_SINGLE instance;
 
 	return &instance;
