@@ -682,6 +682,11 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		case FRMEGG:
 		case FRMZIGZAG:
 		  return true;
+		case FRMLINE:
+		case FRMFPOLY:
+		case FRMTEAR:
+		case FRMWAVE:
+		case FRMDAISY:
 		default: {
 		}
 	  }
