@@ -74,8 +74,9 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: logs-archive
-          path: logs.zip
+          name: build-logs
+          path: |
+            **/*.log
           if-no-files-found: ignore
 
       - name: Upload Artifact
