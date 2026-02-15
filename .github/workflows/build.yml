@@ -67,9 +67,11 @@ jobs:
         run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
 
       - name: Zip all logs
+        if: success() || failure()
         run: zip -r logs.zip *.log
 
       - name: Upload logs artifact
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: logs-archive
