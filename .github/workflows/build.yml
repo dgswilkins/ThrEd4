@@ -58,7 +58,7 @@ jobs:
           runVcpkgInstall: true
 
       - name: Check Installed Packages
-        run: Get-ChildItem -Recurse -Path ${{env.VCPKG_INSTALLED_DIR}}
+        run: Get-ChildItem -Recurse -Path ${{ github.workspace }}
 
       - name: Build
         working-directory: ${{ github.workspace }}
