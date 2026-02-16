@@ -71,7 +71,7 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
+          name: build-logs-${{env.BUILD_CONFIGURATION}}-${{env.BUILD_PLATFORM}}.zip
           path: |
             **/*.log
           retention-days: 7
