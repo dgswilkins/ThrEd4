@@ -119,17 +119,6 @@ constexpr auto TRACE_RGB_FLAG = std::array {StateFlag::TRCRED, StateFlag::TRCGRN
 constexpr auto TRACE_RGB_MASK = std::array {REDMSK, GRNMSK, BLUMSK}; // trace masks
 constexpr auto TRACE_SHIFT    = std::array {0U, BYTSHFT, WRDSHFT};   // trace shift values
 
-constexpr auto TRWINROW01 = int8_t {15}; // row 1
-constexpr auto TRWINROW02 = int8_t {16}; // row 2
-constexpr auto TRWINROW03 = int8_t {17}; // row 3
-constexpr auto TRWINROW04 = int8_t {18}; // row 4
-constexpr auto TRWINROW05 = int8_t {19}; // row 5
-constexpr auto TRWINROW06 = int8_t {20}; // row 6
-constexpr auto TRWINROW07 = int8_t {21}; // row 7
-constexpr auto TRWINROW08 = int8_t {22}; // row 8
-constexpr auto TRWINROW09 = int8_t {23}; // row 9
-constexpr auto TRWINROW10 = int8_t {24}; // row 10
-
 auto BlackPen          = gsl::narrow_cast<HPEN>(nullptr);   // black pen
 auto ColumnColor       = uint32_t {};                       // trace color column
 auto CurrentTracePoint = POINT {};                          // current point being traced
@@ -181,7 +170,7 @@ auto trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT>;
 void trcratnum();
 void trcstpnum();
 auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
-void trnumwnd0(int32_t position) noexcept;
+void trnumwnd0(trace::Window row) noexcept;
 auto trsum() -> uint32_t;
 
 #if TRCMTH == 0
@@ -758,7 +747,8 @@ auto trcsub(int32_t const xCoordinate, int32_t const yCoordinate, int32_t const 
   throw std::runtime_error("No window created in trcsub");
 }
 
-void trnumwnd0(int32_t const position) noexcept {
+void trnumwnd0(trace::Window const row) noexcept {
+  auto const     position = wrap::toIntegralType(row) * ButtonHeight;
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
   TraceNumberInput        = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
@@ -815,8 +805,12 @@ void trace::initColorRef() noexcept {
 
 void trace::initTraceWindows() {
   constexpr auto DW_STYLE = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
+  const auto position01    = ButtonHeight * wrap::toIntegralType(Window::row01);
+  const auto position02    = ButtonHeight * wrap::toIntegralType(Window::row02);
+  const auto position03    = ButtonHeight * wrap::toIntegralType(Window::row03);
+  const auto position04    = ButtonHeight * wrap::toIntegralType(Window::row04);
   TraceStepWin            = CreateWindowEx(
-      0L, L"STATIC", L"", DW_STYLE, 0, ButtonHeight * TRWINROW04, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      0L, L"STATIC", L"", DW_STYLE, 0, position04, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   auto iTraceControlWindow = TraceControlWindow.begin();
   auto iTraceDownWindow    = TraceDownWindow.begin();
   auto iTraceSelectWindow  = TraceSelectWindow.begin();
@@ -825,10 +819,10 @@ void trace::initTraceWindows() {
   auto iTraceRGB           = TRACE_RGB.begin();
   for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
 	auto const channel     = gsl::narrow_cast<int32_t>(iRGB);
-	*iTraceControlWindow++ = trcsub(ButtonWidth * channel, 0, ButtonHeight * TRWINROW01);
-	*iTraceSelectWindow++  = trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW01, ButtonHeight);
-	*iTraceUpWindow++      = trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW02, ButtonHeight);
-	*iTraceDownWindow++    = trcsub(ButtonWidth * channel, ButtonHeight * TRWINROW03, ButtonHeight);
+	*iTraceControlWindow++ = trcsub(ButtonWidth * channel, 0, position01);
+	*iTraceSelectWindow++  = trcsub(ButtonWidth * channel, position01, ButtonHeight);
+	*iTraceUpWindow++      = trcsub(ButtonWidth * channel, position02, ButtonHeight);
+	*iTraceDownWindow++    = trcsub(ButtonWidth * channel, position03, ButtonHeight);
 	*iTraceBrush++         = CreateSolidBrush(*iTraceRGB++);
   }
 }
@@ -1251,76 +1245,71 @@ void trace::tracpar() {
   }
   else {
 	ColumnColor = ducolm();
-	if (TraceMsgPoint.y < ButtonHeight * TRWINROW01) {
+	if (TraceMsgPoint.y < ButtonHeight * wrap::toIntegralType(Window::row01)) {
 	  getColors();
 	  auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
 	  thred::redraw(*itTraceControlWindow);
 	  trace();
 	}
 	else {
-	  if (auto const position = wrap::floor<int32_t>(TraceMsgPoint.y / ButtonHeight); position < TRWINROW02) {
-		Instance->stateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
-		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
-		thred::redraw(*itTraceSelectWindow);
-		trace();
-	  }
-	  else {
-		if (position < TRWINROW04) {
+	  switch (auto const row = wrap::toEnumType<Window>(wrap::floor<int8_t>(TraceMsgPoint.y / ButtonHeight)); row) {
+		case Window::row01: {
+		  Instance->stateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
+		  {
+			auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
+			thred::redraw(*itTraceSelectWindow);
+		  }
+		  trace();
+		  break;
+		}
+		case Window::row02:
+		case Window::row03: { // TRNIN0
 		  Instance->stateMap.set(StateFlag::NUMIN);
 		  Instance->stateMap.set(StateFlag::TRNIN0);
 		  TraceMsgIndex       = 0;
 		  TraceInputBuffer[0] = 0;
-		  if (position < TRWINROW03) {
-			trnumwnd0(ButtonHeight * TRWINROW02);
+		  trnumwnd0(row);
+		  if (row == Window::row02) {
 			Instance->stateMap.set(StateFlag::TRNUP);
 		  }
 		  else {
-			trnumwnd0(ButtonHeight * TRWINROW03);
 			Instance->stateMap.reset(StateFlag::TRNUP);
 		  }
+		  break;
 		}
-		else {
-		  if (position < TRWINROW06) {
-			Instance->stateMap.set(StateFlag::NUMIN);
-			Instance->stateMap.set(StateFlag::TRNIN1);
-			thred::resetMsgBuffer();
-			if (position < TRWINROW05) {
-			  thred::createTraceNumWin(ButtonHeight * TRWINROW04);
-			  Instance->stateMap.set(StateFlag::TRNUP);
-			}
-			else {
-			  thred::createTraceNumWin(ButtonHeight * TRWINROW05);
-			  Instance->stateMap.reset(StateFlag::TRNUP);
-			}
+		case Window::row04:
+		case Window::row05: { // TRNIN1
+		  Instance->stateMap.set(StateFlag::NUMIN);
+		  Instance->stateMap.set(StateFlag::TRNIN1);
+		  thred::resetMsgBuffer();
+		  thred::createTraceNumWin(row);
+		  if (row == Window::row04) {
+			Instance->stateMap.set(StateFlag::TRNUP);
 		  }
 		  else {
-			switch (position) {
-			  case TRWINROW06: {
-				trdif();
-				break;
-			  }
-			  case TRWINROW07: {
-				thred::hidbit();
-				break;
-			  }
-			  case TRWINROW08: {
-				blak();
-				break;
-			  }
-			  case TRWINROW09: {
-				trcsel();
-				break;
-			  }
-			  case TRWINROW10: {
-				tracedg();
-				break;
-			  }
-			  default: {
-				outDebugString(L"default hit in tracpar: position [{}]\n", position);
-				break;
-			  }
-			}
+			Instance->stateMap.reset(StateFlag::TRNUP);
 		  }
+		  break;
+		}
+		case Window::row06: {
+		  trdif();
+		  break;
+		}
+		case Window::row07: {
+		  thred::hidbit();
+		  break;
+		}
+		case Window::row08: {
+		  blak();
+		  break;
+		}
+		case Window::row09: {
+		  trcsel();
+		  break;
+		}
+		case Window::row10: {
+		  tracedg();
+		  break;
 		}
 	  }
 	}

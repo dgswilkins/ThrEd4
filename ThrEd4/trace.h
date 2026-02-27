@@ -2,6 +2,20 @@
 #define THRED_TRACE_H
 
 namespace trace {
+
+enum class Window : int8_t {
+  row01 = 15,
+  row02,
+  row03,
+  row04,
+  row05,
+  row06,
+  row07,
+  row08,
+  row09,
+  row10
+};
+
 void blak();
 void dutrnum1();
 void dutrnum2();

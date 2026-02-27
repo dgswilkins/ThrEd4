@@ -12776,8 +12776,9 @@ void thred::destroyGeneralNumberInputBox() noexcept {
   GeneralNumberInputBox = nullptr;
 }
 
-void thred::createTraceNumWin(int32_t const position) noexcept {
+void thred::createTraceNumWin(trace::Window const row) noexcept {
   constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
+  const auto     position = wrap::toIntegralType(row) * ButtonHeight;
   GeneralNumberInputBox   = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }

@@ -4,6 +4,7 @@
 // Local Headers
 #include "fRectangle.h"
 #include "point.h"
+#include "trace.h"
 
 // Standard Libraries
 #include <filesystem>
@@ -276,7 +277,7 @@ void thumbHome();
 void thumbQuit();
 void thumnail();
 void toglup();
-void createTraceNumWin(int32_t position) noexcept;
+void createTraceNumWin(trace::Window row) noexcept;
 void tst();
 auto txtWid(wchar_t const* string) noexcept(std::is_same_v<size_t, uint32_t>) -> SIZE;
 void unbBox();
