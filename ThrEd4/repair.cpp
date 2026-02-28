@@ -214,21 +214,17 @@ void chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
 
 void datmsg(uint32_t const code) {
   auto dataErrorID = wrap::toUnsigned(IDS_BADUKN);
-  switch (code) {
-	case BADFLT:
-	  dataErrorID = IDS_BADFLT;
-	  break;
-	case BADCLP:
-	  dataErrorID = IDS_BADCLP;
-	  break;
-	case BADSAT:
-	  dataErrorID = IDS_BADSAT;
-	  break;
-	case BADTX:
-	  dataErrorID = IDS_BADTX;
-	  break;
-	default:
-	  break;
+  if (code == BADFLT) {
+	dataErrorID = IDS_BADFLT;
+  }
+  else if (code == BADCLP) {
+	dataErrorID = IDS_BADCLP;
+  }
+  else if (code == BADSAT) {
+	dataErrorID = IDS_BADSAT;
+  }
+  else if (code == BADTX) {
+	dataErrorID = IDS_BADTX;
   }
   displayText::shoMsg(displayText::loadStr(dataErrorID), false);
 }
