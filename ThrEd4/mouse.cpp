@@ -608,64 +608,68 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	GetWindowRect(MsgWindow, &windowRect);
 	if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
 	    WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
-	  constexpr auto FRMLINE   = 0;
-	  constexpr auto FRMFPOLY  = 1;
-	  constexpr auto FRMRPOLY  = 2;
-	  constexpr auto FRMSTAR   = 3;
-	  constexpr auto FRMSPIRAL = 4;
-	  constexpr auto FRMHEART  = 5;
-	  constexpr auto FRMLENS   = 6;
-	  constexpr auto FRMEGG    = 7;
-	  constexpr auto FRMTEAR   = 8;
-	  constexpr auto FRMZIGZAG = 9;
-	  constexpr auto FRMWAVE   = 10;
-	  constexpr auto FRMDAISY  = 11;
+	  enum class FillType : int {
+	    Line   = 0,
+	    FPoly  = 1,
+	    RPoly  = 2,
+	    Star   = 3,
+	    Spiral = 4,
+	    Heart  = 5,
+	    Lens   = 6,
+	    Egg    = 7,
+	    Tear   = 8,
+	    Zigzag = 9,
+	    Wave   = 10,
+	    Daisy  = 11
+	  };
 
-	  auto const iFillType = (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
+	  auto const iFillTypeValue =
+	      (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
+	  auto const iFillType = static_cast<FillType>(iFillTypeValue);
 	  if (Instance->stateMap.testAndReset(StateFlag::FENDIN)) {
-		if (iFillType == 3) {
+		if (iFillTypeValue == 3) {
 		  Instance->userFlagMap.reset(UserFlag::SQRFIL);
 		}
-		if (iFillType == 4) {
+		if (iFillTypeValue == 4) {
 		  Instance->userFlagMap.set(UserFlag::SQRFIL);
 		}
 	  }
 	  else {
 		switch (iFillType) {
-		  case FRMLINE:
+		  case FillType::Line:
 			form::duform(FormStyles::kLine);
 			break;
-		  case FRMFPOLY:
+		  case FillType::FPoly:
 			form::duform(FormStyles::kFreehand);
 			break;
-		  case FRMRPOLY:
+		  case FillType::RPoly:
 			form::duform(FormStyles::kRegular);
 			break;
-		  case FRMSTAR:
+		  case FillType::Star:
 			form::duform(FormStyles::kStar);
 			break;
-		  case FRMSPIRAL:
+		  case FillType::Spiral:
 			form::duform(FormStyles::kSpiral);
 			break;
-		  case FRMHEART:
+		  case FillType::Heart:
 			form::duform(FormStyles::kHeart);
 			break;
-		  case FRMLENS:
+		  case FillType::Lens:
 			form::duform(FormStyles::kLens);
 			break;
-		  case FRMEGG:
+		  case FillType::Egg:
 			form::duform(FormStyles::kEgg);
 			break;
-		  case FRMTEAR:
+		  case FillType::Tear:
 			form::duform(FormStyles::kTear);
 			break;
-		  case FRMZIGZAG:
+		  case FillType::Zigzag:
 			form::duform(FormStyles::kZigzag);
 			break;
-		  case FRMWAVE:
+		  case FillType::Wave:
 			form::duform(FormStyles::kWave);
 			break;
-		  case FRMDAISY:
+		  case FillType::Daisy:
 			form::duform(FormStyles::kDaisy);
 			break;
 		  default: {
@@ -674,19 +678,19 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  switch (iFillType) {
-		case FRMRPOLY:
-		case FRMSTAR:
-		case FRMSPIRAL:
-		case FRMHEART:
-		case FRMLENS:
-		case FRMEGG:
-		case FRMZIGZAG:
+		case FillType::RPoly:
+		case FillType::Star:
+		case FillType::Spiral:
+		case FillType::Heart:
+		case FillType::Lens:
+		case FillType::Egg:
+		case FillType::Zigzag:
 		  return true;
-		case FRMLINE:
-		case FRMFPOLY:
-		case FRMTEAR:
-		case FRMWAVE:
-		case FRMDAISY:
+		case FillType::Line:
+		case FillType::FPoly:
+		case FillType::Tear:
+		case FillType::Wave:
+		case FillType::Daisy:
 		default: {
 		}
 	  }
