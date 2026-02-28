@@ -96,7 +96,7 @@ class FTHR_INFO
 {
   public:
   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  uint8_t  fillType {};      // feather fill type
+  FeatherFillType  fillType {};      // feather fill type
   uint8_t  upCount {};       // feather up count
   uint8_t  downCount {};     // feather down count
   uint8_t  color {};         // feather blend color

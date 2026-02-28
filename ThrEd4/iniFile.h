@@ -21,7 +21,7 @@ constexpr auto NAME_LEN = 50;                      // Length of the name fields 
 constexpr auto OLDNUM   = uint32_t {4U};           // number of old filenames saved on file menu
 constexpr auto DPLEN    = 180;                     // default directory path length
 
-constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
+constexpr auto FDEFTYP = FeatherFillType::ragged; // default feather type
 
 enum class DaisyStyle : uint8_t { // daisy form types
   kSine,                          // Sine shape
@@ -100,7 +100,7 @@ class INI_FILE // ini file structure
   uint16_t waveStart {};              // wave strting point
   uint16_t waveEnd {};                // wave ending point;
   uint16_t waveLobes {};              // wave lobes
-  uint8_t  featherFillType {};        // feather fill type
+  FeatherFillType  featherFillType {};        // feather fill type
   uint8_t  featherUpCount {};         // feather up count
   uint8_t  featherDownCount {};       // feather down count
   uint8_t  featherType {};            // feather bits
@@ -183,7 +183,7 @@ constexpr auto FDEFFLR = 9.0F;           // default feather floor
 constexpr auto FDEFNUM = uint16_t {10U}; // default feather number
 
 inline void INI_FILE::setFeather() noexcept {
-  if (featherFillType == 0U) {
+  if (featherFillType == FeatherFillType::none) {
 	featherFillType = FDEFTYP;
   }
   if (featherUpCount == 0U) {

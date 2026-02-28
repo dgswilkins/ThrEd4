@@ -552,6 +552,16 @@ constexpr auto FTHRLIST = std::array<LIST_TYPE, FSTYLMAX> {{{.stringID = IDS_FTH
                                                             {.stringID = IDS_FTH4, .value = FTHRMP},
                                                             {.stringID = IDS_FTH5, .value = FTHFAZ}}};
 
+enum class FeatherFillType : uint8_t {
+  none     = 0U,
+  sine     = FTHSIN,
+  halfSine = FTHSIN2,
+  line     = FTHLIN,
+  ragged   = FTHPSG,
+  sawtooth = FTHRMP,
+  picket   = FTHFAZ,
+};
+
 // fill types
 constexpr auto NOFILL   = uint8_t {0U};  // no fill
 constexpr auto VRTF     = uint8_t {1U};  // Vertical fill

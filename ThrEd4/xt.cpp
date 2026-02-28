@@ -68,7 +68,7 @@
 class FEATHER
 {
   public:
-  uint32_t fillType {};          // type of feather fill
+  FeatherFillType fillType {};          // type of feather fill
   float    ratio {};             // feather ratio
   float    minStitch {};         // smallest stitch allowed
   float    ratioLocal {};        // local feather ratio
@@ -1191,7 +1191,7 @@ void nudfn(F_RECTANGLE const& designSizeRect) noexcept {
 void nurat(FEATHER& feather) noexcept {
   auto const remainder = fmodf(feather.globalPosition, 1.0F);
   switch (feather.fillType) {
-	case FTHPSG: {
+	case FeatherFillType::ragged: {
 	  if (feather.upCount != 0U) {
 		if (feather.countUp != 0U) {
 		  feather.ratio =
@@ -1219,7 +1219,7 @@ void nurat(FEATHER& feather) noexcept {
 	  feather.ratio *= feather.formRatio;
 	  break;
 	}
-	case FTHFAZ: {
+	case FeatherFillType::picket: {
 	  if (feather.phase >= feather.upCount) {
 		feather.ratio = 1;
 	  }
@@ -1228,7 +1228,7 @@ void nurat(FEATHER& feather) noexcept {
 	  }
 	  break;
 	}
-	case FTHSIN: {
+	case FeatherFillType::sine: {
 	  if (remainder > feather.globalRatio) {
 		feather.ratio = (sin(((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F) + PI_F) * HALF) + HALF;
 	  }
@@ -1238,7 +1238,7 @@ void nurat(FEATHER& feather) noexcept {
 	  feather.ratio *= feather.formRatio;
 	  break;
 	}
-	case FTHSIN2: {
+	case FeatherFillType::halfSine: {
 	  if (remainder > feather.globalRatio) {
 		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F);
 	  }
@@ -1248,7 +1248,7 @@ void nurat(FEATHER& feather) noexcept {
 	  feather.ratio *= feather.formRatio;
 	  break;
 	}
-	case FTHRMP: {
+	case FeatherFillType::sawtooth: {
 	  if (remainder > feather.globalRatio) {
 		feather.ratio = (1.0F - remainder) / (1.0F - feather.globalRatio);
 	  }
@@ -1258,7 +1258,7 @@ void nurat(FEATHER& feather) noexcept {
 	  feather.ratio *= feather.formRatio;
 	  break;
 	}
-	case FTHLIN:
+	case FeatherFillType::line:
 	default: {
 	  feather.ratio = feather.formRatio;
 	  break;

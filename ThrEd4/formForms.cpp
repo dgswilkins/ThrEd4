@@ -307,7 +307,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  valueWindow[LFTHCOL] = numwin(format(FMT_COMPILE(L"{}"), form.feather.color + 1U), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHTYP] = txtwin(displayText::loadStr(IDS_FTHTYP), LabelWindowCoords);
-	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.feather.fillType - 1U);
+	  auto itFeather       = wrap::next(FTHRLIST.begin(), wrap::toIntegralType(form.feather.fillType) - 1U);
 	  valueWindow[LFTHTYP] = numwin(displayText::loadStr(itFeather->stringID), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHBLND] = txtwin(displayText::loadStr(IDS_FTHBLND), LabelWindowCoords);
@@ -339,7 +339,7 @@ void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  labelWindow[LFTHSIZ] = txtwin(displayText::loadStr(IDS_FTHSIZ), LabelWindowCoords);
 	  valueWindow[LFTHSIZ] = numwin(format(FMT_COMPILE(L"{:.2f}"), form.feather.ratio), ValueWindowCoords);
 	  nxtlin(formMenuEntryCount);
-	  if (form.feather.fillType == FTHPSG) { // if the feather is ragged
+	  if (form.feather.fillType == FeatherFillType::ragged) {
 		// label and fill the feather steps field
 		labelWindow[LFTHNUM] = txtwin(displayText::loadStr(IDS_FTHNUM), LabelWindowCoords);
 		valueWindow[LFTHNUM] = numwin(format(FMT_COMPILE(L"{}"), form.feather.count), ValueWindowCoords);

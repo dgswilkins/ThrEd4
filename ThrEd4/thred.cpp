@@ -3413,7 +3413,7 @@ void handleFeatherIDOK(HWND hwndlg) {
 	buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
 	// NOLINTNEXTLINE(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
 	if (wcscmp(buf.data(), buffer.c_str()) == 0) {
-	  IniFile.featherFillType = iFeatherStyle.value;
+	  IniFile.featherFillType = wrap::toEnumType<FeatherFillType>(iFeatherStyle.value);
 	  break;
 	}
   }
@@ -3472,7 +3472,7 @@ void handleFeatherWMINITDIALOG(HWND hwndlg) {
 	            0,
 	            reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
-  auto const wParam = IniFile.featherFillType - 1;
+  auto const wParam = wrap::toIntegralType(IniFile.featherFillType) - 1;
   SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, wParam, 0);
   auto state = wrap::toUnsigned((featherType & AT_FTHBLND) != 0 ? BST_CHECKED : BST_UNCHECKED);
   CheckDlgButton(hwndlg, IDC_FDBLND, state);
@@ -6491,7 +6491,7 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
 	}
 	case LFTHTYP: { // if we are choosing a feather fill type
 	  for (auto const& iEntry : FTHRLIST) {
-		if (iEntry.value != form.feather.fillType) {
+		if (wrap::toEnumType<FeatherFillType>(iEntry.value) != form.feather.fillType) {
 		  dusid(iEntry, sideWindowLocation, sideWindowSize);
 		}
 	  }
@@ -11362,7 +11362,7 @@ auto thred::handleSideWindowActive() -> bool {
 	                                                        ThrSingle->SideWindow.operator[](feather.value);
 	                                               });
 	    iFeather != FTHRLIST.end()) {
-	  form.feather.fillType = iFeather->value;
+	  form.feather.fillType = wrap::toEnumType<FeatherFillType>(iFeather->value);
 	  unsid(true);
 	  form::refil(ClosestFormToCursor);
 	  formForms::refrm();
