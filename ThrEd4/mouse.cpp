@@ -625,7 +625,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 
 	  auto const iFillTypeValue =
 	      (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
-	  auto const iFillType = static_cast<FillType>(iFillTypeValue);
+	  auto const iFillType = wrap::toEnumType<FillType>(iFillTypeValue);
 	  if (Instance->stateMap.testAndReset(StateFlag::FENDIN)) {
 		if (iFillTypeValue == 3) {
 		  Instance->userFlagMap.reset(UserFlag::SQRFIL);
