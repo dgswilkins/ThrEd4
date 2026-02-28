@@ -890,7 +890,7 @@ void ritbrd(FRM_HEAD const& form) {
       INS_REC {.code  = TYPBRD,
                .color = gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
                .index = wrap::toUnsigned(Instance->interleaveSequence.size()),
-               .seq   = I_BRD});
+               .seq   = SeqID::I_BRD});
   form::chkseq(true);
 }
 
@@ -903,7 +903,7 @@ void ritapbrd() {
       INS_REC {.code  = TYPMSK,
                .color = gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U,
                .index = wrap::toUnsigned(Instance->interleaveSequence.size()),
-               .seq   = I_AP});
+               .seq   = SeqID::I_AP});
   form::chkseq(true);
 }
 
@@ -915,7 +915,7 @@ void ritfil(FRM_HEAD& form) {
       INS_REC {.code  = TYPFRM,
                .color = gsl::narrow_cast<uint32_t>(form.fillColor),
                .index = wrap::toUnsigned(Instance->interleaveSequence.size()),
-               .seq   = I_FIL});
+               .seq   = SeqID::I_FIL});
   form::chkseq(false);
 }
 

@@ -829,14 +829,14 @@ void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) 
   auto&       interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   interleaveSequenceIndices.emplace_back(INS_REC {
-      .code = TYPFRM, .color = form.fillColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
+      .code = TYPFRM, .color = form.fillColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = SeqID::I_FIL});
   form::chkseq(false);
   if ((form.extendedAttribute & AT_FTHBLND) == 0U ||
       ~(form.extendedAttribute & (AT_FTHUP | AT_FTHBTH)) == (AT_FTHUP | AT_FTHBTH)) {
 	return;
   }
   interleaveSequenceIndices.emplace_back(INS_REC {
-      .code = FTHMSK, .color = form.feather.color, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FTH});
+      .code = FTHMSK, .color = form.feather.color, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = SeqID::I_FTH});
   auto const sequenceMax      = wrap::toUnsigned(featherSequence.size());
   auto       iReverseSequence = sequenceMax - 1U;
   for (auto iSequence = 0U; iSequence < sequenceMax; ++iSequence) {
@@ -1391,7 +1391,7 @@ void ritwlk(FRM_HEAD& form, uint32_t const walkMask) {
 
   if (!Instance->oSequence.empty()) {
 	Instance->interleaveSequenceIndices.emplace_back(INS_REC {
-	    .code = walkMask, .color = form.underlayColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = I_FIL});
+	    .code = walkMask, .color = form.underlayColor, .index = wrap::toUnsigned(interleaveSequence.size()), .seq = SeqID::I_FIL});
 #if BUGBAK
 	for (auto val : Instance->oSequence) {
 	  Instance->interleaveSequence.push_back(val);
@@ -2092,7 +2092,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
   auto&       interleaveSequenceIndices = Instance->interleaveSequenceIndices;
 
   interleaveSequenceIndices.emplace_back(INS_REC {
-      .code = 0, .color = 0, .index = wrap::toUnsigned(Instance->interleaveSequence.size()), .seq = 0});
+      .code = 0, .color = 0, .index = wrap::toUnsigned(Instance->interleaveSequence.size()), .seq = SeqID::I_AP});
   ilData.layerIndex =
       gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1) | formIndex << FRMSHFT;
   Instance->stateMap.reset(StateFlag::DIDSTRT);
@@ -2101,8 +2101,9 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
 	auto code             = 0U;
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(interleaveSequenceIndices.size() - 1U); ++iSequence) {
 	  ilData.pins = iSequence;
+	  // NOLINTNEXTLINE(clang-diagnostic-switch-default)
 	  switch (interleaveSequenceIndices.operator[](iSequence).seq) {
-		case I_AP: {
+		case SeqID::I_AP: {
 		  if ((fillStartsMap & M_FIL) != 0U && fillStartsData[FSI::kApplique] >= ilData.coloc) {
 			ilData.coloc = fillStartsData[FSI::kApplique];
 		  }
@@ -2114,7 +2115,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
 		  }
 		  break;
 		}
-		case I_FIL: {
+		case SeqID::I_FIL: {
 		  if ((fillStartsMap & M_FIL) != 0U && fillStartsData[FSI::kFill] >= ilData.coloc) {
 			ilData.coloc = fillStartsData[FSI::kFill];
 		  }
@@ -2123,7 +2124,7 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
 		  }
 		  break;
 		}
-		case I_FTH: {
+		case SeqID::I_FTH: {
 		  if ((fillStartsMap & M_FIL) != 0U && fillStartsData[FSI::kFeather] >= ilData.coloc) {
 			ilData.coloc = fillStartsData[FSI::kFeather];
 		  }
@@ -2132,18 +2133,13 @@ void xt::intlv(uint32_t const formIndex, FillStartsDataType const& fillStartsDat
 		  }
 		  break;
 		}
-		case I_BRD: {
+		case SeqID::I_BRD: {
 		  if ((fillStartsMap & M_BRD) != 0U && fillStartsData[FSI::kBorder] >= ilData.coloc) {
 			ilData.coloc = fillStartsData[FSI::kBorder];
 		  }
 		  else {
 			ilData.coloc = fillStartsData[FSI::kBorderColor];
 		  }
-		  break;
-		}
-		default: {
-		  outDebugString(L"default hit in intlv: seq [{}]\n",
-		                 interleaveSequenceIndices.operator[](iSequence).seq);
 		  break;
 		}
 	  }

@@ -943,20 +943,22 @@ class SEARCH_REC
   float    length {};
 };
 
+// interleave sequence identifiers
+enum class SeqID : uint8_t { 
+  I_AP = 0,
+  I_FIL = 1,
+  I_FTH = 2,
+  I_BRD = 3
+};
+
 class INS_REC
 {
   public:
   uint32_t code {};
   uint32_t color {};
   uint32_t index {};
-  uint32_t seq {};
+  SeqID   seq {};
 };
-
-// interleave sequence identifiers
-constexpr auto I_AP  = uint8_t {0U};
-constexpr auto I_FIL = uint8_t {1U};
-constexpr auto I_FTH = uint8_t {2U};
-constexpr auto I_BRD = uint8_t {3U};
 
 class RNG_COUNT
 {
