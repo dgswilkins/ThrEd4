@@ -634,6 +634,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  else {
+		// NOLINTNEXTLINE(clang-diagnostic-switch-default)
 		switch (iFillType) {
 		  case FillType::Line:
 			form::duform(FormStyles::kLine);
@@ -673,6 +674,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			break;
 		}
 	  }
+	  // NOLINTNEXTLINE(clang-diagnostic-switch-default)
 	  switch (iFillType) {
 		case FillType::RPoly:
 		case FillType::Star:
