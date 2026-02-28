@@ -1252,7 +1252,7 @@ void trace::tracpar() {
 	  trace();
 	}
 	else {
-	  switch (auto const row = wrap::toEnumType<Window>(wrap::floor<int8_t>(TraceMsgPoint.y / ButtonHeight)); row) {
+	  switch (auto const row = wrap::toEnumType<Window>(wrap::floor<int8_t>(TraceMsgPoint.y / ButtonHeight)); row) { // NOLINT(clang-diagnostic-switch-default)
 		case Window::row01: {
 		  Instance->stateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
 		  {
