@@ -608,24 +608,23 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	GetWindowRect(MsgWindow, &windowRect);
 	if (WinMsg.pt.x >= windowRect.left && WinMsg.pt.x <= windowRect.right &&
 	    WinMsg.pt.y >= windowRect.top && WinMsg.pt.y <= windowRect.bottom) {
-	  enum class FillType : int {
-	    Line   = 0,
-	    FPoly  = 1,
-	    RPoly  = 2,
-	    Star   = 3,
-	    Spiral = 4,
-	    Heart  = 5,
-	    Lens   = 6,
-	    Egg    = 7,
-	    Tear   = 8,
-	    Zigzag = 9,
-	    Wave   = 10,
-	    Daisy  = 11
+	  enum class FillType : uint8_t {
+		Line   = 0,
+		FPoly  = 1,
+		RPoly  = 2,
+		Star   = 3,
+		Spiral = 4,
+		Heart  = 5,
+		Lens   = 6,
+		Egg    = 7,
+		Tear   = 8,
+		Zigzag = 9,
+		Wave   = 10,
+		Daisy  = 11
 	  };
 
-	  auto const iFillTypeValue =
-	      (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
-	  auto const iFillType = wrap::toEnumType<FillType>(iFillTypeValue);
+	  auto const iFillTypeValue = (WinMsg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
+	  auto const iFillType      = wrap::toEnumType<FillType>(iFillTypeValue);
 	  if (Instance->stateMap.testAndReset(StateFlag::FENDIN)) {
 		if (iFillTypeValue == 3) {
 		  Instance->userFlagMap.reset(UserFlag::SQRFIL);
@@ -672,9 +671,6 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  case FillType::Daisy:
 			form::duform(FormStyles::kDaisy);
 			break;
-		  default: {
-			break;
-		  }
 		}
 	  }
 	  switch (iFillType) {
@@ -690,8 +686,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		case FillType::FPoly:
 		case FillType::Tear:
 		case FillType::Wave:
-		case FillType::Daisy:
-		default: {
+		case FillType::Daisy: {
 		}
 	  }
 	}
