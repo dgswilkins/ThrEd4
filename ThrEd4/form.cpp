@@ -4090,19 +4090,35 @@ void fmclp(FRM_HEAD& form) {
   LineSpacing          = savedSpacing;
 }
 
+enum class EdgeType : decltype(EDGELINE) {
+  EDGELINE   = EDGELINE,
+  EDGEBEAN   = EDGEBEAN,
+  EDGECLIP   = EDGECLIP,
+  EDGEANGSAT = EDGEANGSAT,
+  EDGEPROPSAT = EDGEPROPSAT,
+  EDGEAPPL   = EDGEAPPL,
+  EDGEBHOL   = EDGEBHOL,
+  EDGEPICOT  = EDGEPICOT,
+  EDGEDOUBLE = EDGEDOUBLE,
+  EDGELCHAIN = EDGELCHAIN,
+  EDGEOCHAIN = EDGEOCHAIN,
+  EDGECLIPX  = EDGECLIPX
+};
+
 void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
-  switch (form.edgeType & NEGUND) {
-	case EDGELINE: {
+  auto const maskedEdgeType = form.edgeType & NEGUND;
+  switch (static_cast<EdgeType>(maskedEdgeType)) {
+	case EdgeType::EDGELINE: {
 	  brdfil(form);
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEBEAN: {
+	case EdgeType::EDGEBEAN: {
 	  bold(form);
 	  ritbrd(form);
 	  break;
 	}
-	case EDGECLIP: {
+	case EdgeType::EDGECLIP: {
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 	  clip::clpout(form.borderSize);
@@ -4110,13 +4126,13 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEANGSAT: {
+	case EdgeType::EDGEANGSAT: {
 	  Instance->stateMap.reset(StateFlag::SAT1);
 	  satin::slbrd(form);
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEPROPSAT: {
+	case EdgeType::EDGEPROPSAT: {
 	  if (form.vertexCount > 2) {
 		Instance->stateMap.reset(StateFlag::SAT1);
 		plbrd(form, angledForm, Instance->angledFormVertices);
@@ -4124,7 +4140,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  }
 	  break;
 	}
-	case EDGEAPPL: {
+	case EdgeType::EDGEAPPL: {
 	  lapbrd(form);
 	  ritapbrd();
 	  Instance->stateMap.reset(StateFlag::SAT1);
@@ -4132,7 +4148,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEBHOL: {
+	case EdgeType::EDGEBHOL: {
 	  auto const length      = ButtonholeCornerLength;
 	  ButtonholeCornerLength = form::getblen();
 	  satin::satout(form, BHWIDTH);
@@ -4141,7 +4157,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEPICOT: {
+	case EdgeType::EDGEPICOT: {
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 	  auto const length      = ButtonholeCornerLength;
@@ -4151,24 +4167,24 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEDOUBLE: {
+	case EdgeType::EDGEDOUBLE: {
 	  dubfn(form);
 	  ritbrd(form);
 	  break;
 	}
-	case EDGELCHAIN: {
+	case EdgeType::EDGELCHAIN: {
 	  Instance->stateMap.set(StateFlag::LINCHN);
 	  clip::chnfn(form);
 	  ritbrd(form);
 	  break;
 	}
-	case EDGEOCHAIN: {
+	case EdgeType::EDGEOCHAIN: {
 	  Instance->stateMap.reset(StateFlag::LINCHN);
 	  clip::chnfn(form);
 	  ritbrd(form);
 	  break;
 	}
-	case EDGECLIPX: {
+	case EdgeType::EDGECLIPX: {
 	  auto clipRect = F_RECTANGLE {};
 	  clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 	  clip::duxclp(form);
