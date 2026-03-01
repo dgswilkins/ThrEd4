@@ -175,21 +175,6 @@ class V_RECT_2
   F_POINT dopnt;
 };
 
-enum class EdgeType : uint8_t {
-  line         = EDGELINE,
-  bean         = EDGEBEAN,
-  clip         = EDGECLIP,
-  angSatin     = EDGEANGSAT,
-  propSatin    = EDGEPROPSAT,
-  applique     = EDGEAPPL,
-  buttonHole   = EDGEBHOL,
-  picot        = EDGEPICOT,
-  doubleStitch = EDGEDOUBLE,
-  lineChain    = EDGELCHAIN,
-  openChain    = EDGEOCHAIN,
-  evenClip     = EDGECLIPX
-};
-
 namespace {
 constexpr auto BHWIDTH  = 20.0F; // Button hole width
 constexpr auto CLPMIN   = 0.5F;  // if clipboard data width less than this, then don't fill
@@ -1392,7 +1377,7 @@ void chkbrd(FRM_HEAD const& form) {
 	  clip::duxclp(form);
 	  break;
 	}
-	case EdgeType::angSatin: {
+	case EdgeType::angleSatin: {
 	  satin::sbrd(form);
 	  break;
 	}
@@ -1406,7 +1391,7 @@ void chkbrd(FRM_HEAD const& form) {
 	  satin::sbrd(form);
 	  break;
 	}
-	case EdgeType::buttonHole: {
+	case EdgeType::buttonhole: {
 	  auto const length      = ButtonholeCornerLength;
 	  ButtonholeCornerLength = form::getblen();
 	  satin::satout(form, BHWIDTH);
@@ -4123,7 +4108,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  ritbrd(form);
 	  break;
 	}
-	case EdgeType::angSatin: {
+	case EdgeType::angleSatin: {
 	  Instance->stateMap.reset(StateFlag::SAT1);
 	  satin::slbrd(form);
 	  ritbrd(form);
@@ -4145,7 +4130,7 @@ void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
 	  ritbrd(form);
 	  break;
 	}
-	case EdgeType::buttonHole: {
+	case EdgeType::buttonhole: {
 	  auto const length      = ButtonholeCornerLength;
 	  ButtonholeCornerLength = form::getblen();
 	  satin::satout(form, BHWIDTH);

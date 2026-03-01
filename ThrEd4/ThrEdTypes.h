@@ -631,6 +631,22 @@ constexpr auto EDGELIST =
                                       {.stringID = IDS_EDG11, .value = EDGEOCHAIN},
                                       {.stringID = IDS_EDG12, .value = EDGECLIPX}}};
 
+enum class EdgeType : uint8_t {
+  unfilled     = EDGEUNFIL,
+  line         = EDGELINE,
+  bean         = EDGEBEAN,
+  clip         = EDGECLIP,
+  angleSatin   = EDGEANGSAT,
+  applique     = EDGEAPPL,
+  propSatin    = EDGEPROPSAT,
+  buttonhole   = EDGEBHOL,
+  picot        = EDGEPICOT,
+  doubleStitch = EDGEDOUBLE,
+  lineChain    = EDGELCHAIN,
+  openChain    = EDGEOCHAIN,
+  evenClip     = EDGECLIPX
+};
+
 // preference window entries
 constexpr auto PRFAPPCOL = uint8_t {0U};   // Applique color
 constexpr auto PRFAPSLEN = uint8_t {1U};   // Applique stitchLen
