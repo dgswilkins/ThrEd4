@@ -1190,8 +1190,9 @@ void nudfn(F_RECTANGLE const& designSizeRect) noexcept {
 
 void nurat(FEATHER& feather) noexcept {
   auto const remainder = fmodf(feather.globalPosition, 1.0F);
-  switch (feather.fillType) {
+  switch (feather.fillType) { // NOLINT(clang-diagnostic-switch-default)
 	case FeatherFillType::none: {
+	  return;
 	}
 	case FeatherFillType::sine: {
 	  if (remainder > feather.globalRatio) {
