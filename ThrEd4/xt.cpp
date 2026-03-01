@@ -1191,6 +1191,32 @@ void nudfn(F_RECTANGLE const& designSizeRect) noexcept {
 void nurat(FEATHER& feather) noexcept {
   auto const remainder = fmodf(feather.globalPosition, 1.0F);
   switch (feather.fillType) {
+	case FeatherFillType::none: {
+	}
+	case FeatherFillType::sine: {
+	  if (remainder > feather.globalRatio) {
+		feather.ratio = (sin(((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F) + PI_F) * HALF) + HALF;
+	  }
+	  else {
+		feather.ratio = (sin(remainder / feather.globalRatio * PI_F) * HALF) + HALF;
+	  }
+	  feather.ratio *= feather.formRatio;
+	  break;
+	}
+	case FeatherFillType::halfSine: {
+	  if (remainder > feather.globalRatio) {
+		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F);
+	  }
+	  else {
+		feather.ratio = sin(remainder / feather.globalRatio * PI_F);
+	  }
+	  feather.ratio *= feather.formRatio;
+	  break;
+	}
+	case FeatherFillType::line: {
+	  feather.ratio = feather.formRatio;
+	  break;
+	}
 	case FeatherFillType::ragged: {
 	  if (feather.upCount != 0U) {
 		if (feather.countUp != 0U) {
@@ -1219,35 +1245,6 @@ void nurat(FEATHER& feather) noexcept {
 	  feather.ratio *= feather.formRatio;
 	  break;
 	}
-	case FeatherFillType::picket: {
-	  if (feather.phase >= feather.upCount) {
-		feather.ratio = 1;
-	  }
-	  else {
-		feather.ratio = feather.formRatio;
-	  }
-	  break;
-	}
-	case FeatherFillType::sine: {
-	  if (remainder > feather.globalRatio) {
-		feather.ratio = (sin(((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F) + PI_F) * HALF) + HALF;
-	  }
-	  else {
-		feather.ratio = (sin(remainder / feather.globalRatio * PI_F) * HALF) + HALF;
-	  }
-	  feather.ratio *= feather.formRatio;
-	  break;
-	}
-	case FeatherFillType::halfSine: {
-	  if (remainder > feather.globalRatio) {
-		feather.ratio = sin((1.0F - remainder) / (1.0F - feather.globalRatio) * PI_F);
-	  }
-	  else {
-		feather.ratio = sin(remainder / feather.globalRatio * PI_F);
-	  }
-	  feather.ratio *= feather.formRatio;
-	  break;
-	}
 	case FeatherFillType::sawtooth: {
 	  if (remainder > feather.globalRatio) {
 		feather.ratio = (1.0F - remainder) / (1.0F - feather.globalRatio);
@@ -1258,9 +1255,13 @@ void nurat(FEATHER& feather) noexcept {
 	  feather.ratio *= feather.formRatio;
 	  break;
 	}
-	case FeatherFillType::line:
-	default: {
-	  feather.ratio = feather.formRatio;
+	case FeatherFillType::picket: {
+	  if (feather.phase >= feather.upCount) {
+		feather.ratio = 1;
+	  }
+	  else {
+		feather.ratio = feather.formRatio;
+	  }
 	  break;
 	}
   }
