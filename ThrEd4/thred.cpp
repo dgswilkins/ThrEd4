@@ -4436,23 +4436,28 @@ void init() {
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) { // create the buttons below the color windows
 	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
 	auto buttonTxt = std::wstring {};
-	switch (iButton) {
-	  case HBOXSEL: {
+	switch (wrap::toEnumType<ButtonWindow>(iButton)) {
+	  case ButtonWindow::boxSelect: {
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		buttonTxt.assign(displayText::loadStr(IDS_BOXSEL));
 		break;
 	  }
-	  case HUPTO: {
+	  case ButtonWindow::upTo: {
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		buttonTxt.assign(displayText::loadStr(IDS_UPOF));
 		break;
 	  }
-	  case HHID: {
+	  case ButtonWindow::pickColor: {
 		windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
 		buttonTxt.assign(displayText::loadStr(IDS_PIKOL));
 		break;
 	  }
-	  default: {
+	  case ButtonWindow::number:
+	  case ButtonWindow::total:
+	  case ButtonWindow::minLen:
+	  case ButtonWindow::maxLen:
+	  case ButtonWindow::color:
+	  case ButtonWindow::layer: {
 		buttonTxt.assign(blank);
 	  }
 	}

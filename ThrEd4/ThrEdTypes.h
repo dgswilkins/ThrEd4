@@ -958,6 +958,18 @@ constexpr auto HCOR      = uint8_t {7U};
 constexpr auto HLAYR     = uint8_t {8U};
 constexpr auto BUTTONCNT = uint8_t {9U};
 
+enum class ButtonWindow : uint8_t {
+  boxSelect = HBOXSEL, // HBOXSEL
+  upTo      = HUPTO,   // HUPTO
+  pickColor = HHID,    // HHID
+  number    = HNUM,    // HNUM
+  total     = HTOT,    // HTOT
+  minLen    = HMINLEN, // HMINLEN
+  maxLen    = HMAXLEN, // HMAXLEN
+  color     = HCOR,    // HCOR
+  layer     = HLAYR    // HLAYR
+};
+
 // text button windows
 constexpr auto HTXCLR  = uint8_t {0U};
 constexpr auto HTXHI   = uint8_t {1U};
