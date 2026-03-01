@@ -1367,11 +1367,11 @@ void dubfn(FRM_HEAD const& currentForm) {
 }
 
 void chkbrd(FRM_HEAD const& form) {
-  if (form.edgeType == EDGEUNFIL) {
-	return;
-  }
   // NOLINTNEXTLINE(clang-diagnostic-switch-default)
   switch (auto const maskedEdgeType = wrap::toEnumType<EdgeType>(form.edgeType & NEGUND); maskedEdgeType) {
+	case EdgeType::unfilled: {
+	  return;
+	}
 	case EdgeType::line: {
 	  brdfil(form);
 	  break;
