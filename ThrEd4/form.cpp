@@ -4090,6 +4090,9 @@ void fmclp(FRM_HEAD& form) {
 void swEdgeType(FRM_HEAD const& form, FRM_HEAD& angledForm) {
   // NOLINTNEXTLINE(clang-diagnostic-switch-default)
   switch (auto const maskedEdgeType = wrap::toEnumType<EdgeType>(form.edgeType & NEGUND); maskedEdgeType) {
+	case EdgeType::unfilled: {
+	  return;
+	}
 	case EdgeType::line: {
 	  brdfil(form);
 	  ritbrd(form);
