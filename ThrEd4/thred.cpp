@@ -872,52 +872,52 @@ void chknum() {
   xt::clrstch();
   auto& formList = Instance->formList;
 
-  if (SideWinMsgIdx != 0U) {
+  if (SideWinMsgIdx != 0U) { // there is a value in the side window to update from
 	auto const& valueWindow           = Instance->valueWindow;
 	auto&       sideWindowEntryBuffer = ThrSingle->SideWindowEntryBuffer;
 	if (FormMenuChoice != 0U) { // the form menu is open
 	  auto& form = formList.operator[](ClosestFormToCursor);
 
 	  auto const value = wrap::wcsToFloat(sideWindowEntryBuffer.data()) * PFGRAN;
-	  switch (FormMenuChoice) {
-		case LTXOF: { // update texture fill spacing
+	  switch (wrap::toEnumType<FormDataLines>(FormMenuChoice)) { // NOLINT(clang-diagnostic-switch-default)
+		case FormDataLines::TextureFillSpacing: { // update texture fill spacing
 		  thred::savdo();
 		  form.txof = value;
 		  break;
 		}
-		case LUANG: { // update underlay angle
+		case FormDataLines::UnderlayAngle: { // update underlay angle
 		  thred::savdo();
 		  form.underlayStitchAngle = value * DEGRADF * IPFGRAN;
 		  break;
 		}
-		case LUSPAC: { // update underlay spacing
+		case FormDataLines::UnderlaySpacing: { // update underlay spacing
 		  thred::savdo();
 		  form.underlaySpacing = value;
 		  break;
 		}
-		case LWLKIND: { // update underlay indent spacing
+		case FormDataLines::EdgeWalkUnderlayIndent: { // update underlay indent spacing
 		  thred::savdo();
 		  form.underlayIndent = value;
 		  break;
 		}
-		case LULEN: { // update underlay stitch length
+		case FormDataLines::UnderlayStitchLength: { // update underlay stitch length
 		  thred::savdo();
 		  form.underlayStitchLen = value;
 		  break;
 		}
-		case LDSTRT: { // update fill start point
+		case FormDataLines::FormFillStartData: { // update fill start point
 		  thred::savdo();
 		  form.fillStart = wrap::round<uint32_t>(value * IPFGRAN);
 		  form.fillStart %= form.vertexCount;
 		  break;
 		}
-		case LDEND: { // update fill end point
+		case FormDataLines::FormFillEndData: { // update fill end point
 		  thred::savdo();
 		  form.fillEnd = wrap::round<uint32_t>(value * IPFGRAN);
 		  form.fillEnd %= form.vertexCount;
 		  break;
 		}
-		case LFTHUPCNT: { // update feather up count
+		case FormDataLines::FeatherUpCount: { // update feather up count
 		  thred::savdo();
 		  auto           upcnt    = value * IPFGRAN;
 		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
@@ -926,7 +926,7 @@ void chknum() {
 		  form.feather.upCount = wrap::round<uint8_t>(upcnt);
 		  break;
 		}
-		case LFTHCOL: { // update feather color
+		case FormDataLines::FeatherColor: { // update feather color
 		  if (value != 0.0F) {
 			thred::savdo();
 			form::nufthcol((wrap::wcsToLong<uint32_t>(sideWindowEntryBuffer.data()) - 1U) & COLMSK);
@@ -937,7 +937,7 @@ void chknum() {
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
-		case LFRMCOL: { // update form color
+		case FormDataLines::FormFillColor: { // update form color
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
@@ -951,7 +951,7 @@ void chknum() {
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
-		case LUNDCOL: { // update underlay color
+		case FormDataLines::UnderlayColor: { // update underlay color
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
@@ -966,7 +966,7 @@ void chknum() {
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
-		case LBRDCOL: { // update border color
+		case FormDataLines::BorderColor: { // update border color
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
@@ -980,7 +980,7 @@ void chknum() {
 		  Instance->stateMap.set(StateFlag::RESTCH);
 		  return;
 		}
-		case LBRDPIC: { // update picot spacing
+		case FormDataLines::PicotBorderSpacing: { // update picot spacing
 		  thred::savdo();
 		  form.edgeSpacing = value;
 		  thred::unsid(true);
@@ -988,7 +988,7 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LFRMFAZ: { // update clip phase angle
+		case FormDataLines::ClipboardPhase: { // update clip phase angle
 		  thred::savdo();
 		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
 		  thred::unsid(true);
@@ -996,7 +996,7 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LBRDPOS: { // update chain position
+		case FormDataLines::ChainPosition: { // update chain position
 		  thred::savdo();
 		  form.edgeStitchLen = value * IPFGRAN;
 		  thred::unsid(true);
@@ -1004,7 +1004,7 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMAXFIL: { // update max fill stitch length
+		case FormDataLines::MaxFillStitchLength: { // update max fill stitch length
 		  thred::savdo();
 		  form.maxFillStitchLen = value;
 		  thred::unsid(true);
@@ -1012,7 +1012,7 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMINFIL: { // update min fill stitch length
+		case FormDataLines::MinFillStitchLength: { // update min fill stitch length
 		  thred::savdo();
 		  form.minFillStitchLen = value;
 		  thred::unsid(true);
@@ -1020,7 +1020,7 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMAXBRD: { // update max border stitch length
+		case FormDataLines::MaxBorderStitchLength: { // update max border stitch length
 		  thred::savdo();
 		  form.maxBorderStitchLen = value;
 		  thred::unsid(true);
@@ -1028,7 +1028,7 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		case LMINBRD: { // update min border stitch length
+		case FormDataLines::MinBorderStitchLength: { // update min border stitch length
 		  thred::savdo();
 		  form.minBorderStitchLen = value;
 		  thred::unsid(true);
@@ -1036,114 +1036,124 @@ void chknum() {
 		  form::refil(ClosestFormToCursor);
 		  return;
 		}
-		default: {
-		  outDebugString(L"default hit in chknum 1: FormMenuChoice [{}]\n", FormMenuChoice);
+		case FormDataLines::ButtonholeCornerSize: {
+		  thred::savdo();
+		  if (form.edgeType == EDGEBHOL) {
+			form::savblen(value);
+		  }
+		  else {
+			form::savplen(value);
+		  }
 		  break;
 		}
-	  }
-	  if (FormMenuChoice == LBCSIZ) { // update buttonhole corner size or picot length
-		thred::savdo();
-		if (form.edgeType == EDGEBHOL) {
-		  form::savblen(value);
+		case FormDataLines::FeatherSize: { // update feather size
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.feather.ratio = value * IPFGRAN;
+		  }
+		  break;
 		}
-		else {
-		  form::savplen(value);
+		case FormDataLines::FeatherNumber: { // update feather count
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
+		  }
+		  break;
 		}
-	  }
-	  else {
-		if (value != 0.0F) {
-		  switch (FormMenuChoice) {
-			case LFTHSIZ: { // update feather size
-			  thred::savdo();
-			  form.feather.ratio = value * IPFGRAN;
-			  break;
-			}
-			case LFTHNUM: { // update feather count
-			  thred::savdo();
-			  form.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
-			  break;
-			}
-			case LFTHFLR: { // update feather min stitch size
-			  thred::savdo();
-			  form.feather.minStitchSize = value;
-			  break;
-			}
-			case LFTHDWNCNT: { // update feather down count
-			  thred::savdo();
-			  auto           dncnt    = value * IPFGRAN;
-			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
+		case FormDataLines::FeatherFloor: { // update feather floor
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.feather.minStitchSize = value;
+		  }
+		  break;
+		}
+		case FormDataLines::FeatherDownCount: { // update feather down count
+		  if (value != 0.0F) {
+			thred::savdo();
+			auto           dncnt    = value * IPFGRAN;
+			constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
 
-			  dncnt                  = std::min(dncnt, FDNCLAMP);
-			  form.feather.downCount = wrap::round<uint8_t>(dncnt);
-			  break;
-			}
-			case LFRMSPAC: { // update fill spacing
-			  thred::savdo();
-			  form.fillSpacing = value;
-			  break;
-			}
-			case LFRMLEN: { // update fill stitch length
-			  thred::savdo();
-			  form.stitchLength = value;
-			  break;
-			}
-			case LBRDSPAC: { // update border spacing
-			  thred::savdo();
-			  switch (auto const edgeType = form.edgeType & NEGUND; edgeType) {
-				case EDGEPROPSAT:
-				case EDGEOCHAIN:
-				case EDGELCHAIN: {
-				  form.edgeSpacing = value;
-				  break;
-				}
-				default: {
-				  form.edgeSpacing = value * HALF;
-				}
-			  }
-			  break;
-			}
-			case LBRDLEN: { // update border stitch length
-			  thred::savdo();
-			  form.edgeStitchLen = value;
-			  break;
-			}
-			case LBRDSIZ: { // update border width
-			  thred::savdo();
-			  form.borderSize = value;
-			  break;
-			}
-			case LFRMANG: { // update fill angle
-			  thred::savdo();
-			  form.fillAngle = value * DEGRADF * IPFGRAN;
-			  break;
-			}
-			case LSACANG: { // update clip fill angle
-			  thred::savdo();
-			  form.clipFillAngle = value * DEGRADF * IPFGRAN;
-			  break;
-			}
-			case LAPCOL: { // update applique color
-			  thred::savdo();
-			  form.borderColor &= COLMSK;
-			  auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
-			  if (borderColor != 0U) {
-				--borderColor;
-			  }
-			  borderColor &= COLMSK;
-			  form.borderColor |= gsl::narrow_cast<decltype(form.borderColor)>(borderColor << 4U);
-			  break;
-			}
-			default: {
-			  outDebugString(L"default hit in chknum 2: FormMenuChoice [{}]\n", FormMenuChoice);
-			  break;
-			}
+			dncnt                  = std::min(dncnt, FDNCLAMP);
+			form.feather.downCount = wrap::round<uint8_t>(dncnt);
 		  }
+		  break;
 		}
-		else {
-		  thred::savdo();
-		  if (FormMenuChoice == LFRMSPAC && form.isFanClip()) { // update fan clip spacing
-			form.fillSpacing = 0;
+		case FormDataLines::FormFillSpace: { // update fill spacing
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.fillSpacing = value;
 		  }
+		  else {
+			if (form.isFanClip()) { // update fan clip spacing
+			  thred::savdo();
+			  form.fillSpacing = 0;
+			}
+		  }
+		  break;
+		}
+		case FormDataLines::FormStitchLen: { // update fill stitch length
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.stitchLength = value;
+		  }
+		  break;
+		}
+		case FormDataLines::BorderSpace: { // update border spacing
+		  if (value != 0.0F) {
+			thred::savdo();
+			switch (auto const edgeType = form.edgeType & NEGUND; edgeType) {
+			  case EDGEPROPSAT:
+			  case EDGEOCHAIN:
+			  case EDGELCHAIN: {
+				form.edgeSpacing = value;
+				break;
+			  }
+			  default: {
+				form.edgeSpacing = value * HALF;
+			  }
+			}
+		  }
+		  break;
+		}
+		case FormDataLines::BorderStitchLen: { // update border stitch length
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.edgeStitchLen = value;
+		  }
+		  break;
+		}
+		case FormDataLines::BorderSize: { // update border width
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.borderSize = value;
+		  }
+		  break;
+		}
+		case FormDataLines::FormAngle: { // update fill angle
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.fillAngle = value * DEGRADF * IPFGRAN;
+		  }
+		  break;
+		}
+		case FormDataLines::AngleClipboardAngle: { // update clip fill angle
+		  if (value != 0.0F) {
+			thred::savdo();
+			form.clipFillAngle = value * DEGRADF * IPFGRAN;
+		  }
+		  break;
+		}
+		case FormDataLines::AppliqueColor: { // update applique color
+		  if (value != 0.0F) {
+			form.borderColor &= COLMSK;
+			auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
+			if (borderColor != 0U) {
+			  --borderColor;
+			}
+			borderColor &= COLMSK;
+			form.borderColor |= gsl::narrow_cast<decltype(form.borderColor)>(borderColor << 4U);
+		  }
+		  break;
 		}
 	  }
 	  thred::unsid(true);

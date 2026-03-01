@@ -761,6 +761,95 @@ constexpr auto LUNDCOL    = uint8_t {47U}; // underlay color
 constexpr auto LTXOF      = uint8_t {48U}; // texture fill spacing
 constexpr auto LASTLIN    = uint8_t {49U}; // must be the last entry
 
+//enum class AllFormDataLines : uint8_t {
+//  Form0                  = LFRM,       // form 0
+//  Layer                  = LLAYR,      // layer 1
+//  FormFill               = LFRMFIL,    // form fill 2
+//  FormFillColor          = LFRMCOL,    // form fill color 3
+//  FormFillSpace          = LFRMSPAC,   // form fill space 4
+//  FormStitchLen          = LFRMLEN,    // form stitch length 5
+//  FormAngle              = LFRMANG,    // angle of angle fill 6
+//  Border                 = LBRD,       // border 7
+//  BorderColor            = LBRDCOL,    // border color 8
+//  BorderSpace            = LBRDSPAC,   // border space 9
+//  BorderStitchLen        = LBRDLEN,    // border stitch length 10
+//  BorderSize             = LBRDSIZ,    // border size 11
+//  AppliqueColor          = LAPCOL,     // applique color 12
+//  ButtonholeCornerSize   = LBCSIZ,     // buttonhole corner size 13
+//  FormStartStyle         = LBSTRT,     // form start style 14
+//  FormEndStyle           = LBFIN,      // form end style 15
+//  PicotBorderSpacing     = LBRDPIC,    // picot border spacing 16
+//  BorderUnderlay         = LBRDUND,    // border underlay 17
+//  AngleClipboardAngle    = LSACANG,    // angle clipboard angle 18
+//  ClipboardPhase         = LFRMFAZ,    // clipboard phase 19
+//  ChainPosition          = LBRDPOS,    // chain position 20
+//  SquarePointedFillEnds  = LBFILSQR,   // square/pointed fill ends 21
+//  MaxFillStitchLength    = LMAXFIL,    // maximum fill stitch length 22
+//  MinFillStitchLength    = LMINFIL,    // minimum fill stitch length 23
+//  MaxBorderStitchLength  = LMAXBRD,    // maximum border stitch length 24
+//  MinBorderStitchLength  = LMINBRD,    // minimum border stitch length 25
+//  FeatherColor           = LFTHCOL,    // feather color 26
+//  FeatherFillType        = LFTHTYP,    // feather fill type
+//  FeatherBlend           = LFTHBLND,   // feather blend
+//  FeatherBothUpDown      = LFTHBTH,    // feather both up and down
+//  FeatherUpDown          = LFTHUP,     // feather up or down
+//  FeatherUpCount         = LFTHUPCNT,  // feather up count
+//  FeatherDownCount       = LFTHDWNCNT, // feather down count
+//  FeatherSize            = LFTHSIZ,    // feather size
+//  FeatherNumber          = LFTHNUM,    // feather number
+//  FeatherFloor           = LFTHFLR,    // feather floor
+//  FormFillStartOnOff     = LFSTRT,     // form fill start on/off
+//  FormFillStartData      = LDSTRT,     // form fill start data
+//  FormFillEndOnOff       = LFEND,      // form fill end on/off
+//  FormFillEndData        = LDEND,      // form fill end data
+//  CenterWalk             = LCWLK,      // center walk
+//  EdgeWalk               = LWALK,      // edge walk
+//  EdgeWalkUnderlayIndent = LWLKIND,    // edge walk/underlay indent
+//  Underlay               = LUND,       // underlay
+//  UnderlayStitchLength   = LULEN,      // underlay stitch length
+//  UnderlayAngle          = LUANG,      // underlay angle
+//  UnderlaySpacing        = LUSPAC,     // underlay spacing
+//  UnderlayColor          = LUNDCOL,    // underlay color
+//  TextureFillSpacing     = LTXOF,      // texture fill spacing
+//  LastLine               = LASTLIN     // must be the last entry
+//};
+
+enum class FormDataLines : uint8_t {   // form data lines that take a numeric value
+  FormFillColor          = LFRMCOL,    // form fill color 3
+  FormFillSpace          = LFRMSPAC,   // form fill space 4
+  FormStitchLen          = LFRMLEN,    // form stitch length 5
+  FormAngle              = LFRMANG,    // angle of angle fill 6
+  BorderColor            = LBRDCOL,    // border color 8
+  BorderSpace            = LBRDSPAC,   // border space 9
+  BorderStitchLen        = LBRDLEN,    // border stitch length 10
+  BorderSize             = LBRDSIZ,    // border size 11
+  AppliqueColor          = LAPCOL,     // applique color 12
+  ButtonholeCornerSize   = LBCSIZ,     // buttonhole corner size 13
+  PicotBorderSpacing     = LBRDPIC,    // picot border spacing 16
+  AngleClipboardAngle    = LSACANG,    // angle clipboard angle 18
+  ClipboardPhase         = LFRMFAZ,    // clipboard phase 19
+  ChainPosition          = LBRDPOS,    // chain position 20
+  MaxFillStitchLength    = LMAXFIL,    // maximum fill stitch length 22
+  MinFillStitchLength    = LMINFIL,    // minimum fill stitch length 23
+  MaxBorderStitchLength  = LMAXBRD,    // maximum border stitch length 24
+  MinBorderStitchLength  = LMINBRD,    // minimum border stitch length 25
+  FeatherColor           = LFTHCOL,    // feather color 26
+  FeatherUpCount         = LFTHUPCNT,  // feather up count
+  FeatherDownCount       = LFTHDWNCNT, // feather down count
+  FeatherSize            = LFTHSIZ,    // feather size
+  FeatherNumber          = LFTHNUM,    // feather number
+  FeatherFloor           = LFTHFLR,    // feather floor
+  FormFillStartData      = LDSTRT,     // form fill start data
+  FormFillEndData        = LDEND,      // form fill end data
+  EdgeWalkUnderlayIndent = LWLKIND,    // edge walk/underlay indent
+  UnderlayStitchLength   = LULEN,      // underlay stitch length
+  UnderlayAngle          = LUANG,      // underlay angle
+  UnderlaySpacing        = LUSPAC,     // underlay spacing
+  UnderlayColor          = LUNDCOL,    // underlay color
+  TextureFillSpacing     = LTXOF      // texture fill spacing
+};
+
+
 // fill message codes
 constexpr auto FMM_FAN   = uint16_t {0U};
 constexpr auto FMM_VRT   = uint16_t {1U};
