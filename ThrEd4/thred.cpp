@@ -1101,14 +1101,23 @@ void chknum() {
 		case FormDataLines::BorderSpace: { // update border spacing
 		  if (value != 0.0F) {
 			thred::savdo();
-			switch (auto const edgeType = form.edgeType & NEGUND; edgeType) {
-			  case EDGEPROPSAT:
-			  case EDGEOCHAIN:
-			  case EDGELCHAIN: {
+			switch (auto const edgeType = wrap::toEnumType<EdgeType>(form.edgeType & NEGUND); edgeType) { // NOLINT(clang-diagnostic-switch-default)
+			  case EdgeType::propSatin:
+			  case EdgeType::openChain:
+			  case EdgeType::lineChain: {
 				form.edgeSpacing = value;
 				break;
 			  }
-			  default: {
+			  case EdgeType::unfilled:
+			  case EdgeType::line:
+			  case EdgeType::bean:
+			  case EdgeType::clip:
+			  case EdgeType::angleSatin:
+			  case EdgeType::applique:
+			  case EdgeType::buttonhole:
+			  case EdgeType::picot:
+			  case EdgeType::doubleStitch:
+			  case EdgeType::evenClip: {
 				form.edgeSpacing = value * HALF;
 			  }
 			}
