@@ -697,6 +697,66 @@ constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {
      {.stringID = IDS_PRF8, .value = PRFSBXCUT},  {.stringID = IDS_PRF4, .value = PRFSTCMAX},
      {.stringID = IDS_PRF5, .value = PRFSTCUSR},  {.stringID = IDS_PRF6, .value = PRFSTCMIN}}};
 
+//enum class AllPrefDataLines : uint8_t {
+//  appliqueColor = PRFAPPCOL,
+//  appliqueStitchLen = PRFAPSLEN,
+//  borderWidth = PRFBRDWID,
+//  buttonCornerLen = PRFBCNLEN,
+//  chainFillLen = PRFCHFLEN,
+//  chainFillPos = PRFCHFPOS,
+//  clipboardOffset = PRFCLPOFF,
+//  clipboardPhase = PRFCLPPHS,
+//  eggRatio = PRFEGGRAT,
+//  fillAngle = PRFFILANG,
+//  fillEnds = PRFFILEND,
+//  fillSpacing = PRFFILSPC,
+//  gridCutoff = PRFGRDCUT,
+//  gridSize = PRFGRDSIZ,
+//  hoopType = PRFHUPTYP,
+//  hoopHeight = PRFHUPHGT,
+//  hoopWidth = PRFHUPWID,
+//  lensRatio = PRFLENRAT,
+//  nudgePixels = PRFNUGSTP,
+//  picotSpacing = PRFPCTSPC,
+//  satinFormEnds = PRFSATEND,
+//  satinUnderlay = PRFSATUND,
+//  smallStitchSize = PRFSMLSTH,
+//  snapToSize = PRFSNPSIZ,
+//  spiralWraps = PRFSPLWRP,
+//  starRatio = PRFSTRRAT,
+//  stitchBoxCutoff = PRFSBXCUT,
+//  stitchLengthMax = PRFSTCMAX,
+//  stitchLengthUser = PRFSTCUSR,
+//  stitchLengthMin = PRFSTCMIN
+//};
+
+enum class PrefDataLines : uint8_t {
+  appliqueColor     = PRFAPPCOL,
+  appliqueStitchLen = PRFAPSLEN,
+  borderWidth       = PRFBRDWID,
+  buttonCornerLen   = PRFBCNLEN,
+  chainFillLen      = PRFCHFLEN,
+  chainFillPos      = PRFCHFPOS,
+  clipOffset        = PRFCLPOFF,
+  clipPhase         = PRFCLPPHS,
+  eggRatio          = PRFEGGRAT,
+  fillAngle         = PRFFILANG,
+  fillSpacing       = PRFFILSPC,
+  gridSize          = PRFGRDSIZ,
+  hoopHeight        = PRFHUPHGT,
+  hoopWidth         = PRFHUPWID,
+  lensRatio         = PRFLENRAT,
+  nudgePixels       = PRFNUGSTP,
+  picotSpacing      = PRFPCTSPC,
+  smallStitchLength = PRFSMLSTH,
+  snapToSize        = PRFSNPSIZ,
+  spiralWrap        = PRFSPLWRP,
+  starRatio         = PRFSTRRAT,
+  stitchLengthMax   = PRFSTCMAX,
+  stitchLengthUser  = PRFSTCUSR,
+  stitchLengthMin   = PRFSTCMIN
+};
+
 // form types
 enum class FormStyles : uint8_t {
   kNone = 0U, // No form

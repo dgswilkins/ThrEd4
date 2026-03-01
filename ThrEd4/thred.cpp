@@ -1175,176 +1175,207 @@ void chknum() {
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto hWnd   = HWND {nullptr};
 		auto fmtStr = std::wstring {};
-		switch (PreferenceIndex - 1) {
-		  case PRFEGGRAT: {
+		switch (auto pref = wrap::toEnumType<PrefDataLines>(PreferenceIndex - 1); pref) { // NOLINT(clang-diagnostic-switch-default)
+		  case PrefDataLines::eggRatio: {
 			IniFile.eggRatio = value;
 			fmtStr           = format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd             = valueWindow.operator[](PRFEGGRAT);
 			break;
 		  }
-		  case PRFNUGSTP: {
+		  case PrefDataLines::nudgePixels: {
 			IniFile.cursorNudgeStep = value;
 			IniFile.nudgePixels     = pxchk(value);
 			fmtStr                  = format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd                    = valueWindow.operator[](PRFNUGSTP);
 			break;
 		  }
-		  case PRFPCTSPC: {
+		  case PrefDataLines::picotSpacing: {
 			PicotSpacing = value * PFGRAN;
 			fmtStr       = format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd         = valueWindow.operator[](PRFPCTSPC);
 			break;
 		  }
-		  case PRFCLPOFF: {
+		  case PrefDataLines::clipOffset: {
 			IniFile.clipOffset = value * PFGRAN;
 			fmtStr             = format(FMT_COMPILE(L"{:.2f} mm"), value);
 			hWnd               = valueWindow.operator[](PRFCLPOFF);
 			break;
 		  }
-		  case PRFCLPPHS: {
+		  case PrefDataLines::clipPhase: {
 			IniFile.fillPhase = wrap::floor<uint32_t>(value);
 			fmtStr            = format(FMT_COMPILE(L"{}"), IniFile.fillPhase);
 			hWnd              = valueWindow.operator[](PRFCLPPHS);
 			break;
 		  }
-		  case PRFCHFPOS: {
+		  case PrefDataLines::chainFillPos: {
 			IniFile.chainRatio = value;
 			fmtStr             = format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd               = valueWindow.operator[](PRFCHFPOS);
 			break;
 		  }
-		  case PRFSTCMIN: {
+		  case PrefDataLines::stitchLengthMin: {
 			MinStitchLength = value * PFGRAN;
 			fmtStr          = format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd            = valueWindow.operator[](PRFSTCMIN);
 			break;
 		  }
-		  default: {
+		  case PrefDataLines::fillSpacing: {
 			if (value != 0.0F) {
-			  fmtStr = format(FMT_COMPILE(L"{:.2f}"), value);
-			  switch (PreferenceIndex - 1) {
-				case PRFFILSPC: {
-				  LineSpacing = value * PFGRAN;
-				  hWnd        = valueWindow.operator[](PRFFILSPC);
-				  break;
-				}
-				case PRFFILANG: {
-				  IniFile.fillAngle = value * DEGRADF;
-				  hWnd              = valueWindow.operator[](PRFFILANG);
-				  break;
-				}
-				case PRFBRDWID: {
-				  Instance->borderWidth = value * PFGRAN;
-				  IniFile.borderWidth   = Instance->borderWidth;
-				  hWnd                  = valueWindow.operator[](PRFBRDWID);
-				  break;
-				}
-				case PRFSTCMAX: {
-				  IniFile.maxStitchLength = value * PFGRAN;
-				  hWnd                    = valueWindow.operator[](PRFSTCMAX);
-				  break;
-				}
-				case PRFSTCUSR: {
-				  UserStitchLength = value * PFGRAN;
-				  hWnd             = valueWindow.operator[](PRFSTCUSR);
-				  break;
-				}
-				case PRFSMLSTH: {
-				  SmallStitchLength = value * PFGRAN;
-				  hWnd              = valueWindow.operator[](PRFSMLSTH);
-				  break;
-				}
-				case PRFAPPCOL: {
-				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-				  fmtStr        = format(FMT_COMPILE(L"{}"), AppliqueColor + 1U);
-				  hWnd          = valueWindow.operator[](PRFAPPCOL);
-				  break;
-				}
-				case PRFAPSLEN: {
-				  IniFile.AppStitchLen = value * PFGRAN;
-				  hWnd                 = valueWindow.operator[](PRFAPSLEN);
-				  break;
-				}
-				case PRFSNPSIZ: {
-				  Instance->SnapLength = value * PFGRAN;
-				  hWnd                 = valueWindow.operator[](PRFSNPSIZ);
-				  break;
-				}
-				case PRFSTRRAT: {
-				  StarRatio = value;
-
-				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
-				  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
-
-				  StarRatio = std::clamp(StarRatio, SRMINLIM, SRMAXLIM);
-				  fmtStr    = format(FMT_COMPILE(L"{:.2f}"), StarRatio);
-				  hWnd      = valueWindow.operator[](PRFSTRRAT);
-				  break;
-				}
-				case PRFLENRAT: {
-				  IniFile.lensRatio = value;
-
-				  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
-				  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
-
-				  IniFile.lensRatio = std::clamp(IniFile.lensRatio, LRMINLIM, LRMAXLIM);
-				  fmtStr            = format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio);
-				  hWnd              = valueWindow.operator[](PRFLENRAT);
-				  break;
-				}
-				case PRFSPLWRP: {
-				  SpiralWrap = value;
-				  // ToDo - Are these limits correct?
-				  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
-				  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
-
-				  SpiralWrap = std::clamp(SpiralWrap, SRMINLIM, SRMAXLIM);
-				  fmtStr     = format(FMT_COMPILE(L"{:.2f}"), SpiralWrap);
-				  hWnd       = valueWindow.operator[](PRFSPLWRP);
-				  break;
-				}
-				case PRFBCNLEN: {
-				  form::setButtonholeCornerLength(value * PFGRAN);
-				  fmtStr = format(FMT_COMPILE(L"{:.2f}"), value);
-				  hWnd   = valueWindow.operator[](PRFBCNLEN);
-				  break;
-				}
-				case PRFHUPWID: {
-				  IniFile.hoopSizeX = value * PFGRAN;
-				  fmtStr            = format(FMT_COMPILE(L"{:.0f} mm"), value);
-				  hWnd              = valueWindow.operator[](PRFHUPWID);
-				  form::sethup();
-				  formForms::prfmsg();
-				  thred::chkhup();
-				  break;
-				}
-				case PRFHUPHGT: {
-				  IniFile.hoopSizeY = value * PFGRAN;
-				  fmtStr            = format(FMT_COMPILE(L"{:.0f} mm"), value);
-				  hWnd              = valueWindow.operator[](PRFHUPHGT);
-				  form::sethup();
-				  formForms::prfmsg();
-				  thred::chkhup();
-				  break;
-				}
-				case PRFGRDSIZ: {
-				  IniFile.gridSize = value * PFGRAN;
-				  fmtStr           = format(FMT_COMPILE(L"{:.2f} mm"), value);
-				  hWnd             = valueWindow.operator[](PRFGRDSIZ);
-				  break;
-				}
-				case PRFCHFLEN: {
-				  IniFile.chainSpace = value * PFGRAN;
-				  fmtStr             = format(FMT_COMPILE(L"{:.2f}"), value);
-				  hWnd               = valueWindow.operator[](PRFCHFLEN);
-				  break;
-				}
-				default: {
-				  outDebugString(L"default hit in chknum 3: PreferenceIndex [{}]\n", PreferenceIndex - 1);
-				  break;
-				}
-			  }
+			  LineSpacing = value * PFGRAN;
+			  fmtStr      = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd        = valueWindow.operator[](PRFFILSPC);
 			}
+			break;
+		  }
+		  case PrefDataLines::fillAngle: {
+			if (value != 0.0F) {
+			  IniFile.fillAngle = value * DEGRADF;
+			  fmtStr            = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd              = valueWindow.operator[](PRFFILANG);
+			}
+			break;
+		  }
+		  case PrefDataLines::borderWidth: {
+			if (value != 0.0F) {
+			  Instance->borderWidth = value * PFGRAN;
+			  IniFile.borderWidth   = Instance->borderWidth;
+			  fmtStr                = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd                  = valueWindow.operator[](PRFBRDWID);
+			}
+			break;
+		  }
+		  case PrefDataLines::stitchLengthMax: {
+			if (value != 0.0F) {
+			  IniFile.maxStitchLength = value * PFGRAN;
+			  fmtStr                  = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd                    = valueWindow.operator[](PRFSTCMAX);
+			}
+			break;
+		  }
+		  case PrefDataLines::stitchLengthUser: {
+			if (value != 0.0F) {
+			  UserStitchLength = value * PFGRAN;
+			  fmtStr           = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd             = valueWindow.operator[](PRFSTCUSR);
+			}
+			break;
+		  }
+		  case PrefDataLines::smallStitchLength: {
+			if (value != 0.0F) {
+			  SmallStitchLength = value * PFGRAN;
+			  fmtStr            = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd              = valueWindow.operator[](PRFSMLSTH);
+			}
+			break;
+		  }
+		  case PrefDataLines::appliqueColor: {
+			if (value != 0.0F) {
+			  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
+			  fmtStr        = format(FMT_COMPILE(L"{}"), AppliqueColor + 1U);
+			  hWnd          = valueWindow.operator[](PRFAPPCOL);
+			}
+			break;
+		  }
+		  case PrefDataLines::appliqueStitchLen: {
+			if (value != 0.0F) {
+			  IniFile.AppStitchLen = value * PFGRAN;
+			  fmtStr               = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd                 = valueWindow.operator[](PRFAPSLEN);
+			}
+			break;
+		  }
+		  case PrefDataLines::snapToSize: {
+			if (value != 0.0F) {
+			  Instance->SnapLength = value * PFGRAN;
+			  fmtStr               = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd                 = valueWindow.operator[](PRFSNPSIZ);
+			}
+			break;
+		  }
+		  case PrefDataLines::starRatio: {
+			if (value != 0.0F) {
+			  StarRatio = value;
+
+			  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
+			  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
+
+			  StarRatio = std::clamp(StarRatio, SRMINLIM, SRMAXLIM);
+			  fmtStr    = format(FMT_COMPILE(L"{:.2f}"), StarRatio);
+			  hWnd      = valueWindow.operator[](PRFSTRRAT);
+			}
+			break;
+		  }
+		  case PrefDataLines::lensRatio: {
+			if (value != 0.0F) {
+			  IniFile.lensRatio = value;
+
+			  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
+			  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
+
+			  IniFile.lensRatio = std::clamp(IniFile.lensRatio, LRMINLIM, LRMAXLIM);
+			  fmtStr            = format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio);
+			  hWnd              = valueWindow.operator[](PRFLENRAT);
+			}
+			break;
+		  }
+		  case PrefDataLines::spiralWrap: {
+			if (value != 0.0F) {
+			  SpiralWrap = value;
+			  // ToDo - Are these limits correct?
+			  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
+			  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
+
+			  SpiralWrap = std::clamp(SpiralWrap, SRMINLIM, SRMAXLIM);
+			  fmtStr     = format(FMT_COMPILE(L"{:.2f}"), SpiralWrap);
+			  hWnd       = valueWindow.operator[](PRFSPLWRP);
+			}
+			break;
+		  }
+		  case PrefDataLines::buttonCornerLen: {
+			if (value != 0.0F) {
+			  form::setButtonholeCornerLength(value * PFGRAN);
+			  fmtStr = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd   = valueWindow.operator[](PRFBCNLEN);
+			}
+			break;
+		  }
+		  case PrefDataLines::hoopWidth: {
+			if (value != 0.0F) {
+			  IniFile.hoopSizeX = value * PFGRAN;
+			  fmtStr            = format(FMT_COMPILE(L"{:.0f} mm"), value);
+			  hWnd              = valueWindow.operator[](PRFHUPWID);
+			  form::sethup();
+			  formForms::prfmsg();
+			  thred::chkhup();
+			}
+			break;
+		  }
+		  case PrefDataLines::hoopHeight: {
+			if (value != 0.0F) {
+			  IniFile.hoopSizeY = value * PFGRAN;
+			  fmtStr            = format(FMT_COMPILE(L"{:.0f} mm"), value);
+			  hWnd              = valueWindow.operator[](PRFHUPHGT);
+			  form::sethup();
+			  formForms::prfmsg();
+			  thred::chkhup();
+			}
+			break;
+		  }
+		  case PrefDataLines::gridSize: {
+			if (value != 0.0F) {
+			  IniFile.gridSize = value * PFGRAN;
+			  fmtStr           = format(FMT_COMPILE(L"{:.2f} mm"), value);
+			  hWnd             = valueWindow.operator[](PRFGRDSIZ);
+			}
+			break;
+		  }
+		  case PrefDataLines::chainFillLen: {
+			if (value != 0.0F) {
+			  IniFile.chainSpace = value * PFGRAN;
+			  fmtStr             = format(FMT_COMPILE(L"{:.2f}"), value);
+			  hWnd               = valueWindow.operator[](PRFCHFLEN);
+			}
+			break;
 		  }
 		}
 		if (nullptr != hWnd && !fmtStr.empty()) {
