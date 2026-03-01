@@ -802,6 +802,20 @@ constexpr auto HTXVRT  = uint8_t {4U};
 constexpr auto HTXHOR  = uint8_t {5U};
 constexpr auto HTXANG  = uint8_t {6U};
 constexpr auto HTXMIR  = uint8_t {7U};
+constexpr auto HTXNF  = uint8_t {0xFFU}; // not found
+
+// text button windows
+enum class TextureButton : uint8_t {
+  Clear      = HTXCLR, // HTXCLR
+  Height     = HTXHI, // HTXHI
+  Width      = HTXWID, // HTXWID
+  Spacing    = HTXSPAC, // HTXSPAC
+  Vertical   = HTXVRT, // HTXVRT
+  Horizontal = HTXHOR, // HTXHOR
+  Angled     = HTXANG, // HTXANG
+  Mirror     = HTXMIR, // HTXMIR
+  NotFound   = HTXNF    // not found
+};
 
 // Machine types
 enum class Machine : int8_t { kPfaff, kTajima, kBrother };

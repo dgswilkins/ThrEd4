@@ -171,6 +171,7 @@ void dutxtx(uint32_t index, uint16_t offsetPixels) noexcept(std::is_same_v<size_
 void ed2px(F_POINT const& editPoint, POINT& point) noexcept;
 auto ed2stch(F_POINT const& point) noexcept -> F_POINT;
 void ed2txp(POINT const& offset, TX_PNT& textureRecord);
+auto findButtonIndex(HWND hwnd) -> uint8_t;
 auto inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool;
 void nutx(uint32_t formIndex);
 void nxbak();
@@ -866,38 +867,44 @@ void butsid(uint32_t const windowId) {
   displayText::updateWinFont(MainStitchWin);
 }
 
+#pragma warning(suppress : 26461) // con.3 The pointer argument can be marked as a pointer to const
+auto findButtonIndex(HWND hwnd) -> uint8_t {
+  for (auto index = 0U; index < Instance->buttonWin.size(); ++index) {
+	if (hwnd == Instance->buttonWin.operator[](index)) {
+	  return gsl::narrow<uint8_t>(index);
+	}
+  }
+  return HTXNF; // Not found
+}
+
 auto chkbut() -> bool {
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXCLR)) {
-	txdelal();
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXHI)) {
-	butsid(HTXHI);
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXWID)) {
-	butsid(HTXWID);
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXSPAC)) {
-	butsid(HTXSPAC);
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXVRT)) {
-	dutxfn(TextureStyle::kVertical);
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXHOR)) {
-	dutxfn(TextureStyle::kHorizontal);
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXANG)) {
-	dutxfn(TextureStyle::kAngled);
-	return true;
-  }
-  if (WinMsg.hwnd == Instance->buttonWin.operator[](HTXMIR)) {
-	dutxmir();
-	return true;
+  switch (auto val = wrap::toEnumType<TextureButton>(findButtonIndex(WinMsg.hwnd)); val) { // NOLINT(clang-diagnostic-switch-default)
+	case TextureButton::Clear:
+	  txdelal();
+	  return true;
+	case TextureButton::Height:
+	  butsid(HTXHI);
+	  return true;
+	case TextureButton::Width:
+	  butsid(HTXWID);
+	  return true;
+	case TextureButton::Spacing:
+	  butsid(HTXSPAC);
+	  return true;
+	case TextureButton::Vertical:
+	  dutxfn(TextureStyle::kVertical);
+	  return true;
+	case TextureButton::Horizontal:
+	  dutxfn(TextureStyle::kHorizontal);
+	  return true;
+	case TextureButton::Angled:
+	  dutxfn(TextureStyle::kAngled);
+	  return true;
+	case TextureButton::Mirror:
+	  dutxmir();
+	  return true;
+	case TextureButton::NotFound:
+	  break;
   }
   return false;
 }
@@ -933,22 +940,25 @@ void chktxnum() {
   if (value != 0.0F) {
 	Instance->textureInputBuffer.clear();
 	value *= PFGRAN;
-	switch (TextureWindowId) {
-	  case HTXHI: {
+	switch (wrap::toEnumType<TextureButton>(TextureWindowId)) { // NOLINT(clang-diagnostic-switch-default)
+	  case TextureButton::Clear: {
+		break;
+	  }
+	  case TextureButton::Height: {
 		texture::savtxt();
 		TextureScreen.areaHeight = value;
 		IniFile.textureHeight    = value;
 		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
-	  case HTXWID: {
+	  case TextureButton::Width: {
 		texture::savtxt();
 		TextureScreen.width  = value;
 		IniFile.textureWidth = value;
 		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
-	  case HTXSPAC: {
+	  case TextureButton::Spacing: {
 		texture::savtxt();
 		TextureScreen.spacing  = value;
 		IniFile.textureSpacing = value;
@@ -956,7 +966,11 @@ void chktxnum() {
 		Instance->stateMap.set(StateFlag::CHKTX);
 		break;
 	  }
-	  default: {
+	  case TextureButton::Vertical: // none of these have values and should not be found in this function
+	  case TextureButton::Horizontal:
+	  case TextureButton::Angled: 
+	  case TextureButton::Mirror:
+	  case TextureButton::NotFound: {
 		outDebugString(L"default hit in chktxnum: TextureWindowId [{}]\n", TextureWindowId);
 		break;
 	  }
