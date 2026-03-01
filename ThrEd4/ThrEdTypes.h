@@ -925,6 +925,11 @@ enum class FormDataLines : uint8_t {   // form data lines that take a numeric va
   TextureFillSpacing     = LTXOF      // texture fill spacing
 };
 
+enum class FlexDataLines : uint8_t {
+  Layer                  = LLAYR,      // layer 1
+  FormFill               = LFRMFIL,    // form fill 2
+  FeatherFillType        = LFTHTYP,    // feather fill type
+};
 
 // fill message codes
 constexpr auto FMM_FAN   = uint16_t {0U};

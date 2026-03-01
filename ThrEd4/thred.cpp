@@ -6488,21 +6488,22 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
 	return;
   }
   auto entryCount = int32_t {0};
+  auto choice     = wrap::toEnumType<FlexDataLines>(formMenuChoice);
   // choose the side window vertical size based on the form menu choice
-  switch (formMenuChoice) {
-	case LLAYR: {
+  switch (choice) {
+	case FlexDataLines::Layer: {
 	  entryCount      = gsl::narrow<int32_t>(LAYRLIST.size());
 	  auto const zero = displayText::loadStr(IDS_LAY03);
 	  formForms::maxtsiz(zero, sideWindowSize);
 	  break;
 	}
-	case LFTHTYP: {
+	case FlexDataLines::FeatherFillType: {
 	  entryCount         = gsl::narrow<int32_t>(FTHRLIST.size() - 1U);
 	  auto const fthrWid = displayText::loadStr(IDS_FTH3);
 	  formForms::maxtsiz(fthrWid, sideWindowSize);
 	  break;
 	}
-	case LFRMFIL: {
+	case FlexDataLines::FormFill: {
 	  entryCount = gsl::narrow<int32_t>(FILLLIST.size());
 	  for (auto const& iEntry : FILLLIST) {
 		if (iEntry.value == form.fillType) {
@@ -6536,15 +6537,15 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
                                      nullptr,
                                      ThrEdInstance,
                                      nullptr);
-  switch (formMenuChoice) {
+  switch (choice) {
 	// fill the side window with the appropriate entries
-	case LLAYR: { // if we are choosing a layer
+	case FlexDataLines::Layer: { // if we are choosing a layer
 	  for (auto const& iEntry : LAYRLIST) {
 		dusid(iEntry, sideWindowLocation, sideWindowSize);
 	  }
 	  break;
 	}
-	case LFTHTYP: { // if we are choosing a feather fill type
+	case FlexDataLines::FeatherFillType: { // if we are choosing a feather fill type
 	  for (auto const& iEntry : FTHRLIST) {
 		if (wrap::toEnumType<FeatherFillType>(iEntry.value) != form.feather.fillType) {
 		  dusid(iEntry, sideWindowLocation, sideWindowSize);
@@ -6552,7 +6553,7 @@ void sidmsg(FRM_HEAD const& form, uint32_t formMenuChoice) {
 	  }
 	  break;
 	}
-	case LFRMFIL: { // if we are choosing a fill type
+	case FlexDataLines::FormFill: { // if we are choosing a fill type
 	  for (auto const& iEntry : FILLLIST) {
 		if (iEntry.value == form.fillType) {
 		  continue;
