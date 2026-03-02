@@ -1032,24 +1032,24 @@ void formForms::prfmsg() {
   ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.cx;
   ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   auto row                = PREFLIST.begin();
-  prflin(format(FMT_COMPILE(L"{}"), AppliqueColor + 1U), *row++);
+  prflin(format(FMT_COMPILE(L"{:3d}"), AppliqueColor + 1U), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.AppStitchLen * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), Instance->borderWidth * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), form::getButtonholeCornerLength() * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainSpace * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.chainRatio), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.clipOffset * IPFGRAN), *row++);
-  prflin(format(FMT_COMPILE(L"{}"), IniFile.fillPhase), *row++);
+  prflin(format(FMT_COMPILE(L"{:d}"), IniFile.fillPhase), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.eggRatio), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.fillAngle * RADDEGF), *row++);
   auto choice = Instance->userFlagMap.test(UserFlag::SQRFIL) ? displayText::loadStr(IDS_SQR)
                                                              : displayText::loadStr(IDS_PNTD);
   prflin(choice, *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), LineSpacing * IPFGRAN), *row++);
-  prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getShowStitchThreshold())), *row++);
+  prflin(format(FMT_COMPILE(L"{:d}"), thred::duthrsh(thred::getShowStitchThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f} mm"), IniFile.gridSize * IPFGRAN), *row++);
   form::sethup();
-  prflin(format(FMT_COMPILE(L"{}"),
+  prflin(format(FMT_COMPILE(L"{:s}"),
                 displayText::loadStr(wrap::toUnsigned(wrap::toIntegralType(IniFile.hoopType)) - 1U + IDS_HUP0)),
          *row++);
   prflin(format(FMT_COMPILE(L"{:.0f} mm"), IniFile.hoopSizeY * IPFGRAN), *row++);
@@ -1067,7 +1067,7 @@ void formForms::prfmsg() {
   prflin(format(FMT_COMPILE(L"{:.2f}"), Instance->SnapLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getSpiralWrap()), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), thred::getStarRatio()), *row++);
-  prflin(format(FMT_COMPILE(L"{}"), thred::duthrsh(thred::getStitchBoxesThreshold())), *row++);
+  prflin(format(FMT_COMPILE(L"{:d}"), thred::duthrsh(thred::getStitchBoxesThreshold())), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), IniFile.maxStitchLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), UserStitchLength * IPFGRAN), *row++);
   prflin(format(FMT_COMPILE(L"{:.2f}"), MinStitchLength * IPFGRAN), *row);

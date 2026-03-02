@@ -1213,7 +1213,7 @@ void chknum() {
 		  }
 		  case PrefDataLines::clipPhase: {
 			IniFile.fillPhase = wrap::floor<uint32_t>(value);
-			fmtStr            = format(FMT_COMPILE(L"{}"), IniFile.fillPhase);
+			fmtStr            = format(FMT_COMPILE(L"{:d}"), IniFile.fillPhase);
 			hWnd              = valueWindow.operator[](PRFCLPPHS);
 			break;
 		  }
@@ -1281,7 +1281,7 @@ void chknum() {
 		  case PrefDataLines::appliqueColor: {
 			if (value != 0.0F) {
 			  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-			  fmtStr        = format(FMT_COMPILE(L"{}"), AppliqueColor + 1U);
+			  fmtStr        = format(FMT_COMPILE(L"{:3d}"), AppliqueColor + 1U);
 			  hWnd          = valueWindow.operator[](PRFAPPCOL);
 			}
 			break;
@@ -3521,12 +3521,12 @@ void handleFeatherWMINITDIALOG(HWND hwndlg) {
   auto const featherType = IniFile.featherType;
   SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
   SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), format(FMT_COMPILE(L"{:.2f}"), IniFile.featherRatio).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), format(FMT_COMPILE(L"{}"), IniFile.featherUpCount).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), format(FMT_COMPILE(L"{:3d}"), IniFile.featherUpCount).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT),
-                format(FMT_COMPILE(L"{}"), IniFile.featherDownCount).c_str());
+                format(FMT_COMPILE(L"{:3d}"), IniFile.featherDownCount).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_DFLR),
                 format(FMT_COMPILE(L"{:.2f}"), IniFile.featherMinStitchSize * IPFGRAN).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), format(FMT_COMPILE(L"{}"), IniFile.featherCount).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), format(FMT_COMPILE(L"{:d}"), IniFile.featherCount).c_str());
   auto featherStyle = std::wstring {};
   for (auto const& iFeatherStyle : FTHRLIST) {
 	featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));

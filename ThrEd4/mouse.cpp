@@ -698,7 +698,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (thred::checkPreferenceIndex(PRFAPPCOL + 1) && thred::inDefaultColorWindows()) {
 	AppliqueColor = thred::getVerticalIndex();
 	SetWindowText(Instance->valueWindow.operator[](PRFAPPCOL),
-	              format(FMT_COMPILE(L"{}"), AppliqueColor).c_str());
+	              format(FMT_COMPILE(L"{:3d}"), AppliqueColor).c_str());
 	thred::unsid(true);
 	return true;
   }
