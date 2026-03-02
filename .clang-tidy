@@ -2,6 +2,7 @@
 Checks:            "*,\
 -altera-*,\
 -bugprone-easily-swappable-parameters,\
+-clang-diagnostic-covered-switch-default,\
 -clang-diagnostic-nonportable-system-include-path,\
 -clang-diagnostic-padded,\
 -clang-diagnostic-pre-c++20-compat-pedantic,\
