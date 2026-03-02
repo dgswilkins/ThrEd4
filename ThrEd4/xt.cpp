@@ -1190,7 +1190,7 @@ void nudfn(F_RECTANGLE const& designSizeRect) noexcept {
 
 void nurat(FEATHER& feather) noexcept {
   auto const remainder = fmodf(feather.globalPosition, 1.0F);
-  switch (feather.fillType) { // NOLINT(clang-diagnostic-switch-default)
+  switch (feather.fillType) {
 	case FeatherFillType::none: {
 	  return;
 	}
@@ -1263,6 +1263,10 @@ void nurat(FEATHER& feather) noexcept {
 	  else {
 		feather.ratio = feather.formRatio;
 	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in nurat: feather.fillType [{}]\n", wrap::toIntegralType(feather.fillType));
 	  break;
 	}
   }
@@ -1954,7 +1958,7 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 	}
 	if (auto const attribute = Instance->stitchBuffer.operator[](iSourceStitch).attribute;
 	    codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
-	  switch (auto const type = STITCH_TYPES.at(dutyp(attribute)); type) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
+	  switch (auto const type = STITCH_TYPES.at(dutyp(attribute)); type) {
 		case StitchStyle::kApplique: {
 		  if ((tmap & M_AP) == 0U) {
 			tmap |= M_AP;
@@ -1991,6 +1995,10 @@ void xt::fdelstch(uint32_t const formIndex, FillStartsDataType& fillStartsData, 
 			tmap |= M_FIL;
 			fillStartsData[FSI::kFill] = iDestinationStitch;
 		  }
+		  break;
+		}
+		default: {
+		  outDebugString(L"default hit in fdelstch: type [{}]\n", wrap::toIntegralType(type));
 		  break;
 		}
 	  }
@@ -2497,7 +2505,7 @@ void xt::setfilend() {
 }
 
 void xt::duauxnam(fs::path& auxName) {
-  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+  switch (IniFile.auxFileType) {
 	case Machine::kTajima: {
 	  auxName.replace_extension(".dst");
 	  break;
@@ -2510,6 +2518,10 @@ void xt::duauxnam(fs::path& auxName) {
 #endif
 	case Machine::kPfaff: {
 	  auxName.replace_extension("pcs");
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in duauxnam: IniFile.auxFileType [{}]\n", wrap::toIntegralType(IniFile.auxFileType));
 	  break;
 	}
   }

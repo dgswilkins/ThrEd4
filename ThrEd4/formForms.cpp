@@ -1154,7 +1154,7 @@ void formForms::dasyfrm() {
 	PseudoRandomValue    = SEED;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
-	  switch (borderType) {       // NOLINT(clang-diagnostic-switch-default)
+	  switch (borderType) {      
 		case DaisyStyle::kSine: { // sine wave
 		  distanceFromDaisyCenter = diameter + (sin(petalPointAngle) * petalLength);
 		  petalPointAngle += deltaPetalAngle;
@@ -1194,6 +1194,11 @@ void formForms::dasyfrm() {
 		  }
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in dasyfrm: bordertype [{}]\n", wrap::toIntegralType(borderType));
+		  break;
+		}
+
 	  }
 	  Instance->formVertices.emplace_back(referencePoint.x + (cos(angle) * distanceFromDaisyCenter),
 	                                      referencePoint.y + (sin(angle) * distanceFromDaisyCenter));

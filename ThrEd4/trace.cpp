@@ -402,7 +402,7 @@ void dutrac() {
 	  }
 	}
 	// trace in the direction of the closest edge
-	switch (flag) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
+	switch (flag) {
 	  case TraceDir::kTop: {
 		CurrentTracePoint.y = top;
 		traceDirection      = TraceDir::kRight;
@@ -421,6 +421,10 @@ void dutrac() {
 	  case TraceDir::kLeft: {
 		CurrentTracePoint.x = left;
 		traceDirection      = TraceDir::kTop;
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in dutrac: flag [{}]\n", wrap::toIntegralType(flag));
 		break;
 	  }
 	}
@@ -572,7 +576,7 @@ auto trcbit(TraceDir const initialDirection, TraceDir& traceDirection, std::vect
   auto const& tracedEdges = TraceInstance->TracedEdges;
   auto        pixelIndex  = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
   // use the initial direction to determine the next direction
-  switch (traceDirection) { // NOLINT(clang-diagnostic-switch-default) since the switch handles all possible values
+  switch (traceDirection) {
 	case TraceDir::kRight: { // was tracing right
 
 	  pixelIndex += 1 - bitmap::getBitmapWidth(); // look at the pixel down and to the right
@@ -667,6 +671,10 @@ auto trcbit(TraceDir const initialDirection, TraceDir& traceDirection, std::vect
 		  }
 		}
 	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in trcbit: traceDirection [{}]\n", wrap::toIntegralType(traceDirection));
 	  break;
 	}
   }
@@ -1252,7 +1260,7 @@ void trace::tracpar() {
 	  trace();
 	}
 	else {
-	  switch (auto const row = wrap::toEnumType<Window>(wrap::floor<int8_t>(TraceMsgPoint.y / ButtonHeight)); row) { // NOLINT(clang-diagnostic-switch-default)
+	  switch (auto const row = wrap::toEnumType<Window>(wrap::floor<int8_t>(TraceMsgPoint.y / ButtonHeight)); row) {
 		case Window::row01: {
 		  Instance->stateMap.flip(TRACE_RGB_FLAG.at(ColumnColor));
 		  {
@@ -1309,6 +1317,10 @@ void trace::tracpar() {
 		}
 		case Window::row10: {
 		  tracedg();
+		  break;
+		}
+		default: {
+		  outDebugString(L"default hit in tracpar: row [{}]\n", wrap::toIntegralType(row));
 		  break;
 		}
 	  }

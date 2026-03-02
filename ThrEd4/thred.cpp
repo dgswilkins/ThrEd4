@@ -879,7 +879,7 @@ void chknum() {
 	  auto& form = formList.operator[](ClosestFormToCursor);
 
 	  auto const value = wrap::wcsToFloat(sideWindowEntryBuffer.data()) * PFGRAN;
-	  switch (wrap::toEnumType<FormDataLines>(FormMenuChoice)) { // NOLINT(clang-diagnostic-switch-default)
+	  switch (wrap::toEnumType<FormDataLines>(FormMenuChoice)) {
 		case FormDataLines::TextureFillSpacing: { // update texture fill spacing
 		  thred::savdo();
 		  form.txof = value;
@@ -1101,7 +1101,7 @@ void chknum() {
 		case FormDataLines::BorderSpace: { // update border spacing
 		  if (value != 0.0F) {
 			thred::savdo();
-			switch (auto const edgeType = wrap::toEnumType<EdgeType>(form.edgeType & NEGUND); edgeType) { // NOLINT(clang-diagnostic-switch-default)
+			switch (auto const edgeType = wrap::toEnumType<EdgeType>(form.edgeType & NEGUND); edgeType) {
 			  case EdgeType::propSatin:
 			  case EdgeType::openChain:
 			  case EdgeType::lineChain: {
@@ -1119,6 +1119,10 @@ void chknum() {
 			  case EdgeType::doubleStitch:
 			  case EdgeType::evenClip: {
 				form.edgeSpacing = value * HALF;
+			  }
+			  default: {
+				outDebugString(L"default hit in chknum: form.edgeType [{}]\n", form.edgeType & NEGUND);
+				break;
 			  }
 			}
 		  }
@@ -1164,6 +1168,10 @@ void chknum() {
 		  }
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in chknum: FormMenuChoice [{}]\n", FormMenuChoice);
+		  break;
+		}
 	  }
 	  thred::unsid(true);
 	  form::refil(ClosestFormToCursor);
@@ -1175,7 +1183,7 @@ void chknum() {
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto hWnd   = HWND {nullptr};
 		auto fmtStr = std::wstring {};
-		switch (auto pref = wrap::toEnumType<PrefDataLines>(PreferenceIndex - 1); pref) { // NOLINT(clang-diagnostic-switch-default)
+		switch (auto pref = wrap::toEnumType<PrefDataLines>(PreferenceIndex - 1); pref) {
 		  case PrefDataLines::eggRatio: {
 			IniFile.eggRatio = value;
 			fmtStr           = format(FMT_COMPILE(L"{:.2f}"), value);
@@ -1375,6 +1383,10 @@ void chknum() {
 			  fmtStr             = format(FMT_COMPILE(L"{:.2f}"), value);
 			  hWnd               = valueWindow.operator[](PRFCHFLEN);
 			}
+			break;
+		  }
+		  default: {
+			outDebugString(L"default hit in chknum: PreferenceIndex [{}]\n", PreferenceIndex - 1);
 			break;
 		  }
 		}
@@ -4460,6 +4472,10 @@ void init() {
 	  case ButtonWindow::layer: {
 		buttonTxt.assign(blank);
 	  }
+	  default: {
+		outDebugString(L"default hit in init: iButton [{}]\n", iButton);
+		break;
+	  }
 	}
 	Instance->buttonWin.operator[](iButton) =
 	    CreateWindowEx(0,
@@ -5608,7 +5624,7 @@ void redini() {
 	  IniFile.setWav();
 	  IniFile.setFeather();
 	  IniFile.setDaisy();
-	  switch (IniFile.hoopType) { // NOLINT(clang-diagnostic-switch-default)
+	  switch (IniFile.hoopType) {
 		case HoopSize::kSmall: {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
@@ -5641,6 +5657,10 @@ void redini() {
 		  IniFile.hoopType  = HoopSize::kLarge;
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
+		}
+		default: {
+		  outDebugString(L"default hit in redini: hoopType [{}]\n", wrap::toIntegralType(IniFile.hoopType));
+		  break;
 		}
 	  }
 	  UnzoomedRect = {.cx = std::lround(IniFile.hoopSizeX), .cy = std::lround(IniFile.hoopSizeY)};
@@ -6181,7 +6201,7 @@ void sav() {
   }
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
-  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+  switch (IniFile.auxFileType) {
 	case Machine::kTajima: {
 	  flag = DST::saveDST(auxName, saveStitches);
 	  break;
@@ -6194,6 +6214,10 @@ void sav() {
 #endif
 	case Machine::kPfaff: {
 	  flag = PCS::savePCS(auxName, saveStitches);
+	}
+	default: {
+	  outDebugString(L"default hit in sav: IniFile.auxFileType [{}]\n", wrap::toIntegralType(IniFile.auxFileType));
+	  break;
 	}
   }
   if (flag) {
@@ -9367,7 +9391,7 @@ void thred::delet() {
   }
   if (Instance->stateMap.test(StateFlag::FRMPSEL) || form::closfrm(ClosestFormToCursor)) {
 	auto& form = formList.operator[](ClosestFormToCursor);
-	switch (form.type) { // NOLINT(clang-diagnostic-switch-default)
+	switch (form.type) {
 	  case FormStyles::kLine: {
 		if (handleDeleteLineForm(form)) {
 		  return;
@@ -9391,6 +9415,10 @@ void thred::delet() {
 	  case FormStyles::kWave:
 	  case FormStyles::kDaisy: {
 		// Do nothing - these forms are handled elsewhere
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in delet: form.type [{}]\n", wrap::toIntegralType(form.type));
 		break;
 	  }
 	}
@@ -11275,7 +11303,7 @@ void thred::updateHoopSize() {
   if (auto const option = std::distance(sideWindow.begin(), itHwnd) + 1;
       option >= wrap::toIntegralType(HoopSize::kSetCustom) &&
       option <= wrap::toIntegralType(HoopSize::kUserDefined)) {
-	switch (auto const optionVal = wrap::toEnumType<HoopSize>(option); optionVal) { // NOLINT(clang-diagnostic-switch-default)
+	switch (auto const optionVal = wrap::toEnumType<HoopSize>(option); optionVal) {
 	  case HoopSize::kSetCustom: {
 		IniFile.customHoopX = IniFile.hoopSizeX;
 		IniFile.customHoopY = IniFile.hoopSizeY;
@@ -11303,6 +11331,10 @@ void thred::updateHoopSize() {
 		IniFile.hoopSizeX = IniFile.customHoopX;
 		IniFile.hoopSizeY = IniFile.customHoopY;
 		IniFile.hoopType  = HoopSize::kUserDefined;
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in updateHoopSize: option [{}]\n", option);
 		break;
 	  }
 	}
@@ -12434,7 +12466,7 @@ void thred::updateBackgroundColor() {
 }
 
 void thred::openAuxFile() {
-  switch (IniFile.auxFileType) { // NOLINT(clang-diagnostic-switch-default)
+  switch (IniFile.auxFileType) {
 	case Machine::kTajima: {
 	  nuFil(FileIndices::DST);
 	  break;
@@ -12447,6 +12479,11 @@ void thred::openAuxFile() {
 #endif
 	case Machine::kPfaff: {
 	  nuFil(FileIndices::PCS);
+	}
+	default: {
+	  outDebugString(L"default hit in openAuxFile: IniFile.auxFileType [{}]\n",
+	                 wrap::toIntegralType(IniFile.auxFileType));
+	  break;
 	}
   }
   showOnlyLayer(0U);

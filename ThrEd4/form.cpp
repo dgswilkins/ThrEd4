@@ -5882,7 +5882,7 @@ void form::flipv() {
 }
 
 void form::duform(FormStyles const formType) {
-  switch (formType) { // NOLINT(clang-diagnostic-switch-default)
+  switch (formType) {
 	case FormStyles::kNone:
 	  // Do nothing, no form to draw
 	  break;
@@ -5927,6 +5927,11 @@ void form::duform(FormStyles const formType) {
 	case FormStyles::kDaisy:
 	  formForms::dasyfrm();
 	  break;
+	default: {
+	  outDebugString(L"default hit in duform: formType [{}]\n",
+	                 wrap::toIntegralType(formType));
+	  break;
+	}
   }
 }
 
@@ -6392,7 +6397,7 @@ void form::refilfn(uint32_t const formIndex) {
   Instance->stateMap.reset(StateFlag::ISUND);
   auto textureSegments = std::vector<RNG_COUNT> {};
   textureSegments.resize(wrap::toSize(form.texture.lines));
-  switch (form.type) { // NOLINT(clang-diagnostic-switch-default)
+  switch (form.type) {
 	case FormStyles::kLine: {
 	  swEdgeType(form, angledForm);
 	  if (form.fillType == CONTF && (form.attribute & FRECONT) != 0) {
@@ -6441,6 +6446,11 @@ void form::refilfn(uint32_t const formIndex) {
 	  // Do nothing, these are handled elsewhere
 	  break;
 	}
+	default: {
+	  outDebugString(L"default hit in refilfn: form.type [{}]\n", wrap::toIntegralType(form.type));
+	  break;
+	}
+
   }
   UserStitchLength = savedStitchLength;
   xt::intlv(formIndex, fillStartsData, fillStartsMap);

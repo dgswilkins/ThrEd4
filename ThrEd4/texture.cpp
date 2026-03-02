@@ -607,7 +607,7 @@ void txfn(TextureStyle const textureType, uint32_t const formIndex) {
   texture::savtxt();
   nutx(formIndex);
   form.squareEnd(Instance->userFlagMap.test(UserFlag::SQRFIL));
-  switch (textureType) { // NOLINT(clang-diagnostic-switch-default)
+  switch (textureType) {
 	case TextureStyle::kVertical: {
 	  txvrt(form);
 	  break;
@@ -618,6 +618,10 @@ void txfn(TextureStyle const textureType, uint32_t const formIndex) {
 	}
 	case TextureStyle::kAngled: {
 	  txang(form);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in txfn: textureType [{}]\n", wrap::toIntegralType(textureType));
 	  break;
 	}
   }
@@ -878,7 +882,7 @@ auto findButtonIndex(HWND hwnd) -> uint8_t {
 }
 
 auto chkbut() -> bool {
-  switch (auto val = wrap::toEnumType<TextureButton>(findButtonIndex(WinMsg.hwnd)); val) { // NOLINT(clang-diagnostic-switch-default)
+  switch (auto val = wrap::toEnumType<TextureButton>(findButtonIndex(WinMsg.hwnd)); val) {
 	case TextureButton::Clear:
 	  txdelal();
 	  return true;
@@ -905,6 +909,10 @@ auto chkbut() -> bool {
 	  return true;
 	case TextureButton::NotFound:
 	  break;
+	default: {
+	  outDebugString(L"default hit in chkbut: val [{}]\n", wrap::toIntegralType(val));
+	  break;
+	}
   }
   return false;
 }
@@ -940,7 +948,7 @@ void chktxnum() {
   if (value != 0.0F) {
 	Instance->textureInputBuffer.clear();
 	value *= PFGRAN;
-	switch (wrap::toEnumType<TextureButton>(TextureWindowId)) { // NOLINT(clang-diagnostic-switch-default)
+	switch (wrap::toEnumType<TextureButton>(TextureWindowId)) {
 	  case TextureButton::Clear: {
 		break;
 	  }
@@ -971,6 +979,10 @@ void chktxnum() {
 	  case TextureButton::Angled: 
 	  case TextureButton::Mirror:
 	  case TextureButton::NotFound: {
+		outDebugString(L"unexpected hit in chktxnum: TextureWindowId [{}]\n", TextureWindowId);
+		break;
+	  }
+	  default: {
 		outDebugString(L"default hit in chktxnum: TextureWindowId [{}]\n", TextureWindowId);
 		break;
 	  }
