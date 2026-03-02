@@ -1119,6 +1119,7 @@ void chknum() {
 			  case EdgeType::doubleStitch:
 			  case EdgeType::evenClip: {
 				form.edgeSpacing = value * HALF;
+				break;
 			  }
 			  default: {
 				outDebugString(L"default hit in chknum: form.edgeType [{}]\n", form.edgeType & NEGUND);
@@ -4471,6 +4472,7 @@ void init() {
 	  case ButtonWindow::color:
 	  case ButtonWindow::layer: {
 		buttonTxt.assign(blank);
+		break;
 	  }
 	  default: {
 		outDebugString(L"default hit in init: iButton [{}]\n", iButton);
@@ -5657,6 +5659,7 @@ void redini() {
 		  IniFile.hoopType  = HoopSize::kLarge;
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
+		  break;
 		}
 		default: {
 		  outDebugString(L"default hit in redini: hoopType [{}]\n", wrap::toIntegralType(IniFile.hoopType));
@@ -6214,6 +6217,7 @@ void sav() {
 #endif
 	case Machine::kPfaff: {
 	  flag = PCS::savePCS(auxName, saveStitches);
+	  break;
 	}
 	default: {
 	  outDebugString(L"default hit in sav: IniFile.auxFileType [{}]\n", wrap::toIntegralType(IniFile.auxFileType));
@@ -12479,6 +12483,7 @@ void thred::openAuxFile() {
 #endif
 	case Machine::kPfaff: {
 	  nuFil(FileIndices::PCS);
+	  break;
 	}
 	default: {
 	  outDebugString(L"default hit in openAuxFile: IniFile.auxFileType [{}]\n",
