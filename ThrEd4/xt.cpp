@@ -248,7 +248,7 @@ auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool;
 auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT;
 void notundfn(uint32_t code);
 void nudfn(F_RECTANGLE const& designSizeRect) noexcept;
-void nurat(FEATHER& feather) noexcept;
+void nurat(FEATHER& feather);
 auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
     -> double;
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
@@ -1188,7 +1188,7 @@ void nudfn(F_RECTANGLE const& designSizeRect) noexcept {
   }
 }
 
-void nurat(FEATHER& feather) noexcept {
+void nurat(FEATHER& feather) {
   auto const remainder = fmodf(feather.globalPosition, 1.0F);
   switch (feather.fillType) {
 	case FeatherFillType::none: {
