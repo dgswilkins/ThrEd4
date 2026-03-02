@@ -51,6 +51,7 @@
 #include <wingdi.h>
 #include <winnt.h>
 #include <WinUser.h>
+#include <WTypesbase.h>
 
 // Standard Libraries
 #include <array>
@@ -292,7 +293,7 @@ auto loadName(fs::path const& directory, fs::path& fileName) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
-      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+      CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   if (FAILED(hResult) || nullptr == pFileOpen) {
 	return false;
   }
@@ -377,7 +378,7 @@ auto saveName(fs::path& fileName) {
   auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
-      CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+      CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   if (FAILED(hResult) || nullptr == pFileSave) {
 	return false;
   }
