@@ -56,6 +56,9 @@
 #include <type_traits>
 #include <vector>
 
+// satin internal namespace
+namespace {
+
 class SATIN_SINGLE
 {
   public:
@@ -79,8 +82,6 @@ class SATIN_SINGLE
   ~SATIN_SINGLE()         = default;
 };
 
-// satin internal namespace
-namespace {
 auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-line
 
 SATIN_SINGLE* SatinInstance;

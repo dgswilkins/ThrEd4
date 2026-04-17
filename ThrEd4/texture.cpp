@@ -74,6 +74,9 @@
 #include <utility>
 #include <vector>
 
+// texture internal namespace
+namespace {
+
 class TX_HIST_BUFF
 {
   public:
@@ -132,8 +135,6 @@ class TXT_SINGLE
   ~TXT_SINGLE()         = default;
 };
 
-// texture internal namespace
-namespace {
 constexpr auto OSCLAMP   = -0.5F; // values below this are off screen and should be clamped
 constexpr auto TXTRAT    = 0.95F; // texture fill clipboard shrink/grow ratio
 constexpr auto SIGNATURE = std::array<char, 4> {'t', 'x', 'h', 0}; // texture history signature

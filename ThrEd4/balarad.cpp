@@ -48,6 +48,9 @@
 #include <iterator>
 #include <vector>
 
+// balarad internal namespace
+namespace {
+
 #pragma pack(push, 1)
 class BAL_STITCH // balarad stitch
 {
@@ -103,8 +106,6 @@ class BAL_SINGLE
   ~BAL_SINGLE()         = default;
 };
 
-// balarad namespace
-namespace {
 constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
 constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
 constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration

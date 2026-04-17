@@ -63,6 +63,9 @@
 #include <string>
 #include <vector>
 
+// PES internal namespace
+namespace {
+
 #pragma pack(push, 1)
 // clang-format off
 class PECHDR
@@ -255,8 +258,6 @@ class THREAD
   // NOLINTEND(clang-diagnostic-unused-private-field)
 };
 
-// PES internal namespace
-namespace {
 constexpr auto BIT12    = uint32_t {0x800U}; // Set bit 12 if delta is negative
 constexpr auto BIT8     = uint32_t {0x80U};  // Set bit 8 on the upper byte
 constexpr auto BTSPBYTE = 8U;                // bits per byte

@@ -60,6 +60,9 @@
 // ReSharper restore CppUnusedIncludeDirective
 #include <vector>
 
+// formClip internal namespace
+namespace {
+
 #pragma pack(push, 1)
 class FORM_CLIP // form data clipboard header
 {
@@ -113,7 +116,6 @@ class FCLIP_SINGLE
   ~FCLIP_SINGLE()         = default;
 };
 
-namespace {
 auto ClipFormsCount  = uint32_t {}; // number of forms the on the clipboard
 auto ClipOrigin      = POINT {};    // origin of clipboard box in stitch coordinates
 auto LowerLeftStitch = F_POINT {};  // lower left formOrigin in a form

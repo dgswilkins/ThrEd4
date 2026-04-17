@@ -65,6 +65,9 @@
 #include <utility>
 #include <vector>
 
+// xt internal namespace
+namespace {
+
 class FEATHER
 {
   public:
@@ -148,8 +151,6 @@ class ATFLD
 
 #endif
 
-// xt internal namespace
-namespace {
 constexpr auto FSED = uint32_t {1340007303U}; // feather sequence seed
 
 // Type map constants

@@ -33,6 +33,9 @@
 #include <utility>
 #include <vector>
 
+// repair internal namespace
+namespace {
+
 class BAD_COUNTS
 {
   public:
@@ -43,8 +46,6 @@ class BAD_COUNTS
   uint32_t tx {};
 };
 
-// repair internal namespace
-namespace {
 constexpr auto BADFLT = uint8_t {1U};       // bad form list
 constexpr auto BADCLP = uint8_t {1U << 1U}; // bad clip
 constexpr auto BADSAT = uint8_t {1U << 2U}; // bad satin

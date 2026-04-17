@@ -67,6 +67,9 @@
 #include <type_traits>
 #include <vector>
 
+// form internal namespace
+namespace {
+
 class CLIP_SEG
 {
   public:
@@ -175,7 +178,6 @@ class V_RECT_2
   F_POINT dopnt;
 };
 
-namespace {
 constexpr auto BHWIDTH  = 20.0F; // Button hole width
 constexpr auto CLPMIN   = 0.5F;  // if clipboard data width less than this, then don't fill
 constexpr auto CLPMINVT = 1.2F;  // Minimum clip width for skinny vertical clips

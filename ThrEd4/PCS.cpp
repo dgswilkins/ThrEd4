@@ -53,14 +53,13 @@
 
 #pragma pack(push, 1)
 
+// PCS internal namespace
 namespace {
 constexpr auto PCSBMPNSZ = 14;            // Bitmap filename maximum length in PCS spec
 constexpr auto LEADIN    = int8_t {0x32}; // LEADIN marker for PCS file
 
 constexpr auto LARGE_HOOP = F_POINT {LHUPX, LHUPY}; // Large hoop size
 constexpr auto SMALL_HOOP = F_POINT {SHUPX, SHUPY}; // Small hoop size
-
-} // namespace
 
 class PCSHEADER // pcs file header structure
 {
@@ -124,7 +123,6 @@ class PCS_STITCH
 };
 #pragma pack(pop)
 
-namespace {
 auto PCSHeader = PCSHEADER {}; // pcs file header
 
 // Definitions

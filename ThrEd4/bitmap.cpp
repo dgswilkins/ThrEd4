@@ -73,6 +73,9 @@
 // ReSharper restore CppUnusedIncludeDirective
 #include <vector>
 
+// bitmap internal namespace
+namespace {
+
 class BMP_SINGLE
 {
   public:
@@ -119,8 +122,6 @@ class BMP_SINGLE
   ~BMP_SINGLE()         = default;
 };
 
-// bitmap internal namespace
-namespace {
 constexpr auto BITCOL = uint32_t {0xffff00U};                          // default bitmap color
 constexpr auto BPB    = 8U;                                            // bits per byte
 constexpr auto BPP24  = DWORD {24U};                                   // 24 bits per pixel

@@ -57,6 +57,9 @@
 #include <type_traits>
 #include <vector>
 
+// trace internal namespace
+namespace {
+
 // edge tracing directions
 enum class TraceDir : uint8_t {
   kTop,    // top edge
@@ -96,8 +99,6 @@ class TRACE_SINGLE
   ~TRACE_SINGLE()         = default;
 };
 
-// trace internal namespace
-namespace {
 constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are 9 pixels immediately adjacent
 constexpr auto BYTEMAXV = uint8_t {255U};   // max color value in a byte wide counter
 constexpr auto CCRATIO  = 1.0F / 255.0F;    // This is used to convert 0-255 to 0-1

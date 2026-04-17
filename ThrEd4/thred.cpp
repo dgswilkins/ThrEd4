@@ -124,6 +124,9 @@
 #include <new>
 #endif
 
+// thred internal namespace
+namespace {
+
 // File open types
 enum class FileStyles : uint8_t {
   ALL_FILES, // All file Types
@@ -220,8 +223,6 @@ class THR_SINGLE
   ~THR_SINGLE()         = default;
 };
 
-// thred internal namespace
-namespace {
 constexpr auto ARROWPNT = 3U;            // points required to draw arrow
 constexpr auto CHRDEF   = 0.25;          // default chain stitch ratio
 constexpr auto CHSDEF   = 24.0F;         // default chain stitch length

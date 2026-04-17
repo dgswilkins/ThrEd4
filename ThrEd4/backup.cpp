@@ -43,6 +43,9 @@
 // ReSharper restore CppUnusedIncludeDirective
 #include <iterator>
 
+// backup internal namespace
+namespace {
+
 class BACK_HEAD // Backup header
 {
   public:
@@ -62,7 +65,6 @@ class BACK_HEAD // Backup header
   SIZE          zoomRect {};
 };
 
-namespace {
 // Main Variables
 auto UndoBufferWriteIndex = uint32_t {}; // undo storage pointer
 auto UndoBufferReadIndex  = uint32_t {}; // undo retrieval pointers

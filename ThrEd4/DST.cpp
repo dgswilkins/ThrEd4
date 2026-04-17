@@ -50,6 +50,9 @@
 #include <string>
 #include <vector>
 
+// DST internal namespace
+namespace {
+
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
 class DST_OFFSETS
 {
@@ -155,9 +158,6 @@ class DST_SINGLE
   DST_SINGLE() noexcept = default;
   ~DST_SINGLE()         = default;
 };
-
-// DST internal namespace
-namespace {
 
 constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
 constexpr auto DSTMAX    = 121L;                 // maximum stitch/jump length of 121 in DST format
