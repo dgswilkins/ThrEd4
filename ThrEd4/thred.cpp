@@ -6823,15 +6823,16 @@ auto thrInit() -> uint32_t {
 	ThrSingle->initialize();
   }
   catch (std::bad_alloc const&) {
-	outDebugString(L"Memory allocation failure in ThrSingle\n");
+	outDebugString(L"Memory allocation failure in thrInit\n");
 	return EXIT_FAILURE;
   }
   catch (std::exception const& e) {
-	outDebugString(L"Exception caught in ThrSingle: {}\n", static_cast<const void*>(e.what()));
+	auto const errorMsg = utf::utf8ToUtf16(std::string(e.what()));
+	outDebugString(L"Exception caught in thrInit: {}\n", errorMsg);
 	return EXIT_FAILURE;
   }
   catch (...) {
-	outDebugString(L"Unknown exception caught in ThrSingle\n");
+	outDebugString(L"Unknown exception caught in thrInit\n");
 	return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

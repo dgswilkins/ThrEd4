@@ -95,15 +95,16 @@ auto globals::globalsInit() -> uint32_t {
 	Instance->initialize();
   }
   catch (std::bad_alloc const&) {
-	outDebugString(L"Memory allocation failure in Instance\n");
+	outDebugString(L"Memory allocation failure in globalsInit\n");
 	return EXIT_FAILURE;
   }
   catch (std::exception const& e) {
-	outDebugString(L"Exception caught in Instance: {}\n", static_cast<const void*>(e.what()));
+	auto const errorMsg = utf::utf8ToUtf16(std::string(e.what()));
+	outDebugString(L"Exception caught in globalsInit: {}\n", errorMsg);
 	return EXIT_FAILURE;
   }
   catch (...) {
-	outDebugString(L"Unknown exception caught in Instance\n");
+	outDebugString(L"Unknown exception caught in globalsInit\n");
 	return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

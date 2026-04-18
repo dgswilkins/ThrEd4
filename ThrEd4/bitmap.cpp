@@ -781,15 +781,16 @@ auto bitmap::bmpInit() -> uint32_t {
 	BMPInstance->initialize();
   }
   catch (std::bad_alloc const&) {
-	outDebugString(L"Memory allocation failure in BMPInstance\n");
+	outDebugString(L"Memory allocation failure in bmpInit\n");
 	return EXIT_FAILURE;
   }
   catch (std::exception const& e) {
-	outDebugString(L"Exception caught in BMPInstance: {}\n", static_cast<const void*>(e.what()));
+	auto const errorMsg = utf::utf8ToUtf16(std::string(e.what()));
+	outDebugString(L"Exception caught in bmpInit: {}\n", errorMsg);
 	return EXIT_FAILURE;
   }
   catch (...) {
-	outDebugString(L"Unknown exception caught in BMPInstance\n");
+	outDebugString(L"Unknown exception caught in bmpInit\n");
 	return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
