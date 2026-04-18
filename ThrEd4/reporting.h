@@ -18,7 +18,7 @@
 
 namespace rpt {
 
-void reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode);
+void reportError([[maybe_unused]] const wchar_t* prompt, DWORD const& errorCode);
 } // namespace rpt
 
 #endif // THRED_REPORTING_H
