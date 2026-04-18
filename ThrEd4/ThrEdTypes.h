@@ -11,8 +11,6 @@
 #ifdef _DEBUG
 #pragma warning(push)
 #pragma warning(disable : 4702) // supress warning for fmt library header
-#include "fmt/xchar.h"
-#include "fmt/compile.h"
 #pragma warning(pop)
 #endif
 
@@ -41,11 +39,11 @@ class FMT_WITH_LOC
   }
 };
 
-template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, Args&&... args) {
+template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, Args... args) {
   auto       name = utf::utf8ToUtf16(std::string(fwl.loc.file_name()));
   auto       line = fwl.loc.line();
-  auto const strY = format(FMT_COMPILE(L" {:s}({:d}) : {:s}"), name, line, fwl.strX);
-  auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
+  auto const strY = std::format(L" {:s}({:d}) : {:s}", name, line, fwl.strX);
+  auto const strZ = std::vformat(strY, std::make_wformat_args(args...));
   OutputDebugString(strZ.c_str());
 }
 #else

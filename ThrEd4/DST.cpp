@@ -17,7 +17,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "fmt/format.h"
 #include "gsl/span"
 #include "gsl/util"
 #pragma warning(pop)
@@ -47,6 +46,7 @@
 #include <cstring>
 // ReSharper restore CppUnusedIncludeDirective
 #include <filesystem>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -972,11 +972,11 @@ void DSTHED::writeDSTHeader(const std::filesystem::path& auxName, size_t& dstRec
   constexpr auto CAR  = uint8_t {0xd}; // ASCII carriage return
   spDstHdrDesc.back() = CAR;
 
-  auto const recs   = fmt::format(FMT_STRING("{:7d}\r"), dstRecSize);
-  auto const xplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().x);
-  auto const xminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().x);
-  auto const yplus  = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getPositive().y);
-  auto const yminus = fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.getNegative().y);
+  auto const recs   = std::format("{:7d}\r", dstRecSize);
+  auto const xplus  = std::format("{:5d}\xd", dstOffset.getNegative().x);
+  auto const xminus = std::format("{:5d}\xd", dstOffset.getPositive().x);
+  auto const yplus  = std::format("{:5d}\xd", dstOffset.getPositive().y);
+  auto const yminus = std::format("{:5d}\xd", dstOffset.getNegative().y);
   // clang-format off
   // NOLINTBEGIN(clang-diagnostic-unsafe-buffer-usage-in-libc-call)
   strncpy(m_recshed.data(),  "ST:",          m_recshed.size());

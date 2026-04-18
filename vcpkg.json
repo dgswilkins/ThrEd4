@@ -5,8 +5,7 @@
   "dependencies": [
     "boost-dynamic-bitset",
     "boost-range",
-    "ms-gsl",
-    "fmt"
+    "ms-gsl"
   ],
   "overrides": [
     {
@@ -16,10 +15,6 @@
     {
       "name": "boost-range",
       "version": "1.90.0"
-    },
-    {
-      "name": "fmt",
-      "version": "12.1.0"
     },
     {
       "name": "ms-gsl",

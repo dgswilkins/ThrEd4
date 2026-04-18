@@ -21,7 +21,6 @@
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #ifndef _DEBUG
 #if SHOW_ERROR
-#include "fmt/xchar.h"
 #endif
 #endif
 #include "gsl/span"
@@ -40,6 +39,9 @@
 #include <minwindef.h>
 #include <WinBase.h>
 #include <winnt.h>
+
+// Standard Libraries
+#include <format>
 
 // report the system error from GetLastError
 void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode) {
@@ -60,8 +62,7 @@ void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD& errorCode) 
 	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 #else
 #if SHOW_ERROR
-	auto const info = format(
-	    fmt::runtime(L"{} failed with error [{}], {}\n"), prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
+	auto const info = std::format(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 	displayText::shoMsg(info, false);
 #endif
 #endif

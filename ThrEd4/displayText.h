@@ -7,12 +7,6 @@
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
 
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "fmt/xchar.h"
-#pragma warning(pop)
-
 // Standard Libraries
 #include <cstdint>
 #include <string>
@@ -60,18 +54,18 @@ void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
 
 template <class inType> auto format(uint32_t const messageId, inType const& value) -> std::wstring {
-  return fmt::format(fmt::runtime(loadStr(messageId)), value);
+  return std::vformat(loadStr(messageId), std::make_wformat_args(value));
 }
 
 template <class inTypeA, class inTypeB>
 auto format2(uint32_t const messageId, inTypeA const& valueA, inTypeB const& valueB) -> std::wstring {
-  return fmt::format(fmt::runtime(loadStr(messageId)), valueA, valueB);
+  return std::vformat(loadStr(messageId), std::make_wformat_args(valueA, valueB));
 }
 
 template <class inTypeA, class inTypeB, class inTypeC, class inTypeD, class inTypeE>
 auto format5(uint32_t const messageId, inTypeA valueA, inTypeB valueB, inTypeC valueC, inTypeD valueD, inTypeE valueE)
     -> std::wstring {
-  return fmt::format(fmt::runtime(loadStr(messageId)), valueA, valueB, valueC, valueD, valueE);
+  return std::vformat(loadStr(messageId), std::make_wformat_args(valueA, valueB, valueC, valueD, valueE));
 }
 
 template <class inType> void showMessage(uint32_t messageId, inType const& value) {

@@ -26,7 +26,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "fmt/compile.h"
 #include "gsl/narrow"
 #include "gsl/pointers"
 #include "gsl/util"
@@ -58,6 +57,7 @@
 #include <cstdint>
 // ReSharper restore CppUnusedIncludeDirective
 #include <filesystem>
+#include <format>
 #include <iterator>
 #include <stdexcept>
 #include <string>
@@ -1482,7 +1482,7 @@ auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> I
 
 // ReSharper disable CppParameterMayBeConst
 void setstxt(int32_t const stringIndex, float const value, HWND dialog) {
-  SetWindowText(GetDlgItem(dialog, stringIndex), format(FMT_COMPILE(L"{:.2f}"), value * IPFGRAN).c_str());
+  SetWindowText(GetDlgItem(dialog, stringIndex), std::format(L"{:.2f}", value * IPFGRAN).c_str());
 }
 // ReSharper restore CppParameterMayBeConst
 

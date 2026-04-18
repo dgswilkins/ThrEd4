@@ -27,7 +27,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include "fmt/compile.h"
 #include "gsl/narrow"
 #include "gsl/util"
 #pragma warning(pop)
@@ -52,6 +51,7 @@
 #include <cmath>
 // ReSharper disable CppUnusedIncludeDirective
 #include <cstdint>
+#include <format>
 #include <ranges>
 // ReSharper restore CppUnusedIncludeDirective
 #include <string>
@@ -698,7 +698,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (thred::checkPreferenceIndex(PRFAPPCOL + 1) && thred::inDefaultColorWindows()) {
 	AppliqueColor = thred::getVerticalIndex();
 	SetWindowText(Instance->valueWindow.operator[](PRFAPPCOL),
-	              format(FMT_COMPILE(L"{:3d}"), AppliqueColor).c_str());
+	              std::format(L"{:3d}", AppliqueColor).c_str());
 	thred::unsid(true);
 	return true;
   }
