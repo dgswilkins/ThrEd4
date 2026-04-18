@@ -243,7 +243,7 @@ auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD by
   }
   else {
 	if (0 == ReadFile(fileHandle, gsl::narrow<LPVOID>(buffer), gsl::narrow<DWORD>(bytesToRead), bytesRead, nullptr)) {
-	  auto errorCode = GetLastError();
+	  auto const errorCode = GetLastError();
 	  CloseHandle(fileHandle);
 	  rpt::reportError(prompt, errorCode);
 	  return false;
