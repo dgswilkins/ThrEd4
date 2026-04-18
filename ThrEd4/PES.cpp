@@ -84,8 +84,6 @@ class PECHDR
   uint8_t                  colorCount {};  // Number of colors minus one, 0xFF means 0 colors
   std::array<uint8_t, 463> pad {};         // Pad bytes up to 512.
   // NOLINTEND(readability-magic-numbers, misc-non-private-member-variables-in-classes)
-
-  explicit constexpr PECHDR() noexcept = default;
 };
 // clang-format on
 #pragma pack(pop)
@@ -106,8 +104,6 @@ class PECHDR2
   uint16_t xMin {};     // starting X val (Bigendian)
   uint16_t yMin {};     // starting Y val (Bigendian)
   // NOLINTEND(misc-non-private-member-variables-in-classes)
-
-  explicit constexpr PECHDR2() noexcept = default;
 };
 #pragma pack(pop)
 
