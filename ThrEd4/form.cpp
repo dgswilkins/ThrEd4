@@ -252,12 +252,12 @@ void drawFormBox(const FRM_HEAD& form);
 void drawFormsBox();
 void drawStartGuide(FRM_HEAD const& form,
                     uint8_t         layer,
-                    unsigned int&   lastPoint) noexcept(!std::is_same_v<ptrdiff_t, int>);
+                    unsigned int&   lastPoint);
 
 constexpr auto duat(uint32_t attribute) -> uint32_t;
 
 void dubfn(FRM_HEAD const& currentForm);
-void ducon() noexcept;
+void ducon();
 void dufcntr(F_POINT& center) noexcept;
 void dufdat(std::vector<F_POINT>&  tempClipPoints,
             std::vector<SAT_CON>&  tempGuides,
@@ -330,10 +330,10 @@ void fnvrt(std::vector<F_POINT>&    currentFillVertices,
 auto fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept -> bool;
 void frmToLine(FRM_HEAD const& form);
 void frmpnts(uint32_t type);
-void frmpoly(gsl::span<POINT> const& source) noexcept;
+void frmpoly(gsl::span<POINT> const& source);
 void frmsqr(uint32_t vertexIndex, uint32_t iVertex);
 void frmsqr0(POINT const& controlPoint);
-void frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, uint32_t>);
+void frmx(POINT const& controlPoint, HDC hDC);
 void fsangl(FRM_HEAD& form);
 void fsclp(uint32_t formIndex);
 void fsclpx(uint32_t formIndex);
@@ -655,7 +655,7 @@ void frmsqr0(POINT const& controlPoint) {
 }
 
 // ReSharper disable CppParameterMayBeConst
-void frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, uint32_t>) {
+void frmx(POINT const& controlPoint, HDC hDC) {
   auto       line   = std::array<POINT, LNPNTS> {};
   auto const offset = thred::duScale(8);
   SelectObject(hDC, FormSelectedPen);
@@ -671,7 +671,7 @@ void frmx(POINT const& controlPoint, HDC hDC) noexcept(std::is_same_v<size_t, ui
 }
 // ReSharper restore CppParameterMayBeConst
 
-void frmpoly(gsl::span<POINT> const& source) noexcept {
+void frmpoly(gsl::span<POINT> const& source) {
   for (auto const& iPoint : source) {
 	wrap::polyline(StitchWindowMemDC, std::addressof(iPoint), LNPNTS);
   }
@@ -679,7 +679,7 @@ void frmpoly(gsl::span<POINT> const& source) noexcept {
 
 void drawStartGuide(FRM_HEAD const& form,
                     uint8_t const   layer,
-                    unsigned int&   lastPoint) noexcept(!std::is_same_v<ptrdiff_t, int>) {
+                    unsigned int&   lastPoint) {
   SelectObject(StitchWindowMemDC, FormPen);
   auto& formLines = Instance->formLines;
   frmpoly(gsl::span(std::addressof(formLines.operator[](1)), form.wordParam - 1));
@@ -4366,7 +4366,7 @@ void fsangl(FRM_HEAD& form) {
   form::refil(ClosestFormToCursor);
 }
 
-void ducon() noexcept {
+void ducon() {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::polyline(StitchWindowDC, Instance->formLines.data(), LNPNTS);
@@ -5401,7 +5401,7 @@ void form::frmlin(std::vector<F_POINT> const& vertices) {
                                          ((vertices[0].y - ZoomRect.bottom) * ZoomRatio.y))});
 }
 
-void form::dufrm() noexcept {
+void form::dufrm() {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::polyline(StitchWindowDC, Instance->formLines.data(), NewFormVertexCount);
@@ -5414,7 +5414,7 @@ void form::unfrm() {
   }
 }
 
-void form::mdufrm() noexcept {
+void form::mdufrm() {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   auto const& formLines = Instance->formLines;
@@ -5534,7 +5534,7 @@ void form::delfrms() {
   }
 }
 
-void form::fselrct(uint32_t const iForm) noexcept(std::is_same_v<size_t, uint32_t>) {
+void form::fselrct(uint32_t const iForm) {
   // clang-format off
   auto const& form = Instance->formList.operator[](iForm);
   std::array<F_POINT, SQPNTS> formOutline;
@@ -6682,7 +6682,7 @@ void form::drwcon() {
   ducon();
 }
 
-void form::duinsf() noexcept {
+void form::duinsf() {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);

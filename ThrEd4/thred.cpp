@@ -7436,7 +7436,7 @@ void thred::unbox() {
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
-void thred::ilin() noexcept {
+void thred::ilin() {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
@@ -7457,7 +7457,7 @@ void thred::xlin() {
   }
 }
 
-void thred::ilin1() noexcept {
+void thred::ilin1() {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);

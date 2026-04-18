@@ -56,10 +56,10 @@ void dubold();
 void dubsfil(FRM_HEAD& form);
 void dueg(uint32_t sides);
 void duform(FormStyles formType);
-void dufrm() noexcept;
+void dufrm();
 void duhart(uint32_t sideCount);
 void dulens(uint32_t sides);
-void duinsf() noexcept;
+void duinsf();
 void dupfn(float rotationAngle);
 void dupsel(HDC hDC);
 void durpoli(uint32_t vertexCount);
@@ -89,7 +89,7 @@ void frmon();
 void frmovlin();
 auto frmrng(uint32_t iForm, RANGE& range) -> bool;
 void frmsadj();
-void fselrct(uint32_t iForm) noexcept(std::is_same_v<size_t, uint32_t>);
+void fselrct(uint32_t iForm);
 void fsizpar(FRM_HEAD& form) noexcept;
 auto getAllItemsRect() noexcept -> F_RECTANGLE&;
 auto getblen() noexcept -> float;
@@ -108,7 +108,7 @@ auto linx(std::vector<F_POINT> const& points,
           uint32_t                    finish,
           F_POINT&                    intersection,
           std::vector<F_POINT> const& outsidePoints) noexcept -> bool;
-void mdufrm() noexcept;
+void mdufrm();
 void movlayr(uint32_t layer);
 void munfrm();
 void nubrdcol(uint8_t color) noexcept;

@@ -155,7 +155,7 @@ auto floor(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_
   }
 }
 
-void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSize) noexcept;
+void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSize);
 
 auto getFormVertices() noexcept -> std::vector<F_POINT>&;
 
@@ -226,7 +226,7 @@ void narrow_cast(outType& outvar, inType invar) noexcept { // NOLINT(readability
   }
 }
 
-void polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
+void polyline(HDC hdc, POINT const* apt, uint32_t cpt);
 auto pressed(int virtKey) noexcept -> bool;
 
 template <class bufType, class inType>
@@ -273,7 +273,7 @@ auto round(inType invar) noexcept(std::is_same_v<inType, float> && std::is_same_
 }
 
 void setCursor(HCURSOR hCursor) noexcept;
-void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
+void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString);
 
 template <class inType>
 auto toPtrdiff(inType invar) noexcept(!std::is_same_v<ptrdiff_t, int> || !std::is_same_v<inType, uint32_t>)
@@ -376,7 +376,7 @@ auto wcsToLong(wchar_t const* buffer) noexcept(std::is_same_v<outType, long>) ->
   }
 }
 
-void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
+void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped);
 
 template <typename EnumType> constexpr auto toIntegralType(EnumType invar) noexcept {
   static_assert(std::is_enum_v<EnumType>, "Enum type required");

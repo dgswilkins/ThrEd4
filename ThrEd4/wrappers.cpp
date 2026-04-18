@@ -52,7 +52,7 @@ auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
 }
 
 // ReSharper disable CppParameterMayBeConst
-void wrap::polyline(HDC hdc, POINT const* apt, uint32_t const cpt) noexcept {
+void wrap::polyline(HDC hdc, POINT const* apt, uint32_t const cpt) {
   Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 // ReSharper restore CppParameterMayBeConst
@@ -63,19 +63,19 @@ auto wrap::pressed(int const virtKey) noexcept -> bool {
 }
 
 // ReSharper disable CppParameterMayBeConst
-void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t const bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
+void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t const bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) {
   WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t const iLen, LPSIZE lpSize) noexcept {
+void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t const iLen, LPSIZE lpSize) {
   GetTextExtentPoint32(hdc, lpString, gsl::narrow<int32_t>(iLen), lpSize);
 }
 // ReSharper restore CppParameterMayBeConst
 
 // ReSharper disable CppParameterMayBeConst
-void wrap::textOut(HDC hdc, int32_t const nXStart, int32_t const nYStart, LPCTSTR lpString, uint32_t const cchString) noexcept {
+void wrap::textOut(HDC hdc, int32_t const nXStart, int32_t const nYStart, LPCTSTR lpString, uint32_t const cchString) {
   TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int32_t>(cchString));
 }
 // ReSharper restore CppParameterMayBeConst
