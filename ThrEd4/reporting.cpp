@@ -3,10 +3,12 @@
 #include "stdafx.h"
 #ifndef _DEBUG
 #include "switches.h"
-#if SHOW_ERROR
+#endif
+
+#if !defined(_DEBUG) && SHOW_ERROR == 1
 #include "displayText.h"
 #endif
-#endif
+
 #include "reporting.h"
 #ifdef _DEBUG
 #include "ThrEdTypes.h"
@@ -19,10 +21,6 @@
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#ifndef _DEBUG
-#if SHOW_ERROR
-#endif
-#endif
 #include "gsl/span"
 #include "gsl/util"
 #pragma warning(pop)
@@ -41,7 +39,9 @@
 #include <winnt.h>
 
 // Standard Libraries
+#if !defined(_DEBUG) && SHOW_ERROR == 1
 #include <format>
+#endif
 
 // report the system error from GetLastError
 void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD const& errorCode) {
@@ -60,11 +60,9 @@ void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD const& error
 	msg[wrap::toSize(res) - 2U] = 0;
 #ifdef _DEBUG
 	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
-#else
-#if SHOW_ERROR
+#elif SHOW_ERROR == 1
 	auto const info = std::format(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 	displayText::shoMsg(info, false);
-#endif
 #endif
 	LocalFree(lpMsgBuf);
   }
