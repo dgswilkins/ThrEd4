@@ -74,12 +74,15 @@ class PECHDR
 // NOLINTBEGIN(readability-magic-numbers, misc-non-private-member-variables-in-classes)
   std::array<char, 19>     label {}; // Label string prefixed with "LA:" and padded with space (0x20)
   int8_t                   labnd {}; // carriage return character
+  // ReSharper disable once CppDeclaratorNeverUsed
   std::array<uint8_t, 11>  ukn1 {};  // Unknown (' ')
+  // ReSharper disable once CppDeclaratorNeverUsed
   uint8_t                  ukn2 {};  // Unknown
   uint16_t                 hnd1 {};  // Unknown (0x00ff)
   uint8_t                  thumbWidth {};  // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
                                            // So, 6 would mean 6x8 = 48 pixels per line
   uint8_t                  thumbHeight {}; // Thumbnail image height in pixels (38)
+  // ReSharper disable once CppDeclaratorNeverUsed
   std::array<uint8_t, 12>  ukn3 {};        // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
   uint8_t                  colorCount {};  // Number of colors minus one, 0xFF means 0 colors
   std::array<uint8_t, 463> pad {};         // Pad bytes up to 512.
@@ -136,11 +139,13 @@ class PESHED
   std::array<char, 4>    ledV {};  //   4-7  version (0001)
   uint32_t               off {};   //   8-b  Absolute PEC section byte offset
   uint16_t               hpsz {};  //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+  // ReSharper disable once CppDeclaratorNeverUsed
   uint16_t               usdn {};  //   e,f  Use existing design area (1)
   uint16_t               blct {};  // 10,11  CSewSeg segment block count (1)
   std::array<uint8_t, 4> hnd1 {};  // 12-15  header end (FF FF 00 00)
   uint16_t               celn {};  // 16,17  Length of following string (7)
   std::array<char, 7>    ce {};    // 18-1e  CEmbOne identification (CEmbOne)
+  // ReSharper disable CppDeclaratorNeverUsed
   int16_t                xlft {};  // 1f,20  Extent left
   int16_t                xtop {};  // 21,22  Extent top
   int16_t                xrht {};  // 23,24  Extent right
@@ -149,17 +154,23 @@ class PESHED
   int16_t                ptop {};  // 29,2a  Extent top position
   int16_t                prht {};  // 2b,2c  Extent right position
   int16_t                pbot {};  // 2d,2e  Extent bottom position
+  // ReSharper restore CppDeclaratorNeverUsed
   float                  atfm1 {}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
+  // ReSharper disable CppDeclaratorNeverUsed
   float                  atfm2 {}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
   float                  atfm3 {}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
+  // ReSharper restore CppDeclaratorNeverUsed
   float                  atfm4 {}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
   float                  atfm5 {}; // 3f-42  Affine transform Left_Pos
   float                  atfm6 {}; // 43-46  Affine transform Bottom_Pos
+  // ReSharper disable CppDeclaratorNeverUsed
   uint16_t               ukn1 {};  // 47,48  unknown (1)
   int16_t                xtrn {};  // 49,4a  CSewSeg x coordinate translation (0)
   int16_t                ytrn {};  // 4b,4c  CSewSeg y coordinate translation (0)
+  // ReSharper restore CppDeclaratorNeverUsed
   int16_t                xsiz {};  // 4d,4e  CSewSeg width
   int16_t                ysiz {};  // 4f,50  CSewSeg height
+  // ReSharper disable once CppDeclaratorNeverUsed
   std::array<int8_t, 8>  ukn2 {};  // 51,58  unknown (0)
   uint16_t               bcnt {};  // 59,5a  CSewSeg block count (segments + (2*colorChanges))
   std::array<uint8_t, 4> hnd2 {};  // 5b-5e  header end (FF FF 00 00)

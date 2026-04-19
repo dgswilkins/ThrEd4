@@ -56,6 +56,7 @@ class BAL_STITCH // balarad stitch
 {
   public:
   uint8_t code {};
+  // ReSharper disable once CppDeclaratorNeverUsed
   uint8_t flag {};
   float   x {};
   float   y {};
@@ -72,11 +73,12 @@ class BAL_HEAD // balarad file header
   std::array<COLORREF, MAXCOL> color {};
 
   uint32_t signature {};
+  // ReSharper disable once CppDeclaratorNeverUsed
   uint16_t version {};
   float    hoopSizeX {};
   float    hoopSizeY {};
   COLORREF backgroundColor {};
-
+  // ReSharper disable once CppDeclaratorNeverUsed
   std::array<uint8_t, BALPAD> res {};
 };
 #pragma pack(pop)

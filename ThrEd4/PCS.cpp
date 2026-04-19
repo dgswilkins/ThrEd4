@@ -115,9 +115,11 @@ class PCS_STITCH
   public:
   uint8_t fx {}; // fractional part of x coord or color if tag = 3
   int16_t x {};  // integer part of x coord
+  // ReSharper disable once CppDeclaratorNeverUsed
   uint8_t nx {};
   uint8_t fy {}; // fractional part of y coord
   int16_t y {};  // integer part of y coord
+  // ReSharper disable once CppDeclaratorNeverUsed
   uint8_t ny {};
   uint8_t tag {};
 };
