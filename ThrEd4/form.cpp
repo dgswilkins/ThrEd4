@@ -130,7 +130,8 @@ class R_CON // PathMap: path map for sequencing
 {
   public:
   uint32_t node {};
-  bool     isConnected {};
+  // ReSharper disable once CppDeclaratorNeverUsed
+  bool isConnected {}; // This is used only for debugging to check that the path is fully connected. It is not used in the actual path finding.
   uint32_t nextGroup {};
 };
 
