@@ -168,7 +168,7 @@ void dutxfn(TextureStyle textureType);
 void dutxlin(F_POINT const& point0in, F_POINT const& point1in);
 void dutxmir();
 void dutxrct(TXTR_RECT& textureRect) noexcept;
-void dutxtlin() noexcept;
+void dutxtlin();
 void dutxtx(uint32_t index, uint16_t offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>);
 void ed2px(F_POINT const& editPoint, POINT& point) noexcept;
 auto ed2stch(F_POINT const& point) noexcept -> F_POINT;
@@ -259,7 +259,7 @@ void dutxrct(TXTR_RECT& textureRect) noexcept {
   textureRect = TXTR_RECT {.left = minX, .right = maxX, .top = maxY, .bottom = minY};
 }
 
-void dutxtlin() noexcept {
+void dutxtlin() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   wrap::polyline(StitchWindowDC, Instance->formLines.data(), LNPNTS);
 }
