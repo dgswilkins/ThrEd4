@@ -5,6 +5,7 @@
 #include "iniFile.h"
 #include "point.h"
 #include "ThrEdTypes.h"
+#include "utf8conv.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -27,6 +28,7 @@
 #include <cstdlib>
 #include <exception>
 #include <new>
+#include <string>
 #include <vector>
 
 // clang-format off

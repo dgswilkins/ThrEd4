@@ -18,6 +18,7 @@
 #include "textureHeader.h"
 #include "thred.h"
 #include "ThrEdTypes.h"
+#include "utf8conv.h"
 // ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 // ReSharper restore CppUnusedIncludeDirective
