@@ -79,7 +79,6 @@ class FORMS_CLIP // multiple forms clipboard header
   public:
   uint32_t clipType {};
   uint16_t formCount {};
-  uint16_t reserved {};
 };
 #pragma pack(pop)
 
