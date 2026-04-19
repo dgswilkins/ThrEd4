@@ -1450,7 +1450,7 @@ void satin::satfix() {
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
-void satin::dusat() noexcept {
+void satin::dusat() {
   auto const  vertexCount = SatinInstance->TempPolygon.size();
   auto const& formLines   = Instance->formLines;
   auto const* line        = &formLines[vertexCount - 1U];

@@ -10,7 +10,7 @@ void delcon(FRM_HEAD& form, uint32_t GuideIndex);
 void delsac(uint32_t formIndex);
 void delspnt();
 void drwsat();
-void dusat() noexcept;
+void dusat();
 void ribon();
 void satadj(FRM_HEAD& form);
 void satbrd();
