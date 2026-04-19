@@ -435,7 +435,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   }
   auto bytesRead = DWORD {};
   if (!wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
-	auto errorCode = GetLastError();
+	auto const errorCode = GetLastError();
 	CloseHandle(hBitmapFile);
 	resetBmpFile(true);
 	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil", errorCode);
