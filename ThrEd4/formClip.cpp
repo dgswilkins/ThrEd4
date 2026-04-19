@@ -244,7 +244,7 @@ void clipSelectedForm() {
 	auto*      clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 	auto const spData         = gsl::span {clipStitchData, stitchCount};
 	auto       iTexture       = firstStitch;
-	savclp(spData[0], Instance->stitchBuffer.operator[](iTexture), length);
+	savclp(spData[0], Instance->stitchBuffer.operator[](iTexture), stitchCount);
 	++iTexture;
 	auto       iDestination   = 1U;
 	auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
