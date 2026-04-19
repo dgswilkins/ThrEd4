@@ -741,7 +741,7 @@ void txsiz(float const ratio, FRM_HEAD const& textureForm) {
 
 void txt2pix(TX_PNT const& texturePoint, POINT& screenPoint) noexcept {
   screenPoint.x =
-      std::lround((TextureScreen.spacing * wrap::toFloat(texturePoint.line) + TextureScreen.xOffset) /
+      std::lround(((TextureScreen.spacing * wrap::toFloat(texturePoint.line)) + TextureScreen.xOffset) /
                   TextureScreen.editToPixelRatio);
   screenPoint.y =
       std::lround(wrap::toFloat(TextureScreen.height) -
@@ -1057,7 +1057,7 @@ void dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
   TextureInstance->TempTexturePoints.reserve(TextureInstance->TempTexturePoints.size() + lineRange);
   while (integerStart <= integerFinish) {
 	if (auto const yOffset =
-	        (slope * (-point0.x + wrap::toFloat(integerStart) * TextureScreen.spacing)) + point0.y;
+	        (slope * (-point0.x + (wrap::toFloat(integerStart) * TextureScreen.spacing))) + point0.y;
 	    yOffset > 0 && yOffset < TextureScreen.areaHeight) {
 	  TextureInstance->TempTexturePoints.push_back(
 	      TX_PNT {.y = yOffset, .line = gsl::narrow<uint16_t>(integerStart)});
@@ -1269,11 +1269,11 @@ void texture::drwtxtr() {
   constexpr auto BIAS = 2.0F;
   TextureScreen.xOffset =
       flag ? 0.0F
-           : (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
-              TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + BIAS)) *
+           : ((TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right)) -
+              (TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + BIAS))) *
                  HALF;
   auto const yOffset   = flag ? wrap::round<LONG>((wrap::toFloat(StitchWindowClientRect.bottom) -
-                                                 TextureScreen.areaHeight / TextureScreen.editToPixelRatio) *
+                                                 (TextureScreen.areaHeight / TextureScreen.editToPixelRatio)) *
                                                 HALF)
                               : StitchWindowClientRect.bottom / 4;
   TextureScreen.top    = yOffset;
@@ -1304,7 +1304,7 @@ void texture::drwtxtr() {
   line[1].y = StitchWindowClientRect.bottom;
   for (auto iVertical = 1U; iVertical < TextureScreen.lines + 1U; ++iVertical) {
 	line[0].x = line[1].x =
-	    std::lroundf((TextureScreen.spacing * wrap::toFloat(iVertical) + TextureScreen.xOffset) /
+	    std::lroundf(((TextureScreen.spacing * wrap::toFloat(iVertical)) + TextureScreen.xOffset) /
 	                 TextureScreen.editToPixelRatio);
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }

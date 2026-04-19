@@ -192,7 +192,7 @@ auto clpsid(uint32_t const              vertexIndex,
   auto const fClipCount = wrap::toFloat(clipCount);
   auto const remainder =
       clipCount > 1U
-          ? ((length - fClipCount * ClipRectSize.cx) / (fClipCount - 1.0F) + ClipRectSize.cx) / length
+          ? (((length - (fClipCount * ClipRectSize.cx)) / (fClipCount - 1.0F)) + ClipRectSize.cx) / length
           : (length - ClipRectSize.cx) / 2;
   auto const step         = F_POINT {delta.x * remainder, delta.y * remainder};
   auto       insertPoint  = *itStartVertex; // copy intended
@@ -672,7 +672,7 @@ void picfn(FRM_HEAD const&       form,
   auto step = F_POINT {};
   if (count > 1) {
 	auto const tdub =
-	    ((length - wrap::toFloat(count) * spacing) / (wrap::toFloat(count) - 1.0F) + spacing) / length;
+	    (((length - (wrap::toFloat(count) * spacing)) / (wrap::toFloat(count) - 1.0F)) + spacing) / length;
 	auto const val = F_POINT {delta.x * tdub, delta.y * tdub};
 	step           = val;
   }

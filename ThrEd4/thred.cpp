@@ -2765,14 +2765,14 @@ void dugrid() {
   for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; ++iGrid) {
 	gridLine[0].y = gridLine[1].y =
 	    wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
-	                        ((wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y));
+	                        (((wrap::toFloat(iGrid) * IniFile.gridSize) - ZoomRect.bottom) * ZoomRatio.y));
 	wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
   }
   gridLine[0].y = 0;
   gridLine[1].y = StitchWindowClientRect.bottom;
   for (auto iGrid = gridRect.left; iGrid <= gridRect.right; ++iGrid) {
 	gridLine[0].x = gridLine[1].x =
-	    wrap::ceil<int32_t>((wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x);
+	    wrap::ceil<int32_t>(((wrap::toFloat(iGrid) * IniFile.gridSize) - ZoomRect.left) * ZoomRatio.x);
 	wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
   }
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -8672,7 +8672,7 @@ auto thred::closlin() -> uint32_t {
 		  auto const poff  = offsetX - (offsetY / slope);
 
 		  intersection = F_POINT {offset - (slope * intersection.y),
-		                          slope * (offset - poff) / (slope * slope + 1.0F)};
+		                          slope * (offset - poff) / ((slope * slope) + 1.0F)};
 
 		  deltaX = intersection.x - offsetX;
 		  deltaY = intersection.y - offsetY;

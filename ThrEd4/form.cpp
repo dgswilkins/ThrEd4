@@ -830,7 +830,7 @@ auto findDistanceToSide(F_POINT const& lineStart, F_POINT const& lineEnd, F_POIN
       param < 0 ? F_POINT {point.x - lineStart.x, point.y - lineStart.y} // Before the first point
       : param > 1
           ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y} // After the last point
-          : F_POINT {point.x - (lineStart.x + param * varC), point.y - (lineStart.y + param * varD)}; // Between endpoints
+          : F_POINT {point.x - (lineStart.x + (param * varC)), point.y - (lineStart.y + (param * varD))}; // Between endpoints
   // NOLINTEND(readability-avoid-nested-conditional-operator)
   // returning shortest distance
   distance = std::sqrt((diff.x * diff.x) + (diff.y * diff.y));
@@ -914,7 +914,7 @@ void bdrlin(uint32_t const vertexIndex, uint32_t const start, uint32_t const fin
   auto const length      = std::hypot(delta.x, delta.y);
   auto       stitchCount = Instance->userFlagMap.test(UserFlag::LINSPAC)
                                ? wrap::ceil<uint32_t>(length / stitchSize)
-                               : wrap::round<uint32_t>(((length - stitchSize * HALF) / stitchSize) + 1.0F);
+                               : wrap::round<uint32_t>(((length - (stitchSize * HALF)) / stitchSize) + 1.0F);
   auto       step        = F_POINT {};
   if (Instance->userFlagMap.test(UserFlag::LINSPAC)) {
 	if (stitchCount != 0U) {
@@ -4998,7 +4998,7 @@ void shrnks() {
   auto delta  = deltas.begin();
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto const  count      = std::floor(*length / ClipRectSize.cx);
-	auto const  ratio      = (ClipRectSize.cx * count + 0.004F) / *length;
+	auto const  ratio      = ((ClipRectSize.cx * count) + 0.004F) / *length;
 	auto const& thisVertex = itVertex[iVertex];
 	auto&       nextVertex = itVertex[iVertex + 1];
 	nextVertex             = thisVertex + *delta * ratio;
