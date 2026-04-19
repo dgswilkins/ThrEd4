@@ -18,7 +18,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-2025-vs2026]
         # Add additional configuration types to build here.
         # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
         #configuration: [Debug, Release]
@@ -43,7 +43,7 @@ jobs:
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}\vcpkg_installed
       OUT_PATH: ${{ github.workspace }}\${{ matrix.path }}${{ matrix.configuration }}
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Run checkout action
