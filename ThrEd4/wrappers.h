@@ -234,7 +234,7 @@ auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD by
     -> bool {
   if constexpr (std::is_same_v<inType, DWORD>) {
 	if (0 == ReadFile(fileHandle, gsl::narrow<LPVOID>(buffer), bytesToRead, bytesRead, nullptr)) {
-	  auto errorCode = GetLastError();
+	  auto const errorCode = GetLastError();
 	  CloseHandle(fileHandle);
 	  rpt::reportError(prompt, errorCode);
 	  return false;
