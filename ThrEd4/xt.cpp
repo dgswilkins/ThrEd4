@@ -100,7 +100,6 @@ class INT_INFO
   uint32_t      layerIndex {};
   uint32_t      start {};
   uint32_t      output {};
-  F_POINT_ATTR* highStitchBuffer {};
 };
 
 class O_REC
