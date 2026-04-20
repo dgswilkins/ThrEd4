@@ -48,7 +48,7 @@ template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, Args
 }
 #else
 template <typename... Args>
-constexpr void outDebugString([[maybe_unused]] const wchar_t* value, [[maybe_unused]] Args... args) {
+constexpr void outDebugString([[maybe_unused]] const wchar_t* value, [[maybe_unused]] Args&&... args) {
 }
 #endif
 
