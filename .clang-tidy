@@ -10,6 +10,7 @@ Checks:            "*,\
 -cppcoreguidelines-avoid-magic-numbers,\
 -cppcoreguidelines-avoid-non-const-global-variables,\
 -cppcoreguidelines-macro-to-enum,\
+-cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,\
 -fuchsia-*,\
 -llvmlibc-*,\
 -hicpp-avoid-c-arrays,\
