@@ -278,8 +278,8 @@ void dutxtx(uint32_t const index, uint16_t const offsetPixels) noexcept(std::is_
 }
 
 void ed2px(F_POINT const& editPoint, POINT& point) noexcept {
-  point = POINT {std::lround(editPoint.x / TextureScreen.editToPixelRatio),
-                 std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+  point = POINT {.x = std::lround(editPoint.x / TextureScreen.editToPixelRatio),
+                 .y = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
                              (editPoint.y / TextureScreen.editToPixelRatio))};
 }
 
@@ -409,8 +409,8 @@ void redtbak() {
 }
 
 void ritxfrm(FRM_HEAD const& textureForm) {
-  auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
-                             (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
+  auto const offset = POINT {.x = (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+                             .y = (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
   auto& formLines = Instance->formLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
@@ -431,13 +431,13 @@ void ritxfrm(FRM_HEAD const& textureForm) {
 }
 
 void ritxrct() noexcept(std::is_same_v<size_t, uint32_t>) {
-  auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
-                             (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
+  auto const offset = POINT {.x = (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+                             .y = (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
-  auto const rectangle = RECT {(TexturePixelRect.left + offset.x),
-                               (TexturePixelRect.top + offset.y),
-                               (TexturePixelRect.right + offset.x),
-                               (TexturePixelRect.bottom + offset.y)};
+  auto const rectangle = RECT {.left = (TexturePixelRect.left + offset.x),
+                               .top = (TexturePixelRect.top + offset.y),
+                               .right = (TexturePixelRect.right + offset.x),
+                               .bottom = (TexturePixelRect.bottom + offset.y)};
 
   auto line = std::array<POINT, SQPNTS> {};
 
@@ -810,11 +810,11 @@ void txtlin() {
 
 void txtxfn(POINT const& reference, uint16_t const offsetPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto line = std::array<POINT, 2> {};
-  line[0]   = POINT {reference.x, reference.y - offsetPixels};
-  line[1]   = POINT {reference.x, reference.y + offsetPixels};
+  line[0]   = POINT {.x = reference.x, .y = reference.y - offsetPixels};
+  line[1]   = POINT {.x = reference.x, .y = reference.y + offsetPixels};
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
-  line[0] = POINT {reference.x - offsetPixels, reference.y};
-  line[1] = POINT {reference.x + offsetPixels, reference.y};
+  line[0] = POINT {.x = reference.x - offsetPixels, .y = reference.y};
+  line[1] = POINT {.x = reference.x + offsetPixels, .y = reference.y};
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
@@ -1805,7 +1805,7 @@ void texture::setshft() {
   thred::unbBox();
   Instance->stateMap.reset(StateFlag::BZUMIN);
   auto const stitchPoint = thred::pxCor2stch(
-      POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
+      POINT {.x = ZoomBoxLine[2].x + StitchWindowOrigin.x, .y = ZoomBoxLine[2].y + StitchWindowOrigin.y});
   auto const selectionRect =
       F_RECTANGLE {ZoomBoxOrigin.x, ZoomBoxOrigin.y, stitchPoint.x, stitchPoint.y};
   Instance->stateMap.reset(StateFlag::TXIN);

@@ -854,11 +854,11 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
   maxX += MARGIN;
   minY -= MARGIN;
   maxY += MARGIN;
-  auto centerCoordinate = POINT {std::lround(wrap::midl(maxX, minX)), std::lround(wrap::midl(maxY, minY))};
-  DSTOffsetData.setPositive({std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
-                             std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
-  DSTOffsetData.setNegative({std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),
-                             std::lround(wrap::toFloat(centerCoordinate.y - 1) - minY)});
+  auto centerCoordinate = POINT {.x = std::lround(wrap::midl(maxX, minX)), .y = std::lround(wrap::midl(maxY, minY))};
+  DSTOffsetData.setPositive({.x = std::lround(maxX - wrap::toFloat(centerCoordinate.x + 1)),
+                             .y = std::lround(maxY - wrap::toFloat(centerCoordinate.y + 1))});
+  DSTOffsetData.setNegative({.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - minX),
+                             .y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - minY)});
   auto color = dstStitchBuffer[0].attribute & COLMSK;
   for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
@@ -868,12 +868,12 @@ void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::ve
 	  iUC   = wrap::next(UserColor.begin(), color);
 	  colorData.push_back(*iUC);
 	}
-	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
-                         std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
-	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
+	auto       lengths         = SIZE {.cx = std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
+                         .cy = std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
+	auto const absoluteLengths = SIZE {.cx = abs(lengths.cx), .cy = abs(lengths.cy)};
 	auto const count = absoluteLengths.cx > absoluteLengths.cy ? (absoluteLengths.cx / DSTMAX) + 1
 	                                                           : (absoluteLengths.cy / DSTMAX) + 1;
-	auto const stepSize = SIZE {(absoluteLengths.cx / count) + 1, (absoluteLengths.cy / count) + 1};
+	auto const stepSize = SIZE {.cx = (absoluteLengths.cx / count) + 1, .cy = (absoluteLengths.cy / count) + 1};
 
 	auto difference = SIZE {};
 	while (lengths.cx != 0 || lengths.cy != 0) {

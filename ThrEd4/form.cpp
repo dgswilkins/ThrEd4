@@ -605,13 +605,13 @@ void frmToLine(FRM_HEAD const& form) {
 
   auto itCurrentVertex = itFirstVertex; // intentional copy
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	formLines.push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
-	                           std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	formLines.push_back(POINT {.x = std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
+	                           .y = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                       ((itCurrentVertex->y - ZoomRect.bottom) * ZoomRatio.y))});
 	++itCurrentVertex;
   }
-  formLines.push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
-                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+  formLines.push_back(POINT {.x = std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
+                             .y = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
                                          ((itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y))});
 }
 
@@ -728,7 +728,7 @@ void drawFormBox(FRM_HEAD const& form) {
 void drawFormsBox() {
   thred::selectMultiFormPen();
   thred::ratsr();
-  SelectedFormsRect = RECT {BIGLONG, LOWLONG, LOWLONG, BIGLONG};
+  SelectedFormsRect = RECT {.left = BIGLONG, .top = LOWLONG, .right = LOWLONG, .bottom = BIGLONG};
   for (auto const selectedForm : Instance->selectedFormList) {
 	form::fselrct(selectedForm);
   }
@@ -2311,10 +2311,10 @@ void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::
 	maxX = std::max(maxX, itVertex.x);
 	maxY = std::max(maxY, itVertex.y);
   }
-  auto clipGrid     = RECT {wrap::floor<int32_t>(minX / clipWidth),
-                        wrap::ceil<int32_t>((maxY / ClipRectSize.cy) + 1.0F) + 2,
-                        wrap::ceil<int32_t>(maxX / clipWidth),
-                        wrap::floor<int32_t>((minY / ClipRectSize.cy) - 1.0F)};
+  auto clipGrid     = RECT {.left = wrap::floor<int32_t>(minX / clipWidth),
+                        .top = wrap::ceil<int32_t>((maxY / ClipRectSize.cy) + 1.0F) + 2,
+                        .right = wrap::ceil<int32_t>(maxX / clipWidth),
+                        .bottom = wrap::floor<int32_t>((minY / ClipRectSize.cy) - 1.0F)};
   auto boundingRect = F_RECTANGLE {minX, maxY, maxX, minY};
 
   auto negativeOffset = 0L;
@@ -4728,7 +4728,7 @@ void doTimeWindow(float const rangeX, std::vector<uint32_t> const& xPoints, std:
   auto&      formLines    = Instance->formLines;
   formLines.clear();
   formLines.push_back(POINT {});
-  formLines.push_back(POINT {0, ButtonHeight});
+  formLines.push_back(POINT {.x = 0, .y = ButtonHeight});
   SelectObject(timeDC, thred::getUserPen(0U));
   for (auto iColumn = 1U; iColumn < wrap::round<uint32_t>(rangeX) - checkLength - 1U; ++iColumn) {
 	snpfn(xPoints,
@@ -5379,8 +5379,8 @@ void form::ispcdclp() {
 }
 
 auto form::sfCor2px(F_POINT const& stitchPoint) -> POINT {
-  return POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
-                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+  return POINT {.x = wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
+                .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     ((stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y))};
 }
 
@@ -5393,12 +5393,12 @@ void form::frmlin(std::vector<F_POINT> const& vertices) {
   formLines.clear();
   formLines.reserve(vertexMax);
   for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
-	formLines.push_back(POINT {std::lround((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
-	                           std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+	formLines.push_back(POINT {.x = std::lround((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
+	                           .y = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                       ((vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y))});
   }
-  formLines.push_back(POINT {std::lround((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
-                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+  formLines.push_back(POINT {.x = std::lround((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
+                             .y = std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
                                          ((vertices[0].y - ZoomRect.bottom) * ZoomRatio.y))});
 }
 
@@ -5562,7 +5562,7 @@ void form::fselrct(uint32_t const iForm) {
 	++iFormOutline;
   }
 
-  SelectedFormsRect = RECT {minX, maxY, maxX, minY};
+  SelectedFormsRect = RECT {.left = minX, .top = maxY, .right = maxX, .bottom = minY};
   // ReSharper disable once CppUnreachableCode
   if (OUTL_ALL) {
 	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
@@ -5609,11 +5609,11 @@ void form::unpsel() {
 }
 
 auto form::sRct2px(F_RECTANGLE const& stitchRect) -> RECT {
-  return RECT {wrap::ceil<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x),
-               wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+  return RECT {.left = wrap::ceil<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x),
+               .top = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                    ((stitchRect.top - ZoomRect.bottom) * ZoomRatio.y)),
-               wrap::ceil<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x),
-               wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+               .right = wrap::ceil<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x),
+               .bottom = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                    ((stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y))};
 }
 
@@ -5700,7 +5700,7 @@ void form::drwfrm() {
 	if (Instance->stateMap.test(StateFlag::FRMPMOV)) { // if the user is moving a form point
 	  thred::ritmov(ClosestFormToCursor);
 	  Instance->rubberBandLine.operator[](1) =
-	      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	      POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  Instance->stateMap.set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	}
@@ -5714,13 +5714,13 @@ void form::setmfrm(uint32_t const formIndex) {
   auto       itVertex = wrap::next(Instance->formVertices.cbegin(), closeForm.vertexIndex);
   auto       point    = sfCor2px(itVertex[0]);
   auto const offset =
-      POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
-             WinMsg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
+      POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x - point.x + std::lround(FormMoveDelta.x),
+             .y = WinMsg.pt.y - StitchWindowOrigin.y - point.y + std::lround(FormMoveDelta.y)};
   auto& formLines = Instance->formLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; ++iForm) {
 	point            = sfCor2px(*itVertex);
-	formLines[iForm] = POINT {point.x + offset.x, point.y + offset.y};
+	formLines[iForm] = POINT {.x = point.x + offset.x, .y = point.y + offset.y};
 	++itVertex;
   }
   formLines[closeForm.vertexCount] = formLines[0];
@@ -5786,11 +5786,11 @@ auto form::pdir(FRM_HEAD const& form, uint32_t const vertex) -> uint32_t {
 }
 
 void form::pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept {
-  auto corner = POINT {screenRect.left + StitchWindowOrigin.x, screenRect.top + StitchWindowOrigin.y};
+  auto corner = POINT {.x = screenRect.left + StitchWindowOrigin.x, .y = screenRect.top + StitchWindowOrigin.y};
   auto stitchPoint = thred::pxCor2stch(corner);
   stitchRect.left  = stitchPoint.x;
   stitchRect.top   = stitchPoint.y;
-  corner = POINT {screenRect.right + StitchWindowOrigin.x, screenRect.bottom + StitchWindowOrigin.y};
+  corner = POINT {.x = screenRect.right + StitchWindowOrigin.x, .y = screenRect.bottom + StitchWindowOrigin.y};
   stitchPoint       = thred::pxCor2stch(corner);
   stitchRect.right  = stitchPoint.x;
   stitchRect.bottom = stitchPoint.y;
@@ -5945,7 +5945,7 @@ auto form::closfrm(uint32_t& formIndex) -> bool {
 	return false;
   }
   auto const screenCoordinate =
-      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+      POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   thred::rats();
   auto       closestForm   = 0U;
   auto       closestVertex = 0U;
@@ -6487,8 +6487,8 @@ void form::refil(uint32_t const formIndex) {
 void form::setfpnt() {
   // clang-format off
   auto&      form             = Instance->formList.operator[](ClosestFormToCursor);
-  auto const screenCoordinate = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), 
-									   (WinMsg.pt.y - StitchWindowOrigin.y)};
+  auto const screenCoordinate = POINT {.x = (WinMsg.pt.x - StitchWindowOrigin.x), 
+									   .y = (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const itVertex         = wrap::next(Instance->formVertices.begin(), form.vertexIndex + ClosestVertexToCursor);
   // clang-format on
   unfrm();
@@ -6585,7 +6585,7 @@ void form::filangl() {
 
 auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
     -> bool {
-  auto const point = POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+  auto const point = POINT {.x = (WinMsg.pt.x - StitchWindowOrigin.x), .y = (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = Instance->formList.operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   thred::duzrat();
@@ -6638,7 +6638,7 @@ auto form::chkfrm(std::vector<POINT>& formControlPoints, std::vector<POINT>& str
 
 void form::rstfrm() {
   auto const point =
-      POINT {(WinMsg.pt.x + std::lround(FormMoveDelta.x)), (WinMsg.pt.y + std::lround(FormMoveDelta.y))};
+      POINT {.x = (WinMsg.pt.x + std::lround(FormMoveDelta.x)), .y = (WinMsg.pt.y + std::lround(FormMoveDelta.y))};
 
   auto const attribute = ClosestFormToCursor << 4U;
   setmfrm(ClosestFormToCursor);
@@ -6678,7 +6678,7 @@ void form::clrfills() noexcept {
 void form::drwcon() {
   uncon();
   auto& formLines = Instance->formLines;
-  formLines[1]    = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  formLines[1]    = POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   Instance->stateMap.set(StateFlag::SHOCON);
   ducon();
 }
@@ -6901,7 +6901,7 @@ void form::rinfrm() {
 	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
   InsertLine[0] = formLines[FormVertexPrev];
-  InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  InsertLine[1] = POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   Instance->stateMap.set(StateFlag::SHOINSF);
   duinsf();
 }
@@ -6950,7 +6950,7 @@ void form::setins() {
   }
   frmToLine(*FormForInsert);
   InsertLine[0] = Instance->formLines.operator[](FormVertexPrev);
-  InsertLine[1] = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+  InsertLine[1] = POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   Instance->stateMap.set(StateFlag::INSFRM);
   duinsf();
   Instance->stateMap.set(StateFlag::RESTCH);
@@ -7431,7 +7431,7 @@ void form::setexpand(float const xyRatio) {
 	  throw std::runtime_error("no valid control vertex"); // we should never reach here
 	}
   }
-  auto const integerReference = POINT {std::lround(reference.x), std::lround(reference.y)};
+  auto const integerReference = POINT {.x = std::lround(reference.x), .y = std::lround(reference.y)};
   auto const stitchReference  = px2stchf(integerReference);
   if (Instance->stateMap.test(StateFlag::FPSEL)) { // form point selected
 	resizeFormPoints(stitchReference, ratio);

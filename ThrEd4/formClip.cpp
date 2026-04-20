@@ -625,12 +625,12 @@ void setpclp() {
   ++itIntlvSeq;
   FormClipInstance->FormVerticesAsLine.push_back(point);
   point             = form::sfCor2px(*itIntlvSeq);
-  auto const offset = POINT {WinMsg.pt.x - StitchWindowOrigin.x - point.x,
-                             WinMsg.pt.y - StitchWindowOrigin.y - point.y};
+  auto const offset = POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x - point.x,
+                             .y = WinMsg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(interleaveSequence.size()) - 1U; ++ine) {
 	point = form::sfCor2px(*itIntlvSeq);
 	++itIntlvSeq;
-	FormClipInstance->FormVerticesAsLine.push_back(POINT {point.x + offset.x, point.y + offset.y});
+	FormClipInstance->FormVerticesAsLine.push_back(POINT {.x = point.x + offset.x, .y = point.y + offset.y});
   }
   point = form::sfCor2px(interleaveSequence.back());
   FormClipInstance->FormVerticesAsLine.push_back(point);
@@ -1029,7 +1029,7 @@ void tfc::txtclp(FRM_HEAD& textureForm) {
   Instance->stateMap.set(StateFlag::TXTCLP);
   Instance->stateMap.set(StateFlag::TXTMOV);
   texture::setxfrm();
-  texture::setTxtCurLoc(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
+  texture::setTxtCurLoc(POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y});
   GlobalUnlock(clipMemory);
   Instance->stateMap.set(StateFlag::RESTCH);
   Instance->stateMap.reset(StateFlag::WASWROT);

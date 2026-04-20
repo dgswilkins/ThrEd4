@@ -81,12 +81,12 @@ auto thredFile::readTHRFile(std::filesystem::path const&    newFileName,
 	  if (thredHeader.hoopType == wrap::toIntegralType(HoopSize::kSmall)) {
 		IniFile.hoopSizeX = SHUPX;
 		IniFile.hoopSizeY = SHUPY;
-		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
+		UnzoomedRect = SIZE {.cx = gsl::narrow_cast<int32_t>(SHUPX), .cy = gsl::narrow_cast<int32_t>(SHUPY)};
 	  }
 	  else {
 		IniFile.hoopSizeX = LHUPX;
 		IniFile.hoopSizeY = LHUPY;
-		UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
+		UnzoomedRect = SIZE {.cx = gsl::narrow_cast<int32_t>(LHUPX), .cy = gsl::narrow_cast<int32_t>(LHUPY)};
 	  }
 	  thred::ritfnam(thred::getDesignerName());
 	  auto const spModifierName = gsl::span {extendedHeader.modifierName};

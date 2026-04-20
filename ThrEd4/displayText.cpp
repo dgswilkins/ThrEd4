@@ -458,7 +458,7 @@ void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
 }
 
 auto displayText::getThrEdFont(int32_t const weight) noexcept -> HFONT {
-  auto lfText = LOGFONT {0L, 0L, 0L, 0L, 0L, 0, 0, 0, 0, 0, 0, 0, 0, L""};
+  auto lfText = LOGFONT { .lfHeight = 0L, .lfWidth = 0L, .lfEscapement = 0L, .lfOrientation = 0L, .lfWeight = 0L, .lfItalic = 0, .lfUnderline = 0, .lfStrikeOut = 0, .lfCharSet = 0, .lfOutPrecision = 0, .lfClipPrecision = 0, .lfQuality = 0, .lfPitchAndFamily = 0, .lfFaceName = L""};
 #if HIGHDPI
   auto const uDpi = GetDpiForWindow(ThrEdWindow);
   SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);

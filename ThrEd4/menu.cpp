@@ -354,18 +354,18 @@ void menu::wrnmen() {
 void menu::auxmen() {
   constexpr auto CCH = 13; // length of the menu item text???
 
-  auto filinfo = MENUITEMINFO {sizeof(MENUITEMINFO),
-                               MIIM_TYPE,
-                               MFT_STRING,
-                               0,
-                               0,
-                               nullptr,
-                               nullptr,
-                               nullptr,
-                               0,
-                               nullptr, // dwTypeData
-                               CCH,
-                               nullptr};
+  auto filinfo = MENUITEMINFO {.cbSize        = sizeof(MENUITEMINFO), // Size
+                               .fMask         = MIIM_TYPE,            // Mask
+                               .fType         = MFT_STRING,           // Type
+                               .fState        = 0,                    // State
+                               .wID           = 0,                    // ID
+                               .hSubMenu      = nullptr,              // SubMenu
+                               .hbmpChecked   = nullptr,              // bmpChecked
+                               .hbmpUnchecked = nullptr,              // bmpUnchecked
+                               .dwItemData    = 0,                    // ItemData
+                               .dwTypeData    = nullptr,              // TypeData
+                               .cch = CCH, // cch (dummy value since we use SetMenuItemInfo)
+                               .hbmpItem = nullptr}; // bmpItem (available only on Windows 2000 and higher)
   auto auxMsg  = std::wstring {};
   CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
 #if PESACT
@@ -404,7 +404,7 @@ void menu::auxmen() {
 }
 
 void menu::redfils(std::array<uint32_t, OLDNUM> const& lruMenuId, std::vector<fs::path>& previousNames) {
-  auto findData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
+  auto findData = WIN32_FIND_DATA {.dwFileAttributes = 0, .ftCreationTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .ftLastAccessTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .ftLastWriteTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .nFileSizeHigh = 0, .nFileSizeLow = 0, .dwReserved0 = 0, .dwReserved1 = 0, .cFileName = L"", .cAlternateFileName = L""};
   for (auto const& iLRU : lruMenuId) {
 	if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != gsl::narrow_cast<UINT>(-1)) {
 	  DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
@@ -442,18 +442,18 @@ void menu::init() noexcept {
   ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
   ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
   MenuInfo       = MENUITEMINFO {
-      sizeof(MENUITEMINFO),       // Size
-      MIIM_TYPE,                  // Mask
-      MFT_STRING,                 // Type
-      0,                          // State
-      0,                          // ID
-      nullptr,                    // SubMenu
-      nullptr,                    // bmpChecked
-      nullptr,                    // bmpUnchecked
-      0,                          // ItemData
-      Instance->formOnOff.data(), // TypeData
-      1,                          // cch (dummy value since we use SetMenuItemInfo)
-      nullptr                     // bmpItem (available only on Windows 2000 and higher)
+      .cbSize        = sizeof(MENUITEMINFO),       // Size
+      .fMask         = MIIM_TYPE,                  // Mask
+      .fType         = MFT_STRING,                 // Type
+      .fState        = 0,                          // State
+      .wID           = 0,                          // ID
+      .hSubMenu      = nullptr,                    // SubMenu
+      .hbmpChecked   = nullptr,                    // bmpChecked
+      .hbmpUnchecked = nullptr,                    // bmpUnchecked
+      .dwItemData    = 0,                          // ItemData
+      .dwTypeData    = Instance->formOnOff.data(), // TypeData
+      .cch           = 1,                          // cch (dummy value since we use SetMenuItemInfo)
+      .hbmpItem      = nullptr                     // bmpItem (available only on Windows 2000 and higher)
   };
 }
 
@@ -1774,7 +1774,7 @@ auto menu::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bo
 	  break;
 	}
 	case ID_ADEND: { // add
-	  auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
+	  auto stitchCoordsInPixels = POINT {.x = 0L, .y = StitchWindowClientRect.bottom};
 	  if (!Instance->stitchBuffer.empty()) {
 		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(Instance->stitchBuffer.size()) - 1U);
 	  }

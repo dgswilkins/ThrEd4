@@ -340,7 +340,7 @@ void dutrac() {
 	stitchPoint.y -= wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
   }
   auto const bmpSR = bitmap::getBmpStitchRatio();
-  CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
+  CurrentTracePoint = POINT {.x = std::lround(bmpSR.x * stitchPoint.x), .y = std::lround(bmpSR.y * stitchPoint.y)};
   CurrentTracePoint.x   = std::min(CurrentTracePoint.x, bitmap::getBitmapWidth());
   CurrentTracePoint.y   = std::min(CurrentTracePoint.y, bitmap::getBitmapHeight());
   auto const savedPoint = (CurrentTracePoint.y * bitmap::getBitmapWidth()) + CurrentTracePoint.x;
@@ -932,7 +932,7 @@ void trace::trace() {
 	}
 	auto const bmpSR = bitmap::getBmpStitchRatio();
 	auto const bitmapPoint =
-	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround((bmpSR.y * stitchPoint.y) - 1.0F)};
+	    POINT {.x = std::lround(bmpSR.x * stitchPoint.x), .y = std::lround((bmpSR.y * stitchPoint.y) - 1.0F)};
 
 	auto const color = spTBD[wrap::toSize((bitmapPoint.y * bitmap::getBitmapWidth()) + bitmapPoint.x)] ^ 0xffffffU;
 	if (Instance->stateMap.test(StateFlag::TRCUP)) {
@@ -1248,7 +1248,7 @@ void trace::tracpar() {
   if (Instance->stateMap.test(StateFlag::TRNIN1)) {
 	dutrnum1();
   }
-  TraceMsgPoint = POINT {WinMsg.pt.x - ThredWindowOrigin.x, WinMsg.pt.y - ThredWindowOrigin.y};
+  TraceMsgPoint = POINT {.x = (WinMsg.pt.x - ThredWindowOrigin.x), .y = (WinMsg.pt.y - ThredWindowOrigin.y)};
   if (TraceMsgPoint.x > ButtonWidthX3) {
 	dutrac();
   }

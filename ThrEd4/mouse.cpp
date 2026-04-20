@@ -99,8 +99,8 @@ auto finrng(uint32_t const find) noexcept -> bool {
 
 void moveForms() {
   auto const point =
-      POINT {WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x - SelectedFormsRect.left,
-             WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
+      POINT {.x = WinMsg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x - SelectedFormsRect.left,
+             .y = WinMsg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y - SelectedFormsRect.top};
   thred::ratsr();
   FormMoveDelta = thred::getMoveDelta(point);
 
@@ -525,7 +525,7 @@ auto mouse::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
 	if (auto const relativePoint =
-	        POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	        POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	    relativePoint.x >= controlPoint[0].x && relativePoint.x <= controlPoint[2].x &&
 	    relativePoint.y >= controlPoint[0].y && relativePoint.y <= controlPoint[4].y) {
 	  thred::duSelbox();
@@ -1249,7 +1249,7 @@ auto mouse::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (Instance->stateMap.test(StateFlag::INSFIL)) { // If we are inserting a fill form
 	  form::unfrm();
-	  auto const point = POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+	  auto const point = POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
 	  thred::insflin(point);
 	  Instance->stateMap.set(StateFlag::SHOFRM);
 	  form::dufrm();

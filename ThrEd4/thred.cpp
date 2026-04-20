@@ -232,10 +232,10 @@ constexpr auto DEFULEN  = 12.0F;         // default underlay stitch length
 constexpr auto DNDLEN   = 256U;          // designer name decoding table length
 constexpr auto DNELEN   = 128U;          // designer name encoding table length
 constexpr auto DNLEN    = 50U;           // designer name order table length
-constexpr auto FLTDST = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"}; // Display only Tajima format files (.dst)
-constexpr auto FLTPCS = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"}; // Display only Pfaff format files (.pcs)
-constexpr auto FLTPES = COMDLG_FILTERSPEC {L"Brother", L"*.pes"}; // Display only Brother format files (.pes)
-constexpr auto FLTTHR = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Display only ThrEd format files (.thr)
+constexpr auto FLTDST = COMDLG_FILTERSPEC {.pszName = L"Tajima", .pszSpec = L"*.dst"}; // Display only Tajima format files (.dst)
+constexpr auto FLTPCS = COMDLG_FILTERSPEC {.pszName = L"Pfaff", .pszSpec = L"* .pcs"}; // Display only Pfaff format files (.pcs)
+constexpr auto FLTPES = COMDLG_FILTERSPEC {.pszName = L"Brother", .pszSpec = L"*.pes"}; // Display only Brother format files (.pes)
+constexpr auto FLTTHR = COMDLG_FILTERSPEC {.pszName = L"Thredworks", .pszSpec = L"*.thr"}; // Display only ThrEd format files (.thr)
 
 // file menu recently used file menu positions. These must be updated if the file menu is changed
 constexpr auto FM_ONAM0 = uint8_t {15U};
@@ -664,8 +664,8 @@ void boxs() {
 }
 
 auto centr() noexcept -> F_POINT {
-  auto const center = POINT {std::lround((ZoomRect.right - ZoomRect.left) * 0.5F),
-                             std::lround((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
+  auto const center = POINT {.x = std::lround((ZoomRect.right - ZoomRect.left) * 0.5F),
+                             .y = std::lround((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
   return F_POINT {ZoomRect.left + wrap::toFloat(center.x), ZoomRect.bottom + wrap::toFloat(center.y)};
 }
 
@@ -810,7 +810,7 @@ auto chkhid(size_t const colorToCheck) -> bool {
 }
 
 void chkirct() noexcept {
-  auto const screenLimits = SIZE {ScreenSizePixels.cx - 1, ScreenSizePixels.cy - 1};
+  auto const screenLimits = SIZE {.cx = ScreenSizePixels.cx - 1, .cy = ScreenSizePixels.cy - 1};
   IniFile.initialWindowCoords.left = std::clamp(IniFile.initialWindowCoords.left, 0L, screenLimits.cx);
   IniFile.initialWindowCoords.right = std::clamp(IniFile.initialWindowCoords.right, 0L, screenLimits.cx);
   IniFile.initialWindowCoords.top = std::clamp(IniFile.initialWindowCoords.top, 0L, screenLimits.cy);
@@ -2170,11 +2170,11 @@ void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStit
   auto gapToEdge = offset - (slope * ZoomRect.top);
   if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 	stitchLine[0] =
-	    POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
-	           wrap::ceil<int32_t>(maxYcoord - ((prevStitch.y - ZoomRect.bottom) * ZoomRatio.x))};
+	    POINT {.x = wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+	           .y = wrap::ceil<int32_t>(maxYcoord - ((prevStitch.y - ZoomRect.bottom) * ZoomRatio.x))};
 	stitchLine[1] =
-	    POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
-	           wrap::ceil<int32_t>(maxYcoord - ((iStitch.y - ZoomRect.bottom) * ZoomRatio.x))};
+	    POINT {.x = wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+	           .y = wrap::ceil<int32_t>(maxYcoord - ((iStitch.y - ZoomRect.bottom) * ZoomRatio.x))};
 	wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 	return;
   }
@@ -2182,11 +2182,11 @@ void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStit
   gapToEdge = offset - (slope * ZoomRect.bottom);
   if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 	stitchLine[0] =
-	    POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
-	           wrap::ceil<int32_t>(maxYcoord - ((prevStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
+	    POINT {.x = wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+	           .y = wrap::ceil<int32_t>(maxYcoord - ((prevStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
 	stitchLine[1] =
-	    POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
-	           wrap::ceil<int32_t>(maxYcoord - ((iStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
+	    POINT {.x = wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+	           .y = wrap::ceil<int32_t>(maxYcoord - ((iStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
 	wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 	return;
   }
@@ -2195,11 +2195,11 @@ void drawOffScreenLine(const F_POINT_ATTR& iStitch, const F_POINT_ATTR& prevStit
 	gapToEdge = (offset - ZoomRect.left) / slope;
 	if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
 	  stitchLine[0] =
-	      POINT {wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
-	             wrap::ceil<int32_t>(maxYcoord - ((prevStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
+	      POINT {.x = wrap::ceil<int32_t>((prevStitch.x - ZoomRect.left) * ZoomRatio.x),
+	             .y = wrap::ceil<int32_t>(maxYcoord - ((prevStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
 	  stitchLine[1] =
-	      POINT {wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
-	             wrap::ceil<int32_t>(maxYcoord - ((iStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
+	      POINT {.x = wrap::ceil<int32_t>((iStitch.x - ZoomRect.left) * ZoomRatio.x),
+	             .y = wrap::ceil<int32_t>(maxYcoord - ((iStitch.y - ZoomRect.bottom) * ZoomRatio.y))};
 	  wrap::polyline(StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 	}
   }
@@ -2478,7 +2478,7 @@ void duClos(uint32_t const      startStitch,
 
 void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uint32_t>) {
   auto const offset = thred::duScale(10);
-  auto arrowCenter  = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
+  auto arrowCenter  = POINT {.x = (stitchCoordsInPixels.x - offset), .y = (stitchCoordsInPixels.y + offset)};
   StitchArrow[1]    = stitchCoordsInPixels;
   rotpix(arrowCenter, StitchArrow[0], stitchCoordsInPixels);
   arrowCenter.y = stitchCoordsInPixels.y - offset;
@@ -2494,7 +2494,7 @@ void duar(POINT const& stitchCoordsInPixels) noexcept(std::is_same_v<size_t, uin
 }
 
 void dubar(DRAWITEMSTRUCT const& drawItem) {
-  auto colorBarRect = RECT {drawItem.rcItem.left, 0, drawItem.rcItem.right, drawItem.rcItem.bottom};
+  auto colorBarRect = RECT {.left = drawItem.rcItem.left, .top = 0, .right = drawItem.rcItem.right, .bottom = drawItem.rcItem.bottom};
   auto indicatorLine  = std::array<POINT, 2> {};
   auto const buffSize = wrap::toFloat(Instance->stitchBuffer.size());
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
@@ -2754,10 +2754,10 @@ void dugrid() {
   }
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   thred::selectGridPen();
-  auto const gridRect = RECT {wrap::ceil<int32_t>(ZoomRect.left / IniFile.gridSize),
-                              wrap::floor<int32_t>(ZoomRect.top / IniFile.gridSize),
-                              wrap::floor<int32_t>(ZoomRect.right / IniFile.gridSize),
-                              wrap::ceil<int32_t>(ZoomRect.bottom / IniFile.gridSize)};
+  auto const gridRect = RECT {.left = wrap::ceil<int32_t>(ZoomRect.left / IniFile.gridSize),
+                              .top = wrap::floor<int32_t>(ZoomRect.top / IniFile.gridSize),
+                              .right = wrap::floor<int32_t>(ZoomRect.right / IniFile.gridSize),
+                              .bottom = wrap::ceil<int32_t>(ZoomRect.bottom / IniFile.gridSize)};
 
   auto gridLine = std::array<POINT, 2> {};
   gridLine[0].x = 0;
@@ -2843,7 +2843,7 @@ void dumov() {
   auto const abCenterPixels = sdCor2px(Instance->stitchBuffer.operator[](keys::getMoveAnchor()));
   arrowBox[ABP0]            = abCenterPixels;
   arrowBox[ABP6]            = abCenterPixels;
-  auto offsetFromCenter     = POINT {abCenterPixels.x + ABLX, abCenterPixels.y + ABSX};
+  auto offsetFromCenter     = POINT {.x = abCenterPixels.x + ABLX, .y = abCenterPixels.y + ABSX};
   rotpix(offsetFromCenter, arrowBox[ABP1], abCenterPixels);
   offsetFromCenter.y = abCenterPixels.y - ABSX;
   rotpix(offsetFromCenter, arrowBox[ABP5], abCenterPixels);
@@ -2851,7 +2851,7 @@ void dumov() {
   rotpix(offsetFromCenter, arrowBox[ABP2], abCenterPixels);
   offsetFromCenter.y = abCenterPixels.y - ABWX;
   rotpix(offsetFromCenter, arrowBox[ABP4], abCenterPixels);
-  offsetFromCenter = POINT {abCenterPixels.x + ABHY, abCenterPixels.y};
+  offsetFromCenter = POINT {.x = abCenterPixels.x + ABHY, .y = abCenterPixels.y};
   rotpix(offsetFromCenter, arrowBox[ABP3], abCenterPixels);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -3726,7 +3726,7 @@ void handleSizeRestored(HWND p_hWnd) {
   chkirct();
   if (Instance->stateMap.testAndSet(StateFlag::SIZED)) {
 	auto       screenCenterOffset = LONG {};
-	auto const maxWindowDimension = SIZE {ScreenSizePixels.cx - 30, ScreenSizePixels.cy - 30};
+	auto const maxWindowDimension = SIZE {.cx = ScreenSizePixels.cx - 30, .cy = ScreenSizePixels.cy - 30};
 	if (ThredWindowRect.right - ThredWindowRect.left > maxWindowDimension.cx) {
 	  screenCenterOffset    = (ScreenSizePixels.cx - maxWindowDimension.cx) / 2;
 	  ThredWindowRect.left  = screenCenterOffset;
@@ -4064,11 +4064,11 @@ auto handleWndProcWMDRAWITEM(LPARAM lParam) -> bool {
 		SelectObject(drawItem.hDC, CrossPen);
 		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 		auto line = std::array<POINT, 2> {};
-		line[0]   = POINT {drawItem.rcItem.right / 2, 0};
-		line[1]   = POINT {drawItem.rcItem.right / 2, drawItem.rcItem.bottom};
+		line[0]   = POINT {.x = drawItem.rcItem.right / 2, .y = 0};
+		line[1]   = POINT {.x = drawItem.rcItem.right / 2, .y = drawItem.rcItem.bottom};
 		wrap::polyline(drawItem.hDC, line.data(), wrap::toUnsigned(line.size()));
-		line[0] = POINT {0, drawItem.rcItem.bottom / 2};
-		line[1] = POINT {drawItem.rcItem.right, drawItem.rcItem.bottom / 2};
+		line[0] = POINT {.x = 0, .y = drawItem.rcItem.bottom / 2};
+		line[1] = POINT {.x = drawItem.rcItem.right, .y = drawItem.rcItem.bottom / 2};
 		wrap::polyline(drawItem.hDC, line.data(), wrap::toUnsigned(line.size()));
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	  }
@@ -5801,8 +5801,8 @@ void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	  }
 	}
   }
-  auto const drawingDestinationSize = SIZE {(drawItem.rcItem.right - drawItem.rcItem.left),
-                                            (drawItem.rcItem.bottom - drawItem.rcItem.top)};
+  auto const drawingDestinationSize = SIZE {.cx = (drawItem.rcItem.right - drawItem.rcItem.left),
+                                            .cy = (drawItem.rcItem.bottom - drawItem.rcItem.top)};
   auto const xRatio                 = wrap::toFloat(drawingDestinationSize.cx) / stitchSourceSize.x;
   auto const yRatio                 = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
   auto const ratio                  = xRatio < yRatio ? xRatio : yRatio;
@@ -6119,7 +6119,7 @@ void rotstch(F_POINT_ATTR& stitch, float const rotationAngle, F_POINT const& rot
 }
 
 auto rsed() noexcept -> uint32_t {
-  auto time = SYSTEMTIME {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U};
+  auto time = SYSTEMTIME {.wYear = 0U, .wMonth = 0U, .wDayOfWeek = 0U, .wDay = 0U, .wHour = 0U, .wMinute = 0U, .wSecond = 0U, .wMilliseconds = 0U};
   GetLocalTime(&time);
   return (gsl::narrow_cast<uint32_t>(time.wSecond) << WRDSHFT) | time.wMilliseconds;
 }
@@ -6243,8 +6243,8 @@ auto savcmp() noexcept -> bool {
 }
 
 auto sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT {
-  return POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
-                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) +
+  return POINT {.x = wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
+                .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) +
                                     ((ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y))};
 }
 
@@ -6272,8 +6272,8 @@ void selin(uint32_t start, uint32_t end, HDC hDC) {
 	auto stitch = wrap::next(Instance->stitchBuffer.begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
 	  Instance->searchLine.push_back(
-	      POINT {wrap::ceil<int32_t>((stitch->x - ZoomRect.left) * ZoomRatio.x),
-	             wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+	      POINT {.x = wrap::ceil<int32_t>((stitch->x - ZoomRect.left) * ZoomRatio.x),
+	             .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                 ((stitch->y - ZoomRect.bottom) * ZoomRatio.y))});
 	  ++stitch;
 	}
@@ -6661,8 +6661,8 @@ void stCor2px(F_POINT_ATTR const& stitch, POINT& point) {
 
 auto stch2px2(uint32_t const iStitch) -> bool {
   auto const stitchCoordsInPixels = POINT {
-      wrap::ceil<int32_t>((Instance->stitchBuffer.operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
-      wrap::ceil<int32_t>(
+      .x = wrap::ceil<int32_t>((Instance->stitchBuffer.operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
+      .y = wrap::ceil<int32_t>(
           wrap::toFloat(StitchWindowClientRect.bottom) -
           ((Instance->stitchBuffer.operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y))};
   return stitchCoordsInPixels.x >= 0 && stitchCoordsInPixels.x <= StitchWindowClientRect.right &&
@@ -6845,7 +6845,7 @@ void thrsav() {
 	return;
   }
   if (!Instance->stateMap.testAndReset(StateFlag::IGNAM)) {
-	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
+	auto fileData = WIN32_FIND_DATA {.dwFileAttributes = 0, .ftCreationTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .ftLastAccessTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .ftLastWriteTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .nFileSizeHigh = 0, .nFileSizeLow = 0, .dwReserved0 = 0, .dwReserved1 = 0, .cFileName = L"", .cAlternateFileName = L""};
 	auto geName   = workingFileName; // intentional copy
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -7354,7 +7354,7 @@ void thred::redraw(HWND window) noexcept {
 
 void thred::movStch() {
   auto clientSize =
-      SIZE {(ThredWindowRect.right - ButtonWidthX3 - (ScrollSize + ColorBarSize)), ThredWindowRect.bottom};
+      SIZE {.cx = (ThredWindowRect.right - ButtonWidthX3 - (ScrollSize + ColorBarSize)), .cy = ThredWindowRect.bottom};
   auto verticalOffset = 0;
   unboxs();
   if (Instance->stateMap.test(StateFlag::RUNPAT) || Instance->stateMap.test(StateFlag::WASPAT)) {
@@ -7419,11 +7419,11 @@ void thred::shft(F_POINT const& delta) noexcept {
 
 auto thred::stch2px1(uint32_t const iStitch) -> POINT {
   if (Instance->stitchBuffer.empty()) {
-	return POINT {0L, StitchWindowClientRect.bottom};
+	return POINT {.x = 0L, .y = StitchWindowClientRect.bottom};
   }
   auto const current = wrap::next(Instance->stitchBuffer.begin(), iStitch);
-  return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
-                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+  return POINT {.x = wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
+                .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     ((current->y - ZoomRect.bottom) * ZoomRatio.y))};
 }
 
@@ -7757,28 +7757,28 @@ void thred::duzero() {
 
 void thred::pgdwn() {
   if (Instance->stateMap.test(StateFlag::ZUMED)) {
-	auto const scrollPosition = POINT {0, std::lround((ZoomRect.top - ZoomRect.bottom) * PAGSCROL)};
+	auto const scrollPosition = POINT {.x = 0, .y = std::lround((ZoomRect.top - ZoomRect.bottom) * PAGSCROL)};
 	rshft(scrollPosition);
   }
 }
 
 void thred::pgup() {
   if (Instance->stateMap.test(StateFlag::ZUMED)) {
-	auto const scrollPosition = POINT {0, std::lround(-(ZoomRect.top - ZoomRect.bottom) * PAGSCROL)};
+	auto const scrollPosition = POINT {.x = 0, .y = std::lround(-(ZoomRect.top - ZoomRect.bottom) * PAGSCROL)};
 	rshft(scrollPosition);
   }
 }
 
 void thred::pglft() {
   if (Instance->stateMap.test(StateFlag::ZUMED)) {
-	auto const scrollPosition = POINT {std::lround((ZoomRect.right - ZoomRect.left) * PAGSCROL), 0};
+	auto const scrollPosition = POINT {.x = std::lround((ZoomRect.right - ZoomRect.left) * PAGSCROL), .y = 0};
 	rshft(scrollPosition);
   }
 }
 
 void thred::pgrit() {
   if (Instance->stateMap.test(StateFlag::ZUMED)) {
-	auto const scrollPosition = POINT {std::lround(-(ZoomRect.right - ZoomRect.left) * PAGSCROL), 0};
+	auto const scrollPosition = POINT {.x = std::lround(-(ZoomRect.right - ZoomRect.left) * PAGSCROL), .y = 0};
 	rshft(scrollPosition);
   }
 }
@@ -7934,8 +7934,8 @@ auto thred::stch2px(uint32_t const iStitch, POINT& stitchCoordsInPixels) -> bool
 }
 
 auto thred::stch2pxr(F_POINT const& stitchCoordinate) -> POINT {
-  return POINT {wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
-                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+  return POINT {.x = wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
+                .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     ((stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y))};
 }
 
@@ -8334,7 +8334,7 @@ void thred::closPnt() {
 auto thred::closPnt1(uint32_t& closestStitch) -> bool {
   auto       closestIndex = 0U;
   auto const pointToCheck =
-      POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+      POINT {.x = (WinMsg.pt.x - StitchWindowOrigin.x), .y = (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto stitchCoordsInPixels = POINT {};
   if (Instance->stateMap.test(StateFlag::SELBOX) && stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	if (std::hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
@@ -8869,12 +8869,12 @@ void thred::clpbox() {
   if (auto const unzoomedY = wrap::toFloat(UnzoomedRect.cy); stitchPoint.y + ClipRectSize.cy > unzoomedY) {
 	stitchPoint.y = unzoomedY - ClipRectSize.cy;
   }
-  tfc::setClipOrigin({std::lround(stitchPoint.x), std::lround(stitchPoint.y)});
+  tfc::setClipOrigin({.x = std::lround(stitchPoint.x), .y = std::lround(stitchPoint.y)});
   auto const adjustedSize =
-      SIZE {wrap::ceil<int32_t>(ClipRectSize.cx * ratio), wrap::ceil<int32_t>(ClipRectSize.cy * ratio)};
+      SIZE {.cx = wrap::ceil<int32_t>(ClipRectSize.cx * ratio), .cy = wrap::ceil<int32_t>(ClipRectSize.cy * ratio)};
   auto const stitchCoordsInPixels = POINT {
-      wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ratio),
-      wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+      .x = wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ratio),
+      .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                           ((stitchPoint.y - ZoomRect.bottom) * ratio) - wrap::toFloat(adjustedSize.cy))};
   ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = stitchCoordsInPixels.x;
   ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = stitchCoordsInPixels.y;
@@ -8887,8 +8887,8 @@ void thred::clpbox() {
 void thred::rSelbox() {
   auto const ratio = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
   auto const adjustedSelectSize =
-      SIZE {gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cx) * ratio)),
-            gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cy) * ratio))};
+      SIZE {.cx = gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cx) * ratio)),
+            .cy = gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cy) * ratio))};
   unsel();
   auto stitchPoint = pxCor2stch(WinMsg.pt);
   if (stitchPoint.x - wrap::toFloat(SelectBoxOffset.x + SelectBoxSize.cx) >=
@@ -8906,8 +8906,8 @@ void thred::rSelbox() {
 	stitchPoint.y = wrap::toFloat(SelectBoxOffset.y);
   }
   auto const stitchCoordsInPixels = POINT {
-      wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - wrap::toFloat(SelectBoxOffset.x)) * ratio),
-      wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+      .x = wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - wrap::toFloat(SelectBoxOffset.x)) * ratio),
+      .y = wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                           ((stitchPoint.y - ZoomRect.bottom - wrap::toFloat(SelectBoxOffset.y)) * ratio) -
                           wrap::toFloat(adjustedSelectSize.cy))};
   auto& frmCtrls  = ThrSingle->FormControlPoints;
@@ -9608,7 +9608,7 @@ void thred::vubak() {
 }
 
 void thred::insflin(POINT const insertPoint) {
-  auto const offset    = POINT {InsertSize.cx / 2, InsertSize.cy / 2};
+  auto const offset    = POINT {.x = InsertSize.cx / 2, .y = InsertSize.cy / 2};
   auto&      formLines = Instance->formLines;
   formLines.resize(SQPNTS);
   formLines[0].x = formLines[3].x = formLines[4].x = insertPoint.x - offset.x;
@@ -9649,7 +9649,7 @@ void thred::insfil(fs::path& insertedFile) {
   InsertSize.cx = std::lround(insertedSize.x * HorizontalRatio);
   // ToDo - Should this be vertical ratio?
   InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
-  auto const initialInsertPoint = POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
+  auto const initialInsertPoint = POINT {.x = StitchWindowClientRect.right / 2, .y = StitchWindowClientRect.bottom / 2};
   insflin(initialInsertPoint);
   form::setNewFormVertexCount(5U); // inserted file is a rectangle NOLINT(readability-magic-numbers)
   Instance->stateMap.set(StateFlag::SHOFRM);
@@ -9970,7 +9970,7 @@ void thred::showOnlyLayer(uint8_t const play) {
 
 auto thred::iselpnt() noexcept -> bool {
   auto const pointToTest =
-      POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+      POINT {.x = (WinMsg.pt.x - StitchWindowOrigin.x), .y = (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto closestControlPoint = 0U;
   auto minimumLength       = BIGDBL;
   auto iControlPoint       = 0U;
@@ -10011,7 +10011,7 @@ auto thred::isLine(std::vector<POINT> const& boxOutline) noexcept -> bool {
 auto thred::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto       minLength = BIGDBL;
   auto const pointToTest =
-      POINT {(WinMsg.pt.x - StitchWindowOrigin.x), (WinMsg.pt.y - StitchWindowOrigin.y)};
+      POINT {.x = (WinMsg.pt.x - StitchWindowOrigin.x), .y = (WinMsg.pt.y - StitchWindowOrigin.y)};
   auto controlPoint = Instance->selectedFormsLine.begin();
 
   auto const endPoint = Instance->selectedFormsLine.size();
@@ -10178,7 +10178,7 @@ auto thred::inrng(uint32_t const iStitch) noexcept -> bool {
 }
 
 void thred::thumnail() {
-  auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
+  auto fileData = WIN32_FIND_DATA {.dwFileAttributes = 0, .ftCreationTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .ftLastAccessTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .ftLastWriteTime = {.dwLowDateTime = 0, .dwHighDateTime = 0}, .nFileSizeHigh = 0, .nFileSizeLow = 0, .dwReserved0 = 0, .dwReserved1 = 0, .cFileName = L"", .cAlternateFileName = L""};
   unbsho();
   formForms::destroyFormDataSheet();
   trace::untrace();
@@ -11066,8 +11066,8 @@ void thred::set1knot() {
 void thred::fixpclp(uint32_t const closestFormToCursor) {
   auto& interleaveSequence = Instance->interleaveSequence;
 
-  auto const point = POINT {(WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
-                            (WinMsg.pt.y + gsl::narrow_cast<decltype(WinMsg.pt.y)>(FormMoveDelta.y))};
+  auto const point = POINT {.x = (WinMsg.pt.x + gsl::narrow_cast<decltype(WinMsg.pt.x)>(FormMoveDelta.x)),
+                            .y = (WinMsg.pt.y + gsl::narrow_cast<decltype(WinMsg.pt.y)>(FormMoveDelta.y))};
   auto       itIntlvSeq  = std::next(interleaveSequence.begin());
   auto const stitchPoint = pxCor2stch(point);
   auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
@@ -12207,7 +12207,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 	ThrEdInstance          = hInstance;
 	constexpr auto ICONDIM = 32; // window icon x & y dimension in pixels
 	auto           winClass =
-	    WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+	    WNDCLASSEX {.cbSize = sizeof(WNDCLASSEX), .style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC, .lpfnWndProc = wndProc, .cbClsExtra = 0, .cbWndExtra = 0, .hInstance = ThrEdInstance, .hIcon = nullptr, .hCursor = nullptr, .hbrBackground = nullptr, .lpszMenuName = nullptr, .lpszClassName = nullptr, .hIconSm = nullptr};
 	winClass.cbSize      = sizeof(WNDCLASSEX);
 	winClass.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	winClass.lpfnWndProc = wndProc;
@@ -12842,9 +12842,9 @@ void thred::selectGridPen() noexcept {
 }
 
 void thred::numWnd() {
-  auto messageRect = RECT {0L, 0L, 0L, 0L};
+  auto messageRect = RECT {.left = 0L, .top = 0L, .right = 0L, .bottom = 0L};
   GetClientRect(MsgWindow, &messageRect);
-  auto wRect = RECT {0L, 0L, 0L, 0L};
+  auto wRect = RECT {.left = 0L, .top = 0L, .right = 0L, .bottom = 0L};
   GetWindowRect(MainStitchWin, &wRect);
   auto xOffset = wRect.left;
   GetWindowRect(ThrEdWindow, &wRect);

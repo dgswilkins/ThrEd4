@@ -1466,7 +1466,7 @@ void satin::drwsat() {
   auto&      formLines   = Instance->formLines;
   formLines.resize(vertexCount + 1U);
   formLines[vertexCount] =
-      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+      POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   Instance->stateMap.set(StateFlag::SHOSAT);
   dusat();
 }
@@ -1474,7 +1474,7 @@ void satin::drwsat() {
 void satin::satpnt0() {
   auto& formLines = Instance->formLines;
   formLines.clear();
-  formLines.push_back(POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y});
+  formLines.push_back(POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y});
   SatinInstance->TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
   Instance->stateMap.set(StateFlag::SATPNT);
 }
@@ -1484,7 +1484,7 @@ void satin::satpnt1() {
   auto const vertexCount = SatinInstance->TempPolygon.size();
   auto&      formLines   = Instance->formLines;
   formLines[vertexCount] =
-      POINT {WinMsg.pt.x - StitchWindowOrigin.x, WinMsg.pt.y - StitchWindowOrigin.y};
+      POINT {.x = WinMsg.pt.x - StitchWindowOrigin.x, .y = WinMsg.pt.y - StitchWindowOrigin.y};
   dusat();
   SatinInstance->TempPolygon.push_back(thred::pxCor2stch(WinMsg.pt));
   Instance->stateMap.set(StateFlag::RESTCH);

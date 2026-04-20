@@ -126,8 +126,8 @@ constexpr auto BITCOL = uint32_t {0xffff00U};                          // defaul
 constexpr auto BPB    = 8U;                                            // bits per byte
 constexpr auto BPP24  = DWORD {24U};                                   // 24 bits per pixel
 constexpr auto BPP32  = DWORD {32U};                                   // 32 bits per pixel
-constexpr auto FLTALL = COMDLG_FILTERSPEC {L"All files", L"*.*"};      // filter specifications
-constexpr auto FLTBMP = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"}; // filter specifications
+constexpr auto FLTALL = COMDLG_FILTERSPEC {.pszName = L"All files", .pszSpec = L"*.*"};      // filter specifications
+constexpr auto FLTBMP = COMDLG_FILTERSPEC {.pszName = L"Bitmap Files", .pszSpec = L"*.bmp"}; // filter specifications
 constexpr auto SZBMPNM = 17U; // ThrEd spec for BMP filename length (16 byte width characters + 1 for zero terminator)
 
 auto BitmapColor          = BITCOL; // bitmap color
@@ -417,8 +417,8 @@ auto stch2bit(F_POINT& point) -> POINT {
   if (Instance->stateMap.test(StateFlag::LANDSCAP)) {
 	point.y -= wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y;
   }
-  return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
-                wrap::round<LONG>(wrap::toFloat(BitmapHeight) - (BmpStitchRatio.y * point.y))};
+  return POINT {.x = wrap::round<LONG>(BmpStitchRatio.x * point.x),
+                .y = wrap::round<LONG>(wrap::toFloat(BitmapHeight) - (BmpStitchRatio.y * point.y))};
 }
 } // namespace
 
@@ -721,19 +721,19 @@ void bitmap::drawBmpBackground() {
 }
 
 auto bitmap::getrmap() -> uint32_t {
-  auto const header = BITMAPINFOHEADER {wrap::toUnsigned(sizeof(BITMAPINFOHEADER)),
-                                        gsl::narrow_cast<LONG>(BitmapWidth),
-                                        gsl::narrow_cast<LONG>(BitmapHeight),
-                                        1U,
-                                        BPP32,
-                                        BI_RGB,
-                                        0U,
-                                        0L,
-                                        0L,
-                                        0U,
-                                        0U};
+  auto const header = BITMAPINFOHEADER {.biSize = wrap::toUnsigned(sizeof(BITMAPINFOHEADER)),
+                                        .biWidth = gsl::narrow_cast<LONG>(BitmapWidth),
+                                        .biHeight = gsl::narrow_cast<LONG>(BitmapHeight),
+                                        .biPlanes = 1U,
+                                        .biBitCount = BPP32,
+                                        .biCompression = BI_RGB,
+                                        .biSizeImage = 0U,
+                                        .biXPelsPerMeter = 0L,
+                                        .biYPelsPerMeter = 0L,
+                                        .biClrUsed = 0U,
+                                        .biClrImportant = 0U};
 
-  auto const info = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
+  auto const info = BITMAPINFO {.bmiHeader = header, .bmiColors = {RGBQUAD {.rgbBlue = 0, .rgbGreen = 0, .rgbRed = 0, .rgbReserved = 0}}};
   TraceBitmap     = getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
   auto bitmapSize = 0U;

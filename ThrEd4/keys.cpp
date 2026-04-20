@@ -147,7 +147,7 @@ auto handleEndKey(int32_t& retflag) -> bool {
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
-	  auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
+	  auto stitchCoordsInPixels = POINT {.x = 0L, .y = StitchWindowClientRect.bottom};
 	  if (!Instance->stitchBuffer.empty()) {
 		stitchCoordsInPixels = thred::stch2px1(wrap::toUnsigned(Instance->stitchBuffer.size() - 1U));
 	  }
@@ -544,7 +544,7 @@ void ritcur() {
   if (currentCursor == nullptr) {
 	return;
   }
-  auto iconInfo = ICONINFO {FALSE, 0U, 0U, nullptr, nullptr};
+  auto iconInfo = ICONINFO {.fIcon = FALSE, .xHotspot = 0U, .yHotspot = 0U, .hbmMask = nullptr, .hbmColor = nullptr};
   GetIconInfo(currentCursor, &iconInfo);
   auto cursorPosition = POINT {};
   GetCursorPos(&cursorPosition);
