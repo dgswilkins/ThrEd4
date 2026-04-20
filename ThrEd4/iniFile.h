@@ -69,7 +69,7 @@ class INI_FILE // ini file structure
 
   float    buttonholeCornerLength {}; // buttonhole fill corner length
   float    picotSpace {};             // space between border picots
-  HoopSize hoopType {};               // hoop type
+  HoopSize hoopType {HoopSize::kLarge}; // hoop type
   Machine  auxFileType {};            // machine file type
   float    hoopSizeX {};              // hoop x size
   float    hoopSizeY {};              // hoop y size
