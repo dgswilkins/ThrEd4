@@ -44,7 +44,6 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "boost/dynamic_bitset/dynamic_bitset.hpp"
-#include "boost/range/algorithm_ext/iota.hpp"
 #include "gsl/narrow"
 #include "gsl/span"
 #include "gsl/util"
@@ -3051,14 +3050,14 @@ void fnamtabs() {
   constexpr auto MAX8B   = uint8_t {127};          // max value of a signed byte
   constexpr auto NDXOFF  = uint8_t {32U};          // index offset
   constexpr auto NAMELEN = NameOrder.size();
-  boost::range::iota(NameOrder, 0);
+  wrap::iota(NameOrder, 0);
   PseudoRandomValue = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
 	auto const source      = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
 	auto const destination = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
 	std::swap(*destination, *source);
   }
-  boost::range::iota(NameEncoder, NCODOF);
+  wrap::iota(NameEncoder, NCODOF);
   PseudoRandomValue = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
 	auto const source      = wrap::next(NameEncoder.begin(), form::psg() & MSK7BITS);

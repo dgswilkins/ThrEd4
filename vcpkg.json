@@ -4,16 +4,11 @@
   "version": "4.0.1.0",
   "dependencies": [
     "boost-dynamic-bitset",
-    "boost-range",
     "ms-gsl"
   ],
   "overrides": [
     {
       "name": "boost-dynamic-bitset",
-      "version": "1.90.0"
-    },
-    {
-      "name": "boost-range",
       "version": "1.90.0"
     },
     {

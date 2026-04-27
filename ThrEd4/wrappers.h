@@ -390,6 +390,11 @@ constexpr auto toEnumType(IntegralType value) -> EnumType {
   return static_cast<EnumType>(value);
 }
 
+template <class Container, class valueType>
+auto iota(Container& container, valueType value) noexcept -> void {
+  std::iota(container.begin(), container.end(), value);
+}
+
 } // namespace wrap
 
 #endif // THRED_WRAPPERS_H
