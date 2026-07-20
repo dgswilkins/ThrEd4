@@ -9287,7 +9287,8 @@ void form::filclpx() {
   }
   auto* clipMemory = tfc::getPCDClipMemory();
   if (clipMemory == nullptr) {
-	auto const str = std::wstring(L"no clipboard data");
+	// ReSharper disable once CppVariableCanBeMadeConstexpr
+	auto const str = std::wstring(L"no clipboard data"); 
 	displayText::shoMsg(str, false);
 	CloseClipboard();
 	return;

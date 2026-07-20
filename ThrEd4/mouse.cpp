@@ -1570,6 +1570,7 @@ auto mouse::handleRightButtonDown() -> bool {
 		  form::nufsel();
 		}
 		if (Instance->selectedFormList.size() > 1) {
+		  // ReSharper disable once CppVariableCanBeMadeConstexpr
 		  std::wstring const blank;
 		  displayText::butxt(HNUM, blank);
 		}

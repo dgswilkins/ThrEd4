@@ -1960,6 +1960,7 @@ void doDrwInit(DRAWITEMSTRUCT const& drawItem) {
 	thred::ritfcor(*itVertex);
   }
   if (!Instance->stateMap.test(StateFlag::SELBOX) && !Instance->stateMap.test(StateFlag::FRMPSEL)) {
+	// ReSharper disable once CppVariableCanBeMadeConstexpr
 	auto const blank = std::wstring {};
 	displayText::butxt(HCOR, blank);
   }
@@ -3111,6 +3112,7 @@ void formStretch(uint32_t const form) {
 void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   if (auto const& form = Instance->formList.operator[](ClosestFormToCursor);
       Instance->stitchBuffer.empty() || (form.fillType == 0U && form.edgeType == 0U)) {
+	// ReSharper disable once CppVariableCanBeMadeConstexpr
 	auto const blank = std::wstring {};
 	displayText::butxt(HMAXLEN, blank);
 	displayText::butxt(HMINLEN, blank);
@@ -4446,6 +4448,7 @@ void init() {
   }
   thred::setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) { // create the buttons below the color windows
 	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
@@ -5299,6 +5302,7 @@ void nuFil(FileIndices const fileIndex) {
   Instance->stateMap.set(StateFlag::RESTCH);
   nunams();
   ritini();
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
   if (!Instance->stitchBuffer.empty()) {
@@ -6033,6 +6037,7 @@ void ritlayr() {
 	}
   }
   if ((layer & FRMMMSK) != 0U) {
+	// ReSharper disable once CppVariableCanBeMadeConstexpr
 	auto const blank = std::wstring {};
 	displayText::butxt(HLAYR, blank);
   }
@@ -6940,6 +6945,7 @@ void unthum() {
   else {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
   }
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
   thred::redraw(Instance->buttonWin.operator[](HHID));
@@ -7676,6 +7682,7 @@ void thred::ritot(uint32_t const number) {
 
 void thred::lenCalc() {
   auto static chkVal = 0.0F;
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank   = std::wstring {};
   if (Instance->stateMap.test(StateFlag::LENSRCH)) {
 	auto const stitch     = wrap::next(Instance->stitchBuffer.begin(), ClosestPointIndex);
@@ -10215,6 +10222,7 @@ void thred::thumnail() {
   ThrSingle->ThumbnailSearchString.clear();
   ThrSingle->ThumbnailSearchString.push_back(0);
   SetWindowText(Instance->buttonWin.operator[](HBOXSEL), L"");
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank = std::wstring {};
   displayText::butxt(HBOXSEL, blank);
   vubak();
@@ -10815,6 +10823,7 @@ void thred::delstch() {
   rstAll();
   form::clrfills();
   resetColorChanges();
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
   displayText::butxt(HTOT, blank);
@@ -11227,6 +11236,7 @@ void thred::qcode() {
 	rstAll();
   }
   Instance->stateMap.set(StateFlag::RESTCH);
+  // ReSharper disable once CppVariableCanBeMadeConstexpr
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
 }
