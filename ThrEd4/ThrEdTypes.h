@@ -39,7 +39,7 @@ class FMT_WITH_LOC
   }
 };
 
-template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, const Args&... args) { 
+template <typename... Args> constexpr void outDebugString(FMT_WITH_LOC fwl, [[maybe_unused]] const Args&... args) { 
   auto       name = utf::utf8ToUtf16(std::string(fwl.loc.file_name()));
   auto       line = fwl.loc.line();
   auto const strY = std::format(L" {:s}({:d}) : {:s}", name, line, fwl.strX);
