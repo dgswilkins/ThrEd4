@@ -9544,10 +9544,9 @@ void thred::redclp(HGLOBAL const clipMemory) {
                           0U);
 
 #if CLPBUG
-  OutputDebugString(format(FMT_COMPILE(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n"),
+  outDebugString(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n",
                            clipBuffer.back().x,
-                           clipBuffer.back().y)
-                        .c_str());
+                           clipBuffer.back().y);
 #endif
   auto clipRect = F_RECTANGLE {
       clipBuffer.front().x, clipBuffer.front().y, clipBuffer.front().x, clipBuffer.front().y};
@@ -9558,11 +9557,10 @@ void thred::redclp(HGLOBAL const clipMemory) {
 	                        (iCSD->led & COLMSK) | codedLayer);
 
 #if CLPBUG
-	OutputDebugString(format(FMT_COMPILE(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n"),
+	outDebugString(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n",
 	                         iStitch,
 	                         clipBuffer.back().x,
-	                         clipBuffer.back().y)
-	                      .c_str());
+	                         clipBuffer.back().y);
 #endif
 	clipRect.left   = std::min(clipBuffer.back().x, clipRect.left);
 	clipRect.right  = std::max(clipBuffer.back().x, clipRect.right);

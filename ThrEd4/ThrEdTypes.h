@@ -8,11 +8,6 @@
 
 // Open Source headers
 #include "gsl/gsl"
-#ifdef _DEBUG
-#pragma warning(push)
-#pragma warning(disable : 4702) // supress warning for fmt library header
-#pragma warning(pop)
-#endif
 
 // Standard Libraries
 #include <numbers>

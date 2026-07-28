@@ -8,8 +8,6 @@
 #define CreateWindowEx
 #define EN_CHANGE
 #define FALSE
-#define FMT_COMPILE(s) FMT_STRING(s)
-#define FMT_COMPILE(s) FMT_STRING_IMPL(s, fmt::compiled_string, explicit)
 #define GSL_SUPPRESS(x) [[gsl::suppress("x")]]
 #define GSL_SUPPRESS(x) [[gsl::suppress(x)]]
 #define GetWindowText
