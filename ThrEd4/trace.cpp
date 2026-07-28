@@ -966,15 +966,15 @@ void trace::trace() {
 #if TRCMTH == 0
   auto const upBrightness   = icolsum(UpPixelColor);
   auto const downBrightness = icolsum(DownPixelColor);
-  if (Instance->TracedMap.empty()) {
-	Instance->TracedMap.resize(TraceDataSize, false);
+  if (TraceInstance->TracedMap.empty()) {
+	TraceInstance->TracedMap.resize(TraceDataSize, false);
   }
   auto const lastIndex = wrap::toUnsigned(bitmap::getBitmapWidth() * bitmap::getBitmapHeight());
   auto       itTBD     = spTBD.begin();
   for (auto index = 0U; index < lastIndex; ++index) {
 	auto const pointBrightness = colsum(*itTBD);
 	if (upBrightness > pointBrightness && downBrightness < pointBrightness) {
-	  Instance->TracedMap.set(index);
+	  TraceInstance->TracedMap.set(index);
 	}
 	else {
 	  *itTBD = 0;
