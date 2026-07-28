@@ -3458,7 +3458,9 @@ void lcon(FRM_HEAD const&              form,
           std::vector<SMAL_PNT_L>&     lineEndpoints,
           std::vector<F_POINT>&        workingFormVertices) {
 #if BUGSEQ
+  UNREFERENCED_PARAMETER(form);
   UNREFERENCED_PARAMETER(groupIndexSequence);
+  UNREFERENCED_PARAMETER(workingFormVertices);
 #endif
 
   if (lineEndpoints.empty()) {
@@ -3784,10 +3786,10 @@ auto handleSeq(size_t const iSequence, B_SEQ_PNT& bCurrent) -> bool {
 }
 
 void bakseq() {
-  auto& bSequence = Instance->bSequence;
 
 #if BUGSEQ
 #else
+  auto& bSequence = Instance->bSequence;
 #if BUGBAK
 
   for (auto val : bSequence) {
