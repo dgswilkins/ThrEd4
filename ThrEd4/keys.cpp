@@ -1009,7 +1009,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 		  thred::reldun();
 		  break;
 		}
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 		if (OpenClipboard(ThrEdWindow) != 0) {
 		  EmptyClipboard();
 		}
@@ -1017,7 +1017,7 @@ auto keys::handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::
 		break;
 #endif
 	  }
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 	  if (wrap::pressed(VK_SHIFT)) {
 		xt::dmpat();
 		break;

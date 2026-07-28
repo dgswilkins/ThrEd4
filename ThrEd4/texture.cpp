@@ -1255,7 +1255,7 @@ void texture::drwtxtr() {
 	auto const erased = std::erase_if(TextureInstance->TempTexturePoints, [&](auto const& point) -> bool {
 	  return !(point.line <= TextureScreen.lines && point.y <= TextureScreen.areaHeight);
 	});
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 	outDebugString(L"[{}] texture points erased\n", erased);
 #else
 	// ReSharper disable CppClangTidyClangDiagnosticUnusedValue

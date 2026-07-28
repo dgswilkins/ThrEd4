@@ -21,7 +21,7 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
-#ifndef _DEBUG
+#ifndef THRED_DEBUG
 // ReSharper disable CppUnusedIncludeDirective
 #include <cmath>
 // ReSharper restore CppUnusedIncludeDirective

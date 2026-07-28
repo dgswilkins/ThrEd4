@@ -16,13 +16,13 @@
 
 // Standard Libraries
 #include <numbers>
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 #include <source_location>
 #else
 #include <stdexcept>
 #endif
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 class FMT_WITH_LOC
 {
   public:

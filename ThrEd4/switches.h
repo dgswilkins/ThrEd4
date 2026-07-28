@@ -5,6 +5,9 @@
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage, modernize-macro-to-enum)
 // compile switches
+#if defined(_DEBUG) && !defined(THRED_DEBUG)
+#define THRED_DEBUG 1
+#endif 
 #define HIGHDPI 1 // allow for high DPI scaling
 #define PESACT 1  // compile pes code
 #define BUGBAK 0  // turn bakseq off

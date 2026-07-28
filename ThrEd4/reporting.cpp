@@ -1,16 +1,14 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 // Local Headers
 #include "stdafx.h"
-#ifndef _DEBUG
 #include "switches.h"
-#endif
 
-#if !defined(_DEBUG) && SHOW_ERROR == 1
+#if !defined(THRED_DEBUG) && SHOW_ERROR == 1
 #include "displayText.h"
 #endif
 
 #include "reporting.h"
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 #include "ThrEdTypes.h"
 #endif
 // ReSharper disable CppUnusedIncludeDirective
@@ -39,7 +37,7 @@
 #include <winnt.h>
 
 // Standard Libraries
-#if !defined(_DEBUG) && SHOW_ERROR == 1
+#if !defined(THRED_DEBUG) && SHOW_ERROR == 1
 #include <format>
 #endif
 
@@ -58,7 +56,7 @@ void rpt::reportError([[maybe_unused]] const wchar_t* prompt, DWORD const& error
 	auto const msg = gsl::span {static_cast<wchar_t*>(lpMsgBuf), res};
 	// erase the \r\n at the end of the msg
 	msg[wrap::toSize(res) - 2U] = 0;
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 #elif SHOW_ERROR == 1
 	auto const info = std::format(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));

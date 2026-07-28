@@ -6239,7 +6239,7 @@ void sav() {
 }
 
 auto savcmp() noexcept -> bool {
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
   return true;
 #else
   return !Instance->stateMap.test(StateFlag::CMPDO);
@@ -8514,7 +8514,7 @@ void thred::movbox() {
   }
   if (auto stitchCoordsInPixels = POINT {}; stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	unbox();
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 	auto const& stitch = Instance->stitchBuffer.operator[](ClosestPointIndex);
 	outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
 	               ClosestPointIndex,

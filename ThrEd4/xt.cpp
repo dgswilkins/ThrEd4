@@ -136,7 +136,7 @@ enum class StitchStyle : char {
   kBorder        // border
 };
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 
 class ATFLD
 {
@@ -199,7 +199,7 @@ auto chkrdun(std::vector<uint32_t> const& formFillCounter,
              SORT_REC const&              stitchRecord) noexcept -> bool;
 void delwlk(uint32_t code);
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 void dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count);
 void duatf(uint32_t ind);
 #endif
@@ -467,7 +467,7 @@ void delwlk(uint32_t code) {
   }
 }
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 
 void dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t const count) {
   for (auto iRegion = 0U; iRegion < count; ++iRegion) {
@@ -484,7 +484,7 @@ void dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t const count) {
 }
 #endif
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 
 void duatf(uint32_t ind) {
   // clang-format off
@@ -1584,7 +1584,7 @@ void xt::fsort() {
 	}
 	std::ranges::sort(pRecs, orComp);
 	std::ranges::sort(pFRecs, orfComp);
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 	dmprec(pRecs, lastRegion);
 #endif
 	if (Instance->formList.empty()) {
@@ -1924,7 +1924,7 @@ void xt::selalfrm() {
   Instance->stateMap.set(StateFlag::RESTCH);
 }
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 
 void xt::dmpat() {
   auto attribute = Instance->stitchBuffer.front().attribute;

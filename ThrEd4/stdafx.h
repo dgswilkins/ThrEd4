@@ -41,7 +41,7 @@
 #include <cctype>
 #include <climits>
 #include <cstring>
-#ifndef _DEBUG
+#ifndef THRED_DEBUG
 #include <cmath>
 #endif
 #include <cstddef>

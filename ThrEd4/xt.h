@@ -68,7 +68,7 @@ void chkund(uint32_t formIndex, std::vector<RNG_COUNT> const& textureSegments, s
 void chkwlk(uint32_t formIndex);
 void clrstch() noexcept;
 
-#ifdef _DEBUG
+#ifdef THRED_DEBUG
 void dmpat();
 #endif
 
