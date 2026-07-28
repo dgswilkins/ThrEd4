@@ -594,7 +594,7 @@ void bitmap::lodbmp(fs::path const& directory) {
   auto const filePart = fs::path {dest.data()};
   auto       saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
 #else
-  auto const saveFile = utf::utf16ToUtf8(UTF16BMPname.filename().wstring());
+  auto const saveFile = utf::utf16ToUtf8(BMPInstance->UTF16BMPname.filename().wstring());
 #endif
   if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	std::ranges::copy(saveFile, UTF8BMPname.begin());
